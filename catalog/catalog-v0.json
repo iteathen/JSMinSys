@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -292,5 +292,107 @@
     "increment-decrement-are-syntax-not-distinct-primitive-capabilities",
     "other-Math-builtins-remain-observed-demands-until-explicitly-admitted",
     "new-operation-families-require-explicit-admission"
-  ]
+  ],
+  "admissibleData": {
+    "scalarDomains": [
+      {
+        "name": "uint32",
+        "bits": 32,
+        "signed": false,
+        "status": "admissible",
+        "role": "default-hot-word"
+      }
+    ],
+    "storageFamilies": [
+      {
+        "name": "TypedArray",
+        "status": "admissible",
+        "note": "Specific element types remain use-qualified; BigInt-backed typed arrays excluded from hot substrate."
+      }
+    ],
+    "preferredTypedArrays": [
+      "Uint32Array"
+    ],
+    "otherAdmissibleTypedArrays": [
+      "Int8Array",
+      "Uint8Array",
+      "Uint8ClampedArray",
+      "Int16Array",
+      "Uint16Array",
+      "Int32Array",
+      "Float32Array",
+      "Float64Array"
+    ],
+    "excludedHotTypedArrays": [
+      "BigInt64Array",
+      "BigUint64Array"
+    ],
+    "backingMemory": [
+      "ArrayBuffer",
+      "SharedArrayBuffer"
+    ]
+  },
+  "costModel": {
+    "unit": "cycles",
+    "canonicalMetrics": [
+      "latency_cycles",
+      "reciprocal_throughput_cycles",
+      "executed_uops"
+    ],
+    "rule": "Native instruction cost is not treated as JavaScript operator cost until optimized V8 assembly is inspected.",
+    "referenceProfiles": [
+      {
+        "id": "x86_64-amd-zen3",
+        "reason": "first reference profile for the Connect4 workload",
+        "source": "uops.info March 2026 data",
+        "operations": {
+          "add32": {
+            "candidateNative": "ADD r32,r32",
+            "latency_cycles": 1,
+            "reciprocal_throughput_cycles": 0.25,
+            "executed_uops": 1,
+            "status": "native-verified"
+          },
+          "sub32": {
+            "candidateNative": "SUB r32,*",
+            "latency_cycles": 1,
+            "reciprocal_throughput_cycles": 0.25,
+            "executed_uops": 1,
+            "status": "representative-native-form-verified"
+          },
+          "imul32": {
+            "candidateNative": "IMUL r32,r32",
+            "latency_cycles": 3,
+            "reciprocal_throughput_cycles": 1,
+            "executed_uops": 1,
+            "status": "native-verified"
+          },
+          "idiv32": {
+            "candidateNative": "IDIV r32",
+            "latency_cycles": {
+              "min": 9,
+              "max": 14
+            },
+            "reciprocal_throughput_cycles": 6,
+            "executed_uops": 2,
+            "status": "native-reference-not-js-operator-cost"
+          },
+          "shl_fixed": {
+            "candidateNative": "SHL r*,imm8",
+            "latency_cycles": 1,
+            "reciprocal_throughput_cycles": 0.5,
+            "executed_uops": 1,
+            "status": "representative-native-form-verified"
+          },
+          "shr_fixed": {
+            "candidateNative": "SHR r*,imm8",
+            "latency_cycles": 1,
+            "reciprocal_throughput_cycles": 0.5,
+            "executed_uops": 1,
+            "status": "representative-native-form-verified"
+          }
+        }
+      }
+    ]
+  }
 }
