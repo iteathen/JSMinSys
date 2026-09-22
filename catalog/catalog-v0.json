@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -246,7 +246,9 @@
       "*",
       "/",
       "%",
-      "**"
+      "**",
+      "++",
+      "--"
     ],
     "bitwise": [
       "&",
@@ -393,6 +395,62 @@
           }
         }
       }
+    ]
+  },
+  "oneCycleAdmissionPolicy": {
+    "rule": "Any source-level operation whose qualified hot-path lowering is a single 1-cycle native operation on a supported reference profile is admissible by default, unless hidden runtime machinery materially raises total cost.",
+    "referenceProfile": "x86_64-amd-zen3",
+    "currentNativeReferenceShapes": [
+      {
+        "shape": "MOV r32,r32",
+        "latency_cycles": 0,
+        "note": "measured dependency latency can be zero via move elimination; documented nominal latency 1"
+      },
+      {
+        "shape": "ADD r32,r32",
+        "latency_cycles": 1,
+        "reciprocal_throughput_cycles": 0.25,
+        "executed_uops": 1
+      },
+      {
+        "shape": "SUB r32,*",
+        "latency_cycles": 1,
+        "reciprocal_throughput_cycles": 0.25,
+        "executed_uops": 1
+      },
+      {
+        "shape": "INC r32",
+        "latency_cycles": 1,
+        "reciprocal_throughput_cycles": 0.25,
+        "executed_uops": 1
+      },
+      {
+        "shape": "CMP r32,imm32",
+        "latency_cycles": 1,
+        "reciprocal_throughput_cycles": 0.25,
+        "executed_uops": 1
+      },
+      {
+        "shape": "fixed-count shift",
+        "latency_cycles": 1,
+        "reciprocal_throughput_cycles": 0.5,
+        "executed_uops": 1
+      }
+    ],
+    "pendingExactV8Qualification": [
+      "&",
+      "|",
+      "^",
+      "~",
+      "<<",
+      ">>",
+      ">>>",
+      "===",
+      "!==",
+      "<",
+      "<=",
+      ">",
+      ">="
     ]
   }
 }
