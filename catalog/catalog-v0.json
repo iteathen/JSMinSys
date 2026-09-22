@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -238,5 +238,59 @@
     "bigint-not-in-hot-substrate-without-contrary-evidence",
     "assembly-is-qualification-authority",
     "minimize-total-physical-cost-not-operator-count"
+  ],
+  "admissibleOperations": {
+    "arithmetic": [
+      "+",
+      "-",
+      "*",
+      "/",
+      "%",
+      "**"
+    ],
+    "bitwise": [
+      "&",
+      "|",
+      "^",
+      "~",
+      "<<",
+      ">>",
+      ">>>"
+    ],
+    "comparison": [
+      "===",
+      "!==",
+      "<",
+      "<=",
+      ">",
+      ">="
+    ],
+    "logicalAndSelection": [
+      "!",
+      "&&",
+      "||",
+      "?:"
+    ],
+    "memoryAndControl": [
+      "CONST32",
+      "LD32",
+      "ST32",
+      "ADDR",
+      "TESTZ",
+      "TESTNZ",
+      "BRANCH",
+      "JUMP"
+    ],
+    "specializedBuiltins": [
+      "Math.imul",
+      "Math.clz32"
+    ]
+  },
+  "admissionNotes": [
+    "admissible-does-not-mean-preferred-or-cheapest",
+    "division-modulus-and-exponentiation-are-legal-but-remain-optimization-targets",
+    "increment-decrement-are-syntax-not-distinct-primitive-capabilities",
+    "other-Math-builtins-remain-observed-demands-until-explicitly-admitted",
+    "new-operation-families-require-explicit-admission"
   ]
 }
