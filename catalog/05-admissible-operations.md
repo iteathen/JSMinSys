@@ -15,7 +15,24 @@ The ordinary JavaScript arithmetic operators are admissible:
 - `%` — remainder / modulus
 - `**` — exponentiation
 
-Increment/decrement syntax (`++`, `--`) is not treated as a distinct primitive capability; it is syntactic access to admitted arithmetic.
+Increment/decrement syntax (`++`, `--`) is explicitly admissible as well. On the Zen 3 reference profile, native `INC r32` is a 1-cycle, 1-µop ALU operation; `++`/`--` remain semantically reducible to ordinary arithmetic, but their emitted forms may be independently qualified.
+
+## One-cycle auto-admission rule
+
+Any source-level operation whose qualified hot-path lowering is a **single 1-cycle native operation** on a supported reference profile is admissible by default, provided it does not introduce hidden allocation, conversion, memory, synchronization, exception, or deoptimization machinery that makes the source operation materially more expensive than that native shape.
+
+This rule concerns **latency**, not operator popularity. We still record reciprocal throughput and µops separately.
+
+Current operations already inside the allow-list that fit or are expected to fit this class after exact V8 qualification include:
+
+- addition and subtraction
+- increment/decrement
+- 32-bit bitwise AND/OR/XOR/NOT
+- fixed-count 32-bit shifts
+- compare/test operations that feed control directly
+- simple register/value copy where V8 lowers it to a move or eliminates the move
+
+The native machine being capable of a 1-cycle instruction is not sufficient by itself: JSMinSys records the operation as fully qualified only after the V8-emitted path is inspected.
 
 ## Bitwise operators
 
