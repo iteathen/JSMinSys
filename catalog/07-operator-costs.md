@@ -28,6 +28,8 @@ A value is not treated as an actual JavaScript operator cost until its optimized
 | JS operation | Candidate native shape | Zen 3 latency | Zen 3 reciprocal throughput | μops | Qualification |
 |---|---|---:|---:|---:|---|
 | `+` | `ADD r32,r32` | 1 | 0.25 | 1 | native cost verified; JS lowering must be checked per shape |
+| `++` | `INC r32` candidate | 1 | 0.25 | 1 | native cost verified; exact JS lowering pending |
+| `--` | `DEC/SUB r32,1` candidate | ~1 | ~0.25 | ~1 | expected simple ALU; exact native/JS qualification pending |
 | `-` | simple `SUB r32,*` | 1 | 0.25 | 1 | representative SUB form verified; exact JS form pending |
 | `*` | `IMUL r32,r32` when integer-specialized | 3 | 1.00 | 1 | native cost verified; ordinary `*` lowering pending |
 | `/` | possible integer `IDIV r32` path | 9–14 dependency-dependent | 6.00 | 2 | native reference only; JS guards/semantics may add work |
@@ -40,15 +42,27 @@ A value is not treated as an actual JavaScript operator cost until its optimized
 | `<<` | fixed-count SHL | 1 | 0.50 | 1 | representative shift cost verified |
 | `>>` | fixed-count SAR/SHR depending lowering | ~1 | ~0.50 | ~1 | exact signed lowering pending |
 | `>>>` | fixed-count SHR | 1 | 0.50 | 1 | representative shift cost verified |
-| `===` / `!==` | CMP/TEST plus materialize or branch | context-dependent | context-dependent | context-dependent | must inspect use-site lowering |
-| `< <= > >=` | CMP plus materialize or branch | context-dependent | context-dependent | context-dependent | must inspect use-site lowering |
+| `===` / `!==` | CMP/TEST plus materialize or branch | 1 for native compare/test stage | 0.25 for representative CMP | 1 for compare/test stage | whole JS expression remains context-dependent |
+| `< <= > >=` | CMP plus materialize or branch | 1 for native compare stage | 0.25 for representative CMP | 1 for compare stage | whole JS expression remains context-dependent |
 | `!` | TEST/CMP/select | context-dependent | context-dependent | context-dependent | must inspect use-site lowering |
 | `&&` / `||` | short-circuit control flow | data/context-dependent | data/context-dependent | variable | block-level cost |
 | `?:` | branch or conditional-select shape | data/context-dependent | data/context-dependent | variable | block-level cost |
 | `Math.imul` | `IMUL r32,r32` target shape | 3 | 1.00 | 1 | native cost verified; JS lowering qualification still required |
 | `Math.clz32` | LZCNT/BSR-family target | pending | pending | pending | native + V8 qualification pending |
 
+## One-cycle admission rule
+
+A source-level operation is automatically admissible when its qualified hot-path lowering is a single 1-cycle native operation on a supported reference profile and no hidden JS/V8 machinery materially increases that cost. The catalog still distinguishes native latency from complete JS-expression cost.
+
+Current one-cycle native reference shapes include ADD, representative SUB, INC, fixed-count shifts, CMP, and register MOV/copy. Bitwise AND/OR/XOR/NOT are expected to join this class once their exact emitted 32-bit forms are captured for the target Node/V8 build.
+
 ## Verified native references
+
+### MOV / value copy, register-register, 32-bit
+
+uops.info AMD Zen 3 reports register MOV with measured dependency latency 0 via move elimination, 0.17–0.25 cycle throughput, and 1 executed µop when not eliminated.
+
+Source: https://uops.info/html-instr/MOV_89_R32_R32.html
 
 ### ADD, register-register, 32-bit
 
@@ -59,6 +73,24 @@ uops.info AMD Zen 3:
 - executed μops: 1
 
 Source: https://uops.info/html-instr/ADD_01_R32_R32.html
+
+### INC, 32-bit
+
+uops.info AMD Zen 3:
+
+- latency: 1 cycle
+- measured throughput: 0.25 cycles/instruction
+- executed µops: 1
+
+Source: https://uops.info/html-instr/INC_R32.html
+
+### CMP, representative 32-bit compare
+
+uops.info AMD Zen 3 reports a 1-cycle register-to-flags latency, 0.25-cycle measured loop throughput, and 1 executed µop for `CMP r32, imm32`.
+
+Source: https://uops.info/html-instr/CMP_R32_I32.html
+
+This is the native compare stage only; materializing a Boolean or branching can add work depending on the emitted sequence.
 
 ### SUB, representative 32-bit simple form
 
