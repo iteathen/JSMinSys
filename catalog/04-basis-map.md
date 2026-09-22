@@ -64,14 +64,11 @@ A comparison that feeds a branch may be cheaper as a fused compare/test/branch s
 
 These must justify themselves through assembly/cost qualification.
 
-### Explicitly outside the initial basis
+### Outside the minimal core unless cost evidence promotes them
 
 - BigInt
 - arbitrary precision
 - floating-point math as a solver representation requirement
-- division
-- modulo
-- exponentiation
 - generic allocation
 - generic collections
 - general sorting
@@ -79,7 +76,9 @@ These must justify themselves through assembly/cost qualification.
 - strings
 - object graphs
 
-Any may be reconsidered only under evidence.
+`/`, `%`, and `**` are explicitly admissible source operations but are not presumed members of the minimal core; they remain targets for elimination when representation or cheaper operators make them unnecessary.
+
+The items above remain outside the current admissible hot substrate unless explicitly promoted.
 
 ## 3. Block → symbol map
 
