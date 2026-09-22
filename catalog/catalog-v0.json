@@ -1,0 +1,242 @@
+{
+  "version": "0.1.0",
+  "status": "research-bootstrap",
+  "workload": "Connect4 solver corpus",
+  "sourcePins": {
+    "incumbent": "3c7524321d49c11c3cb6c519425e3bd0ed4bb42b",
+    "isomax": "a26ef2254c850243f68505eeff1d849ad0f4f0c0",
+    "bsfp": "abdf7b0993f07bd6087669848c2dda91dff65608"
+  },
+  "primitiveDemand": {
+    "arithmetic": {
+      "add": {
+        "token": "+",
+        "approxOccurrences": 399,
+        "status": "hardware-floor-candidate"
+      },
+      "sub": {
+        "token": "-",
+        "approxOccurrences": 299,
+        "status": "challenge-before-admission"
+      },
+      "mul": {
+        "token": "*",
+        "approxOccurrences": 142,
+        "status": "challenge-before-admission"
+      },
+      "div": {
+        "token": "/",
+        "approxOccurrences": 22,
+        "status": "representation-removal-target"
+      },
+      "mod": {
+        "token": "%",
+        "approxOccurrences": 7,
+        "status": "representation-removal-target"
+      },
+      "exp": {
+        "token": "**",
+        "approxOccurrences": 18,
+        "status": "cold-or-removal-target"
+      }
+    },
+    "bitwise": {
+      "and": {
+        "token": "&",
+        "approxOccurrences": 296,
+        "status": "hardware-floor-candidate"
+      },
+      "or": {
+        "token": "|",
+        "approxOccurrences": 209,
+        "status": "hardware-floor-candidate"
+      },
+      "xor": {
+        "token": "^",
+        "approxOccurrences": 24,
+        "status": "hardware-floor-candidate"
+      },
+      "not": {
+        "token": "~",
+        "approxOccurrences": 24,
+        "status": "derive-or-precompute-candidate"
+      },
+      "shl": {
+        "token": "<<",
+        "approxOccurrences": 70,
+        "status": "hardware-floor-candidate"
+      },
+      "shr": {
+        "token": ">>",
+        "approxOccurrences": 146,
+        "status": "challenge-signed-need"
+      },
+      "ushr": {
+        "token": ">>>",
+        "approxOccurrences": 133,
+        "status": "hardware-floor-candidate"
+      }
+    },
+    "comparisons": {
+      "eq": {
+        "token": "===",
+        "approxOccurrences": 287
+      },
+      "neq": {
+        "token": "!==",
+        "approxOccurrences": 228
+      },
+      "lt": {
+        "token": "<",
+        "approxOccurrences": 309
+      },
+      "le": {
+        "token": "<=",
+        "approxOccurrences": 32
+      },
+      "gt": {
+        "token": ">",
+        "approxOccurrences": 267
+      },
+      "ge": {
+        "token": ">=",
+        "approxOccurrences": 109
+      }
+    },
+    "logical": {
+      "and": {
+        "token": "&&",
+        "approxOccurrences": 148
+      },
+      "or": {
+        "token": "||",
+        "approxOccurrences": 161
+      },
+      "not": {
+        "token": "!",
+        "approxOccurrences": 140
+      },
+      "select": {
+        "token": "?:",
+        "approxOccurrences": 134
+      }
+    },
+    "builtins": {
+      "math": [
+        "imul",
+        "clz32",
+        "floor",
+        "trunc",
+        "ceil",
+        "round",
+        "min",
+        "max"
+      ],
+      "atomics": [
+        "load",
+        "store",
+        "compareExchange",
+        "exchange",
+        "add",
+        "sub",
+        "wait",
+        "notify"
+      ],
+      "storage": [
+        "Int8Array",
+        "Int16Array",
+        "Int32Array",
+        "Float64Array",
+        "SharedArrayBuffer"
+      ]
+    }
+  },
+  "provisionalSymbols": {
+    "memory": [
+      "LD32",
+      "ST32",
+      "CONST32",
+      "ADDR"
+    ],
+    "control": [
+      "TESTZ",
+      "TESTNZ",
+      "BRANCH",
+      "JUMP"
+    ],
+    "transforms": [
+      "ADD32",
+      "AND32",
+      "OR32",
+      "XOR32",
+      "SHL32",
+      "USHR32"
+    ],
+    "compareCandidates": [
+      "EQ32",
+      "LT32"
+    ],
+    "specializedCandidates": [
+      "CLZ32",
+      "IMUL32"
+    ]
+  },
+  "abstractions": [
+    "board-position-state",
+    "winning-geometry",
+    "coordinate-mapping",
+    "bitset-fixed-width-values",
+    "game-state-transition",
+    "recursive-exact-search",
+    "move-ordering",
+    "bounds-score-normalization",
+    "transposition-table",
+    "hash-mix",
+    "canonicalization-symmetry",
+    "residual-requirements",
+    "support-lattice",
+    "frontier-antichain-dominance",
+    "shared-work-concurrency",
+    "proof-certificate-diagnostics"
+  ],
+  "blocks": [
+    "bit-test",
+    "set-bit",
+    "clear-bit",
+    "toggle-bit",
+    "wordwise-logical",
+    "multiword-zero-equality",
+    "cross-word-shift",
+    "multiword-add-sub",
+    "first-set-bit",
+    "popcount",
+    "coordinate-decode",
+    "legal-landing-cell",
+    "winning-line-test",
+    "apply-undo-transition",
+    "mix32",
+    "power-of-two-index",
+    "tt-probe-replace",
+    "canonical-reflection",
+    "subset-implication-dominance",
+    "frontier-normalization",
+    "residual-transition",
+    "fixed-candidate-selection",
+    "alpha-beta-bound-update",
+    "atomic-claim-release",
+    "shared-queue",
+    "capacity-growth-rehash"
+  ],
+  "rules": [
+    "representation-first",
+    "do-nothing-first",
+    "laziest-workable-response-second",
+    "exploit-existing-structure-before-adding-state",
+    "redesign-representation-before-adding-machinery",
+    "32-bit-word-default",
+    "widen-by-composing-32-bit-words",
+    "bigint-not-in-hot-substrate-without-contrary-evidence",
+    "assembly-is-qualification-authority",
+    "minimize-total-physical-cost-not-operator-count"
+  ]
+}
