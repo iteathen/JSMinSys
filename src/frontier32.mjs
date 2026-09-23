@@ -8,10 +8,12 @@ export function normalizeMinimal2x32InPlace(lo, hi, length) {
   for (let index = 0; index < length; index += 1) {
     const candidateLo = lo[index];
     const candidateHi = hi[index];
+    const inverseLo = ~candidateLo;
+    const inverseHi = ~candidateHi;
     let rejected = 0;
 
     for (let scan = 0; scan < retained; scan += 1) {
-      if ((lo[scan] & ~candidateLo) === 0 && (hi[scan] & ~candidateHi) === 0) {
+      if ((lo[scan] & inverseLo) === 0 && (hi[scan] & inverseHi) === 0) {
         rejected = 1;
         break;
       }
