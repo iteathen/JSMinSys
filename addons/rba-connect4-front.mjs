@@ -51,8 +51,8 @@ function prepareUpsets(g,a,d,basis,bi,n){
     const row=depthBase+i*cw;for(let w=0;w<cw;w+=1)a.up[row+w]=0;
     a.up[row+(i>>>5)]|=1<<(i&31);
     const id=basis[bi+i],start=id<g.pairShapeStart?pair:
-      id<g.tripleShapeStart?triple:id<g.quadShapeStart?quad:n;
-    for(let j=start;j<n;j+=1)if(a.profile.shapeSubset(g,id,basis[bi+j]))a.up[row+(j>>>5)]|=1<<(j&31);
+      id<g.tripleShapeStart?triple:id<g.quadShapeStart?quad:n,subset=a.profile.prepareSubset(g,id);
+    for(let j=start;j<n;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,basis[bi+j]))a.up[row+(j>>>5)]|=1<<(j&31);
   }
 }
 function prepareImages(g,a,d,cell,mover,basis,bi){
@@ -68,7 +68,8 @@ function prepareImages(g,a,d,cell,mover,basis,bi){
         const classStart=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad,
           largerStart=image<g.pairShapeStart?pair:image<g.tripleShapeStart?triple:image<g.quadShapeStart?quad:cn;
         for(let j=classStart;j<largerStart;j+=1)if(a.basis[nextBasis+j]===image){out[row+(j>>>5)]|=1<<(j&31);break;}
-        for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+        const subset=a.profile.prepareSubset(g,image);
+        for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
       }
     }
   }
