@@ -130,6 +130,17 @@ test('CPC closes a forced block that lifts another opponent terminal singleton',
   assert.deepEqual([...s.interval],[3,3]);
 });
 
+test('CPC closes when every legal move lifts an opponent terminal singleton',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
+  // P0 to move after 000011121222. There is no currently playable P1
+  // singleton, but every legal P0 move exposes one on P1's next turn.
+  const moves=[0,0,0,0,1,1,1,2,1,2,2,2];
+  const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  assert.equal(exact(columns,rows,moves).value,1);
+  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
+  assert.deepEqual([...s.interval],[1,1]);
+});
+
 test('CPC recognizes exact fork loss after enabling move',()=>{
   const g=prepareConnect4RbaGeometry({columns:5,rows:4});
   // 0-based: P0 1, P1 1, P0 2, P1 1, P0 3.
