@@ -1,6 +1,6 @@
 {
-  "version": "0.6.0",
-  "status": "catalog-implementation-complete-except-deferred",
+  "version": "0.7.0",
+  "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
     {
@@ -1109,38 +1109,49 @@
         "hotL1Predicted": "3 + 9*N + 6*K",
         "hotL2Predicted": "3 + 17*N + 14*K"
       }
-    }
-  ],
-  "deferred": [
+    },
     {
       "name": "allocateTypedCapacity",
+      "source": "src/capacity32.mjs",
       "block": "capacity-growth-rehash",
-      "missingPrimitives": [
-        "new / typed-array construction"
+      "primitives": [
+        "Uint32Array.construct"
       ],
-      "reason": "Dynamic storage allocation is not in the admitted execution primitive list. Rehash into caller-provided storage is implemented; allocation is deferred for primitive-admission review.",
-      "status": "deferred-missing-primitive",
+      "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "deferred",
-        "reason": "Cannot calculate implementation cycles until the missing allocation primitive is dispositioned and an implementation exists."
+        "kind": "expression",
+        "expression": "TYPED_ARRAY_ALLOC_U32(length, typedArrayAllocationPath, pageState, gcState)",
+        "neesOperation": "memory.allocate.typed.u32",
+        "bytesExpression": "4 * length",
+        "note": "Dynamic allocation is deliberately parameterized rather than assigned a false scalar. Cost includes typed-array/view creation, backing-store allocation, zero initialization/zero-page provisioning, GC/external-memory accounting, and page commitment/fault effects."
       }
     }
   ],
+  "deferred": [],
   "summary": {
-    "functionsImplemented": 54,
+    "functionsImplemented": 55,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
-    "deferredMissingPrimitive": 1,
-    "functionsWithCycleCount": 54,
-    "functionsMissingCycleCount": 0
+    "deferredMissingPrimitive": 0,
+    "functionsWithCycleCount": 55,
+    "functionsMissingCycleCount": 0,
+    "blocksComplete": 20,
+    "blocksCompletedWithAdmittedPrimitive": 1
   },
   "decisions": [
     {
       "candidate": "Number.isInteger",
       "disposition": "not-required",
       "reason": "Checked external integrality belongs outside the sealed hot scope; internal indices enter with an established integer-domain invariant."
+    },
+    {
+      "candidate": "Uint32Array.construct",
+      "disposition": "admitted",
+      "reason": "Cost magnitude does not control admission. NEES now provides an explicit parameterized allocation-cycle model; the application author decides whether the cost is worthwhile.",
+      "neesOperation": "memory.allocate.typed.u32",
+      "neesAuthorityCommit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69"
     }
   ],
   "cycleCountAuthority": {
