@@ -1,5 +1,5 @@
 {
-  "version": "0.20.0",
+  "version": "0.21.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -488,15 +488,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 33.5,
-          "max": 42
+          "min": 28,
+          "max": 36.5
         },
         "hotL2Predicted": {
-          "min": 73.5,
-          "max": 90
+          "min": 60,
+          "max": 76.5
         },
-        "expression": "typed stores own uint32 conversion: 5*LOAD + 5*STORE + 11..15 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 15 ALU/control",
-        "note": "Explicit >>>0 coercions are removed where values flow only through bitwise operations into Uint32Array storage."
+        "expression": "support-mask mirrors removed: 4*LOAD + 4*STORE + 10..14 ALU/control; cross-lane above case: 5*LOAD + 5*STORE + 14 ALU/control",
+        "note": "Only playable masks, ply, landing-cell state, and supportCode remain. supportLo/supportHi were removed after consumer audit found no runtime reader in the surveyed Isometric path."
       },
       "preconditions": [
         "configured columns and cellCount are immutable for the engine instance",
@@ -528,15 +528,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 33.5,
-          "max": 43
+          "min": 27,
+          "max": 36.5
         },
         "hotL2Predicted": {
-          "min": 73.5,
-          "max": 91
+          "min": 59,
+          "max": 76.5
         },
-        "expression": "typed stores own uint32 conversion: 5*LOAD + 5*STORE + 11..16 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 16 ALU/control",
-        "note": "Explicit unsigned coercions are removed from store-only values and bitwise-local intermediates."
+        "expression": "support-mask mirrors removed: 4*LOAD + 4*STORE + 9..14 ALU/control; cross-lane above case: 5*LOAD + 5*STORE + 14 ALU/control",
+        "note": "Undo no longer maintains an unread occupancy mirror; authoritative support identity remains supportCode."
       },
       "preconditions": [
         "configured columns and cellCount are immutable for the engine instance",
@@ -1721,6 +1721,24 @@
           "before": "2 + N*(2*L+5) + P*(L+2)",
           "after": "2 + N*(2*L+5)",
           "mechanism": "score producer encodes unplayable columns with floor sentinel"
+        }
+      ]
+    },
+    {
+      "id": "round-014",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32",
+          "before": "33.5-42 L1 / 73.5-90 L2",
+          "after": "28-36.5 L1 / 60-76.5 L2",
+          "mechanism": "delete supportLo/supportHi state updates after runtime consumer audit found no reader"
+        },
+        {
+          "function": "undoMove32",
+          "before": "33.5-43 L1 / 73.5-91 L2",
+          "after": "27-36.5 L1 / 59-76.5 L2",
+          "mechanism": "delete supportLo/supportHi restoration after runtime consumer audit found no reader"
         }
       ]
     }
