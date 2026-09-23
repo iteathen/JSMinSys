@@ -48,43 +48,33 @@ function playableCell(g,words,offset,cell){
   return words[offset+g.cellColumn[cell]]===g.cellRow[cell];
 }
 
-// One basis pass prepares both players' singleton profile.
-// Return -1 for an immediate mover terminal. Otherwise low bits are the
-// opponent's distinct playable singleton count capped at 2; bit 2 records
-// whether the mover has any singleton at all, including nonplayable future
-// singletons used by the fork-precursor guard.
-function collectSingletonProfile(g,words,offset,basis,basisOffset,basisSize,mover,scratch){
-  const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
-  p0Bits.fill(0);p1Bits.fill(0);
-  const p0Coord=offset+g.p0Offset,p1Coord=offset+g.p1Offset;
-  let opponentImmediate=0,moverHasSingleton=0;
+// One player-local pass records every active singleton and counts distinct
+// currently playable singleton terminals, capped at two. Keeping the mover and
+// opponent passes separate preserves the cheap early-terminal path while still
+// eliminating the duplicate singleton scans formerly done by fork derivation.
+function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,player,bits,scratch,storeThreats){
+  bits.fill(0);
+  const coord=offset+(player?g.p1Offset:g.p0Offset);
+  let immediate=0,any=0;
   for(let i=0;i<basisSize;i+=1){
+    if(!coordHas(words,coord,i))continue;
     const id=basis[basisOffset+i];if(g.shapeSize[id]!==1)continue;
     const cell=g.shapeCells[id*4],word=cell>>>5,mask=1<<(cell&31);
-    const column=g.cellColumn[cell],row=g.cellRow[cell],playable=words[offset+column]===row;
-
-    if(coordHas(words,p0Coord,i)&&!(p0Bits[word]&mask)){
-      p0Bits[word]|=mask;
-      if(mover===0){
-        moverHasSingleton=1;
-        if(playable)return -1;
-      }else if(playable&&opponentImmediate<2){
-        scratch.threatCells[opponentImmediate]=cell;scratch.threatColumns[opponentImmediate]=column;
-        opponentImmediate+=1;
-      }
+    if(bits[word]&mask)continue;
+    bits[word]|=mask;any=1;
+    const column=g.cellColumn[cell];
+    if(words[offset+column]!==g.cellRow[cell])continue;
+    if(storeThreats&&immediate<2){
+      scratch.threatCells[immediate]=cell;scratch.threatColumns[immediate]=column;
     }
-    if(coordHas(words,p1Coord,i)&&!(p1Bits[word]&mask)){
-      p1Bits[word]|=mask;
-      if(mover===1){
-        moverHasSingleton=1;
-        if(playable)return -1;
-      }else if(playable&&opponentImmediate<2){
-        scratch.threatCells[opponentImmediate]=cell;scratch.threatColumns[opponentImmediate]=column;
-        opponentImmediate+=1;
-      }
-    }
+    if(immediate<2)immediate+=1;
   }
-  return opponentImmediate|(moverHasSingleton?4:0);
+  return immediate|(any?4:0);
+}
+
+function cellMarked(bits,cell){return (bits[cell>>>5]&(1<<(cell&31)))!==0;}
+function playableCell(g,words,offset,cell){
+  return words[offset+g.cellColumn[cell]]===g.cellRow[cell];
 }
 
 // Qualified one-step fork-precursor closure.
@@ -293,46 +283,28 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
 
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
-  // One pass gathers both players' singleton profile. A current-player
-  // immediate terminal still supersedes every opponent obligation.
-  const singletonProfile=collectSingletonProfile(g,words,offset,basis,basisOffset,basisSize,mover,scratch);
-  if(singletonProfile<0){
+  // Current-player immediate terminal supersedes every opponent obligation.
+  const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells;
+  const opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther;
+  const ownProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,scratch,0);
+  if(ownProfile&3){
     const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
   }
 
-  const opponent=mover^1,threats=singletonProfile&3,moverHasSingleton=(singletonProfile>>>2)&1,
-    opponentSingletons=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther;
+  const opponent=mover^1;
+  const opponentProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,opponent,opponentBits,scratch,1);
+  const threats=opponentProfile&3,moverHasSingleton=(ownProfile>>>2)&1;
   if(threats>1){
     const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
   }
   if(threats===1){
-    const column=scratch.threatColumns[0],height=words[offset+column];
-    // Blocking the only current singleton is forced. If that support event
-    // exposes another opponent singleton one row above, first-win order makes
-    // the reply terminal before the mover can create any later counterplay.
-    if(height+1<g.rows&&cellMarked(opponentSingletons,(height+1)*g.columns+column)){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-      return CPC_EXACT;
-    }
+    const column=scratch.threatColumns[0];
     scratch.forcedColumn[0]=column;
     scratch.preemptionMask32[0]=g.columns<=32?((1<<column)>>>0):0;
     scratch.preemptionCount[0]=1;
   }else{
-    // With no current singleton threat, one move changes support in exactly one
-    // column. If every legal move exposes an opponent singleton at that next
-    // support cell, every continuation loses on the opponent's next ply.
-    let legal=0,allLift=1;
-    for(let column=0;column<g.columns;column+=1){
-      const height=words[offset+column];if(height>=g.rows)continue;
-      legal+=1;
-      if(height+1>=g.rows||!cellMarked(opponentSingletons,(height+1)*g.columns+column)){allLift=0;break;}
-    }
-    if(legal&&allLift){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-      return CPC_EXACT;
-    }
     const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
     if(precursor<0){
       const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
