@@ -2,6 +2,8 @@
 
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
+The current normative draft is [SPEC.md](SPEC.md).
+
 The project works upward from the cheapest qualified operations rather than downward from conventional software abstractions. The initial workload corpus is the Connect4 solver family; Connect4 is a proving workload, not part of the JSMinSys API.
 
 ## Method
@@ -29,4 +31,4 @@ The working hypothesis is a 32-bit word domain for hot computation. Wider logica
 
 ## Status
 
-Research bootstrap. No primitive vocabulary is authoritative yet. See `catalog/` for the first Connect4-derived inventory.
+Draft 0.1 specification bootstrap. The primitive vocabulary remains provisional; see `SPEC.md` for normative intent and `catalog/` for the Connect4-derived research inventory.
