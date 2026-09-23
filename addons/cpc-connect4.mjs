@@ -64,10 +64,13 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
     bits[word]|=mask;any=1;
     const column=g.cellColumn[cell];
     if(words[offset+column]!==g.cellRow[cell])continue;
-    if(storeThreats&&immediate<2){
-      scratch.threatCells[immediate]=cell;scratch.threatColumns[immediate]=column;
-    }
-    if(immediate<2)immediate+=1;
+    // Mover singleton: CPC is already exact, so the rest of the basis is
+    // irrelevant. Opponent: two distinct playable singletons are already an
+    // exact loss, so stop after recording the second witness.
+    if(!storeThreats)return 5; // immediate=1 | any=4
+    scratch.threatCells[immediate]=cell;scratch.threatColumns[immediate]=column;
+    immediate+=1;
+    if(immediate===2)return 6; // immediate=2 | any=4
   }
   return immediate|(any?4:0);
 }
@@ -289,7 +292,8 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
 
   const opponent=mover^1;
   const opponentProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,opponent,opponentBits,scratch,1);
-  const threats=opponentProfile&3,moverHasSingleton=(ownProfile>>>2)&1;
+  const threats=opponentProfile&3,moverHasSingleton=(ownProfile>>>2)&1,
+    opponentHasSingleton=(opponentProfile>>>2)&1;
   if(threats>1){
     const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
@@ -308,17 +312,19 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
     scratch.preemptionCount[0]=1;
   }else{
     // With no current singleton threat, a move changes support in one column.
-    // If every legal move exposes an opponent singleton at that next support
-    // cell, every continuation loses on the opponent's next ply.
-    let legal=0,allLift=1;
-    for(let column=0;column<g.columns;column+=1){
-      const height=words[offset+column];if(height>=g.rows)continue;
-      legal+=1;
-      if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
-    }
-    if(legal&&allLift){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-      return CPC_EXACT;
+    // If there are no opponent singleton targets at all this test cannot fire,
+    // so avoid even the short legal-column scan.
+    if(opponentHasSingleton){
+      let legal=0,allLift=1;
+      for(let column=0;column<g.columns;column+=1){
+        const height=words[offset+column];if(height>=g.rows)continue;
+        legal+=1;
+        if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
+      }
+      if(legal&&allLift){
+        const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+        return CPC_EXACT;
+      }
     }
     const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
     if(precursor<0){
