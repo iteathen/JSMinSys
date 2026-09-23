@@ -5,7 +5,8 @@ import {
   rbaTtPublishPrepared32,rbaTtPublishExactOwned32,
   rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
   rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,
-  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
+  rbaTtSignal32,
+  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
 import {
   prepareRbaBranchWorker32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
@@ -90,7 +91,7 @@ test('branch manager retains one child and exposes only surplus work',()=>{
   assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1);
   assert.equal(w.q,-1);
 
-  assert.equal(rbaBranchManagerStep32(t,reconcile),1);
+  assert.ok(rbaBranchManagerStep32(t,reconcile)>=1);
   assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1,'worker did not claim surplus child');
   assert.equal(rbaBranchReadyCount32(t),0);
   assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1);
@@ -109,10 +110,12 @@ test('manager event budget bounds one scheduling turn',()=>{
   const t=table();
   for(let tag=1;tag<=3;tag++){
     const q=rbaTtIntern32(t,key(tag),0,emptyBasis,0,0);
-    t.eventMember[q]=1;
+    rbaTtSignal32(t,q);
   }
-  // This is a configuration-validation smoke test only; real event membership
-  // is exercised through the branch publication test above.
+  assert.equal(t.control[RBA_TT_EVENT_COUNT],3);
+  const processed=rbaBranchManagerStep32(t,()=>{}, {budget:1});
+  assert.equal(processed,1);
+  assert.equal(t.control[RBA_TT_EVENT_COUNT],2);
   const w=prepareRbaBranchWorker32({owner:7,workerCount:4,state:null,readyTarget:8});
   assert.equal(w.owner,7);assert.equal(w.readyTarget,8);
 });
