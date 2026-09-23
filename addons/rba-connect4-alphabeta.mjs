@@ -187,8 +187,16 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }
   }
   const rootExact=rootLo===rootHi?absToRelative(rootLo,mover):null;
+  const rootSemantic=intervalToRelative(rootLo,rootHi,mover);
 
-  let alpha=-2,beta=2,best=-2,bestMove=-1;
+  // A two-value exact CPC interval needs only one W/D/L threshold test at the
+  // root. Keep the historical full window for the unconstrained three-value
+  // domain so exact-cache qualification semantics remain unchanged there.
+  let alpha=-2,beta=2;
+  if(rootExact===null&&rootSemantic[1]-rootSemantic[0]===1){
+    alpha=rootSemantic[0];beta=rootSemantic[1];
+  }
+  let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     usePreempt=preemptCount>1&&g.columns<=32,row=0;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
@@ -230,7 +238,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(value>best){best=value;bestMove=caller;}
     if(value>alpha)alpha=value;
     if(rootExact!==null&&value===rootExact){best=rootExact;bestMove=caller;break;}
-    if(rootExact===null&&best===1)break;
+    if(rootExact===null&&(best===1||alpha>=beta))break;
   }
   const relative=rootExact!==null?rootExact:best;
   return {value:relativeToAbs(relative,mover),relative,move:bestMove,metrics:metrics(state)};
