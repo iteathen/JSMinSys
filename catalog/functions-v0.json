@@ -1,0 +1,146 @@
+{
+  "version": "0.1.0",
+  "status": "implementation-in-progress",
+  "rule": "Stop implementation when a required primitive is not present in the admitted operation/capability set.",
+  "functions": [
+    {
+      "name": "bitTest32",
+      "source": "src/word32.mjs",
+      "block": "bit-test",
+      "primitives": [
+        "&",
+        "!=="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "bitSet32",
+      "source": "src/word32.mjs",
+      "block": "set-bit",
+      "primitives": [
+        "|",
+        ">>>"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "bitClear32",
+      "source": "src/word32.mjs",
+      "block": "clear-bit",
+      "primitives": [
+        "&",
+        "~",
+        ">>>"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "bitToggle32",
+      "source": "src/word32.mjs",
+      "block": "toggle-bit",
+      "primitives": [
+        "^",
+        ">>>"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "and2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "wordwise-logical",
+      "primitives": [
+        "LD32",
+        "&",
+        "ST32",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "or2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "wordwise-logical",
+      "primitives": [
+        "LD32",
+        "|",
+        "ST32",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "xor2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "wordwise-logical",
+      "primitives": [
+        "LD32",
+        "^",
+        "ST32",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "zero2x32",
+      "source": "src/word64x32.mjs",
+      "block": "multiword-zero-equality",
+      "primitives": [
+        "|",
+        "==="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "equal2x32",
+      "source": "src/word64x32.mjs",
+      "block": "multiword-zero-equality",
+      "primitives": [
+        "^",
+        "|",
+        "==="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "firstSetBitIndex32",
+      "source": "src/word32.mjs",
+      "block": "first-set-bit",
+      "primitives": [
+        "===",
+        "?:",
+        "-",
+        "&",
+        "Math.clz32"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "popcount32",
+      "source": "src/word32.mjs",
+      "block": "popcount",
+      "primitives": [
+        ">>>",
+        "-",
+        "&",
+        "=",
+        "+",
+        "Math.imul"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "subset32",
+      "source": "src/word32.mjs",
+      "block": "subset-implication-dominance",
+      "primitives": [
+        "&",
+        "~",
+        "==="
+      ],
+      "status": "implemented"
+    }
+  ]
+}
