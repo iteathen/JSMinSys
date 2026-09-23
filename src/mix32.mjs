@@ -27,6 +27,23 @@ export function mix2x32PowerOfTwoIndex(a, b, capacityMask) {
   return x & capacityMask;
 }
 
+export function xorTupleHash32(ids, count) {
+  let hash = 0;
+  let multiplier = 0x9e3779b1;
+  for (let slot = 0; slot < count; slot += 1) {
+    hash ^= Math.imul(ids[slot] + 1, multiplier);
+    multiplier += 0x85ebca6a;
+  }
+  return hash >>> 0;
+}
+
+export function updateXorTupleHash32(hash, slot, oldValue, newValue) {
+  const multiplier = 0x9e3779b1 + Math.imul(slot, 0x85ebca6a);
+  return (hash
+    ^ Math.imul(oldValue + 1, multiplier)
+    ^ Math.imul(newValue + 1, multiplier)) >>> 0;
+}
+
 export function mix3x32Locator(a, b, c) {
   let x = Math.imul(a, 0x9e3779b1);
   x ^= Math.imul(b, 0x85ebca6b);

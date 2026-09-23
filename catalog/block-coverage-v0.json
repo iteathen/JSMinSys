@@ -207,9 +207,11 @@
         "mix32Strong",
         "mix3x32Locator",
         "mix3x32PowerOfTwoIndex",
-        "mix2x32PowerOfTwoIndex"
+        "mix2x32PowerOfTwoIndex",
+        "xorTupleHash32",
+        "updateXorTupleHash32"
       ],
-      "note": "Joint locator profiles now cover exact two- and three-coordinate keys. mix2x32PowerOfTwoIndex and mix3x32PowerOfTwoIndex return power-of-two primary indices directly when exact tuple equality owns identity; stronger mixers remain available where measured collision/probe locality justifies their extra cost."
+      "note": "Hashing profiles now distinguish exact-key addressing shapes: direct two-/three-coordinate indices, and separable ordered tuple fingerprints. xorTupleHash32 gives parentless tuple construction; updateXorTupleHash32 updates only changed coordinates when a transition already owns parent hash and old/new ids. Exact tuple equality remains identity, and the raw separable fingerprint should be avalanched with mix32 before power-of-two masking."
     },
     {
       "id": 10,

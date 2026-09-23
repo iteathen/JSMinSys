@@ -1,5 +1,5 @@
 {
-  "version": "0.98.0",
+  "version": "0.99.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3482,6 +3482,71 @@
       }
     },
     {
+      "name": "xorTupleHash32",
+      "source": "src/mix32.mjs",
+      "block": "hash-mix32",
+      "primitives": [
+        "LD32",
+        "+",
+        "Math.imul",
+        "^",
+        "<",
+        "+=",
+        "+=",
+        ">>>",
+        "="
+      ],
+      "status": "implemented-separable-tuple-hash-profile",
+      "preconditions": [
+        "ids contains the exact ordered tuple coordinates and count is the configured tuple length",
+        "tuple coordinates are exact uint32-compatible scalar ids; exact tuple equality remains authoritative",
+        "the returned uint32 is a separable fingerprint/locator, not semantic identity",
+        "power-of-two addressing should avalanche this raw fingerprint through mix32 or an equivalently qualified finalizer before masking",
+        "callers selecting incremental updates use updateXorTupleHash32 with the same slot ordering and constants"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(LOAD + 9) + BM",
+        "parameters": {
+          "N": "configured tuple length",
+          "LOAD": "NEES cache-level dependent id load cost",
+          "BM": "additional loop branch-misprediction penalties, normally zero for a stable small configured count"
+        },
+        "hotL1Count10Cycles": 133,
+        "note": "Each tuple element performs one id load, value increment, IMUL contribution, XOR accumulation, multiplier increment, and predicted loop control. For the pinned 10-slot residual class tuple this is a separable raw fingerprint; mix32 + powerOfTwoIndex32 adds 6 cycles when an addressed bucket is required."
+      }
+    },
+    {
+      "name": "updateXorTupleHash32",
+      "source": "src/mix32.mjs",
+      "block": "hash-mix32",
+      "primitives": [
+        "Math.imul",
+        "+",
+        "^",
+        ">>>",
+        "="
+      ],
+      "status": "implemented-incremental-tuple-hash-profile",
+      "preconditions": [
+        "hash was produced by xorTupleHash32 over the parent tuple using the same slot ordering",
+        "slot is the exact tuple coordinate that changed",
+        "oldValue is the parent coordinate and newValue is the child coordinate already owned by the transition producer",
+        "caller invokes this only for an actual changed slot and does not reconstruct old/new values solely for hashing",
+        "the returned uint32 remains a locator/fingerprint; exact tuple equality authorizes identity",
+        "the integration retains a full xorTupleHash32 rebuild path for parentless construction and for distributions where many-slot updates are cheaper to rebuild"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 15,
+        "note": "Derive the slot multiplier once, compute old/new contributions, XOR both out/in, and normalize to the Uint32 fingerprint domain. A parent hash load and final address mix/mask remain caller-visible."
+      }
+    },
+    {
       "name": "mix3x32Locator",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -6565,11 +6630,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 227,
+    "functionsImplemented": 229,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 227,
+    "functionsWithCycleCount": 229,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8372,6 +8437,24 @@
           "before": "a new chunk reloads both exact words from transient scratch before dense-key storage",
           "after": "dense key pair and hash-slot id are published directly from the producer scalars",
           "mechanism": "delete transient scratch stores/loads while retaining the authoritative dense exact-key representation"
+        }
+      ]
+    },
+    {
+      "id": "round-092",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "residual class tuple hash",
+          "before": "every new class rescans all 10 chunk ids and independently strong-mixes each coordinate before a final strong mix",
+          "after": "a separable ordered fingerprint costs 133 L1 ledger cycles for the full 10-slot rebuild, then existing mix32+mask supplies a 6-cycle addressed index",
+          "mechanism": "replace repeated per-coordinate avalanche with one odd-multiplied contribution per exact tuple coordinate while retaining full tuple equality"
+        },
+        {
+          "function": "parent-derived residual class hash",
+          "before": "a child whose transition already knows changed chunk slots still recomputes the entire 10-slot hash",
+          "after": "load the parent fingerprint and apply a 15-cycle reversible hash update per changed slot",
+          "mechanism": "make tuple hashing delta-compatible so unchanged coordinates perform no hash work"
         }
       ]
     }

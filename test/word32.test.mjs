@@ -375,7 +375,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, xorTupleHash32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1569,6 +1569,56 @@ test('one-lane caller meta makes known-cell undo landing-only', () => {
     base[CALLER_PLY1_SUPPORT_CODE],
   );
   assert.deepEqual(landingFast, landingBase);
+});
+
+test('separable tuple hash updates from exact slot deltas', () => {
+  const ids = new Uint32Array([3, 5, 8, 13, 21, 34, 55, 89, 144, 233]);
+  let hash = xorTupleHash32(ids, ids.length);
+
+  for (let slot = 0; slot < ids.length; slot += 1) {
+    const oldValue = ids[slot];
+    const newValue = (oldValue ^ Math.imul(slot + 1, 0x9e3779b1)) >>> 0;
+    const updated = updateXorTupleHash32(hash, slot, oldValue, newValue);
+    const copy = ids.slice();
+    copy[slot] = newValue;
+    assert.equal(updated, xorTupleHash32(copy, copy.length));
+  }
+
+  const sequential = ids.slice();
+  let sequentialHash = hash;
+  for (const slot of [1, 4, 7]) {
+    const oldValue = sequential[slot];
+    const newValue = (oldValue + 0x80000000 + slot) >>> 0;
+    sequentialHash = updateXorTupleHash32(
+      sequentialHash, slot, oldValue, newValue,
+    );
+    sequential[slot] = newValue;
+  }
+  assert.equal(
+    sequentialHash,
+    xorTupleHash32(sequential, sequential.length),
+  );
+
+  const buckets = new Uint32Array(256);
+  const sample = new Uint32Array(10);
+  for (let i = 0; i < 4096; i += 1) {
+    for (let slot = 0; slot < sample.length; slot += 1) {
+      sample[slot] = Math.imul(i + slot * 17, slot + 3) >>> 0;
+    }
+    const address = powerOfTwoIndex32(
+      mix32(xorTupleHash32(sample, sample.length)),
+      255,
+    );
+    buckets[address] += 1;
+  }
+  let occupied = 0;
+  let maxBucket = 0;
+  for (let bucket = 0; bucket < buckets.length; bucket += 1) {
+    if (buckets[bucket] !== 0) occupied += 1;
+    if (buckets[bucket] > maxBucket) maxBucket = buckets[bucket];
+  }
+  assert.equal(occupied, 256);
+  assert.ok(maxBucket < 40);
 });
 
 test('joint two-word direct index covers structured power-of-two buckets', () => {
