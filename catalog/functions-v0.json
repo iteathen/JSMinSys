@@ -1,5 +1,5 @@
 {
-  "version": "0.21.0",
+  "version": "0.22.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -608,6 +608,35 @@
       }
     },
     {
+      "name": "reflectPacked3x24",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "LD32",
+        "&",
+        "|",
+        ">>>",
+        "+",
+        "="
+      ],
+      "status": "implemented-precomputed",
+      "preconditions": [
+        "tables were built by fillReflect3Tables32 for the configured columns",
+        "3*columns <= 24",
+        "rankMask preserves all non-support bits"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 24,
+        "hotL2Predicted": 48,
+        "hotL3Predicted": 153,
+        "expression": "3*LOAD + 7 index/mask/shift operations + 3*OR + final uint32 coercion",
+        "note": "Three-byte precomputed reflection path for configured supports occupying at most 24 bits."
+      }
+    },
+    {
       "name": "reflectPacked3x32",
       "source": "src/mix32.mjs",
       "block": "canonical-reflection",
@@ -1037,9 +1066,8 @@
       "block": "multiword-add-sub",
       "primitives": [
         "+",
-        "<",
+        ">",
         "?:",
-        ">>>",
         "ST32",
         "="
       ],
@@ -1048,8 +1076,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 8,
-        "note": "High-lane uint32 coercion is delegated to destination typed storage; low-lane coercion remains required for carry detection."
+        "cycles": 7,
+        "note": "Carry is detected from the exact unwrapped Number sum (>0xffffffff); Uint32Array storage performs the low-lane wrap."
       }
     },
     {
@@ -1332,11 +1360,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 61,
+    "functionsImplemented": 62,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 61,
+    "functionsWithCycleCount": 62,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1739,6 +1767,24 @@
           "before": "33.5-43 L1 / 73.5-91 L2",
           "after": "27-36.5 L1 / 59-76.5 L2",
           "mechanism": "delete supportLo/supportHi restoration after runtime consumer audit found no reader"
+        }
+      ]
+    },
+    {
+      "id": "round-015",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x24",
+          "before": "31-cycle four-byte lookup when used for <=24 support bits",
+          "after": "24 L1 / 48 L2 / 153 L3",
+          "mechanism": "omit unused fourth contribution-table load"
+        },
+        {
+          "function": "add2x32Into",
+          "before": "8 cycles",
+          "after": "7 cycles",
+          "mechanism": "detect carry from exact Number sum before typed-store wrap"
         }
       ]
     }
