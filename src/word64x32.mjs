@@ -1,18 +1,18 @@
-export function and2x32Into(dst, di, a, ai, b, bi) {
-  dst[di] = a[ai] & b[bi];
-  dst[di + 1] = a[ai + 1] & b[bi + 1];
+export function and2x32Into(dst, di, a0, a1, b0, b1) {
+  dst[di] = a0 & b0;
+  dst[di + 1] = a1 & b1;
   return dst;
 }
 
-export function or2x32Into(dst, di, a, ai, b, bi) {
-  dst[di] = a[ai] | b[bi];
-  dst[di + 1] = a[ai + 1] | b[bi + 1];
+export function or2x32Into(dst, di, a0, a1, b0, b1) {
+  dst[di] = a0 | b0;
+  dst[di + 1] = a1 | b1;
   return dst;
 }
 
-export function xor2x32Into(dst, di, a, ai, b, bi) {
-  dst[di] = a[ai] ^ b[bi];
-  dst[di + 1] = a[ai + 1] ^ b[bi + 1];
+export function xor2x32Into(dst, di, a0, a1, b0, b1) {
+  dst[di] = a0 ^ b0;
+  dst[di + 1] = a1 ^ b1;
   return dst;
 }
 
