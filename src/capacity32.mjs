@@ -7,9 +7,7 @@ export function isPowerOfTwo32(value) {
 }
 
 export function nextPowerOfTwo32(value) {
-  let result = 1;
-  while (result < value) result <<= 1;
-  return result >>> 0;
+  return (1 << (32 - Math.clz32(value - 1))) >>> 0;
 }
 
 export function rehashOverwrite32(
