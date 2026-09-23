@@ -1,5 +1,5 @@
 import { mixSpan32Locator32, publishSpan32 } from '../src/widekey32.mjs';
-import { atomicTryClaim32, atomicReleaseNoNotify32 } from '../src/atomic32.mjs';
+import { atomicTryClaimLoadFirst32, atomicReleaseNoNotify32 } from '../src/atomic32.mjs';
 import {
   intrusiveEnqueueTailStamped32,
   intrusiveEnqueueOnceTailStamped32,
@@ -47,7 +47,7 @@ export function createRbaTt32({
   for(let q=0;q<capacity;q+=1)t.link[q]=q+1;t.link[capacity-1]=-1;
   return t;
 }
-export function rbaTtEnter32(t,owner){if(Atomics.load(t.control,RBA_TT_STOP))return 0;return atomicTryClaim32(t.control,RBA_TT_LOCK,0,owner)?1:0;}
+export function rbaTtEnter32(t,owner){if(Atomics.load(t.control,RBA_TT_STOP))return 0;return atomicTryClaimLoadFirst32(t.control,RBA_TT_LOCK,0,owner)?1:0;}
 export function rbaTtLeave32(t){atomicReleaseNoNotify32(t.control,RBA_TT_LOCK,0);}
 export function rbaTtFail32(t,code){Atomics.compareExchange(t.control,RBA_TT_ERROR,0,code);Atomics.store(t.control,RBA_TT_STOP,1);Atomics.add(t.control,RBA_TT_WAKE,1);Atomics.notify(t.control,RBA_TT_WAKE);return 0;}
 export function rbaTtValid32(t,q,g){return q>=0&&q<t.capacity&&t.live[q]&&t.generation[q]===g?1:0;}
