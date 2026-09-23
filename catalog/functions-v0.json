@@ -1,5 +1,5 @@
 {
-  "version": "0.38.0",
+  "version": "0.39.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -221,17 +221,17 @@
       "source": "src/word64x32.mjs",
       "block": "multiword-zero-equality",
       "primitives": [
-        "^",
-        "|",
-        "==="
+        "===",
+        "&&"
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "fixed",
-        "cycles": 4,
-        "note": "2*XOR + OR + zero test."
+        "kind": "range",
+        "minCycles": 2,
+        "maxCycles": 3,
+        "note": "Direct lane equality with short-circuit; replaces two XORs plus OR reduction."
       }
     },
     {
@@ -968,6 +968,64 @@
         "kind": "fixed",
         "cycles": 2,
         "note": "Compare + predicted select."
+      }
+    },
+    {
+      "name": "normalizeMinimal2xI32InPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "!==",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "input ordered by nondecreasing set cardinality",
+        "lo/hi arrays use Int32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(2*L+3) + C*(2*L+8) + R*(2*S+1)",
+        "hotL1Predicted": "2 + 11*N + 16*C + 2*R",
+        "hotL2Predicted": "2 + 27*N + 32*C + 2*R",
+        "note": "Signed bit-pattern containment removes per-candidate complement setup while preserving ordered single-scan normalization."
+      }
+    },
+    {
+      "name": "normalizeMaximal2xI32InPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "!==",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "input ordered by nonincreasing set cardinality",
+        "lo/hi arrays use Int32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(2*L+3) + C*(2*L+8) + R*(2*S+1)",
+        "hotL1Predicted": "2 + 11*N + 16*C + 2*R",
+        "hotL2Predicted": "2 + 27*N + 32*C + 2*R",
+        "note": "Direct signed containment removes two complement operations from every maximal-frontier subset check."
       }
     },
     {
@@ -1836,11 +1894,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 80,
+    "functionsImplemented": 82,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 80,
+    "functionsWithCycleCount": 82,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2633,6 +2691,30 @@
           "before": "blocking consumption path",
           "after": "nonblocking CAS reservation fast path",
           "mechanism": "return false on empty instead of waiting"
+        }
+      ]
+    },
+    {
+      "id": "round-032",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "equal2x32",
+          "before": "4 cycles",
+          "after": "2-3 cycles",
+          "mechanism": "direct short-circuit lane equality"
+        },
+        {
+          "function": "normalizeMinimal2xI32InPlace",
+          "before": "unsigned minimal: 2 + N*(2L+5) + C*(2L+8) + ...",
+          "after": "2 + N*(2L+3) + C*(2L+8) + ...",
+          "mechanism": "signed bit-pattern containment removes candidate complement setup"
+        },
+        {
+          "function": "normalizeMaximal2xI32InPlace",
+          "before": "unsigned maximal: C*(2L+10)",
+          "after": "C*(2L+8)",
+          "mechanism": "direct signed containment removes per-comparison complements"
         }
       ]
     }
