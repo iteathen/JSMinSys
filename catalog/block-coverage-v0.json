@@ -227,9 +227,11 @@
       "functions": [
         "ttHit32",
         "ttReplace32",
-        "ttUpdateValue32"
+        "ttUpdateValue32",
+        "fillI32Sentinel32",
+        "probe3x32SentinelSlot32"
       ],
-      "note": "TT probe retains the prepared index. Full replacement writes tag+value for misses/replacements; proven hits may use ttUpdateValue32 to update only the value and avoid an identical tag store."
+      "note": "TT/cache probing retains prepared indices and exact identity. Proven hit updates may store only the value. For exact triple open addressing whose first coordinate has an impossible sentinel, fillI32Sentinel32 makes setup cost explicit and probe3x32SentinelSlot32 folds occupancy into key0: occupied probe steps avoid a separate used[] load, insertion avoids its store, and the returned sign preserves hit-versus-empty state without a post-probe occupancy reload."
     },
     {
       "id": 12,

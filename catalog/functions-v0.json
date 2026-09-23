@@ -1,5 +1,5 @@
 {
-  "version": "0.95.0",
+  "version": "0.96.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -742,6 +742,76 @@
         "expression": "STORE_COST",
         "hotLocalMinimumCycles": 0.5,
         "note": "Hit update writes only the value. Full ttReplace32 remains for misses/replacements that must publish a tag."
+      }
+    },
+    {
+      "name": "fillI32Sentinel32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "ST32",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization-profile",
+      "preconditions": [
+        "storage is Int32-backed and has capacity >= count",
+        "sentinel is outside the valid key0 domain selected for the configured cache",
+        "called during cache initialization or cold growth, not once per hot probe"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(3 + STORE_COST)",
+        "parameters": {
+          "N": "number of key0 slots initialized",
+          "STORE_COST": "NEES store cost for initialization locality"
+        },
+        "note": "Cold sentinel initialization is explicit. It replaces implicit zero initialization as the occupancy representation setup and is not hidden in the hot probe saving."
+      }
+    },
+    {
+      "name": "probe3x32SentinelSlot32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "LD32",
+        "===",
+        "~",
+        "&&",
+        "+",
+        "&",
+        "="
+      ],
+      "status": "implemented-sentinel-probe-profile",
+      "preconditions": [
+        "capacity is a power of two and capacityMask = capacity - 1",
+        "start is already the prepared primary index and lies in 0..capacityMask",
+        "capacityMask is nonnegative in int32 so every occupied slot index is nonnegative",
+        "at least one slot contains emptyKey0, so linear probing terminates",
+        "key0s is Int32-backed, key1s uses exact int32 key identity, and key2s preserves exact uint32 key identity",
+        "emptyKey0 cannot equal any valid key0; the pinned IsoMax residual coordinate admits -1 terminal-win and nonnegative class IDs, so an independently reserved negative sentinel is required",
+        "a nonnegative return is an exact-key hit slot; a negative return encodes the empty insertion slot as bitwise complement and the caller accounts one NOT when decoding it",
+        "exact three-coordinate equality remains authoritative; the locator/start index is not semantic identity"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "C0*(LOAD+7) + C1*(2*LOAD+9) + C2*(3*LOAD+11) + TERMINAL + BM",
+        "parameters": {
+          "C0": "occupied nonmatching slots rejected after key0 comparison",
+          "C1": "occupied nonmatching slots with matching key0 but mismatching key1",
+          "C2": "occupied nonmatching slots with matching key0 and key1 but mismatching key2",
+          "LOAD": "NEES cache-level dependent load cost",
+          "TERMINAL": "empty stop: LOAD+3; exact hit: 3*LOAD+8",
+          "BM": "additional branch-misprediction penalties for the selected probe scenario"
+        },
+        "hotL1DirectMissCycles": 7,
+        "hotL1DirectHitCycles": 20,
+        "note": "The first exact-key load also proves occupancy. Relative to a separate used[] byte plus key0 array, every occupied probe step deletes one memory load; the signed terminal result also lets consumers replace a post-probe occupancy reload with a scalar sign test. Empty insertion decoding remains explicitly one NOT in the caller ledger."
       }
     },
     {
@@ -6396,11 +6466,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 222,
+    "functionsImplemented": 224,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 222,
+    "functionsWithCycleCount": 224,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8155,6 +8225,24 @@
           "before": "mix3x32Locator + powerOfTwoIndex32 = 17 cycles",
           "after": "14 fixed cycles",
           "mechanism": "for a 2^k table, omit the final odd multiplier and return the folded low-k bits directly; odd multiplication only permutes primary buckets modulo 2^k"
+        }
+      ]
+    },
+    {
+      "id": "round-089",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "probe3x32SentinelSlot32",
+          "before": "separate used[] occupancy plus exact key0 storage; every occupied probe step loads both and prepared get/store reloads occupancy after the probe returns",
+          "after": "key0 sentinel carries occupancy; the already-loaded key0 scalar also participates in exact equality, and the returned sign carries hit-versus-empty state",
+          "mechanism": "reuse an impossible exact-key value as the empty representation instead of maintaining and re-reading a separate occupancy mirror"
+        },
+        {
+          "function": "fillI32Sentinel32",
+          "before": "zero-initialized key storage plus a separately zero-initialized occupancy array",
+          "after": "one explicit cold sentinel fill of key0 storage; no occupancy array is required by the selected probe representation",
+          "mechanism": "pay and account representation setup once at initialization/growth to delete repeated hot occupancy traffic"
         }
       ]
     }

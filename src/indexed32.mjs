@@ -82,6 +82,33 @@ export function ttUpdateValue32(values, index, value) {
   return index;
 }
 
+export function fillI32Sentinel32(storage, count, sentinel) {
+  for (let index = 0; index < count; index += 1) storage[index] = sentinel;
+  return count;
+}
+
+export function probe3x32SentinelSlot32(
+  key0s,
+  key1s,
+  key2s,
+  capacityMask,
+  start,
+  key0,
+  key1,
+  key2,
+  emptyKey0,
+) {
+  let slot = start;
+  for (;;) {
+    const stored0 = key0s[slot];
+    if (stored0 === emptyKey0) return ~slot;
+    if (stored0 === key0
+        && key1s[slot] === key1
+        && key2s[slot] === key2) return slot;
+    slot = (slot + 1) & capacityMask;
+  }
+}
+
 export function selectGreater32(a, b) {
   return a >= b ? a : b;
 }

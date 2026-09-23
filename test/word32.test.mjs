@@ -103,6 +103,8 @@ import {
   ttHit32,
   ttReplace32,
   ttUpdateValue32,
+  fillI32Sentinel32,
+  probe3x32SentinelSlot32,
   selectGreater32,
   selectLess32,
 } from '../src/indexed32.mjs';
@@ -173,6 +175,60 @@ test('indexed and table blocks', () => {
   assert.equal(values[ttIndex], 5678);
   assert.equal(selectGreater32(4, 9), 9);
   assert.equal(selectLess32(4, 9), 4);
+});
+
+
+test('sentinel triple probe folds occupancy into exact key storage', () => {
+  const emptyKey0 = -2147483648;
+  const key0s = new Int32Array(8);
+  const key1s = new Int32Array(8);
+  const key2s = new Uint32Array(8);
+
+  assert.equal(fillI32Sentinel32(key0s, 8, emptyKey0), 8);
+
+  let probe = probe3x32SentinelSlot32(
+    key0s, key1s, key2s, 7, 3, 7, 11, 13, emptyKey0,
+  );
+  assert.equal(probe, ~3);
+  let slot = ~probe;
+  key0s[slot] = 7;
+  key1s[slot] = 11;
+  key2s[slot] = 13;
+
+  assert.equal(
+    probe3x32SentinelSlot32(key0s, key1s, key2s, 7, 3, 7, 11, 13, emptyKey0),
+    3,
+  );
+
+  key0s[4] = -1;
+  key1s[4] = 5;
+  key2s[4] = 0xffffffff;
+  assert.equal(
+    probe3x32SentinelSlot32(key0s, key1s, key2s, 7, 3, -1, 5, 0xffffffff, emptyKey0),
+    4,
+  );
+  assert.equal(
+    probe3x32SentinelSlot32(key0s, key1s, key2s, 7, 3, 99, 1, 2, emptyKey0),
+    ~5,
+  );
+
+  fillI32Sentinel32(key0s, 8, emptyKey0);
+  key0s[7] = 1;
+  key1s[7] = 2;
+  key2s[7] = 3;
+  key0s[0] = 4;
+  key1s[0] = 5;
+  key2s[0] = 6;
+  assert.equal(
+    probe3x32SentinelSlot32(key0s, key1s, key2s, 7, 7, 4, 5, 6, emptyKey0),
+    0,
+  );
+  probe = probe3x32SentinelSlot32(
+    key0s, key1s, key2s, 7, 7, 9, 9, 9, emptyKey0,
+  );
+  assert.equal(probe, ~1);
+  slot = ~probe;
+  assert.equal(slot, 1);
 });
 
 
