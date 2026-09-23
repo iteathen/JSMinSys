@@ -28,7 +28,7 @@ export function createRbaTt32({
   const u32=n=>new Uint32Array(new SharedArrayBuffer(n*4));
   const i32=n=>new Int32Array(new SharedArrayBuffer(n*4));
   const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,edgeCapacity,
-    control:i32(RBA_TT_CONTROL_WORDS),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
+    control:i32(RBA_TT_CONTROL_WORDS),fault:i32(4),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
     basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
     lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),priority:i32(capacity),redirect:i32(capacity),
@@ -118,7 +118,7 @@ export function rbaTtTake32(t,owner){
     if(t.refs[q]&&!t.exact[q]){t.execution[q]=owner;return q;}
     t.execution[q]=0;if(!t.refs[q])rbaTtRecycle32(t,q);}
 }
-export function rbaTtReleaseExecution32(t,q,owner){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.execution[q]=0;if(!t.refs[q])rbaTtRecycle32(t,q);return 1;}
+export function rbaTtReleaseExecution32(t,q,owner){if(t.execution[q]!==owner){t.fault[0]=1;t.fault[1]=q;t.fault[2]=owner;t.fault[3]=t.execution[q];return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);}t.execution[q]=0;if(!t.refs[q])rbaTtRecycle32(t,q);return 1;}
 export function rbaTtSignal32(t,q){if(!t.live[q])return 0;return intrusiveEnqueueOnceTailStamped32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember,t.eventGeneration,t.generation,q);}
 export function rbaTtTakeEvent32(t){const q=t.control[RBA_TT_EVENT_HEAD];if(q===-1)return -1;if(t.eventGeneration[q]!==t.generation[q]||!t.live[q]){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}return intrusivePopHeadStamped32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember);}
 export function rbaTtTighten32(t,q,lo,hi){
@@ -249,7 +249,7 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
       if(rbaTtValid32(t,original,generation)&&t.refs[original])t.refs[original]-=1;
       t.child[e]=child;t.childGeneration[e]=t.generation[child];
     }
-    if(!rbaTtValid32(t,child,t.childGeneration[e]))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+    if(!rbaTtValid32(t,child,t.childGeneration[e])){t.fault[0]=2;t.fault[1]=q;t.fault[2]=child;t.fault[3]=t.childGeneration[e];return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);}
     const head=t.parentHead[child];t.edgeNext[e]=head;t.edgePrev[e]=-1;
     if(head!==-1)t.edgePrev[head]=e;t.parentHead[child]=e;t.edgeAttached[e]=1;
   }
@@ -307,7 +307,7 @@ export function rbaTtAttachDependencies32(t,q){
   t.phase[q]=3;return 1;
 }
 export function rbaTtReconcile32(t,q,minimize){
-  if(t.phase[q]!==3||(minimize!==0&&minimize!==1))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+  if(t.phase[q]!==3||(minimize!==0&&minimize!==1)){t.fault[0]=3;t.fault[1]=q;t.fault[2]=t.phase[q];t.fault[3]=minimize;return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);}
   const base=q*t.edgeCapacity,count=t.count[q],qLo=t.lower[q],qHi=t.upper[q];let lo=minimize?4:0,hi=lo;
   for(let i=0;i<count;i+=1){const e=base+i,child=t.child[e];let a=t.edgeLower[e],b=t.edgeUpper[e];
     if(child>=0){if(t.lower[child]>a)a=t.lower[child];if(t.upper[child]<b)b=t.upper[child];}
