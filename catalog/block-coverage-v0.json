@@ -53,8 +53,10 @@
       "status": "implemented",
       "functions": [
         "popcount32",
+        "popcount2x32SparseHigh",
         "popcount2x32"
-      ]
+      ],
+      "note": "One-lane, fixed two-lane, and sparse-high two-lane popcount profiles are separately costed; initialization/workload evidence selects the appropriate form."
     },
     {
       "id": 5,
