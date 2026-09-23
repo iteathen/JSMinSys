@@ -134,12 +134,13 @@
       "status": "implemented",
       "functions": [
         "fillReflect3Tables32",
+        "reflectPacked3x16",
         "reflectPacked3x24",
         "reflectPacked3x32",
         "reflectPacked3Direct32",
         "canonicalMin32"
       ],
-      "note": "Runtime-configured geometry can precompute reflection contribution tables; direct arithmetic fallback remains available and independently costed."
+      "note": "Initialization builds exactly the byte tables required by configured packed-support width; hot reflection selects 2-, 3-, or 4-byte lookup or direct arithmetic."
     },
     {
       "id": 13,
