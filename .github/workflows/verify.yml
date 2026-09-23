@@ -1,0 +1,39 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: node tools/verify-catalog.mjs
+      - run: node --test test/*.test.mjs
+
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: node -e "const fs=require('fs'); for (const f of fs.readdirSync('catalog').filter(x=>x.endsWith('.json'))) JSON.parse(fs.readFileSync('catalog/'+f,'utf8'));"
+
+  node-compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: for f in src/*.mjs tools/*.mjs test/*.mjs; do node --check "$f"; done
