@@ -486,3 +486,22 @@ for small fixed-degree decisions.
 A caller-owned scalar copy publishes a fixed derived span without allocation or
 bulk-copy machinery. Publication ordering, lifetime, and aliasing preconditions
 remain explicit at the governing application unit.
+
+## 29. Worker execution substrate
+
+The application owns its outer worker loop and domain evaluator. JSMinSys supplies
+the recurring fixed-storage mechanics underneath that loop:
+
+- stamped queue take with generation/currentness validation;
+- owned-work liveness validation and execution release;
+- resolved-value publication ordering;
+- fixed-degree dependency-row publication;
+- direct retention of one runnable dependency without mandatory queue round-trip;
+- atomic wake observation/signaling;
+- explicit worker parking; and
+- stop/completion polling.
+
+The block does not define domain result codes, game semantics, dependency meaning,
+or a worker framework. List/topology mutation remains externally serialized unless
+the selected helper explicitly uses Atomics. Blocking wait cost remains unbounded
+in the general cycle model and must be separated from active CPU work.
