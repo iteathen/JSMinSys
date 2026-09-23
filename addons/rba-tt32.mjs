@@ -83,17 +83,17 @@ export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize,priorit
   return rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,priority);
 }
 export function rbaTtFindEquivalent32(t,q){
-  if(!t.live[q])return -1;
+  if(!t.live[q]||t.redirect[q]>=0)return -1;
   const hash=t.locator[q],keyWords=t.keyWords,base=q*keyWords,bucket=t.bucket[q];
-  let best=-1;
+  let best=q;
   for(let scan=t.buckets[bucket];scan!==-1;scan=t.link[scan]){
     if(scan===q||!t.live[scan]||t.redirect[scan]>=0||t.locator[scan]!==hash)continue;
     const other=scan*keyWords;let w=0;
     while(w<keyWords&&t.keys[other+w]===t.keys[base+w])w+=1;
-    if(w===keyWords&&(best<0||t.exact[scan]>t.exact[best]||
+    if(w===keyWords&&(t.exact[scan]>t.exact[best]||
       (t.exact[scan]===t.exact[best]&&t.generation[scan]<t.generation[best])))best=scan;
   }
-  return best;
+  return best===q?-1:best;
 }
 export function rbaTtRetain32(t,q,g){if(!rbaTtValid32(t,q,g))return 0;if(t.refs[q]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);t.refs[q]+=1;return 1;}
 export function rbaTtUnqueueReady32(t,q){if(!t.readyMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,q);if(t.execution[q]===RBA_TT_EXECUTION_QUEUED)t.execution[q]=0;return 1;}
@@ -145,6 +145,159 @@ export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,
   t.phase[q]=2;rbaTtSignal32(t,q);let next=-1;
   for(let i=0;i<count;i+=1){const child=t.child[edgeBase+i];if(child>=0&&t.execution[child]===0&&!t.exact[child]&&t.phase[child]===0){t.execution[child]=owner;next=child;break;}}
   rbaTtReleaseExecution32(t,q,owner);return next;
+}
+export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count){
+  if(t.execution[q]!==owner||count<1||count>t.edgeCapacity||(count|0)!==count){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+  if(!rbaTtTighten32(t,q,stateLo,stateHi))return -1;
+  const edgeBase=q*t.edgeCapacity,keyStride=t.keyWords;
+  let childKey=keyOffset,childBasis=basisOffset;
+  for(let i=0;i<count;i+=1){
+    let child=-1;const lo=actionLo[i],hi=actionHi[i],priority=priorities?priorities[i]|0:0;
+    if(lo<1||hi>3||lo>hi){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+    if(childPresent[i]){
+      child=rbaTtAllocate32(t,keys,childKey,basis,childBasis,basisSizes[i],priority);
+      if(child<0)return -1;
+      if(!rbaTtTighten32(t,child,lo,hi))return -1;
+    }
+    const e=edgeBase+i;t.child[e]=child;t.childGeneration[e]=child<0?0:t.generation[child];
+    t.edgeLabel[e]=labels[i];t.edgeLower[e]=lo;t.edgeUpper[e]=hi;t.edgeAttached[e]=0;
+    t.edgeNext[e]=-1;t.edgePrev[e]=-1;t.count[q]=i+1;
+    childKey+=keyStride;childBasis+=basisStride;
+  }
+  t.phase[q]=RBA_TT_PHASE_PENDING_ATTACH;rbaTtSignal32(t,q);
+  let next=-1;
+  for(let i=0;i<count;i+=1){
+    const child=t.child[edgeBase+i];
+    if(child<0||t.exact[child]||t.phase[child]!==RBA_TT_PHASE_NEW)continue;
+    if(next<0){t.execution[child]=owner;next=child;}
+    else rbaTtEnqueue32(t,child);
+  }
+  rbaTtReleaseExecution32(t,q,owner);
+  return next;
+}
+
+function managerRedirectAttachedParents(t,duplicate,canonical){
+  let e=t.parentHead[duplicate],moved=0;
+  while(e!==-1){
+    const next=t.edgeNext[e],head=t.parentHead[canonical];
+    if(t.refs[canonical]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+    t.refs[canonical]+=1;
+    if(t.refs[duplicate])t.refs[duplicate]-=1;
+    t.child[e]=canonical;t.childGeneration[e]=t.generation[canonical];
+    t.edgePrev[e]=-1;t.edgeNext[e]=head;if(head!==-1)t.edgePrev[head]=e;
+    t.parentHead[canonical]=e;moved+=1;e=next;
+  }
+  t.parentHead[duplicate]=-1;
+  return moved;
+}
+
+export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets){
+  if(duplicate<0||canonical<0||duplicate===canonical||!t.live[duplicate]||!t.live[canonical])return 0;
+  if(t.redirect[duplicate]>=0)return t.redirect[duplicate]===canonical?1:0;
+  if(t.locator[duplicate]!==t.locator[canonical])return 0;
+  const keyWords=t.keyWords,a=duplicate*keyWords,b=canonical*keyWords;
+  for(let w=0;w<keyWords;w+=1)if(t.keys[a+w]!==t.keys[b+w])return 0;
+
+  if(t.lower[duplicate]>t.lower[canonical]||t.upper[duplicate]<t.upper[canonical])
+    if(!rbaTtTighten32(t,canonical,t.lower[duplicate],t.upper[duplicate]))return 0;
+  if(t.priority[duplicate]>t.priority[canonical])t.priority[canonical]=t.priority[duplicate];
+
+  managerRedirectAttachedParents(t,duplicate,canonical);
+  const wasQueued=t.readyMember[duplicate]?1:0;
+  if(wasQueued)rbaTtUnqueueReady32(t,duplicate);
+  if(t.eventMember[duplicate])unqueueEvent(t,duplicate);
+
+  const owner=t.execution[duplicate];
+  if(owner>RBA_TT_EXECUTION_QUEUED&&resetTargets&&owner-2<resetTargets.length)
+    Atomics.store(resetTargets,owner-2,-1);
+
+  t.redirect[duplicate]=canonical;
+  if((wasQueued||owner>RBA_TT_EXECUTION_QUEUED)&&
+     t.execution[canonical]===RBA_TT_EXECUTION_FREE&&!t.exact[canonical]&&
+     t.phase[canonical]===RBA_TT_PHASE_NEW&&!t.readyMember[canonical])rbaTtEnqueue32(t,canonical);
+
+  if(!t.execution[duplicate]&&!t.refs[duplicate]&&t.count[duplicate])
+    rbaTtDetachDependencies32(t,duplicate);
+  if(!t.execution[duplicate]&&!t.refs[duplicate])rbaTtRecycle32(t,duplicate);
+  return 1;
+}
+
+export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
+  if(t.phase[q]!==RBA_TT_PHASE_PENDING_ATTACH)return 0;
+  const base=q*t.edgeCapacity,count=t.count[q];
+  for(let i=0;i<count;i+=1){
+    const e=base+i;let child=t.child[e];
+    if(child<0)continue;
+    while(t.redirect[child]>=0)child=t.redirect[child];
+    const equivalent=rbaTtFindEquivalent32(t,child);
+    if(equivalent>=0){
+      const original=t.child[e],generation=t.childGeneration[e];
+      rbaTtManagerMergeDuplicate32(t,child,equivalent,resetTargets);
+      child=equivalent;
+      if(t.child[e]===original){
+        if(t.refs[child]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+        t.refs[child]+=1;
+        if(rbaTtValid32(t,original,generation)&&t.refs[original])t.refs[original]-=1;
+        t.child[e]=child;t.childGeneration[e]=t.generation[child];
+        if(!t.refs[original]&&!t.execution[original]&&t.count[original])rbaTtDetachDependencies32(t,original);
+        if(!t.refs[original]&&!t.execution[original])rbaTtRecycle32(t,original);
+      }
+    }else if(child!==t.child[e]){
+      const original=t.child[e],generation=t.childGeneration[e];
+      if(t.refs[child]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+      t.refs[child]+=1;
+      if(rbaTtValid32(t,original,generation)&&t.refs[original])t.refs[original]-=1;
+      t.child[e]=child;t.childGeneration[e]=t.generation[child];
+    }
+    if(!rbaTtValid32(t,child,t.childGeneration[e]))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+    const head=t.parentHead[child];t.edgeNext[e]=head;t.edgePrev[e]=-1;
+    if(head!==-1)t.edgePrev[head]=e;t.parentHead[child]=e;t.edgeAttached[e]=1;
+  }
+  t.phase[q]=RBA_TT_PHASE_ATTACHED;return 1;
+}
+
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
+  let q=t.control[RBA_TT_READY_HEAD],seen=0,merged=0,best=-1,bestPriority=-2147483648;
+  while(q!==-1&&seen<budget){
+    const next=t.readyNext[q];
+    if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
+      rbaTtUnqueueReady32(t,q);
+    }else{
+      const equivalent=rbaTtFindEquivalent32(t,q);
+      if(equivalent>=0){merged+=rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);}
+      else if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
+    }
+    q=next;seen+=1;
+  }
+  if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
+    const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
+    if(p!==-1)t.readyNext[p]=n;if(n!==-1)t.readyPrev[n]=p;else t.control[RBA_TT_READY_TAIL]=p;
+    t.readyPrev[best]=-1;t.readyNext[best]=head;if(head!==-1)t.readyPrev[head]=best;
+    else t.control[RBA_TT_READY_TAIL]=best;t.control[RBA_TT_READY_HEAD]=best;
+  }
+  return merged;
+}
+
+export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
+  let q=start,seen=0;
+  while(seen<budget){
+    if(q>=t.capacity)q=0;
+    if(t.live[q]){
+      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW){
+        const equivalent=rbaTtFindEquivalent32(t,q);
+        if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+      }
+      if(t.live[q]&&t.exact[q]&&q!==t.control[RBA_TT_ROOT]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
+      if(t.live[q]&&t.redirect[q]>=0&&!t.execution[q]&&!t.refs[q]&&t.count[q])rbaTtDetachDependencies32(t,q);
+      if(t.live[q]&&!t.execution[q]&&!t.refs[q]&&!t.count[q]&&t.parentHead[q]===-1){
+        if(t.readyMember[q])rbaTtUnqueueReady32(t,q);
+        if(t.eventMember[q])unqueueEvent(t,q);
+        rbaTtRecycle32(t,q);
+      }
+    }
+    q+=1;seen+=1;
+  }
+  return q>=t.capacity?0:q;
 }
 export function rbaTtPublishExactOwned32(t,q,owner,v){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);if(!rbaTtSetExact32(t,q,v))return 0;return rbaTtReleaseExecution32(t,q,owner);}
 export function rbaTtAttachDependencies32(t,q){
