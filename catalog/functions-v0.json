@@ -1,5 +1,5 @@
 {
-  "version": "0.93.0",
+  "version": "0.94.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4326,15 +4326,15 @@
       "status": "implemented-cutoff-first-profile",
       "preconditions": [
         "caller enters the child-result update with alpha < beta",
-        "on true, caller cuts off before computing/storing a raised alpha",
-        "on false, caller may then apply raiseLowerBound32(alpha,value)"
+        "ordinary bound-update use may test updated best value >= beta",
+        "stronger child-score use is valid when previous best value <= alpha: score >= beta then guarantees cutoff and best replacement before any best/bound compare"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
         "cycles": 1,
-        "note": "Under alpha<beta, max(alpha,value)>=beta iff value>=beta. Cutoff children avoid the 2-cycle lower-bound select."
+        "note": "One comparison. Under value<=alpha<beta, testing raw child score>=beta first proves both cutoff and that this score is the new best, so cutoff paths skip best-value and lower-bound comparisons."
       }
     },
     {
@@ -4347,15 +4347,59 @@
       "status": "implemented-cutoff-first-profile",
       "preconditions": [
         "caller enters the child-result update with alpha < beta",
-        "on true, caller cuts off before computing/storing a lowered beta",
-        "on false, caller may then apply lowerUpperBound32(beta,value)"
+        "ordinary bound-update use may test updated best value <= alpha",
+        "stronger child-score use is valid when previous best value >= beta: score <= alpha then guarantees cutoff and best replacement before any best/bound compare"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
         "cycles": 1,
-        "note": "Under alpha<beta, min(beta,value)<=alpha iff value<=alpha. Cutoff children avoid the 2-cycle upper-bound select."
+        "note": "Dual one-comparison cutoff. Under alpha<beta<=value, score<=alpha proves cutoff and new-best status before upper-bound/best comparisons."
+      }
+    },
+    {
+      "name": "maxChildRaisesAlpha32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        ">"
+      ],
+      "status": "implemented-window-aware-child-profile",
+      "preconditions": [
+        "caller already tested score < beta, so this child does not cutoff",
+        "previous best value <= alpha",
+        "on true, score is necessarily greater than previous best, so caller may set value=alpha=score and bestMove=child without a separate best comparison",
+        "on false, alpha remains unchanged and caller only needs a score>value test if best identity/value must still be updated"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Second stage of max-child triage after cutoff-first score>=beta test."
+      }
+    },
+    {
+      "name": "minChildLowersBeta32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        "<"
+      ],
+      "status": "implemented-window-aware-child-profile",
+      "preconditions": [
+        "caller already tested score > alpha, so this child does not cutoff",
+        "previous best value >= beta",
+        "on true, score is necessarily less than previous best, so caller may set value=beta=score and bestMove=child without a separate best comparison",
+        "on false, beta remains unchanged and caller only needs a score<value test if best identity/value must still be updated"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Second stage of min-child triage after cutoff-first score<=alpha test."
       }
     },
     {
@@ -6325,11 +6369,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 219,
+    "functionsImplemented": 221,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 219,
+    "functionsWithCycleCount": 221,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8054,6 +8098,24 @@
           "before": "three-coordinate locator composition using mix32 per coordinate plus combine/final mix is about 32 serial-ledger cycles",
           "after": "16 fixed cycles",
           "mechanism": "jointly mix the exact tuple once because the hash only addresses the table and exact coordinates still authorize hits"
+        }
+      ]
+    },
+    {
+      "id": "round-087",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "max child update sequence",
+          "before": "cutoff-first plus best select plus alpha update costs about 5 serial operations on a continuing child",
+          "after": "2 operations when score raises alpha, 3 when it can only improve best; cutoff remains 1",
+          "mechanism": "use value<=alpha<beta to triage raw score before best-value and bound updates"
+        },
+        {
+          "function": "min child update sequence",
+          "before": "dual continuing-child path performs best select and beta update after cutoff test",
+          "after": "2 operations when score lowers beta, 3 for best-only/no-bound path; cutoff remains 1",
+          "mechanism": "use alpha<beta<=value dual invariant"
         }
       ]
     }

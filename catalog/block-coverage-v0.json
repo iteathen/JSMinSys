@@ -340,9 +340,11 @@
         "lowerUpperBound32",
         "cutoff32",
         "maxValueCutsOff32",
-        "minValueCutsOff32"
+        "minValueCutsOff32",
+        "maxChildRaisesAlpha32",
+        "minChildLowersBeta32"
       ],
-      "note": "Alpha-beta primitives include ordinary bound updates/cutoff plus cutoff-first child-result predicates. When the caller already has alpha<beta, testing value>=beta or value<=alpha first removes bound-update work on cutoff paths without increasing non-cutoff serial cost."
+      "note": "Alpha-beta profiles now exploit the full child-update window invariant. Test raw score for cutoff first; if it continues, test score against the active bound. A bound-raising/lowering child is automatically the new best, deleting a separate best comparison; only the residual fail-low/fail-high region needs best-only comparison."
     },
     {
       "id": 18,

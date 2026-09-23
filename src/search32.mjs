@@ -22,6 +22,14 @@ export function minValueCutsOff32(value, alpha) {
   return value <= alpha;
 }
 
+export function maxChildRaisesAlpha32(score, alpha) {
+  return score > alpha;
+}
+
+export function minChildLowersBeta32(score, beta) {
+  return score < beta;
+}
+
 export function argMaxPlayable32(scoresInOrder, order, count, none) {
   let bestIndex = -1;
   let bestScore = -2147483648;

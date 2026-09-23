@@ -301,6 +301,8 @@ import {
   cutoff32,
   maxValueCutsOff32,
   minValueCutsOff32,
+  maxChildRaisesAlpha32,
+  minChildLowersBeta32,
   argMaxPlayable32,
   argMaxPlayableSlot32,
   argMaxPlayableSlot2Nonempty32,
@@ -1797,6 +1799,16 @@ test('search scalar blocks', () => {
   assert.equal(maxValueCutsOff32(6, 7), false);
   assert.equal(minValueCutsOff32(-3, -3), true);
   assert.equal(minValueCutsOff32(-2, -3), false);
+
+  // Max-node invariant before a child: value <= alpha < beta.
+  assert.equal(maxValueCutsOff32(12, 10), true);
+  assert.equal(maxChildRaisesAlpha32(7, 5), true);
+  assert.equal(maxChildRaisesAlpha32(4, 5), false);
+
+  // Min-node dual: alpha < beta <= value.
+  assert.equal(minValueCutsOff32(-6, -5), true);
+  assert.equal(minChildLowersBeta32(3, 5), true);
+  assert.equal(minChildLowersBeta32(6, 5), false);
   const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
   const scoresInOrder = new Int32Array([-2147483648, 2, 4, 1, 3, 0, 2]);
   assert.equal(argMaxPlayable32(scoresInOrder, order, 7, 0xffffffff), 4);
