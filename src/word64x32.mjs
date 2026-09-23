@@ -25,11 +25,6 @@ export function equal2x32(a0, a1, b0, b1) {
 }
 
 export function shl2x32Into(dst, di, lo, hi, count) {
-  if (count === 0) {
-    dst[di] = lo;
-    dst[di + 1] = hi;
-    return dst;
-  }
   if (count < 32) {
     dst[di] = lo << count;
     dst[di + 1] = (hi << count) | (lo >>> (32 - count));
@@ -41,11 +36,6 @@ export function shl2x32Into(dst, di, lo, hi, count) {
 }
 
 export function ushr2x32Into(dst, di, lo, hi, count) {
-  if (count === 0) {
-    dst[di] = lo;
-    dst[di + 1] = hi;
-    return dst;
-  }
   if (count < 32) {
     dst[di] = (lo >>> count) | (hi << (32 - count));
     dst[di + 1] = hi >>> count;
