@@ -1,5 +1,5 @@
 export function mix32(value) {
-  return Math.imul(value ^ (value >>> 16), 0x7feb352d) >>> 0;
+  return Math.imul(value ^ (value >>> 16), 0x7feb352d);
 }
 
 export function mix32Medium(value) {
@@ -7,7 +7,7 @@ export function mix32Medium(value) {
   x ^= x >>> 16;
   x = Math.imul(x, 0x7feb352d);
   x ^= x >>> 15;
-  return x >>> 0;
+  return x;
 }
 
 export function mix32Strong(value) {
@@ -17,7 +17,7 @@ export function mix32Strong(value) {
   x ^= x >>> 15;
   x = Math.imul(x, 0x846ca68b);
   x ^= x >>> 16;
-  return x >>> 0;
+  return x;
 }
 
 export function fillReflect3Tables32(tables, columns, byteCount) {
