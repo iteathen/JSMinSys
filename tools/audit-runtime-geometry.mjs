@@ -34,11 +34,12 @@ for(const name of [
 const addons=readFileSync('addons/index.mjs','utf8');
 for(const name of [
   'rba-tt32.mjs','rba-connect4-geometry.mjs','rba-connect4-coordinate.mjs',
-  'rba-connect4-front.mjs','rba-connect4-solver.mjs'
+  'rba-connect4-front.mjs','rba-connect4-solver.mjs','rba-connect4-profile.mjs'
 ])assert.ok(addons.includes(name),`missing configured RBA export ${name}`);
 
 const spec=readFileSync('SPEC.md','utf8');
 assert.ok(spec.includes('JMS-DATA-007'), 'general geometry path rule missing');
+assert.ok(spec.includes('JMS-DATA-008'), 'initialization specialization rule missing');
 
 const functions=JSON.parse(readFileSync('catalog/functions-v0.json','utf8'));
 const names=new Set(functions.functions.map(fn=>fn.name));
