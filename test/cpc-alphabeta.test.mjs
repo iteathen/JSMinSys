@@ -4,7 +4,7 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 import {
   prepareConnect4CpcScratch,evaluateConnect4Cpc32,connect4CpcTargetOwner32,
-  CPC_EXACT,CPC_RESTRICT,
+  CPC_NONE,CPC_EXACT,CPC_BOUND,CPC_RESTRICT,
 } from '../addons/cpc-connect4.mjs';
 import {
   prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,
@@ -64,6 +64,29 @@ test('CPC per-column XOR parity equals literal future-event count on configured 
       }
     }
   }
+});
+
+test('CPC pooled-frontier response extends all-even pairing without counting omitted frontiers',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
+
+  // Two odd-remainder columns form an even frontier pool. Every surviving P0
+  // requirement is covered by a true upper-response cell, so P0 gets an exact
+  // no-win upper bound even though the old all-even guard would reject this q.
+  const positive=[0,1,0,0],q=connect4RbaFromMoves(positive,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  let odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-q.words[c])&1;
+  assert.equal(odd,2);
+  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_BOUND);
+  assert.deepEqual([...s.interval],[1,2]);
+  assert.equal(exact(columns,rows,positive).value,2);
+
+  // Same pool cardinality, but here the only tempting parity hit in one
+  // residual is an omitted odd-column frontier cell. Counting it as a vertical
+  // response would be unsound, so CPC must leave the position unresolved.
+  const negative=[0,2,0,0],nq=connect4RbaFromMoves(negative,{geometry:g,canonical:false}),ns=prepareConnect4CpcScratch(g);
+  odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-nq.words[c])&1;
+  assert.equal(odd,2);
+  assert.equal(evaluateConnect4Cpc32(g,nq.words,0,nq.basis,0,nq.basis.length,ns),CPC_NONE);
+  assert.deepEqual([...ns.interval],[1,3]);
 });
 
 test('CPC recognizes exact fork loss after enabling move',()=>{
