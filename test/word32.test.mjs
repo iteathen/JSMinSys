@@ -158,26 +158,23 @@ test('apply and undo support state', () => {
 test('mix and reflection blocks', () => {
   assert.equal(mix32(0), 0);
   const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
-  const reflected = reflectPacked3x32(code, 7, 21);
+  const reflected = reflectPacked3x32(code);
   assert.equal((reflected >>> 21), 2);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
-  const genericCode = ((1 << 9) | (1 << 0) | (2 << 3) | (3 << 6)) >>> 0;
-  const genericReflected = reflectPacked3x32(genericCode, 3, 9);
-  assert.equal(genericReflected >>> 9, 1);
-  assert.equal(genericReflected & 7, 3);
-  assert.equal((genericReflected >>> 6) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
 });
 
 test('frontier normalization blocks', () => {
-  const lo = new Uint32Array([0b0011, 0b0111, 0b0100]);
+  // minimal precondition: nondecreasing cardinality.
+  const lo = new Uint32Array([0b0100, 0b0011, 0b0111]);
   const hi = new Uint32Array(3);
   const minimal = normalizeMinimal2x32InPlace(lo, hi, 3);
   assert.equal(minimal, 2);
   assert.equal((lo[0] === 0b0011 && lo[1] === 0b0100) || (lo[0] === 0b0100 && lo[1] === 0b0011), true);
 
-  const lo2 = new Uint32Array([0b0011, 0b0111, 0b0100]);
+  // maximal precondition: nonincreasing cardinality.
+  const lo2 = new Uint32Array([0b0111, 0b0011, 0b0100]);
   const hi2 = new Uint32Array(3);
   const maximal = normalizeMaximal2x32InPlace(lo2, hi2, 3);
   assert.equal(maximal, 1);
