@@ -1,5 +1,5 @@
 {
-  "version": "0.18.0",
+  "version": "0.19.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -458,7 +458,6 @@
         "|",
         "&",
         "~",
-        ">>>",
         "+",
         "<<",
         "<",
@@ -470,15 +469,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 37.5,
-          "max": 48
+          "min": 33.5,
+          "max": 42
         },
         "hotL2Predicted": {
-          "min": 77.5,
-          "max": 96
+          "min": 73.5,
+          "max": 90
         },
-        "expression": "maintained landing-cell representation: 5*LOAD + 5*STORE + 15..19 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 21 ALU/control",
-        "note": "Maintaining next landing cell removes row*columns+column and reuses next=cell+columns for above-cell logic."
+        "expression": "typed stores own uint32 conversion: 5*LOAD + 5*STORE + 11..15 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 15 ALU/control",
+        "note": "Explicit >>>0 coercions are removed where values flow only through bitwise operations into Uint32Array storage."
       },
       "preconditions": [
         "configured columns and cellCount are immutable for the engine instance",
@@ -498,7 +497,6 @@
         "|",
         "&",
         "~",
-        ">>>",
         "+",
         "-",
         "<<",
@@ -511,15 +509,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 37.5,
-          "max": 49
+          "min": 33.5,
+          "max": 43
         },
         "hotL2Predicted": {
-          "min": 77.5,
-          "max": 97
+          "min": 73.5,
+          "max": 91
         },
-        "expression": "maintained landing-cell representation: 5*LOAD + 5*STORE + 15..20 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 22 ALU/control",
-        "note": "Undo obtains the played cell by subtracting configured columns from the maintained next landing cell; no row decode or multiply is required."
+        "expression": "typed stores own uint32 conversion: 5*LOAD + 5*STORE + 11..16 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 16 ALU/control",
+        "note": "Explicit unsigned coercions are removed from store-only values and bitwise-local intermediates."
       },
       "preconditions": [
         "configured columns and cellCount are immutable for the engine instance",
@@ -645,11 +643,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "8 + 10*C",
+        "expression": "8 + 9*C",
         "parameters": {
           "C": "configured columns"
         },
-        "note": "Direct arithmetic fallback avoids reflection-table memory traffic; preferable when lookup tables are cold or configured width is small."
+        "note": "Unsigned conversion is delayed until the returned scalar; per-column redundant coercions are removed."
       }
     },
     {
@@ -970,9 +968,13 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
         "minCycles": 4,
-        "maxCycles": 13,
-        "note": "Predicted-path range across count==0, <32, <64, and >=64. Includes two hot/local stores at 0.5-cycle minimum each."
-      }
+        "maxCycles": 11,
+        "note": "Natural [0,64) shift domain removes the >=64 branch; typed stores own result coercion."
+      },
+      "preconditions": [
+        "0 <= count < 64",
+        "destination is Uint32Array-compatible storage"
+      ]
     },
     {
       "name": "ushr2x32Into",
@@ -994,9 +996,13 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
         "minCycles": 4,
-        "maxCycles": 13,
-        "note": "Predicted-path range across count==0, <32, <64, and >=64. Includes two hot/local stores at 0.5-cycle minimum each."
-      }
+        "maxCycles": 11,
+        "note": "Natural [0,64) shift domain removes the >=64 branch; typed stores own result coercion."
+      },
+      "preconditions": [
+        "0 <= count < 64",
+        "destination is Uint32Array-compatible storage"
+      ]
     },
     {
       "name": "add2x32Into",
@@ -1015,8 +1021,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 9,
-        "note": "Static serial ledger with predicted carry select and two hot/local stores at 0.5-cycle minimum each."
+        "cycles": 8,
+        "note": "High-lane uint32 coercion is delegated to destination typed storage; low-lane coercion remains required for carry detection."
       }
     },
     {
@@ -1027,7 +1033,6 @@
         "-",
         "<",
         "?:",
-        ">>>",
         "ST32",
         "="
       ],
@@ -1036,8 +1041,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 9,
-        "note": "Static serial ledger with predicted borrow select and two hot/local stores at 0.5-cycle minimum each."
+        "cycles": 7,
+        "note": "Both result coercions are delegated to destination typed storage; borrow is determined before stores."
       }
     },
     {
@@ -1623,6 +1628,54 @@
           "before": "not present",
           "after": "explicit initialization-only symbolic cost",
           "mechanism": "move reflection permutation construction to configuration phase"
+        }
+      ]
+    },
+    {
+      "id": "round-012",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32",
+          "before": "37.5-48 L1 / 77.5-96 L2",
+          "after": "33.5-42 L1 / 73.5-90 L2",
+          "mechanism": "delegate uint32 conversion to typed stores; remove redundant intermediate coercions"
+        },
+        {
+          "function": "undoMove32",
+          "before": "37.5-49 L1 / 77.5-97 L2",
+          "after": "33.5-43 L1 / 73.5-91 L2",
+          "mechanism": "delegate uint32 conversion to typed stores; remove redundant intermediate coercions"
+        },
+        {
+          "function": "shl2x32Into",
+          "before": "4-13 cycles",
+          "after": "4-11 cycles",
+          "mechanism": "restrict to natural [0,64) domain and remove store-only coercions"
+        },
+        {
+          "function": "ushr2x32Into",
+          "before": "4-13 cycles",
+          "after": "4-11 cycles",
+          "mechanism": "restrict to natural [0,64) domain and remove store-only coercions"
+        },
+        {
+          "function": "add2x32Into",
+          "before": "9 cycles",
+          "after": "8 cycles",
+          "mechanism": "typed destination owns high-lane coercion"
+        },
+        {
+          "function": "sub2x32Into",
+          "before": "9 cycles",
+          "after": "7 cycles",
+          "mechanism": "typed destination owns both result coercions"
+        },
+        {
+          "function": "reflectPacked3Direct32",
+          "before": "8 + 10*C cycles",
+          "after": "8 + 9*C cycles",
+          "mechanism": "delay unsigned coercion until scalar return"
         }
       ]
     }
