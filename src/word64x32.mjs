@@ -120,13 +120,12 @@ export function popcount2x32SparseHigh(lo, hi) {
   a = a - ((a >>> 1) & 0x55555555);
   a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
   a = (a + (a >>> 4)) & 0x0f0f0f0f;
-  const ac = Math.imul(a, 0x01010101) >>> 24;
 
   let b = hi;
   b = b - ((b >>> 1) & 0x55555555);
   b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
   b = (b + (b >>> 4)) & 0x0f0f0f0f;
-  return ac + (Math.imul(b, 0x01010101) >>> 24);
+  return Math.imul(a + b, 0x01010101) >>> 24;
 }
 
 export function popcount2x32(lo, hi) {
@@ -134,11 +133,10 @@ export function popcount2x32(lo, hi) {
   a = a - ((a >>> 1) & 0x55555555);
   a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
   a = (a + (a >>> 4)) & 0x0f0f0f0f;
-  const ac = Math.imul(a, 0x01010101) >>> 24;
 
   let b = hi;
   b = b - ((b >>> 1) & 0x55555555);
   b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
   b = (b + (b >>> 4)) & 0x0f0f0f0f;
-  return ac + (Math.imul(b, 0x01010101) >>> 24);
+  return Math.imul(a + b, 0x01010101) >>> 24;
 }

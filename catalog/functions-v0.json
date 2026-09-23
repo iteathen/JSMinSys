@@ -1,5 +1,5 @@
 {
-  "version": "0.42.0",
+  "version": "0.43.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2138,7 +2138,7 @@
       ],
       "status": "implemented-distribution-profile",
       "preconditions": [
-        "choose this profile when hi===0 occurs often enough to justify the branch",
+        "choose this profile when hi===0 exceeds about 18.2% under the current serial ledger or measured emitted-code evidence favors it",
         "use fixed-cost popcount2x32 when upper-lane occupancy is usually nonzero"
       ],
       "cycleCount": {
@@ -2146,8 +2146,8 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
         "minCycles": 16,
-        "maxCycles": 31,
-        "note": "hi===0 path costs branch/test + one SWAR popcount; hi!==0 path costs branch/test + full two-lane popcount. Break-even against fixed 29-cycle popcount2x32 occurs when hi===0 exceeds about 13.3% under this serial ledger."
+        "maxCycles": 27,
+        "note": "hi===0 path remains branch/test + one 14-cycle SWAR popcount. hi!==0 uses the fused 25-cycle two-lane path plus branch/test. Break-even against fixed 25-cycle popcount2x32 occurs when hi===0 exceeds 2/11 (~18.2%) under this serial ledger."
       }
     },
     {
@@ -2167,8 +2167,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 29,
-        "note": "Two SWAR popcounts with redundant lane input coercions removed, plus final add."
+        "cycles": 25,
+        "note": "Both lanes perform SWAR through byte-local counts, then add byte counts before one shared IMUL/shift accumulation. Each per-lane byte count is <=8, so the <=16 byte sums cannot carry across bytes."
       }
     },
     {
@@ -3219,6 +3219,24 @@
           "before": "physical-column-indexed landing state required a hot slot-to-column remap before transition",
           "after": "one initialization-time permutation; transition consumes selected move slot directly",
           "mechanism": "align landing/support/score ownership at configuration time"
+        }
+      ]
+    },
+    {
+      "id": "round-036",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "popcount2x32",
+          "before": "29 fixed cycles",
+          "after": "25 fixed cycles",
+          "mechanism": "fuse the two lanes before byte accumulation; share final IMUL and shift"
+        },
+        {
+          "function": "popcount2x32SparseHigh",
+          "before": "16-cycle hi==0 / 31-cycle hi!=0",
+          "after": "16-cycle hi==0 / 27-cycle hi!=0",
+          "mechanism": "reuse fused two-lane accumulation on the nonzero-high path"
         }
       ]
     }

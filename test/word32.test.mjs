@@ -463,8 +463,10 @@ test('two-lane set iteration and cardinality', () => {
   assert.equal(cardinalityClass2x32(8, 1), 2);
   assert.equal(cardinalityClass2x32(0b1010, 0), 2);
   assert.equal(popcount2x32(0xffffffff, 0x3ff), 42);
+  assert.equal(popcount2x32(0xffffffff, 0xffffffff), 64);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0), 32);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0x3ff), 42);
+  assert.equal(popcount2x32SparseHigh(0xffffffff, 0xffffffff), 64);
 });
 
 test('move-slot index space removes hot physical-column remap', () => {

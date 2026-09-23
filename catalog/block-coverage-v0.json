@@ -66,7 +66,7 @@
         "popcount2x32SparseHigh",
         "popcount2x32"
       ],
-      "note": "One-lane, fixed two-lane, and sparse-high two-lane popcount profiles are separately costed; initialization/workload evidence selects the appropriate form."
+      "note": "Exact-count consumers remain where semantics require cardinality. The fixed two-lane profile fuses lane-local byte counts before one final accumulation; sparse-high keeps a one-lane fast path and is selected only when its measured/distribution break-even is favorable."
     },
     {
       "id": 5,
