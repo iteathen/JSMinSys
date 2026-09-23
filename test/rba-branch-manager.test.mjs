@@ -212,5 +212,8 @@ test('manager inspects newest surplus before an old head window',()=>{
   assert.equal(rbaTtManagerInspectReady32(t,resetTargets,1),1,
     'one-item manager window did not inspect newest surplus');
   assert.equal(t.redirect[duplicate],canonical);
-  assert.equal(rbaBranchReadyCount32(t),4);
+  assert.equal(t.readyMember[duplicate],0);
+  assert.equal(t.readyMember[canonical],1);
+  assert.equal(rbaBranchReadyCount32(t),5,
+    'dedupe should replace redundant work with its unresolved canonical q');
 });
