@@ -438,3 +438,138 @@ export function applyMove32CallerPlyKnownCell(
   return cell;
 }
 
+/**
+ * Undo profiles for callers that retain the exact played cell returned by the
+ * paired apply across recursive work. They do not reload landingCells[index]
+ * to rediscover that cell; landingCells is still restored for later legality.
+ */
+export function undoMove1x32KnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const ply = state[STATE_PLY] - 1;
+  const next = cell + columns;
+  const bit = 1 << cell;
+  let playable = state[STATE_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[STATE_PLY] = ply;
+  state[STATE_PLAYABLE_LO] = playable;
+  landingCells[index] = cell;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] - supportDelta;
+  return cell;
+}
+
+export function undoMove1x32CallerPlyKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const next = cell + columns;
+  const bit = 1 << cell;
+  let playable = state[CALLER_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[CALLER_PLY1_PLAYABLE_LO] = playable;
+  landingCells[index] = cell;
+  state[CALLER_PLY1_SUPPORT_CODE] = state[CALLER_PLY1_SUPPORT_CODE] - supportDelta;
+  return cell;
+}
+
+export function undoMove32KnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const ply = state[STATE_PLY] - 1;
+  const next = cell + columns;
+  const bit = 1 << cell;
+
+  state[STATE_PLY] = ply;
+  landingCells[index] = cell;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] - supportDelta;
+
+  if (cell < 32) {
+    let playableLo = state[STATE_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[STATE_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[STATE_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[STATE_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[STATE_PLAYABLE_HI] = playableHi;
+  }
+  return cell;
+}
+
+export function undoMove32CallerPlyKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const next = cell + columns;
+  const bit = 1 << cell;
+
+  landingCells[index] = cell;
+  state[CALLER_PLY2_SUPPORT_CODE] = state[CALLER_PLY2_SUPPORT_CODE] - supportDelta;
+
+  if (cell < 32) {
+    let playableLo = state[CALLER_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CALLER_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CALLER_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[CALLER_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[CALLER_PLY2_PLAYABLE_HI] = playableHi;
+  }
+  return cell;
+}
+
