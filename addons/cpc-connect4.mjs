@@ -57,8 +57,11 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
   const coord=offset+(player?g.p1Offset:g.p0Offset);
   let immediate=0,any=0;
   for(let i=0;i<basisSize;i+=1){
+    const id=basis[basisOffset+i];
+    // Basis ids are sorted by residual cardinality; singleton ids form the
+    // first class, so no later basis entry can matter once size exceeds one.
+    if(g.shapeSize[id]!==1)break;
     if(!coordHas(words,coord,i))continue;
-    const id=basis[basisOffset+i];if(g.shapeSize[id]!==1)continue;
     const cell=g.shapeCells[id*4],word=cell>>>5,mask=1<<(cell&31);
     if(bits[word]&mask)continue;
     bits[word]|=mask;any=1;
@@ -93,7 +96,9 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   // A second basis pass handles both the mover minimal-pair guard and the
   // opponent's playable pair-to-fork precursor relation.
   for(let i=0;i<basisSize;i+=1){
-    const id=basis[basisOffset+i];if(g.shapeSize[id]!==2)continue;
+    const id=basis[basisOffset+i],size=g.shapeSize[id];
+    if(size<2)continue;
+    if(size>2)break;
     const base=id*4,a=g.shapeCells[base],b=g.shapeCells[base+1];
 
     if(coordHas(words,moverCoord,i)&&!cellMarked(moverBits,a)&&!cellMarked(moverBits,b))return 0;
