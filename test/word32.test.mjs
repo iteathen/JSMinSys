@@ -46,17 +46,15 @@ test('subset32', () => {
 });
 
 test('two-lane wordwise blocks', () => {
-  const a = new Uint32Array([0xf0f0, 0xaaaa]);
-  const b = new Uint32Array([0x0ff0, 0x5555]);
   const dst = new Uint32Array(2);
 
-  and2x32Into(dst, 0, a, 0, b, 0);
+  and2x32Into(dst, 0, 0xf0f0, 0xaaaa, 0x0ff0, 0x5555);
   assert.deepEqual([...dst], [0x00f0, 0x0000]);
 
-  or2x32Into(dst, 0, a, 0, b, 0);
+  or2x32Into(dst, 0, 0xf0f0, 0xaaaa, 0x0ff0, 0x5555);
   assert.deepEqual([...dst], [0xfff0, 0xffff]);
 
-  xor2x32Into(dst, 0, a, 0, b, 0);
+  xor2x32Into(dst, 0, 0xf0f0, 0xaaaa, 0x0ff0, 0x5555);
   assert.deepEqual([...dst], [0xff00, 0xffff]);
 
   assert.equal(zero2x32(0, 0), true);
