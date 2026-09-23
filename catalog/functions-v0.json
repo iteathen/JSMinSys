@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "implementation-in-progress",
   "rule": "Stop implementation when a required primitive is not present in the admitted operation/capability set.",
   "functions": [
@@ -139,6 +139,102 @@
         "&",
         "~",
         "==="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "landingCell32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        "LD32",
+        "<",
+        "?:",
+        "*",
+        "+"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "maskContains32",
+      "source": "src/indexed32.mjs",
+      "block": "winning-line-test",
+      "primitives": [
+        "&",
+        "==="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "maskContains2x32",
+      "source": "src/indexed32.mjs",
+      "block": "winning-line-test",
+      "primitives": [
+        "&",
+        "===",
+        "&&"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "residualTransition32",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "LD32",
+        "*",
+        "+"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "powerOfTwoIndex32",
+      "source": "src/indexed32.mjs",
+      "block": "power-of-two-index",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "ttProbeIndex32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "&",
+        "LD32",
+        "===",
+        "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "ttReplace32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "ST32",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "selectGreater32",
+      "source": "src/indexed32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">=",
+        "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "selectLess32",
+      "source": "src/indexed32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "<=",
+        "?:"
       ],
       "status": "implemented"
     }
