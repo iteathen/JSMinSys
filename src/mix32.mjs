@@ -3,6 +3,14 @@ export function mix32(value) {
   x ^= x >>> 16;
   x = Math.imul(x, 0x7feb352d);
   x ^= x >>> 15;
+  return x >>> 0;
+}
+
+export function mix32Strong(value) {
+  let x = value;
+  x ^= x >>> 16;
+  x = Math.imul(x, 0x7feb352d);
+  x ^= x >>> 15;
   x = Math.imul(x, 0x846ca68b);
   x ^= x >>> 16;
   return x >>> 0;
