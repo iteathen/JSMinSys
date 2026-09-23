@@ -1,5 +1,5 @@
 {
-  "version": "0.97.0",
+  "version": "0.98.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -812,6 +812,80 @@
         "hotL1DirectMissCycles": 7,
         "hotL1DirectHitCycles": 20,
         "note": "The first exact-key load also proves occupancy. Relative to a separate used[] byte plus key0 array, every occupied probe step deletes one memory load; the signed terminal result also lets consumers replace a post-probe occupancy reload with a scalar sign test. Empty insertion decoding remains explicitly one NOT in the caller ledger."
+      }
+    },
+    {
+      "name": "probe2x32IdSlot32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "LD32",
+        "===",
+        "~",
+        "<<",
+        "&&",
+        "+",
+        "&",
+        "="
+      ],
+      "status": "implemented-scalar-key-probe-profile",
+      "preconditions": [
+        "capacity is a power of two and capacityMask = capacity - 1",
+        "start is the already-prepared primary index in 0..capacityMask",
+        "hashSlots is Int32-backed, emptyId is distinct from every occupied id, and occupied ids are nonnegative",
+        "occupied id <= 0x3fffffff so id << 1 addresses a nonnegative two-word dense-key pair",
+        "words is Uint32-backed and stores exact key pairs at offsets id << 1 and (id << 1) + 1",
+        "caller already owns key0 and key1 as live exact uint32 scalar results of independent producer work",
+        "caller does not load or materialize a source key array solely to qualify for this profile",
+        "at least one hash slot contains emptyId so linear probing terminates",
+        "a nonnegative return is an exact-key hit id; a negative return encodes the empty insertion slot as bitwise complement",
+        "exact two-coordinate equality remains authoritative; the primary index and occupied id are addressing only"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "C0*(2*LOAD+8) + C1*(3*LOAD+11) + TERMINAL + BM",
+        "parameters": {
+          "C0": "occupied nonmatching ids rejected after key0 comparison",
+          "C1": "occupied nonmatching ids with matching key0 but mismatching key1",
+          "LOAD": "NEES cache-level dependent load cost",
+          "TERMINAL": "empty stop: LOAD+3; exact hit: 3*LOAD+8",
+          "BM": "additional branch-misprediction penalties for the selected probe scenario"
+        },
+        "hotL1DirectMissCycles": 7,
+        "hotL1DirectHitCycles": 20,
+        "note": "The exact key stays in producer-owned scalars. Hash-slot id loads and stored-key loads remain explicit, but the probe performs no source-key loads or temporary key materialization."
+      }
+    },
+    {
+      "name": "publish2x32IdSlot32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "ST32",
+        "<<",
+        "+",
+        "="
+      ],
+      "status": "implemented-scalar-key-publication-profile",
+      "preconditions": [
+        "slot is the empty insertion slot decoded from a paired probe2x32IdSlot32 miss",
+        "id is the caller-owned nonnegative dense-key id and id <= 0x3fffffff",
+        "key0 and key1 are already-live exact uint32 producer scalars; no source array is loaded solely for publication",
+        "words has capacity for the pair at id << 1 and hashSlots has capacity for slot",
+        "no concurrent reader requires atomic publication ordering for this local interner profile"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + 3*STORE_COST",
+        "parameters": {
+          "STORE_COST": "NEES store cost for the selected locality/ownership scenario"
+        },
+        "hotLocalMinimumCycles": 3.5,
+        "note": "One shift and one +1 address increment feed two dense-key stores plus the hash-slot id store. Source-key loads are absent because publication consumes producer-owned scalars."
       }
     },
     {
@@ -6491,11 +6565,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 225,
+    "functionsImplemented": 227,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 225,
+    "functionsWithCycleCount": 227,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8280,6 +8354,24 @@
           "before": "two-word exact residual keys are independently strong-mixed, combined through two additional IMUL stages, strong-mixed again, then masked for a power-of-two table",
           "after": "two coordinate-specific products are XOR-combined, folded once, and masked directly in 10 serial-ledger cycles",
           "mechanism": "treat the hash as addressing only and jointly mix the exact two-word tuple instead of independently avalanching coordinates that are still compared exactly on probe"
+        }
+      ]
+    },
+    {
+      "id": "round-091",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "two-word residual interner probe",
+          "before": "producer stores an exact two-word key into scratch; hashing and each exact comparison reload the source words",
+          "after": "producer-owned key0/key1 scalars feed the direct power-of-two index and exact id probe without source-key loads",
+          "mechanism": "preserve the already-computed exact pair across the producer/hasher/probe boundary instead of materializing and rereading it"
+        },
+        {
+          "function": "two-word residual interner publication",
+          "before": "a new chunk reloads both exact words from transient scratch before dense-key storage",
+          "after": "dense key pair and hash-slot id are published directly from the producer scalars",
+          "mechanism": "delete transient scratch stores/loads while retaining the authoritative dense exact-key representation"
         }
       ]
     }

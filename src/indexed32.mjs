@@ -109,6 +109,41 @@ export function probe3x32SentinelSlot32(
   }
 }
 
+export function probe2x32IdSlot32(
+  hashSlots,
+  words,
+  capacityMask,
+  start,
+  key0,
+  key1,
+  emptyId,
+) {
+  let slot = start;
+  for (;;) {
+    const id = hashSlots[slot];
+    if (id === emptyId) return ~slot;
+    const base = id << 1;
+    if (words[base] === key0
+        && words[base + 1] === key1) return id;
+    slot = (slot + 1) & capacityMask;
+  }
+}
+
+export function publish2x32IdSlot32(
+  words,
+  hashSlots,
+  slot,
+  id,
+  key0,
+  key1,
+) {
+  const base = id << 1;
+  words[base] = key0;
+  words[base + 1] = key1;
+  hashSlots[slot] = id;
+  return id;
+}
+
 export function selectGreater32(a, b) {
   return a >= b ? a : b;
 }

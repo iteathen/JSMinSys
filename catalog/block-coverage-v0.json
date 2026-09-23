@@ -230,9 +230,11 @@
         "ttReplace32",
         "ttUpdateValue32",
         "fillI32Sentinel32",
-        "probe3x32SentinelSlot32"
+        "probe3x32SentinelSlot32",
+        "probe2x32IdSlot32",
+        "publish2x32IdSlot32"
       ],
-      "note": "TT/cache probing retains prepared indices and exact identity. Proven hit updates may store only the value. For exact triple open addressing whose first coordinate has an impossible sentinel, fillI32Sentinel32 makes setup cost explicit and probe3x32SentinelSlot32 folds occupancy into key0: occupied probe steps avoid a separate used[] load, insertion avoids its store, and the returned sign preserves hit-versus-empty state without a post-probe occupancy reload."
+      "note": "TT/cache probing retains prepared indices and exact identity. Proven hit updates may store only the value. Exact triple open addressing can fold occupancy into an impossible key0 sentinel. Two-word dense-key interners can preserve producer-owned key scalars through direct indexing, exact probing, and publication: probe2x32IdSlot32 performs no source-key reloads, and publish2x32IdSlot32 writes a new dense pair/hash slot directly from those scalars."
     },
     {
       "id": 12,

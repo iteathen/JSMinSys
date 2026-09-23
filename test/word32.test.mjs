@@ -105,6 +105,8 @@ import {
   ttUpdateValue32,
   fillI32Sentinel32,
   probe3x32SentinelSlot32,
+  probe2x32IdSlot32,
+  publish2x32IdSlot32,
   selectGreater32,
   selectLess32,
 } from '../src/indexed32.mjs';
@@ -226,6 +228,56 @@ test('sentinel triple probe folds occupancy into exact key storage', () => {
   probe = probe3x32SentinelSlot32(
     key0s, key1s, key2s, 7, 7, 9, 9, 9, emptyKey0,
   );
+  assert.equal(probe, ~1);
+  slot = ~probe;
+  assert.equal(slot, 1);
+});
+
+
+test('scalar two-word interner probe preserves producer-owned exact keys', () => {
+  const emptyId = -1;
+  const hashSlots = new Int32Array(8);
+  hashSlots.fill(emptyId);
+  const words = new Uint32Array(16);
+
+  let probe = probe2x32IdSlot32(
+    hashSlots, words, 7, 3, 0x80000000, 0xffffffff, emptyId,
+  );
+  assert.equal(probe, ~3);
+  let slot = ~probe;
+  assert.equal(
+    publish2x32IdSlot32(
+      words, hashSlots, slot, 0, 0x80000000, 0xffffffff,
+    ),
+    0,
+  );
+  assert.equal(words[0], 0x80000000);
+  assert.equal(words[1], 0xffffffff);
+  assert.equal(
+    probe2x32IdSlot32(
+      hashSlots, words, 7, 3, 0x80000000, 0xffffffff, emptyId,
+    ),
+    0,
+  );
+
+  assert.equal(publish2x32IdSlot32(words, hashSlots, 4, 1, 7, 11), 1);
+  assert.equal(
+    probe2x32IdSlot32(hashSlots, words, 7, 3, 7, 11, emptyId),
+    1,
+  );
+  assert.equal(
+    probe2x32IdSlot32(hashSlots, words, 7, 3, 99, 100, emptyId),
+    ~5,
+  );
+
+  hashSlots.fill(emptyId);
+  publish2x32IdSlot32(words, hashSlots, 7, 0, 1, 2);
+  publish2x32IdSlot32(words, hashSlots, 0, 1, 3, 4);
+  assert.equal(
+    probe2x32IdSlot32(hashSlots, words, 7, 7, 3, 4, emptyId),
+    1,
+  );
+  probe = probe2x32IdSlot32(hashSlots, words, 7, 7, 5, 6, emptyId);
   assert.equal(probe, ~1);
   slot = ~probe;
   assert.equal(slot, 1);
