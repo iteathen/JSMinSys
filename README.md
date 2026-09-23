@@ -34,13 +34,17 @@ The working hypothesis is a 32-bit word domain for hot computation. Wider logica
 Draft 0.2 implementation bootstrap. The current function catalog implements every research block expressible with the admitted vocabulary; missing-primitive cases are isolated in `catalog/deferred-primitives.md`. See `SPEC.md` for normative intent and `catalog/` for the Connect4-derived research inventory.
 
 
+## Admission principle
+
+Slow operations are allowed when their cost can be accounted for faithfully. JSMinSys makes cost visible; it does not forbid an operation merely because it is expensive. Application authors decide whether a function's cost is justified.
+
 ## Implementation status
 
 The current catalog implementation is exported from `src/index.mjs`.
 
-- 54 catalog functions implemented
-- 19 of 20 research blocks complete without adding a primitive
-- capacity allocation deferred for primitive review
+- 55 catalog functions implemented
+- 20 of 20 research blocks implemented
+- typed capacity allocation admitted and costed through NEES
 - coordinate decode is implemented only as a comparison/reference anti-candidate
 - `Number.isInteger` was reviewed and rejected as unnecessary inside the sealed scope
 
