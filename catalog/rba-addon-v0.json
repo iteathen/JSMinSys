@@ -1,8 +1,9 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
     "addons/rba-tt32.mjs",
+    "addons/rba-branch-manager.mjs",
     "addons/rba-connect4-geometry.mjs",
     "addons/rba-connect4-coordinate.mjs",
     "addons/rba-connect4-front.mjs",
@@ -140,5 +141,28 @@
         "currentProductionNote": "After support-lift CPC closure, the maintained rank-28 control uses 49 alpha-beta nodes; the original Four-Front A/B comparison used 54 baseline nodes before that closure."
       }
     }
+  },
+  "branchManagerContract": {
+    "workAuthority": "The RBA TT ready queue is the sole shared work queue. BranchManager does not own a second task table or branch identity.",
+    "managerOwns": [
+      "bounded event draining",
+      "dependency attachment/reconciliation callback execution under TT transaction",
+      "surplus dependency exposure through the TT ready queue",
+      "worker wake signaling"
+    ],
+    "workerOwns": [
+      "one active q at a time",
+      "evaluation outside the TT transaction",
+      "publication of prepared result under TT transaction",
+      "direct retention of at most one runnable child"
+    ],
+    "queueSemantics": "Unresolved dependencies not retained by the publishing worker become shared ready-q work after manager reconciliation. Generation/membership/ref/execution fields prevent stale or duplicate ownership.",
+    "applicationOwns": [
+      "domain evaluator",
+      "domain publication interpretation",
+      "min/max or other reconciliation semantics",
+      "root witness/result interpretation",
+      "thread spawning policy"
+    ]
   }
 }
