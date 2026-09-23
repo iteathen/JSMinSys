@@ -100,3 +100,90 @@ test('indexed and table blocks', () => {
   assert.equal(selectGreater32(4, 9), 9);
   assert.equal(selectLess32(4, 9), 4);
 });
+
+
+import {
+  applyMove32,
+  undoMove32,
+  STATE_PLY,
+  STATE_SIDE,
+  STATE_SUPPORT_LO,
+  STATE_SUPPORT_HI,
+  STATE_PLAYABLE_LO,
+  STATE_PLAYABLE_HI,
+  STATE_SUPPORT_CODE,
+} from '../src/state32.mjs';
+import { mix32, reflectPacked3x32, canonicalMin32 } from '../src/mix32.mjs';
+import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace } from '../src/frontier32.mjs';
+import {
+  negateScore32,
+  raiseLowerBound32,
+  lowerUpperBound32,
+  cutoff32,
+  argMaxPlayable32,
+} from '../src/search32.mjs';
+
+test('apply and undo support state', () => {
+  const state = new Uint32Array(7);
+  const heights = new Uint8Array(7);
+  const moveColumns = new Uint8Array(42);
+  const cellLo = new Uint32Array(42);
+  const cellHi = new Uint32Array(42);
+  for (let cell = 0; cell < 32; cell += 1) cellLo[cell] = (1 << cell) >>> 0;
+  for (let cell = 32; cell < 42; cell += 1) cellHi[cell] = (1 << (cell - 32)) >>> 0;
+  for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
+
+  const cell = applyMove32(state, heights, moveColumns, cellLo, cellHi, 3, 7, 6, 21);
+  assert.equal(cell, 3);
+  assert.equal(state[STATE_PLY], 1);
+  assert.equal(state[STATE_SIDE], 1);
+  assert.equal(heights[3], 1);
+  assert.equal((state[STATE_SUPPORT_LO] & (1 << 3)) !== 0, true);
+  assert.equal((state[STATE_PLAYABLE_LO] & (1 << 10)) !== 0, true);
+  assert.equal(state[STATE_SUPPORT_CODE], ((1 << 9) + (1 << 21)) >>> 0);
+
+  const undone = undoMove32(state, heights, moveColumns, cellLo, cellHi, 7, 6, 21);
+  assert.equal(undone, 3);
+  assert.equal(state[STATE_PLY], 0);
+  assert.equal(state[STATE_SIDE], 0);
+  assert.equal(heights[3], 0);
+  assert.equal(state[STATE_SUPPORT_LO], 0);
+  assert.equal(state[STATE_SUPPORT_HI], 0);
+  assert.equal(state[STATE_SUPPORT_CODE], 0);
+});
+
+test('mix and reflection blocks', () => {
+  assert.equal(mix32(0), 0);
+  const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
+  const reflected = reflectPacked3x32(code, 7, 21);
+  assert.equal((reflected >>> 21), 2);
+  assert.equal(reflected & 7, 3);
+  assert.equal((reflected >>> 18) & 7, 1);
+  assert.equal(canonicalMin32(9, 4), 4);
+});
+
+test('frontier normalization blocks', () => {
+  const lo = new Uint32Array([0b0011, 0b0111, 0b0100]);
+  const hi = new Uint32Array(3);
+  const minimal = normalizeMinimal2x32InPlace(lo, hi, 3);
+  assert.equal(minimal, 2);
+  assert.equal((lo[0] === 0b0011 && lo[1] === 0b0100) || (lo[0] === 0b0100 && lo[1] === 0b0011), true);
+
+  const lo2 = new Uint32Array([0b0011, 0b0111, 0b0100]);
+  const hi2 = new Uint32Array(3);
+  const maximal = normalizeMaximal2x32InPlace(lo2, hi2, 3);
+  assert.equal(maximal, 1);
+  assert.equal(lo2[0], 0b0111);
+});
+
+test('search scalar blocks', () => {
+  assert.equal(negateScore32(1), -1);
+  assert.equal(raiseLowerBound32(-1, 1), 1);
+  assert.equal(lowerUpperBound32(1, -1), -1);
+  assert.equal(cutoff32(1, 1), true);
+  const scores = new Int32Array([0, 1, 2, 8, 4, 3, 2]);
+  const heights = new Uint8Array(7);
+  heights[3] = 6;
+  const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
+  assert.equal(argMaxPlayable32(scores, heights, order, 7, 6, 0xffffffff), 4);
+});
