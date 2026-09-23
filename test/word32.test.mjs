@@ -11,6 +11,7 @@ import {
   bitToggleI32,
   firstSetBitIndex32,
   popcount32,
+  popcount32Sparse,
   subset32,
   cardinalityClass32,
   isolatedBitIndex32,
@@ -655,6 +656,7 @@ import {
   clearIsolatedBit32,
   cardinalityClass2x32,
   popcount2x32SparseHigh,
+  popcount2x32SparseBits,
   popcount2x32,
   fillPopcount10Table32,
   popcount2x32High10Table,
@@ -743,6 +745,24 @@ test('two-lane set iteration and cardinality', () => {
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0), 32);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0x3ff), 42);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0xffffffff), 64);
+});
+
+test('sparse exact popcount profiles', () => {
+  const oneLane = [0, 1, 0x80000000, 0b1010, 0x80000001];
+  for (const value of oneLane) {
+    assert.equal(popcount32Sparse(value), popcount32(value));
+  }
+
+  const twoLane = [
+    [0, 0],
+    [1, 0],
+    [0x80000000, 1],
+    [0b1010, 0b0101],
+    [0x80000001, 0x200],
+  ];
+  for (const [lo, hi] of twoLane) {
+    assert.equal(popcount2x32SparseBits(lo, hi), popcount2x32(lo, hi));
+  }
 });
 
 test('10-bit high-lane popcount table profile', () => {

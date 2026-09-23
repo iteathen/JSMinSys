@@ -56,3 +56,12 @@ export function isolatedHighBitIndex32(bit) {
   return 63 - Math.clz32(bit);
 }
 
+export function popcount32Sparse(word) {
+  let count = 0;
+  while (word !== 0) {
+    word = word & (word - 1);
+    count += 1;
+  }
+  return count;
+}
+

@@ -1,5 +1,5 @@
 {
-  "version": "0.58.0",
+  "version": "0.59.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -317,6 +317,34 @@
         "kind": "fixed",
         "cycles": 14,
         "note": "SWAR popcount with redundant input uint32 coercion removed under the uint32 input invariant."
+      }
+    },
+    {
+      "name": "popcount32Sparse",
+      "source": "src/word32.mjs",
+      "block": "popcount",
+      "primitives": [
+        "!==",
+        "-",
+        "&",
+        "+=",
+        "="
+      ],
+      "status": "implemented-sparsity-profile",
+      "preconditions": [
+        "choose this profile only when exact set-bit count K is expected small enough to beat fixed SWAR",
+        "branch-misprediction penalties remain explicit and may change the break-even"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "1 + 5*K + BM",
+        "parameters": {
+          "K": "number of set bits in word",
+          "BM": "sum of branch-misprediction penalties for the loop under the selected scenario"
+        },
+        "note": "Predicted-loop ledger clears one lowest bit per iteration. With BM=0 it beats 14-cycle popcount32 for K<=2; K>=3 should normally use SWAR."
       }
     },
     {
@@ -2946,6 +2974,34 @@
       }
     },
     {
+      "name": "popcount2x32SparseBits",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        "!==",
+        "-",
+        "&",
+        "+=",
+        "="
+      ],
+      "status": "implemented-sparsity-profile",
+      "preconditions": [
+        "choose this profile only when total exact set-bit count K across both lanes is expected small enough to beat fused SWAR",
+        "branch-misprediction penalties remain explicit and may change the break-even"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + 5*K + BM",
+        "parameters": {
+          "K": "total number of set bits across lo and hi",
+          "BM": "sum of branch-misprediction penalties across both loops"
+        },
+        "note": "Two loop-exit tests plus five predicted serial cycles per cleared bit. With BM=0 it beats fixed 25-cycle popcount2x32 for K<=4."
+      }
+    },
+    {
       "name": "popcount2x32SparseHigh",
       "source": "src/word64x32.mjs",
       "block": "popcount",
@@ -3194,11 +3250,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 124,
+    "functionsImplemented": 126,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 124,
+    "functionsWithCycleCount": 126,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4335,6 +4391,24 @@
           "before": "atomicRelease32 = ATOMIC_STORE + ATOMIC_NOTIFY",
           "after": "ATOMIC_STORE",
           "mechanism": "narrow release contract for polling/external-wakeup consumers so no scheduler wake is emitted"
+        }
+      ]
+    },
+    {
+      "id": "round-052",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "popcount32Sparse",
+          "before": "popcount32 fixed 14 cycles",
+          "after": "1 + 5*K + BM; predicted-loop win for K<=2",
+          "mechanism": "do work proportional to actual set bits by repeatedly clearing the lowest one"
+        },
+        {
+          "function": "popcount2x32SparseBits",
+          "before": "popcount2x32 fixed 25 cycles",
+          "after": "2 + 5*K + BM; predicted-loop win for total K<=4",
+          "mechanism": "same sparsity-sensitive exact count across both lanes"
         }
       ]
     }

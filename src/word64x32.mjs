@@ -165,3 +165,16 @@ export function popcount2x32High10Table(lo, hi, table) {
   return (Math.imul(x, 0x01010101) >>> 24) + table[hi];
 }
 
+export function popcount2x32SparseBits(lo, hi) {
+  let count = 0;
+  while (lo !== 0) {
+    lo = lo & (lo - 1);
+    count += 1;
+  }
+  while (hi !== 0) {
+    hi = hi & (hi - 1);
+    count += 1;
+  }
+  return count;
+}
+
