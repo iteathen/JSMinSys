@@ -313,6 +313,18 @@ Draft 0.2 currently admits the following source-level families.
 
 These are generally not preferred in E0 unless justified.
 
+### Storage construction
+
+- `Uint32Array.construct` — source realization: `new Uint32Array(length)`
+
+This operation is admitted despite potentially high and variable cost because NEES provides an explicit parameterized cost model:
+
+```text
+TYPED_ARRAY_ALLOC_U32(length, typedArrayAllocationPath, pageState, gcState)
+```
+
+Generic `new` is not admitted by this rule.
+
 ### Atomics
 
 - `Atomics.load`
@@ -348,6 +360,16 @@ NEES remains authoritative for:
 - branches;
 - dependency depth;
 - governing-unit interpretation.
+
+### JMS-COST-004 — Cost magnitude does not control admission
+
+A high cycle cost is not, by itself, grounds for exclusion from JSMinSys.
+
+An operation MAY be admitted when its cost can be represented faithfully under NEES as a fixed value, range, parameterized expression, or unbounded cost. The application author decides whether the operation is worth its cost.
+
+JSMinSys SHOULD make expensive operations visibly expensive rather than hiding or prohibiting them solely because they are slow.
+
+All admitted functions remain candidates for later cycle-cost reduction, but optimization MUST preserve semantics and follow NEES governing-unit qualification.
 
 ### JMS-COST-003 — Local duplicate cost catalogs are non-authoritative
 
