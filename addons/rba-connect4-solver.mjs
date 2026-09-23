@@ -50,7 +50,7 @@ function rootCanonicalColumn(g,orderIndex,reflected){const caller=g.actionOrder[
 export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
   const g=state.g,base=q*t.keyWords,terminal=connect4RbaTerminal(g,t.keys,base);
-  state.count=0;state.witness=-1;state.childPresent.fill(0);
+  state.count=0;state.witness=-1;
   if(terminal)return terminal;
   if(!g.lineCount||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
   const n=t.basisSize[q];if(!n)return RBA_EXACT_DRAW;
@@ -77,7 +77,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     const column=q===rootQ?rootCanonicalColumn(g,oi,rootReflected):g.actionOrder[oi];
     if(t.keys[base+column]>=g.rows)continue;
     const action=state.boundary.depth?queryConnect4RbaFourFront(g,state.boundary,state.boundary.actionBase+column*4,t.keys,base):13;
-    let lo=action&3,hi=action>>>2;state.actions[count]=column;
+    let lo=action&3,hi=action>>>2;state.actions[count]=column;state.childPresent[count]=0;
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
