@@ -31,27 +31,27 @@ export function applyMove32(
 ) {
   const ply = state[STATE_PLY];
   const cell = landingCells[column];
-  const bit = (1 << cell) >>> 0;
+  const bit = 1 << cell;
   const next = cell + columns;
 
   if (cell < 32) {
-    state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] | bit) >>> 0;
-    let playableLo = (state[STATE_PLAYABLE_LO] & ~bit) >>> 0;
+    state[STATE_SUPPORT_LO] = state[STATE_SUPPORT_LO] | bit;
+    let playableLo = state[STATE_PLAYABLE_LO] & ~bit;
 
     if (next < cellCount) {
-      const aboveBit = (1 << next) >>> 0;
-      if (next < 32) playableLo = (playableLo | aboveBit) >>> 0;
-      else state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] | aboveBit) >>> 0;
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo = playableLo | aboveBit;
+      else state[STATE_PLAYABLE_HI] = state[STATE_PLAYABLE_HI] | aboveBit;
     }
 
     state[STATE_PLAYABLE_LO] = playableLo;
   } else {
-    state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] | bit) >>> 0;
-    let playableHi = (state[STATE_PLAYABLE_HI] & ~bit) >>> 0;
+    state[STATE_SUPPORT_HI] = state[STATE_SUPPORT_HI] | bit;
+    let playableHi = state[STATE_PLAYABLE_HI] & ~bit;
 
     if (next < cellCount) {
-      const aboveBit = (1 << next) >>> 0;
-      playableHi = (playableHi | aboveBit) >>> 0;
+      const aboveBit = 1 << next;
+      playableHi = playableHi | aboveBit;
     }
 
     state[STATE_PLAYABLE_HI] = playableHi;
@@ -59,7 +59,7 @@ export function applyMove32(
 
   landingCells[column] = next;
   state[STATE_PLY] = ply + 1;
-  state[STATE_SUPPORT_CODE] = (state[STATE_SUPPORT_CODE] + supportDelta) >>> 0;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] + supportDelta;
   return cell;
 }
 
@@ -74,33 +74,33 @@ export function undoMove32(
   const ply = state[STATE_PLY] - 1;
   const next = landingCells[column];
   const cell = next - columns;
-  const bit = (1 << cell) >>> 0;
+  const bit = 1 << cell;
 
   state[STATE_PLY] = ply;
   landingCells[column] = cell;
-  state[STATE_SUPPORT_CODE] = (state[STATE_SUPPORT_CODE] - supportDelta) >>> 0;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] - supportDelta;
 
   if (cell < 32) {
-    state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] & ~bit) >>> 0;
+    state[STATE_SUPPORT_LO] = state[STATE_SUPPORT_LO] & ~bit;
     let playableLo = state[STATE_PLAYABLE_LO];
 
     if (next < cellCount) {
-      const aboveBit = (1 << next) >>> 0;
-      if (next < 32) playableLo = (playableLo & ~aboveBit) >>> 0;
-      else state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] & ~aboveBit) >>> 0;
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo = playableLo & ~aboveBit;
+      else state[STATE_PLAYABLE_HI] = state[STATE_PLAYABLE_HI] & ~aboveBit;
     }
 
-    state[STATE_PLAYABLE_LO] = (playableLo | bit) >>> 0;
+    state[STATE_PLAYABLE_LO] = playableLo | bit;
   } else {
-    state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] & ~bit) >>> 0;
+    state[STATE_SUPPORT_HI] = state[STATE_SUPPORT_HI] & ~bit;
     let playableHi = state[STATE_PLAYABLE_HI];
 
     if (next < cellCount) {
-      const aboveBit = (1 << next) >>> 0;
-      playableHi = (playableHi & ~aboveBit) >>> 0;
+      const aboveBit = 1 << next;
+      playableHi = playableHi & ~aboveBit;
     }
 
-    state[STATE_PLAYABLE_HI] = (playableHi | bit) >>> 0;
+    state[STATE_PLAYABLE_HI] = playableHi | bit;
   }
   return cell;
 }
