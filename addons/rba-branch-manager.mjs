@@ -3,6 +3,9 @@ import {
   rbaTtLeave32,
   rbaTtTake32,
   rbaTtTakeEvent32,
+  rbaTtReleaseExecution32,
+  rbaTtManagerInspectReady32,
+  rbaTtManagerClean32,
   rbaTtFail32,
   RBA_TT_STOP,
   RBA_TT_DONE,
@@ -31,6 +34,7 @@ export function prepareRbaBranchWorker32({
   workerCount=1,
   readyTarget=workerCount*2,
   state=null,
+  resetTargets=null,
 }={}){
   if(!Number.isInteger(owner)||owner<2||owner>0x7fffffff||
      !Number.isInteger(workerCount)||workerCount<1||
@@ -41,6 +45,8 @@ export function prepareRbaBranchWorker32({
     workerCount,
     readyTarget,
     state,
+    resetTargets,
+    resetIndex:owner-2,
     q:-1,
     code:0,
     expose:0,
@@ -55,10 +61,33 @@ export function rbaBranchReadyCount32(t){
   return t.control[RBA_TT_READY_COUNT];
 }
 
+export function prepareRbaBranchManager32({capacity,resetTargets=null}={}){
+  if(!Number.isInteger(capacity)||capacity<1)throw new RangeError('invalid RBA branch manager capacity');
+  return {scanCursor:0,resetTargets,events:0,dedupes:0,maintenancePasses:0};
+}
+
+function applyWorkerReset32(t,worker){
+  const reset=worker.resetTargets;
+  if(!reset||worker.resetIndex<0||worker.resetIndex>=reset.length||
+     Atomics.load(reset,worker.resetIndex)===-2)return 0;
+  if(!rbaTtEnter32(t,worker.owner))return -1;
+  try{
+    if(worker.q>=0&&t.execution[worker.q]===worker.owner)
+      rbaTtReleaseExecution32(t,worker.q,worker.owner);
+    worker.q=-1;worker.code=0;worker.expose=0;
+    Atomics.store(reset,worker.resetIndex,-2);
+  }finally{
+    rbaTtLeave32(t);
+  }
+  Atomics.add(t.control,RBA_TT_WAKE,1);
+  Atomics.notify(t.control,RBA_TT_WAKE);
+  return 1;
+}
+
 export function rbaBranchManagerStep32(
   t,
   reconcile,
-  {owner=1,budget=64,context=null}={},
+  {owner=1,budget=64,context=null,manager=null}={},
 ){
   if(typeof reconcile!=='function')throw new TypeError('RBA reconcile callback required');
   if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
@@ -72,12 +101,18 @@ export function rbaBranchManagerStep32(
       if(q===-1)break;
       reconcile(t,q,context);
       processed+=1;
+      if(manager)manager.events+=1;
       if(Atomics.load(t.control,RBA_TT_STOP))break;
+    }
+    if(manager){
+      manager.dedupes+=rbaTtManagerInspectReady32(t,manager.resetTargets,budget);
+      manager.scanCursor=rbaTtManagerClean32(t,manager.resetTargets,manager.scanCursor,budget);
+      manager.maintenancePasses+=1;
     }
   }finally{
     rbaTtLeave32(t);
   }
-  if(processed){
+  if(processed||manager){
     Atomics.add(t.control,RBA_TT_WAKE,1);
     Atomics.notify(t.control,RBA_TT_WAKE);
   }
@@ -87,12 +122,12 @@ export function rbaBranchManagerStep32(
 export function runRbaBranchManagerLoop32(
   t,
   reconcile,
-  {owner=1,budget=64,context=null,waitMs=1}={},
+  {owner=1,budget=64,context=null,waitMs=1,manager=null}={},
 ){
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA manager wait');
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchManagerStep32(t,reconcile,{owner,budget,context}))
+    if(!rbaBranchManagerStep32(t,reconcile,{owner,budget,context,manager}))
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
@@ -107,6 +142,10 @@ export function rbaBranchWorkerStep32(
 ){
   if(typeof evaluate!=='function'||typeof publish!=='function')
     throw new TypeError('RBA worker callbacks required');
+
+  const resetBefore=applyWorkerReset32(t,worker);
+  if(resetBefore<0)return 0;
+  if(resetBefore>0)return 1;
 
   if(worker.q===-1){
     if(!rbaTtEnter32(t,worker.owner))return 0;
@@ -123,6 +162,10 @@ export function rbaBranchWorkerStep32(
     worker.code=evaluate(t,worker.q,worker.state,worker.expose,context);
     worker.evaluations+=1;
   }
+
+  const resetAfter=applyWorkerReset32(t,worker);
+  if(resetAfter<0)return 0;
+  if(resetAfter>0)return 1;
 
   if(!rbaTtEnter32(t,worker.owner))return 0;
   const q=worker.q;
