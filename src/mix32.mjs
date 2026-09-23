@@ -31,6 +31,15 @@ export function fillReflect3Tables32(tables, columns) {
   return supportBits;
 }
 
+export function reflectPacked3x24(code, tables, rankMask) {
+  return (
+    (code & rankMask)
+    | tables[code & 0xff]
+    | tables[0x100 + ((code >>> 8) & 0xff)]
+    | tables[0x200 + ((code >>> 16) & 0xff)]
+  ) >>> 0;
+}
+
 export function reflectPacked3x32(code, tables, rankMask) {
   return (
     (code & rankMask)
