@@ -323,7 +323,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix3x32Locator, mix3x32PowerOfTwoIndex, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1517,6 +1517,33 @@ test('one-lane caller meta makes known-cell undo landing-only', () => {
     base[CALLER_PLY1_SUPPORT_CODE],
   );
   assert.deepEqual(landingFast, landingBase);
+});
+
+test('joint two-word direct index covers structured power-of-two buckets', () => {
+  assert.equal(mix2x32PowerOfTwoIndex(0, 0, 255), 0);
+  assert.notEqual(
+    mix2x32PowerOfTwoIndex(1, 0, 255),
+    mix2x32PowerOfTwoIndex(0, 1, 255),
+  );
+  assert.equal(
+    mix2x32PowerOfTwoIndex(0x7fffffff, 0x80000000, 1023),
+    903,
+  );
+
+  const buckets = new Uint32Array(256);
+  for (let i = 0; i < 4096; i += 1) {
+    const a = i;
+    const b = Math.imul(i, 3) ^ 0x9e3779b9;
+    buckets[mix2x32PowerOfTwoIndex(a, b, 255)] += 1;
+  }
+  let occupied = 0;
+  let maxBucket = 0;
+  for (let i = 0; i < buckets.length; i += 1) {
+    if (buckets[i] !== 0) occupied += 1;
+    if (buckets[i] > maxBucket) maxBucket = buckets[i];
+  }
+  assert.equal(occupied, 256);
+  assert.ok(maxBucket < 40);
 });
 
 test('joint triple locator mixes exact-key coordinates without becoming identity', () => {

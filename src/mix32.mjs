@@ -20,6 +20,13 @@ export function mix32Strong(value) {
   return x;
 }
 
+export function mix2x32PowerOfTwoIndex(a, b, capacityMask) {
+  let x = Math.imul(a, 0x9e3779b1);
+  x ^= Math.imul(b, 0x85ebca6b);
+  x ^= x >>> 16;
+  return x & capacityMask;
+}
+
 export function mix3x32Locator(a, b, c) {
   let x = Math.imul(a, 0x9e3779b1);
   x ^= Math.imul(b, 0x85ebca6b);

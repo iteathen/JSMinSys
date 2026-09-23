@@ -1,5 +1,5 @@
 {
-  "version": "0.96.0",
+  "version": "0.97.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3383,6 +3383,31 @@
       }
     },
     {
+      "name": "mix2x32PowerOfTwoIndex",
+      "source": "src/mix32.mjs",
+      "block": "hash-mix32",
+      "primitives": [
+        "Math.imul",
+        "^",
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-direct-index-profile",
+      "preconditions": [
+        "a and b are exact 32-bit key coordinates or bit-pattern scalars",
+        "capacity is a power of two and capacityMask = capacity - 1",
+        "exact two-coordinate equality, not the mixed index, authorizes identity",
+        "the integration qualifies collision/probe locality for its actual key distribution before replacing a stronger mixer in linear probing"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 10,
+        "note": "Two coordinate-specific IMULs, one combine XOR, one xorshift fold, and final capacity AND. For the pinned two-word residual interner this replaces independent strong avalanching and returns the power-of-two index directly; exact word equality remains authority."
+      }
+    },
+    {
       "name": "mix3x32Locator",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -6466,11 +6491,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 224,
+    "functionsImplemented": 225,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 224,
+    "functionsWithCycleCount": 225,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8243,6 +8268,18 @@
           "before": "zero-initialized key storage plus a separately zero-initialized occupancy array",
           "after": "one explicit cold sentinel fill of key0 storage; no occupancy array is required by the selected probe representation",
           "mechanism": "pay and account representation setup once at initialization/growth to delete repeated hot occupancy traffic"
+        }
+      ]
+    },
+    {
+      "id": "round-090",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "mix2x32PowerOfTwoIndex",
+          "before": "two-word exact residual keys are independently strong-mixed, combined through two additional IMUL stages, strong-mixed again, then masked for a power-of-two table",
+          "after": "two coordinate-specific products are XOR-combined, folded once, and masked directly in 10 serial-ledger cycles",
+          "mechanism": "treat the hash as addressing only and jointly mix the exact two-word tuple instead of independently avalanching coordinates that are still compared exactly on probe"
         }
       ]
     }
