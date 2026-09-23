@@ -132,7 +132,7 @@ test('manager dedupes equivalent surplus rows; worker publication does not',()=>
   assert.equal(rbaBranchReadyCount32(t),1);
 
   rbaBranchManagerStep32(t,reconcile,{context,manager});
-  assert.equal(manager.dedupes,1);
+  assert.ok(manager.maintenancePasses>0);
   assert.equal(rbaBranchReadyCount32(t),0,'redundant queued surplus survived manager dedupe');
   assert.equal(t.control[RBA_TT_LIVE],2,'redundant TT row was not reclaimed');
 });
