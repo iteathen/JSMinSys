@@ -66,6 +66,26 @@ test('CPC per-column XOR parity equals literal future-event count on configured 
   }
 });
 
+test('projected CPC advisory collection is semantically inert and opt-in',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4];
+  const off=prepareConnect4CpcScratch(g),on=prepareConnect4CpcScratch(g,{projectedAdvisory:true});
+  let sawProjected=0;
+  for(let rank=16;rank<=moves.length;rank+=1){
+    const q=connect4RbaFromMoves(moves.slice(0,rank),{geometry:g,canonical:false});
+    const offKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,off);
+    const offInterval=[...off.interval],offMask=off.preemptionMask32[0],offCount=off.preemptionCount[0];
+    const onKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,on);
+    assert.equal(onKind,offKind);
+    assert.deepEqual([...on.interval],offInterval);
+    assert.equal(on.preemptionMask32[0],offMask);
+    assert.equal(on.preemptionCount[0],offCount);
+    assert.equal(off.projectedForks[0]+off.projectedForks[1],0);
+    if(on.projectedForks[0]+on.projectedForks[1])sawProjected=1;
+  }
+  assert.equal(sawProjected,1);
+});
+
 test('CPC pooled-frontier response extends all-even pairing without counting omitted frontiers',()=>{
   const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
 
