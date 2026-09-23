@@ -155,6 +155,11 @@ test('apply and undo support state', () => {
 
 test('mix and reflection blocks', () => {
   assert.equal(mix32(0), 0);
+  assert.equal(mix32Medium(0), 0);
+  assert.equal(mix32Strong(0), 0);
+  const mixed = new Set();
+  for (let value = 0; value < 4096; value += 1) mixed.add(mix32(value));
+  assert.equal(mixed.size, 4096);
   assert.equal(mix32Strong(0), 0);
   assert.notEqual(mix32(0x12345678), mix32Strong(0x12345678));
   const tables7 = new Uint32Array(1024);
