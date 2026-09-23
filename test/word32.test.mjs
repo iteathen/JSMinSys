@@ -238,6 +238,10 @@ test('search scalar blocks', () => {
 
 
 import {
+  shl2x32Lt32Into,
+  shl2x32Ge32Into,
+  ushr2x32Lt32Into,
+  ushr2x32Ge32Into,
   shl2x32Into,
   ushr2x32Into,
   add2x32Into,
@@ -287,8 +291,19 @@ test('two-lane shifts and arithmetic', () => {
 
   shl2x32Into(dst, 0, 1, 0, 63);
   assert.deepEqual([...dst], [0, 0x80000000]);
+  shl2x32Ge32Into(dst, 0, 1, 63);
+  assert.deepEqual([...dst], [0, 0x80000000]);
+
+  shl2x32Lt32Into(dst, 0, 0x80000000, 0, 1);
+  assert.deepEqual([...dst], [0, 1]);
+
   ushr2x32Into(dst, 0, 0, 0x80000000, 63);
   assert.deepEqual([...dst], [1, 0]);
+  ushr2x32Ge32Into(dst, 0, 0x80000000, 63);
+  assert.deepEqual([...dst], [1, 0]);
+
+  ushr2x32Lt32Into(dst, 0, 0, 1, 1);
+  assert.deepEqual([...dst], [0x80000000, 0]);
 
   add2x32Into(dst, 0, 0xffffffff, 1, 1, 2);
   assert.deepEqual([...dst], [0, 4]);
