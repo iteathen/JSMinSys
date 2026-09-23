@@ -109,18 +109,20 @@ function search(state,depth,alpha,beta){
   else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
   if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
 
-  let semantic=intervalToRelative(state.cpc.interval[0],state.cpc.interval[1],mover);
+  let semanticLo,semanticHi;
+  if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
+  else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const f=frontEvidence(state,words,keyOffset,basis,basisOffset,n,mover);
-    if(f){if(f[0]>semantic[0])semantic[0]=f[0];if(f[1]<semantic[1])semantic[1]=f[1];}
+    if(f){if(f[0]>semanticLo)semanticLo=f[0];if(f[1]<semanticHi)semanticHi=f[1];}
   }
-  if(semantic[0]===semantic[1]){
-    const abs=relativeToAbs(semantic[0],mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semantic[0];
+  if(semanticLo===semanticHi){
+    const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semanticLo;
   }
-  if(semantic[0]>=beta){state.cutoffs+=1;return semantic[0];}
-  if(semantic[1]<=alpha){state.cutoffs+=1;return semantic[1];}
-  if(semantic[0]>alpha)alpha=semantic[0];
-  if(semantic[1]<beta)beta=semantic[1];
+  if(semanticLo>=beta){state.cutoffs+=1;return semanticLo;}
+  if(semanticHi<=alpha){state.cutoffs+=1;return semanticHi;}
+  if(semanticLo>alpha)alpha=semanticLo;
+  if(semanticHi<beta)beta=semanticHi;
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
@@ -169,7 +171,7 @@ function search(state,depth,alpha,beta){
     if(best===1)break;
   }
   if(!legal)return 0;
-  if(best===-2)best=semantic[0];
+  if(best===-2)best=semanticLo;
   // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
   // may be valid alpha/beta bounds but are not global q truth.
   if(!cut&&alphaOrig===-2&&betaOrig===2){
