@@ -2,6 +2,20 @@
 
 This catalog tracks physical cost for admissible JSMinSys operations.
 
+## Cycle-model completeness invariant
+
+Every admissible emission must have a cycle mapping in `cycle-model-v0.json`. Admission without a cost model is invalid.
+
+Current coverage:
+
+- admissible emissions: **62**
+- cycle-mapped emissions: **62**
+- missing mappings: **0**
+
+The map uses fixed, ranged, symbolic-expression, or unbounded models so no operation is silently treated as zero-cost merely because its exact runtime path is variable.
+
+See `08-function-cycle-accounting.md` for aggregation rules.
+
 ## Important: what “cycles” means
 
 There is no architecture-independent single cycle count for a JavaScript operator.
