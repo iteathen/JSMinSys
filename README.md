@@ -46,8 +46,9 @@ Slow operations are allowed when their cost can be accounted for faithfully. JSM
 
 The current catalog implementation is exported from `src/index.mjs`.
 
-- 63 catalog functions implemented
-- 20 of 20 research blocks implemented
+- 267 catalog functions implemented
+- 28 of 28 research blocks implemented
+- fixed-width relational/RBA-enabling blocks cover 3/6/8-lane sets, six-word skylines, exact wide keys, durable intervals, sparse remaps, and generation-stamped intrusive work lists
 - typed capacity allocation admitted and costed through NEES
 - coordinate decode is implemented only as a comparison/reference anti-candidate
 - `Number.isInteger` was reviewed and rejected as unnecessary inside the sealed scope
