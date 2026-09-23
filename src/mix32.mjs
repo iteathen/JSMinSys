@@ -20,13 +20,13 @@ export function mix32Strong(value) {
   return x >>> 0;
 }
 
-export function fillReflect3Tables32(tables, columns) {
+export function fillReflect3Tables32(tables, columns, byteCount) {
   const supportBits = columns * 3;
   let sourceBit = 0;
   let fieldBit = 0;
   let targetBase = (columns - 1) * 3;
 
-  for (let byte = 0; byte < 4; byte += 1) {
+  for (let byte = 0; byte < byteCount; byte += 1) {
     const base = byte << 8;
     tables[base] = 0;
 
@@ -48,6 +48,13 @@ export function fillReflect3Tables32(tables, columns) {
     }
   }
   return supportBits;
+}
+
+export function reflectPacked3x16(code, tables) {
+  return (
+    tables[code & 0xff]
+    | tables[0x100 + ((code >>> 8) & 0xff)]
+  ) >>> 0;
 }
 
 export function reflectPacked3x24(code, tables) {
