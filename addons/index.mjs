@@ -4,3 +4,4 @@ export * from './rba-connect4-geometry.mjs';
 export * from './rba-connect4-coordinate.mjs';
 export * from './rba-connect4-front.mjs';
 export * from './rba-connect4-solver.mjs';
+export * from './rba-connect4-profile.mjs';
