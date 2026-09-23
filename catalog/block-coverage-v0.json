@@ -93,9 +93,10 @@
         "fillLandingCells32",
         "fillLandingCellsByOrder32",
         "landingCell32",
-        "playableColumn32"
+        "playableColumn32",
+        "playableKnownCell32"
       ],
-      "note": "Initialization may index landing cells by physical column or permute them once into preferred move-slot order. Hot landing lookup and transitions then consume that configured index directly; geometry stride remains physical columns."
+      "note": "Initialization may index landing cells by physical column or move slot. If a caller already observed the current landing cell for scoring, legality, or a known-cell transition, playableKnownCell32 reuses that scalar and avoids a second load. Otherwise playableColumn32 remains the direct load+compare form."
     },
     {
       "id": 7,

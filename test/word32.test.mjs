@@ -545,6 +545,7 @@ import {
 } from '../src/word64x32.mjs';
 import {
   playableColumn32,
+  playableKnownCell32,
   fillLandingCellsByOrder32,
   fillCoordinateTables32,
   decodeColumn32,
@@ -685,6 +686,13 @@ test('one-lane cardinality classification', () => {
   assert.equal(cardinalityClass32(0x80000000), 1);
   assert.equal(cardinalityClass32(0b1010), 2);
   assert.equal(cardinalityClass32(0xffffffff), 2);
+});
+
+test('known landing cell legality reuses observed state', () => {
+  assert.equal(playableKnownCell32(0, 42), true);
+  assert.equal(playableKnownCell32(41, 42), true);
+  assert.equal(playableKnownCell32(42, 42), false);
+  assert.equal(playableKnownCell32(49, 42), false);
 });
 
 test('trusted legality and coordinate reference decode', () => {

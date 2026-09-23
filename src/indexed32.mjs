@@ -64,6 +64,11 @@ export function playableColumn32(landingCells, column, cellCount) {
   return landingCells[column] < cellCount;
 }
 
+export function playableKnownCell32(cell, cellCount) {
+  return cell < cellCount;
+}
+
+
 export function fillCoordinateTables32(rowByCell, columnByCell, columns, rows) {
   let cell = 0;
   for (let row = 0; row < rows; row += 1) {

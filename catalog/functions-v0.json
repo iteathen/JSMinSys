@@ -1,5 +1,5 @@
 {
-  "version": "0.50.0",
+  "version": "0.51.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2684,6 +2684,28 @@
       ]
     },
     {
+      "name": "playableKnownCell32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        "<"
+      ],
+      "status": "implemented-caller-known-profile",
+      "preconditions": [
+        "cell is the already-observed current landing cell for the candidate/index",
+        "cellCount is the immutable configured columns*rows value",
+        "the caller does not load landingCells solely to populate this argument when claiming a governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 1,
+        "maxCycles": 2,
+        "note": "Compare only. Reuses an already-observed landing cell instead of repeating the load in playableColumn32."
+      }
+    },
+    {
       "name": "fillCoordinateTables32",
       "source": "src/indexed32.mjs",
       "block": "coordinate-decode",
@@ -2839,11 +2861,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 112,
+    "functionsImplemented": 113,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 112,
+    "functionsWithCycleCount": 113,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3848,6 +3870,18 @@
           "before": "clearLowestSetBit32: 3 cycles",
           "after": "2 cycles",
           "mechanism": "same XOR reuse plus required unsigned coercion"
+        }
+      ]
+    },
+    {
+      "id": "round-044",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "playableKnownCell32",
+          "before": "playableColumn32: 5 L1 / 13 L2 cycles",
+          "after": "1-2 cycles when landing cell is already observed",
+          "mechanism": "reuse caller-known landing cell and delete the duplicate legality load"
         }
       ]
     }
