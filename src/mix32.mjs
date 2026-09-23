@@ -1,4 +1,8 @@
 export function mix32(value) {
+  return Math.imul(value ^ (value >>> 16), 0x7feb352d) >>> 0;
+}
+
+export function mix32Medium(value) {
   let x = value;
   x ^= x >>> 16;
   x = Math.imul(x, 0x7feb352d);
@@ -18,22 +22,29 @@ export function mix32Strong(value) {
 
 export function fillReflect3Tables32(tables, columns) {
   const supportBits = columns * 3;
+  let sourceBit = 0;
+  let fieldBit = 0;
+  let targetBase = (columns - 1) * 3;
+
   for (let byte = 0; byte < 4; byte += 1) {
     const base = byte << 8;
-    const sourceBase = byte << 3;
-    for (let value = 0; value < 256; value += 1) {
-      let reflected = 0;
-      for (let bit = 0; bit < 8; bit += 1) {
-        const sourceBit = sourceBase + bit;
-        if (sourceBit >= supportBits) break;
-        if ((value & (1 << bit)) === 0) continue;
-        const column = Math.floor(sourceBit / 3);
-        const fieldBit = sourceBit - column * 3;
-        const targetColumn = columns - 1 - column;
-        const targetBit = targetColumn * 3 + fieldBit;
-        reflected |= 1 << targetBit;
+    tables[base] = 0;
+
+    for (let bit = 0; bit < 8; bit += 1) {
+      const contribution = sourceBit < supportBits
+        ? 1 << (targetBase + fieldBit)
+        : 0;
+      const span = 1 << bit;
+      for (let value = 0; value < span; value += 1) {
+        tables[base + span + value] = tables[base + value] | contribution;
       }
-      tables[base + value] = reflected;
+
+      sourceBit += 1;
+      fieldBit += 1;
+      if (fieldBit === 3) {
+        fieldBit = 0;
+        targetBase -= 3;
+      }
     }
   }
   return supportBits;
