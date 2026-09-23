@@ -1,5 +1,5 @@
 {
-  "version": "0.44.0",
+  "version": "0.45.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -925,6 +925,164 @@
         },
         "expression": "normal lane: 3*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 4*STORE + 12 ALU/control",
         "note": "Removes duplicate state-owned ply traffic/decrement while preserving reversible playable/support mechanics."
+      }
+    },
+    {
+      "name": "applyMove1x32KnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-known-cell-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "caller already holds the exact current landing cell for this transition index from independent legality, tactical, scoring, or proof work",
+        "caller does not load landingCells solely to satisfy this profile when claiming the governing-unit reduction",
+        "cell is legal and equals the maintained current landing cell for index",
+        "configured columns and cellCount are immutable for the engine instance",
+        "supportDelta is the precomputed support-only delta for the selected transition index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 21,
+          "max": 23
+        },
+        "hotL2Predicted": {
+          "min": 45,
+          "max": 47
+        },
+        "expression": "3*LOAD + 4*STORE + 7..9 ALU/control",
+        "note": "Deletes the landingCells load from applyMove1x32; all state-owned ply/support/playable updates remain."
+      }
+    },
+    {
+      "name": "applyMove1x32CallerPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-known-cell-caller-owned-ply-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact current landing cell for this transition index from independent legality, tactical, scoring, or proof work",
+        "caller does not load landingCells solely to satisfy this profile when claiming the governing-unit reduction",
+        "cell is legal and equals the maintained current landing cell for index",
+        "configured columns and cellCount are immutable for the engine instance",
+        "supportDelta is the precomputed support-only delta for the selected transition index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 15.5,
+          "max": 17.5
+        },
+        "hotL2Predicted": {
+          "min": 31.5,
+          "max": 33.5
+        },
+        "expression": "2*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "Composes caller-owned ply with caller-known landing cell; no landing or ply state load is performed."
+      }
+    },
+    {
+      "name": "applyMove32KnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-known-cell-profile",
+      "preconditions": [
+        "configured board cell count is <= 64 for this two-lane mask primitive",
+        "caller already holds the exact current landing cell for this transition index from independent legality, tactical, scoring, or proof work",
+        "caller does not load landingCells solely to satisfy this profile when claiming the governing-unit reduction",
+        "cell is legal and equals the maintained current landing cell for index",
+        "configured columns and cellCount are immutable for the engine instance",
+        "supportDelta is the precomputed support-only delta for the selected transition index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 23,
+          "max": 31.5
+        },
+        "hotL2Predicted": {
+          "min": 47,
+          "max": 63.5
+        },
+        "expression": "normal lane: 3*LOAD + 4*STORE + 9..13 ALU/control; cross-lane above: 4*LOAD + 5*STORE + 13 ALU/control",
+        "note": "Deletes one maintained-landing load while preserving state-owned ply and all two-lane transition cases."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-known-cell-caller-owned-ply-profile",
+      "preconditions": [
+        "configured board cell count is 33..64 for this selected two-lane profile",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact current landing cell for this transition index from independent legality, tactical, scoring, or proof work",
+        "caller does not load landingCells solely to satisfy this profile when claiming the governing-unit reduction",
+        "cell is legal and equals the maintained current landing cell for index",
+        "configured columns and cellCount are immutable for the engine instance",
+        "supportDelta is the precomputed support-only delta for the selected transition index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 17.5,
+          "max": 26
+        },
+        "hotL2Predicted": {
+          "min": 33.5,
+          "max": 50
+        },
+        "expression": "normal lane: 2*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 12 ALU/control",
+        "note": "Composes both ownership reductions: no ply state traffic and no landing-cell reload."
       }
     },
     {
@@ -2382,11 +2540,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 98,
+    "functionsImplemented": 102,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 98,
+    "functionsWithCycleCount": 102,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3295,6 +3453,24 @@
           "before": "generic move-slot N=7: 57 L1 / 113 L2 / 358 L3 cycles",
           "after": "40 L1 / 96 L2 / 341 L3 cycles",
           "mechanism": "initialization selects an exact seven-slot unrolled scan; ongoing/nonempty invariant removes count, loop, tail, and none handling"
+        }
+      ]
+    },
+    {
+      "id": "round-038",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove1x32KnownCell / applyMove32KnownCell",
+          "before": "state-owned profiles reload landingCells: 25-27 L1 one-lane; 27-35.5 L1 two-lane",
+          "after": "21-23 L1 one-lane; 23-31.5 L1 two-lane",
+          "mechanism": "reuse caller-observed landing cell and delete one hot load"
+        },
+        {
+          "function": "applyMove1x32CallerPlyKnownCell / applyMove32CallerPlyKnownCell",
+          "before": "caller-ply profiles: 19.5-21.5 L1 one-lane; 21.5-30 L1 two-lane",
+          "after": "15.5-17.5 L1 one-lane; 17.5-26 L1 two-lane",
+          "mechanism": "compose caller-owned ply with caller-known landing cell"
         }
       ]
     }

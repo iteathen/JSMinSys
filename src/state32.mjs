@@ -302,3 +302,139 @@ export function undoMove32CallerPly(
   return cell;
 }
 
+/**
+ * Apply profiles for callers that already hold the exact current landing cell
+ * for an independent legality, tactical, or proof-facing reason. These
+ * primitives do not reload landingCells[index]; they still advance the
+ * maintained landing cell for later legality and undo.
+ */
+export function applyMove1x32KnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const ply = state[STATE_PLY];
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let playable = state[STATE_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[STATE_PLAYABLE_LO] = playable;
+  landingCells[index] = next;
+  state[STATE_PLY] = ply + 1;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+
+export function applyMove1x32CallerPlyKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let playable = state[CALLER_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[CALLER_PLY1_PLAYABLE_LO] = playable;
+  landingCells[index] = next;
+  state[CALLER_PLY1_SUPPORT_CODE] = state[CALLER_PLY1_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+
+export function applyMove32KnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const ply = state[STATE_PLY];
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[STATE_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[STATE_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[STATE_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[STATE_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[STATE_PLAYABLE_HI] = playableHi;
+  }
+
+  landingCells[index] = next;
+  state[STATE_PLY] = ply + 1;
+  state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+
+export function applyMove32CallerPlyKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[CALLER_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CALLER_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CALLER_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[CALLER_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[CALLER_PLY2_PLAYABLE_HI] = playableHi;
+  }
+
+  landingCells[index] = next;
+  state[CALLER_PLY2_SUPPORT_CODE] = state[CALLER_PLY2_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+

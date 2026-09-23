@@ -137,6 +137,10 @@ import {
   undoMove1x32CallerPly,
   applyMove32CallerPly,
   undoMove32CallerPly,
+  applyMove1x32KnownCell,
+  applyMove1x32CallerPlyKnownCell,
+  applyMove32KnownCell,
+  applyMove32CallerPlyKnownCell,
   CALLER_PLY1_PLAYABLE_LO,
   CALLER_PLY1_SUPPORT_CODE,
   CALLER_PLY2_PLAYABLE_LO,
@@ -258,6 +262,66 @@ test('caller-owned ply transition profiles match state-owned transition mechanic
     assert.equal(caller2[CALLER_PLY2_SUPPORT_CODE], base2[STATE_SUPPORT_CODE]);
     assert.deepEqual(landingCaller2, landingBase2);
   }
+});
+
+test('known-cell apply profiles reuse an already observed landing cell', () => {
+  const landingA = new Uint32Array(4);
+  const landingB = new Uint32Array(4);
+  fillLandingCells32(landingA, 4);
+  fillLandingCells32(landingB, 4);
+  const stateA = new Uint32Array(4);
+  const stateB = new Uint32Array(4);
+  stateA[STATE_PLAYABLE_LO] = 0b1111;
+  stateB[STATE_PLAYABLE_LO] = 0b1111;
+  const delta1 = 1 << 6;
+  const cell1 = landingB[2];
+  assert.equal(applyMove1x32(stateA, landingA, 2, 4, 16, delta1), cell1);
+  assert.equal(applyMove1x32KnownCell(stateB, landingB, 2, cell1, 4, 16, delta1), cell1);
+  assert.deepEqual(stateB, stateA);
+  assert.deepEqual(landingB, landingA);
+
+  const compactA = new Uint32Array(2);
+  const compactB = new Uint32Array(2);
+  const compactLandingA = new Uint32Array(4);
+  const compactLandingB = new Uint32Array(4);
+  fillLandingCells32(compactLandingA, 4);
+  fillLandingCells32(compactLandingB, 4);
+  compactA[CALLER_PLY1_PLAYABLE_LO] = 0b1111;
+  compactB[CALLER_PLY1_PLAYABLE_LO] = 0b1111;
+  const compactCell = compactLandingB[1];
+  applyMove1x32CallerPly(compactA, compactLandingA, 1, 4, 16, 1 << 3);
+  applyMove1x32CallerPlyKnownCell(compactB, compactLandingB, 1, compactCell, 4, 16, 1 << 3);
+  assert.deepEqual(compactB, compactA);
+  assert.deepEqual(compactLandingB, compactLandingA);
+
+  // Low-lane cell 31 with the next landing in the high lane exercises the
+  // cross-lane branch while still supplying the landing cell from the caller.
+  const twoA = new Uint32Array(4);
+  const twoB = new Uint32Array(4);
+  const twoLandingA = new Uint32Array(7);
+  const twoLandingB = new Uint32Array(7);
+  twoLandingA[3] = 31;
+  twoLandingB[3] = 31;
+  twoA[STATE_PLAYABLE_LO] = 0x80000000;
+  twoB[STATE_PLAYABLE_LO] = 0x80000000;
+  const delta2 = 1 << 9;
+  applyMove32(twoA, twoLandingA, 3, 7, 42, delta2);
+  applyMove32KnownCell(twoB, twoLandingB, 3, 31, 7, 42, delta2);
+  assert.deepEqual(twoB, twoA);
+  assert.deepEqual(twoLandingB, twoLandingA);
+
+  const compactTwoA = new Uint32Array(3);
+  const compactTwoB = new Uint32Array(3);
+  const compactTwoLandingA = new Uint32Array(7);
+  const compactTwoLandingB = new Uint32Array(7);
+  compactTwoLandingA[3] = 31;
+  compactTwoLandingB[3] = 31;
+  compactTwoA[CALLER_PLY2_PLAYABLE_LO] = 0x80000000;
+  compactTwoB[CALLER_PLY2_PLAYABLE_LO] = 0x80000000;
+  applyMove32CallerPly(compactTwoA, compactTwoLandingA, 3, 7, 42, delta2);
+  applyMove32CallerPlyKnownCell(compactTwoB, compactTwoLandingB, 3, 31, 7, 42, delta2);
+  assert.deepEqual(compactTwoB, compactTwoA);
+  assert.deepEqual(compactTwoLandingB, compactTwoLandingA);
 });
 
 test('mix and reflection blocks', () => {

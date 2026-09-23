@@ -116,9 +116,13 @@
         "applyMove1x32CallerPly",
         "undoMove1x32CallerPly",
         "applyMove32CallerPly",
-        "undoMove32CallerPly"
+        "undoMove32CallerPly",
+        "applyMove1x32KnownCell",
+        "applyMove1x32CallerPlyKnownCell",
+        "applyMove32KnownCell",
+        "applyMove32CallerPlyKnownCell"
       ],
-      "note": "Initialization/integration selects one-lane (<=32 cells) or two-lane (33..64 cells) transitions. Where the owning recursion already carries ply/rank independently, caller-owned-ply profiles omit the duplicate state word and its load/store/arithmetic; otherwise the state-owned-ply profiles remain authoritative. Geometry is runtime-configured and invariant after initialization."
+      "note": "Initialization selects lane count and compatible state ownership. Apply additionally has known-cell profiles when legality/tactical/proof work already produced the exact landing cell; this deletes the duplicate landing load without adding history. If the caller must load the cell solely for apply, use the ordinary profile for governing-unit accounting. Geometry remains runtime-configured and immutable after initialization."
     },
     {
       "id": 9,
