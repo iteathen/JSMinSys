@@ -1,4 +1,5 @@
 export * from './branch-manager-host.mjs';
+export * from './rba-branch-manager.mjs';
 export * from './rba-tt32.mjs';
 export * from './rba-connect4-geometry.mjs';
 export * from './rba-connect4-coordinate.mjs';
