@@ -260,10 +260,12 @@
       "functions": [
         "atomicTryClaim32",
         "atomicRelease32",
+        "atomicReleaseNoNotify32",
         "atomicExchange32",
         "atomicAdd32",
         "atomicSub32"
-      ]
+      ],
+      "note": "Atomic release has notifying and no-notify profiles. Polling or externally awakened consumers select atomicReleaseNoNotify32 and pay only the publication store; Atomics.wait users retain atomicRelease32 so wake semantics are not weakened."
     },
     {
       "id": 19,

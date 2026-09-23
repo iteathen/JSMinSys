@@ -676,6 +676,7 @@ import {
 import {
   atomicTryClaim32,
   atomicRelease32,
+  atomicReleaseNoNotify32,
   atomicExchange32,
   atomicAdd32,
   atomicSub32,
@@ -888,6 +889,8 @@ test('atomic blocks', () => {
   assert.equal(atomicAdd32(words, 1, 3), 5);
   assert.equal(atomicSub32(words, 1, 2), 8);
   assert.equal(atomicRelease32(words, 0, 0), 0);
+  assert.equal(atomicReleaseNoNotify32(words, 0, 7), 7);
+  assert.equal(Atomics.load(words, 0), 7);
 });
 
 test('bounded shared queue blocks without waiting', () => {

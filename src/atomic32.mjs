@@ -8,6 +8,11 @@ export function atomicRelease32(words, index, released) {
   return released;
 }
 
+export function atomicReleaseNoNotify32(words, index, released) {
+  Atomics.store(words, index, released);
+  return released;
+}
+
 export function atomicExchange32(words, index, value) {
   return Atomics.exchange(words, index, value);
 }
