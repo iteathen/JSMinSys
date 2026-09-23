@@ -88,6 +88,50 @@ export function reflectPacked3Direct32(code, columns, initialTargetShift) {
   return reflected;
 }
 
+
+export function reflectPacked3Columns2(code) {
+  return ((code << 3) | (code >>> 3)) & 0x3f;
+}
+
+export function reflectPacked3Columns3(code) {
+  return ((code & 0x7) << 6) | (code & 0x38) | (code >>> 6);
+}
+
+export function reflectPacked3Columns4(code) {
+  let x = ((code & 0x1c7) << 3) | ((code & 0xe38) >>> 3);
+  return ((x << 6) | (x >>> 6)) & 0xfff;
+}
+
+export function reflectPacked3Columns5(code) {
+  let x = ((code & 0x1c7) << 3) | ((code & 0xe38) >>> 3);
+  x = ((x << 6) | (x >>> 6)) & 0xfff;
+  return (code >>> 12) | (x << 3);
+}
+
+function reflectPacked3Low8(code) {
+  let x = ((code & 0x1c71c7) << 3) | ((code & 0xe38e38) >>> 3);
+  x = ((x & 0x03f03f) << 6) | ((x & 0xfc0fc0) >>> 6);
+  return ((x << 12) | (x >>> 12)) & 0xffffff;
+}
+
+export function reflectPacked3Columns6To7(code, rightShift) {
+  return reflectPacked3Low8(code) >>> rightShift;
+}
+
+export function reflectPacked3Columns8(code) {
+  return reflectPacked3Low8(code);
+}
+
+export function reflectPacked3Columns9(code) {
+  return (code >>> 24) | (reflectPacked3Low8(code) << 3);
+}
+
+export function reflectPacked3Columns10(code) {
+  let high = code >>> 24;
+  high = ((high << 3) | (high >>> 3)) & 0x3f;
+  return high | (reflectPacked3Low8(code) << 6);
+}
+
 export function canonicalMin32(value, reflected) {
   return value <= reflected ? value : reflected;
 }

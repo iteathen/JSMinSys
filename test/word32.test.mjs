@@ -140,6 +140,16 @@ import {
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
 import { mix32, mix32Medium, mix32Strong, fillReflect3Tables32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import {
+  reflectPacked3Columns2,
+  reflectPacked3Columns3,
+  reflectPacked3Columns4,
+  reflectPacked3Columns5,
+  reflectPacked3Columns6To7,
+  reflectPacked3Columns8,
+  reflectPacked3Columns9,
+  reflectPacked3Columns10,
+} from '../src/mix32.mjs';
 import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace, normalizeMinimal2xI32InPlace, normalizeMaximal2xI32InPlace } from '../src/frontier32.mjs';
 import {
   negateScore32,
@@ -202,6 +212,45 @@ test('mix and reflection blocks', () => {
   assert.equal(reflected4 & 7, 4);
   assert.equal((reflected4 >>> 9) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
+});
+
+
+test('configured packed-3 register reflection profiles', () => {
+  // A one-column reflection is identity; initialization should select no work.
+  assert.equal(reflectPacked3Direct32(5, 1, 0), 5);
+
+  const profiles = [
+    [2, reflectPacked3Columns2],
+    [3, reflectPacked3Columns3],
+    [4, reflectPacked3Columns4],
+    [5, reflectPacked3Columns5],
+    [6, (code) => reflectPacked3Columns6To7(code, 6)],
+    [7, (code) => reflectPacked3Columns6To7(code, 3)],
+    [8, reflectPacked3Columns8],
+    [9, reflectPacked3Columns9],
+    [10, reflectPacked3Columns10],
+  ];
+
+  let seed = 0x12345678;
+  for (const [columns, reflect] of profiles) {
+    const bits = columns * 3;
+    const mask = (1 << bits) - 1;
+    const samples = columns <= 5 ? (1 << bits) : 4096;
+
+    for (let sample = 0; sample < samples; sample += 1) {
+      let code = sample;
+      if (columns > 5) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        code = seed & mask;
+      }
+
+      assert.equal(
+        reflect(code),
+        reflectPacked3Direct32(code, columns, 3 * (columns - 1)),
+        `columns=${columns} code=${code}`,
+      );
+    }
+  }
 });
 
 test('frontier normalization blocks', () => {

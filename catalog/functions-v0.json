@@ -1,5 +1,5 @@
 {
-  "version": "0.39.0",
+  "version": "0.40.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -954,6 +954,199 @@
       }
     },
     {
+      "name": "reflectPacked3Columns2",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 2",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 4,
+        "note": "Two 3-bit fields are exchanged by a 6-bit rotate: two shifts + OR + mask; no table load or setup."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns3",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 3",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 6,
+        "note": "Outer 3-bit fields exchange while the middle field stays in place: 2*AND + 2*SHIFT + 2*OR."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns4",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 4",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 9,
+        "note": "Swap adjacent 3-bit fields, then exchange the two 6-bit halves; register-only fixed network."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns5",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 5",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 12,
+        "note": "Reverse the low four fields with the 4-column network and place the fifth field at the low end; no table memory."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns6To7",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns is 6 or 7",
+        "support encoding uses 3 bits per column",
+        "rightShift === 3*(8-columns) was prepared during initialization",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 15,
+        "note": "Reverse an eight-field padded lane with a 14-operation swap network, then apply one initialization-prepared alignment shift."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns8",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 8",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 14,
+        "note": "Three divide-and-conquer field-swap stages; final 12-bit-half exchange uses a masked rotate."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns9",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 9",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 17,
+        "note": "Reverse the low eight fields in registers and move the ninth field to the low end; no table memory."
+      }
+    },
+    {
+      "name": "reflectPacked3Columns10",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "&",
+        "|",
+        "<<",
+        ">>>"
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured columns === 10",
+        "support encoding uses 3 bits per column",
+        "packed support contains no rank/ply metadata"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 21,
+        "note": "Reverse the low eight fields plus the upper two-field 6-bit lane, then exchange the two reversed blocks; no table memory."
+      }
+    },
+    {
       "name": "canonicalMin32",
       "source": "src/mix32.mjs",
       "block": "canonical-reflection",
@@ -1894,11 +2087,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 82,
+    "functionsImplemented": 90,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 82,
+    "functionsWithCycleCount": 90,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2715,6 +2908,18 @@
           "before": "unsigned maximal: C*(2L+10)",
           "after": "C*(2L+8)",
           "mechanism": "direct signed containment removes per-comparison complements"
+        }
+      ]
+    },
+    {
+      "id": "round-033",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "configured packed-3 reflection",
+          "before": "C2 direct 20; C3-C5 lookup 13 L1; C6-C8 lookup 21 L1; C9-C10 lookup 28 L1, plus reflection-table initialization",
+          "after": "C1 no-op; C2 4; C3 6; C4 9; C5 12; C6-C7 15; C8 14; C9 17; C10 21 fixed cycles",
+          "mechanism": "initialization selects an exact register-only 3-bit field-swap network; configured geometry becomes control-plane choice rather than hot-loop discovery"
         }
       ]
     }

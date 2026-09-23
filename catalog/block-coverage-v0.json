@@ -156,9 +156,17 @@
         "reflectPacked3x24",
         "reflectPacked3x32",
         "reflectPacked3Direct32",
+        "reflectPacked3Columns2",
+        "reflectPacked3Columns3",
+        "reflectPacked3Columns4",
+        "reflectPacked3Columns5",
+        "reflectPacked3Columns6To7",
+        "reflectPacked3Columns8",
+        "reflectPacked3Columns9",
+        "reflectPacked3Columns10",
         "canonicalMin32"
       ],
-      "note": "Initialization builds exactly the byte tables required by configured packed-support width; hot reflection selects 2-, 3-, or 4-byte lookup or direct arithmetic."
+      "note": "Initialization selects no work for one column or an exact register-only 3-bit field-swap profile for 2..10 columns. These profiles beat the current direct/byte-table static L1 ledgers and require no reflection-table setup; lookup/direct forms remain qualified alternatives for emitted-code/cache studies."
     },
     {
       "id": 13,
