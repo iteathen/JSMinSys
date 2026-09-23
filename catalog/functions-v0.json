@@ -1,5 +1,5 @@
 {
-  "version": "0.16.0",
+  "version": "0.17.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -236,24 +236,51 @@
       }
     },
     {
+      "name": "fillLandingCells32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        "ST32",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization",
+      "preconditions": [
+        "landingCells capacity >= configured columns"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + C*(3 + STORE_COST)",
+        "parameters": {
+          "C": "configured column count"
+        },
+        "note": "Initialization-only. Prepares next-landing-cell state once for the configured board."
+      }
+    },
+    {
       "name": "landingCell32",
       "source": "src/indexed32.mjs",
       "block": "legal-landing-cell",
       "primitives": [
-        "LD32",
-        "*",
-        "+"
+        "LD32"
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 8,
-        "hotL2Predicted": 16,
-        "expression": "LOAD + IMUL + ADD",
-        "note": "Trusted primitive: legality/full-column check is owned separately by playableColumn32."
-      }
+        "hotL1Predicted": 4,
+        "hotL2Predicted": 12,
+        "hotL3Predicted": 47,
+        "expression": "LOAD(landingCells[column])",
+        "note": "Next landing cell is maintained directly; row*columns multiplication is eliminated."
+      },
+      "preconditions": [
+        "landingCells was initialized for the configured board"
+      ]
     },
     {
       "name": "maskContains32",
@@ -433,7 +460,6 @@
         "~",
         ">>>",
         "+",
-        "*",
         "<<",
         "<",
         "="
@@ -444,19 +470,20 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 41.5,
-          "max": 53
+          "min": 37.5,
+          "max": 48
         },
         "hotL2Predicted": {
-          "min": 81.5,
-          "max": 101
+          "min": 77.5,
+          "max": 96
         },
-        "expression": "dynamic geometry, lane-specialized: 5*LOAD + 5*STORE + 19..24 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 26 ALU/control",
-        "note": "Dimensions are runtime-configured but immutable. Caller supplies precomputed supportDelta; move-column history and side-to-move maintenance are eliminated from the primitive."
+        "expression": "maintained landing-cell representation: 5*LOAD + 5*STORE + 15..19 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 21 ALU/control",
+        "note": "Maintaining next landing cell removes row*columns+column and reuses next=cell+columns for above-cell logic."
       },
       "preconditions": [
-        "configured columns and lastRow are immutable for the engine instance",
+        "configured columns and cellCount are immutable for the engine instance",
         "configured board cell count is <= 64 for this two-lane mask primitive",
+        "landingCells[column] is the current next playable cell",
         "supportDelta is precomputed during initialization for the selected column and support encoding",
         "column is already legal"
       ]
@@ -474,7 +501,6 @@
         ">>>",
         "+",
         "-",
-        "*",
         "<<",
         "<",
         "="
@@ -485,19 +511,20 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 41.5,
-          "max": 54
+          "min": 37.5,
+          "max": 49
         },
         "hotL2Predicted": {
-          "min": 81.5,
-          "max": 102
+          "min": 77.5,
+          "max": 97
         },
-        "expression": "dynamic geometry, lane-specialized: 5*LOAD + 5*STORE + 19..25 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 27 ALU/control",
-        "note": "Caller-owned undo column removes move-history traffic; side-to-move is derived from ply parity."
+        "expression": "maintained landing-cell representation: 5*LOAD + 5*STORE + 15..20 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 22 ALU/control",
+        "note": "Undo obtains the played cell by subtracting configured columns from the maintained next landing cell; no row decode or multiply is required."
       },
       "preconditions": [
-        "configured columns and lastRow are immutable for the engine instance",
+        "configured columns and cellCount are immutable for the engine instance",
         "configured board cell count is <= 64 for this two-lane mask primitive",
+        "landingCells[column] points to the cell immediately above the move being undone, or beyond cellCount when full",
         "supportDelta is precomputed during initialization for the supplied column",
         "caller supplies the exact column being undone",
         "at least one move exists"
@@ -1041,8 +1068,12 @@
         "hotL1Predicted": 5,
         "hotL2Predicted": 13,
         "expression": "LOAD + compare",
-        "note": "Trusted internal legality predicate."
-      }
+        "note": "Column is playable iff its maintained next landing cell is inside the configured cell domain."
+      },
+      "preconditions": [
+        "landingCells was initialized for the configured board",
+        "cellCount is configured columns*rows"
+      ]
     },
     {
       "name": "fillCoordinateTables32",
@@ -1200,11 +1231,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 57,
+    "functionsImplemented": 58,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 57,
+    "functionsWithCycleCount": 58,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1469,6 +1500,36 @@
           "before": "not present",
           "after": "initialization-only setup cost is explicitly cycle-accounted",
           "mechanism": "move geometry decoding work to configuration phase"
+        }
+      ]
+    },
+    {
+      "id": "round-010",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "landingCell32",
+          "before": "8 L1 / 16 L2",
+          "after": "4 L1 / 12 L2",
+          "mechanism": "maintain next landing cell index per column"
+        },
+        {
+          "function": "applyMove32",
+          "before": "41.5-53 L1 / 81.5-101 L2",
+          "after": "37.5-48 L1 / 77.5-96 L2",
+          "mechanism": "replace row height with maintained next landing cell; eliminate hot multiply"
+        },
+        {
+          "function": "undoMove32",
+          "before": "41.5-54 L1 / 81.5-102 L2",
+          "after": "37.5-49 L1 / 77.5-97 L2",
+          "mechanism": "derive played cell as landingCells[column]-columns; eliminate row decode/multiply"
+        },
+        {
+          "function": "fillLandingCells32",
+          "before": "not present",
+          "after": "explicit initialization cost",
+          "mechanism": "move landing-cell coordinate construction to configuration phase"
         }
       ]
     }
