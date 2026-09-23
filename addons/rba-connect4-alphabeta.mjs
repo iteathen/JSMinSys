@@ -41,8 +41,8 @@ function resetConnect4RbaExactCache32(cache){
 
 function absToRelative(value,mover){return value===2?0:mover===0?value-2:2-value;}
 function relativeToAbs(value,mover){return value===0?2:mover===0?value+2:2-value;}
-function intervalToRelativePacked(lo,hi,mover){
-  return mover===0?(lo-1)|((hi-1)<<2):(3-hi)|((3-lo)<<2);
+function intervalToRelative(lo,hi,mover){
+  return mover===0?[lo-2,hi-2]:[2-hi,2-lo];
 }
 
 export function prepareConnect4RbaAlphaBeta({
@@ -77,10 +77,11 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize,mover){
   state.frontCalls+=1;
   const result=buildConnect4RbaFourFront(g,a,words,offset,basis,basisOffset,basisSize);
   state.frontSteps+=a.steps;
-  if(result){state.frontFailures+=1;return -1;}
+  if(result){state.frontFailures+=1;return null;}
   const packed=queryConnect4RbaFourFront(g,a,0,words,offset),lo=packed&3,hi=packed>>>2;
+  const relative=intervalToRelative(lo,hi,mover);
   if(lo===hi)state.frontExact+=1;
-  return intervalToRelativePacked(lo,hi,mover);
+  return relative;
 }
 
 function search(state,depth,alpha,beta){
@@ -108,22 +109,18 @@ function search(state,depth,alpha,beta){
   else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
   if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
 
-  const semanticPacked=intervalToRelativePacked(state.cpc.interval[0],state.cpc.interval[1],mover);
-  let semanticLo=(semanticPacked&3)-1,semanticHi=((semanticPacked>>>2)&3)-1;
+  let semantic=intervalToRelative(state.cpc.interval[0],state.cpc.interval[1],mover);
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const f=frontEvidence(state,words,keyOffset,basis,basisOffset,n,mover);
-    if(f>=0){
-      const fLo=(f&3)-1,fHi=((f>>>2)&3)-1;
-      if(fLo>semanticLo)semanticLo=fLo;if(fHi<semanticHi)semanticHi=fHi;
-    }
+    if(f){if(f[0]>semantic[0])semantic[0]=f[0];if(f[1]<semantic[1])semantic[1]=f[1];}
   }
-  if(semanticLo===semanticHi){
-    const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semanticLo;
+  if(semantic[0]===semantic[1]){
+    const abs=relativeToAbs(semantic[0],mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semantic[0];
   }
-  if(semanticLo>=beta){state.cutoffs+=1;return semanticLo;}
-  if(semanticHi<=alpha){state.cutoffs+=1;return semanticHi;}
-  if(semanticLo>alpha)alpha=semanticLo;
-  if(semanticHi<beta)beta=semanticHi;
+  if(semantic[0]>=beta){state.cutoffs+=1;return semantic[0];}
+  if(semantic[1]<=alpha){state.cutoffs+=1;return semantic[1];}
+  if(semantic[0]>alpha)alpha=semantic[0];
+  if(semantic[1]<beta)beta=semantic[1];
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns;
@@ -136,10 +133,10 @@ function search(state,depth,alpha,beta){
       const column=g.actionOrder[oi];
       if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
       legal+=1;
-      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset),
-        rel=intervalToRelativePacked(packed&3,packed>>>2,mover),relLo=(rel&3)-1,relHi=((rel>>>2)&3)-1;
-      state.actionLo[row+column]=relLo;state.actionHi[row+column]=relHi;state.actionKnown[row+column]=1;
-      if(relLo===relHi)state.frontActionExact+=1;
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
+      const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
+      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
+      if(rel[0]===rel[1])state.frontActionExact+=1;
     }
     if(!legal)return 0;
   }
@@ -171,7 +168,7 @@ function search(state,depth,alpha,beta){
     if(best===1)break;
   }
   if(!legal)return 0;
-  if(best===-2)best=semanticLo;
+  if(best===-2)best=semantic[0];
   // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
   // may be valid alpha/beta bounds but are not global q truth.
   if(!cut&&alphaOrig===-2&&betaOrig===2){
@@ -197,22 +194,20 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const f=frontEvidence(state,state.words,0,state.basis,0,state.basisSize[0],mover);
-    if(f>=0){
-      const fLo=(f&3)-1,fHi=((f>>>2)&3)-1,
-        absLo=mover===0?fLo+2:2-fHi,absHi=mover===0?fHi+2:2-fLo;
+    if(f){
+      const absLo=mover===0?f[0]+2:2-f[1],absHi=mover===0?f[1]+2:2-f[0];
       if(absLo>rootLo)rootLo=absLo;if(absHi<rootHi)rootHi=absHi;
     }
   }
-  const rootExact=rootLo===rootHi?absToRelative(rootLo,mover):null,
-    rootSemantic=intervalToRelativePacked(rootLo,rootHi,mover),
-    rootSemanticLo=(rootSemantic&3)-1,rootSemanticHi=((rootSemantic>>>2)&3)-1;
+  const rootExact=rootLo===rootHi?absToRelative(rootLo,mover):null;
+  const rootSemantic=intervalToRelative(rootLo,rootHi,mover);
 
   // A two-value exact CPC interval needs only one W/D/L threshold test at the
   // root. Keep the historical full window for the unconstrained three-value
   // domain so exact-cache qualification semantics remain unchanged there.
   let alpha=-2,beta=2;
-  if(rootExact===null&&rootSemanticHi-rootSemanticLo===1){
-    alpha=rootSemanticLo;beta=rootSemanticHi;
+  if(rootExact===null&&rootSemantic[1]-rootSemantic[0]===1){
+    alpha=rootSemantic[0];beta=rootSemantic[1];
   }
   let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
@@ -221,9 +216,9 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
       const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
       if(state.words[column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
-      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0),
-        rel=intervalToRelativePacked(packed&3,packed>>>2,mover);
-      state.actionLo[row+column]=(rel&3)-1;state.actionHi[row+column]=((rel>>>2)&3)-1;state.actionKnown[row+column]=1;
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0);
+      const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
+      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
     }
   }
   for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
