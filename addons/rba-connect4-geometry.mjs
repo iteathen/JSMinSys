@@ -80,10 +80,16 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   const removeBytes=cellCount*shapeCount*4;
   if(removeBytes<=specializationBudgetBytes){
     removeByCell=new Int32Array(cellCount*shapeCount);
-    for(let cell=0;cell<cellCount;cell+=1)for(let id=0;id<shapeCount;id+=1){
-      const size=shapeSize[id],base=id*4;let pos=-1;
-      for(let i=0;i<size;i+=1)if(shapeCells[base+i]===cell){pos=i;break;}
-      removeByCell[cell*shapeCount+id]=pos<0?id:removeAt[id*4+pos];
+    for(let cell=0;cell<cellCount;cell+=1){
+      const row=cell*shapeCount;
+      for(let id=0;id<shapeCount;id+=1)removeByCell[row+id]=id;
+    }
+    for(let id=0;id<shapeCount;id+=1){
+      const size=shapeSize[id],base=id*4;
+      for(let pos=0;pos<size;pos+=1){
+        const cell=shapeCells[base+pos];
+        removeByCell[cell*shapeCount+id]=removeAt[base+pos];
+      }
     }
     specializationBytes+=removeBytes;
   }
@@ -91,13 +97,15 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   if(specializationBytes+subsetBytes<=specializationBudgetBytes){
     subsetTable=new Uint32Array(shapeCount*shapeCount);
     for(let a=0;a<shapeCount;a+=1)for(let b=0;b<shapeCount;b+=1){
-      if(shapeSize[a]>shapeSize[b])continue;
-      const ab=a*4,bb=b*4;let ok=1;
-      for(let i=0;i<shapeSize[a];i+=1){const cell=shapeCells[ab+i];let found=0;
-        for(let j=0;j<shapeSize[b];j+=1)if(shapeCells[bb+j]===cell){found=1;break;}
-        if(!found){ok=0;break;}
+      const aSize=shapeSize[a],bSize=shapeSize[b];if(aSize>bSize)continue;
+      const ab=a*4,bb=b*4;let i=0,j=0;
+      while(i<aSize&&j<bSize){
+        const av=shapeCells[ab+i],bv=shapeCells[bb+j];
+        if(av===bv){i+=1;j+=1;}
+        else if(bv<av)j+=1;
+        else break;
       }
-      subsetTable[a*shapeCount+b]=ok;
+      subsetTable[a*shapeCount+b]=i===aSize?1:0;
     }
     specializationBytes+=subsetBytes;
   }
