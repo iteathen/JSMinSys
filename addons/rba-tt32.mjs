@@ -100,11 +100,13 @@ export function rbaTtUnqueueReady32(t,q){if(!t.readyMember[q])return 0;intrusive
 function unqueueEvent(t,q){if(!t.eventMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember,q);return 1;}
 export function rbaTtRecycle32(t,q){
   if(!t.live[q]||t.refs[q]||t.execution[q]||t.readyMember[q]||t.eventMember[q]||t.count[q]||t.parentHead[q]!==-1)return 0;
-  const bucket=t.bucket[q];let prev=-1,scan=t.buckets[bucket];
+  const redirect=t.redirect[q],bucket=t.bucket[q];let prev=-1,scan=t.buckets[bucket];
   while(scan!==q&&scan!==-1){prev=scan;scan=t.link[scan];}
   if(scan===-1)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
   if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
-  t.live[q]=0;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;return 1;
+  t.live[q]=0;t.redirect[q]=-1;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;
+  if(redirect>=0&&redirect<t.capacity&&t.live[redirect]&&t.refs[redirect])t.refs[redirect]-=1;
+  return 1;
 }
 export function rbaTtRelease32(t,q,g){if(!rbaTtValid32(t,q,g)||!t.refs[q])return 0;const refs=t.refs[q]-1;t.refs[q]=refs;if(refs)return 1;if(t.readyMember[q])rbaTtUnqueueReady32(t,q);if(t.count[q])rbaTtSignal32(t,q);rbaTtRecycle32(t,q);return 1;}
 export function rbaTtEnqueue32(t,q){
@@ -211,6 +213,8 @@ export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets)
   if(owner>RBA_TT_EXECUTION_QUEUED&&resetTargets&&owner-2<resetTargets.length)
     Atomics.store(resetTargets,owner-2,-1);
 
+  if(t.refs[canonical]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+  t.refs[canonical]+=1; // redirect owns a temporary canonical lifetime pin
   t.redirect[duplicate]=canonical;
   if((wasQueued||owner>RBA_TT_EXECUTION_QUEUED)&&
      t.execution[canonical]===RBA_TT_EXECUTION_FREE&&!t.exact[canonical]&&
