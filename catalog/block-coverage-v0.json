@@ -364,7 +364,7 @@
         "queueEnqueueOwnedNext32",
         "queueDequeueOwnedNext32"
       ],
-      "note": "Nonblocking queue profiles test exact ready sequence equality before any wrap-distance work. Generic shared-reservation paths compute signed differences only after an equality miss; owned-reservation paths need only equality because any non-equal slot is unavailable. Blocking ownership/wait profiles are unchanged."
+      "note": "Queue sequence comparisons are performed in the Int32 domain. Equality-first nonblocking profiles retain their fast-path reduction, while dequeue-ready values are explicitly normalized across 0x7fffffff -> -2147483648 rollover. Owned/shared and blocking/nonblocking profiles otherwise remain unchanged."
     },
     {
       "id": 20,

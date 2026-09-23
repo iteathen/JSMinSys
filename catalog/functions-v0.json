@@ -1,5 +1,5 @@
 {
-  "version": "0.88.0",
+  "version": "0.89.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4842,9 +4842,9 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "unbounded",
-        "fastPath": "ATOMIC_RMW + 1 + ATOMIC_LOAD + 2 + LOAD + ATOMIC_STORE + 1 + ATOMIC_NOTIFY",
+        "fastPath": "ATOMIC_RMW + 1 + 2 + ATOMIC_LOAD + 2 + LOAD + ATOMIC_STORE + 1 + ATOMIC_NOTIFY",
         "waitIterationActiveCost": "ATOMIC_WAIT + ATOMIC_LOAD + 1",
-        "note": "Elapsed time remains unbounded due to Atomics.wait. Payload consumption uses an ordinary load guarded by the sequence atomic."
+        "note": "Elapsed time remains unbounded due to Atomics.wait. ready=(position+1)|0 is explicitly normalized before sequence comparison so signed rollover remains correct; payload consumption remains guarded by the sequence atomic."
       },
       "preconditions": [
         "sequence atomic acquisition/publication establishes payload visibility",
@@ -4975,9 +4975,9 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "unbounded",
-        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + LOAD + STORE_COST + ATOMIC_STORE + 6",
-        "nonEqualPath": "2*ATOMIC_LOAD + 7 before retry/empty decision",
-        "note": "Ready-sequence equality is tested first, deleting SUB+int32 coercion from successful attempts. Non-equal signed-difference logic preserves wrap-aware empty/retry behavior."
+        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + LOAD + STORE_COST + ATOMIC_STORE + 7",
+        "nonEqualPath": "2*ATOMIC_LOAD + 8 before retry/empty decision",
+        "note": "Equality-first still deletes one operation versus the pre-round-066 success path, but ready must include int32 normalization before comparison to an Atomics-loaded sequence value."
       }
     },
     {
@@ -5037,10 +5037,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 4",
-        "unavailablePath": "ATOMIC_LOAD + 3",
+        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 5",
+        "unavailablePath": "ATOMIC_LOAD + 4",
         "callerSuccessAdvance": "ADD + int32-coercion",
-        "note": "Owned consumer compares observed sequence directly with ready; no signed difference is required when this side owns the reservation position."
+        "note": "Owned consumer uses exact sequence equality, but its ready value is int32-normalized for rollover correctness. The shared reservation load/CAS/retry are still eliminated."
       }
     },
     {
@@ -7606,6 +7606,24 @@
           "before": "general center-omitted known-cell low/same path: 2*LOAD + 3*STORE + 8..12 ALU",
           "after": "LOAD + 2*STORE + 7..11 ALU",
           "mechanism": "compose center zero-delta ownership with caller-known landing cell"
+        }
+      ]
+    },
+    {
+      "id": "round-082",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "queueDequeue32",
+          "before": "ready = position+1 compared as Number; incorrect at signed int32 rollover",
+          "after": "ready = (position+1)|0; one additional accounted ALU",
+          "mechanism": "match Atomics sequence values in their actual Int32 domain"
+        },
+        {
+          "function": "queueTryDequeue32 / queueTryDequeueOwnedPosition32",
+          "before": "equality-first ready comparison skipped int32 normalization at rollover",
+          "after": "retain equality-first optimization with explicit ready normalization",
+          "mechanism": "preserve wrap correctness while keeping signed-difference work off the success path"
         }
       ]
     }

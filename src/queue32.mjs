@@ -27,7 +27,7 @@ export function queueDequeue32(
 ) {
   const position = Atomics.add(dequeue, 0, 1);
   const slot = position & mask;
-  const ready = position + 1;
+  const ready = (position + 1) | 0;
   let observed = Atomics.load(sequence, slot);
   while (observed !== ready) {
     Atomics.wait(sequence, slot, observed);
@@ -75,7 +75,7 @@ export function queueTryDequeue32(
     const position = Atomics.load(dequeue, 0);
     const slot = position & mask;
     const observed = Atomics.load(sequence, slot);
-    const ready = position + 1;
+    const ready = (position + 1) | 0;
     if (observed === ready) {
       if (Atomics.compareExchange(dequeue, 0, position, ready) !== position) continue;
       out[outIndex] = values[slot];
@@ -113,7 +113,7 @@ export function queueTryDequeueOwnedPosition32(
   outIndex,
 ) {
   const slot = position & mask;
-  const ready = position + 1;
+  const ready = (position + 1) | 0;
   const observed = Atomics.load(sequence, slot);
   if (observed !== ready) return false;
 

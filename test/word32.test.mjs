@@ -2006,6 +2006,37 @@ test('bounded shared queue blocks without waiting', () => {
 });
 
 
+test('queue dequeue ready sequence is int32-normalized across wrap', () => {
+  const sequence = new Int32Array(new SharedArrayBuffer(4));
+  const values = new Int32Array(new SharedArrayBuffer(4));
+  const dequeue = new Int32Array(new SharedArrayBuffer(4));
+  const out = new Int32Array(1);
+
+  dequeue[0] = 0x7fffffff;
+  sequence[0] = -2147483648;
+  values[0] = 77;
+
+  assert.equal(queueDequeue32(dequeue, sequence, values, 0, 1), 77);
+  assert.equal(dequeue[0], -2147483648);
+
+  dequeue[0] = 0x7fffffff;
+  sequence[0] = -2147483648;
+  values[0] = 88;
+  assert.equal(queueTryDequeue32(dequeue, sequence, values, 0, 1, out, 0), true);
+  assert.equal(out[0], 88);
+  assert.equal(dequeue[0], -2147483648);
+
+  sequence[0] = -2147483648;
+  values[0] = 99;
+  assert.equal(
+    queueTryDequeueOwnedPosition32(
+      sequence, values, 0, 1, 0x7fffffff, out, 0,
+    ),
+    true,
+  );
+  assert.equal(out[0], 99);
+});
+
 test('caller-owned queue positions remove reservation CAS', () => {
   const capacity = 4;
   const mask = capacity - 1;
