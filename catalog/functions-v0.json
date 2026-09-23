@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "status": "catalog-implementation-complete-except-deferred",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -11,7 +11,14 @@
         "&",
         "!=="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "AND + compare/test."
+      }
     },
     {
       "name": "bitSet32",
@@ -21,7 +28,14 @@
         "|",
         ">>>"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "OR + uint32 coercion/shift."
+      }
     },
     {
       "name": "bitClear32",
@@ -32,7 +46,14 @@
         "~",
         ">>>"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "NOT + AND + uint32 coercion/shift."
+      }
     },
     {
       "name": "bitToggle32",
@@ -42,7 +63,14 @@
         "^",
         ">>>"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "XOR + uint32 coercion/shift."
+      }
     },
     {
       "name": "and2x32Into",
@@ -55,7 +83,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 22,
+        "hotL2Predicted": 54,
+        "expression": "4*LOAD + 2*AND + 3*ADD(address/index) + 2*STORE",
+        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum; ownership penalties remain outside this scenario."
+      }
     },
     {
       "name": "or2x32Into",
@@ -68,7 +105,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 22,
+        "hotL2Predicted": 54,
+        "expression": "4*LOAD + 2*OR + 3*ADD(address/index) + 2*STORE",
+        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum."
+      }
     },
     {
       "name": "xor2x32Into",
@@ -81,7 +127,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 22,
+        "hotL2Predicted": 54,
+        "expression": "4*LOAD + 2*XOR + 3*ADD(address/index) + 2*STORE",
+        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum."
+      }
     },
     {
       "name": "zero2x32",
@@ -91,7 +146,14 @@
         "|",
         "==="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "OR + zero test."
+      }
     },
     {
       "name": "equal2x32",
@@ -102,7 +164,14 @@
         "|",
         "==="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 4,
+        "note": "2*XOR + OR + zero test."
+      }
     },
     {
       "name": "firstSetBitIndex32",
@@ -115,7 +184,15 @@
         "&",
         "Math.clz32"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 2,
+        "maxCycles": 6,
+        "note": "Predicted-path range: zero path is compare+branch; nonzero path adds negate, AND, CLZ and subtraction. Add 15-19 cycles for a branch misprediction."
+      }
     },
     {
       "name": "popcount32",
@@ -129,7 +206,14 @@
         "+",
         "Math.imul"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 15,
+        "note": "Static serial count for the current SWAR implementation: shifts/masks/adds/subtract plus one IMUL."
+      }
     },
     {
       "name": "subset32",
@@ -140,7 +224,14 @@
         "~",
         "==="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "NOT + AND + zero test."
+      }
     },
     {
       "name": "landingCell32",
@@ -153,7 +244,22 @@
         "*",
         "+"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 6,
+          "max": 10
+        },
+        "hotL2Predicted": {
+          "min": 14,
+          "max": 18
+        },
+        "expression": "LOAD + compare + predicted select + (valid ? IMUL + ADD : 0)",
+        "note": "Range is invalid/full-column path through valid landing-cell path."
+      }
     },
     {
       "name": "maskContains32",
@@ -163,7 +269,14 @@
         "&",
         "==="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "AND + equality test."
+      }
     },
     {
       "name": "maskContains2x32",
@@ -174,7 +287,15 @@
         "===",
         "&&"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 3,
+        "maxCycles": 5,
+        "note": "First lane AND/test plus predicted short-circuit; second lane adds AND/test when evaluated."
+      }
     },
     {
       "name": "residualTransition32",
@@ -185,7 +306,16 @@
         "*",
         "+"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 8,
+        "hotL2Predicted": 16,
+        "expression": "IMUL + ADD + LOAD",
+        "note": "Indexed transition-table lookup."
+      }
     },
     {
       "name": "powerOfTwoIndex32",
@@ -194,7 +324,14 @@
       "primitives": [
         "&"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "AND mask."
+      }
     },
     {
       "name": "ttProbeIndex32",
@@ -206,7 +343,16 @@
         "===",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 7,
+        "hotL2Predicted": 15,
+        "expression": "AND + LOAD + equality test + predicted select",
+        "note": "Hot tag probe."
+      }
     },
     {
       "name": "ttReplace32",
@@ -216,7 +362,15 @@
         "ST32",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*STORE_COST",
+        "note": "Two indexed stores. NEES store profile gives 0.5-cycle hot/local throughput minimum per store; cache ownership/coherence remains symbolic.",
+        "hotLocalMinimumCycles": 1
+      }
     },
     {
       "name": "selectGreater32",
@@ -226,7 +380,14 @@
         ">=",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Compare + predicted select."
+      }
     },
     {
       "name": "selectLess32",
@@ -236,7 +397,14 @@
         "<=",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Compare + predicted select."
+      }
     },
     {
       "name": "applyMove32",
@@ -256,7 +424,22 @@
         "<",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 72.5,
+          "max": 94.5
+        },
+        "hotL2Predicted": {
+          "min": 152.5,
+          "max": 206.5
+        },
+        "expression": "noAbove: 10*LOAD + 9*STORE + 28 ALU/control; above: 14*LOAD + 11*STORE + 33 ALU/control",
+        "note": "Predicted-branch serial ledger; range reflects whether an above cell exists. Stores use 0.5-cycle hot/local minimum."
+      }
     },
     {
       "name": "undoMove32",
@@ -276,7 +459,22 @@
         "<",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 76,
+          "max": 100
+        },
+        "hotL2Predicted": {
+          "min": 164,
+          "max": 220
+        },
+        "expression": "noAbove: 11*LOAD + 8*STORE + 28 ALU/control; above: 15*LOAD + 10*STORE + 35 ALU/control",
+        "note": "Predicted-branch serial ledger; range reflects whether an above cell exists."
+      }
     },
     {
       "name": "mix32",
@@ -289,7 +487,14 @@
         "=",
         "Math.imul"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 14,
+        "note": "OR/coercion + 3 shift/XOR stages + 2 IMUL + final uint32 coercion."
+      }
     },
     {
       "name": "reflectPacked3x32",
@@ -306,7 +511,18 @@
         "<",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "5 + 16*C",
+        "note": "C is columns. Includes loop control under predicted branches; for Connect4 C=7 => 117 cycles.",
+        "parameters": {
+          "C": "column count"
+        },
+        "connect4Cycles": 117
+      }
     },
     {
       "name": "canonicalMin32",
@@ -316,7 +532,14 @@
         "<=",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Compare + predicted select."
+      }
     },
     {
       "name": "normalizeMinimal2x32InPlace",
@@ -334,7 +557,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(2*L+3) + C1*(2*L+10) + C2*(2*L+10) + K*(2*S+1) + R*(2*S+1)",
+        "note": "N=input entries; C1=first-pass subset checks; C2=filter subset checks; K=retained entries copied during filtering; R=accepted candidates; L=load cycles; S=store cycles.",
+        "hotL1Predicted": "2 + 11*N + 18*C1 + 18*C2 + 2*K + 2*R",
+        "hotL2Predicted": "2 + 27*N + 34*C1 + 34*C2 + 2*K + 2*R"
+      }
     },
     {
       "name": "normalizeMaximal2x32InPlace",
@@ -352,7 +584,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(2*L+3) + C1*(2*L+10) + C2*(2*L+10) + K*(2*S+1) + R*(2*S+1)",
+        "note": "N=input entries; C1=first-pass subset checks; C2=filter subset checks; K=retained entries copied during filtering; R=accepted candidates; L=load cycles; S=store cycles.",
+        "hotL1Predicted": "2 + 11*N + 18*C1 + 18*C2 + 2*K + 2*R",
+        "hotL2Predicted": "2 + 27*N + 34*C1 + 34*C2 + 2*K + 2*R"
+      }
     },
     {
       "name": "negateScore32",
@@ -361,7 +602,14 @@
       "primitives": [
         "-"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Unary negation/subtraction class."
+      }
     },
     {
       "name": "raiseLowerBound32",
@@ -371,7 +619,14 @@
         ">",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Compare + predicted select."
+      }
     },
     {
       "name": "lowerUpperBound32",
@@ -381,7 +636,14 @@
         "<",
         "?:"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Compare + predicted select."
+      }
     },
     {
       "name": "cutoff32",
@@ -390,7 +652,14 @@
       "primitives": [
         ">="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Ordered compare."
+      }
     },
     {
       "name": "argMaxPlayable32",
@@ -404,7 +673,16 @@
         "+",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + N*(2*L+5) + P*(L+2)",
+        "note": "N=candidate count; P=playable candidates whose score is read; L=load cycles. Register assignments are assumed move-eliminated.",
+        "hotL1Predicted": "2 + 13*N + 6*P",
+        "hotL2Predicted": "2 + 29*N + 14*P"
+      }
     },
     {
       "name": "atomicTryClaim32",
@@ -414,7 +692,15 @@
         "Atomics.compareExchange",
         "==="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 8.5,
+        "maxCycles": 13,
+        "note": "Uncontended locked-RMW range 7.5-12 plus equality test. Contention can exceed this."
+      }
     },
     {
       "name": "atomicRelease32",
@@ -424,7 +710,14 @@
         "Atomics.store",
         "Atomics.notify"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "ATOMIC_STORE + ATOMIC_NOTIFY",
+        "note": "NEES does not assign a fixed Zen 3 cycle count to seq-cst Atomics.store/notify; both remain explicit symbolic terms."
+      }
     },
     {
       "name": "atomicExchange32",
@@ -433,7 +726,15 @@
       "primitives": [
         "Atomics.exchange"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 7.5,
+        "maxCycles": 12,
+        "note": "Uncontended locked-RMW reference; contention/cache-line migration can exceed."
+      }
     },
     {
       "name": "atomicAdd32",
@@ -442,7 +743,15 @@
       "primitives": [
         "Atomics.add"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 7.5,
+        "maxCycles": 12,
+        "note": "Uncontended locked-RMW reference; contention/cache-line migration can exceed."
+      }
     },
     {
       "name": "atomicSub32",
@@ -451,7 +760,15 @@
       "primitives": [
         "Atomics.sub"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 7.5,
+        "maxCycles": 12,
+        "note": "Provisional uncontended locked arithmetic RMW class; contention can exceed."
+      }
     },
     {
       "name": "queueEnqueue32",
@@ -467,7 +784,14 @@
         "!==",
         "+"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "unbounded",
+        "fastPath": "ATOMIC_RMW + 1 + ATOMIC_LOAD + 2 + 2*ATOMIC_STORE + 1 + ATOMIC_NOTIFY",
+        "note": "Contains Atomics.wait in the wait loop, so elapsed cycles have no finite upper bound. Fast-path expression assumes no wait iterations."
+      }
     },
     {
       "name": "queueDequeue32",
@@ -483,7 +807,14 @@
         "!==",
         "+"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "unbounded",
+        "fastPath": "ATOMIC_RMW + 1 + ATOMIC_LOAD + 2 + ATOMIC_LOAD + ATOMIC_STORE + 1 + ATOMIC_NOTIFY",
+        "note": "Contains Atomics.wait in the wait loop, so elapsed cycles have no finite upper bound. Fast-path expression assumes no wait iterations."
+      }
     },
     {
       "name": "shl2x32Into",
@@ -499,7 +830,15 @@
         "ST32",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 4,
+        "maxCycles": 13,
+        "note": "Predicted-path range across count==0, <32, <64, and >=64. Includes two hot/local stores at 0.5-cycle minimum each."
+      }
     },
     {
       "name": "ushr2x32Into",
@@ -515,7 +854,15 @@
         "ST32",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 4,
+        "maxCycles": 13,
+        "note": "Predicted-path range across count==0, <32, <64, and >=64. Includes two hot/local stores at 0.5-cycle minimum each."
+      }
     },
     {
       "name": "add2x32Into",
@@ -529,7 +876,14 @@
         "ST32",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 9,
+        "note": "Static serial ledger with predicted carry select and two hot/local stores at 0.5-cycle minimum each."
+      }
     },
     {
       "name": "sub2x32Into",
@@ -543,7 +897,14 @@
         "ST32",
         "="
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 9,
+        "note": "Static serial ledger with predicted borrow select and two hot/local stores at 0.5-cycle minimum each."
+      }
     },
     {
       "name": "firstSetBitIndex2x32",
@@ -556,7 +917,15 @@
         "Math.clz32",
         "+"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 4,
+        "maxCycles": 9,
+        "note": "Predicted path from empty two-lane value through high-lane and low-lane set-bit paths."
+      }
     },
     {
       "name": "clearLowestSetBit32",
@@ -567,7 +936,14 @@
         "-",
         ">>>"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Subtract + AND + uint32 coercion."
+      }
     },
     {
       "name": "cardinalityClass2x32",
@@ -582,7 +958,15 @@
         "&",
         "-"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 3,
+        "maxCycles": 13,
+        "note": "Predicted-path range across zero, cross-lane multiple, and single-word classification."
+      }
     },
     {
       "name": "popcount2x32",
@@ -596,7 +980,14 @@
         "=",
         "Math.imul"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 31,
+        "note": "Two SWAR popcounts plus final add."
+      }
     },
     {
       "name": "playableColumn32",
@@ -606,7 +997,16 @@
         "LD32",
         "<"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 5,
+        "hotL2Predicted": 13,
+        "expression": "LOAD + compare",
+        "note": "Trusted internal legality predicate."
+      }
     },
     {
       "name": "decodeColumn32",
@@ -615,7 +1015,15 @@
       "primitives": [
         "%"
       ],
-      "status": "implemented-reference-anti-candidate"
+      "status": "implemented-reference-anti-candidate",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 9,
+        "maxCycles": 14,
+        "note": "Integer-division/remainder core reference. This is an anti-candidate and source lowering remains realization-sensitive."
+      }
     },
     {
       "name": "decodeRow32",
@@ -625,7 +1033,15 @@
         "/",
         "Math.floor"
       ],
-      "status": "implemented-reference-anti-candidate"
+      "status": "implemented-reference-anti-candidate",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "DIV_CORE(9..14) + FLOAT_FLOOR",
+        "note": "Division core has a 9-14 cycle native reference; NEES currently leaves the exact Math.floor floating-path cost symbolic.",
+        "minCycles": 9
+      }
     },
     {
       "name": "isPowerOfTwo32",
@@ -638,7 +1054,15 @@
         "===",
         "&&"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 2,
+        "maxCycles": 5,
+        "note": "Predicted short-circuit range: nonpositive path through full subtract/AND/test path."
+      }
     },
     {
       "name": "nextPowerOfTwo32",
@@ -650,7 +1074,17 @@
         "=",
         ">>>"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + 3*K",
+        "note": "K is the number of loop iterations/shifts. Includes final loop test and uint32 coercion.",
+        "parameters": {
+          "K": "number of left-shift iterations"
+        }
+      }
     },
     {
       "name": "rehashOverwrite32",
@@ -665,7 +1099,16 @@
         "=",
         "<"
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(L+5) + K*(L+1+2*S)",
+        "note": "N=old slots scanned; K=non-empty entries rehashed; L=load cycles; S=store cycles.",
+        "hotL1Predicted": "3 + 9*N + 6*K",
+        "hotL2Predicted": "3 + 17*N + 14*K"
+      }
     }
   ],
   "deferred": [
@@ -676,14 +1119,22 @@
         "new / typed-array construction"
       ],
       "reason": "Dynamic storage allocation is not in the admitted execution primitive list. Rehash into caller-provided storage is implemented; allocation is deferred for primitive-admission review.",
-      "status": "deferred-missing-primitive"
+      "status": "deferred-missing-primitive",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "deferred",
+        "reason": "Cannot calculate implementation cycles until the missing allocation primitive is dispositioned and an implementation exists."
+      }
     }
   ],
   "summary": {
     "functionsImplemented": 54,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
-    "deferredMissingPrimitive": 1
+    "deferredMissingPrimitive": 1,
+    "functionsWithCycleCount": 54,
+    "functionsMissingCycleCount": 0
   },
   "decisions": [
     {
@@ -691,5 +1142,13 @@
       "disposition": "not-required",
       "reason": "Checked external integrality belongs outside the sealed hot scope; internal indices enter with an established integer-domain invariant."
     }
-  ]
+  ],
+  "cycleCountAuthority": {
+    "standard": "NEES Draft 0.5",
+    "profile": "node26-v8-14.6/x86_64-amd-zen3",
+    "metric": "static serial ledger cycles",
+    "branchRule": "Predicted branch baseline is 1 cycle; add 15-19 cycles per modeled Zen 3 misprediction.",
+    "memoryRule": "L1 dependent load=4 cycles; L2=12; L3≈47. Hot/local store uses the NEES 0.5-cycle throughput minimum only where explicitly stated.",
+    "limitation": "These totals are additive accounting values, not guaranteed wall-clock latency. NEES governing-unit evidence remains authoritative."
+  }
 }
