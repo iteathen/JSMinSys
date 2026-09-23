@@ -16,6 +16,7 @@ export function prepareConnect4CpcScratch(g){
     projectedDistance:new Uint32Array(g.maxBasis),
     projectedCount:new Uint32Array(2),
     projectedForks:new Uint32Array(2),
+    actionBias:new Int32Array(g.columns),
     forcedColumn:new Int32Array(1),
     interval:new Uint32Array(2),
   };
@@ -90,7 +91,9 @@ function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
 
 function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
   scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;
+  for(let c=0;c<g.columns;c+=1)scratch.actionBias[c]=0;
   scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
+  const mover=(words[offset+g.metaOffset]>>>2)&1;
   for(let player=0;player<2;player+=1){
     const coord=offset+(player?g.p1Offset:g.p0Offset);
     let count=0;
@@ -102,7 +105,9 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
       if(connect4CpcTargetOwner32(g,words,offset,cell)!==player)continue;
       scratch.projectedCells[count]=cell;
       scratch.projectedOwner[count]=player;
-      scratch.projectedDistance[count]=connect4CpcTargetSupportDistance32(g,words,offset,cell);
+      const distance=connect4CpcTargetSupportDistance32(g,words,offset,cell);
+      scratch.projectedDistance[count]=distance;
+      scratch.actionBias[g.cellColumn[cell]]+=(player===mover?4:2)+(g.rows-distance);
       count+=1;
     }
     scratch.projectedCount[player]=count;
