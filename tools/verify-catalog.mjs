@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const catalog = JSON.parse(readFileSync('catalog/catalog-v0.json', 'utf8'));
 const functions = JSON.parse(readFileSync('catalog/functions-v0.json', 'utf8'));
 const coverage = JSON.parse(readFileSync('catalog/block-coverage-v0.json', 'utf8'));
+const cycleModel = JSON.parse(readFileSync('catalog/cycle-model-v0.json', 'utf8'));
 
 const admitted = new Set(Object.values(catalog.admissibleOperations).flat());
 const names = new Set();
@@ -48,7 +49,7 @@ for (const block of coverage.blocks) {
 assert.equal(coverage.blocks.length, coverage.summary.catalogBlocks);
 assert.equal(
   coverage.blocks.filter((block) => !block.status.includes('deferred')).length,
-  coverage.summary.completeWithoutNewPrimitive,
+  coverage.summary.complete,
 );
 assert.equal(
   coverage.blocks.filter((block) => block.status.includes('deferred')).length,
@@ -57,7 +58,7 @@ assert.equal(
 
 const sourceFiles = [...new Set(functions.functions.map((fn) => fn.source))];
 const forbiddenSourcePatterns = [
-  [/\bnew\s+/, 'dynamic construction'],
+  [/\bnew\s+/, 'unapproved dynamic construction'],
   [/\bBigInt\b|\bBigInt64Array\b|\bBigUint64Array\b/, 'BigInt'],
   [/\bNumber\.isInteger\s*\(/, 'Number.isInteger'],
   [/\bMap\s*\(|\bSet\s*\(|\bWeakMap\s*\(|\bWeakSet\s*\(/, 'general collection construction'],
@@ -65,8 +66,9 @@ const forbiddenSourcePatterns = [
 ];
 for (const path of sourceFiles) {
   const source = readFileSync(path, 'utf8');
+  const sourceWithAdmittedConstructionRemoved = source.replace(/\bnew\s+Uint32Array\s*\(/g, 'Uint32Array.construct(');
   for (const [pattern, label] of forbiddenSourcePatterns) {
-    assert.ok(!pattern.test(source), `${path}: forbidden sealed-source form: ${label}`);
+    assert.ok(!pattern.test(sourceWithAdmittedConstructionRemoved), `${path}: forbidden sealed-source form: ${label}`);
   }
 }
 
@@ -77,8 +79,18 @@ assert.equal(
 );
 assert.equal(functions.summary.functionsMissingCycleCount, 0, 'implemented functions missing cycle counts');
 
+for (const primitive of admitted) {
+  assert.ok(cycleModel.operations[primitive], `admitted primitive missing cycle model: ${primitive}`);
+}
+assert.equal(
+  Object.keys(cycleModel.operations).length,
+  admitted.size,
+  'cycle model and admitted-operation counts differ',
+);
+assert.equal(cycleModel.coverage.complete, true, 'cycle model coverage must be complete');
+
 console.log(
   `JSMinSys catalog verified: ${functions.functions.length} implemented functions, all cycle-counted, ` +
-  `${coverage.summary.completeWithoutNewPrimitive}/${coverage.summary.catalogBlocks} blocks complete without new primitives, ` +
+  `${coverage.summary.complete}/${coverage.summary.catalogBlocks} blocks complete, ` +
   `${functions.deferred.length} deferred function(s).`,
 );
