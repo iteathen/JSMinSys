@@ -173,12 +173,14 @@ export function rbaBranchWorkerStep32(
   let next=-1;
   try{
     if(t.execution[q]!==worker.owner){
+      t.fault[0]=4;t.fault[1]=q;t.fault[2]=worker.owner;t.fault[3]=t.execution[q];
       rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
     }else{
       next=publish(t,q,worker.owner,worker.state,worker.code,context);
       if(t.execution[q]===worker.owner)
         rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
       if(next>=0&&t.execution[next]!==worker.owner){
+        t.fault[0]=5;t.fault[1]=next;t.fault[2]=worker.owner;t.fault[3]=t.execution[next];
         rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
         next=-1;
       }
