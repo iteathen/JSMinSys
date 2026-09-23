@@ -160,15 +160,16 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
   return row-words[offset+column];
 }
 
-// Pooled-frontier paired-response theorem. Odd-remainder columns contribute
-// their currently playable frontier cells to one shared waiting pool. The pool
-// must have even cardinality. Those frontier cells are deliberately omitted
-// from the vertical response set; every other upper response cell has the
-// geometry-prepared pairedResponseRowParity.
-function pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
-  let poolParity=0;
-  for(let c=0;c<g.columns;c+=1)poolParity^=(g.rows-words[offset+c])&1;
-  if(poolParity)return 0;
+// Pooled-frontier paired response plus the L=1 synchronized-frontier
+// specialization. Odd-remainder columns contribute their currently playable
+// frontier cells to an even pool. Pairing those frontiers deterministically
+// gives an additional exact pair blocker: the attacker cannot own both ends of
+// a pair. The omitted frontier cells are never counted as vertical responses.
+function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch){
+  let poolCount=0;
+  for(let c=0;c<g.columns;c+=1)
+    if(((g.rows-words[offset+c])&1)!==0)scratch.threatColumns[poolCount++]=c;
+  if(poolCount&1)return 0;
   const coord=offset+(player?g.p1Offset:g.p0Offset);
   for(let i=0;i<basisSize;i+=1){
     if(!coordHas(words,coord,i))continue;
@@ -180,6 +181,18 @@ function pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,
       const height=words[offset+column];
       if(((g.rows-height)&1)!==0&&row===height)continue;
       covered=1;break;
+    }
+    if(!covered){
+      for(let p=0;p<poolCount;p+=2){
+        const a=scratch.threatColumns[p],b=scratch.threatColumns[p+1];
+        const acell=words[offset+a]*g.columns+a,bcell=words[offset+b]*g.columns+b;
+        let hit=0;
+        for(let j=0;j<size;j+=1){
+          const cell=g.shapeCells[base+j];
+          if(cell===acell)hit|=1;else if(cell===bcell)hit|=2;
+        }
+        if(hit===3){covered=1;break;}
+      }
     }
     if(!covered)return 0;
   }
@@ -232,9 +245,9 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   if(!p0Any)scratch.interval[1]=2;
   if(!p1Any)scratch.interval[0]=2;
 
-  if(mover===0&&pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0))
+  if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
     scratch.interval[1]=Math.min(scratch.interval[1],2);
-  if(mover===1&&pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1))
+  if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
     scratch.interval[0]=Math.max(scratch.interval[0],2);
 
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
