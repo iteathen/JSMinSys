@@ -39,7 +39,7 @@ export function insertMinimal6x32InPlace(words, base, length, capacity, candidat
 }
 
 // Stream pairwise OR (join under subset order) through immediate skyline absorption.
-// out may already contain retained generators. Returns new length or ~length on capacity.
+// out may already contain retained generators. Returns retained length or ~length on capacity.
 export function productJoinMinimal6x32Into(
   out,
   outBase,
