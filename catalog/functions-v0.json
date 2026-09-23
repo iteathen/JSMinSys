@@ -1,5 +1,5 @@
 {
-  "version": "0.24.0",
+  "version": "0.25.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1299,21 +1299,21 @@
       "source": "src/capacity32.mjs",
       "block": "capacity-growth-rehash",
       "primitives": [
-        ">",
         "&",
         "-",
-        "===",
-        "&&"
+        "==="
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "range",
-        "minCycles": 2,
-        "maxCycles": 5,
-        "note": "Predicted short-circuit range: nonpositive path through full subtract/AND/test path."
-      }
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Positive-domain validation is owned by initialization; hot/configured test is subtract + AND + zero test."
+      },
+      "preconditions": [
+        "value is a positive integer capacity validated by the configuration owner"
+      ]
     },
     {
       "name": "nextPowerOfTwo32",
@@ -1840,6 +1840,18 @@
           "before": "4-11 cycles including zero identity path",
           "after": "6-9 cycles for real nonzero shifts",
           "mechanism": "remove zero-shift no-op branch"
+        }
+      ]
+    },
+    {
+      "id": "round-018",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "isPowerOfTwo32",
+          "before": "2-5 cycles including positive-domain check",
+          "after": "3 cycles on the required positive-capacity domain",
+          "mechanism": "move positivity validation to configuration owner"
         }
       ]
     }
