@@ -1,5 +1,5 @@
 {
-  "version": "0.19.0",
+  "version": "0.20.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -321,12 +321,27 @@
       }
     },
     {
+      "name": "residualBase32",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "*"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Compute classIndex * actionCount once and reuse across multiple action lookups."
+      }
+    },
+    {
       "name": "residualTransition32",
       "source": "src/indexed32.mjs",
       "block": "residual-transition",
       "primitives": [
         "LD32",
-        "*",
         "+"
       ],
       "status": "implemented",
@@ -334,11 +349,15 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 8,
-        "hotL2Predicted": 16,
-        "expression": "IMUL + ADD + LOAD",
-        "note": "Indexed transition-table lookup."
-      }
+        "hotL1Predicted": 5,
+        "hotL2Predicted": 13,
+        "hotL3Predicted": 48,
+        "expression": "ADD + LOAD",
+        "note": "The class-base multiply is hoisted and amortized across action lookups."
+      },
+      "preconditions": [
+        "classBase was computed once for the current class/action-count pair"
+      ]
     },
     {
       "name": "powerOfTwoIndex32",
@@ -797,8 +816,6 @@
       "block": "fixed-candidate-selection",
       "primitives": [
         "LD32",
-        ">=",
-        "<",
         ">",
         "+",
         "="
@@ -808,11 +825,21 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "2 + N*(2*L+5) + P*(L+2)",
-        "note": "N=candidate count; P=playable candidates whose score is read; L=load cycles. Register assignments are assumed move-eliminated.",
-        "hotL1Predicted": "2 + 13*N + 6*P",
-        "hotL2Predicted": "2 + 29*N + 14*P"
-      }
+        "expression": "2 + N*(2*L + 5)",
+        "parameters": {
+          "N": "candidate count",
+          "L": "load cycles"
+        },
+        "hotL1Predicted": "2 + 13*N",
+        "hotL2Predicted": "2 + 29*N",
+        "example7L1Cycles": 93,
+        "note": "Legality is encoded by the score producer using the existing floor sentinel, eliminating a second per-candidate state load and branch."
+      },
+      "preconditions": [
+        "scores for unplayable columns equal -2147483648",
+        "all playable scores are greater than -2147483648",
+        "order contains the configured candidate columns"
+      ]
     },
     {
       "name": "atomicTryClaim32",
@@ -1305,11 +1332,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 60,
+    "functionsImplemented": 61,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 60,
+    "functionsWithCycleCount": 61,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1676,6 +1703,24 @@
           "before": "8 + 10*C cycles",
           "after": "8 + 9*C cycles",
           "mechanism": "delay unsigned coercion until scalar return"
+        }
+      ]
+    },
+    {
+      "id": "round-013",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "residualTransition32",
+          "before": "8 L1 / 16 L2 per lookup",
+          "after": "5 L1 / 13 L2 after one 3-cycle residualBase32 per class",
+          "mechanism": "hoist classIndex*actionCount across repeated action lookups"
+        },
+        {
+          "function": "argMaxPlayable32",
+          "before": "2 + N*(2*L+5) + P*(L+2)",
+          "after": "2 + N*(2*L+5)",
+          "mechanism": "score producer encodes unplayable columns with floor sentinel"
         }
       ]
     }
