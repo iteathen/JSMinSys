@@ -111,3 +111,22 @@ test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle
     assert.ok(rb.metrics.frontCalls>0);
   }
 });
+
+
+test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>{
+  const columns=7,rows=6,g=prepareConnect4RbaGeometry({columns,rows});
+  const fixtures=[
+    [6,0,2,1,5,2,1,1,1,0,5,2,5,2,4,1,0,1,4,3,2,6,6,6,6,2,4,4,0,6,0,3,4,5,4],
+    [4,2,2,3,0,3,5,6,5,6,5,6,6,3,6,0,6,2,0,2,1,0,0,1,0,1,4,5,5,1,4,4,4,2,2],
+  ];
+  const memo=new Map();
+  for(const moves of fixtures){
+    const oracle=exact(columns,rows,moves,memo),root=connect4RbaFromMoves(moves,{geometry:g});
+    for(const mode of [RBA_AB_CPC_ONLY,RBA_AB_CPC_FOUR_FRONT]){
+      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
+      const result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
+      assert.equal(result.value,oracle.value,JSON.stringify({moves,mode,oracle,result}));
+      assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,oracle,result}));
+    }
+  }
+});
