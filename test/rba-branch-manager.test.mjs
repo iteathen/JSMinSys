@@ -2,18 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,
-  rbaTtPublishPrepared32,rbaTtPublishExactOwned32,
-  rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
-  rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,
-  rbaTtSignal32,
-  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
+  rbaTtPublishSurplus32,rbaTtPublishExactOwned32,
+  rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
+  rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,
+  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,
+  RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
 import {
-  prepareRbaBranchWorker32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
-  rbaBranchReadyCount32,
+  prepareRbaBranchWorker32,prepareRbaBranchManager32,
+  rbaBranchWorkerStep32,rbaBranchManagerStep32,rbaBranchReadyCount32,
 } from '../addons/rba-branch-manager.mjs';
 
-function table(){return createRbaTt32({capacity:16,bucketCount:16,keyWords:2,basisCapacity:1,edgeCapacity:2});}
+function table(){return createRbaTt32({capacity:32,bucketCount:32,keyWords:2,basisCapacity:1,edgeCapacity:2});}
 function key(tag){return Uint32Array.from([tag,tag+100]);}
 const emptyBasis=new Uint32Array(1);
 
@@ -25,6 +25,7 @@ function makeState(){
     labels:new Uint32Array(2),
     lo:new Uint32Array(2),
     hi:new Uint32Array(2),
+    priorities:new Int32Array(2),
     present:new Uint32Array(2),
     count:0,
   };
@@ -39,6 +40,7 @@ function evaluate(t,q,state){
     state.labels[0]=0;state.labels[1]=1;
     state.lo[0]=state.lo[1]=1;
     state.hi[0]=state.hi[1]=3;
+    state.priorities[0]=10;state.priorities[1]=20;
     state.present[0]=state.present[1]=1;
     state.count=2;
     return 4;
@@ -52,16 +54,16 @@ function publish(t,q,owner,state,code){
     return -1;
   }
   if(code!==4)return -1;
-  return rbaTtPublishPrepared32(
+  return rbaTtPublishSurplus32(
     t,q,owner,1,3,
-    state.keys,0,
-    state.basis,0,1,
-    state.sizes,state.labels,state.lo,state.hi,state.present,state.count,
+    state.keys,0,state.basis,0,1,
+    state.sizes,state.labels,state.lo,state.hi,state.present,state.priorities,state.count,
   );
 }
 
-function reconcile(t,q){
-  if(t.phase[q]===RBA_TT_PHASE_PENDING_ATTACH)rbaTtAttachDependencies32(t,q);
+function reconcile(t,q,context){
+  if(t.phase[q]===RBA_TT_PHASE_PENDING_ATTACH)
+    rbaTtManagerAttachDependencies32(t,q,context.resetTargets);
   if(t.phase[q]===RBA_TT_PHASE_ATTACHED)rbaTtReconcile32(t,q,0);
   rbaTtSignalParents32(t,q);
   if(t.exact[q]){
@@ -71,33 +73,34 @@ function reconcile(t,q){
       return;
     }
     if(t.count[q])rbaTtDetachDependencies32(t,q);
-  }else{
-    rbaTtEnqueueDependencies32(t,q);
   }
 }
 
-test('branch manager retains one child and exposes only surplus work',()=>{
+test('workers publish surplus directly; manager only inspects/reconciles it',()=>{
   const t=table(),root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
   rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
-  const w=prepareRbaBranchWorker32({owner:2,workerCount:2,state:makeState()});
+  const resetTargets=new Int32Array(new SharedArrayBuffer(2*4));resetTargets.fill(-2);
+  const state=makeState();
+  const w=prepareRbaBranchWorker32({owner:2,workerCount:2,state,resetTargets});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const context={resetTargets};
 
   assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1);
   assert.ok(w.q>=0,'worker did not retain first child');
-  assert.equal(rbaBranchReadyCount32(t),0,'surplus became visible before manager attachment');
+  assert.equal(rbaBranchReadyCount32(t),1,'worker did not publish surplus directly');
 
-  assert.equal(rbaBranchManagerStep32(t,reconcile),1);
-  assert.equal(rbaBranchReadyCount32(t),1,'manager did not expose exactly one surplus child');
+  rbaBranchManagerStep32(t,reconcile,{context,manager});
+  assert.equal(rbaBranchReadyCount32(t),1,'manager manufactured or consumed surplus');
 
   assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1);
   assert.equal(w.q,-1);
 
-  assert.ok(rbaBranchManagerStep32(t,reconcile)>=1);
-  assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1,'worker did not claim/process surplus child');
+  rbaBranchManagerStep32(t,reconcile,{context,manager});
+  assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1,'worker did not claim/process surplus');
   assert.equal(rbaBranchReadyCount32(t),0);
-  assert.equal(w.q,-1);
 
-  for(let i=0;i<4&&!Atomics.load(t.control,RBA_TT_DONE);i++)
-    rbaBranchManagerStep32(t,reconcile);
+  for(let i=0;i<8&&!Atomics.load(t.control,RBA_TT_DONE);i++)
+    rbaBranchManagerStep32(t,reconcile,{context,manager});
 
   assert.equal(Atomics.load(t.control,RBA_TT_DONE),1);
   assert.equal(t.exact[root],3);
@@ -106,16 +109,69 @@ test('branch manager retains one child and exposes only surplus work',()=>{
   assert.equal(w.evaluations,3);
 });
 
+test('manager dedupes equivalent surplus rows; worker publication does not',()=>{
+  const t=table(),root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
+  rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const state=makeState();
+  const w=prepareRbaBranchWorker32({owner:2,workerCount:1,state,resetTargets});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const context={resetTargets};
+
+  const duplicateEvaluate=(table,q,s)=>{
+    if(table.keys[q*2]!==1)return 2;
+    s.keys.set(key(2),0);s.keys.set(key(2),2);
+    s.sizes[0]=s.sizes[1]=0;s.labels[0]=0;s.labels[1]=1;
+    s.lo[0]=s.lo[1]=1;s.hi[0]=s.hi[1]=3;
+    s.priorities[0]=10;s.priorities[1]=20;
+    s.present[0]=s.present[1]=1;s.count=2;return 4;
+  };
+
+  rbaBranchWorkerStep32(t,w,duplicateEvaluate,publish);
+  assert.equal(t.control[RBA_TT_LIVE],3,'worker unexpectedly deduped its equivalent children');
+  assert.equal(rbaBranchReadyCount32(t),1);
+
+  rbaBranchManagerStep32(t,reconcile,{context,manager});
+  assert.equal(manager.dedupes,1);
+  assert.equal(rbaBranchReadyCount32(t),0,'redundant queued surplus survived manager dedupe');
+  assert.equal(t.control[RBA_TT_LIVE],2,'redundant TT row was not reclaimed');
+});
+
+test('manager resets a worker when retained work merges into existing q',()=>{
+  const t=table(),existing=rbaTtIntern32(t,key(2),0,emptyBasis,0,0);
+  const root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
+  rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const state=makeState();
+  const w=prepareRbaBranchWorker32({owner:2,workerCount:1,state,resetTargets});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const context={resetTargets};
+
+  const oneChild=(table,q,s)=>{
+    if(table.keys[q*2]!==1)return 2;
+    s.keys.set(key(2),0);s.sizes[0]=0;s.labels[0]=0;s.lo[0]=1;s.hi[0]=3;
+    s.priorities[0]=50;s.present[0]=1;s.count=1;return 4;
+  };
+
+  rbaBranchWorkerStep32(t,w,oneChild,publish);
+  assert.ok(w.q>=0&&w.q!==existing);
+  rbaBranchManagerStep32(t,reconcile,{context,manager});
+  assert.equal(Atomics.load(resetTargets,0),-1,'manager did not request worker reset');
+
+  rbaBranchWorkerStep32(t,w,oneChild,publish);
+  assert.equal(w.q,-1,'worker did not honor manager reset before further evaluation');
+  assert.equal(Atomics.load(resetTargets,0),-2);
+});
+
 test('manager event budget bounds one scheduling turn',()=>{
-  const t=table();
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
   for(let tag=1;tag<=3;tag++){
     const q=rbaTtIntern32(t,key(tag),0,emptyBasis,0,0);
     rbaTtSignal32(t,q);
   }
   assert.equal(t.control[RBA_TT_EVENT_COUNT],3);
-  const processed=rbaBranchManagerStep32(t,()=>{}, {budget:1});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const processed=rbaBranchManagerStep32(t,()=>{}, {budget:1,manager});
   assert.equal(processed,1);
   assert.equal(t.control[RBA_TT_EVENT_COUNT],2);
-  const w=prepareRbaBranchWorker32({owner:7,workerCount:4,state:null,readyTarget:8});
-  assert.equal(w.owner,7);assert.equal(w.readyTarget,8);
 });
