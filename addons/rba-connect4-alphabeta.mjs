@@ -41,11 +41,12 @@ export function prepareConnect4RbaAlphaBeta({
   boundaryBudget=100000,
   cacheCapacity=65536,
   cpcFrontierResponse=false,
+  cpcProjectedAdvisory=false,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(mode!==RBA_AB_CPC_ONLY&&mode!==RBA_AB_CPC_FOUR_FRONT)throw new RangeError('invalid alpha-beta mode');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),levels=g.cellCount+1;
-  return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse}),coord:prepareConnect4RbaCoordinateScratch(g),
+  return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
       :null,
