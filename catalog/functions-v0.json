@@ -1,5 +1,5 @@
 {
-  "version": "0.84.0",
+  "version": "0.85.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2470,6 +2470,61 @@
           "STORE": "table store cost"
         },
         "note": "Initialization work and table footprint now scale with configured packed-support width instead of always materializing four byte tables."
+      }
+    },
+    {
+      "name": "fillReflectExactSmall32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "ST32",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization-cache-profile",
+      "preconditions": [
+        "configured columns is 3 or 4",
+        "entries === 1 << (3*columns) was prepared during initialization",
+        "initialTargetShift === 3*(columns-1) was prepared during initialization",
+        "table capacity >= entries Uint32 elements",
+        "allocation cost for table storage is separately owned/accounted by the caller"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + E*(5 + 9*C + STORE_COST)",
+        "parameters": {
+          "E": "entries = 1 << (3*columns)",
+          "C": "configured columns (3 or 4)",
+          "STORE_COST": "table store cost during initialization"
+        },
+        "note": "Each setup entry composes the qualified reflectPacked3Direct32 cost (2+9*C) with ordinary loop control and one table store. Allocation remains separately accounted."
+      }
+    },
+    {
+      "name": "reflectPacked3ExactTable32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "LD32"
+      ],
+      "status": "implemented-configured-cache-profile",
+      "preconditions": [
+        "configured columns is 3 or 4",
+        "table was built by fillReflectExactSmall32 for the same configured width",
+        "select this profile only when expected table residency beats the register-only configured reflector"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 4,
+        "hotL2Predicted": 12,
+        "hotL3Predicted": 47,
+        "expression": "LOAD(table[code])",
+        "note": "C3 table is 512 Uint32 entries (2 KiB), C4 table is 4096 entries (16 KiB). L1 lookup beats register C3=6 and C4=9; colder lookup does not."
       }
     },
     {
@@ -5266,11 +5321,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 190,
+    "functionsImplemented": 192,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 190,
+    "functionsWithCycleCount": 192,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6839,6 +6894,24 @@
           "before": "only configured count 7 could eliminate score-array loads when producer already owned live scalar scores",
           "after": "all configured counts 2..10 have scalar selectors costing 2*(N-1) cycles",
           "mechanism": "extend producer-owned scalar selection across the same runtime-configured width range as exact array selectors"
+        }
+      ]
+    },
+    {
+      "id": "round-078",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3ExactTable32",
+          "before": "register C3=6 cycles / C4=9 cycles",
+          "after": "4 L1 / 12 L2 / 47 L3",
+          "mechanism": "configuration-time exact reflection table for only the widths whose full state table is small enough to offer an L1 win"
+        },
+        {
+          "function": "fillReflectExactSmall32",
+          "before": "no exact-table setup path",
+          "after": "explicit compositional initialization ledger",
+          "mechanism": "account table generation and leave storage allocation/cold-cache trade visible"
         }
       ]
     }

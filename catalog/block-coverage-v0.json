@@ -223,9 +223,11 @@
         "reflectPacked3Columns8",
         "reflectPacked3Columns9",
         "reflectPacked3Columns10",
-        "canonicalMin32"
+        "canonicalMin32",
+        "fillReflectExactSmall32",
+        "reflectPacked3ExactTable32"
       ],
-      "note": "Reflection consumes support-only bits. Register-only configured profiles fuse final alignment wherever profitable: C5, C6/7, and C9/C10 avoid materializing an intermediate rotated field block."
+      "note": "Reflection supports register-only configured networks, byte-contribution tables, and exact C3/C4 cache profiles. Exact tables are admitted only where 2 KiB/16 KiB storage can plausibly remain L1-hot and beat the 6/9-cycle register networks; cache and allocation costs stay explicit."
     },
     {
       "id": 13,

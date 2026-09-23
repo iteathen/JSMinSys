@@ -50,6 +50,22 @@ export function fillReflect3Tables32(tables, columns, byteCount) {
   return supportBits;
 }
 
+export function fillReflectExactSmall32(
+  table,
+  entries,
+  columns,
+  initialTargetShift,
+) {
+  for (let code = 0; code < entries; code += 1) {
+    table[code] = reflectPacked3Direct32(code, columns, initialTargetShift);
+  }
+  return entries;
+}
+
+export function reflectPacked3ExactTable32(code, table) {
+  return table[code];
+}
+
 export function reflectPacked3x16(code, tables) {
   return (
     tables[code & 0xff]

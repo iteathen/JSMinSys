@@ -238,7 +238,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, fillReflect3Tables32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -960,6 +960,25 @@ test('mix and reflection blocks', () => {
   assert.equal(canonicalMin32(9, 4), 4);
 });
 
+
+test('exact C3/C4 reflection tables match direct reference', () => {
+  for (const columns of [3, 4]) {
+    const entries = 1 << (columns * 3);
+    const table = new Uint32Array(entries);
+    const initialTargetShift = 3 * (columns - 1);
+    assert.equal(
+      fillReflectExactSmall32(table, entries, columns, initialTargetShift),
+      entries,
+    );
+
+    for (let code = 0; code < entries; code += 1) {
+      assert.equal(
+        reflectPacked3ExactTable32(code, table),
+        reflectPacked3Direct32(code, columns, initialTargetShift),
+      );
+    }
+  }
+});
 
 test('configured packed-3 register reflection profiles', () => {
   // A one-column reflection is identity; initialization should select no work.
