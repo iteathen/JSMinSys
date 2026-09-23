@@ -21,7 +21,6 @@ export const STATE_SUPPORT_CODE = 6;
 export function applyMove32(
   state,
   heights,
-  moveColumns,
   column,
   columns,
   rows,
@@ -58,7 +57,6 @@ export function applyMove32(
   }
 
   heights[column] = row + 1;
-  moveColumns[ply] = column;
   state[STATE_PLY] = ply + 1;
   state[STATE_SIDE] = 1 - state[STATE_SIDE];
   state[STATE_SUPPORT_CODE] = (
@@ -70,14 +68,13 @@ export function applyMove32(
 export function undoMove32(
   state,
   heights,
-  moveColumns,
+  column,
   columns,
   rows,
   supportIncrement,
   rankIncrement,
 ) {
   const ply = state[STATE_PLY] - 1;
-  const column = moveColumns[ply];
   const row = heights[column] - 1;
   const cell = row * columns + column;
   const bit = (1 << cell) >>> 0;
