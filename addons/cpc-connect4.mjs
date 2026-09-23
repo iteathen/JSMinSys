@@ -124,6 +124,8 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
 // Projected singleton/fork counts are advisory only.
 export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize,scratch){
   scratch.interval[0]=1;scratch.interval[1]=3;scratch.forcedColumn[0]=-1;
+  scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
+  for(let c=0;c<g.columns;c+=1)scratch.actionBias[c]=0;
   const meta=words[offset+g.metaOffset],terminal=meta&3,rank=meta>>>2,mover=rank&1;
   if(terminal){scratch.interval[0]=terminal;scratch.interval[1]=terminal;return CPC_EXACT;}
 
