@@ -14,12 +14,11 @@ export function cutoff32(alpha, beta) {
   return alpha >= beta;
 }
 
-export function argMaxPlayable32(scores, heights, order, count, fullHeight, none) {
+export function argMaxPlayable32(scores, order, count, none) {
   let best = none;
   let bestScore = -2147483648;
   for (let index = 0; index < count; index += 1) {
     const column = order[index];
-    if (heights[column] >= fullHeight) continue;
     const score = scores[column];
     if (score > bestScore) {
       bestScore = score;
