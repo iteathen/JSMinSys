@@ -375,7 +375,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, publish3x32Locator32, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1667,6 +1667,25 @@ test('joint two-word direct index covers structured power-of-two buckets', () =>
   }
   assert.equal(occupied, 256);
   assert.ok(maxBucket < 40);
+});
+
+test('triple key publication hashes live scalars without scratch reload', () => {
+  const scratch = new Int32Array(5);
+  const vectors = [
+    [0, 0, 0],
+    [1, -1, 0xffffffff],
+    [0x7fffffff, -2147483648, 0x80000000],
+    [123456789, -987654321, 0xfedcba98],
+  ];
+
+  for (const [a, b, c] of vectors) {
+    scratch.fill(0);
+    const fused = publish3x32Locator32(scratch, 1, a, b, c);
+    assert.equal(fused, mix3x32Locator(a, b, c));
+    assert.equal(scratch[1], a | 0);
+    assert.equal(scratch[2], b | 0);
+    assert.equal(scratch[3], c | 0);
+  }
 });
 
 test('joint triple locator mixes exact-key coordinates without becoming identity', () => {

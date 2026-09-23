@@ -1,5 +1,5 @@
 {
-  "version": "0.100.0",
+  "version": "0.101.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3578,6 +3578,39 @@
       }
     },
     {
+      "name": "publish3x32Locator32",
+      "source": "src/mix32.mjs",
+      "block": "hash-mix32",
+      "primitives": [
+        "ST32",
+        "+",
+        "Math.imul",
+        "^",
+        ">>>",
+        "="
+      ],
+      "status": "implemented-producer-publication-fusion-profile",
+      "preconditions": [
+        "a, b, and c are the already-live exact canonical key coordinates produced by the caller",
+        "target is caller-owned Int32-backed scratch required by an independent downstream exact-key consumer",
+        "target has capacity for offset..offset+2",
+        "the caller would publish these same three bit patterns even without hashing; scratch stores are not introduced solely to qualify for this profile",
+        "the locator is addressing only and exact tuple equality remains authoritative",
+        "unsigned coordinate values may be stored as signed Int32 bit patterns because the locator observes identical low 32 bits; downstream numeric consumers normalize explicitly when required"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "18 + 3*STORE_COST",
+        "parameters": {
+          "STORE_COST": "NEES store cost for the caller-owned scratch locality"
+        },
+        "hotLocalMinimumCycles": 19.5,
+        "note": "Three required scratch stores remain. Two address increments plus the 16-cycle joint triple locator execute directly from producer scalars, deleting the three scratch reloads that a store-then-hash composition would perform."
+      }
+    },
+    {
       "name": "mix3x32Locator",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -6661,11 +6694,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 230,
+    "functionsImplemented": 231,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 230,
+    "functionsWithCycleCount": 231,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8498,6 +8531,18 @@
           "before": "generic separable builder costs 133 L1 ledger cycles for the fixed 10-coordinate tuple",
           "after": "exact unrolled builder costs 90 L1 ledger cycles",
           "mechanism": "select the immutable FRONTIER_SLOTS=10 shape at initialization and remove loop control plus multiplier progression without changing the fingerprint"
+        }
+      ]
+    },
+    {
+      "id": "round-094",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "canonical triple key publication + locator",
+          "before": "canonical key producer stores three scratch coordinates, then the locator reloads all three before hashing",
+          "after": "required scratch publication and the 16-cycle locator consume the same already-live producer scalars",
+          "mechanism": "fuse the producer/publication/hash boundary so scratch remains the multi-value return channel without becoming the hash input"
         }
       ]
     }

@@ -210,9 +210,10 @@
         "mix2x32PowerOfTwoIndex",
         "xorTupleHash32",
         "updateXorTupleHash32",
-        "xorTupleHash10x32"
+        "xorTupleHash10x32",
+        "publish3x32Locator32"
       ],
-      "note": "Hashing profiles include direct two-/three-coordinate indices and separable ordered tuple fingerprints. The generic xorTupleHash32 supports arbitrary configured counts; xorTupleHash10x32 is the exact immutable ten-slot profile used by the pinned residual representation and is algebraically identical without loop/multiplier-progression work. updateXorTupleHash32 retains sparse parent-delta updates. Exact tuple equality remains identity, and raw separable fingerprints are avalanched before power-of-two masking."
+      "note": "Hashing profiles include direct two-/three-coordinate indices, fused triple-key publication, and separable ordered tuple fingerprints. publish3x32Locator32 applies when a canonical-key producer must publish three exact coordinates to caller-owned scratch anyway: the locator consumes those live scalars and avoids immediately reloading the scratch. Exact equality remains identity. Generic/exact separable tuple builders and parent-delta updates cover residual-class tuples."
     },
     {
       "id": 10,

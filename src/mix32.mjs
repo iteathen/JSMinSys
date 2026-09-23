@@ -58,6 +58,16 @@ export function updateXorTupleHash32(hash, slot, oldValue, newValue) {
     ^ Math.imul(newValue + 1, multiplier)) >>> 0;
 }
 
+export function publish3x32Locator32(target, offset, a, b, c) {
+  target[offset] = a;
+  target[offset + 1] = b;
+  target[offset + 2] = c;
+  let x = Math.imul(a, 0x9e3779b1);
+  x ^= Math.imul(b, 0x85ebca6b);
+  x ^= Math.imul(c, 0xc2b2ae35);
+  return Math.imul(x ^ (x >>> 16), 0x7feb352d);
+}
+
 export function mix3x32Locator(a, b, c) {
   let x = Math.imul(a, 0x9e3779b1);
   x ^= Math.imul(b, 0x85ebca6b);
