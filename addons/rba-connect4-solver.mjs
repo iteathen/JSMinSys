@@ -51,14 +51,14 @@ function rootCanonicalColumn(g,orderIndex,reflected){const caller=g.actionOrder[
 
 export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
-  const g=state.g,base=q*t.keyWords,terminal=connect4RbaTerminal(g,t.keys,base);
+  const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
   if(!g.lineCount||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
   const n=t.basisSize[q];if(!n)return RBA_EXACT_DRAW;
 
   state.boundaryCalls+=1;
-  const outcome=buildConnect4RbaFourFront(g,state.boundary,t.keys,base,t.basis,q*t.basisCapacity,n);
+  const outcome=buildConnect4RbaFourFront(g,state.boundary,t.keys,base,t.basis,basisBase,n);
   state.boundarySteps+=state.boundary.steps;if(outcome){state.boundaryFailures+=1;return outcome;}
   const interval=queryConnect4RbaFourFront(g,state.boundary,0,t.keys,base);
   state.lower=interval&3;state.upper=interval>>>2;const mover=connect4RbaRank(g,t.keys,base)&1;
@@ -84,7 +84,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
       const childBase=count*g.keyWords,childBi=count*g.maxBasis;
-      const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,q*t.basisCapacity,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map);
+      const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,basisBase,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map);
       state.transitions+=1;
       if(term<0||(term&&(term<lo||term>hi)))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
