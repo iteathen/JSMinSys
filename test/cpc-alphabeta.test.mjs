@@ -81,7 +81,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
 
   // Fixing the two frontier cells as a synchronized response pair adds an
   // exact pair blocker beyond pooled vertical-response coverage.
-  const paired=[0,2,0,0],pq=connect4RbaFromMoves(paired,{geometry:g,canonical:false}),ps=prepareConnect4CpcScratch(g);
+  const paired=[0,2,0,0],pq=connect4RbaFromMoves(paired,{geometry:g,canonical:false}),ps=prepareConnect4CpcScratch(g,{frontierResponse:true});
   odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-pq.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,pq.words,0,pq.basis,0,pq.basis.length,ps),CPC_BOUND);
@@ -91,7 +91,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   // Omitted frontier parity alone is still not enough: if a residual contains
   // only one endpoint of each fixed pair and no true upper-response cell, the
   // certificate must remain conservative.
-  const negative=[0,0,0,2,2,2],nq=connect4RbaFromMoves(negative,{geometry:g,canonical:false}),ns=prepareConnect4CpcScratch(g);
+  const negative=[0,0,0,2,2,2],nq=connect4RbaFromMoves(negative,{geometry:g,canonical:false}),ns=prepareConnect4CpcScratch(g,{frontierResponse:true});
   odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-nq.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,nq.words,0,nq.basis,0,nq.basis.length,ns),CPC_NONE);
@@ -103,7 +103,7 @@ test('CPC recognizes exact fork loss after enabling move',()=>{
   // 0-based: P0 1, P1 1, P0 2, P1 1, P0 3.
   // P1 to move; P0 has distinct playable bottom singleton targets at columns 0 and 4.
   const q=connect4RbaFromMoves([1,1,2,1,3],{geometry:g,canonical:false});
-  const s=prepareConnect4CpcScratch(g);
+  const s=prepareConnect4CpcScratch(g,{frontierResponse:true});
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
   assert.deepEqual([...s.interval],[3,3]);
 });
