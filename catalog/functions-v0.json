@@ -1,5 +1,5 @@
 {
-  "version": "0.36.0",
+  "version": "0.37.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -853,11 +853,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 14,
-        "hotL2Predicted": 30,
-        "hotL3Predicted": 100,
-        "expression": "2*LOAD + 4 index/mask/shift operations + OR + final uint32 coercion",
-        "note": "Two-byte lookup path for configured support occupying at most 16 bits."
+        "hotL1Predicted": 13,
+        "hotL2Predicted": 29,
+        "hotL3Predicted": 99,
+        "expression": "2*LOAD + 4 index/mask/shift operations + OR",
+        "note": "Packed 3-bit column support occupies at most 30 bits, so bit 31 cannot be set and no unsigned return coercion is required."
       }
     },
     {
@@ -882,11 +882,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 22,
-        "hotL2Predicted": 46,
-        "hotL3Predicted": 151,
-        "expression": "3*LOAD + 7 index/mask/shift operations + 2*OR + final uint32 coercion",
-        "note": "Support-only reflection; separate rank ownership removes one mask and one OR from the prior path."
+        "hotL1Predicted": 21,
+        "hotL2Predicted": 45,
+        "hotL3Predicted": 150,
+        "expression": "3*LOAD + 7 index/mask/shift operations + 2*OR",
+        "note": "Packed 3-bit column support occupies at most 30 bits, so bit 31 cannot be set and no unsigned return coercion is required."
       }
     },
     {
@@ -906,11 +906,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 29,
-        "hotL2Predicted": 61,
-        "hotL3Predicted": 201,
-        "expression": "4*LOAD + 9 index/mask/shift operations + 3*OR + final uint32 coercion",
-        "note": "Support-only reflection; rank/ply is no longer embedded in the reflected scalar."
+        "hotL1Predicted": 28,
+        "hotL2Predicted": 60,
+        "hotL3Predicted": 200,
+        "expression": "4*LOAD + 9 index/mask/shift operations + 3*OR",
+        "note": "Packed 3-bit column support occupies at most 30 bits, so bit 31 cannot be set and no unsigned return coercion is required."
       },
       "preconditions": [
         "tables were built by fillReflect3Tables32 for the configured columns",
@@ -946,11 +946,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + 9*C",
+        "expression": "2 + 9*C",
         "parameters": {
           "C": "configured columns"
         },
-        "note": "Initial target shift is configuration-precomputed; the hot fallback performs only the column loop plus final unsigned return coercion."
+        "note": "Packed support uses at most 30 bits; initial target shift is precomputed and unsigned return coercion is unnecessary."
       }
     },
     {
@@ -2500,6 +2500,36 @@
           "before": "generic ushr2x32Into high path: ~6 cycles",
           "after": "4 cycles",
           "mechanism": "caller-owned count range removes branch"
+        }
+      ]
+    },
+    {
+      "id": "round-030",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x16",
+          "before": "14 L1 cycles",
+          "after": "13 L1 cycles",
+          "mechanism": "support cannot set sign bit; remove unsigned return coercion"
+        },
+        {
+          "function": "reflectPacked3x24",
+          "before": "22 L1 cycles",
+          "after": "21 L1 cycles",
+          "mechanism": "support cannot set sign bit; remove unsigned return coercion"
+        },
+        {
+          "function": "reflectPacked3x32",
+          "before": "29 L1 cycles",
+          "after": "28 L1 cycles",
+          "mechanism": "3-bit columns cap packed support at 30 bits; remove unsigned return coercion"
+        },
+        {
+          "function": "reflectPacked3Direct32",
+          "before": "3 + 9*C cycles",
+          "after": "2 + 9*C cycles",
+          "mechanism": "same 30-bit representation invariant"
         }
       ]
     }
