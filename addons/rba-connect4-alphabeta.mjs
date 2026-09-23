@@ -143,8 +143,11 @@ function search(state,depth,alpha,beta){
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1);
       state.cofactors+=1;
       if(term<0)continue;
-      if(!term)connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[depth+1],state.coord);
-      value=-search(state,depth+1,-beta,-alpha);
+      if(term)value=absToRelative(term,mover);
+      else{
+        connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[depth+1],state.coord);
+        value=-search(state,depth+1,-beta,-alpha);
+      }
     }
     if(value>best)best=value;
     if(value>alpha)alpha=value;
@@ -208,8 +211,11 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1);
     state.cofactors+=1;if(term<0)continue;
-    if(!term)connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
-    value=rootExact!==null?-search(state,1,-2,2):-search(state,1,-beta,-alpha);
+    if(term)value=absToRelative(term,mover);
+    else{
+      connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
+      value=rootExact!==null?-search(state,1,-2,2):-search(state,1,-beta,-alpha);
+    }
     }
     if(value>best){best=value;bestMove=caller;}
     if(value>alpha)alpha=value;
