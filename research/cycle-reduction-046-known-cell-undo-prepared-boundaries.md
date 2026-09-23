@@ -36,10 +36,11 @@ Then:
 ```text
 hasAbove = cell < lastRowStart
 aboveStaysLow = cell < lowLaneAboveLimit
-aboveBit = bit << columns
+sameLaneAboveBit = bit << columns
+crossLaneAboveBit = bit >>> lowLaneAboveLimit
 ```
 
-JavaScript's 32-bit shift semantics naturally provide the correct lane-local bit when the physical above cell crosses the 32-bit boundary.
+For an above bit that stays in its lane, `bit << columns` is exact. For a low-to-high crossing, JavaScript left shift would discard the bit; the correct high-lane bit is `bit >>> lowLaneAboveLimit`, where `lowLaneAboveLimit = 32 - columns` is already prepared for the lane test. This preserves the no-ADD reduction without relying on wraparound shift behavior.
 
 Setup cost is two one-cycle subtractions during initialization for the two-lane profile; one-lane needs only `lastRowStart`.
 
@@ -60,4 +61,4 @@ The thresholds are configuration invariants. They are prepared once, not recompu
 
 ## Correctness
 
-Differential tests continue to cover one-lane and cross-lane undo. An explicit top-row vector verifies the no-above path with `lastRowStart`.
+Differential tests continue to cover one-lane and low-to-high cross-lane undo; the cross-lane vector specifically guards the non-wrapping JavaScript shift behavior. An explicit top-row vector verifies the no-above path with `lastRowStart`.

@@ -1245,7 +1245,7 @@
           "max": 62.5
         },
         "expression": "normal lane: 3*LOAD + 4*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 5*STORE + 12 ALU/control",
-        "note": "Prepared last-row/lane thresholds and bit<<columns remove next reconstruction while preserving every two-lane case."
+        "note": "Prepared last-row/lane thresholds remove next reconstruction. Same-lane/high above bits use bit<<columns; low-to-high crossings use bit>>>lowLaneAboveLimit."
       }
     },
     {
@@ -1286,7 +1286,7 @@
           "max": 49
         },
         "expression": "normal lane: 2*LOAD + 3*STORE + 7..11 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 11 ALU/control",
-        "note": "Composes caller-owned ply and retained apply cell with prepared geometry thresholds; one reconstructed-next add disappears."
+        "note": "Composes caller-owned ply and retained apply cell with prepared geometry thresholds. Same-lane/high above bits use bit<<columns; low-to-high crossings use bit>>>lowLaneAboveLimit."
       }
     },
     {
