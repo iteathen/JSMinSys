@@ -27,7 +27,7 @@ test('word32 bit blocks', () => {
 });
 
 test('first set bit index', () => {
-  assert.equal(firstSetBitIndex32(0), 32);
+  assert.equal(firstSetBitIndex32(0), -1);
   assert.equal(firstSetBitIndex32(1), 0);
   assert.equal(firstSetBitIndex32(0x80000000), 31);
   assert.equal(firstSetBitIndex32(0b1001000), 3);
@@ -84,8 +84,11 @@ test('indexed and table blocks', () => {
   assert.equal(landingCell32(heights, 2, 7, 6, 0xffffffff), 0xffffffff);
   assert.equal(maskContains32(0b1111, 0b0101), true);
   assert.equal(maskContains32(0b0011, 0b0101), false);
+  assert.equal(maskContains32(0x80000000, 0x80000000), true);
+  assert.equal(maskContains32(0, 0x80000000), false);
   assert.equal(maskContains2x32(0b1111, 0b1010, 0b0101, 0b0010), true);
   assert.equal(maskContains2x32(0b1111, 0, 0b0101, 0b0010), false);
+  assert.equal(maskContains2x32(0x80000000, 0x80000000, 0x80000000, 0x80000000), true);
 
   const transitions = new Uint32Array([10, 11, 12, 20, 21, 22]);
   assert.equal(residualTransition32(transitions, 1, 2, 3), 22);
@@ -159,6 +162,11 @@ test('mix and reflection blocks', () => {
   assert.equal((reflected >>> 21), 2);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
+  const genericCode = ((1 << 9) | (1 << 0) | (2 << 3) | (3 << 6)) >>> 0;
+  const genericReflected = reflectPacked3x32(genericCode, 3, 9);
+  assert.equal(genericReflected >>> 9, 1);
+  assert.equal(genericReflected & 7, 3);
+  assert.equal((genericReflected >>> 6) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
 });
 
@@ -265,7 +273,12 @@ test('capacity helpers and overwrite rehash', () => {
   assert.equal(isPowerOfTwo32(1), true);
   assert.equal(isPowerOfTwo32(8), true);
   assert.equal(isPowerOfTwo32(10), false);
+  assert.equal(nextPowerOfTwo32(0), 1);
+  assert.equal(nextPowerOfTwo32(1), 1);
+  assert.equal(nextPowerOfTwo32(2), 2);
+  assert.equal(nextPowerOfTwo32(3), 4);
   assert.equal(nextPowerOfTwo32(9), 16);
+  assert.equal(nextPowerOfTwo32(0x80000000), 0x80000000);
 
   const oldHashes = new Uint32Array([1, 5, 0xffffffff, 9]);
   const oldValues = new Uint32Array([10, 50, 0, 90]);
