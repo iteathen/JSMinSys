@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -238,8 +238,6 @@
       "block": "legal-landing-cell",
       "primitives": [
         "LD32",
-        "<",
-        "?:",
         "*",
         "+"
       ],
@@ -248,16 +246,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": {
-          "min": 6,
-          "max": 10
-        },
-        "hotL2Predicted": {
-          "min": 14,
-          "max": 18
-        },
-        "expression": "LOAD + compare + predicted select + (valid ? IMUL + ADD : 0)",
-        "note": "Range is invalid/full-column path through valid landing-cell path."
+        "hotL1Predicted": 8,
+        "hotL2Predicted": 16,
+        "expression": "LOAD + IMUL + ADD",
+        "note": "Trusted primitive: legality/full-column check is owned separately by playableColumn32."
       }
     },
     {
@@ -949,22 +941,20 @@
       "source": "src/word64x32.mjs",
       "block": "first-next-set-bit",
       "primitives": [
-        "|",
         "===",
         "!==",
-        "&&",
-        "?:",
         "&",
-        "-"
+        "-",
+        "?:"
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
-        "minCycles": 3,
-        "maxCycles": 13,
-        "note": "Predicted-path range across zero, cross-lane multiple, and single-word classification."
+        "minCycles": 4,
+        "maxCycles": 8,
+        "note": "Lane-directed classification avoids OR/short-circuit/select work from the previous formulation."
       }
     },
     {
@@ -1228,6 +1218,24 @@
           "before": "76-100 L1 / 164-220 L2",
           "after": "76-91 L1 / 164-195 L2",
           "mechanism": "fuse playableLo/playableHi updates into one final store per lane"
+        }
+      ]
+    },
+    {
+      "id": "round-003",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "landingCell32",
+          "before": "6-10 L1 / 14-18 L2",
+          "after": "8 L1 / 16 L2 on the required playable-column domain",
+          "mechanism": "move legality check to the existing playableColumn32 owner boundary"
+        },
+        {
+          "function": "cardinalityClass2x32",
+          "before": "3-13 cycles",
+          "after": "4-8 cycles",
+          "mechanism": "classify by lane emptiness before single-word bit test"
         }
       ]
     }
