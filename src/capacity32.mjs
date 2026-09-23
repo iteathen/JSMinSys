@@ -3,7 +3,7 @@ export function allocateTypedCapacity(length) {
 }
 
 export function isPowerOfTwo32(value) {
-  return value > 0 && (value & (value - 1)) === 0;
+  return (value & (value - 1)) === 0;
 }
 
 export function nextPowerOfTwo32(value) {
