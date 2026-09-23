@@ -23,3 +23,91 @@ export function zero2x32(a0, a1) {
 export function equal2x32(a0, a1, b0, b1) {
   return ((a0 ^ b0) | (a1 ^ b1)) === 0;
 }
+
+export function shl2x32Into(dst, di, lo, hi, count) {
+  if (count === 0) {
+    dst[di] = lo;
+    dst[di + 1] = hi;
+    return dst;
+  }
+  if (count < 32) {
+    dst[di] = (lo << count) >>> 0;
+    dst[di + 1] = ((hi << count) | (lo >>> (32 - count))) >>> 0;
+    return dst;
+  }
+  if (count < 64) {
+    dst[di] = 0;
+    dst[di + 1] = (lo << (count - 32)) >>> 0;
+    return dst;
+  }
+  dst[di] = 0;
+  dst[di + 1] = 0;
+  return dst;
+}
+
+export function ushr2x32Into(dst, di, lo, hi, count) {
+  if (count === 0) {
+    dst[di] = lo;
+    dst[di + 1] = hi;
+    return dst;
+  }
+  if (count < 32) {
+    dst[di] = ((lo >>> count) | (hi << (32 - count))) >>> 0;
+    dst[di + 1] = hi >>> count;
+    return dst;
+  }
+  if (count < 64) {
+    dst[di] = hi >>> (count - 32);
+    dst[di + 1] = 0;
+    return dst;
+  }
+  dst[di] = 0;
+  dst[di + 1] = 0;
+  return dst;
+}
+
+export function add2x32Into(dst, di, a0, a1, b0, b1) {
+  const lo = (a0 + b0) >>> 0;
+  const carry = lo < a0 ? 1 : 0;
+  dst[di] = lo;
+  dst[di + 1] = (a1 + b1 + carry) >>> 0;
+  return dst;
+}
+
+export function sub2x32Into(dst, di, a0, a1, b0, b1) {
+  const borrow = a0 < b0 ? 1 : 0;
+  dst[di] = (a0 - b0) >>> 0;
+  dst[di + 1] = (a1 - b1 - borrow) >>> 0;
+  return dst;
+}
+
+export function firstSetBitIndex2x32(lo, hi) {
+  if (lo !== 0) return 31 - Math.clz32(lo & -lo);
+  if (hi !== 0) return 32 + 31 - Math.clz32(hi & -hi);
+  return -1;
+}
+
+export function clearLowestSetBit32(word) {
+  return (word & (word - 1)) >>> 0;
+}
+
+export function cardinalityClass2x32(lo, hi) {
+  if ((lo | hi) === 0) return 0;
+  if (lo !== 0 && hi !== 0) return 2;
+  const word = lo !== 0 ? lo : hi;
+  return (word & (word - 1)) === 0 ? 1 : 2;
+}
+
+export function popcount2x32(lo, hi) {
+  let a = lo >>> 0;
+  a = a - ((a >>> 1) & 0x55555555);
+  a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
+  a = (a + (a >>> 4)) & 0x0f0f0f0f;
+  const ac = Math.imul(a, 0x01010101) >>> 24;
+
+  let b = hi >>> 0;
+  b = b - ((b >>> 1) & 0x55555555);
+  b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
+  b = (b + (b >>> 4)) & 0x0f0f0f0f;
+  return ac + (Math.imul(b, 0x01010101) >>> 24);
+}
