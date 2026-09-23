@@ -295,11 +295,31 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
     return CPC_EXACT;
   }
   if(threats===1){
-    const column=scratch.threatColumns[0];
+    const column=scratch.threatColumns[0],height=words[offset+column];
+    // The only current singleton must be blocked now. If that support event
+    // exposes another opponent singleton immediately above it, first-win order
+    // makes the opponent's next move terminal.
+    if(height+1<g.rows&&cellMarked(opponentBits,(height+1)*g.columns+column)){
+      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      return CPC_EXACT;
+    }
     scratch.forcedColumn[0]=column;
     scratch.preemptionMask32[0]=g.columns<=32?((1<<column)>>>0):0;
     scratch.preemptionCount[0]=1;
   }else{
+    // With no current singleton threat, a move changes support in one column.
+    // If every legal move exposes an opponent singleton at that next support
+    // cell, every continuation loses on the opponent's next ply.
+    let legal=0,allLift=1;
+    for(let column=0;column<g.columns;column+=1){
+      const height=words[offset+column];if(height>=g.rows)continue;
+      legal+=1;
+      if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
+    }
+    if(legal&&allLift){
+      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      return CPC_EXACT;
+    }
     const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
     if(precursor<0){
       const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
