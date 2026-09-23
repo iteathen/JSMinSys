@@ -37,8 +37,10 @@ function combine(a,left,right,out,intersect){
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[out]=n;return 0;
 }
 function prepareValid(g,a,d,n){
-  const cw=g.coordWords,base=d*cw;
-  for(let w=0;w<cw;w+=1){const remaining=n-w*32;a.valid[base+w]=remaining>=32?0xffffffff:remaining>0?(0xffffffff>>>(32-remaining)):0;}
+  const cw=g.coordWords,base=d*cw,full=n>>>5,rem=n&31;let w=0;
+  for(;w<full;w+=1)a.valid[base+w]=0xffffffff;
+  if(w<cw){a.valid[base+w]=rem?0xffffffff>>>(32-rem):0;w+=1;}
+  for(;w<cw;w+=1)a.valid[base+w]=0;
 }
 function prepareUpsets(g,a,d,basis,bi,n){
   const cw=g.coordWords,depthBase=d*g.maxBasis*cw;
