@@ -59,12 +59,13 @@
     {
       "id": 5,
       "name": "coordinate-decode",
-      "status": "implemented-reference-anti-candidate",
+      "status": "implemented-precomputed",
       "functions": [
+        "fillCoordinateTables32",
         "decodeColumn32",
         "decodeRow32"
       ],
-      "note": "Retained for comparison/costing; representation redesign should delete it from hot paths when possible."
+      "note": "Board geometry is configured at initialization; hot row/column decoding uses prepared lookup tables instead of division/modulo."
     },
     {
       "id": 6,
