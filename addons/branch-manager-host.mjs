@@ -6,23 +6,19 @@ import { Worker } from 'node:worker_threads';
 // state initialization and result interpretation remain application-owned.
 
 export function filterFileWorkerExecArgv32(execArgv) {
-  let found = 0;
+  let filtered;
   for (let i = 0; i < execArgv.length; i += 1) {
     const arg = execArgv[i];
-    if (arg === '--input-type' || arg.startsWith('--input-type=')
-        || (i > 0 && execArgv[i - 1] === '--input-type')) {
-      found = 1;
-      break;
+    if (arg === '--input-type') {
+      if (filtered === undefined) filtered = execArgv.slice(0, i);
+      i += 1;
+      continue;
     }
-  }
-  if (!found) return undefined;
-
-  const filtered = [];
-  for (let i = 0; i < execArgv.length; i += 1) {
-    const arg = execArgv[i];
-    if (arg === '--input-type') { i += 1; continue; }
-    if (arg.startsWith('--input-type=')) continue;
-    filtered.push(arg);
+    if (arg.startsWith('--input-type=')) {
+      if (filtered === undefined) filtered = execArgv.slice(0, i);
+      continue;
+    }
+    if (filtered !== undefined) filtered.push(arg);
   }
   return filtered;
 }
