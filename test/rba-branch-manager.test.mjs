@@ -92,9 +92,9 @@ test('branch manager retains one child and exposes only surplus work',()=>{
   assert.equal(w.q,-1);
 
   assert.ok(rbaBranchManagerStep32(t,reconcile)>=1);
-  assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1,'worker did not claim surplus child');
+  assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1,'worker did not claim/process surplus child');
   assert.equal(rbaBranchReadyCount32(t),0);
-  assert.equal(rbaBranchWorkerStep32(t,w,evaluate,publish),1);
+  assert.equal(w.q,-1);
 
   for(let i=0;i<4&&!Atomics.load(t.control,RBA_TT_DONE);i++)
     rbaBranchManagerStep32(t,reconcile);
