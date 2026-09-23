@@ -305,13 +305,14 @@
       "name": "residual-transition",
       "status": "implemented",
       "functions": [
+        "projectMaskedPrefix2x32Into",
         "residualBase32",
         "residualTransition32",
         "fillResidualActionMajor32",
         "residualActionBase32",
         "residualTransitionActionMajor32"
       ],
-      "note": "Residual transitions support both class-major and action-major prepared-base layouts. Class-major fits fixed-class/varying-action loops; action-major fits the pinned fixed-action/varying-class residual loop. Initialization transpose cost remains explicit."
+      "note": "Residual transition support includes class/action prepared layouts plus representation-guarded metadata projection. projectMaskedPrefix2x32Into applies when initialization proves the target semantic metadata is encoded exactly in a fixed two-word prefix of the final normalized residual representation; the hot path projects that prefix directly rather than rescanning the residual."
     },
     {
       "id": 16,

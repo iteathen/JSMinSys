@@ -1,5 +1,5 @@
 {
-  "version": "0.105.0",
+  "version": "0.106.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -598,6 +598,39 @@
         "minCycles": 3,
         "maxCycles": 5,
         "note": "First lane AND/equality plus short-circuit; second lane adds one AND/equality."
+      }
+    },
+    {
+      "name": "projectMaskedPrefix2x32Into",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "="
+      ],
+      "status": "implemented-guarded-prefix-projection-profile",
+      "preconditions": [
+        "initialization has proved that every semantic member projected into lowOut/highOut maps exactly to the configured prefix represented by words[0] and the selected bits of words[1]",
+        "initialization has proved that no matching semantic member exists in words[2..] or in bits of words[1] excluded by highMask",
+        "words contains the final normalized representation; projection is not taken from an intermediate or parent state",
+        "lowOut/highOut are caller-owned preallocated Uint32 storage with index in range",
+        "highMask is immutable for the configured representation",
+        "the prefix mapping itself is a representation invariant checked before hot execution; this function does not discover or validate it per call"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*LOAD + AND + 2*STORE_COST",
+        "parameters": {
+          "LOAD": "NEES cache-level dependent source-word load cost",
+          "STORE_COST": "NEES store cost for the selected metadata ownership/locality scenario"
+        },
+        "hotL1MinimumCycles": 10,
+        "hotL2MinimumCycles": 26,
+        "note": "Two source loads, one mask, and two metadata stores. Initialization owns the encoding proof; no scan, set-bit iteration, or term lookup executes in the hot projection."
       }
     },
     {
@@ -6836,11 +6869,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 236,
+    "functionsImplemented": 237,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 236,
+    "functionsWithCycleCount": 237,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8739,6 +8772,18 @@
           "before": "residual classes are reflected and compared before support decides the final gameplay-key orbit representative",
           "after": "packed support is compared first; original-support minimum skips residual reflection entirely, reflected-support minimum skips residual comparison, and only support ties compare residual content",
           "mechanism": "order canonical coordinates by cheapest discriminator while preserving the same complete two-element orbit and exact action transport"
+        }
+      ]
+    },
+    {
+      "id": "round-099",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "representation-guarded metadata projection",
+          "before": "new residual metadata scans all representation words, masks target members, iterates set bits, maps each member, and accumulates output masks",
+          "after": "initialization proves target identity occupies a fixed two-word prefix; hot metadata construction loads only words 0/1, masks the mixed second word, and stores the pair",
+          "mechanism": "move encoding validation to initialization and exploit semantic identity encoded directly in representation position"
         }
       ]
     }

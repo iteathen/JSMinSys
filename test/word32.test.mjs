@@ -96,6 +96,7 @@ import {
   maskContains2xI32,
   maskContains32,
   maskContains2x32,
+  projectMaskedPrefix2x32Into,
   residualBase32,
   residualTransition32,
   fillResidualActionMajor32,
@@ -166,6 +167,29 @@ test('packed support can replace duplicate height storage', () => {
     landingCellFromPacked3Support32(support4, 6, columns4, 2),
     10,
   );
+});
+
+test('guarded metadata prefix projects without scanning later words', () => {
+  const words = new Uint32Array(20);
+  words[0] = 0x80000001;
+  words[1] = 0xfffff3ff;
+  for (let i = 2; i < words.length; i += 1) words[i] = 0xffffffff;
+
+  const low = new Uint32Array(3);
+  const high = new Uint32Array(3);
+  const index = 1;
+  assert.equal(
+    projectMaskedPrefix2x32Into(low, high, index, words, 0x3ff),
+    index,
+  );
+  assert.equal(low[index], 0x80000001);
+  assert.equal(high[index], 0x3ff);
+
+  words[0] = 0;
+  words[1] = 0xfffffc00;
+  projectMaskedPrefix2x32Into(low, high, 2, words, 0x3ff);
+  assert.equal(low[2], 0);
+  assert.equal(high[2], 0);
 });
 
 test('indexed and table blocks', () => {

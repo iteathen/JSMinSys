@@ -44,6 +44,18 @@ export function maskContains2x32(owned0, owned1, required0, required1) {
     && ((owned1 & required1) ^ required1) === 0;
 }
 
+export function projectMaskedPrefix2x32Into(
+  lowOut,
+  highOut,
+  index,
+  words,
+  highMask,
+) {
+  lowOut[index] = words[0];
+  highOut[index] = words[1] & highMask;
+  return index;
+}
+
 export function residualBase32(classIndex, actionCount) {
   return classIndex * actionCount;
 }
