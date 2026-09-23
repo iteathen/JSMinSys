@@ -15,20 +15,17 @@ export function sideFromPly32(ply) {
  * Geometry is fixed for an engine instance but supplied as initialization-derived
  * scalars rather than hard-coded here:
  * - columns: configured board width
- * - rows: configured board height
- * - supportIncrement: precomputed change to the configured support encoding for
- *   this column
- * - rankIncrement: optional precomputed change to any rank/ply field embedded
- *   in the support encoding; use 0 when rank is represented separately
+ * - lastRow: configured board height minus one
+ * - supportDelta: precomputed total change to the configured support encoding
+ *   for this column, including any embedded rank/ply increment
  */
 export function applyMove32(
   state,
   heights,
   column,
   columns,
-  rows,
-  supportIncrement,
-  rankIncrement,
+  lastRow,
+  supportDelta,
 ) {
   const ply = state[STATE_PLY];
   const row = heights[column];
@@ -39,7 +36,7 @@ export function applyMove32(
     state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] | bit) >>> 0;
     let playableLo = (state[STATE_PLAYABLE_LO] & ~bit) >>> 0;
 
-    if (row + 1 < rows) {
+    if (row < lastRow) {
       const above = cell + columns;
       const aboveBit = (1 << above) >>> 0;
       if (above < 32) playableLo = (playableLo | aboveBit) >>> 0;
@@ -51,7 +48,7 @@ export function applyMove32(
     state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] | bit) >>> 0;
     let playableHi = (state[STATE_PLAYABLE_HI] & ~bit) >>> 0;
 
-    if (row + 1 < rows) {
+    if (row < lastRow) {
       const aboveBit = (1 << (cell + columns)) >>> 0;
       playableHi = (playableHi | aboveBit) >>> 0;
     }
@@ -61,9 +58,7 @@ export function applyMove32(
 
   heights[column] = row + 1;
   state[STATE_PLY] = ply + 1;
-  state[STATE_SUPPORT_CODE] = (
-    state[STATE_SUPPORT_CODE] + supportIncrement + rankIncrement
-  ) >>> 0;
+  state[STATE_SUPPORT_CODE] = (state[STATE_SUPPORT_CODE] + supportDelta) >>> 0;
   return cell;
 }
 
@@ -72,9 +67,8 @@ export function undoMove32(
   heights,
   column,
   columns,
-  rows,
-  supportIncrement,
-  rankIncrement,
+  lastRow,
+  supportDelta,
 ) {
   const ply = state[STATE_PLY] - 1;
   const row = heights[column] - 1;
@@ -84,15 +78,13 @@ export function undoMove32(
   state[STATE_PLY] = ply;
   state[STATE_SIDE] = 1 - state[STATE_SIDE];
   heights[column] = row;
-  state[STATE_SUPPORT_CODE] = (
-    state[STATE_SUPPORT_CODE] - supportIncrement - rankIncrement
-  ) >>> 0;
+  state[STATE_SUPPORT_CODE] = (state[STATE_SUPPORT_CODE] - supportDelta) >>> 0;
 
   if (cell < 32) {
     state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] & ~bit) >>> 0;
     let playableLo = state[STATE_PLAYABLE_LO];
 
-    if (row + 1 < rows) {
+    if (row < lastRow) {
       const above = cell + columns;
       const aboveBit = (1 << above) >>> 0;
       if (above < 32) playableLo = (playableLo & ~aboveBit) >>> 0;
@@ -104,7 +96,7 @@ export function undoMove32(
     state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] & ~bit) >>> 0;
     let playableHi = state[STATE_PLAYABLE_HI];
 
-    if (row + 1 < rows) {
+    if (row < lastRow) {
       const aboveBit = (1 << (cell + columns)) >>> 0;
       playableHi = (playableHi & ~aboveBit) >>> 0;
     }
