@@ -11,7 +11,9 @@ import {
   bitToggleI32,
   firstSetBitIndex32,
   popcount32,
-  subset32,, cardinalityClass32 } from '../src/word32.mjs';
+  subset32,
+  cardinalityClass32,
+} from '../src/word32.mjs';
 import {
   and2x32Into,
   or2x32Into,
