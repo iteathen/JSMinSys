@@ -50,28 +50,25 @@ export function fillReflect3Tables32(tables, columns) {
   return supportBits;
 }
 
-export function reflectPacked3x24(code, tables, rankMask) {
+export function reflectPacked3x24(code, tables) {
   return (
-    (code & rankMask)
-    | tables[code & 0xff]
+    tables[code & 0xff]
     | tables[0x100 + ((code >>> 8) & 0xff)]
     | tables[0x200 + ((code >>> 16) & 0xff)]
   ) >>> 0;
 }
 
-export function reflectPacked3x32(code, tables, rankMask) {
+export function reflectPacked3x32(code, tables) {
   return (
-    (code & rankMask)
-    | tables[code & 0xff]
+    tables[code & 0xff]
     | tables[0x100 + ((code >>> 8) & 0xff)]
     | tables[0x200 + ((code >>> 16) & 0xff)]
     | tables[0x300 + (code >>> 24)]
   ) >>> 0;
 }
 
-export function reflectPacked3Direct32(code, columns, rankShift) {
-  const rank = code >>> rankShift;
-  let reflected = rank << rankShift;
+export function reflectPacked3Direct32(code, columns) {
+  let reflected = 0;
   let sourceShift = 0;
   const lastColumn = columns - 1;
   let targetShift = (lastColumn << 1) + lastColumn;
