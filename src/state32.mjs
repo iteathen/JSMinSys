@@ -449,15 +449,14 @@ export function undoMove1x32KnownCell(
   index,
   cell,
   columns,
-  cellCount,
+  lastRowStart,
   supportDelta,
 ) {
   const ply = state[STATE_PLY] - 1;
-  const next = cell + columns;
   const bit = 1 << cell;
   let playable = state[STATE_PLAYABLE_LO];
 
-  if (next < cellCount) playable ^= bit | (1 << next);
+  if (cell < lastRowStart) playable ^= bit | (bit << columns);
   else playable ^= bit;
 
   state[STATE_PLY] = ply;
@@ -473,14 +472,13 @@ export function undoMove1x32CallerPlyKnownCell(
   index,
   cell,
   columns,
-  cellCount,
+  lastRowStart,
   supportDelta,
 ) {
-  const next = cell + columns;
   const bit = 1 << cell;
   let playable = state[CALLER_PLY1_PLAYABLE_LO];
 
-  if (next < cellCount) playable ^= bit | (1 << next);
+  if (cell < lastRowStart) playable ^= bit | (bit << columns);
   else playable ^= bit;
 
   state[CALLER_PLY1_PLAYABLE_LO] = playable;
@@ -495,11 +493,11 @@ export function undoMove32KnownCell(
   index,
   cell,
   columns,
-  cellCount,
+  lastRowStart,
+  lowLaneAboveLimit,
   supportDelta,
 ) {
   const ply = state[STATE_PLY] - 1;
-  const next = cell + columns;
   const bit = 1 << cell;
 
   state[STATE_PLY] = ply;
@@ -509,9 +507,9 @@ export function undoMove32KnownCell(
   if (cell < 32) {
     let playableLo = state[STATE_PLAYABLE_LO];
 
-    if (next < cellCount) {
-      const aboveBit = 1 << next;
-      if (next < 32) playableLo ^= bit | aboveBit;
+    if (cell < lastRowStart) {
+      const aboveBit = bit << columns;
+      if (cell < lowLaneAboveLimit) playableLo ^= bit | aboveBit;
       else {
         playableLo ^= bit;
         state[STATE_PLAYABLE_HI] ^= aboveBit;
@@ -524,7 +522,7 @@ export function undoMove32KnownCell(
   } else {
     let playableHi = state[STATE_PLAYABLE_HI];
 
-    if (next < cellCount) playableHi ^= bit | (1 << next);
+    if (cell < lastRowStart) playableHi ^= bit | (bit << columns);
     else playableHi ^= bit;
 
     state[STATE_PLAYABLE_HI] = playableHi;
@@ -538,10 +536,10 @@ export function undoMove32CallerPlyKnownCell(
   index,
   cell,
   columns,
-  cellCount,
+  lastRowStart,
+  lowLaneAboveLimit,
   supportDelta,
 ) {
-  const next = cell + columns;
   const bit = 1 << cell;
 
   landingCells[index] = cell;
@@ -550,9 +548,9 @@ export function undoMove32CallerPlyKnownCell(
   if (cell < 32) {
     let playableLo = state[CALLER_PLY2_PLAYABLE_LO];
 
-    if (next < cellCount) {
-      const aboveBit = 1 << next;
-      if (next < 32) playableLo ^= bit | aboveBit;
+    if (cell < lastRowStart) {
+      const aboveBit = bit << columns;
+      if (cell < lowLaneAboveLimit) playableLo ^= bit | aboveBit;
       else {
         playableLo ^= bit;
         state[CALLER_PLY2_PLAYABLE_HI] ^= aboveBit;
@@ -565,7 +563,7 @@ export function undoMove32CallerPlyKnownCell(
   } else {
     let playableHi = state[CALLER_PLY2_PLAYABLE_HI];
 
-    if (next < cellCount) playableHi ^= bit | (1 << next);
+    if (cell < lastRowStart) playableHi ^= bit | (bit << columns);
     else playableHi ^= bit;
 
     state[CALLER_PLY2_PLAYABLE_HI] = playableHi;

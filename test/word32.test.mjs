@@ -348,7 +348,7 @@ test('known-cell undo profiles reuse the cell returned by apply', () => {
   const fastCell = applyMove1x32KnownCell(oneFast, landingFast, 2, 2, 4, 16, delta1);
   assert.equal(fastCell, baseCell);
   undoMove1x32(oneBase, landingBase, 2, 4, 16, delta1);
-  undoMove1x32KnownCell(oneFast, landingFast, 2, fastCell, 4, 16, delta1);
+  undoMove1x32KnownCell(oneFast, landingFast, 2, fastCell, 4, 12, delta1);
   assert.deepEqual(oneFast, oneBase);
   assert.deepEqual(landingFast, landingBase);
 
@@ -366,7 +366,7 @@ test('known-cell undo profiles reuse the cell returned by apply', () => {
   const compactFastCell = applyMove1x32CallerPlyKnownCell(compactFast, compactLandingFast, 1, 1, 4, 16, delta1);
   assert.equal(compactFastCell, compactBaseCell);
   undoMove1x32CallerPly(compactBase, compactLandingBase, 1, 4, 16, delta1);
-  undoMove1x32CallerPlyKnownCell(compactFast, compactLandingFast, 1, compactFastCell, 4, 16, delta1);
+  undoMove1x32CallerPlyKnownCell(compactFast, compactLandingFast, 1, compactFastCell, 4, 12, delta1);
   assert.deepEqual(compactFast, compactBase);
   assert.deepEqual(compactLandingFast, compactLandingBase);
 
@@ -385,7 +385,7 @@ test('known-cell undo profiles reuse the cell returned by apply', () => {
   const twoFastCell = applyMove32KnownCell(twoFast, twoLandingFast, 3, 31, 7, 42, delta2);
   assert.equal(twoFastCell, twoBaseCell);
   undoMove32(twoBase, twoLandingBase, 3, 7, 42, delta2);
-  undoMove32KnownCell(twoFast, twoLandingFast, 3, twoFastCell, 7, 42, delta2);
+  undoMove32KnownCell(twoFast, twoLandingFast, 3, twoFastCell, 7, 35, 25, delta2);
   assert.deepEqual(twoFast, twoBase);
   assert.deepEqual(twoLandingFast, twoLandingBase);
 
@@ -403,9 +403,26 @@ test('known-cell undo profiles reuse the cell returned by apply', () => {
   const compactTwoFastCell = applyMove32CallerPlyKnownCell(compactTwoFast, compactTwoLandingFast, 3, 31, 7, 42, delta2);
   assert.equal(compactTwoFastCell, compactTwoBaseCell);
   undoMove32CallerPly(compactTwoBase, compactTwoLandingBase, 3, 7, 42, delta2);
-  undoMove32CallerPlyKnownCell(compactTwoFast, compactTwoLandingFast, 3, compactTwoFastCell, 7, 42, delta2);
+  undoMove32CallerPlyKnownCell(compactTwoFast, compactTwoLandingFast, 3, compactTwoFastCell, 7, 35, 25, delta2);
   assert.deepEqual(compactTwoFast, compactTwoBase);
   assert.deepEqual(compactTwoLandingFast, compactTwoLandingBase);
+});
+
+test('known-cell undo prepared top-row boundary', () => {
+  const state = new Uint32Array(4);
+  const landing = new Uint32Array(4);
+  state[STATE_PLAYABLE_LO] = 1 << 14;
+  state[STATE_PLY] = 1;
+  state[STATE_SUPPORT_CODE] = 1 << 6;
+  landing[2] = 18;
+
+  assert.equal(
+    undoMove1x32KnownCell(state, landing, 2, 14, 4, 12, 1 << 6),
+    14,
+  );
+  assert.equal(landing[2], 14);
+  assert.equal(state[STATE_PLAYABLE_LO], 0);
+  assert.equal(state[STATE_PLY], 0);
 });
 
 test('mix and reflection blocks', () => {

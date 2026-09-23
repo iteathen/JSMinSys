@@ -133,7 +133,7 @@
         "undoMove32KnownCell",
         "undoMove32CallerPlyKnownCell"
       ],
-      "note": "Initialization selects lane count and compatible state ownership. Apply can reuse a caller-known landing cell; paired undo can reuse the exact played cell already returned by apply and retained across recursion, removing the corresponding landing reload without adding move history. If a caller must load or store a cell solely to satisfy these profiles, use the ordinary profile in governing-unit accounting. Geometry remains runtime-configured and immutable after initialization."
+      "note": "Initialization selects lane count and state ownership. Known-cell apply reuses an observed landing cell; paired known-cell undo additionally consumes initialization-prepared lastRowStart (and lowLaneAboveLimit for two lanes), so it never reconstructs next=cell+columns merely to undo. Ordinary profiles remain for callers without these invariants. Geometry stays runtime-configured and immutable after initialization."
     },
     {
       "id": 9,

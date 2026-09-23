@@ -1,5 +1,5 @@
 {
-  "version": "0.52.0",
+  "version": "0.53.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1138,7 +1138,6 @@
         "ST32",
         "^",
         "|",
-        "+",
         "-",
         "<<",
         "<",
@@ -1149,7 +1148,8 @@
         "configured cellCount <= 32",
         "caller retains the exact played cell already returned by the paired apply across recursive work",
         "caller does not reload landingCells or create move-cell history solely to satisfy this profile",
-        "configured columns and cellCount are immutable for the engine instance",
+        "columns and prepared geometry thresholds are immutable for the engine instance",
+        "lastRowStart = cellCount - columns was prepared during initialization",
         "supportDelta is the precomputed support-only delta for the selected transition index"
       ],
       "cycleCount": {
@@ -1157,15 +1157,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 21,
-          "max": 23
+          "min": 20,
+          "max": 22
         },
         "hotL2Predicted": {
-          "min": 45,
-          "max": 47
+          "min": 44,
+          "max": 46
         },
-        "expression": "3*LOAD + 4*STORE + 7..9 ALU/control",
-        "note": "Reuses the cell already returned by apply. The old landing load disappears; cell+columns replaces next-columns, so arithmetic count is unchanged."
+        "expression": "3*LOAD + 4*STORE + 6..8 ALU/control",
+        "note": "Known played cell plus initialization-prepared lastRowStart removes next=cell+columns reconstruction. aboveBit reuses bit<<columns."
       }
     },
     {
@@ -1177,7 +1177,6 @@
         "ST32",
         "^",
         "|",
-        "+",
         "-",
         "<<",
         "<",
@@ -1189,7 +1188,8 @@
         "caller already owns ply/rank independently",
         "caller retains the exact played cell already returned by the paired apply across recursive work",
         "caller does not reload landingCells or create move-cell history solely to satisfy this profile",
-        "configured columns and cellCount are immutable for the engine instance",
+        "columns and prepared geometry thresholds are immutable for the engine instance",
+        "lastRowStart = cellCount - columns was prepared during initialization",
         "supportDelta is the precomputed support-only delta for the selected transition index"
       ],
       "cycleCount": {
@@ -1197,15 +1197,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 15.5,
-          "max": 17.5
+          "min": 14.5,
+          "max": 16.5
         },
         "hotL2Predicted": {
-          "min": 31.5,
-          "max": 33.5
+          "min": 30.5,
+          "max": 32.5
         },
-        "expression": "2*LOAD + 3*STORE + 6..8 ALU/control",
-        "note": "Composes caller-owned ply with the retained apply result; no landing or ply state load is performed."
+        "expression": "2*LOAD + 3*STORE + 5..7 ALU/control",
+        "note": "Composes caller-owned ply, retained apply cell, and prepared top-row threshold; no landing/ply load or reconstructed-next add."
       }
     },
     {
@@ -1217,7 +1217,6 @@
         "ST32",
         "^",
         "|",
-        "+",
         "-",
         "<<",
         "<",
@@ -1228,23 +1227,25 @@
         "configured board cell count is <=64 for this two-lane mask primitive",
         "caller retains the exact played cell already returned by the paired apply across recursive work",
         "caller does not reload landingCells or create move-cell history solely to satisfy this profile",
-        "configured columns and cellCount are immutable for the engine instance",
-        "supportDelta is the precomputed support-only delta for the selected transition index"
+        "columns and prepared geometry thresholds are immutable for the engine instance",
+        "lastRowStart = cellCount - columns was prepared during initialization",
+        "supportDelta is the precomputed support-only delta for the selected transition index",
+        "lowLaneAboveLimit = 32 - columns was prepared during initialization"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 23,
-          "max": 31.5
+          "min": 22,
+          "max": 30.5
         },
         "hotL2Predicted": {
-          "min": 47,
-          "max": 63.5
+          "min": 46,
+          "max": 62.5
         },
-        "expression": "normal lane: 3*LOAD + 4*STORE + 9..13 ALU/control; cross-lane above: 4*LOAD + 5*STORE + 13 ALU/control",
-        "note": "Reuses the exact played cell returned by apply and removes one maintained-landing load from two-lane undo."
+        "expression": "normal lane: 3*LOAD + 4*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 5*STORE + 12 ALU/control",
+        "note": "Prepared last-row/lane thresholds and bit<<columns remove next reconstruction while preserving every two-lane case."
       }
     },
     {
@@ -1256,7 +1257,6 @@
         "ST32",
         "^",
         "|",
-        "+",
         "-",
         "<<",
         "<",
@@ -1268,23 +1268,25 @@
         "caller already owns ply/rank independently",
         "caller retains the exact played cell already returned by the paired apply across recursive work",
         "caller does not reload landingCells or create move-cell history solely to satisfy this profile",
-        "configured columns and cellCount are immutable for the engine instance",
-        "supportDelta is the precomputed support-only delta for the selected transition index"
+        "columns and prepared geometry thresholds are immutable for the engine instance",
+        "lastRowStart = cellCount - columns was prepared during initialization",
+        "supportDelta is the precomputed support-only delta for the selected transition index",
+        "lowLaneAboveLimit = 32 - columns was prepared during initialization"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 17.5,
-          "max": 26
+          "min": 16.5,
+          "max": 25
         },
         "hotL2Predicted": {
-          "min": 33.5,
-          "max": 50
+          "min": 32.5,
+          "max": 49
         },
-        "expression": "normal lane: 2*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 12 ALU/control",
-        "note": "Composes caller-owned ply with the retained apply result; no landing or ply state load is performed."
+        "expression": "normal lane: 2*LOAD + 3*STORE + 7..11 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 11 ALU/control",
+        "note": "Composes caller-owned ply and retained apply cell with prepared geometry thresholds; one reconstructed-next add disappears."
       }
     },
     {
@@ -3896,6 +3898,24 @@
           "before": "15 fixed cycles",
           "after": "14 fixed cycles",
           "mechanism": "fuse final 24-bit half-swap with configured alignment; initialization supplies both resulting shift counts"
+        }
+      ]
+    },
+    {
+      "id": "round-046",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "undoMove1x32KnownCell / undoMove1x32CallerPlyKnownCell",
+          "before": "21-23 L1 state-owned / 15.5-17.5 L1 caller-ply",
+          "after": "20-22 L1 state-owned / 14.5-16.5 L1 caller-ply",
+          "mechanism": "initialization-prepared lastRowStart removes next=cell+columns; above bit derives from retained bit<<columns"
+        },
+        {
+          "function": "undoMove32KnownCell / undoMove32CallerPlyKnownCell",
+          "before": "23-31.5 L1 state-owned / 17.5-26 L1 caller-ply",
+          "after": "22-30.5 L1 state-owned / 16.5-25 L1 caller-ply",
+          "mechanism": "prepared last-row and low/high-lane thresholds remove reconstructed-next add"
         }
       ]
     }
