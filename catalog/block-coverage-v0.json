@@ -129,9 +129,12 @@
       "name": "canonical-reflection-symmetry",
       "status": "implemented",
       "functions": [
+        "fillReflect3Tables32",
         "reflectPacked3x32",
+        "reflectPacked3Direct32",
         "canonicalMin32"
-      ]
+      ],
+      "note": "Runtime-configured geometry can precompute reflection contribution tables; direct arithmetic fallback remains available and independently costed."
     },
     {
       "id": 13,
