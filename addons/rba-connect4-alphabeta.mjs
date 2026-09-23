@@ -65,7 +65,7 @@ function selectOrder(state,words,offset,depth,root,reflected){
     if(words[offset+column]>=g.rows)continue;
     if(forced>=0&&column!==forced)continue;
     state.order[row+count]=column;
-    state.orderScore[row+count]=state.cpc.actionBias[column]*16+(g.columns-g.priorityByColumn[root&&reflected?caller:column]);
+    state.orderScore[row+count]=(root?0:state.cpc.actionBias[column]*16)+(g.columns-g.priorityByColumn[root&&reflected?caller:column]);
     count+=1;
   }
   // tiny in-place selection sort; ordering is advisory only.
@@ -210,7 +210,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1);
     state.cofactors+=1;if(term<0)continue;
     if(!term)connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
-    value=-search(state,1,-beta,-alpha,0,0);
+    value=rootExact!==null?-search(state,1,-2,2,0,0):-search(state,1,-beta,-alpha,0,0);
     }
     if(value>best){best=value;bestMove=caller;}
     if(value>alpha)alpha=value;
