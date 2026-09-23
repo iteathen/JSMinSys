@@ -50,7 +50,9 @@ export function prepareConnect4RbaAlphaBeta({
       :null,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache:createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords}),
-    actionLo:new Int8Array(levels*g.columns),actionHi:new Int8Array(levels*g.columns),actionKnown:new Uint8Array(levels*g.columns),
+    actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
+    actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
+    actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
     nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcForced:0,cpcProjectedForks:0,
     frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0};
@@ -103,14 +105,13 @@ function search(state,depth,alpha,beta){
   if(semantic[0]>alpha)alpha=semantic[0];
   if(semantic[1]<beta)beta=semantic[1];
 
-  const forced=state.cpc.forcedColumn[0],row=depth*g.columns;
+  const forced=state.cpc.forcedColumn[0],useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns;
   let legal=0;
   for(let oi=0;oi<g.columns;oi+=1){
     const column=g.actionOrder[oi];
     if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced))continue;
     legal+=1;
-    state.actionKnown[row+column]=0;state.actionLo[row+column]=-1;state.actionHi[row+column]=1;
-    if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
+    if(useFront){
       const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
       state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
@@ -124,10 +125,10 @@ function search(state,depth,alpha,beta){
     const column=g.actionOrder[oi];
     if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced))continue;
     let value;
-    if(state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
+    if(useFront&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];
     }else{
-      if(state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
+      if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
       const childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
       const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1);
