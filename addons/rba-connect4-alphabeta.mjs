@@ -68,7 +68,7 @@ export function prepareConnect4RbaAlphaBeta({
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
     nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,cpcPrecursors:0,cpcProjectedForks:0,
-    frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
+    frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,frontLo:0,frontHi:0,
     cofactors:0};
 }
 
@@ -77,11 +77,12 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize,mover){
   state.frontCalls+=1;
   const result=buildConnect4RbaFourFront(g,a,words,offset,basis,basisOffset,basisSize);
   state.frontSteps+=a.steps;
-  if(result){state.frontFailures+=1;return null;}
+  if(result){state.frontFailures+=1;return 0;}
   const packed=queryConnect4RbaFourFront(g,a,0,words,offset),lo=packed&3,hi=packed>>>2;
-  const relative=intervalToRelative(lo,hi,mover);
+  if(mover===0){state.frontLo=lo-2;state.frontHi=hi-2;}
+  else{state.frontLo=2-hi;state.frontHi=2-lo;}
   if(lo===hi)state.frontExact+=1;
-  return relative;
+  return 1;
 }
 
 function search(state,depth,alpha,beta){
@@ -112,9 +113,9 @@ function search(state,depth,alpha,beta){
   let semanticLo,semanticHi;
   if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
   else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
-  if(state.mode===RBA_AB_CPC_FOUR_FRONT){
-    const f=frontEvidence(state,words,keyOffset,basis,basisOffset,n,mover);
-    if(f){if(f[0]>semanticLo)semanticLo=f[0];if(f[1]<semanticHi)semanticHi=f[1];}
+  if(state.mode===RBA_AB_CPC_FOUR_FRONT&&frontEvidence(state,words,keyOffset,basis,basisOffset,n,mover)){
+    if(state.frontLo>semanticLo)semanticLo=state.frontLo;
+    if(state.frontHi<semanticHi)semanticHi=state.frontHi;
   }
   if(semanticLo===semanticHi){
     const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semanticLo;
@@ -137,10 +138,10 @@ function search(state,depth,alpha,beta){
       const column=g.actionOrder[oi];
       if(words[keyOffset+column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
       legal+=1;
-      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
-      const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
-      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
-      if(rel[0]===rel[1])state.frontActionExact+=1;
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset),
+        lo=packed&3,hi=packed>>>2,relLo=mover===0?lo-2:2-hi,relHi=mover===0?hi-2:2-lo;
+      state.actionLo[row+column]=relLo;state.actionHi[row+column]=relHi;state.actionKnown[row+column]=1;
+      if(relLo===relHi)state.frontActionExact+=1;
     }
     if(!legal)return 0;
   }
@@ -195,12 +196,10 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT)state.cpcExact+=1;else if(cpcKind===CPC_BOUND)state.cpcBounds+=1;else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
   if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
-  if(state.mode===RBA_AB_CPC_FOUR_FRONT){
-    const f=frontEvidence(state,state.words,0,state.basis,0,state.basisSize[0],mover);
-    if(f){
-      const absLo=mover===0?f[0]+2:2-f[1],absHi=mover===0?f[1]+2:2-f[0];
-      if(absLo>rootLo)rootLo=absLo;if(absHi<rootHi)rootHi=absHi;
-    }
+  if(state.mode===RBA_AB_CPC_FOUR_FRONT&&frontEvidence(state,state.words,0,state.basis,0,state.basisSize[0],mover)){
+    const absLo=mover===0?state.frontLo+2:2-state.frontHi,
+      absHi=mover===0?state.frontHi+2:2-state.frontLo;
+    if(absLo>rootLo)rootLo=absLo;if(absHi<rootHi)rootHi=absHi;
   }
   const rootExact=rootLo===rootHi?absToRelative(rootLo,mover):null;
   const rootSemantic=intervalToRelative(rootLo,rootHi,mover);
@@ -221,9 +220,10 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
       const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
       if(state.words[column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
-      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0);
-      const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
-      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0),
+        lo=packed&3,hi=packed>>>2;
+      state.actionLo[row+column]=mover===0?lo-2:2-hi;
+      state.actionHi[row+column]=mover===0?hi-2:2-lo;state.actionKnown[row+column]=1;
     }
   }
   for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
