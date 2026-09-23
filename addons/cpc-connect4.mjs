@@ -72,11 +72,6 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
   return immediate|(any?4:0);
 }
 
-function cellMarked(bits,cell){return (bits[cell>>>5]&(1<<(cell&31)))!==0;}
-function playableCell(g,words,offset,cell){
-  return words[offset+g.cellColumn[cell]]===g.cellRow[cell];
-}
-
 // Qualified one-step fork-precursor closure.
 // Guard: the side to move has no active singleton or minimal two-cell own
 // requirement, so an off-preemption move cannot manufacture an earlier
