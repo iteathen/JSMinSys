@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -325,8 +325,8 @@
     "admissible-does-not-mean-preferred-or-cheapest",
     "division-modulus-and-exponentiation-are-legal-but-remain-optimization-targets",
     "increment-decrement-are-syntax-not-distinct-primitive-capabilities",
-    "other-Math-builtins-remain-observed-demands-until-explicitly-admitted",
-    "new-operation-families-require-explicit-admission"
+    "new-operation-families-require-explicit-admission",
+    "every-admissible-emission-must-have-cycle-model"
   ],
   "admissibleData": {
     "scalarDomains": [
@@ -548,6 +548,31 @@
       "<=",
       ">",
       ">="
+    ]
+  },
+  "cycleAccounting": {
+    "invariant": "no-admissible-emission-without-cycle-model",
+    "modelFile": "catalog/cycle-model-v0.json",
+    "functionAccountingFile": "catalog/08-function-cycle-accounting.md",
+    "coverage": {
+      "admissible": 62,
+      "mapped": 62,
+      "missing": 0,
+      "complete": true
+    },
+    "allowedModelKinds": [
+      "fixed",
+      "range",
+      "expression",
+      "unbounded"
+    ],
+    "requiredFunctionViews": [
+      "hot_L1_serial_cycles",
+      "hot_L2_serial_cycles",
+      "cycle_range",
+      "unresolved_symbolic_terms",
+      "blocking_terms",
+      "operation_counts"
     ]
   }
 }
