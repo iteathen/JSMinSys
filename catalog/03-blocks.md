@@ -442,7 +442,7 @@ and lane-local Boolean joins/intersections.
 
 ## 22. Multiword antichain skyline
 
-Six-word fixed records may be maintained as a subset-minimal antichain. The block
+Relational records may be maintained as a subset-minimal antichain. Runtime-sized records use the initialization-selected span path; six-word records remain an optional specialization. The block
 rejects dominated candidates, removes retained generators dominated by a new
 candidate, and admits only within caller-owned fixed capacity. A streamed pairwise
 OR product performs immediate skyline absorption without materializing a Cartesian
@@ -450,7 +450,7 @@ product.
 
 ## 23. Wide exact-key transposition operations
 
-Eight-word identities use a locator only to choose a probe start. Exact equality
+Runtime-sized exact identities use a locator only to choose a probe start. Eight-word identities remain an optional specialization. Exact equality
 still compares every identity word. Publication writes the complete key before
 publishing the dense id slot; synchronization and lifetime remain caller-owned.
 
@@ -458,14 +458,14 @@ publishing the dense id slot; synchronization and lifetime remain caller-owned.
 
 Durable semantic [lower, upper] evidence is distinct from alpha/beta search
 windows. Tightening is monotone intersection; incompatible evidence reports a
-conflict. Fixed-degree up-to-seven min/max reductions provide Bellman-style
-aggregation without allocating candidate objects.
+conflict. Runtime-count min/max reductions provide the geometry-general Bellman path; fixed-degree up-to-seven variants remain optional specializations.
 
 ## 25. Sparse basis transform / remap
 
 Prepared action-major maps can transform sparse ordered IDs through caller-owned
-bitset scratch, deduplicate them, and emit canonical ascending IDs. Three-word
-packed coordinates may be remapped through a prepared local-index permutation.
+bitset scratch, deduplicate them, and emit canonical ascending IDs. Runtime-sized
+packed coordinates may be remapped through a prepared local-index permutation;
+three-word remapping remains an optional specialization.
 The block carries no board/game semantics.
 
 ## 26. Intrusive generation-stamped work list
@@ -495,7 +495,7 @@ the recurring fixed-storage mechanics underneath that loop:
 - stamped queue take with generation/currentness validation;
 - owned-work liveness validation and execution release;
 - resolved-value publication ordering;
-- fixed-degree dependency-row publication;
+- runtime-count dependency-row publication (with fixed-degree specializations where profitable);
 - direct retention of one runnable dependency without mandatory queue round-trip;
 - atomic wake observation/signaling;
 - explicit worker parking; and
@@ -505,3 +505,12 @@ The block does not define domain result codes, game semantics, dependency meanin
 or a worker framework. List/topology mutation remains externally serialized unless
 the selected helper explicitly uses Atomics. Blocking wait cost remains unbounded
 in the general cycle model and must be separated from active CPU work.
+
+
+## 30. Runtime-sized word spans
+
+Geometry-general applications select logical word counts during initialization.
+The span block provides exact equality, subset, wordwise Boolean transforms, and
+reversal over caller-owned typed storage. Fixed 1/2/3/6/8-word variants remain
+eligible specializations, but this span layer is the general path required by
+JMS-DATA-007.
