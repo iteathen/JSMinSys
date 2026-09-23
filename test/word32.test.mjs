@@ -224,6 +224,14 @@ import {
   undoMove1x32PackedAll,
   applyMove1x32PackedAllKnownCell,
   undoMove1x32PackedAllKnownCell,
+  CENTER_OMIT2_PLAYABLE_LO,
+  CENTER_OMIT2_META,
+  supportFromCenterOmittedMeta32,
+  playableHighFromCenterOmittedMeta32,
+  applyMove32CallerPlyCenterOmitted,
+  undoMove32CallerPlyCenterOmitted,
+  applyMove32CallerPlyCenterOmittedKnownCell,
+  undoMove32CallerPlyCenterOmittedKnownCell,
   applyMove1x32PackedPly,
   undoMove1x32PackedPly,
   applyMove32PackedPly,
@@ -535,6 +543,141 @@ test('known-cell undo prepared top-row boundary', () => {
   assert.equal(landing[2], 14);
   assert.equal(state[STATE_PLAYABLE_LO], 0);
   assert.equal(state[STATE_PLY], 0);
+});
+
+test('caller-ply odd-center omission compresses 7x6 transition state', () => {
+  const columns = 7;
+  const rows = 6;
+  const cellCount = columns * rows;
+  const highBits = cellCount - 32;
+  const highMask = (1 << highBits) - 1;
+  const center = columns >> 1;
+  const supportMaskBelowCenter = (1 << (3 * center)) - 1;
+
+  const compressSupport = (support) => (
+    (support & supportMaskBelowCenter)
+    | ((support >>> (3 * (center + 1))) << (3 * center))
+  );
+
+  const packedDelta = (column) => {
+    if (column === center) return 0;
+    const compressedColumn = column < center ? column : column - 1;
+    return 1 << (highBits + 3 * compressedColumn);
+  };
+
+  const base = new Uint32Array(3);
+  const packed = new Uint32Array(2);
+  const landingBase = new Uint32Array(columns);
+  const landingPacked = new Uint32Array(columns);
+  fillLandingCells32(landingBase, columns);
+  fillLandingCells32(landingPacked, columns);
+  for (let column = 0; column < columns; column += 1) {
+    base[CALLER_PLY2_PLAYABLE_LO] |= 1 << column;
+    packed[CENTER_OMIT2_PLAYABLE_LO] |= 1 << column;
+  }
+
+  let ply = 0;
+  for (let move = 0; move < 5; move += 1) {
+    const baseCell = applyMove32CallerPly(
+      base, landingBase, center, columns, cellCount, 1 << (3 * center),
+    );
+    const packedCell = applyMove32CallerPlyCenterOmitted(
+      packed, landingPacked, center, columns, cellCount, 0,
+    );
+    ply += 1;
+    assert.equal(packedCell, baseCell);
+    assert.equal(packed[CENTER_OMIT2_PLAYABLE_LO], base[CALLER_PLY2_PLAYABLE_LO]);
+    assert.equal(
+      playableHighFromCenterOmittedMeta32(packed[CENTER_OMIT2_META], highMask),
+      base[CALLER_PLY2_PLAYABLE_HI],
+    );
+    assert.equal(
+      supportFromCenterOmittedMeta32(packed[CENTER_OMIT2_META], highBits),
+      compressSupport(base[CALLER_PLY2_SUPPORT_CODE]),
+    );
+  }
+
+  const sideColumn = 2;
+  const baseSideCell = applyMove32CallerPly(
+    base, landingBase, sideColumn, columns, cellCount, 1 << (3 * sideColumn),
+  );
+  const packedSideCell = applyMove32CallerPlyCenterOmitted(
+    packed, landingPacked, sideColumn, columns, cellCount, packedDelta(sideColumn),
+  );
+  ply += 1;
+  assert.equal(packedSideCell, baseSideCell);
+  assert.equal(
+    supportFromCenterOmittedMeta32(packed[CENTER_OMIT2_META], highBits),
+    compressSupport(base[CALLER_PLY2_SUPPORT_CODE]),
+  );
+
+  const compressedSupport = supportFromCenterOmittedMeta32(
+    packed[CENTER_OMIT2_META], highBits,
+  );
+  const reflectedFull = reflectPacked3Direct32(
+    base[CALLER_PLY2_SUPPORT_CODE], columns, 18,
+  );
+  assert.equal(
+    reflectPacked3Columns6To7(compressedSupport, 6, 18),
+    compressSupport(reflectedFull),
+  );
+
+  assert.equal(
+    undoMove32CallerPlyCenterOmitted(
+      packed, landingPacked, sideColumn, columns, cellCount, packedDelta(sideColumn),
+    ),
+    undoMove32CallerPly(
+      base, landingBase, sideColumn, columns, cellCount, 1 << (3 * sideColumn),
+    ),
+  );
+  ply -= 1;
+
+  for (let move = 0; move < 5; move += 1) {
+    assert.equal(
+      undoMove32CallerPlyCenterOmitted(
+        packed, landingPacked, center, columns, cellCount, 0,
+      ),
+      undoMove32CallerPly(
+        base, landingBase, center, columns, cellCount, 1 << (3 * center),
+      ),
+    );
+    ply -= 1;
+  }
+
+  assert.equal(ply, 0);
+  assert.equal(packed[CENTER_OMIT2_META], 0);
+  assert.deepEqual(landingPacked, landingBase);
+
+  const knownBase = new Uint32Array(3);
+  const knownPacked = new Uint32Array(2);
+  const knownLandingBase = new Uint32Array(columns);
+  const knownLandingPacked = new Uint32Array(columns);
+  knownLandingBase[center] = 31;
+  knownLandingPacked[center] = 31;
+  knownBase[CALLER_PLY2_PLAYABLE_LO] = 0x80000000;
+  knownPacked[CENTER_OMIT2_PLAYABLE_LO] = 0x80000000;
+
+  applyMove32CallerPlyKnownCell(
+    knownBase, knownLandingBase, center, 31, columns, cellCount, 1 << (3 * center),
+  );
+  applyMove32CallerPlyCenterOmittedKnownCell(
+    knownPacked, knownLandingPacked, center, 31, columns, cellCount, 0,
+  );
+  assert.equal(
+    playableHighFromCenterOmittedMeta32(knownPacked[CENTER_OMIT2_META], highMask),
+    knownBase[CALLER_PLY2_PLAYABLE_HI],
+  );
+  assert.equal(
+    undoMove32CallerPlyCenterOmittedKnownCell(
+      knownPacked, knownLandingPacked, center, 31, columns,
+      cellCount - columns, 32 - columns, 0,
+    ),
+    undoMove32CallerPlyKnownCell(
+      knownBase, knownLandingBase, center, 31, columns,
+      cellCount - columns, 32 - columns, 1 << (3 * center),
+    ),
+  );
+  assert.deepEqual(knownLandingPacked, knownLandingBase);
 });
 
 test('general packed support+ply transitions match separate state', () => {

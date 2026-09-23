@@ -169,9 +169,15 @@
         "applyMove1x32PackedAll",
         "undoMove1x32PackedAll",
         "applyMove1x32PackedAllKnownCell",
-        "undoMove1x32PackedAllKnownCell"
+        "undoMove1x32PackedAllKnownCell",
+        "supportFromCenterOmittedMeta32",
+        "playableHighFromCenterOmittedMeta32",
+        "applyMove32CallerPlyCenterOmitted",
+        "undoMove32CallerPlyCenterOmitted",
+        "applyMove32CallerPlyCenterOmittedKnownCell",
+        "undoMove32CallerPlyCenterOmittedKnownCell"
       ],
-      "note": "Transition profiles now scale physical state packing with configured bit budget. If rank + playable + support all fit one uint32, one-lane state collapses to a single word; otherwise packed support/rank and multiword variants remain. Reflection always receives support-only extraction."
+      "note": "Transition state profiles exploit caller ownership and configured bit budgets. For eligible odd widths with caller-owned ply, the reflection-fixed center support field is omitted; its height remains derivable from ply, and compressed support plus playable-high share one word. 7x6 therefore needs only two transition-state words."
     },
     {
       "id": 9,

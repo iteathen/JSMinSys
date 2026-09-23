@@ -1,5 +1,5 @@
 {
-  "version": "0.85.0",
+  "version": "0.86.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2365,6 +2365,242 @@
         },
         "expression": "LOAD + 2*STORE + 6..8 ALU/control",
         "note": "Retained cell plus full one-word state removes both landing read and separate playable/meta state traffic."
+      }
+    },
+    {
+      "name": "supportFromCenterOmittedMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-caller-ply-center-omitted-profile",
+      "preconditions": [
+        "highBits identifies the packed playable-high width",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "One shift removes packed high-playable bits and exposes compressed support."
+      }
+    },
+    {
+      "name": "playableHighFromCenterOmittedMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-caller-ply-center-omitted-profile",
+      "preconditions": [
+        "highMask selects exactly cellCount-32 playable-high bits",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Playable-high is the low meta field, so external extraction is one AND."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyCenterOmitted",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-ply-center-omitted-profile",
+      "preconditions": [
+        "landingCells[index] is the current next playable physical cell",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 17,
+          "max": 25.5
+        },
+        "hotL2Predicted": {
+          "min": 29,
+          "max": 41.5
+        },
+        "expression": "low/same: 3*LOAD+3*STORE+8..12 ALU/control; low-to-high: 3*LOAD+3*STORE+12 ALU/control; high lane: 2*LOAD+2*STORE+8..12 ALU/control",
+        "note": "Caller-owned ply removes rank state; center omission shrinks support enough to pack playable-high with support. Crossing/high paths delete one state load/store pair without a packing shift."
+      }
+    },
+    {
+      "name": "undoMove32CallerPlyCenterOmitted",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-ply-center-omitted-profile",
+      "preconditions": [
+        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 17,
+          "max": 25.5
+        },
+        "hotL2Predicted": {
+          "min": 29,
+          "max": 41.5
+        },
+        "expression": "low/same: 3*LOAD+3*STORE+8..12 ALU/control; low-to-high: 3*LOAD+3*STORE+12 ALU/control; high lane: 2*LOAD+2*STORE+8..12 ALU/control",
+        "note": "General undo retains the two-word compressed state and caller-owned ply contract."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyCenterOmittedKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-ply-center-omitted-known-cell-profile",
+      "preconditions": [
+        "caller already holds the exact current landing cell for this transition index",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 13,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 21,
+          "max": 29.5
+        },
+        "expression": "low/same: 2*LOAD+3*STORE+8..12 ALU/control; low-to-high: 2*LOAD+3*STORE+12 ALU/control; high lane: LOAD+2*STORE+8..12 ALU/control",
+        "note": "Composes known-cell ownership with center-omitted compressed state; 7x6 low-to-high apply is 21.5 L1 versus 26 for caller-ply known-cell state."
+      }
+    },
+    {
+      "name": "undoMove32CallerPlyCenterOmittedKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        ">>>",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-ply-center-omitted-known-cell-profile",
+      "preconditions": [
+        "caller retains the exact played cell returned by paired apply",
+        "lastRowStart and lowLaneAboveLimit were prepared during initialization",
+        "configured board cell count is 33..64",
+        "configured columns is odd and the reflection-fixed physical center column is omitted from stored support",
+        "caller already owns exact ply/rank as a live scalar for an independent recursive/identity requirement",
+        "compressed support preserves physical-column order with the center field removed",
+        "highBits = cellCount-32 and highBits + 3*(columns-1) <= 32",
+        "meta low highBits bits store playable-high and the remaining bits store compressed support",
+        "configured rows <= 7 so stored 3-bit support fields cannot overflow",
+        "compressedSupportDelta is precomputed per transition index above the highBits field and is zero for the omitted center column",
+        "the omitted center height is derivable from caller-owned ply minus the sum of stored support heights if an external consumer requires it",
+        "canonical reflection may ignore the omitted center because it is reflection-fixed; compressed support reverses as columns-1 packed 3-bit fields"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 12,
+          "max": 20.5
+        },
+        "hotL2Predicted": {
+          "min": 20,
+          "max": 28.5
+        },
+        "expression": "low/same: 2*LOAD+3*STORE+7..11 ALU/control; low-to-high: 2*LOAD+3*STORE+11 ALU/control; high lane: LOAD+2*STORE+7..11 ALU/control",
+        "note": "Retained cell plus prepared geometry and center omission reduce the caller-ply known-cell worst case from 25 to 20.5 L1 cycles."
       }
     },
     {
@@ -5321,11 +5557,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 192,
+    "functionsImplemented": 198,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 192,
+    "functionsWithCycleCount": 198,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6912,6 +7148,24 @@
           "before": "no exact-table setup path",
           "after": "explicit compositional initialization ledger",
           "mechanism": "account table generation and leave storage allocation/cold-cache trade visible"
+        }
+      ]
+    },
+    {
+      "id": "round-079",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32CallerPlyCenterOmitted / undoMove32CallerPlyCenterOmitted",
+          "before": "caller-owned-ply two-lane state stores playableLo + playableHi + all support fields",
+          "after": "eligible odd-width state stores playableLo + one meta word containing playableHi + all non-center support fields",
+          "mechanism": "omit reflection-fixed center support height because caller-owned ply makes it derivable; pack the freed support bits with playable-high"
+        },
+        {
+          "function": "known-cell center-omitted profiles",
+          "before": "caller-ply known-cell worst L1: apply 26 / undo 25",
+          "after": "apply 21.5 / undo 20.5 worst L1 on eligible compressed layouts",
+          "mechanism": "compose retained landing-cell ownership with two-word center-omitted state"
         }
       ]
     }
