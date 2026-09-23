@@ -21,6 +21,7 @@ jobs:
       - run: node tools/audit-runtime-geometry.mjs
       - run: node --test test/*.test.mjs
       - run: node tools/bench-rba-cpc-ab.mjs
+      - run: node tools/bench-rba-addons.mjs
 
   schema:
     runs-on: ubuntu-latest
