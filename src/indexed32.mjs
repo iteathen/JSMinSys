@@ -28,8 +28,7 @@ export function powerOfTwoIndex32(hash, capacityMask) {
   return hash & capacityMask;
 }
 
-export function ttProbeIndex32(tags, capacityMask, hash, tag, missIndex) {
-  const index = hash & capacityMask;
+export function ttProbeIndex32(tags, index, tag, missIndex) {
   return tags[index] === tag ? index : missIndex;
 }
 
