@@ -104,12 +104,6 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
   const primary=compareReflectedSupport(g,words,offset);
   if(primary<0)return 0;
 
-  // Only materialize the reflected support after the lexicographic support
-  // comparison says reflection may be selected. Canonical asymmetric support
-  // returns above without writing the scratch mirror row at all.
-  for(let c=0;c<g.columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
-  scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
-
   for(let w=0;w<g.shapeWordCount;w+=1)scratch.seen[w]=0;
   for(let i=0;i<n;i+=1){const id=g.reflect[basis[bi+i]];scratch.seen[id>>>5]|=1<<(id&31);}
   const rn=emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
@@ -122,6 +116,10 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
     let w=g.p0Offset;while(w<g.keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
     if(w===g.keyWords||words[offset+w]<scratch.mirror[w])return 0;
   }
+  // Support/meta are needed only when reflection is actually selected. In the
+  // symmetric-support case that remains canonical, avoid writing them at all.
+  for(let c=0;c<g.columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
+  scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
   publishSpan32(words,offset,scratch.mirror,0,g.keyWords);
   publishSpan32(basis,bi,scratch.mirrorBasis,0,n);
   return 1;
