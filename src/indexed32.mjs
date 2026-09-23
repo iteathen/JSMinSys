@@ -4,12 +4,12 @@ export function landingCell32(heights, column, columns, rows, invalidCell) {
 }
 
 export function maskContains32(owned, required) {
-  return (owned & required) === required;
+  return ((owned & required) ^ required) === 0;
 }
 
 export function maskContains2x32(owned0, owned1, required0, required1) {
-  return (owned0 & required0) === required0
-    && (owned1 & required1) === required1;
+  return ((owned0 & required0) ^ required0) === 0
+    && ((owned1 & required1) ^ required1) === 0;
 }
 
 export function residualTransition32(table, classIndex, actionIndex, actionCount) {
