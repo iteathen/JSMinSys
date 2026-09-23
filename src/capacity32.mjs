@@ -1,3 +1,7 @@
+export function allocateTypedCapacity(length) {
+  return new Uint32Array(length);
+}
+
 export function isPowerOfTwo32(value) {
   return value > 0 && (value & (value - 1)) === 0;
 }
