@@ -160,16 +160,26 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
   return row-words[offset+column];
 }
 
-function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
-  for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0)return 0;
+// Pooled-frontier paired-response theorem. Odd-remainder columns contribute
+// their currently playable frontier cells to one shared waiting pool. The pool
+// must have even cardinality. Those frontier cells are deliberately omitted
+// from the vertical response set; every other upper response cell has the
+// geometry-prepared pairedResponseRowParity.
+function pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
+  let poolParity=0;
+  for(let c=0;c<g.columns;c+=1)poolParity^=(g.rows-words[offset+c])&1;
+  if(poolParity)return 0;
   const coord=offset+(player?g.p1Offset:g.p0Offset);
   for(let i=0;i<basisSize;i+=1){
     if(!coordHas(words,coord,i))continue;
     const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
     let covered=0;
     for(let j=0;j<size;j+=1){
-      const cell=g.shapeCells[base+j];
-      if((g.cellRow[cell]&1)===g.pairedResponseRowParity){covered=1;break;}
+      const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
+      if((row&1)!==g.pairedResponseRowParity)continue;
+      const height=words[offset+column];
+      if(((g.rows-height)&1)!==0&&row===height)continue;
+      covered=1;break;
     }
     if(!covered)return 0;
   }
@@ -222,9 +232,9 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   if(!p0Any)scratch.interval[1]=2;
   if(!p1Any)scratch.interval[0]=2;
 
-  if(mover===0&&pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0))
+  if(mover===0&&pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0))
     scratch.interval[1]=Math.min(scratch.interval[1],2);
-  if(mover===1&&pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1))
+  if(mover===1&&pooledFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1))
     scratch.interval[0]=Math.max(scratch.interval[0],2);
 
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
