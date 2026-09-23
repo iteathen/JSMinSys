@@ -28,7 +28,7 @@ export function createRbaTt32({
   const u32=n=>new Uint32Array(new SharedArrayBuffer(n*4));
   const i32=n=>new Int32Array(new SharedArrayBuffer(n*4));
   const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,edgeCapacity,
-    control:i32(RBA_TT_CONTROL_WORDS),buckets:i32(bucketCount),keys:u32(capacity*keyWords),
+    control:i32(RBA_TT_CONTROL_WORDS),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
     basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
     lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),link:i32(capacity),bucket:u32(capacity),
@@ -57,6 +57,7 @@ export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize){
   if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
   const hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
   for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
+    if(t.locator[q]!==hash)continue;
     const base=q*keyWords;let w=0;
     while(w<keyWords&&t.keys[base+w]===words[offset+w])w+=1;
     if(w===keyWords){if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}t.refs[q]+=1;return q;}
@@ -65,7 +66,7 @@ export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize){
   if(q<0){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
-  publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
+  publishSpan32(t.keys,q*keyWords,words,offset,keyWords);t.locator[q]=hash;
   if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.count[q]=0;t.parentHead[q]=-1;
