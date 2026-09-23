@@ -450,8 +450,8 @@ test('configured packed-3 register reflection profiles', () => {
     [3, reflectPacked3Columns3],
     [4, reflectPacked3Columns4],
     [5, reflectPacked3Columns5],
-    [6, (code) => reflectPacked3Columns6To7(code, 6)],
-    [7, (code) => reflectPacked3Columns6To7(code, 3)],
+    [6, (code) => reflectPacked3Columns6To7(code, 6, 18)],
+    [7, (code) => reflectPacked3Columns6To7(code, 9, 15)],
     [8, reflectPacked3Columns8],
     [9, reflectPacked3Columns9],
     [10, reflectPacked3Columns10],
@@ -476,6 +476,25 @@ test('configured packed-3 register reflection profiles', () => {
         `columns=${columns} code=${code}`,
       );
     }
+  }
+});
+
+test('prepared 6/7 packed reflection shifts match direct reflection', () => {
+  for (let value = 0; value < (1 << 18); value += 257) {
+    assert.equal(
+      reflectPacked3Columns6To7(value, 6, 18),
+      reflectPacked3Direct32(value, 6, 15),
+    );
+  }
+
+  let seed = 0x9e3779b9;
+  for (let sample = 0; sample < 4096; sample += 1) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const value = seed & 0x1fffff;
+    assert.equal(
+      reflectPacked3Columns6To7(value, 9, 15),
+      reflectPacked3Direct32(value, 7, 18),
+    );
   }
 });
 

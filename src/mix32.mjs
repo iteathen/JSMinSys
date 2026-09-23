@@ -108,11 +108,10 @@ export function reflectPacked3Columns5(code) {
   return (code >>> 12) | (x << 3);
 }
 
-export function reflectPacked3Columns6To7(code, rightShift) {
+export function reflectPacked3Columns6To7(code, leftShift, highShift) {
   let x = ((code & 0x1c71c7) << 3) | ((code & 0xe38e38) >>> 3);
   x = ((x & 0x03f03f) << 6) | ((x & 0xfc0fc0) >>> 6);
-  x = ((x << 12) | (x >>> 12)) & 0xffffff;
-  return x >>> rightShift;
+  return ((x & 0xfff) << leftShift) | (x >>> highShift);
 }
 
 export function reflectPacked3Columns8(code) {

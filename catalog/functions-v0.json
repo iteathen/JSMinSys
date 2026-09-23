@@ -1,5 +1,5 @@
 {
-  "version": "0.51.0",
+  "version": "0.52.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1624,15 +1624,17 @@
       "preconditions": [
         "configured columns is 6 or 7",
         "support encoding uses 3 bits per column",
-        "rightShift === 3*(8-columns) was prepared during initialization",
+        "leftShift and highShift were prepared at initialization",
+        "for 6 columns: leftShift=6 and highShift=18",
+        "for 7 columns: leftShift=9 and highShift=15",
         "packed support contains no rank/ply metadata"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 15,
-        "note": "Reverse an eight-field padded lane with a 14-operation swap network, then apply one initialization-prepared alignment shift."
+        "cycles": 14,
+        "note": "Two 5-operation divide-and-conquer swap stages plus a 4-operation fused final half-swap/alignment. Initialization supplies both final shift counts."
       }
     },
     {
@@ -3882,6 +3884,18 @@
           "before": "playableColumn32: 5 L1 / 13 L2 cycles",
           "after": "1-2 cycles when landing cell is already observed",
           "mechanism": "reuse caller-known landing cell and delete the duplicate legality load"
+        }
+      ]
+    },
+    {
+      "id": "round-045",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3Columns6To7",
+          "before": "15 fixed cycles",
+          "after": "14 fixed cycles",
+          "mechanism": "fuse final 24-bit half-swap with configured alignment; initialization supplies both resulting shift counts"
         }
       ]
     }

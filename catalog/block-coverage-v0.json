@@ -186,7 +186,7 @@
         "reflectPacked3Columns10",
         "canonicalMin32"
       ],
-      "note": "Initialization selects no work for one column or an exact register-only 3-bit field-swap profile for 2..10 columns. These profiles beat the current direct/byte-table static L1 ledgers and require no reflection-table setup; lookup/direct forms remain qualified alternatives for emitted-code/cache studies."
+      "note": "Initialization selects no work for one column or an exact register-only packed-3 profile for 2..10 columns. The 6/7-column profile now precomputes both final alignment shifts so its last half-swap and alignment are fused. Table/direct forms remain qualified alternatives for emitted-code/cache studies."
     },
     {
       "id": 13,
