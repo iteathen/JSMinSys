@@ -1032,6 +1032,22 @@ test('sparse exact popcount profiles', () => {
   }
 });
 
+test('two-lane popcount fused at nibble stage', () => {
+  const vectors = [
+    [0, 0, 0],
+    [0xffffffff, 0, 32],
+    [0, 0xffffffff, 32],
+    [0xffffffff, 0xffffffff, 64],
+    [0x55555555, 0xaaaaaaaa, 32],
+    [0x80000001, 0x80000001, 4],
+    [0x12345678, 0x9abcdef0, popcount32(0x12345678) + popcount32(0x9abcdef0)],
+  ];
+  for (const [lo, hi, expected] of vectors) {
+    assert.equal(popcount2x32(lo, hi), expected);
+    assert.equal(popcount2x32SparseHigh(lo, hi), expected);
+  }
+});
+
 test('10-bit high-lane popcount table profile', () => {
   const table = new Uint32Array(1024);
   assert.equal(fillPopcount10Table32(table), 1024);

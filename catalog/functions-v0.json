@@ -1,5 +1,5 @@
 {
-  "version": "0.71.0",
+  "version": "0.72.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3798,7 +3798,7 @@
         "hotL2Predicted": 27,
         "hotL3Predicted": 62,
         "expression": "14-cycle low-lane SWAR popcount + LOAD(table[hi]) + ADD",
-        "note": "Configured 33..42-cell-style lane widths are one use, but the contract is high-live-bits<=10 rather than a fixed board geometry. L1 wins versus fixed 25-cycle popcount2x32; L2/L3 intentionally do not."
+        "note": "Configured high-live-bits<=10 profile. L1 remains 19 cycles versus the improved 23-cycle fixed two-lane SWAR; L2/L3 intentionally remain less favorable."
       }
     },
     {
@@ -3826,7 +3826,7 @@
           "K": "total number of set bits across lo and hi",
           "BM": "sum of branch-misprediction penalties across both loops"
         },
-        "note": "Two loop-exit tests plus five predicted serial cycles per cleared bit. With BM=0 it beats fixed 25-cycle popcount2x32 for K<=4."
+        "note": "Two loop-exit tests plus five predicted serial cycles per cleared bit. With BM=0 it beats fixed 23-cycle popcount2x32 for K<=4 (K=4 gives 22; K=5 gives 27)."
       }
     },
     {
@@ -3844,7 +3844,7 @@
       ],
       "status": "implemented-distribution-profile",
       "preconditions": [
-        "choose this profile when hi===0 exceeds about 18.2% under the current serial ledger or measured emitted-code evidence favors it",
+        "choose this profile when hi===0 exceeds about 22.2% under the current serial ledger or measured emitted-code evidence favors it",
         "use fixed-cost popcount2x32 when upper-lane occupancy is usually nonzero"
       ],
       "cycleCount": {
@@ -3852,8 +3852,8 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
         "minCycles": 16,
-        "maxCycles": 27,
-        "note": "hi===0 path remains branch/test + one 14-cycle SWAR popcount. hi!==0 uses the fused 25-cycle two-lane path plus branch/test. Break-even against fixed 25-cycle popcount2x32 occurs when hi===0 exceeds 2/11 (~18.2%) under this serial ledger."
+        "maxCycles": 25,
+        "note": "hi===0 remains branch/test + one 14-cycle SWAR popcount. hi!==0 uses the 23-cycle nibble-fused two-lane path plus branch/test. Break-even against fixed 23-cycle popcount2x32 occurs when hi===0 exceeds 2/9 (~22.2%)."
       }
     },
     {
@@ -3873,8 +3873,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 25,
-        "note": "Both lanes perform SWAR through byte-local counts, then add byte counts before one shared IMUL/shift accumulation. Each per-lane byte count is <=8, so the <=16 byte sums cannot carry across bytes."
+        "cycles": 23,
+        "note": "Each lane performs SWAR through 4-bit local counts, then lanes are added while every nibble is <=8. One shared byte-collapse plus IMUL/shift finishes the exact count."
       }
     },
     {
@@ -5447,6 +5447,24 @@
           "before": "3 + N*(2L+3) + C*(2L+8) + M*(2S+1)",
           "after": "3 + (N-1)*(2L+3) + C*(2L+8) + M*(2S+1)",
           "mechanism": "same first-entry seeding deletes two candidate loads plus control on every nonempty call"
+        }
+      ]
+    },
+    {
+      "id": "round-065",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "popcount2x32",
+          "before": "25 fixed cycles",
+          "after": "23 fixed cycles",
+          "mechanism": "fuse the lanes after 4-bit counts, then perform byte collapse once"
+        },
+        {
+          "function": "popcount2x32SparseHigh",
+          "before": "16-cycle hi==0 / 27-cycle hi!=0",
+          "after": "16-cycle hi==0 / 25-cycle hi!=0",
+          "mechanism": "reuse the earlier nibble-stage fusion on the nonzero-high path"
         }
       ]
     }

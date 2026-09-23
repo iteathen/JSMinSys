@@ -81,7 +81,7 @@
         "popcount32Sparse",
         "popcount2x32SparseBits"
       ],
-      "note": "Exact popcount now has fixed SWAR, upper-lane-distribution, hot high<=10 table, and set-bit-sparsity profiles. Sparse loops keep K and branch-mispredict penalties explicit; use them only when the expected distribution beats the fixed SWAR ledger."
+      "note": "Exact popcount has fixed SWAR, set-bit-sparse, high-lane-distribution, and hot high<=10 table profiles. The fixed two-lane path now fuses lanes at the nibble-count stage and collapses bytes only once."
     },
     {
       "id": 5,

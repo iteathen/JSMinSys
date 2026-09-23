@@ -151,26 +151,30 @@ export function popcount2x32SparseHigh(lo, hi) {
   let a = lo;
   a = a - ((a >>> 1) & 0x55555555);
   a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
-  a = (a + (a >>> 4)) & 0x0f0f0f0f;
 
   let b = hi;
   b = b - ((b >>> 1) & 0x55555555);
   b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
-  b = (b + (b >>> 4)) & 0x0f0f0f0f;
-  return Math.imul(a + b, 0x01010101) >>> 24;
+
+  const nibbles = a + b;
+  const bytes = (nibbles & 0x0f0f0f0f)
+    + ((nibbles >>> 4) & 0x0f0f0f0f);
+  return Math.imul(bytes, 0x01010101) >>> 24;
 }
 
 export function popcount2x32(lo, hi) {
   let a = lo;
   a = a - ((a >>> 1) & 0x55555555);
   a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
-  a = (a + (a >>> 4)) & 0x0f0f0f0f;
 
   let b = hi;
   b = b - ((b >>> 1) & 0x55555555);
   b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
-  b = (b + (b >>> 4)) & 0x0f0f0f0f;
-  return Math.imul(a + b, 0x01010101) >>> 24;
+
+  const nibbles = a + b;
+  const bytes = (nibbles & 0x0f0f0f0f)
+    + ((nibbles >>> 4) & 0x0f0f0f0f);
+  return Math.imul(bytes, 0x01010101) >>> 24;
 }
 
 export function fillPopcount10Table32(table) {
