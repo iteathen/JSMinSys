@@ -47,7 +47,7 @@ function playableCell(g,words,offset,cell){
 // opponent passes separate preserves the cheap early-terminal path while still
 // eliminating the duplicate singleton scans formerly done by fork derivation.
 function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,player,bits,scratch,storeThreats){
-  bits.fill(0);
+  for(let w=0;w<bits.length;w+=1)bits[w]=0;
   const coord=offset+(player?g.p1Offset:g.p0Offset);
   let immediate=0,any=0;
   for(let i=0;i<basisSize;i+=1){
@@ -85,7 +85,7 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
   const moverBits=mover?p1Bits:p0Bits,attackerBits=mover?p0Bits:p1Bits;
   const moverCoord=offset+(mover?g.p1Offset:g.p0Offset),attackerCoord=offset+(mover?g.p0Offset:g.p1Offset);
-  targets.fill(0);
+  for(let c=0;c<g.columns;c+=1)targets[c]=0;
 
   // A second basis pass handles both the mover minimal-pair guard and the
   // opponent's playable pair-to-fork precursor relation.
