@@ -23,7 +23,7 @@ export function fillReflect3Tables32(tables, columns) {
         const fieldBit = sourceBit - column * 3;
         const targetColumn = columns - 1 - column;
         const targetBit = targetColumn * 3 + fieldBit;
-        reflected = (reflected | ((1 << targetBit) >>> 0)) >>> 0;
+        reflected |= 1 << targetBit;
       }
       tables[base + value] = reflected;
     }
@@ -43,18 +43,18 @@ export function reflectPacked3x32(code, tables, rankMask) {
 
 export function reflectPacked3Direct32(code, columns, rankShift) {
   const rank = code >>> rankShift;
-  let reflected = (rank << rankShift) >>> 0;
+  let reflected = rank << rankShift;
   let sourceShift = 0;
   const lastColumn = columns - 1;
   let targetShift = (lastColumn << 1) + lastColumn;
 
   for (let column = 0; column < columns; column += 1) {
     const value = (code >>> sourceShift) & 7;
-    reflected = (reflected | (value << targetShift)) >>> 0;
+    reflected |= value << targetShift;
     sourceShift += 3;
     targetShift -= 3;
   }
-  return reflected;
+  return reflected >>> 0;
 }
 
 export function canonicalMin32(value, reflected) {
