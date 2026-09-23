@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "implementation-in-progress",
   "rule": "Stop implementation when a required primitive is not present in the admitted operation/capability set.",
   "functions": [
@@ -484,6 +484,199 @@
         "+"
       ],
       "status": "implemented"
+    },
+    {
+      "name": "shl2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "===",
+        "<",
+        "<<",
+        ">>>",
+        "|",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "ushr2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "===",
+        "<",
+        "<<",
+        ">>>",
+        "|",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "add2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "multiword-add-sub",
+      "primitives": [
+        "+",
+        "<",
+        "?:",
+        ">>>",
+        "ST32",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "sub2x32Into",
+      "source": "src/word64x32.mjs",
+      "block": "multiword-add-sub",
+      "primitives": [
+        "-",
+        "<",
+        "?:",
+        ">>>",
+        "ST32",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "firstSetBitIndex2x32",
+      "source": "src/word64x32.mjs",
+      "block": "first-set-bit",
+      "primitives": [
+        "!==",
+        "-",
+        "&",
+        "Math.clz32",
+        "+"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "clearLowestSetBit32",
+      "source": "src/word64x32.mjs",
+      "block": "next-set-bit",
+      "primitives": [
+        "&",
+        "-",
+        ">>>"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "cardinalityClass2x32",
+      "source": "src/word64x32.mjs",
+      "block": "first-next-set-bit",
+      "primitives": [
+        "|",
+        "===",
+        "!==",
+        "&&",
+        "?:",
+        "&",
+        "-"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "popcount2x32",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        ">>>",
+        "-",
+        "&",
+        "+",
+        "=",
+        "Math.imul"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "playableColumn32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        "LD32",
+        "<"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "decodeColumn32",
+      "source": "src/indexed32.mjs",
+      "block": "coordinate-decode",
+      "primitives": [
+        "%"
+      ],
+      "status": "implemented-reference-anti-candidate"
+    },
+    {
+      "name": "decodeRow32",
+      "source": "src/indexed32.mjs",
+      "block": "coordinate-decode",
+      "primitives": [
+        "/",
+        "Math.floor"
+      ],
+      "status": "implemented-reference-anti-candidate"
+    },
+    {
+      "name": "isPowerOfTwo32",
+      "source": "src/capacity32.mjs",
+      "block": "capacity-growth-rehash",
+      "primitives": [
+        ">",
+        "&",
+        "-",
+        "===",
+        "&&"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "nextPowerOfTwo32",
+      "source": "src/capacity32.mjs",
+      "block": "capacity-growth-rehash",
+      "primitives": [
+        "<",
+        "<<=",
+        "=",
+        ">>>"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "rehashOverwrite32",
+      "source": "src/capacity32.mjs",
+      "block": "capacity-growth-rehash",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "===",
+        "&",
+        "+",
+        "=",
+        "<"
+      ],
+      "status": "implemented"
+    }
+  ],
+  "deferred": [
+    {
+      "name": "allocateTypedCapacity",
+      "block": "capacity-growth-rehash",
+      "missingPrimitives": [
+        "new / typed-array construction"
+      ],
+      "reason": "Dynamic storage allocation is not in the admitted execution primitive list. Rehash into caller-provided storage is implemented; allocation is deferred for primitive-admission review.",
+      "status": "deferred-missing-primitive"
     }
   ]
 }
