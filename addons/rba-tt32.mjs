@@ -97,9 +97,10 @@ export function rbaTtSignal32(t,q){if(!t.live[q])return 0;return intrusiveEnqueu
 export function rbaTtTakeEvent32(t){const q=t.control[RBA_TT_EVENT_HEAD];if(q===-1)return -1;if(t.eventGeneration[q]!==t.generation[q]||!t.live[q]){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}return intrusivePopHeadStamped32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember);}
 export function rbaTtTighten32(t,q,lo,hi){
   if(lo<1||hi>3||lo>hi||(lo|0)!==lo||(hi|0)!==hi)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
-  if(lo<t.lower[q])lo=t.lower[q];if(hi>t.upper[q])hi=t.upper[q];
+  const oldLo=t.lower[q],oldHi=t.upper[q];
+  if(lo<oldLo)lo=oldLo;if(hi>oldHi)hi=oldHi;
   if(lo>hi)return rbaTtFail32(t,RBA_TT_ERR_CONFLICT);
-  if(lo===t.lower[q]&&hi===t.upper[q])return 1;t.lower[q]=lo;t.upper[q]=hi;if(lo===hi)t.exact[q]=lo;rbaTtSignal32(t,q);return 1;
+  if(lo===oldLo&&hi===oldHi)return 1;t.lower[q]=lo;t.upper[q]=hi;if(lo===hi)t.exact[q]=lo;rbaTtSignal32(t,q);return 1;
 }
 export function rbaTtSetExact32(t,q,v){return rbaTtTighten32(t,q,v,v);}
 function releaseEdge(t,e){const child=t.child[e];if(child<0)return 0;if(t.edgeAttached[e]){const p=t.edgePrev[e],n=t.edgeNext[e];if(p===-1)t.parentHead[child]=n;else t.edgeNext[p]=n;if(n!==-1)t.edgePrev[n]=p;t.edgeAttached[e]=0;}t.child[e]=-1;rbaTtRelease32(t,child,t.childGeneration[e]);return 1;}
@@ -126,19 +127,20 @@ export function rbaTtAttachDependencies32(t,q){
 }
 export function rbaTtReconcile32(t,q,minimize){
   if(t.phase[q]!==3||(minimize!==0&&minimize!==1))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
-  const base=q*t.edgeCapacity;let lo=minimize?4:0,hi=lo;
-  for(let i=0;i<t.count[q];i+=1){const e=base+i,child=t.child[e];let a=t.edgeLower[e],b=t.edgeUpper[e];
+  const base=q*t.edgeCapacity,count=t.count[q],qLo=t.lower[q],qHi=t.upper[q];let lo=minimize?4:0,hi=lo;
+  for(let i=0;i<count;i+=1){const e=base+i,child=t.child[e];let a=t.edgeLower[e],b=t.edgeUpper[e];
     if(child>=0){if(t.lower[child]>a)a=t.lower[child];if(t.upper[child]<b)b=t.upper[child];}
-    if(minimize){if(t.lower[q]>a)a=t.lower[q];}else if(t.upper[q]<b)b=t.upper[q];
+    if(minimize){if(qLo>a)a=qLo;}else if(qHi<b)b=qHi;
     if(a>b)return rbaTtFail32(t,RBA_TT_ERR_CONFLICT);t.edgeLower[e]=a;t.edgeUpper[e]=b;
     if(minimize){if(a<lo)lo=a;if(b<hi)hi=b;}else{if(a>lo)lo=a;if(b>hi)hi=b;}
     if(child>=0&&!rbaTtTighten32(t,child,a,b))return 0;
   }
   if(!rbaTtTighten32(t,q,lo,hi))return 0;
-  for(let i=0;i<t.count[q];i+=1){const e=base+i,child=t.child[e];if(child<0)continue;const a=t.edgeLower[e],b=t.edgeUpper[e];if(a===b||(minimize?a>t.upper[q]:b<t.lower[q]))releaseEdge(t,e);}
+  const tightenedLo=t.lower[q],tightenedHi=t.upper[q];
+  for(let i=0;i<count;i+=1){const e=base+i,child=t.child[e];if(child<0)continue;const a=t.edgeLower[e],b=t.edgeUpper[e];if(a===b||(minimize?a>tightenedHi:b<tightenedLo))releaseEdge(t,e);}
   return t.exact[q];
 }
-export function rbaTtEnqueueDependencies32(t,q){const base=q*t.edgeCapacity;let n=0;for(let i=0;i<t.count[q];i+=1){const child=t.child[base+i];if(child>=0)n+=rbaTtEnqueue32(t,child);}return n;}
-export function rbaTtSignalParents32(t,q){let n=0;for(let e=t.parentHead[q];e!==-1;e=t.edgeNext[e])n+=rbaTtSignal32(t,Math.floor(e/t.edgeCapacity));return n;}
+export function rbaTtEnqueueDependencies32(t,q){const base=q*t.edgeCapacity,count=t.count[q];let n=0;for(let i=0;i<count;i+=1){const child=t.child[base+i];if(child>=0)n+=rbaTtEnqueue32(t,child);}return n;}
+export function rbaTtSignalParents32(t,q){let n=0;for(let e=t.parentHead[q];e!==-1;e=t.edgeNext[e])n+=rbaTtSignal32(t,(e/t.edgeCapacity)|0);return n;}
 export function rbaTtDetachDependencies32(t,q){const base=q*t.edgeCapacity,n=t.count[q];t.count[q]=0;for(let i=0;i<n;i+=1)releaseEdge(t,base+i);t.phase[q]=4;rbaTtRecycle32(t,q);return n;}
 export function rbaTtMarkDone32(t){Atomics.store(t.control,RBA_TT_DONE,1);Atomics.add(t.control,RBA_TT_WAKE,1);Atomics.notify(t.control,RBA_TT_WAKE);return 1;}
