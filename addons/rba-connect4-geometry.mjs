@@ -1,9 +1,10 @@
 // COLD Connect4 RBA geometry. Board dimensions are selected at application
 // initialization and remain invariant for the prepared execution instance.
 // Hot state stores one uint32 height per column; no packed-height width limit.
-export function prepareConnect4RbaGeometry({columns,rows,actionOrder}={}) {
-  if(!Number.isSafeInteger(columns)||columns<1||!Number.isSafeInteger(rows)||rows<1)
-    throw new RangeError('invalid Connect4 dimensions');
+export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializationBudgetBytes=2097152}={}) {
+  if(!Number.isSafeInteger(columns)||columns<1||!Number.isSafeInteger(rows)||rows<1||
+     !Number.isSafeInteger(specializationBudgetBytes)||specializationBudgetBytes<0)
+    throw new RangeError('invalid Connect4 dimensions/profile budget');
   const cellCount=columns*rows;
   if(!Number.isSafeInteger(cellCount)||cellCount>=0x40000000)
     throw new RangeError('Connect4 dimensions exceed uint32 RBA profile');
@@ -68,6 +69,33 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder}={}) {
     }
   }
 
+
+  let removeByCell=null,subsetTable=null,specializationBytes=0;
+  const removeBytes=cellCount*shapeCount*4;
+  if(removeBytes<=specializationBudgetBytes){
+    removeByCell=new Int32Array(cellCount*shapeCount);
+    for(let cell=0;cell<cellCount;cell+=1)for(let id=0;id<shapeCount;id+=1){
+      const size=shapeSize[id],base=id*4;let pos=-1;
+      for(let i=0;i<size;i+=1)if(shapeCells[base+i]===cell){pos=i;break;}
+      removeByCell[cell*shapeCount+id]=pos<0?id:removeAt[id*4+pos];
+    }
+    specializationBytes+=removeBytes;
+  }
+  const subsetBytes=shapeCount*shapeCount*4;
+  if(specializationBytes+subsetBytes<=specializationBudgetBytes){
+    subsetTable=new Uint32Array(shapeCount*shapeCount);
+    for(let a=0;a<shapeCount;a+=1)for(let b=0;b<shapeCount;b+=1){
+      if(shapeSize[a]>shapeSize[b])continue;
+      const ab=a*4,bb=b*4;let ok=1;
+      for(let i=0;i<shapeSize[a];i+=1){const cell=shapeCells[ab+i];let found=0;
+        for(let j=0;j<shapeSize[b];j+=1)if(shapeCells[bb+j]===cell){found=1;break;}
+        if(!found){ok=0;break;}
+      }
+      subsetTable[a*shapeCount+b]=ok;
+    }
+    specializationBytes+=subsetBytes;
+  }
+
   let order;
   if(actionOrder!==undefined){
     if(!(actionOrder instanceof Uint32Array)&&!Array.isArray(actionOrder))throw new TypeError('actionOrder must be numeric');
@@ -84,8 +112,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder}={}) {
 
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
-    lineColumn,lineRow,lineShape,shapeSize,shapeCells,reflect,removeAt,singletonByCell,
-    actionOrder:order,priorityByColumn,mirrorColumn};
+    lineColumn,lineRow,lineShape,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,
+    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn};
 }
 
 export function prepareConnect4RbaCoordinateScratch(g){
