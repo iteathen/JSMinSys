@@ -212,6 +212,12 @@ export function reflectPacked3Columns10(code) {
   return high | (((x << 18) | (x >>> 6)) & 0x3fffffc0);
 }
 
+export function canonicalPrimaryCompare32(value, reflected) {
+  if (value < reflected) return -1;
+  if (value > reflected) return 1;
+  return 0;
+}
+
 export function canonicalMin32(value, reflected) {
   return value <= reflected ? value : reflected;
 }

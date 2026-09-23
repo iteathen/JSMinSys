@@ -261,12 +261,13 @@
         "reflectPacked3Columns8",
         "reflectPacked3Columns9",
         "reflectPacked3Columns10",
+        "canonicalPrimaryCompare32",
         "canonicalMin32",
         "fillReflectExactSmall32",
         "reflectPacked3ExactTable32",
         "advanceMirroredSupport32"
       ],
-      "note": "Reflection may be recomputed by configured register/table profiles or maintained incrementally by recursion. A caller-owned reflected-support scalar advances by one mirrored delta ADD and needs no undo; emitted-code qualification must reject the profile if added live scalars spill."
+      "note": "Reflection may be recomputed by configured register/table profiles or maintained incrementally by recursion. canonicalPrimaryCompare32 enables primary-first orbit routing: a cheap exact coordinate can select orientation before expensive secondary reflection/comparison, with secondary tie-break work only when required. A caller-owned reflected-support scalar may advance by one ADD and needs no undo."
     },
     {
       "id": 13,

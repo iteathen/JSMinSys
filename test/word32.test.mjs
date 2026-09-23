@@ -408,7 +408,7 @@ import {
   STATE_SUPPORT_CODE,
   restoreCallerOwnedResidualFrame32,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, publish3x32Locator32, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, publish3x32Locator32, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalPrimaryCompare32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1811,6 +1811,16 @@ test('direct triple power-of-two index preserves primary collision partition', (
     if (seen[direct] < 0) seen[direct] = oldIndex;
     else assert.equal(seen[direct], oldIndex);
   }
+});
+
+test('primary canonical comparison routes expensive secondary work', () => {
+  assert.equal(canonicalPrimaryCompare32(3, 9), -1);
+  assert.equal(canonicalPrimaryCompare32(9, 3), 1);
+  assert.equal(canonicalPrimaryCompare32(7, 7), 0);
+  assert.equal(
+    canonicalPrimaryCompare32(0x7fffffff, 0x7fffffff),
+    0,
+  );
 });
 
 test('mix and reflection blocks', () => {

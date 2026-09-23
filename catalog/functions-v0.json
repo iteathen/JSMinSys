@@ -1,5 +1,5 @@
 {
-  "version": "0.104.0",
+  "version": "0.105.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4218,6 +4218,33 @@
       }
     },
     {
+      "name": "canonicalPrimaryCompare32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "<",
+        ">"
+      ],
+      "status": "implemented-primary-first-canonical-route",
+      "preconditions": [
+        "value/reflected are the cheapest exact primary coordinates of two symmetry-related representations",
+        "negative result selects the original orientation; positive selects reflected; zero requires secondary tie-break comparison",
+        "the caller may skip all secondary reflection/comparison only when a nonzero primary result already fixes the canonical orientation",
+        "secondary transformed values needed for output are still constructed when the reflected orientation wins",
+        "the primary coordinate order plus secondary tie-break defines the same complete two-element orbit partition required by the integration"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "originalFirstPredicted": 2,
+        "reflectedFirstPredicted": 4,
+        "tiePredicted": 4,
+        "expression": "first comparison/control + (value >= reflected ? second comparison/control : 0)",
+        "note": "This comparator is not locally cheaper than a single select; its value is gating expensive secondary reflection/comparison at the enclosing canonicalization unit."
+      }
+    },
+    {
       "name": "canonicalMin32",
       "source": "src/mix32.mjs",
       "block": "canonical-reflection",
@@ -6809,11 +6836,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 235,
+    "functionsImplemented": 236,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 235,
+    "functionsWithCycleCount": 236,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8700,6 +8727,18 @@
           "before": "every incidence entry reloads words[wordIndex] even when adjacent entries address the same immutable word",
           "after": "only the first entry of each consecutive word-index run loads storage; following entries reuse the caller-owned scalar",
           "mechanism": "preserve the already-loaded immutable word across prepared incidence entries whose sort order groups equal word indices"
+        }
+      ]
+    },
+    {
+      "id": "round-098",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "symmetry canonicalization order",
+          "before": "residual classes are reflected and compared before support decides the final gameplay-key orbit representative",
+          "after": "packed support is compared first; original-support minimum skips residual reflection entirely, reflected-support minimum skips residual comparison, and only support ties compare residual content",
+          "mechanism": "order canonical coordinates by cheapest discriminator while preserving the same complete two-element orbit and exact action transport"
         }
       ]
     }
