@@ -37,3 +37,29 @@ export function reduceMinIntervals7x32Into(lowers, uppers, offset, count, out, o
   out[outOffset + 1] = upper;
   return outOffset;
 }
+
+export function reduceMaxIntervals32Into(lowers, uppers, offset, count, out, outOffset) {
+  let lower = lowers[offset];
+  let upper = uppers[offset];
+  for (let index = 1; index < count; index += 1) {
+    const at = offset + index;
+    if (lowers[at] > lower) lower = lowers[at];
+    if (uppers[at] > upper) upper = uppers[at];
+  }
+  out[outOffset] = lower;
+  out[outOffset + 1] = upper;
+  return outOffset;
+}
+
+export function reduceMinIntervals32Into(lowers, uppers, offset, count, out, outOffset) {
+  let lower = lowers[offset];
+  let upper = uppers[offset];
+  for (let index = 1; index < count; index += 1) {
+    const at = offset + index;
+    if (lowers[at] < lower) lower = lowers[at];
+    if (uppers[at] < upper) upper = uppers[at];
+  }
+  out[outOffset] = lower;
+  out[outOffset + 1] = upper;
+  return outOffset;
+}
