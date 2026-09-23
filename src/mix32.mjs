@@ -129,8 +129,7 @@ export function reflectPacked3Columns9(code) {
 }
 
 export function reflectPacked3Columns10(code) {
-  let high = code >>> 24;
-  high = ((high << 3) | (high >>> 3)) & 0x3f;
+  const high = (code >>> 27) | ((code >>> 21) & 0x38);
   let x = ((code & 0x1c71c7) << 3) | ((code & 0xe38e38) >>> 3);
   x = ((x & 0x03f03f) << 6) | ((x & 0xfc0fc0) >>> 6);
   x = ((x << 12) | (x >>> 12)) & 0xffffff;
