@@ -1,27 +1,25 @@
 # Deferred functions requiring primitive review
 
-These functions are deliberately excluded from the active implementation pass.
+The deferred queue is currently **empty**.
 
-The rule is:
+## Resolved items
 
-> A missing primitive does not stop independent catalog implementation. Record the blocked function here, complete everything expressible with the admitted vocabulary, then review this queue as a separate primitive-admission phase.
+### allocateTypedCapacity
 
-## allocateTypedCapacity
+**Disposition:** admitted and implemented.
 
-**Block:** capacity growth / rehash  
-**Status:** deferred — missing primitive  
-**Missing capability:** dynamic typed-storage construction (`new Uint32Array(...)` or equivalent allocation)
+JSMinSys now admits the specific operation `Uint32Array.construct`, realized as `new Uint32Array(length)`.
 
-Already implemented without allocation:
+Its cost is not represented as a cheap constant. NEES operation `memory.allocate.typed.u32` accounts for it as:
 
-- `isPowerOfTwo32`
-- `nextPowerOfTwo32`
-- `rehashOverwrite32` into caller-provided storage
+```text
+TYPED_ARRAY_ALLOC_U32(length, typedArrayAllocationPath, pageState, gcState)
+```
 
-The deferred question is therefore narrow: whether JSMinSys itself needs a storage-allocation primitive, or whether capacity allocation belongs entirely outside JMS-SEALED execution and storage should always be supplied by the owning boundary.
+The application author remains responsible for deciding whether that cost is worth paying.
 
-## Rejected as unnecessary: Number.isInteger
+### Number.isInteger
 
-`Number.isInteger` is not deferred for primitive admission.
+**Disposition:** not required.
 
-The checked application boundary may validate arbitrary JavaScript input, but JMS-SEALED internal indices enter with an established integer-domain invariant. The requirement disappears at the restricted boundary, so no JSMinSys primitive is required.
+Checked integrality remains an external-boundary concern; JMS-SEALED internal indices enter with an established integer-domain invariant.
