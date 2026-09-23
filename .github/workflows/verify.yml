@@ -18,6 +18,7 @@ jobs:
         with:
           node-version: '26'
       - run: node tools/verify-catalog.mjs
+      - run: node tools/audit-runtime-geometry.mjs
       - run: node --test test/*.test.mjs
 
   schema:
