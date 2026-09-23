@@ -48,3 +48,11 @@ export function cardinalityClass32(word) {
   return (word & (word - 1)) === 0 ? 1 : 2;
 }
 
+export function isolatedBitIndex32(bit) {
+  return 31 - Math.clz32(bit);
+}
+
+export function isolatedHighBitIndex32(bit) {
+  return 63 - Math.clz32(bit);
+}
+

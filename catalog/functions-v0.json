@@ -1,5 +1,5 @@
 {
-  "version": "0.48.0",
+  "version": "0.49.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -252,6 +252,50 @@
         "kind": "fixed",
         "cycles": 4,
         "note": "Branchless zero/nonzero handling: zero naturally maps to -1 through clz32(0)=32."
+      }
+    },
+    {
+      "name": "isolatedBitIndex32",
+      "source": "src/word32.mjs",
+      "block": "first-next-set-bit",
+      "primitives": [
+        "-",
+        "Math.clz32"
+      ],
+      "status": "implemented-caller-isolated-profile",
+      "preconditions": [
+        "bit is nonzero and has exactly one set bit",
+        "the caller already isolated this bit for independent iteration/removal work",
+        "the caller does not compute bit = word & -word solely to call this profile when claiming the governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "CLZ + subtract. Caller-supplied isolated bit removes the negate/AND isolation repeated by firstSetBitIndex32."
+      }
+    },
+    {
+      "name": "isolatedHighBitIndex32",
+      "source": "src/word32.mjs",
+      "block": "first-next-set-bit",
+      "primitives": [
+        "-",
+        "Math.clz32"
+      ],
+      "status": "implemented-caller-isolated-profile",
+      "preconditions": [
+        "bit is a nonzero isolated bit from the high 32-bit lane",
+        "the caller already isolated this bit for independent iteration/removal work",
+        "global indices for the high lane are 32..63"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "63 - clz32(bit) folds the +32 lane offset into the same subtract used for local indexing."
       }
     },
     {
@@ -2752,11 +2796,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 108,
+    "functionsImplemented": 110,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 108,
+    "functionsWithCycleCount": 110,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3725,6 +3769,24 @@
           "before": "cardinalityClass2x32 with hi==0: 4-8 cycles",
           "after": "2-6 cycles",
           "mechanism": "initialization-selected one-lane set representation deletes the high-lane emptiness test"
+        }
+      ]
+    },
+    {
+      "id": "round-042",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "isolatedBitIndex32",
+          "before": "firstSetBitIndex32: 4 cycles when caller already holds lsb",
+          "after": "2 cycles",
+          "mechanism": "reuse caller-isolated bit; delete redundant negate/AND isolation"
+        },
+        {
+          "function": "isolatedHighBitIndex32",
+          "before": "two-lane/high indexing requires isolation plus lane selection/offset",
+          "after": "2 cycles after caller isolation",
+          "mechanism": "fold high-lane +32 offset into constant 63 - clz32(bit)"
         }
       ]
     }

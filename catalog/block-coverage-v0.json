@@ -51,13 +51,15 @@
       "status": "implemented",
       "functions": [
         "firstSetBitIndex32",
+        "isolatedBitIndex32",
+        "isolatedHighBitIndex32",
         "firstSetBitIndex2x32",
         "clearLowestSetBit32",
         "cardinalityClass32",
         "cardinalityClass2x32",
         "clearLowestSetBitI32"
       ],
-      "note": "One-lane and two-lane cardinality classifiers are separately costed. Initialization selects cardinalityClass32 when the relevant configured set fits one lane; two-lane classification remains for sets whose occupancy can span both lanes."
+      "note": "General first-set-bit, caller-isolated-bit, clear-lowest-bit, and one/two-lane cardinality profiles coexist. Hot set-bit iteration should reuse an already-isolated lsb rather than recomputing isolation inside an index helper; high-lane global indexing folds the +32 offset into a constant subtract."
     },
     {
       "id": 4,

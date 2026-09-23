@@ -13,6 +13,8 @@ import {
   popcount32,
   subset32,
   cardinalityClass32,
+  isolatedBitIndex32,
+  isolatedHighBitIndex32,
 } from '../src/word32.mjs';
 import {
   and2x32Into,
@@ -657,6 +659,15 @@ test('move-slot index space removes hot physical-column remap', () => {
   assert.equal(landing[slot], 11);
   assert.equal(undoMove32(state, landing, slot, 7, 42, supportDelta), 4);
   assert.equal(landing[slot], 4);
+});
+
+test('isolated-bit index profiles reuse caller isolation', () => {
+  assert.equal(isolatedBitIndex32(1), 0);
+  assert.equal(isolatedBitIndex32(1 << 17), 17);
+  assert.equal(isolatedBitIndex32(0x80000000), 31);
+  assert.equal(isolatedHighBitIndex32(1), 32);
+  assert.equal(isolatedHighBitIndex32(1 << 9), 41);
+  assert.equal(isolatedHighBitIndex32(0x80000000), 63);
 });
 
 test('one-lane cardinality classification', () => {
