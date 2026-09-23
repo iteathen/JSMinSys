@@ -850,6 +850,24 @@ test('lazy frontier compaction skips accepted-prefix rewrites', () => {
   assert.deepEqual([...hiMaxLazy.slice(0, max2Actual)], [...hiMaxBase.slice(0, max2Expected)]);
 });
 
+test('lazy frontier normalizers seed the first accepted entry', () => {
+  const oneMin = new Int32Array([0x80000000]);
+  const oneMax = new Int32Array([0x80000000]);
+  assert.equal(normalizeMinimalI32LazyInPlace(oneMin, 1), 1);
+  assert.equal(normalizeMaximalI32LazyInPlace(oneMax, 1), 1);
+  assert.equal(oneMin[0], -2147483648);
+  assert.equal(oneMax[0], -2147483648);
+
+  const loMin = new Int32Array([0x80000000]);
+  const hiMin = new Int32Array([1]);
+  const loMax = new Int32Array([0x80000000]);
+  const hiMax = new Int32Array([1]);
+  assert.equal(normalizeMinimal2xI32LazyInPlace(loMin, hiMin, 1), 1);
+  assert.equal(normalizeMaximal2xI32LazyInPlace(loMax, hiMax, 1), 1);
+  assert.deepEqual([...loMin, ...hiMin], [-2147483648, 1]);
+  assert.deepEqual([...loMax, ...hiMax], [-2147483648, 1]);
+});
+
 test('search scalar blocks', () => {
   assert.equal(negateScore32(1), -1);
   assert.equal(raiseLowerBound32(-1, 1), 1);

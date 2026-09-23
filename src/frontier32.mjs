@@ -139,7 +139,7 @@ export function normalizeMaximalI32InPlace(words, length) {
 }
 
 export function normalizeMinimalI32LazyInPlace(words, length) {
-  let index = 0;
+  let index = 1;
 
   prefix: for (; index < length; index += 1) {
     const candidate = words[index];
@@ -166,7 +166,7 @@ export function normalizeMinimalI32LazyInPlace(words, length) {
 }
 
 export function normalizeMaximalI32LazyInPlace(words, length) {
-  let index = 0;
+  let index = 1;
 
   prefix: for (; index < length; index += 1) {
     const candidate = words[index];
@@ -193,7 +193,7 @@ export function normalizeMaximalI32LazyInPlace(words, length) {
 }
 
 export function normalizeMinimal2xI32LazyInPlace(lo, hi, length) {
-  let index = 0;
+  let index = 1;
 
   prefix: for (; index < length; index += 1) {
     const candidateLo = lo[index];
@@ -228,7 +228,7 @@ export function normalizeMinimal2xI32LazyInPlace(lo, hi, length) {
 }
 
 export function normalizeMaximal2xI32LazyInPlace(lo, hi, length) {
-  let index = 0;
+  let index = 1;
 
   prefix: for (; index < length; index += 1) {
     const candidateLo = lo[index];

@@ -1,5 +1,5 @@
 {
-  "version": "0.70.0",
+  "version": "0.71.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2402,10 +2402,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + N*(L+3) + C*(L+5) + M*(S+1)",
-        "hotL1Predicted": "3 + 7*N + 9*C + 1.5*M",
-        "hotL2Predicted": "3 + 15*N + 17*C + 1.5*M",
-        "note": "M is accepted entries moved after the first rejection. Accepted prefix entries are never rewritten; if no rejection occurs M=0. N/C terms are conservatively left equal to the ordinary one-lane ledger."
+        "expression": "3 + (N-1)*(L+3) + C*(L+5) + M*(S+1)",
+        "hotL1Predicted": "3 + 7*(N-1) + 9*C + 1.5*M",
+        "hotL2Predicted": "3 + 15*(N-1) + 17*C + 1.5*M",
+        "note": "length>0 proves entry 0 is retained without inspection. M counts accepted entries moved after the first rejection; accepted prefix entries are never rewritten."
       }
     },
     {
@@ -2431,10 +2431,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + N*(L+3) + C*(L+5) + M*(S+1)",
-        "hotL1Predicted": "3 + 7*N + 9*C + 1.5*M",
-        "hotL2Predicted": "3 + 15*N + 17*C + 1.5*M",
-        "note": "Lazy compaction writes only accepted entries after the first rejection; no-rejection inputs perform zero stores."
+        "expression": "3 + (N-1)*(L+3) + C*(L+5) + M*(S+1)",
+        "hotL1Predicted": "3 + 7*(N-1) + 9*C + 1.5*M",
+        "hotL2Predicted": "3 + 15*(N-1) + 17*C + 1.5*M",
+        "note": "length>0 proves entry 0 is retained without inspection. M counts accepted entries moved after the first rejection; accepted prefix entries are never rewritten."
       }
     },
     {
@@ -2461,10 +2461,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + N*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
-        "hotL1Predicted": "3 + 11*N + 16*C + 2*M",
-        "hotL2Predicted": "3 + 27*N + 32*C + 2*M",
-        "note": "M is accepted entries that actually move after the first rejection. The accepted prefix incurs no lo/hi stores."
+        "expression": "3 + (N-1)*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 11*(N-1) + 16*C + 2*M",
+        "hotL2Predicted": "3 + 27*(N-1) + 32*C + 2*M",
+        "note": "length>0 proves entry 0 is retained without loading either lane. M counts accepted entries actually moved after the first rejection."
       }
     },
     {
@@ -2491,10 +2491,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + N*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
-        "hotL1Predicted": "3 + 11*N + 16*C + 2*M",
-        "hotL2Predicted": "3 + 27*N + 32*C + 2*M",
-        "note": "Two-lane lazy compaction suppresses all accepted-prefix stores while retaining the same ordered containment comparisons."
+        "expression": "3 + (N-1)*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 11*(N-1) + 16*C + 2*M",
+        "hotL2Predicted": "3 + 27*(N-1) + 32*C + 2*M",
+        "note": "length>0 proves entry 0 is retained without loading either lane. M counts accepted entries actually moved after the first rejection."
       }
     },
     {
@@ -5429,6 +5429,24 @@
           "before": "cardinalityClass2x32: 4-8 cycles",
           "after": "2-6 cycles when the other lane is already known empty",
           "mechanism": "reuse caller-owned lane emptiness proof"
+        }
+      ]
+    },
+    {
+      "id": "round-064",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "normalizeMinimalI32LazyInPlace / normalizeMaximalI32LazyInPlace",
+          "before": "3 + N*(L+3) + C*(L+5) + M*(S+1)",
+          "after": "3 + (N-1)*(L+3) + C*(L+5) + M*(S+1)",
+          "mechanism": "length>0 proves the first ordered entry is accepted; start prefix scan at index 1"
+        },
+        {
+          "function": "normalizeMinimal2xI32LazyInPlace / normalizeMaximal2xI32LazyInPlace",
+          "before": "3 + N*(2L+3) + C*(2L+8) + M*(2S+1)",
+          "after": "3 + (N-1)*(2L+3) + C*(2L+8) + M*(2S+1)",
+          "mechanism": "same first-entry seeding deletes two candidate loads plus control on every nonempty call"
         }
       ]
     }

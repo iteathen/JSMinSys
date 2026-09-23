@@ -236,7 +236,7 @@
         "normalizeMinimal2xI32LazyInPlace",
         "normalizeMaximal2xI32LazyInPlace"
       ],
-      "note": "Frontier normalization now has lane-selected signed profiles and nonempty lazy-compaction variants. Lazy forms leave the accepted prefix untouched and start writes only after the first rejection, replacing the accepted-store count R with moved accepted entries M. Generic profiles remain for empty/unspecialized callers."
+      "note": "Ordered frontier normalization has lane-selected and lazy-compaction profiles. Nonempty lazy variants seed entry 0 as accepted without loading it, then leave the accepted prefix untouched and begin stores only after the first rejection."
     },
     {
       "id": 15,
