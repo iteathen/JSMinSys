@@ -1,5 +1,5 @@
 {
-  "version": "0.22.0",
+  "version": "0.23.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -552,19 +552,40 @@
       "source": "src/mix32.mjs",
       "block": "mix32",
       "primitives": [
-        "|",
         "^",
         ">>>",
-        "=",
-        "Math.imul"
+        "Math.imul",
+        "="
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
+        "cycles": 8,
+        "note": "One odd IMUL plus two invertible xorshifts and final unsigned coercion. Full 32-bit mapping remains bijective; masked bucket avalanche is weaker than mix32Strong."
+      },
+      "preconditions": [
+        "hash output is used as locator/index material, not semantic identity"
+      ]
+    },
+    {
+      "name": "mix32Strong",
+      "source": "src/mix32.mjs",
+      "block": "mix32",
+      "primitives": [
+        "^",
+        ">>>",
+        "Math.imul",
+        "="
+      ],
+      "status": "implemented-strong-alternative",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
         "cycles": 13,
-        "note": "Initial signed coercion removed; first shift/XOR already performs the required 32-bit coercion. Final unsigned coercion retained."
+        "note": "Two-IMUL stronger-avalanche alternative retained for workloads where reduced bucket collisions justify the additional five cycles."
       }
     },
     {
@@ -1360,11 +1381,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 62,
+    "functionsImplemented": 63,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 62,
+    "functionsWithCycleCount": 63,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1785,6 +1806,24 @@
           "before": "8 cycles",
           "after": "7 cycles",
           "mechanism": "detect carry from exact Number sum before typed-store wrap"
+        }
+      ]
+    },
+    {
+      "id": "round-016",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "mix32",
+          "before": "13 cycles",
+          "after": "8 cycles",
+          "mechanism": "remove second avalanche multiply/xorshift round while preserving a bijective 32-bit mapping"
+        },
+        {
+          "function": "mix32Strong",
+          "before": "implicit old mix32",
+          "after": "13 cycles",
+          "mechanism": "retain stronger-avalanche alternative as explicit application choice"
         }
       ]
     }
