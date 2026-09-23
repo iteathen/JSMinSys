@@ -175,8 +175,11 @@
       "status": "implemented",
       "functions": [
         "normalizeMinimal2x32InPlace",
-        "normalizeMaximal2x32InPlace"
-      ]
+        "normalizeMaximal2x32InPlace",
+        "normalizeMinimal2xI32InPlace",
+        "normalizeMaximal2xI32InPlace"
+      ],
+      "note": "Unsigned and signed-bit-pattern ordered antichain profiles are independently costed; signed lanes avoid complement normalization."
     },
     {
       "id": 15,
