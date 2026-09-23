@@ -54,7 +54,7 @@ export function reflectPacked3x16(code, tables) {
   return (
     tables[code & 0xff]
     | tables[0x100 + ((code >>> 8) & 0xff)]
-  ) >>> 0;
+  );
 }
 
 export function reflectPacked3x24(code, tables) {
@@ -62,7 +62,7 @@ export function reflectPacked3x24(code, tables) {
     tables[code & 0xff]
     | tables[0x100 + ((code >>> 8) & 0xff)]
     | tables[0x200 + ((code >>> 16) & 0xff)]
-  ) >>> 0;
+  );
 }
 
 export function reflectPacked3x32(code, tables) {
@@ -71,7 +71,7 @@ export function reflectPacked3x32(code, tables) {
     | tables[0x100 + ((code >>> 8) & 0xff)]
     | tables[0x200 + ((code >>> 16) & 0xff)]
     | tables[0x300 + (code >>> 24)]
-  ) >>> 0;
+  );
 }
 
 export function reflectPacked3Direct32(code, columns, initialTargetShift) {
@@ -85,7 +85,7 @@ export function reflectPacked3Direct32(code, columns, initialTargetShift) {
     sourceShift += 3;
     targetShift -= 3;
   }
-  return reflected >>> 0;
+  return reflected;
 }
 
 export function canonicalMin32(value, reflected) {
