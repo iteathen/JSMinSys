@@ -1,0 +1,215 @@
+{
+  "version": "0.1.0",
+  "source": "catalog/03-blocks.md",
+  "summary": {
+    "catalogBlocks": 20,
+    "completeWithoutNewPrimitive": 19,
+    "deferredMissingPrimitive": 1
+  },
+  "blocks": [
+    {
+      "id": 1,
+      "name": "bit-membership",
+      "status": "implemented",
+      "functions": [
+        "bitTest32",
+        "bitSet32",
+        "bitClear32",
+        "bitToggle32"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "fixed-width-word-composition",
+      "status": "implemented",
+      "functions": [
+        "and2x32Into",
+        "or2x32Into",
+        "xor2x32Into",
+        "zero2x32",
+        "equal2x32",
+        "shl2x32Into",
+        "ushr2x32Into",
+        "add2x32Into",
+        "sub2x32Into"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "first-next-set-bit",
+      "status": "implemented",
+      "functions": [
+        "firstSetBitIndex32",
+        "firstSetBitIndex2x32",
+        "clearLowestSetBit32",
+        "cardinalityClass2x32"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "popcount",
+      "status": "implemented",
+      "functions": [
+        "popcount32",
+        "popcount2x32"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "coordinate-decode",
+      "status": "implemented-reference-anti-candidate",
+      "functions": [
+        "decodeColumn32",
+        "decodeRow32"
+      ],
+      "note": "Retained for comparison/costing; representation redesign should delete it from hot paths when possible."
+    },
+    {
+      "id": 6,
+      "name": "legal-landing-cell",
+      "status": "implemented",
+      "functions": [
+        "landingCell32",
+        "playableColumn32"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "winning-line-test",
+      "status": "implemented",
+      "functions": [
+        "maskContains32",
+        "maskContains2x32"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "apply-undo-state-transition",
+      "status": "implemented",
+      "functions": [
+        "applyMove32",
+        "undoMove32"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "hash-mix32",
+      "status": "implemented",
+      "functions": [
+        "mix32"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "power-of-two-table-indexing",
+      "status": "implemented",
+      "functions": [
+        "powerOfTwoIndex32",
+        "isPowerOfTwo32",
+        "nextPowerOfTwo32"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "transposition-cache-probe",
+      "status": "implemented",
+      "functions": [
+        "ttProbeIndex32",
+        "ttReplace32"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "canonical-reflection-symmetry",
+      "status": "implemented",
+      "functions": [
+        "reflectPacked3x32",
+        "canonicalMin32"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "subset-implication-dominance",
+      "status": "implemented",
+      "functions": [
+        "subset32",
+        "maskContains2x32"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "frontier-antichain-normalization",
+      "status": "implemented",
+      "functions": [
+        "normalizeMinimal2x32InPlace",
+        "normalizeMaximal2x32InPlace"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "residual-transition",
+      "status": "implemented",
+      "functions": [
+        "residualTransition32"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "move-order-selection",
+      "status": "implemented",
+      "functions": [
+        "selectGreater32",
+        "selectLess32",
+        "argMaxPlayable32"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "alpha-beta-bound-update",
+      "status": "implemented",
+      "functions": [
+        "negateScore32",
+        "raiseLowerBound32",
+        "lowerUpperBound32",
+        "cutoff32"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "shared-atomic-claim-release",
+      "status": "implemented",
+      "functions": [
+        "atomicTryClaim32",
+        "atomicRelease32",
+        "atomicExchange32",
+        "atomicAdd32",
+        "atomicSub32"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "shared-queue-enqueue-dequeue",
+      "status": "implemented",
+      "functions": [
+        "queueEnqueue32",
+        "queueDequeue32"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "capacity-growth-rehash",
+      "status": "partially-implemented-deferred",
+      "functions": [
+        "isPowerOfTwo32",
+        "nextPowerOfTwo32",
+        "rehashOverwrite32"
+      ],
+      "deferred": [
+        "allocateTypedCapacity"
+      ],
+      "missingPrimitives": [
+        "new / typed-array construction"
+      ]
+    }
+  ]
+}
