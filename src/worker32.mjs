@@ -133,3 +133,30 @@ export function parkOnWake32(control, wakeIndex, observed, timeout) {
 export function workerStopOrDone32(control, stopIndex, doneIndex) {
   return Atomics.load(control, stopIndex) || Atomics.load(control, doneIndex) ? 1 : 0;
 }
+
+export function publishDependencies32(
+  childOut, generationOut, payload0Out, payload1Out, payload2Out, outOffset,
+  childIn, generationIn, payload0In, payload1In, payload2In, inOffset, count,
+) {
+  for (let index = 0; index < count; index += 1) {
+    const source = inOffset + index;
+    const target = outOffset + index;
+    childOut[target] = childIn[source];
+    generationOut[target] = generationIn[source];
+    payload0Out[target] = payload0In[source];
+    payload1Out[target] = payload1In[source];
+    payload2Out[target] = payload2In[source];
+  }
+  return count;
+}
+
+export function retainFirstRunnableDependency32(execution, resolved, state, children, offset, count, owner, freeValue) {
+  for (let index = 0; index < count; index += 1) {
+    const child = children[offset + index];
+    if (child >= 0 && execution[child] === freeValue && !resolved[child] && !state[child]) {
+      execution[child] = owner;
+      return child;
+    }
+  }
+  return -1;
+}
