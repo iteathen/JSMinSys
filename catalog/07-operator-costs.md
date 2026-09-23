@@ -137,6 +137,53 @@ Sources:
 
 We still need exact 32-bit V8-emitted forms for authoritative JSMinSys entries.
 
+
+## Newly admitted observed-gap operations
+
+The cycle figures below use the Zen 3 reference profile. For source forms that are not a single native instruction, the entry is a decomposition or lower-bound/reference shape rather than a claim of fixed JavaScript latency.
+
+| Source operation | Reference shape / decomposition | Zen 3 cycle characterization | Notes |
+|---|---|---|---|
+| `=` | register move / memory store | **0 effective dependency cycles** if move-eliminated; memory store throughput about **0.5 cycles** for a simple 32-bit store | actual typed-array store depends on address/bounds/JIT path |
+| `+=` | ADD + write-back | **1-cycle ALU core**; memory-resident update adds load/store dependency, with measured Zen 3 memory-RMW latency around **7 cycles** for representative `ADD m32,r32` | register-local form may remain one ADD |
+| `-=` | SUB + write-back | **1-cycle ALU core** + memory cost if resident in memory | exact memory form pending |
+| `*=` | IMUL + write-back | **3-cycle multiply core** + memory cost | exact JS lowering pending |
+| `&=` | AND + write-back | expected **1-cycle ALU core** + memory cost | exact Zen 3/V8 form pending |
+| `|=` | OR + write-back | expected **1-cycle ALU core** + memory cost | exact Zen 3/V8 form pending |
+| `^=` | XOR + write-back | expected **1-cycle ALU core** + memory cost | exact Zen 3/V8 form pending |
+| `<<=` | SHL + write-back | **1-cycle shift core** + memory cost | exact JS form pending |
+| `??` | nullish test + branch/select | **1-cycle-class test** plus control; total variable | branch prediction and value representation dominate |
+| `?.` | nullish test + guarded access | **1-cycle-class test** plus access/control; total variable | property/index access dominates |
+| `instanceof` | type/prototype tests | **variable, multi-operation** | not representable by one stable instruction cost |
+| `typeof` | tag/type discrimination | **variable; lower bound ~1 cycle for a simple tag test** | actual path depends on value representation |
+| `void` | result discard | **0 additional cycles** when the discarded result needs no materialization | operand evaluation still costs whatever it costs |
+| `Math.floor` | V8 `NumberFloor` / Float64 round-down | **0 additional on an already integral/Smi fast path; floating path variable** | V8 explicitly has Smi and Float64 paths |
+| `Math.trunc` | V8 `NumberTrunc` / Float64 round-to-zero | **0 additional on an already integral/Smi fast path; floating path variable** | Float64 path uses a hardware rounding/conversion shape when supported |
+| `Math.ceil` | V8 `Float64Ceil` | **0 additional on Smi fast path; floating path variable** | same qualification rule |
+| `Math.round` | V8 `Float64Round` | **0 additional on Smi fast path; floating path variable** | exact emitted x64 sequence must be captured |
+| `Math.min` | scalar min / compare-select | native scalar double min can be **1 cycle** on Zen 3 | JS NaN/signed-zero semantics may add guards |
+| `Math.max` | scalar max / compare-select | native scalar double max is **1 cycle** on Zen 3 | JS NaN/signed-zero semantics may add guards |
+| `Atomics.load` | sequentially consistent atomic load | **cache/coherence dependent; not assigned a single cycle** | lower bound is a memory load; shared-line state dominates |
+| `Atomics.store` | sequentially consistent atomic store | **cache/coherence dependent; not assigned a single cycle** | ownership/coherence dominates |
+| `Atomics.compareExchange` | locked CMPXCHG-style RMW | representative Zen 3 locked RMW throughput about **7.7–7.8 cycles**, with operand latencies up to roughly **12 cycles** | contention/cache-line migration can be much worse |
+| `Atomics.exchange` | locked XCHG-style RMW | representative Zen 3 throughput about **7.5 cycles**, with address/data dependencies up to roughly **10 cycles** | contention can dominate |
+| `Atomics.add` | locked XADD-style RMW | representative Zen 3 throughput about **7.7–7.8 cycles**, memory dependency around **8 cycles** | coherence/contended cost can be far larger |
+| `Atomics.sub` | locked arithmetic RMW equivalent | use **~8-cycle uncontended locked-RMW class** as provisional reference | exact V8 instruction form pending |
+| `Atomics.wait` | wait/futex-like blocking path | **unbounded / scheduler-scale** | not meaningfully expressible as a fixed CPU-cycle primitive |
+| `Atomics.notify` | wake/notification path | **variable; scheduler/cache dependent** | may enter runtime/OS machinery |
+
+### Evidence notes for the newly admitted gap set
+
+- V8's current Math builtins explicitly split `ceil`, `floor`, `round`, and `trunc` into Smi and Float64 paths.
+- Zen 3 scalar `VMAXSD` measures 1-cycle latency and 0.5-cycle reciprocal throughput.
+- Zen 3 locked `XADD` measures roughly 7.65–7.82 cycles reciprocal throughput.
+- Zen 3 locked `CMPXCHG` is in the same roughly 7.7–7.8-cycle throughput class.
+- Zen 3 memory `XCHG m32,r32` measures about 7.5 cycles reciprocal throughput.
+- A representative Zen 3 memory read-modify-write `ADD m32,r32` has a 7-cycle memory dependency.
+- A simple 32-bit immediate memory store measures 0.5-cycle reciprocal throughput on Zen 3.
+
+These are native reference costs, not guarantees for every JavaScript use site.
+
 ## Cost-record schema
 
 Every admitted operation should eventually carry:
