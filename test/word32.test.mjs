@@ -1832,6 +1832,7 @@ import {
 } from '../src/capacity32.mjs';
 import {
   atomicTryClaim32,
+  atomicTryClaimLoadFirst32,
   atomicRelease32,
   atomicReleaseNoNotify32,
   atomicExchange32,
@@ -2164,6 +2165,13 @@ test('atomic blocks', () => {
   const words = new Int32Array(new SharedArrayBuffer(16));
   assert.equal(atomicTryClaim32(words, 0, 0, 7), true);
   assert.equal(atomicTryClaim32(words, 0, 0, 8), false);
+
+  words[2] = 5;
+  assert.equal(atomicTryClaimLoadFirst32(words, 2, 0, 9), false);
+  assert.equal(Atomics.load(words, 2), 5);
+  words[2] = 0;
+  assert.equal(atomicTryClaimLoadFirst32(words, 2, 0, 9), true);
+  assert.equal(Atomics.load(words, 2), 9);
   assert.equal(atomicExchange32(words, 1, 5), 0);
   assert.equal(atomicAdd32(words, 1, 3), 5);
   assert.equal(atomicSub32(words, 1, 2), 8);

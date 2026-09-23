@@ -353,9 +353,10 @@
         "atomicReleaseNoNotify32",
         "atomicExchange32",
         "atomicAdd32",
-        "atomicSub32"
+        "atomicSub32",
+        "atomicTryClaimLoadFirst32"
       ],
-      "note": "Atomic release has notifying and no-notify profiles. Polling or externally awakened consumers select atomicReleaseNoNotify32 and pay only the publication store; Atomics.wait users retain atomicRelease32 so wake semantics are not weakened."
+      "note": "Atomic claim has direct-CAS and load-first high-mismatch profiles. Load-first filters observed mismatches before locked RMW work but remains conservative: stale mismatches may return false and stale matches are revalidated by CAS. Release retains notify/no-notify ownership profiles."
     },
     {
       "id": 19,

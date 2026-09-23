@@ -2,6 +2,16 @@ export function atomicTryClaim32(words, index, expected, claimed) {
   return Atomics.compareExchange(words, index, expected, claimed) === expected;
 }
 
+export function atomicTryClaimLoadFirst32(
+  words,
+  index,
+  expected,
+  claimed,
+) {
+  if (Atomics.load(words, index) !== expected) return false;
+  return Atomics.compareExchange(words, index, expected, claimed) === expected;
+}
+
 export function atomicRelease32(words, index, released) {
   Atomics.store(words, index, released);
   Atomics.notify(words, index, 1);

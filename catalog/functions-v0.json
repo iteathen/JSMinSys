@@ -1,5 +1,5 @@
 {
-  "version": "0.91.0",
+  "version": "0.92.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -5010,6 +5010,41 @@
       }
     },
     {
+      "name": "atomicTryClaimLoadFirst32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.compareExchange",
+        "!==",
+        "==="
+      ],
+      "status": "implemented-high-mismatch-profile",
+      "preconditions": [
+        "claim correctness is decided only by compareExchange; the preliminary load is advisory",
+        "caller selects this profile only when mismatch probability is high enough to amortize the additional atomic load",
+        "a stale matching preliminary load is harmless because compareExchange revalidates expected atomically",
+        "a stale nonmatching preliminary load may conservatively return false; caller contract permits a try-claim false result without guaranteeing persistent unavailability"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "mismatchPath": "ATOMIC_LOAD + CMP_EQ",
+        "matchThenCasPath": "ATOMIC_LOAD + CMP_EQ + ATOMIC_RMW + CMP_EQ",
+        "expected": "ATOMIC_LOAD + CMP_EQ + Q*(ATOMIC_RMW + CMP_EQ)",
+        "directBaseline": "ATOMIC_RMW + CMP_EQ",
+        "selectionRule": "choose when ATOMIC_LOAD + CMP_EQ + Q*(ATOMIC_RMW + CMP_EQ) < ATOMIC_RMW + CMP_EQ",
+        "parameters": {
+          "Q": "probability the preliminary atomic load equals expected",
+          "ATOMIC_LOAD": "NEES symbolic sequentially-consistent atomic load cost",
+          "ATOMIC_RMW": "Atomics.compareExchange cost; 7.7-12 uncontended reference before contention",
+          "CMP_EQ": "1-2 cycle equality comparison/materialization class"
+        },
+        "note": "Distribution-specific rejection filter. It avoids a locked RMW on observed mismatches while retaining CAS as final claim authority."
+      }
+    },
+    {
       "name": "atomicRelease32",
       "source": "src/atomic32.mjs",
       "block": "atomic-claim-release",
@@ -6266,11 +6301,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 217,
+    "functionsImplemented": 218,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 217,
+    "functionsWithCycleCount": 218,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -7971,6 +8006,18 @@
           "before": "one-word mutable-state known-cell undo: 10-12 L1",
           "after": "STORE_COST only (0.5 hot-local minimum)",
           "mechanism": "parent caller meta already contains the complete parent playable/support state"
+        }
+      ]
+    },
+    {
+      "id": "round-085",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "atomicTryClaimLoadFirst32",
+          "before": "every failed atomicTryClaim32 attempt pays locked compareExchange",
+          "after": "observed mismatch pays ATOMIC_LOAD + comparison; matching observations still pay authoritative compareExchange",
+          "mechanism": "use a sequentially-consistent load as an advisory rejection filter in high-mismatch regimes"
         }
       ]
     }
