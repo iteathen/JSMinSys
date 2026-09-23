@@ -1,5 +1,5 @@
 {
-  "version": "0.72.0",
+  "version": "0.73.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3138,8 +3138,9 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "unbounded",
-        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + STORE_COST + ATOMIC_STORE + 6",
-        "note": "No blocking wait or notify. The successful path computes position+1 once and reuses it for reservation and publication. CAS retry count remains contention-dependent and unbounded."
+        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + STORE_COST + ATOMIC_STORE + 4",
+        "nonEqualPath": "2*ATOMIC_LOAD + 6 before retry/full decision",
+        "note": "Exact sequence equality is tested before constructing the signed difference. Successful ready-slot attempts delete SUB+int32 coercion; non-equal wrap-aware retry/full handling is unchanged. CAS retries remain unbounded."
       }
     },
     {
@@ -3170,8 +3171,9 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "unbounded",
-        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + LOAD + STORE_COST + ATOMIC_STORE + 8",
-        "note": "No blocking wait or notify. CAS retry count remains contention-dependent and unbounded in the worst case."
+        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + LOAD + STORE_COST + ATOMIC_STORE + 6",
+        "nonEqualPath": "2*ATOMIC_LOAD + 7 before retry/empty decision",
+        "note": "Ready-sequence equality is tested first, deleting SUB+int32 coercion from successful attempts. Non-equal signed-difference logic preserves wrap-aware empty/retry behavior."
       }
     },
     {
@@ -3183,8 +3185,6 @@
         "Atomics.store",
         "ST32",
         "&",
-        "-",
-        "|",
         "!==",
         "+"
       ],
@@ -3201,10 +3201,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 5",
-        "unavailablePath": "ATOMIC_LOAD + 4",
+        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 3",
+        "unavailablePath": "ATOMIC_LOAD + 2",
         "callerSuccessAdvance": "ADD + int32-coercion",
-        "note": "Eliminates the shared enqueue-counter atomic load, reservation CAS, and retry loop. Per-slot sequence synchronization remains. The caller-owned position advance costs two ALU operations under the current int32 ledger."
+        "note": "Owned position needs only exact sequence equality; signed difference is unnecessary because any non-equal slot is simply unavailable."
       }
     },
     {
@@ -3217,8 +3217,6 @@
         "LD32",
         "ST32",
         "&",
-        "-",
-        "|",
         "!==",
         "+"
       ],
@@ -3235,10 +3233,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 6",
-        "unavailablePath": "ATOMIC_LOAD + 5",
+        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 4",
+        "unavailablePath": "ATOMIC_LOAD + 3",
         "callerSuccessAdvance": "ADD + int32-coercion",
-        "note": "Eliminates the shared dequeue-counter atomic load, reservation CAS, and retry loop. It can be selected independently of producer ownership."
+        "note": "Owned consumer compares observed sequence directly with ready; no signed difference is required when this side owns the reservation position."
       }
     },
     {
@@ -3250,7 +3248,6 @@
         "Atomics.store",
         "ST32",
         "&",
-        "-",
         "|",
         "!==",
         "+"
@@ -3267,10 +3264,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 6",
-        "unavailablePath": "ATOMIC_LOAD + 4",
-        "governingSuccess": "same as function fast path; no separate caller ADD/int32-coercion",
-        "note": "One extra internal int32 coercion turns the publication position into the caller's next reservation. Compared with the boolean owned profile plus caller advance, the governing success path saves one ALU cycle."
+        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 4",
+        "unavailablePath": "ATOMIC_LOAD + 2",
+        "governingSuccess": "same as function fast path; returned nextPosition is caller-ready",
+        "note": "Direct sequence equality removes signed-difference construction. The retained int32 coercion belongs to the returned next reservation position."
       }
     },
     {
@@ -3283,7 +3280,6 @@
         "LD32",
         "ST32",
         "&",
-        "-",
         "|",
         "!==",
         "+"
@@ -3300,10 +3296,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 7",
-        "unavailablePath": "ATOMIC_LOAD + 6",
-        "governingSuccess": "same as function fast path; no separate caller ADD/int32-coercion",
-        "note": "Reuses the ready position as caller state. Governing success saves one ALU cycle versus boolean owned dequeue plus caller-side int32 advance."
+        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 5",
+        "unavailablePath": "ATOMIC_LOAD + 4",
+        "governingSuccess": "same as function fast path; returned nextPosition is caller-ready",
+        "note": "Direct ready equality removes signed-difference construction; nextPosition int32 normalization remains because it is returned as caller state."
       }
     },
     {
@@ -5465,6 +5461,24 @@
           "before": "16-cycle hi==0 / 27-cycle hi!=0",
           "after": "16-cycle hi==0 / 25-cycle hi!=0",
           "mechanism": "reuse the earlier nibble-stage fusion on the nonzero-high path"
+        }
+      ]
+    },
+    {
+      "id": "round-066",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "queueTryEnqueue32 / queueTryDequeue32",
+          "before": "success path constructed signed sequence difference before equality",
+          "after": "test exact ready equality first; success local term -2 cycles",
+          "mechanism": "defer wrap-aware signed-difference construction to non-equal cases only"
+        },
+        {
+          "function": "owned nonblocking queue profiles",
+          "before": "owned paths constructed signed differences even though any non-equal slot is unavailable",
+          "after": "direct sequence equality only; success and unavailable paths each -2 cycles",
+          "mechanism": "reservation ownership removes the need to classify non-equal sequence distance"
         }
       ]
     }

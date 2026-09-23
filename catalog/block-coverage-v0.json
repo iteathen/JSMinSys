@@ -310,7 +310,7 @@
         "queueEnqueueOwnedNext32",
         "queueDequeueOwnedNext32"
       ],
-      "note": "Queue profiles now separate blocking/nonblocking and shared/owned reservation semantics. Owned blocking sides remove the locked reservation RMW while preserving per-slot Atomics.wait/notify and sequence publication/acquisition; returned next positions keep caller reservation state local."
+      "note": "Nonblocking queue profiles test exact ready sequence equality before any wrap-distance work. Generic shared-reservation paths compute signed differences only after an equality miss; owned-reservation paths need only equality because any non-equal slot is unavailable. Blocking ownership/wait profiles are unchanged."
     },
     {
       "id": 20,

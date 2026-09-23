@@ -50,14 +50,14 @@ export function queueTryEnqueue32(
     const position = Atomics.load(enqueue, 0);
     const slot = position & mask;
     const observed = Atomics.load(sequence, slot);
-    const difference = (observed - position) | 0;
-    if (difference === 0) {
+    if (observed === position) {
       const ready = position + 1;
       if (Atomics.compareExchange(enqueue, 0, position, ready) !== position) continue;
       values[slot] = value;
       Atomics.store(sequence, slot, ready);
       return true;
     }
+    const difference = (observed - position) | 0;
     if (difference < 0) return false;
   }
 }
@@ -76,13 +76,13 @@ export function queueTryDequeue32(
     const slot = position & mask;
     const observed = Atomics.load(sequence, slot);
     const ready = position + 1;
-    const difference = (observed - ready) | 0;
-    if (difference === 0) {
+    if (observed === ready) {
       if (Atomics.compareExchange(dequeue, 0, position, ready) !== position) continue;
       out[outIndex] = values[slot];
       Atomics.store(sequence, slot, position + capacity);
       return true;
     }
+    const difference = (observed - ready) | 0;
     if (difference < 0) return false;
   }
 }
@@ -96,8 +96,7 @@ export function queueTryEnqueueOwnedPosition32(
 ) {
   const slot = position & mask;
   const observed = Atomics.load(sequence, slot);
-  const difference = (observed - position) | 0;
-  if (difference !== 0) return false;
+  if (observed !== position) return false;
 
   values[slot] = value;
   Atomics.store(sequence, slot, position + 1);
@@ -116,8 +115,7 @@ export function queueTryDequeueOwnedPosition32(
   const slot = position & mask;
   const ready = position + 1;
   const observed = Atomics.load(sequence, slot);
-  const difference = (observed - ready) | 0;
-  if (difference !== 0) return false;
+  if (observed !== ready) return false;
 
   out[outIndex] = values[slot];
   Atomics.store(sequence, slot, position + capacity);
@@ -133,8 +131,7 @@ export function queueTryEnqueueOwnedNext32(
 ) {
   const slot = position & mask;
   const observed = Atomics.load(sequence, slot);
-  const difference = (observed - position) | 0;
-  if (difference !== 0) return position;
+  if (observed !== position) return position;
 
   const nextPosition = (position + 1) | 0;
   values[slot] = value;
@@ -154,8 +151,7 @@ export function queueTryDequeueOwnedNext32(
   const slot = position & mask;
   const nextPosition = (position + 1) | 0;
   const observed = Atomics.load(sequence, slot);
-  const difference = (observed - nextPosition) | 0;
-  if (difference !== 0) return position;
+  if (observed !== nextPosition) return position;
 
   out[outIndex] = values[slot];
   Atomics.store(sequence, slot, position + capacity);
