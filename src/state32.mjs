@@ -1,0 +1,87 @@
+export const STATE_PLY = 0;
+export const STATE_SIDE = 1;
+export const STATE_SUPPORT_LO = 2;
+export const STATE_SUPPORT_HI = 3;
+export const STATE_PLAYABLE_LO = 4;
+export const STATE_PLAYABLE_HI = 5;
+export const STATE_SUPPORT_CODE = 6;
+
+export function applyMove32(
+  state,
+  heights,
+  moveColumns,
+  cellLo,
+  cellHi,
+  column,
+  columns,
+  rows,
+  rankShift,
+) {
+  const ply = state[STATE_PLY];
+  const row = heights[column];
+  const cell = row * columns + column;
+  const bitLo = cellLo[cell];
+  const bitHi = cellHi[cell];
+
+  state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] | bitLo) >>> 0;
+  state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] | bitHi) >>> 0;
+  state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] & ~bitLo) >>> 0;
+  state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] & ~bitHi) >>> 0;
+
+  if (row + 1 < rows) {
+    const above = cell + columns;
+    state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] | cellLo[above]) >>> 0;
+    state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] | cellHi[above]) >>> 0;
+  }
+
+  heights[column] = row + 1;
+  moveColumns[ply] = column;
+  state[STATE_PLY] = ply + 1;
+  state[STATE_SIDE] = 1 - state[STATE_SIDE];
+  state[STATE_SUPPORT_CODE] = (
+    state[STATE_SUPPORT_CODE]
+    + (1 << (column * 3))
+    + (1 << rankShift)
+  ) >>> 0;
+  return cell;
+}
+
+export function undoMove32(
+  state,
+  heights,
+  moveColumns,
+  cellLo,
+  cellHi,
+  columns,
+  rows,
+  rankShift,
+) {
+  const ply = state[STATE_PLY] - 1;
+  const column = moveColumns[ply];
+  const row = heights[column] - 1;
+  const cell = row * columns + column;
+  const bitLo = cellLo[cell];
+  const bitHi = cellHi[cell];
+
+  state[STATE_PLY] = ply;
+  state[STATE_SIDE] = 1 - state[STATE_SIDE];
+  heights[column] = row;
+  state[STATE_SUPPORT_CODE] = (
+    state[STATE_SUPPORT_CODE]
+    - (1 << (column * 3))
+    - (1 << rankShift)
+  ) >>> 0;
+
+  state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] & ~bitLo) >>> 0;
+  state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] & ~bitHi) >>> 0;
+
+  if (row + 1 < rows) {
+    const above = cell + columns;
+    state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] & ~cellLo[above]) >>> 0;
+    state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] & ~cellHi[above]) >>> 0;
+  }
+
+  state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] | bitLo) >>> 0;
+  state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] | bitHi) >>> 0;
+  return cell;
+}
