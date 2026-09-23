@@ -1286,3 +1286,96 @@ export function undoMove32CallerPlyCenterOmittedKnownCell(
   return cell;
 }
 
+export const CENTER_OMIT1_META = 0;
+
+export function supportFromCenterOmittedAll32(meta, cellCount) {
+  return meta >>> cellCount;
+}
+
+export function playableFromCenterOmittedAll32(meta, playableMask) {
+  return meta & playableMask;
+}
+
+export function applyMove1x32CallerPlyCenterOmitted(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  compressedSupportDelta,
+) {
+  const cell = landingCells[index];
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let meta = state[CENTER_OMIT1_META];
+
+  if (next < cellCount) meta ^= bit | (1 << next);
+  else meta ^= bit;
+
+  landingCells[index] = next;
+  state[CENTER_OMIT1_META] = meta + compressedSupportDelta;
+  return cell;
+}
+
+export function undoMove1x32CallerPlyCenterOmitted(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  compressedSupportDelta,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = 1 << cell;
+  let meta = state[CENTER_OMIT1_META];
+
+  if (next < cellCount) meta ^= bit | (1 << next);
+  else meta ^= bit;
+
+  landingCells[index] = cell;
+  state[CENTER_OMIT1_META] = meta - compressedSupportDelta;
+  return cell;
+}
+
+export function applyMove1x32CallerPlyCenterOmittedKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  compressedSupportDelta,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let meta = state[CENTER_OMIT1_META];
+
+  if (next < cellCount) meta ^= bit | (1 << next);
+  else meta ^= bit;
+
+  landingCells[index] = next;
+  state[CENTER_OMIT1_META] = meta + compressedSupportDelta;
+  return cell;
+}
+
+export function undoMove1x32CallerPlyCenterOmittedKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  lastRowStart,
+  compressedSupportDelta,
+) {
+  const bit = 1 << cell;
+  let meta = state[CENTER_OMIT1_META];
+
+  if (cell < lastRowStart) meta ^= bit | (bit << columns);
+  else meta ^= bit;
+
+  landingCells[index] = cell;
+  state[CENTER_OMIT1_META] = meta - compressedSupportDelta;
+  return cell;
+}
+

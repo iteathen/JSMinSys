@@ -175,9 +175,15 @@
         "applyMove32CallerPlyCenterOmitted",
         "undoMove32CallerPlyCenterOmitted",
         "applyMove32CallerPlyCenterOmittedKnownCell",
-        "undoMove32CallerPlyCenterOmittedKnownCell"
+        "undoMove32CallerPlyCenterOmittedKnownCell",
+        "supportFromCenterOmittedAll32",
+        "playableFromCenterOmittedAll32",
+        "applyMove1x32CallerPlyCenterOmitted",
+        "undoMove1x32CallerPlyCenterOmitted",
+        "applyMove1x32CallerPlyCenterOmittedKnownCell",
+        "undoMove1x32CallerPlyCenterOmittedKnownCell"
       ],
-      "note": "Transition state profiles exploit caller ownership and configured bit budgets. For eligible odd widths with caller-owned ply, the reflection-fixed center support field is omitted; its height remains derivable from ply, and compressed support plus playable-high share one word. 7x6 therefore needs only two transition-state words."
+      "note": "Transition state profiles scale with caller ownership and bit budget. Odd-width caller-owned-ply layouts may omit the reflection-fixed center support field; eligible one-lane states then collapse playable plus all remaining support into one uint32, while eligible two-lane states use two words."
     },
     {
       "id": 9,
