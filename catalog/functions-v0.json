@@ -1,5 +1,5 @@
 {
-  "version": "0.66.0",
+  "version": "0.67.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3282,6 +3282,102 @@
       }
     },
     {
+      "name": "shl2x32Lt32PreparedInto",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        ">>>",
+        "|",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-prepared-count-profile",
+      "preconditions": [
+        "1 <= count < 32",
+        "inverseCount === 32-count was prepared once during initialization",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 6,
+        "note": "Prepared inverse count deletes the hot subtraction from the 7-cycle low-count left-shift profile; setup is one initialization SUB per configured count."
+      }
+    },
+    {
+      "name": "shl2x32Ge32PreparedInto",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-prepared-count-profile",
+      "preconditions": [
+        "32 <= original count < 64",
+        "laneCount === originalCount-32 was prepared once during initialization",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Prepared lane count deletes the hot subtraction from the 4-cycle high-count left-shift profile."
+      }
+    },
+    {
+      "name": "ushr2x32Lt32PreparedInto",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        ">>>",
+        "|",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-prepared-count-profile",
+      "preconditions": [
+        "1 <= count < 32",
+        "inverseCount === 32-count was prepared once during initialization",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 6,
+        "note": "Prepared inverse count deletes the hot subtraction from the 7-cycle low-count unsigned-right-shift profile."
+      }
+    },
+    {
+      "name": "ushr2x32Ge32PreparedInto",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        ">>>",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-prepared-count-profile",
+      "preconditions": [
+        "32 <= original count < 64",
+        "laneCount === originalCount-32 was prepared once during initialization",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Prepared lane count deletes the hot subtraction from the 4-cycle high-count unsigned-right-shift profile."
+      }
+    },
+    {
       "name": "shl2x32Into",
       "source": "src/word64x32.mjs",
       "block": "cross-word-shift",
@@ -3861,11 +3957,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 144,
+    "functionsImplemented": 148,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 144,
+    "functionsWithCycleCount": 148,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5140,6 +5236,24 @@
           "before": "21 fixed cycles",
           "after": "20 fixed cycles",
           "mechanism": "extract reversed fields 9/8 directly from code instead of extracting a 6-bit lane and swapping it"
+        }
+      ]
+    },
+    {
+      "id": "round-060",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "shl2x32Lt32PreparedInto / ushr2x32Lt32PreparedInto",
+          "before": "7 fixed cycles",
+          "after": "6 fixed cycles",
+          "mechanism": "prepare 32-count once at initialization"
+        },
+        {
+          "function": "shl2x32Ge32PreparedInto / ushr2x32Ge32PreparedInto",
+          "before": "4 fixed cycles",
+          "after": "3 fixed cycles",
+          "mechanism": "prepare count-32 once at initialization"
         }
       ]
     }

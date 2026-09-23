@@ -48,6 +48,30 @@ export function ushr2x32Ge32Into(dst, di, hi, count) {
   return dst;
 }
 
+export function shl2x32Lt32PreparedInto(dst, di, lo, hi, count, inverseCount) {
+  dst[di] = lo << count;
+  dst[di + 1] = (hi << count) | (lo >>> inverseCount);
+  return dst;
+}
+
+export function shl2x32Ge32PreparedInto(dst, di, lo, laneCount) {
+  dst[di] = 0;
+  dst[di + 1] = lo << laneCount;
+  return dst;
+}
+
+export function ushr2x32Lt32PreparedInto(dst, di, lo, hi, count, inverseCount) {
+  dst[di] = (lo >>> count) | (hi << inverseCount);
+  dst[di + 1] = hi >>> count;
+  return dst;
+}
+
+export function ushr2x32Ge32PreparedInto(dst, di, hi, laneCount) {
+  dst[di] = hi >>> laneCount;
+  dst[di + 1] = 0;
+  return dst;
+}
+
 export function shl2x32Into(dst, di, lo, hi, count) {
   if (count < 32) {
     dst[di] = lo << count;

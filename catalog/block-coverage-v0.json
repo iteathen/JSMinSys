@@ -41,9 +41,13 @@
         "shl2x32Lt32Into",
         "shl2x32Ge32Into",
         "ushr2x32Lt32Into",
-        "ushr2x32Ge32Into"
+        "ushr2x32Ge32Into",
+        "shl2x32Lt32PreparedInto",
+        "shl2x32Ge32PreparedInto",
+        "ushr2x32Lt32PreparedInto",
+        "ushr2x32Ge32PreparedInto"
       ],
-      "note": "Generic and caller-range-proven cross-word shift profiles coexist; known count ranges avoid runtime dispatch."
+      "note": "Generic, caller-range-proven, and initialization-prepared cross-word shift profiles coexist. Configured/fixed shift distances can precompute 32-count or count-32 once, deleting one SUB from every hot shift."
     },
     {
       "id": 3,

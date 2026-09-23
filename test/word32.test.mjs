@@ -823,6 +823,10 @@ import {
   shl2x32Ge32Into,
   ushr2x32Lt32Into,
   ushr2x32Ge32Into,
+  shl2x32Lt32PreparedInto,
+  shl2x32Ge32PreparedInto,
+  ushr2x32Lt32PreparedInto,
+  ushr2x32Ge32PreparedInto,
   shl2x32Into,
   ushr2x32Into,
   add2x32Into,
@@ -904,6 +908,15 @@ test('two-lane shifts and arithmetic', () => {
 
   ushr2x32Lt32Into(dst, 0, 0, 1, 1);
   assert.deepEqual([...dst], [0x80000000, 0]);
+
+  shl2x32Lt32PreparedInto(dst, 0, 0x80000000, 0, 1, 31);
+  assert.deepEqual([...dst], [0, 1]);
+  ushr2x32Lt32PreparedInto(dst, 0, 0, 1, 1, 31);
+  assert.deepEqual([...dst], [0x80000000, 0]);
+  shl2x32Ge32PreparedInto(dst, 0, 1, 31);
+  assert.deepEqual([...dst], [0, 0x80000000]);
+  ushr2x32Ge32PreparedInto(dst, 0, 0x80000000, 31);
+  assert.deepEqual([...dst], [1, 0]);
 
   add2x32Into(dst, 0, 0xffffffff, 1, 1, 2);
   assert.deepEqual([...dst], [0, 4]);
