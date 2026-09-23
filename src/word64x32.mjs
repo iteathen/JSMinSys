@@ -92,10 +92,12 @@ export function clearLowestSetBit32(word) {
 }
 
 export function cardinalityClass2x32(lo, hi) {
-  if ((lo | hi) === 0) return 0;
-  if (lo !== 0 && hi !== 0) return 2;
-  const word = lo !== 0 ? lo : hi;
-  return (word & (word - 1)) === 0 ? 1 : 2;
+  if (lo === 0) {
+    if (hi === 0) return 0;
+    return (hi & (hi - 1)) === 0 ? 1 : 2;
+  }
+  if (hi !== 0) return 2;
+  return (lo & (lo - 1)) === 0 ? 1 : 2;
 }
 
 export function popcount2x32(lo, hi) {
