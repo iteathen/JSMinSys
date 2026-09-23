@@ -40,13 +40,13 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
 
   const singleton=g.singletonByCell[cell];
   if(singleton>=0){
-    // Basis ids are sorted, so locate the played-cell singleton directly
-    // instead of walking every lower singleton id first.
-    let lo=0,hi=n;
-    while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
-    if(lo<n&&basis[bi+lo]===singleton){
-      const coord=src+(player?g.p1Offset:g.p0Offset);
-      if(source[coord+(lo>>>5)]&(1<<(lo&31))){
+    // Basis ids are sorted. Singleton shape ids occupy the first shape-size
+    // class, so stop as soon as the target id has been passed instead of
+    // scanning the entire residual basis on every played cell.
+    const coord=src+(player?g.p1Offset:g.p0Offset);
+    for(let i=0;i<n;i+=1){
+      const id=basis[bi+i];if(id>singleton)break;
+      if(id===singleton&&(source[coord+(i>>>5)]&(1<<(i&31)))){
         const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
       }
     }
