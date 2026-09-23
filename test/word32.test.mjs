@@ -64,3 +64,39 @@ test('two-lane wordwise blocks', () => {
   assert.equal(equal2x32(1, 2, 1, 2), true);
   assert.equal(equal2x32(1, 2, 1, 3), false);
 });
+
+
+import {
+  landingCell32,
+  maskContains32,
+  maskContains2x32,
+  residualTransition32,
+  powerOfTwoIndex32,
+  ttProbeIndex32,
+  ttReplace32,
+  selectGreater32,
+  selectLess32,
+} from '../src/indexed32.mjs';
+
+test('indexed and table blocks', () => {
+  const heights = new Uint8Array([0, 3, 6]);
+  assert.equal(landingCell32(heights, 1, 7, 6, 0xffffffff), 22);
+  assert.equal(landingCell32(heights, 2, 7, 6, 0xffffffff), 0xffffffff);
+  assert.equal(maskContains32(0b1111, 0b0101), true);
+  assert.equal(maskContains32(0b0011, 0b0101), false);
+  assert.equal(maskContains2x32(0b1111, 0b1010, 0b0101, 0b0010), true);
+  assert.equal(maskContains2x32(0b1111, 0, 0b0101, 0b0010), false);
+
+  const transitions = new Uint32Array([10, 11, 12, 20, 21, 22]);
+  assert.equal(residualTransition32(transitions, 1, 2, 3), 22);
+  assert.equal(powerOfTwoIndex32(0x1234, 0xff), 0x34);
+
+  const tags = new Uint32Array(8);
+  const values = new Uint32Array(8);
+  ttReplace32(tags, values, 3, 99, 1234);
+  assert.equal(ttProbeIndex32(tags, 7, 3, 99, 0xffffffff), 3);
+  assert.equal(ttProbeIndex32(tags, 7, 3, 98, 0xffffffff), 0xffffffff);
+  assert.equal(values[3], 1234);
+  assert.equal(selectGreater32(4, 9), 9);
+  assert.equal(selectLess32(4, 9), 4);
+});
