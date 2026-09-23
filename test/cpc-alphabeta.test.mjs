@@ -4,7 +4,7 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 import {
   prepareConnect4CpcScratch,evaluateConnect4Cpc32,connect4CpcTargetOwner32,
-  CPC_EXACT,
+  CPC_EXACT,CPC_RESTRICT,
 } from '../addons/cpc-connect4.mjs';
 import {
   prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,
@@ -132,4 +132,25 @@ test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>
       assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,oracle,result}));
     }
   }
+});
+
+
+test('CPC fork precursor restricts current defense without recursion',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  // d1, b1, f1: e1 is an attacker enabler; c1/g1 are the two future singleton endpoints.
+  const q=connect4RbaFromMoves([3,1,5],{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_RESTRICT);
+  assert.equal(s.precursorCount[0],1);assert.equal(s.preemptionCount[0],3);
+  const expected=((1<<2)|(1<<4)|(1<<6))>>>0;
+  assert.equal(s.preemptionMask32[0],expected);assert.equal(s.forcedColumn[0],-1);
+});
+
+test('CPC intersects alternative fork-precursor preemption sets',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  // d1, a1, e1: c1 and f1 are alternative attacker enablers. Exact current defenses intersect at c1/f1.
+  const q=connect4RbaFromMoves([3,0,4],{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_RESTRICT);
+  assert.equal(s.precursorCount[0],2);assert.equal(s.preemptionCount[0],2);
+  const expected=((1<<2)|(1<<5))>>>0;
+  assert.equal(s.preemptionMask32[0],expected);assert.equal(s.forcedColumn[0],-1);
 });
