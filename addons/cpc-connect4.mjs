@@ -10,7 +10,7 @@ export const CPC_EXACT=1;
 export const CPC_BOUND=2;
 export const CPC_RESTRICT=3;
 
-export function prepareConnect4CpcScratch(g,{frontierResponse=true}={}){
+export function prepareConnect4CpcScratch(g,{frontierResponse=false}={}){
   const cellWords=Math.ceil(g.cellCount/32);
   return {
     threatCells:new Uint32Array(g.columns),
@@ -161,6 +161,22 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
   return row-words[offset+column];
 }
 
+function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
+  for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0)return 0;
+  const coord=offset+(player?g.p1Offset:g.p0Offset);
+  for(let i=0;i<basisSize;i+=1){
+    if(!coordHas(words,coord,i))continue;
+    const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
+    let covered=0;
+    for(let j=0;j<size;j+=1){
+      const cell=g.shapeCells[base+j];
+      if((g.cellRow[cell]&1)===g.pairedResponseRowParity){covered=1;break;}
+    }
+    if(!covered)return 0;
+  }
+  return 1;
+}
+
 // Pooled-frontier paired response plus the L=1 synchronized-frontier
 // specialization. Odd-remainder columns contribute their currently playable
 // frontier cells to an even pool. Pairing those frontiers deterministically
@@ -283,14 +299,20 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
 
   // Long-range response closure is intentionally after the cheap tactical
   // exact/restriction checks so unresolved nodes alone pay its residual scan.
-  // frontierResponse is selected once at initialization for qualification A/B.
-  if(scratch.frontierResponse){
-    if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
-      scratch.interval[1]=Math.min(scratch.interval[1],2);
-    if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
-      scratch.interval[0]=Math.max(scratch.interval[0],2);
-    if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  // The prior all-even theorem remains the production baseline. The pooled/
+  // synchronized frontier extension is selected once at initialization for A/B.
+  if(mover===0){
+    const noWin=scratch.frontierResponse
+      ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
+      :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
+    if(noWin)scratch.interval[1]=Math.min(scratch.interval[1],2);
+  }else{
+    const noWin=scratch.frontierResponse
+      ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch)
+      :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
+    if(noWin)scratch.interval[0]=Math.max(scratch.interval[0],2);
   }
+  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
   collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
   if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
