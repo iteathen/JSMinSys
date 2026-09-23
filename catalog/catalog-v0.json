@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -285,7 +285,40 @@
     ],
     "specializedBuiltins": [
       "Math.imul",
-      "Math.clz32"
+      "Math.clz32",
+      "Math.floor",
+      "Math.trunc",
+      "Math.ceil",
+      "Math.round",
+      "Math.min",
+      "Math.max"
+    ],
+    "assignmentAndUpdate": [
+      "=",
+      "+=",
+      "-=",
+      "*=",
+      "&=",
+      "|=",
+      "^=",
+      "<<="
+    ],
+    "nullishOptionalTypeMeta": [
+      "??",
+      "?.",
+      "instanceof",
+      "typeof",
+      "void"
+    ],
+    "atomics": [
+      "Atomics.load",
+      "Atomics.store",
+      "Atomics.compareExchange",
+      "Atomics.exchange",
+      "Atomics.add",
+      "Atomics.sub",
+      "Atomics.wait",
+      "Atomics.notify"
     ]
   },
   "admissionNotes": [
@@ -392,6 +425,70 @@
             "reciprocal_throughput_cycles": 0.5,
             "executed_uops": 1,
             "status": "representative-native-form-verified"
+          },
+          "assignment_register": {
+            "candidateNative": "MOV / move elimination",
+            "latency_cycles": {
+              "best": 0,
+              "note": "move-eliminated dependency"
+            },
+            "status": "native-reference"
+          },
+          "store32_simple": {
+            "candidateNative": "MOV m32,imm32 / simple store",
+            "reciprocal_throughput_cycles": 0.5,
+            "executed_uops": 1,
+            "status": "native-reference"
+          },
+          "memory_rmw_add32": {
+            "candidateNative": "ADD m32,r32",
+            "memory_dependency_latency_cycles": 7,
+            "status": "native-reference"
+          },
+          "scalar_max_f64": {
+            "candidateNative": "VMAXSD xmm,xmm,xmm",
+            "latency_cycles": 1,
+            "reciprocal_throughput_cycles": 0.5,
+            "executed_uops": 1,
+            "status": "native-reference-not-complete-Math.max-cost"
+          },
+          "atomic_xadd32": {
+            "candidateNative": "LOCK XADD m32,r32",
+            "memory_dependency_latency_cycles": 8,
+            "reciprocal_throughput_cycles": {
+              "min": 7.65,
+              "max": 7.82
+            },
+            "executed_uops": 4,
+            "status": "uncontended-native-reference"
+          },
+          "atomic_cmpxchg32": {
+            "candidateNative": "LOCK CMPXCHG m32,r32",
+            "latency_cycles": {
+              "maxObservedDependency": 12
+            },
+            "reciprocal_throughput_cycles": {
+              "min": 7.7,
+              "max": 7.82
+            },
+            "status": "uncontended-native-reference"
+          },
+          "atomic_xchg32": {
+            "candidateNative": "XCHG m32,r32",
+            "latency_cycles": {
+              "maxObservedDependency": 10
+            },
+            "reciprocal_throughput_cycles": 7.5,
+            "executed_uops": 2,
+            "status": "uncontended-native-reference"
+          },
+          "atomic_wait": {
+            "latency_cycles": "unbounded",
+            "status": "blocking-runtime-scheduler-dependent"
+          },
+          "atomic_notify": {
+            "latency_cycles": "variable",
+            "status": "runtime-scheduler-cache-dependent"
           }
         }
       }
