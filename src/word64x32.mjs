@@ -63,8 +63,7 @@ export function sub2x32Into(dst, di, a0, a1, b0, b1) {
 
 export function firstSetBitIndex2x32(lo, hi) {
   if (lo !== 0) return 31 - Math.clz32(lo & -lo);
-  if (hi !== 0) return 32 + 31 - Math.clz32(hi & -hi);
-  return -1;
+  return 63 - Math.clz32(hi & -hi);
 }
 
 export function clearLowestSetBit32(word) {
