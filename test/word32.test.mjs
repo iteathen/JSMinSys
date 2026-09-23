@@ -162,6 +162,10 @@ import {
   plyFromPackedSupport32,
   supportFromPackedSupport32,
   sideFromPackedSupport32,
+  applyMove1x32PackedPly,
+  undoMove1x32PackedPly,
+  applyMove32PackedPly,
+  undoMove32PackedPly,
   applyMove1x32PackedPlyKnownCell,
   undoMove1x32PackedPlyKnownCell,
   applyMove32PackedPlyKnownCell,
@@ -447,6 +451,90 @@ test('known-cell undo prepared top-row boundary', () => {
   assert.equal(landing[2], 14);
   assert.equal(state[STATE_PLAYABLE_LO], 0);
   assert.equal(state[STATE_PLY], 0);
+});
+
+test('general packed support+ply transitions match separate state', () => {
+  const ordinary1 = new Uint32Array(4);
+  const packed1 = new Uint32Array(2);
+  const landingOrdinary1 = new Uint32Array(4);
+  const landingPacked1 = new Uint32Array(4);
+  fillLandingCells32(landingOrdinary1, 4);
+  fillLandingCells32(landingPacked1, 4);
+  ordinary1[STATE_PLAYABLE_LO] = 0b1111;
+  packed1[PACKED_PLY1_PLAYABLE_LO] = 0b1111;
+
+  const rankShift1 = 12;
+  const supportMask1 = (1 << rankShift1) - 1;
+  const supportDelta1 = 1 << 3;
+  const combinedDelta1 = supportDelta1 + (1 << rankShift1);
+
+  const ordinaryCell1 = applyMove1x32(
+    ordinary1, landingOrdinary1, 1, 4, 16, supportDelta1,
+  );
+  const packedCell1 = applyMove1x32PackedPly(
+    packed1, landingPacked1, 1, 4, 16, combinedDelta1,
+  );
+  assert.equal(packedCell1, ordinaryCell1);
+  assert.equal(packed1[PACKED_PLY1_PLAYABLE_LO], ordinary1[STATE_PLAYABLE_LO]);
+  assert.equal(
+    supportFromPackedSupport32(packed1[PACKED_PLY1_SUPPORT_PLY], supportMask1),
+    ordinary1[STATE_SUPPORT_CODE],
+  );
+  assert.equal(
+    plyFromPackedSupport32(packed1[PACKED_PLY1_SUPPORT_PLY], rankShift1),
+    ordinary1[STATE_PLY],
+  );
+  assert.deepEqual(landingPacked1, landingOrdinary1);
+
+  assert.equal(
+    undoMove1x32PackedPly(packed1, landingPacked1, 1, 4, 16, combinedDelta1),
+    undoMove1x32(ordinary1, landingOrdinary1, 1, 4, 16, supportDelta1),
+  );
+  assert.equal(packed1[PACKED_PLY1_PLAYABLE_LO], ordinary1[STATE_PLAYABLE_LO]);
+  assert.equal(packed1[PACKED_PLY1_SUPPORT_PLY], 0);
+  assert.deepEqual(landingPacked1, landingOrdinary1);
+
+  const ordinary2 = new Uint32Array(4);
+  const packed2 = new Uint32Array(3);
+  const landingOrdinary2 = new Uint32Array(7);
+  const landingPacked2 = new Uint32Array(7);
+  landingOrdinary2[3] = 31;
+  landingPacked2[3] = 31;
+  ordinary2[STATE_PLAYABLE_LO] = 0x80000000;
+  packed2[PACKED_PLY2_PLAYABLE_LO] = 0x80000000;
+
+  const rankShift2 = 21;
+  const supportMask2 = (1 << rankShift2) - 1;
+  const supportDelta2 = 1 << 9;
+  const combinedDelta2 = supportDelta2 + (1 << rankShift2);
+
+  const ordinaryCell2 = applyMove32(
+    ordinary2, landingOrdinary2, 3, 7, 42, supportDelta2,
+  );
+  const packedCell2 = applyMove32PackedPly(
+    packed2, landingPacked2, 3, 7, 42, combinedDelta2,
+  );
+  assert.equal(packedCell2, ordinaryCell2);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_LO], ordinary2[STATE_PLAYABLE_LO]);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_HI], ordinary2[STATE_PLAYABLE_HI]);
+  assert.equal(
+    supportFromPackedSupport32(packed2[PACKED_PLY2_SUPPORT_PLY], supportMask2),
+    ordinary2[STATE_SUPPORT_CODE],
+  );
+  assert.equal(
+    plyFromPackedSupport32(packed2[PACKED_PLY2_SUPPORT_PLY], rankShift2),
+    ordinary2[STATE_PLY],
+  );
+  assert.deepEqual(landingPacked2, landingOrdinary2);
+
+  assert.equal(
+    undoMove32PackedPly(packed2, landingPacked2, 3, 7, 42, combinedDelta2),
+    undoMove32(ordinary2, landingOrdinary2, 3, 7, 42, supportDelta2),
+  );
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_LO], ordinary2[STATE_PLAYABLE_LO]);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_HI], ordinary2[STATE_PLAYABLE_HI]);
+  assert.equal(packed2[PACKED_PLY2_SUPPORT_PLY], 0);
+  assert.deepEqual(landingPacked2, landingOrdinary2);
 });
 
 test('packed support+ply transition profile preserves support-only reflection boundary', () => {

@@ -142,9 +142,13 @@
         "applyMove1x32PackedPlyKnownCell",
         "undoMove1x32PackedPlyKnownCell",
         "applyMove32PackedPlyKnownCell",
-        "undoMove32PackedPlyKnownCell"
+        "undoMove32PackedPlyKnownCell",
+        "applyMove1x32PackedPly",
+        "undoMove1x32PackedPly",
+        "applyMove32PackedPly",
+        "undoMove32PackedPly"
       ],
-      "note": "Transition profiles now include separate-ply, caller-owned-ply, and configured packed support+ply representations. Packed state is selected only when 3-bit support plus rank fits one uint32; combined deltas update both facts with one load/store/add. Reflection remains support-only via an explicit supportMask extraction, so packed physical state does not reintroduce rank work into reflection."
+      "note": "Transition profiles include separate-ply, caller-owned-ply, and packed support+ply representations, each with ordinary and known-cell forms where useful. Packed state is selected only when support+rank fits one uint32 and rows fit the 3-bit support field; combined deltas remove duplicate state traffic. Reflection remains support-only via explicit masking."
     },
     {
       "id": 9,

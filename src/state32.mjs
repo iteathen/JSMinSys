@@ -587,6 +587,132 @@ export function sideFromPackedSupport32(code, rankShift) {
   return (code >>> rankShift) & 1;
 }
 
+export function applyMove1x32PackedPly(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  combinedDelta,
+) {
+  const cell = landingCells[index];
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let playable = state[PACKED_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[PACKED_PLY1_PLAYABLE_LO] = playable;
+  landingCells[index] = next;
+  state[PACKED_PLY1_SUPPORT_PLY] = state[PACKED_PLY1_SUPPORT_PLY] + combinedDelta;
+  return cell;
+}
+
+export function undoMove1x32PackedPly(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  combinedDelta,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = 1 << cell;
+  let playable = state[PACKED_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[PACKED_PLY1_PLAYABLE_LO] = playable;
+  landingCells[index] = cell;
+  state[PACKED_PLY1_SUPPORT_PLY] = state[PACKED_PLY1_SUPPORT_PLY] - combinedDelta;
+  return cell;
+}
+
+export function applyMove32PackedPly(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  combinedDelta,
+) {
+  const cell = landingCells[index];
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[PACKED_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[PACKED_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[PACKED_PLY2_PLAYABLE_HI] = playableHi;
+  }
+
+  landingCells[index] = next;
+  state[PACKED_PLY2_SUPPORT_PLY] = state[PACKED_PLY2_SUPPORT_PLY] + combinedDelta;
+  return cell;
+}
+
+export function undoMove32PackedPly(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  combinedDelta,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = 1 << cell;
+
+  landingCells[index] = cell;
+  state[PACKED_PLY2_SUPPORT_PLY] = state[PACKED_PLY2_SUPPORT_PLY] - combinedDelta;
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[PACKED_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[PACKED_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[PACKED_PLY2_PLAYABLE_HI] = playableHi;
+  }
+  return cell;
+}
+
 export function applyMove1x32PackedPlyKnownCell(
   state,
   landingCells,

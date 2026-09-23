@@ -1,5 +1,5 @@
 {
-  "version": "0.61.0",
+  "version": "0.62.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1391,6 +1391,170 @@
         "kind": "fixed",
         "cycles": 2,
         "note": "Extract rank field then parity bit."
+      }
+    },
+    {
+      "name": "applyMove1x32PackedPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "landingCells[index] is the current next playable cell",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 19.5,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 43.5,
+          "max": 45.5
+        },
+        "expression": "3*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "General one-lane packed state loads landing/playable/packed once each; combined delta replaces separate ply/support state traffic."
+      }
+    },
+    {
+      "name": "undoMove1x32PackedPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 19.5,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 43.5,
+          "max": 45.5
+        },
+        "expression": "3*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "General one-lane packed undo removes separate state-owned ply load/store/decrement without requiring the caller to retain cell."
+      }
+    },
+    {
+      "name": "applyMove32PackedPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured board cell count is 33..64",
+        "landingCells[index] is the current next playable cell",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 21.5,
+          "max": 30
+        },
+        "hotL2Predicted": {
+          "min": 45.5,
+          "max": 62
+        },
+        "expression": "normal lane: 3*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 4*STORE + 12 ALU/control",
+        "note": "General two-lane packed state has the same transition ledger as caller-owned-ply state, without requiring external rank ownership."
+      }
+    },
+    {
+      "name": "undoMove32PackedPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured board cell count is 33..64",
+        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 21.5,
+          "max": 30
+        },
+        "hotL2Predicted": {
+          "min": 45.5,
+          "max": 62
+        },
+        "expression": "normal lane: 3*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 4*STORE + 12 ALU/control",
+        "note": "General two-lane packed undo removes duplicate state-owned rank traffic while retaining ordinary landing-cell ownership."
       }
     },
     {
@@ -3493,11 +3657,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 133,
+    "functionsImplemented": 137,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 133,
+    "functionsWithCycleCount": 137,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4688,6 +4852,24 @@
           "before": "separate state words require separate state ownership",
           "after": "1-cycle support mask or rank shift from an already-loaded packed word",
           "mechanism": "keep physical packing local to state while reflection remains support-only"
+        }
+      ]
+    },
+    {
+      "id": "round-055",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove1x32PackedPly / undoMove1x32PackedPly",
+          "before": "separate state-owned one-lane: 25-27 L1 apply/undo",
+          "after": "packed state: 19.5-21.5 L1 apply/undo",
+          "mechanism": "pack support+ply and use one combined delta without requiring caller-known cell or caller-owned ply"
+        },
+        {
+          "function": "applyMove32PackedPly / undoMove32PackedPly",
+          "before": "separate state-owned two-lane: 27-35.5 L1 apply/undo",
+          "after": "packed state: 21.5-30 L1 apply/undo",
+          "mechanism": "same configured physical-state packing on ordinary landing-loading two-lane paths"
         }
       ]
     }
