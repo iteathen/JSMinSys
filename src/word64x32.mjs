@@ -24,6 +24,30 @@ export function equal2x32(a0, a1, b0, b1) {
   return ((a0 ^ b0) | (a1 ^ b1)) === 0;
 }
 
+export function shl2x32Lt32Into(dst, di, lo, hi, count) {
+  dst[di] = lo << count;
+  dst[di + 1] = (hi << count) | (lo >>> (32 - count));
+  return dst;
+}
+
+export function shl2x32Ge32Into(dst, di, lo, count) {
+  dst[di] = 0;
+  dst[di + 1] = lo << (count - 32);
+  return dst;
+}
+
+export function ushr2x32Lt32Into(dst, di, lo, hi, count) {
+  dst[di] = (lo >>> count) | (hi << (32 - count));
+  dst[di + 1] = hi >>> count;
+  return dst;
+}
+
+export function ushr2x32Ge32Into(dst, di, hi, count) {
+  dst[di] = hi >>> (count - 32);
+  dst[di + 1] = 0;
+  return dst;
+}
+
 export function shl2x32Into(dst, di, lo, hi, count) {
   if (count < 32) {
     dst[di] = lo << count;
