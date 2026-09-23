@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
     "addons/rba-tt32.mjs",
@@ -78,7 +78,11 @@
     "A/B benchmark records Four-Front node reduction separately from recursive front-step/runtime cost",
     "pooled-frontier paired response qualified with exact positive/negative 4x4 oracle controls",
     "fixed L=1 synchronized-frontier pair blocker qualified as an opt-in CPC extension",
-    "rank-16+ prefixes of maintained standard-7x6 benchmark fixtures scanned with zero frontier-extension interval/kind changes"
+    "rank-16+ prefixes of maintained standard-7x6 benchmark fixtures scanned with zero frontier-extension interval/kind changes",
+    "pooled-frontier plus deterministic maximal synchronized-channel response qualified as an opt-in CPC extension with independent oracle controls",
+    "corrected rank-16+ standard-7x6 prefix A/B scan found zero interval/kind changes from the frontier-response extension",
+    "forced-block and universal support-lift terminal-response closures match independent 4x4 exact oracles",
+    "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -102,7 +106,9 @@
       "guarded all-even paired-response no-win interval",
       "current-player immediate terminal",
       "distinct playable opponent singleton fork",
-      "forced single immediate block"
+      "forced single immediate block",
+      "forced-block support-lift terminal response",
+      "universal legal-move support-lift terminal response"
     ],
     "projectedOnly": [
       "future singleton CPC owner from XOR of per-column event contributions",
@@ -112,10 +118,11 @@
     "moveOrderPolicy": "CPC-only mode uses immutable initialization-prepared actionOrder and no per-depth action-order scratch.",
     "optionalLongRange": [
       "pooled-frontier paired-response no-win interval",
-      "fixed L=1 synchronized-frontier pair blockers for <=32 configured columns; wider profiles conservatively skip only that bitmask specialization",
-      "selected at initialization and currently opt-in pending useful standard-board closure evidence"
+      "deterministic L=1 synchronized-frontier pair blockers",
+      "deterministic maximal synchronized channel over ascending odd-remainder column pairs",
+      "selected at initialization and currently opt-in because the corrected maintained standard-7x6 prefix scan shows no additional interval/kind closures"
     ],
-    "frontierResponsePolicy": "The existing all-even paired-response theorem remains the default production path. The pooled/synchronized extension is qualified but opt-in."
+    "frontierResponsePolicy": "The existing all-even paired-response theorem remains the default production path. Pooled plus synchronized-channel response is qualified but opt-in; support-lift terminal response is part of the production CPC tactical closure."
   },
   "fourFrontRole": {
     "status": "qualified-experimental-reference",
@@ -128,7 +135,9 @@
         "alphaBetaMs": 0.27128299999999683,
         "fourFrontAlphaBetaMs": 6.743407999999988,
         "fourFrontSteps": 3703,
-        "note": "single GitHub-runner control; directional evidence, not a universal performance claim"
+        "note": "single GitHub-runner control; directional evidence, not a universal performance claim",
+        "currentProductionAlphaBetaNodes": 49,
+        "currentProductionNote": "After support-lift CPC closure, the maintained rank-28 control uses 49 alpha-beta nodes; the original Four-Front A/B comparison used 54 baseline nodes before that closure."
       }
     }
   }
