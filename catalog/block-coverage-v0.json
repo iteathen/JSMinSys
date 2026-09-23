@@ -317,6 +317,7 @@
       "name": "move-order-selection",
       "status": "implemented",
       "functions": [
+        "reuseGroupedWord32",
         "selectGreater32",
         "selectLess32",
         "argMaxPlayable32",
@@ -341,7 +342,7 @@
         "argMaxPlayableSlot9ScalarsNonempty32",
         "argMaxPlayableSlot10ScalarsNonempty32"
       ],
-      "note": "Candidate selection supports generic count, exact array-backed configured counts 2..10, and scalar-producer configured counts 2..10. Scalar profiles apply only when score production already owns values as live scalars; initialization selects arity once with no hot width dispatch."
+      "note": "Move-order/selection profiles include prepared move-slot indexing, exact/scalar candidate counts, and run-grouped immutable-word reuse. reuseGroupedWord32 exploits incidence layouts already ordered by word index: one load serves the entire consecutive run, with no cache object or mutable mirror."
     },
     {
       "id": 17,

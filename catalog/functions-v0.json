@@ -1,5 +1,5 @@
 {
-  "version": "0.103.0",
+  "version": "0.104.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4655,6 +4655,42 @@
       ]
     },
     {
+      "name": "reuseGroupedWord32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        "===",
+        "?:"
+      ],
+      "status": "implemented-run-grouped-load-reuse-profile",
+      "preconditions": [
+        "word indices arrive in runs: equal indices are consecutive under the selected prepared incidence/order layout",
+        "currentWord/currentBits are caller-owned live scalars from the immediately preceding incidence entry",
+        "currentBits is the exact words[currentWord] value whenever currentWord equals the next wordIndex",
+        "the underlying word storage is immutable for the duration of the synchronous grouped scan",
+        "the caller updates currentWord to wordIndex after consuming the returned bits without materializing a cache object",
+        "select this profile only when repeated-run frequency and branch behavior beat unconditional loads at the governing scan"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "sameRunPredicted": 2,
+        "newRunL1Predicted": 6,
+        "newRunL2Predicted": 14,
+        "newRunL3Predicted": 49,
+        "expression": "2*N + G*LOAD + BM",
+        "parameters": {
+          "N": "number of incidence entries scanned",
+          "G": "number of distinct consecutive word runs, including the first entry",
+          "LOAD": "NEES cache-level dependent word load cost",
+          "BM": "additional branch-misprediction penalties for run-boundary tests"
+        },
+        "note": "Each entry pays equality/control. Only the first entry of each consecutive word run loads storage. At L1 the aggregate beats N unconditional loads when G < N/2."
+      }
+    },
+    {
       "name": "negateScore32",
       "source": "src/search32.mjs",
       "block": "alpha-beta-bound-update",
@@ -6773,11 +6809,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 234,
+    "functionsImplemented": 235,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 234,
+    "functionsWithCycleCount": 235,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8652,6 +8688,18 @@
           "before": "each child writes p0Class/p1Class/status to per-ply history and undo later reloads the parent triple before restoring state",
           "after": "eligible recursion keeps parent p0Class/p1Class as caller-owned frame scalars and restores known ongoing parent status directly",
           "mechanism": "use recursion lifetime as the natural undo owner instead of maintaining duplicate explicit history streams"
+        }
+      ]
+    },
+    {
+      "id": "round-097",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "run-grouped indexed word scans",
+          "before": "every incidence entry reloads words[wordIndex] even when adjacent entries address the same immutable word",
+          "after": "only the first entry of each consecutive word-index run loads storage; following entries reuse the caller-owned scalar",
+          "mechanism": "preserve the already-loaded immutable word across prepared incidence entries whose sort order groups equal word indices"
         }
       ]
     }

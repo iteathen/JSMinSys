@@ -1,3 +1,12 @@
+export function reuseGroupedWord32(
+  words,
+  wordIndex,
+  currentWord,
+  currentBits,
+) {
+  return wordIndex === currentWord ? currentBits : words[wordIndex];
+}
+
 export function negateScore32(value) {
   return -value;
 }

@@ -436,6 +436,7 @@ import {
   normalizeMaximal2x32LazyInPlace,
 } from '../src/frontier32.mjs';
 import {
+  reuseGroupedWord32,
   negateScore32,
   raiseLowerBound32,
   lowerUpperBound32,
@@ -466,6 +467,26 @@ import {
   argMaxPlayableSlot7ScalarsNonempty32,
   physicalColumnFromMoveSlot32,
 } from '../src/search32.mjs';
+
+test('run-grouped indexed word reuse preserves exact values', () => {
+  const words = new Uint32Array([
+    0x80000001, 0x12345678, 0xffffffff, 0x0f0f0f0f,
+  ]);
+  const sequence = [0, 0, 0, 2, 2, 1, 1, 1, 3, 3, 0];
+
+  let currentWord = -1;
+  let currentBits = 0;
+  for (const word of sequence) {
+    currentBits = reuseGroupedWord32(
+      words, word, currentWord, currentBits,
+    );
+    currentWord = word;
+    assert.equal(currentBits, words[word]);
+  }
+
+  assert.equal(reuseGroupedWord32(words, 2, 2, 0xffffffff), 0xffffffff);
+  assert.equal(reuseGroupedWord32(words, 3, 2, 0), words[3]);
+});
 
 test('caller-owned residual frame restores parent without history loads', () => {
   const frame = new Uint32Array([101, 202, 3, 999]);
