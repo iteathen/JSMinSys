@@ -90,9 +90,11 @@
       "functions": [
         "fillCoordinateTables32",
         "decodeColumn32",
-        "decodeRow32"
+        "decodeRow32",
+        "decodeColumnPowerOfTwo32",
+        "decodeRowPowerOfTwo32"
       ],
-      "note": "Board geometry is configured at initialization; hot row/column decoding uses prepared lookup tables instead of division/modulo."
+      "note": "Coordinate decode has table-backed generic profiles and initialization-selected power-of-two geometry profiles. Power-of-two columns use mask/shift and can omit coordinate tables when no other consumer needs them."
     },
     {
       "id": 6,

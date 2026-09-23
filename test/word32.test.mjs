@@ -1175,6 +1175,8 @@ import {
   fillCoordinateTables32,
   decodeColumn32,
   decodeRow32,
+  decodeColumnPowerOfTwo32,
+  decodeRowPowerOfTwo32,
 } from '../src/indexed32.mjs';
 import {
   allocateTypedCapacity,
@@ -1406,6 +1408,20 @@ test('trusted legality and coordinate reference decode', () => {
   assert.equal(fillCoordinateTables32(rowByCell, columnByCell, 7, 6), 42);
   assert.equal(decodeColumn32(columnByCell, 23), 2);
   assert.equal(decodeRow32(rowByCell, 23), 3);
+
+  const pow2Rows = new Uint32Array(16);
+  const pow2Columns = new Uint32Array(16);
+  fillCoordinateTables32(pow2Rows, pow2Columns, 4, 4);
+  for (let cell = 0; cell < 16; cell += 1) {
+    assert.equal(
+      decodeColumnPowerOfTwo32(cell, 3),
+      decodeColumn32(pow2Columns, cell),
+    );
+    assert.equal(
+      decodeRowPowerOfTwo32(cell, 2),
+      decodeRow32(pow2Rows, cell),
+    );
+  }
 
   const row4 = new Uint32Array(16);
   const column4 = new Uint32Array(16);

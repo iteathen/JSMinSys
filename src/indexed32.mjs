@@ -106,6 +106,14 @@ export function fillCoordinateTables32(rowByCell, columnByCell, columns, rows) {
   return cell;
 }
 
+export function decodeColumnPowerOfTwo32(cell, columnMask) {
+  return cell & columnMask;
+}
+
+export function decodeRowPowerOfTwo32(cell, columnShift) {
+  return cell >>> columnShift;
+}
+
 export function decodeColumn32(columnByCell, cell) {
   return columnByCell[cell];
 }

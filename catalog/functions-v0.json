@@ -1,5 +1,5 @@
 {
-  "version": "0.76.0",
+  "version": "0.77.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4531,6 +4531,48 @@
       }
     },
     {
+      "name": "decodeColumnPowerOfTwo32",
+      "source": "src/indexed32.mjs",
+      "block": "coordinate-decode",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-configured-power-of-two-profile",
+      "preconditions": [
+        "configured columns is a positive power of two",
+        "columnMask === columns-1 was prepared during initialization",
+        "cell is a valid configured physical cell index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Power-of-two row-major geometry makes column the low log2(columns) bits; no coordinate-table load is required."
+      }
+    },
+    {
+      "name": "decodeRowPowerOfTwo32",
+      "source": "src/indexed32.mjs",
+      "block": "coordinate-decode",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-configured-power-of-two-profile",
+      "preconditions": [
+        "configured columns is a positive power of two",
+        "columnShift === log2(columns) was prepared during initialization",
+        "cell is a valid configured physical cell index"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Power-of-two row-major geometry makes row an unsigned right shift; no coordinate-table load is required."
+      }
+    },
+    {
       "name": "decodeColumn32",
       "source": "src/indexed32.mjs",
       "block": "coordinate-decode",
@@ -4659,11 +4701,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 170,
+    "functionsImplemented": 172,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 170,
+    "functionsWithCycleCount": 172,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6118,6 +6160,24 @@
           "before": "unsigned two-lane normalizers rewrote every accepted entry and processed entry 0",
           "after": "seeded lazy compaction replaces R stores with moved-entry M stores and N with N-1 candidate iterations",
           "mechanism": "compose first-entry proof with delayed compaction for Uint32 lanes"
+        }
+      ]
+    },
+    {
+      "id": "round-070",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "decodeColumnPowerOfTwo32",
+          "before": "decodeColumn32: 4 L1 / 12 L2 / 47 L3 cycles",
+          "after": "1 fixed cycle",
+          "mechanism": "runtime initialization selects mask decoding when configured columns is a power of two"
+        },
+        {
+          "function": "decodeRowPowerOfTwo32",
+          "before": "decodeRow32: 4 L1 / 12 L2 / 47 L3 cycles",
+          "after": "1 fixed cycle",
+          "mechanism": "runtime initialization prepares log2(columns) and replaces table lookup with shift"
         }
       ]
     }
