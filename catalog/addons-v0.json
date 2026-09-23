@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0",
+  "status": "cold-host-addon",
+  "purpose": "Reusable Node worker-thread session lifecycle for branch-manager style hosts. Not part of JMS-RESTRICTED/JMS-SEALED hot vocabulary.",
+  "modules": [
+    "addons/branch-manager-host.mjs"
+  ],
+  "functions": [
+    "filterFileWorkerExecArgv32",
+    "createMetricViews32",
+    "createManagedThreadSession32",
+    "failManagedThreadSession32",
+    "spawnManagedFileWorker32",
+    "waitManagedThreadSession32",
+    "closeManagedThreadSession32",
+    "managedThreadSessionState32",
+    "sumMetricViews32",
+    "sharedViewBytes32"
+  ],
+  "contract": {
+    "applicationOwns": [
+      "domain root/session initialization",
+      "thread roles and workerData payloads",
+      "domain result interpretation",
+      "outer solve API",
+      "status/reason naming"
+    ],
+    "addonOwns": [
+      "file-worker execArgv sanitation",
+      "thread/error/exit bookkeeping",
+      "first-error fail-closed session signaling",
+      "deadline/cancellation wait",
+      "stop+wake teardown",
+      "terminate+join cleanup",
+      "numeric metric aggregation",
+      "shared-view byte accounting"
+    ],
+    "hotConformance": "cold-only; Worker/Promise/timers/rich errors/objects are intentionally outside JMS restricted execution"
+  }
+}
