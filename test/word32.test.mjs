@@ -115,8 +115,6 @@ import {
   undoMove32,
   STATE_PLY,
   sideFromPly32,
-  STATE_SUPPORT_LO,
-  STATE_SUPPORT_HI,
   STATE_PLAYABLE_LO,
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
@@ -132,7 +130,7 @@ import {
 } from '../src/search32.mjs';
 
 test('apply and undo support state', () => {
-  const state = new Uint32Array(6);
+  const state = new Uint32Array(4);
   const landingCells = new Uint32Array(7);
   fillLandingCells32(landingCells, 7);
   for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
@@ -143,7 +141,6 @@ test('apply and undo support state', () => {
   assert.equal(state[STATE_PLY], 1);
   assert.equal(sideFromPly32(state[STATE_PLY]), 1);
   assert.equal(landingCells[3], 10);
-  assert.equal((state[STATE_SUPPORT_LO] & (1 << 3)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 10)) !== 0, true);
   assert.equal(state[STATE_SUPPORT_CODE], ((1 << 9) + (1 << 21)) >>> 0);
 
@@ -152,8 +149,6 @@ test('apply and undo support state', () => {
   assert.equal(state[STATE_PLY], 0);
   assert.equal(sideFromPly32(state[STATE_PLY]), 0);
   assert.equal(landingCells[3], 3);
-  assert.equal(state[STATE_SUPPORT_LO], 0);
-  assert.equal(state[STATE_SUPPORT_HI], 0);
   assert.equal(state[STATE_SUPPORT_CODE], 0);
 });
 
@@ -350,7 +345,7 @@ test('typed capacity allocation', () => {
 
 
 test('high-lane apply and undo derives masks without lookup tables', () => {
-  const state = new Uint32Array(6);
+  const state = new Uint32Array(4);
   const landingCells = new Uint32Array(7);
   fillLandingCells32(landingCells, 7);
   landingCells[5] = 33;
@@ -359,21 +354,19 @@ test('high-lane apply and undo derives masks without lookup tables', () => {
   const supportDelta = ((1 << 15) + (1 << 21)) >>> 0;
   const cell = applyMove32(state, landingCells, 5, 7, 42, supportDelta);
   assert.equal(cell, 33);
-  assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 1)) !== 0, false);
 
   const undone = undoMove32(state, landingCells, 5, 7, 42, supportDelta);
   assert.equal(undone, 33);
   assert.equal(landingCells[5], 33);
-  assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, false);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 1)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, false);
 });
 
 
 test('runtime-configured 4x4 transition', () => {
-  const state = new Uint32Array(6);
+  const state = new Uint32Array(4);
   const landingCells = new Uint32Array(4);
   fillLandingCells32(landingCells, 4);
   state[STATE_PLAYABLE_LO] = 0b1111;
@@ -384,7 +377,6 @@ test('runtime-configured 4x4 transition', () => {
   assert.equal(cell, 2);
   assert.equal(landingCells[column], 6);
   assert.equal(sideFromPly32(state[STATE_PLY]), 1);
-  assert.equal((state[STATE_SUPPORT_LO] & (1 << 2)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 6)) !== 0, true);
   assert.equal(state[STATE_SUPPORT_CODE], supportDelta);
 
@@ -392,13 +384,12 @@ test('runtime-configured 4x4 transition', () => {
   assert.equal(undone, 2);
   assert.equal(landingCells[column], 2);
   assert.equal(sideFromPly32(state[STATE_PLY]), 0);
-  assert.equal(state[STATE_SUPPORT_LO], 0);
   assert.equal(state[STATE_SUPPORT_CODE], 0);
 });
 
 
 test('bit-31 transition survives typed-store coercion', () => {
-  const state = new Uint32Array(6);
+  const state = new Uint32Array(4);
   const landingCells = new Uint32Array(8);
   fillLandingCells32(landingCells, 8);
   landingCells[7] = 31;
@@ -406,10 +397,8 @@ test('bit-31 transition survives typed-store coercion', () => {
   const supportDelta = 1;
 
   assert.equal(applyMove32(state, landingCells, 7, 8, 64, supportDelta), 31);
-  assert.equal(state[STATE_SUPPORT_LO], 0x80000000);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 7)) !== 0, true);
 
   assert.equal(undoMove32(state, landingCells, 7, 8, 64, supportDelta), 31);
-  assert.equal(state[STATE_SUPPORT_LO], 0);
   assert.equal(state[STATE_PLAYABLE_LO], 0x80000000);
 });
