@@ -6,7 +6,7 @@ import {connect4RbaRemoveCell,connect4RbaShapeSubset} from './rba-connect4-geome
 export const RBA_BOUNDARY_INCOMPLETE=6,RBA_BOUNDARY_CAPACITY=7;
 
 export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=100000}={}){
-  if(!Number.isInteger(depth)||depth<0||depth>8||!Number.isInteger(capacity)||capacity<1||
+  if(!Number.isInteger(depth)||depth<0||!Number.isInteger(capacity)||capacity<1||
      !Number.isInteger(budget)||budget<1)throw new RangeError('RBA front arena bounds');
   const actionBase=(depth+1)*12,slots=actionBase+g.columns*4,recordWords=g.generatorWords;
   const base=Uint32Array.from({length:slots},(_,slot)=>slot*capacity*recordWords);
