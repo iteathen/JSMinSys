@@ -154,13 +154,7 @@ function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
   const coord=offset+(player?g.p1Offset:g.p0Offset);
   for(let i=0;i<basisSize;i+=1){
     if(!coordHas(words,coord,i))continue;
-    const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-    let covered=0;
-    for(let j=0;j<size;j+=1){
-      const cell=g.shapeCells[base+j];
-      if((g.cellRow[cell]&1)===g.pairedResponseRowParity){covered=1;break;}
-    }
-    if(!covered)return 0;
+    if(!g.pairedResponseCover[basis[basisOffset+i]])return 0;
   }
   return 1;
 }
