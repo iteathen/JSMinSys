@@ -119,7 +119,7 @@
         "maskContains32",
         "maskContains2x32"
       ],
-      "note": "Signed bit-pattern containment is preferred when masks never require unsigned numeric interpretation."
+      "note": "Winning-line containment supports signed/unsigned one- and two-lane forms. Initialization should partition immutable required masks into low-only, high-only, and cross-lane groups; single-lane groups use maskContainsI32/maskContains32 directly, leaving two-lane functions only for masks that actually span lanes."
     },
     {
       "id": 8,

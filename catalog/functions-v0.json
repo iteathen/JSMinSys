@@ -1,5 +1,5 @@
 {
-  "version": "0.77.0",
+  "version": "0.78.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -480,8 +480,12 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
         "cycles": 3,
-        "note": "Correct unsigned containment including bit 31: AND + XOR + zero test."
-      }
+        "note": "Bit-31-safe one-lane containment. It also serves preclassified two-lane masks whose required bits occupy only one lane, avoiding the second-lane check."
+      },
+      "preconditions": [
+        "owned and required are one-lane uint32 bit patterns",
+        "for a two-lane required mask, initialization may select this profile when the opposite required lane is known zero and caller supplies the matching owned lane"
+      ]
     },
     {
       "name": "maskContainsI32",
@@ -493,14 +497,15 @@
       ],
       "status": "implemented-signed-bit-pattern-profile",
       "preconditions": [
-        "owned and required use the same int32 bit-pattern representation"
+        "owned and required use the same int32 bit-pattern representation",
+        "for a two-lane required mask, initialization may select this profile when the opposite required lane is known zero and caller supplies the matching owned lane"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
         "cycles": 2,
-        "note": "Signed bit-pattern equality makes bit 31 safe without XOR normalization."
+        "note": "Direct signed bit-pattern containment. Preclassified low-only/high-only required masks can use this 2-cycle profile instead of two-lane containment."
       }
     },
     {
@@ -6178,6 +6183,24 @@
           "before": "decodeRow32: 4 L1 / 12 L2 / 47 L3 cycles",
           "after": "1 fixed cycle",
           "mechanism": "runtime initialization prepares log2(columns) and replaces table lookup with shift"
+        }
+      ]
+    },
+    {
+      "id": "round-071",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "maskContainsI32",
+          "before": "maskContains2xI32: 3-5 cycles for every two-lane required mask",
+          "after": "2 cycles when initialization proves one required lane is zero",
+          "mechanism": "partition required masks by occupied lane and route single-lane cases directly"
+        },
+        {
+          "function": "maskContains32",
+          "before": "maskContains2x32: 4-7 cycles for every unsigned two-lane required mask",
+          "after": "3 cycles when initialization proves one required lane is zero",
+          "mechanism": "same preclassified lane specialization with bit-31-safe unsigned containment"
         }
       ]
     }

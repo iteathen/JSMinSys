@@ -106,6 +106,31 @@ import {
   selectLess32,
 } from '../src/indexed32.mjs';
 
+test('single-required-lane containment matches two-lane containment', () => {
+  const ownedLo = 0x8000000f;
+  const ownedHi = 0x80000003;
+
+  const lowRequired = 0x80000005;
+  assert.equal(
+    maskContainsI32(ownedLo, lowRequired),
+    maskContains2xI32(ownedLo, ownedHi, lowRequired, 0),
+  );
+  assert.equal(
+    maskContains32(ownedLo, lowRequired),
+    maskContains2x32(ownedLo, ownedHi, lowRequired, 0),
+  );
+
+  const highRequired = 0x80000001;
+  assert.equal(
+    maskContainsI32(ownedHi, highRequired),
+    maskContains2xI32(ownedLo, ownedHi, 0, highRequired),
+  );
+  assert.equal(
+    maskContains32(ownedHi, highRequired),
+    maskContains2x32(ownedLo, ownedHi, 0, highRequired),
+  );
+});
+
 test('indexed and table blocks', () => {
   const landingCells = new Uint32Array(7);
   assert.equal(fillLandingCells32(landingCells, 7), 7);
