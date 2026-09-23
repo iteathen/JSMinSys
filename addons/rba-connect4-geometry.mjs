@@ -32,11 +32,11 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     const key=keyOf(cells);
     if(!shapeMap.has(key)){shapeMap.set(key,0);shapeList.push(cells);}
   }
-  shapeList.sort((a,b)=>a.length-b.length||(()=>{
-    const n=Math.min(a.length,b.length);
-    for(let i=0;i<n;i+=1)if(a[i]!==b[i])return a[i]-b[i];
-    return a.length-b.length;
-  })());
+  shapeList.sort((a,b)=>{
+    const lengthDelta=a.length-b.length;if(lengthDelta)return lengthDelta;
+    for(let i=0;i<a.length;i+=1)if(a[i]!==b[i])return a[i]-b[i];
+    return 0;
+  });
   shapeMap.clear();
   for(let id=0;id<shapeList.length;id+=1)shapeMap.set(keyOf(shapeList[id]),id);
 
