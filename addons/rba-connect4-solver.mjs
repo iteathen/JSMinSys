@@ -110,13 +110,17 @@ export function publishConnect4RbaEvaluation32(t,q,owner,state,code,rootQ,rootWi
 
 export function selectConnect4RbaRootWitness32(t,g,root,reflected){
   if(!t.exact[root])return -2;const base=root*t.keyWords;if(connect4RbaTerminal(g,t.keys,base))return -1;
-  const value=t.exact[root],minimize=connect4RbaRank(g,t.keys,base)&1,edgeBase=root*t.edgeCapacity;
-  let bestPriority=g.columns,result=-2;
-  for(let i=0;i<t.count[root];i+=1){const e=edgeBase+i,lo=t.edgeLower[e],hi=t.edgeUpper[e],label=t.edgeLabel[e];
-    const caller=reflected?g.mirrorColumn[label]:label,possible=minimize?lo<=value:hi>=value;if(!possible)continue;
-    const priority=g.priorityByColumn[caller];if(priority<bestPriority){bestPriority=priority;result=minimize?(hi===value?caller:-2):(lo===value?caller:-2);}
+  const value=t.exact[root],minimize=connect4RbaRank(g,t.keys,base)&1,edgeBase=root*t.edgeCapacity,count=t.count[root];
+  // Root dependencies are published in initialization action priority order.
+  // The first edge that can still attain the exact root value therefore owns
+  // deterministic witness priority; if it is not exact yet, no later edge may
+  // supersede it until more evidence arrives.
+  for(let i=0;i<count;i+=1){const e=edgeBase+i,lo=t.edgeLower[e],hi=t.edgeUpper[e];
+    if(minimize?lo>value:hi<value)continue;
+    const label=t.edgeLabel[e],caller=reflected?g.mirrorColumn[label]:label;
+    return minimize?(hi===value?caller:-2):(lo===value?caller:-2);
   }
-  return result;
+  return -2;
 }
 
 export function reconcileConnect4RbaEvent32(t,q,g,rootReflected,rootWitnessOut,witnessIndex=0){
