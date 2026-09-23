@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "implementation-in-progress",
   "rule": "Stop implementation when a required primitive is not present in the admitted operation/capability set.",
   "functions": [
@@ -235,6 +235,253 @@
       "primitives": [
         "<=",
         "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "applyMove32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "|",
+        "&",
+        "~",
+        ">>>",
+        "+",
+        "-",
+        "*",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "undoMove32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "|",
+        "&",
+        "~",
+        ">>>",
+        "+",
+        "-",
+        "*",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "mix32",
+      "source": "src/mix32.mjs",
+      "block": "mix32",
+      "primitives": [
+        "|",
+        "^",
+        ">>>",
+        "=",
+        "Math.imul"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "reflectPacked3x32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        ">>>",
+        "<<",
+        "&",
+        "|",
+        "*",
+        "-",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "canonicalMin32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "<=",
+        "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "normalizeMinimal2x32InPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "!==",
+        "!",
+        "<",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "normalizeMaximal2x32InPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "!==",
+        "!",
+        "<",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "negateScore32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        "-"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "raiseLowerBound32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        ">",
+        "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "lowerUpperBound32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        "<",
+        "?:"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "cutoff32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        ">="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "argMaxPlayable32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">=",
+        "<",
+        ">",
+        "+",
+        "="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "atomicTryClaim32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.compareExchange",
+        "==="
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "atomicRelease32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.store",
+        "Atomics.notify"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "atomicExchange32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.exchange"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "atomicAdd32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.add"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "atomicSub32",
+      "source": "src/atomic32.mjs",
+      "block": "atomic-claim-release",
+      "primitives": [
+        "Atomics.sub"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "queueEnqueue32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.add",
+        "Atomics.load",
+        "Atomics.wait",
+        "Atomics.store",
+        "Atomics.notify",
+        "&",
+        "!==",
+        "+"
+      ],
+      "status": "implemented"
+    },
+    {
+      "name": "queueDequeue32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.add",
+        "Atomics.load",
+        "Atomics.wait",
+        "Atomics.store",
+        "Atomics.notify",
+        "&",
+        "!==",
+        "+"
       ],
       "status": "implemented"
     }
