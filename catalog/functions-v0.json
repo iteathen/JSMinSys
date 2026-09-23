@@ -1,5 +1,5 @@
 {
-  "version": "0.35.0",
+  "version": "0.36.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1266,6 +1266,102 @@
       }
     },
     {
+      "name": "shl2x32Lt32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        ">>>",
+        "|",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-range-profile",
+      "preconditions": [
+        "1 <= count < 32",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 7,
+        "note": "Branch-free low-count 64-bit left shift."
+      }
+    },
+    {
+      "name": "shl2x32Ge32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-range-profile",
+      "preconditions": [
+        "32 <= count < 64",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 4,
+        "note": "Branch-free high-count 64-bit left shift."
+      }
+    },
+    {
+      "name": "ushr2x32Lt32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        "<<",
+        ">>>",
+        "|",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-range-profile",
+      "preconditions": [
+        "1 <= count < 32",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 7,
+        "note": "Branch-free low-count 64-bit unsigned right shift."
+      }
+    },
+    {
+      "name": "ushr2x32Ge32Into",
+      "source": "src/word64x32.mjs",
+      "block": "cross-word-shift",
+      "primitives": [
+        ">>>",
+        "-",
+        "ST32",
+        "="
+      ],
+      "status": "implemented-range-profile",
+      "preconditions": [
+        "32 <= count < 64",
+        "destination is Uint32Array-compatible storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 4,
+        "note": "Branch-free high-count 64-bit unsigned right shift."
+      }
+    },
+    {
       "name": "shl2x32Into",
       "source": "src/word64x32.mjs",
       "block": "cross-word-shift",
@@ -1667,11 +1763,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 74,
+    "functionsImplemented": 78,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 74,
+    "functionsWithCycleCount": 78,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2374,6 +2470,36 @@
           "before": "clearLowestSetBit32: 3 cycles",
           "after": "2 cycles",
           "mechanism": "signed bit-pattern result removes unsigned coercion"
+        }
+      ]
+    },
+    {
+      "id": "round-029",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "shl2x32Lt32Into",
+          "before": "generic shl2x32Into low path: ~9 cycles",
+          "after": "7 cycles",
+          "mechanism": "caller-owned count range removes branch"
+        },
+        {
+          "function": "shl2x32Ge32Into",
+          "before": "generic shl2x32Into high path: ~6 cycles",
+          "after": "4 cycles",
+          "mechanism": "caller-owned count range removes branch"
+        },
+        {
+          "function": "ushr2x32Lt32Into",
+          "before": "generic ushr2x32Into low path: ~9 cycles",
+          "after": "7 cycles",
+          "mechanism": "caller-owned count range removes branch"
+        },
+        {
+          "function": "ushr2x32Ge32Into",
+          "before": "generic ushr2x32Into high path: ~6 cycles",
+          "after": "4 cycles",
+          "mechanism": "caller-owned count range removes branch"
         }
       ]
     }
