@@ -4,6 +4,14 @@ This is the current explicit allow-list for JSMinSys computation.
 
 **Admissible does not mean preferred, required, or equally cheap.** An admissible operation may still be avoided when representation, structural reuse, precomputation, or a cheaper operation eliminates it.
 
+## Cost-transparent admission
+
+Operation cost magnitude does **not** determine admissibility.
+
+An operation may be admitted even when it is expensive if its cost can be represented faithfully through the selected NEES cost profile as a fixed value, range, parameterized expression, or unbounded cost. The application author decides whether that cost is worth paying.
+
+JSMinSys therefore rejects **unaccounted** operations, not merely slow ones.
+
 ## Arithmetic operators
 
 The ordinary JavaScript arithmetic operators are admissible:
@@ -132,6 +140,22 @@ The following observed `Math.*` helpers are now admissible as well:
 
 They remain subject to cost qualification and may be eliminated by representation where possible.
 
+## Storage construction
+
+The following typed-storage construction operation is admissible:
+
+- `Uint32Array.construct` — source realization: `new Uint32Array(length)`
+
+Its cost is intentionally not a fixed scalar. NEES models it as:
+
+```text
+TYPED_ARRAY_ALLOC_U32(length, typedArrayAllocationPath, pageState, gcState)
+```
+
+The model includes typed-array/view creation, backing-store allocation, zero initialization or zero-page provisioning, GC/external-memory accounting, and page commitment/fault effects where applicable.
+
+Generic `new` is **not** admitted by this rule.
+
 ## Atomic operations
 
 The observed shared-memory operations are admissible:
@@ -164,4 +188,4 @@ The operating rule is:
 
 > Allow the small set of ordinary, directly optimized operators we know we may need; then minimize total physical cost of the actual program rather than artificially minimizing the number of operator names.
 
-New operation families remain disallowed until explicitly admitted.
+New operation families remain disallowed until explicitly admitted. High cost alone is not a reason to deny admission when the cost can be represented accurately.
