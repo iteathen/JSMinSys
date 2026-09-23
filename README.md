@@ -2,7 +2,7 @@
 
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
-The current normative draft is [SPEC.md](SPEC.md).
+The current normative draft is [SPEC.md](SPEC.md). JSMinSys is a strict NEES-EXTREME execution profile: NEES supplies the governing optimization, evidence, qualification, and cost-accounting standard; JSMinSys adds narrower admissible data, operations, blocks, and mechanical sealing.
 
 The project works upward from the cheapest qualified operations rather than downward from conventional software abstractions. The initial workload corpus is the Connect4 solver family; Connect4 is a proving workload, not part of the JSMinSys API.
 
@@ -31,4 +31,4 @@ The working hypothesis is a 32-bit word domain for hot computation. Wider logica
 
 ## Status
 
-Draft 0.1 specification bootstrap. The primitive vocabulary remains provisional; see `SPEC.md` for normative intent and `catalog/` for the Connect4-derived research inventory.
+Draft 0.2 specification bootstrap. The primitive vocabulary remains provisional; see `SPEC.md` for normative intent and `catalog/` for the Connect4-derived research inventory.
