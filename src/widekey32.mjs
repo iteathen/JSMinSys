@@ -34,3 +34,32 @@ export function publishSpan32(target, targetOffset, source, sourceOffset, count)
   for (let index = 0; index < count; index += 1) target[targetOffset + index] = source[sourceOffset + index];
   return count;
 }
+
+export function mixSpan32Locator32(words, offset, wordCount) {
+  let hash = 0;
+  for (let lane = 0; lane < wordCount; lane += 1) {
+    const x = hash ^ words[offset + lane];
+    hash = Math.imul(x ^ (x >>> 16), 0x7feb352d);
+  }
+  return hash >>> 0;
+}
+
+export function probeSpan32IdSlot32(hashSlots, words, capacityMask, start, keyWords, keyOffset, wordCount, emptyId) {
+  let slot = start;
+  for (;;) {
+    const id = hashSlots[slot];
+    if (id === emptyId) return ~slot;
+    const base = id * wordCount;
+    let lane = 0;
+    while (lane < wordCount && words[base + lane] === keyWords[keyOffset + lane]) lane += 1;
+    if (lane === wordCount) return id;
+    slot = (slot + 1) & capacityMask;
+  }
+}
+
+export function publishSpanIdSlot32(words, hashSlots, slot, id, keyWords, keyOffset, wordCount) {
+  const base = id * wordCount;
+  for (let lane = 0; lane < wordCount; lane += 1) words[base + lane] = keyWords[keyOffset + lane];
+  hashSlots[slot] = id;
+  return id;
+}
