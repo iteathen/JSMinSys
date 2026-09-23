@@ -189,9 +189,13 @@
         "supportFromCallerPlyMeta32",
         "playableHighFromCallerPlyMeta32",
         "applyMove32CallerPlyMetaKnownCell",
-        "undoMove32CallerPlyMetaKnownCell"
+        "undoMove32CallerPlyMetaKnownCell",
+        "supportFromCallerPlyMeta1x32",
+        "playableFromCallerPlyMeta1x32",
+        "applyMove1x32CallerPlyMetaKnownCell",
+        "undoMove1x32CallerPlyMetaKnownCell"
       ],
-      "note": "Recursive transition profiles include caller-carried meta when caller-owned ply and high playable + full support fit below the sign bit. Known-cell apply returns the child meta scalar; mutable state retains only playable-low and landing cells, so recursive return restores support/high by parent scalar ownership rather than undo stores."
+      "note": "Caller-carried recursive profiles now cover eligible one- and two-lane layouts. When one-lane playable+support fit below the sign bit, known-cell apply uses only scalar ALU plus the landing store and undo is landing-only; parent meta ownership restores all other state."
     },
     {
       "id": 9,

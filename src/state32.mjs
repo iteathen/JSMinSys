@@ -1608,3 +1608,39 @@ export function undoMove32CallerPlyMetaKnownCell(
   return cell;
 }
 
+export function supportFromCallerPlyMeta1x32(meta, cellCount) {
+  return meta >>> cellCount;
+}
+
+export function playableFromCallerPlyMeta1x32(meta, playableMask) {
+  return meta & playableMask;
+}
+
+export function applyMove1x32CallerPlyMetaKnownCell(
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  meta,
+  packedSupportDelta,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (next < cellCount) meta ^= bit | (1 << next);
+  else meta ^= bit;
+
+  landingCells[index] = next;
+  return meta + packedSupportDelta;
+}
+
+export function undoMove1x32CallerPlyMetaKnownCell(
+  landingCells,
+  index,
+  cell,
+) {
+  landingCells[index] = cell;
+  return cell;
+}
+

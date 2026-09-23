@@ -238,6 +238,10 @@ import {
   advanceMirroredSupport32,
   applyMove32CallerPlyMetaKnownCell,
   undoMove32CallerPlyMetaKnownCell,
+  supportFromCallerPlyMeta1x32,
+  playableFromCallerPlyMeta1x32,
+  applyMove1x32CallerPlyMetaKnownCell,
+  undoMove1x32CallerPlyMetaKnownCell,
   applyMove32CallerPlyCenterOmittedCenter,
   undoMove32CallerPlyCenterOmittedCenter,
   applyMove32CallerPlyCenterOmittedCenterKnownCell,
@@ -1394,6 +1398,67 @@ test('caller-carried meta restores support/high by recursive ownership', () => {
     advanceMirroredSupport32(0, 1 << 12),
     reflectPacked3Columns6To7(1 << 6, 9, 15),
   );
+});
+
+test('one-lane caller meta makes known-cell undo landing-only', () => {
+  const columns = 4;
+  const rows = 4;
+  const cellCount = columns * rows;
+  const playableMask = (1 << cellCount) - 1;
+  const column = 2;
+  const supportDelta = 1 << (3 * column);
+  const packedSupportDelta = supportDelta << cellCount;
+  const mirroredSupportDelta = 1 << (3 * (columns - 1 - column));
+
+  const base = new Uint32Array(2);
+  const landingBase = new Uint32Array(columns);
+  const landingFast = new Uint32Array(columns);
+  fillLandingCells32(landingBase, columns);
+  fillLandingCells32(landingFast, columns);
+  base[CALLER_PLY1_PLAYABLE_LO] = (1 << columns) - 1;
+
+  const parentMeta = (1 << columns) - 1;
+  const parentReflected = 0;
+  const cell = landingFast[column];
+
+  applyMove1x32CallerPlyKnownCell(
+    base, landingBase, column, cell, columns, cellCount, supportDelta,
+  );
+  const childMeta = applyMove1x32CallerPlyMetaKnownCell(
+    landingFast, column, cell, columns, cellCount,
+    parentMeta, packedSupportDelta,
+  );
+  const childReflected = advanceMirroredSupport32(
+    parentReflected, mirroredSupportDelta,
+  );
+
+  assert.equal(
+    playableFromCallerPlyMeta1x32(childMeta, playableMask),
+    base[CALLER_PLY1_PLAYABLE_LO],
+  );
+  assert.equal(
+    supportFromCallerPlyMeta1x32(childMeta, cellCount),
+    base[CALLER_PLY1_SUPPORT_CODE],
+  );
+  assert.equal(
+    childReflected,
+    reflectPacked3Columns4(base[CALLER_PLY1_SUPPORT_CODE]),
+  );
+
+  undoMove1x32CallerPlyKnownCell(
+    base, landingBase, column, cell, columns, cellCount - columns, supportDelta,
+  );
+  undoMove1x32CallerPlyMetaKnownCell(landingFast, column, cell);
+
+  assert.equal(
+    playableFromCallerPlyMeta1x32(parentMeta, playableMask),
+    base[CALLER_PLY1_PLAYABLE_LO],
+  );
+  assert.equal(
+    supportFromCallerPlyMeta1x32(parentMeta, cellCount),
+    base[CALLER_PLY1_SUPPORT_CODE],
+  );
+  assert.deepEqual(landingFast, landingBase);
 });
 
 test('mix and reflection blocks', () => {
