@@ -16,8 +16,12 @@ export function maskContains2x32(owned0, owned1, required0, required1) {
     && ((owned1 & required1) ^ required1) === 0;
 }
 
-export function residualTransition32(table, classIndex, actionIndex, actionCount) {
-  return table[classIndex * actionCount + actionIndex];
+export function residualBase32(classIndex, actionCount) {
+  return classIndex * actionCount;
+}
+
+export function residualTransition32(table, classBase, actionIndex) {
+  return table[classBase + actionIndex];
 }
 
 export function powerOfTwoIndex32(hash, capacityMask) {
