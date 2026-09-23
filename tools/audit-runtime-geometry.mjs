@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 
 const addonFiles=readdirSync('addons').filter(name=>name.endsWith('.mjs'));
+const coreSourceFiles=readdirSync('src').filter(name=>name.endsWith('.mjs'));
 const forbidden=[
   [/7x6/i,'7x6 proving geometry'],
   [/rba7x6/i,'fixed RBA 7x6 API'],
@@ -10,6 +11,16 @@ const forbidden=[
   [/\b625\b/,'7x6 residual-shape constant'],
   [/RBA_TT_MAX_EDGES|RBA_TT_MAX_BASIS|RBA_TT_KEY_WORDS/,'fixed RBA TT dimension constant'],
 ];
+for(const file of coreSourceFiles){
+  const source=readFileSync('src/'+file,'utf8');
+  for(const [pattern,label] of [
+    [/7x6/i,'7x6 proving geometry'],
+    [/\\b42\\b/,'standard-board cell-count constant'],
+    [/\\b69\\b/,'7x6 winning-line constant'],
+    [/\\b625\\b/,'7x6 residual-shape constant'],
+  ])assert.ok(!pattern.test(source),`src/${file}: hidden ${label}`);
+}
+
 for(const file of addonFiles){
   const source=readFileSync('addons/'+file,'utf8');
   for(const [pattern,label] of forbidden)assert.ok(!pattern.test(source),`addons/${file}: hidden ${label}`);
