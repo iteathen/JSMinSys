@@ -112,6 +112,8 @@ test('indexed and table blocks', () => {
 
 
 import {
+  applyMove1x32,
+  undoMove1x32,
   applyMove32,
   undoMove32,
   STATE_PLY,
@@ -385,14 +387,14 @@ test('runtime-configured 4x4 transition', () => {
   const column = 2;
   const supportDelta = 1 << 6;
 
-  const cell = applyMove32(state, landingCells, column, 4, 16, supportDelta);
+  const cell = applyMove1x32(state, landingCells, column, 4, 16, supportDelta);
   assert.equal(cell, 2);
   assert.equal(landingCells[column], 6);
   assert.equal(sideFromPly32(state[STATE_PLY]), 1);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 6)) !== 0, true);
   assert.equal(state[STATE_SUPPORT_CODE], supportDelta);
 
-  const undone = undoMove32(state, landingCells, column, 4, 16, supportDelta);
+  const undone = undoMove1x32(state, landingCells, column, 4, 16, supportDelta);
   assert.equal(undone, 2);
   assert.equal(landingCells[column], 2);
   assert.equal(sideFromPly32(state[STATE_PLY]), 0);
@@ -413,4 +415,23 @@ test('bit-31 transition survives typed-store coercion', () => {
 
   assert.equal(undoMove32(state, landingCells, 7, 8, 64, supportDelta), 31);
   assert.equal(state[STATE_PLAYABLE_LO], 0x80000000);
+});
+
+
+test('one-lane full-column transition', () => {
+  const state = new Uint32Array(4);
+  const landingCells = new Uint32Array(4);
+  fillLandingCells32(landingCells, 4);
+  const column = 3;
+  landingCells[column] = 15;
+  state[STATE_PLAYABLE_LO] = 1 << 15;
+  const supportDelta = 1 << 9;
+
+  assert.equal(applyMove1x32(state, landingCells, column, 4, 16, supportDelta), 15);
+  assert.equal(landingCells[column], 19);
+  assert.equal((state[STATE_PLAYABLE_LO] & (1 << 15)) !== 0, false);
+
+  assert.equal(undoMove1x32(state, landingCells, column, 4, 16, supportDelta), 15);
+  assert.equal(landingCells[column], 15);
+  assert.equal((state[STATE_PLAYABLE_LO] & (1 << 15)) !== 0, true);
 });
