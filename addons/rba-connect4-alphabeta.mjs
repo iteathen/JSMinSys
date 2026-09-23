@@ -40,7 +40,7 @@ export function prepareConnect4RbaAlphaBeta({
   boundaryCapacity=256,
   boundaryBudget=100000,
   cacheCapacity=65536,
-  cpcFrontierResponse=true,
+  cpcFrontierResponse=false,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(mode!==RBA_AB_CPC_ONLY&&mode!==RBA_AB_CPC_FOUR_FRONT)throw new RangeError('invalid alpha-beta mode');
