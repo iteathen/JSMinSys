@@ -15,11 +15,11 @@ export function bitToggle32(word, mask) {
 }
 
 export function firstSetBitIndex32(word) {
-  return word === 0 ? 32 : 31 - Math.clz32(word & -word);
+  return 31 - Math.clz32(word & -word);
 }
 
 export function popcount32(word) {
-  let x = word >>> 0;
+  let x = word;
   x = x - ((x >>> 1) & 0x55555555);
   x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
   x = (x + (x >>> 4)) & 0x0f0f0f0f;
