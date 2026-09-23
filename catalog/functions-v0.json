@@ -1,5 +1,5 @@
 {
-  "version": "0.81.0",
+  "version": "0.82.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2686,8 +2686,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 12,
-        "note": "Reverse the low four fields with the 4-column network and place the fifth field at the low end; no table memory."
+        "cycles": 11,
+        "note": "Reverse the low four fields, fuse the final 6-bit exchange with left-by-3 alignment, then place the fifth source field at the low end."
       }
     },
     {
@@ -6307,6 +6307,18 @@
           "before": "20 fixed cycles",
           "after": "19 fixed cycles",
           "mechanism": "same fused final rotation/alignment after direct upper-pair extraction"
+        }
+      ]
+    },
+    {
+      "id": "round-075",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3Columns5",
+          "before": "12 fixed cycles",
+          "after": "11 fixed cycles",
+          "mechanism": "fuse the final 12-bit half exchange with its left-by-3 output alignment"
         }
       ]
     }

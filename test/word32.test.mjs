@@ -983,6 +983,22 @@ test('configured packed-3 register reflection profiles', () => {
   }
 });
 
+test('5-column reflection fused final alignment preserves edge fields', () => {
+  const vectors = [
+    0,
+    7,
+    7 << 12,
+    (7 | (6 << 3) | (5 << 6) | (4 << 9) | (3 << 12)) >>> 0,
+    0x7fff,
+  ];
+  for (const code of vectors) {
+    assert.equal(
+      reflectPacked3Columns5(code),
+      reflectPacked3Direct32(code, 5, 12),
+    );
+  }
+});
+
 test('9/10-column reflection fused final alignment preserves edge fields', () => {
   const vectors9 = [
     0,

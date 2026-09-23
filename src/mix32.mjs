@@ -104,8 +104,7 @@ export function reflectPacked3Columns4(code) {
 
 export function reflectPacked3Columns5(code) {
   let x = ((code & 0x1c7) << 3) | ((code & 0xe38) >>> 3);
-  x = ((x << 6) | (x >>> 6)) & 0xfff;
-  return (code >>> 12) | (x << 3);
+  return (code >>> 12) | (((x << 9) | (x >>> 3)) & 0x7ff8);
 }
 
 export function reflectPacked3Columns6To7(code, leftShift, highShift) {
