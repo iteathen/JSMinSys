@@ -85,7 +85,8 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
       let j=image<g.pairShapeStart?childPair:
         image<g.tripleShapeStart?childTriple:
         image<g.quadShapeStart?childQuad:cn;
-      for(;j<cn;j+=1)if(profile.shapeSubset(g,image,childBasis[ci+j]))
+      const subset=profile.prepareSubset(g,image);
+      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j]))
         target[targetCoord+(j>>>5)]|=1<<(j&31);
     }
   }
