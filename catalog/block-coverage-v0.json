@@ -57,9 +57,11 @@
         "clearLowestSetBit32",
         "cardinalityClass32",
         "cardinalityClass2x32",
+        "clearIsolatedBitI32",
+        "clearIsolatedBit32",
         "clearLowestSetBitI32"
       ],
-      "note": "General first-set-bit, caller-isolated-bit, clear-lowest-bit, and one/two-lane cardinality profiles coexist. Hot set-bit iteration should reuse an already-isolated lsb rather than recomputing isolation inside an index helper; high-lane global indexing folds the +32 offset into a constant subtract."
+      "note": "General first-set-bit, caller-isolated-bit, caller-isolated clear, clear-lowest-bit, and one/two-lane cardinality profiles coexist. Once a hot iterator has isolated lsb, it should reuse that bit both for indexing and for XOR clearing rather than recomputing the lowest-bit relation."
     },
     {
       "id": 4,

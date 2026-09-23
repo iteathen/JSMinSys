@@ -90,6 +90,14 @@ export function firstSetBitIndex2x32(lo, hi) {
   return 63 - Math.clz32(hi & -hi);
 }
 
+export function clearIsolatedBitI32(word, bit) {
+  return word ^ bit;
+}
+
+export function clearIsolatedBit32(word, bit) {
+  return (word ^ bit) >>> 0;
+}
+
 export function clearLowestSetBitI32(word) {
   return word & (word - 1);
 }

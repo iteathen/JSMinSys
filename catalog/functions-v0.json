@@ -1,5 +1,5 @@
 {
-  "version": "0.49.0",
+  "version": "0.50.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2505,6 +2505,49 @@
       }
     },
     {
+      "name": "clearIsolatedBitI32",
+      "source": "src/word64x32.mjs",
+      "block": "next-set-bit",
+      "primitives": [
+        "^"
+      ],
+      "status": "implemented-caller-isolated-profile",
+      "preconditions": [
+        "bit is a nonzero isolated bit that is set in word",
+        "the caller already isolated bit for independent indexing/iteration work",
+        "result is consumed as an int32 bit pattern"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "XOR clears a known-present isolated bit. Reuses caller isolation instead of recomputing word-1 and AND."
+      }
+    },
+    {
+      "name": "clearIsolatedBit32",
+      "source": "src/word64x32.mjs",
+      "block": "next-set-bit",
+      "primitives": [
+        "^",
+        ">>>"
+      ],
+      "status": "implemented-caller-isolated-profile",
+      "preconditions": [
+        "bit is a nonzero isolated bit that is set in word",
+        "the caller already isolated bit for independent indexing/iteration work",
+        "result is required as an unsigned uint32 numeric value"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "XOR + unsigned coercion. Still one cycle cheaper than clearLowestSetBit32 when the isolated bit already exists."
+      }
+    },
+    {
       "name": "clearLowestSetBitI32",
       "source": "src/word64x32.mjs",
       "block": "next-set-bit",
@@ -2796,11 +2839,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 110,
+    "functionsImplemented": 112,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 110,
+    "functionsWithCycleCount": 112,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3787,6 +3830,24 @@
           "before": "two-lane/high indexing requires isolation plus lane selection/offset",
           "after": "2 cycles after caller isolation",
           "mechanism": "fold high-lane +32 offset into constant 63 - clz32(bit)"
+        }
+      ]
+    },
+    {
+      "id": "round-043",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "clearIsolatedBitI32",
+          "before": "clearLowestSetBitI32: 2 cycles",
+          "after": "1 cycle",
+          "mechanism": "reuse caller-isolated known-present bit and clear with XOR"
+        },
+        {
+          "function": "clearIsolatedBit32",
+          "before": "clearLowestSetBit32: 3 cycles",
+          "after": "2 cycles",
+          "mechanism": "same XOR reuse plus required unsigned coercion"
         }
       ]
     }

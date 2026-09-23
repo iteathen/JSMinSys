@@ -537,6 +537,8 @@ import {
   firstSetBitIndex2x32,
   clearLowestSetBitI32,
   clearLowestSetBit32,
+  clearIsolatedBitI32,
+  clearIsolatedBit32,
   cardinalityClass2x32,
   popcount2x32SparseHigh,
   popcount2x32,
@@ -659,6 +661,13 @@ test('move-slot index space removes hot physical-column remap', () => {
   assert.equal(landing[slot], 11);
   assert.equal(undoMove32(state, landing, slot, 7, 42, supportDelta), 4);
   assert.equal(landing[slot], 4);
+});
+
+test('isolated-bit clear profiles reuse caller isolation', () => {
+  assert.equal(clearIsolatedBitI32(0b1010, 0b0010), 0b1000);
+  assert.equal(clearIsolatedBitI32(0x80000001, 1), -2147483648);
+  assert.equal(clearIsolatedBit32(0x80000001, 1), 0x80000000);
+  assert.equal(clearIsolatedBit32(0xffffffff, 0x80000000), 0x7fffffff);
 });
 
 test('isolated-bit index profiles reuse caller isolation', () => {
