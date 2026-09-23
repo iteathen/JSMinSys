@@ -251,6 +251,11 @@ test('two-lane shifts and arithmetic', () => {
   ushr2x32Into(dst, 0, 0, 1, 1);
   assert.deepEqual([...dst], [0x80000000, 0]);
 
+  shl2x32Into(dst, 0, 1, 0, 63);
+  assert.deepEqual([...dst], [0, 0x80000000]);
+  ushr2x32Into(dst, 0, 0, 0x80000000, 63);
+  assert.deepEqual([...dst], [1, 0]);
+
   add2x32Into(dst, 0, 0xffffffff, 1, 1, 2);
   assert.deepEqual([...dst], [0, 4]);
 
@@ -385,4 +390,22 @@ test('runtime-configured 4x4 transition', () => {
   assert.equal(sideFromPly32(state[STATE_PLY]), 0);
   assert.equal(state[STATE_SUPPORT_LO], 0);
   assert.equal(state[STATE_SUPPORT_CODE], 0);
+});
+
+
+test('bit-31 transition survives typed-store coercion', () => {
+  const state = new Uint32Array(6);
+  const landingCells = new Uint32Array(8);
+  fillLandingCells32(landingCells, 8);
+  landingCells[7] = 31;
+  state[STATE_PLAYABLE_LO] = 0x80000000;
+  const supportDelta = 1;
+
+  assert.equal(applyMove32(state, landingCells, 7, 8, 64, supportDelta), 31);
+  assert.equal(state[STATE_SUPPORT_LO], 0x80000000);
+  assert.equal((state[STATE_PLAYABLE_HI] & (1 << 7)) !== 0, true);
+
+  assert.equal(undoMove32(state, landingCells, 7, 8, 64, supportDelta), 31);
+  assert.equal(state[STATE_SUPPORT_LO], 0);
+  assert.equal(state[STATE_PLAYABLE_LO], 0x80000000);
 });
