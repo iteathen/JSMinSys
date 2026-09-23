@@ -154,6 +154,18 @@ import {
   CALLER_PLY2_PLAYABLE_LO,
   CALLER_PLY2_PLAYABLE_HI,
   CALLER_PLY2_SUPPORT_CODE,
+  PACKED_PLY1_PLAYABLE_LO,
+  PACKED_PLY1_SUPPORT_PLY,
+  PACKED_PLY2_PLAYABLE_LO,
+  PACKED_PLY2_PLAYABLE_HI,
+  PACKED_PLY2_SUPPORT_PLY,
+  plyFromPackedSupport32,
+  supportFromPackedSupport32,
+  sideFromPackedSupport32,
+  applyMove1x32PackedPlyKnownCell,
+  undoMove1x32PackedPlyKnownCell,
+  applyMove32PackedPlyKnownCell,
+  undoMove32PackedPlyKnownCell,
   STATE_PLY,
   sideFromPly32,
   STATE_PLAYABLE_LO,
@@ -435,6 +447,73 @@ test('known-cell undo prepared top-row boundary', () => {
   assert.equal(landing[2], 14);
   assert.equal(state[STATE_PLAYABLE_LO], 0);
   assert.equal(state[STATE_PLY], 0);
+});
+
+test('packed support+ply transition profile preserves support-only reflection boundary', () => {
+  // Runtime-configured one-lane 4x4: support uses 12 bits, ply begins at bit 12.
+  const ordinary1 = new Uint32Array(4);
+  const packed1 = new Uint32Array(2);
+  const landingOrdinary1 = new Uint32Array(4);
+  const landingPacked1 = new Uint32Array(4);
+  fillLandingCells32(landingOrdinary1, 4);
+  fillLandingCells32(landingPacked1, 4);
+  ordinary1[STATE_PLAYABLE_LO] = 0b1111;
+  packed1[PACKED_PLY1_PLAYABLE_LO] = 0b1111;
+
+  const rankShift1 = 12;
+  const supportMask1 = (1 << rankShift1) - 1;
+  const supportDelta1 = 1 << 6;
+  const combinedDelta1 = supportDelta1 + (1 << rankShift1);
+
+  applyMove1x32KnownCell(ordinary1, landingOrdinary1, 2, 2, 4, 16, supportDelta1);
+  applyMove1x32PackedPlyKnownCell(packed1, landingPacked1, 2, 2, 4, 16, combinedDelta1);
+  assert.equal(packed1[PACKED_PLY1_PLAYABLE_LO], ordinary1[STATE_PLAYABLE_LO]);
+  assert.deepEqual(landingPacked1, landingOrdinary1);
+  assert.equal(
+    supportFromPackedSupport32(packed1[PACKED_PLY1_SUPPORT_PLY], supportMask1),
+    ordinary1[STATE_SUPPORT_CODE],
+  );
+  assert.equal(plyFromPackedSupport32(packed1[PACKED_PLY1_SUPPORT_PLY], rankShift1), ordinary1[STATE_PLY]);
+  assert.equal(sideFromPackedSupport32(packed1[PACKED_PLY1_SUPPORT_PLY], rankShift1), 1);
+
+  undoMove1x32KnownCell(ordinary1, landingOrdinary1, 2, 2, 4, 12, supportDelta1);
+  undoMove1x32PackedPlyKnownCell(packed1, landingPacked1, 2, 2, 4, 12, combinedDelta1);
+  assert.equal(packed1[PACKED_PLY1_PLAYABLE_LO], ordinary1[STATE_PLAYABLE_LO]);
+  assert.deepEqual(landingPacked1, landingOrdinary1);
+  assert.equal(packed1[PACKED_PLY1_SUPPORT_PLY], 0);
+
+  // Runtime-configured two-lane 7x6 test vector crossing cell 31 -> 38.
+  const ordinary2 = new Uint32Array(4);
+  const packed2 = new Uint32Array(3);
+  const landingOrdinary2 = new Uint32Array(7);
+  const landingPacked2 = new Uint32Array(7);
+  landingOrdinary2[3] = 31;
+  landingPacked2[3] = 31;
+  ordinary2[STATE_PLAYABLE_LO] = 0x80000000;
+  packed2[PACKED_PLY2_PLAYABLE_LO] = 0x80000000;
+
+  const rankShift2 = 21;
+  const supportMask2 = (1 << rankShift2) - 1;
+  const supportDelta2 = 1 << 9;
+  const combinedDelta2 = supportDelta2 + (1 << rankShift2);
+
+  applyMove32KnownCell(ordinary2, landingOrdinary2, 3, 31, 7, 42, supportDelta2);
+  applyMove32PackedPlyKnownCell(packed2, landingPacked2, 3, 31, 7, 42, combinedDelta2);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_LO], ordinary2[STATE_PLAYABLE_LO]);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_HI], ordinary2[STATE_PLAYABLE_HI]);
+  assert.deepEqual(landingPacked2, landingOrdinary2);
+  assert.equal(
+    supportFromPackedSupport32(packed2[PACKED_PLY2_SUPPORT_PLY], supportMask2),
+    ordinary2[STATE_SUPPORT_CODE],
+  );
+  assert.equal(plyFromPackedSupport32(packed2[PACKED_PLY2_SUPPORT_PLY], rankShift2), ordinary2[STATE_PLY]);
+
+  undoMove32KnownCell(ordinary2, landingOrdinary2, 3, 31, 7, 35, 25, supportDelta2);
+  undoMove32PackedPlyKnownCell(packed2, landingPacked2, 3, 31, 7, 35, 25, combinedDelta2);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_LO], ordinary2[STATE_PLAYABLE_LO]);
+  assert.equal(packed2[PACKED_PLY2_PLAYABLE_HI], ordinary2[STATE_PLAYABLE_HI]);
+  assert.deepEqual(landingPacked2, landingOrdinary2);
+  assert.equal(packed2[PACKED_PLY2_SUPPORT_PLY], 0);
 });
 
 test('mix and reflection blocks', () => {

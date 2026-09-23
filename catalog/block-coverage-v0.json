@@ -135,9 +135,16 @@
         "undoMove1x32KnownCell",
         "undoMove1x32CallerPlyKnownCell",
         "undoMove32KnownCell",
-        "undoMove32CallerPlyKnownCell"
+        "undoMove32CallerPlyKnownCell",
+        "plyFromPackedSupport32",
+        "supportFromPackedSupport32",
+        "sideFromPackedSupport32",
+        "applyMove1x32PackedPlyKnownCell",
+        "undoMove1x32PackedPlyKnownCell",
+        "applyMove32PackedPlyKnownCell",
+        "undoMove32PackedPlyKnownCell"
       ],
-      "note": "Initialization selects lane count and state ownership. Known-cell apply reuses an observed landing cell; paired known-cell undo additionally consumes initialization-prepared lastRowStart (and lowLaneAboveLimit for two lanes), so it never reconstructs next=cell+columns merely to undo. Ordinary profiles remain for callers without these invariants. Geometry stays runtime-configured and immutable after initialization."
+      "note": "Transition profiles now include separate-ply, caller-owned-ply, and configured packed support+ply representations. Packed state is selected only when 3-bit support plus rank fits one uint32; combined deltas update both facts with one load/store/add. Reflection remains support-only via an explicit supportMask extraction, so packed physical state does not reintroduce rank work into reflection."
     },
     {
       "id": 9,
@@ -190,7 +197,7 @@
         "reflectPacked3Columns10",
         "canonicalMin32"
       ],
-      "note": "Initialization selects no work for one column or an exact register-only packed-3 profile for 2..10 columns. The 6/7-column profile now precomputes both final alignment shifts so its last half-swap and alignment are fused. Table/direct forms remain qualified alternatives for emitted-code/cache studies."
+      "note": "Reflection functions continue to consume support-only packed bits. Configured transition state may physically pack support+ply when it fits, but supportFromPackedSupport32 masks rank away before reflection; rank extraction/reinsertion is never part of the reflection primitive."
     },
     {
       "id": 13,

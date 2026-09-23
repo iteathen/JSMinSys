@@ -1,5 +1,5 @@
 {
-  "version": "0.60.0",
+  "version": "0.61.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1315,6 +1315,249 @@
         },
         "expression": "normal lane: 2*LOAD + 3*STORE + 7..11 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 11 ALU/control",
         "note": "Composes caller-owned ply and retained apply cell with prepared geometry thresholds. Same-lane/high above bits use bit<<columns; low-to-high crossings use bit>>>lowLaneAboveLimit."
+      }
+    },
+    {
+      "name": "plyFromPackedSupport32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "rankShift identifies the configured packed rank field",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Unsigned shift extracts rank from an already-loaded packed support+ply word."
+      }
+    },
+    {
+      "name": "supportFromPackedSupport32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "supportMask selects exactly the configured support field",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "AND extracts support-only bits before reflection/identity consumers; rank is never reintroduced into reflection."
+      }
+    },
+    {
+      "name": "sideFromPackedSupport32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "rankShift identifies the configured packed rank field",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Extract rank field then parity bit."
+      }
+    },
+    {
+      "name": "applyMove1x32PackedPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "caller already holds the exact current landing cell for this transition index",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 15.5,
+          "max": 17.5
+        },
+        "hotL2Predicted": {
+          "min": 31.5,
+          "max": 33.5
+        },
+        "expression": "2*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "Packed support+ply replaces separate ply/support loads, stores, and increments with one packed load/store/add."
+      }
+    },
+    {
+      "name": "undoMove1x32PackedPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "caller retains the exact played cell returned by paired apply",
+        "lastRowStart was prepared during initialization",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 14.5,
+          "max": 16.5
+        },
+        "hotL2Predicted": {
+          "min": 30.5,
+          "max": 32.5
+        },
+        "expression": "2*LOAD + 3*STORE + 5..7 ALU/control",
+        "note": "Packed support+ply plus retained cell/prepared boundary reaches the same transition ledger as caller-owned ply without external rank ownership."
+      }
+    },
+    {
+      "name": "applyMove32PackedPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured board cell count is 33..64",
+        "caller already holds the exact current landing cell for this transition index",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 17.5,
+          "max": 26
+        },
+        "hotL2Predicted": {
+          "min": 33.5,
+          "max": 50
+        },
+        "expression": "normal lane: 2*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 12 ALU/control",
+        "note": "Two-lane packed state eliminates separate state-owned ply traffic while preserving support-only reflection extraction."
+      }
+    },
+    {
+      "name": "undoMove32PackedPlyKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        ">>>",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-state-profile",
+      "preconditions": [
+        "configured board cell count is 33..64",
+        "caller retains the exact played cell returned by paired apply",
+        "lastRowStart and lowLaneAboveLimit were prepared during initialization",
+        "support encoding uses 3 bits per configured column",
+        "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
+        "rankShift = 3*columns and rankShift + rankBits <= 32",
+        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
+        "rankIncrement represents one in the packed rank field",
+        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16.5,
+          "max": 25
+        },
+        "hotL2Predicted": {
+          "min": 32.5,
+          "max": 49
+        },
+        "expression": "normal lane: 2*LOAD + 3*STORE + 7..11 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 11 ALU/control",
+        "note": "Packed support+ply combines state-owned rank with the retained-cell/prepared-boundary undo reductions."
       }
     },
     {
@@ -3250,11 +3493,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 126,
+    "functionsImplemented": 133,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 126,
+    "functionsWithCycleCount": 133,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4421,6 +4664,30 @@
           "before": "3 + N*(L+5) + K*(L+1+2*S)",
           "after": "2 + N*(L+5) + K*(L+1+2*S)",
           "mechanism": "delete return newMask+1 because the caller supplied newMask and already owns capacity"
+        }
+      ]
+    },
+    {
+      "id": "round-054",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove1x32PackedPlyKnownCell / undoMove1x32PackedPlyKnownCell",
+          "before": "state-owned known-cell: apply 21-23 L1; undo 20-22 L1",
+          "after": "packed state: apply 15.5-17.5 L1; undo 14.5-16.5 L1",
+          "mechanism": "pack support+ply when configured bit budget permits; one combined delta replaces separate ply/support load-store-update"
+        },
+        {
+          "function": "applyMove32PackedPlyKnownCell / undoMove32PackedPlyKnownCell",
+          "before": "state-owned known-cell: apply 23-31.5 L1; undo 22-30.5 L1",
+          "after": "packed state: apply 17.5-26 L1; undo 16.5-25 L1",
+          "mechanism": "same packed physical-state reduction for two-lane masks"
+        },
+        {
+          "function": "support/ply extraction",
+          "before": "separate state words require separate state ownership",
+          "after": "1-cycle support mask or rank shift from an already-loaded packed word",
+          "mechanism": "keep physical packing local to state while reflection remains support-only"
         }
       ]
     }
