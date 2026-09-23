@@ -92,18 +92,22 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   return 0;
 }
 
-function compareSupport(g,words,offset,reflected){
+function compareReflectedSupport(g,words,offset){
   for(let c=0;c<g.columns;c+=1){
-    const a=words[offset+c],b=reflected[c];
+    const a=words[offset+c],b=words[offset+g.mirrorColumn[c]];
     if(a<b)return -1;if(a>b)return 1;
   }
   return 0;
 }
 export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratch){
+  const primary=compareReflectedSupport(g,words,offset);
+  if(primary<0)return 0;
+
+  // Only materialize the reflected support after the lexicographic support
+  // comparison says reflection may be selected. Canonical asymmetric support
+  // returns above without writing the scratch mirror row at all.
   for(let c=0;c<g.columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
   scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
-  const primary=compareSupport(g,words,offset,scratch.mirror);
-  if(primary<0)return 0;
 
   for(let w=0;w<g.shapeWordCount;w+=1)scratch.seen[w]=0;
   for(let i=0;i<n;i+=1){const id=g.reflect[basis[bi+i]];scratch.seen[id>>>5]|=1<<(id&31);}
