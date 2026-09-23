@@ -261,9 +261,12 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
 }
 
 export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
-  let q=t.control[RBA_TT_READY_HEAD],seen=0,merged=0,best=-1,bestPriority=-2147483648;
+  // Workers append new surplus at READY_TAIL. Inspect from the tail so the
+  // manager sees fresh surplus first instead of repeatedly rescanning the same
+  // old head window while the queue grows behind it.
+  let q=t.control[RBA_TT_READY_TAIL],seen=0,merged=0,best=-1,bestPriority=-2147483648;
   while(q!==-1&&seen<budget){
-    const next=t.readyNext[q];
+    const previous=t.readyPrev[q];
     if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
       rbaTtUnqueueReady32(t,q);
     }else{
@@ -271,7 +274,7 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
       if(equivalent>=0){merged+=rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);}
       else if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
     }
-    q=next;seen+=1;
+    q=previous;seen+=1;
   }
   if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
     const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
