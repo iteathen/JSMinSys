@@ -1,5 +1,5 @@
 {
-  "version": "0.12.0",
+  "version": "0.13.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -77,9 +77,8 @@
       "source": "src/word64x32.mjs",
       "block": "wordwise-logical",
       "primitives": [
-        "LD32",
-        "&",
         "ST32",
+        "&",
         "+",
         "="
       ],
@@ -87,21 +86,22 @@
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "scenario",
-        "hotL1Predicted": 22,
-        "hotL2Predicted": 54,
-        "expression": "4*LOAD + 2*AND + 3*ADD(address/index) + 2*STORE",
-        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum; ownership penalties remain outside this scenario."
-      }
+        "kind": "expression",
+        "expression": "2*AND + ADD(index) + 2*STORE_COST",
+        "hotLocalMinimumCycles": 4,
+        "note": "Source-array loads are removed from the primitive contract; callers that load lanes from memory account for those loads separately."
+      },
+      "preconditions": [
+        "source lanes already available as scalar uint32 values"
+      ]
     },
     {
       "name": "or2x32Into",
       "source": "src/word64x32.mjs",
       "block": "wordwise-logical",
       "primitives": [
-        "LD32",
-        "|",
         "ST32",
+        "|",
         "+",
         "="
       ],
@@ -109,21 +109,22 @@
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "scenario",
-        "hotL1Predicted": 22,
-        "hotL2Predicted": 54,
-        "expression": "4*LOAD + 2*OR + 3*ADD(address/index) + 2*STORE",
-        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum."
-      }
+        "kind": "expression",
+        "expression": "2*OR + ADD(index) + 2*STORE_COST",
+        "hotLocalMinimumCycles": 4,
+        "note": "Source-array loads are removed from the primitive contract; callers that load lanes from memory account for those loads separately."
+      },
+      "preconditions": [
+        "source lanes already available as scalar uint32 values"
+      ]
     },
     {
       "name": "xor2x32Into",
       "source": "src/word64x32.mjs",
       "block": "wordwise-logical",
       "primitives": [
-        "LD32",
-        "^",
         "ST32",
+        "^",
         "+",
         "="
       ],
@@ -131,12 +132,14 @@
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "scenario",
-        "hotL1Predicted": 22,
-        "hotL2Predicted": 54,
-        "expression": "4*LOAD + 2*XOR + 3*ADD(address/index) + 2*STORE",
-        "note": "Store uses NEES hot/local 0.5-cycle throughput minimum."
-      }
+        "kind": "expression",
+        "expression": "2*XOR + ADD(index) + 2*STORE_COST",
+        "hotLocalMinimumCycles": 4,
+        "note": "Source-array loads are removed from the primitive contract; callers that load lanes from memory account for those loads separately."
+      },
+      "preconditions": [
+        "source lanes already available as scalar uint32 values"
+      ]
     },
     {
       "name": "zero2x32",
@@ -412,9 +415,9 @@
         ">>>",
         "+",
         "-",
-        "*",
         "<<",
         "<",
+        "<=",
         "="
       ],
       "status": "implemented",
@@ -423,16 +426,21 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 68.5,
-          "max": 79.5
+          "min": 50.5,
+          "max": 60
         },
         "hotL2Predicted": {
-          "min": 132.5,
-          "max": 143.5
+          "min": 98.5,
+          "max": 116
         },
-        "expression": "noAbove: 8*LOAD + 9*STORE + 32..33 ALU/control; above: 8*LOAD + 9*STORE + 41..43 ALU/control",
-        "note": "Played/above cell masks are derived from the cell index, deleting 2-4 mask-table loads. Range reflects low/high lane mask construction and above-cell path."
-      }
+        "expression": "lane-specialized 7x6 transition; low->low 55.5 L1, low->high 60 L1, high-full 50.5 L1, high-row4 55.5 L1",
+        "note": "Only the affected support lane is loaded/stored. Only the affected playable lane is normally touched; the other playable lane is touched only when an above-cell crosses bit 31/32. Cell and support shifts use shifts/adds rather than multiply."
+      },
+      "preconditions": [
+        "Connect4 geometry is 7 columns x 6 rows",
+        "support-code rank increment is bit 21",
+        "column is already legal"
+      ]
     },
     {
       "name": "undoMove32",
@@ -447,9 +455,9 @@
         ">>>",
         "+",
         "-",
-        "*",
         "<<",
         "<",
+        "<=",
         "="
       ],
       "status": "implemented",
@@ -458,16 +466,21 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 72,
-          "max": 85
+          "min": 54,
+          "max": 64.5
         },
         "hotL2Predicted": {
-          "min": 144,
-          "max": 157
+          "min": 110,
+          "max": 128.5
         },
-        "expression": "noAbove: 9*LOAD + 8*STORE + 32..33 ALU/control; above: 9*LOAD + 8*STORE + 43..45 ALU/control",
-        "note": "Played/above cell masks are derived from the cell index, deleting 2-4 mask-table loads. Range reflects low/high lane construction and above-cell path."
-      }
+        "expression": "lane-specialized 7x6 undo; high-full 54 L1, low->low/high-row4 60 L1, low->high 64.5 L1",
+        "note": "Only affected lanes are touched. Cell/support coordinate arithmetic is specialized to the fixed Connect4 representation."
+      },
+      "preconditions": [
+        "Connect4 geometry is 7 columns x 6 rows",
+        "support-code rank increment is bit 21",
+        "at least one move exists"
+      ]
     },
     {
       "name": "mix32",
@@ -1279,6 +1292,42 @@
           "before": "two subset-scan phases for accepted candidates",
           "after": "one rejection scan",
           "mechanism": "exploit nonincreasing-cardinality input invariant"
+        }
+      ]
+    },
+    {
+      "id": "round-006",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32",
+          "before": "68.5-79.5 L1 / 132.5-143.5 L2",
+          "after": "50.5-60 L1 / 98.5-116 L2",
+          "mechanism": "specialize 7x6 geometry and update only affected bit lanes"
+        },
+        {
+          "function": "undoMove32",
+          "before": "72-85 L1 / 144-157 L2",
+          "after": "54-64.5 L1 / 110-128.5 L2",
+          "mechanism": "specialize 7x6 geometry and update only affected bit lanes"
+        },
+        {
+          "function": "and2x32Into",
+          "before": "22 L1 / 54 L2",
+          "after": "4-cycle hot-local floor with scalar sources",
+          "mechanism": "remove forced source-array loads from primitive API"
+        },
+        {
+          "function": "or2x32Into",
+          "before": "22 L1 / 54 L2",
+          "after": "4-cycle hot-local floor with scalar sources",
+          "mechanism": "remove forced source-array loads from primitive API"
+        },
+        {
+          "function": "xor2x32Into",
+          "before": "22 L1 / 54 L2",
+          "after": "4-cycle hot-local floor with scalar sources",
+          "mechanism": "remove forced source-array loads from primitive API"
         }
       ]
     }
