@@ -4,6 +4,10 @@ import {connect4RbaRemoveCell,connect4RbaShapeSubset} from './rba-connect4-geome
 
 function removeDense(g,id,cell){return g.removeByCell[cell*g.shapeCount+id];}
 function removeSparse(g,id,cell){return connect4RbaRemoveCell(g,id,cell);}
+function prepareRemoveDense(g,cell){return cell*g.shapeCount;}
+function prepareRemoveSparse(g,cell){return cell;}
+function removeDensePrepared(g,id,row){return g.removeByCell[row+id];}
+function removeSparsePrepared(g,id,cell){return connect4RbaRemoveCell(g,id,cell);}
 function subsetDense(g,a,b){return g.subsetTable[a*g.shapeCount+b];}
 function subsetSparse(g,a,b){return connect4RbaShapeSubset(g,a,b);}
 function prepareSubsetDense(g,a){return a*g.shapeCount;}
@@ -58,6 +62,8 @@ export function prepareConnect4RbaExecutionProfile(g){
   const coordinate3=g.coordWords===3,front6=g.generatorWords===6;
   return {
     removeCell:denseRemove?removeDense:removeSparse,
+    prepareRemove:denseRemove?prepareRemoveDense:prepareRemoveSparse,
+    removePrepared:denseRemove?removeDensePrepared:removeSparsePrepared,
     shapeSubset:denseSubset?subsetDense:subsetSparse,
     prepareSubset:denseSubset?prepareSubsetDense:prepareSubsetSparse,
     shapeSubsetPrepared:denseSubset?subsetDensePrepared:subsetSparsePrepared,
