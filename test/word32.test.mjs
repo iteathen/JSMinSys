@@ -232,6 +232,10 @@ import {
   undoMove32CallerPlyCenterOmitted,
   applyMove32CallerPlyCenterOmittedKnownCell,
   undoMove32CallerPlyCenterOmittedKnownCell,
+  applyMove32CallerPlyCenterOmittedCenter,
+  undoMove32CallerPlyCenterOmittedCenter,
+  applyMove32CallerPlyCenterOmittedCenterKnownCell,
+  undoMove32CallerPlyCenterOmittedCenterKnownCell,
   CENTER_OMIT1_META,
   supportFromCenterOmittedAll32,
   playableFromCenterOmittedAll32,
@@ -679,6 +683,78 @@ test('caller-ply odd-center omission fully packs eligible one-lane state', () =>
     ),
   );
   assert.deepEqual(knownLandingPacked, knownLandingBase);
+});
+
+test('omitted-center specialized transition skips zero support work', () => {
+  const columns = 7;
+  const cellCount = 42;
+  const center = columns >> 1;
+
+  const general = new Uint32Array(2);
+  const specialized = new Uint32Array(2);
+  const landingGeneral = new Uint32Array(columns);
+  const landingSpecialized = new Uint32Array(columns);
+  fillLandingCells32(landingGeneral, columns);
+  fillLandingCells32(landingSpecialized, columns);
+  for (let column = 0; column < columns; column += 1) {
+    general[CENTER_OMIT2_PLAYABLE_LO] |= 1 << column;
+    specialized[CENTER_OMIT2_PLAYABLE_LO] |= 1 << column;
+  }
+
+  for (let move = 0; move < 6; move += 1) {
+    assert.equal(
+      applyMove32CallerPlyCenterOmittedCenter(
+        specialized, landingSpecialized, center, columns, cellCount,
+      ),
+      applyMove32CallerPlyCenterOmitted(
+        general, landingGeneral, center, columns, cellCount, 0,
+      ),
+    );
+    assert.deepEqual(specialized, general);
+    assert.deepEqual(landingSpecialized, landingGeneral);
+  }
+
+  for (let move = 0; move < 6; move += 1) {
+    assert.equal(
+      undoMove32CallerPlyCenterOmittedCenter(
+        specialized, landingSpecialized, center, columns, cellCount,
+      ),
+      undoMove32CallerPlyCenterOmitted(
+        general, landingGeneral, center, columns, cellCount, 0,
+      ),
+    );
+    assert.deepEqual(specialized, general);
+    assert.deepEqual(landingSpecialized, landingGeneral);
+  }
+
+  const knownGeneral = new Uint32Array(2);
+  const knownSpecialized = new Uint32Array(2);
+  const knownLandingGeneral = new Uint32Array(columns);
+  const knownLandingSpecialized = new Uint32Array(columns);
+  knownLandingGeneral[center] = 31;
+  knownLandingSpecialized[center] = 31;
+  knownGeneral[CENTER_OMIT2_PLAYABLE_LO] = 0x80000000;
+  knownSpecialized[CENTER_OMIT2_PLAYABLE_LO] = 0x80000000;
+
+  applyMove32CallerPlyCenterOmittedKnownCell(
+    knownGeneral, knownLandingGeneral, center, 31, columns, cellCount, 0,
+  );
+  applyMove32CallerPlyCenterOmittedCenterKnownCell(
+    knownSpecialized, knownLandingSpecialized, center, 31, columns, cellCount,
+  );
+  assert.deepEqual(knownSpecialized, knownGeneral);
+  assert.deepEqual(knownLandingSpecialized, knownLandingGeneral);
+
+  undoMove32CallerPlyCenterOmittedKnownCell(
+    knownGeneral, knownLandingGeneral, center, 31, columns,
+    cellCount - columns, 32 - columns, 0,
+  );
+  undoMove32CallerPlyCenterOmittedCenterKnownCell(
+    knownSpecialized, knownLandingSpecialized, center, 31, columns,
+    cellCount - columns, 32 - columns,
+  );
+  assert.deepEqual(knownSpecialized, knownGeneral);
+  assert.deepEqual(knownLandingSpecialized, knownLandingGeneral);
 });
 
 test('caller-ply odd-center omission compresses 7x6 transition state', () => {

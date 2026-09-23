@@ -181,9 +181,13 @@
         "applyMove1x32CallerPlyCenterOmitted",
         "undoMove1x32CallerPlyCenterOmitted",
         "applyMove1x32CallerPlyCenterOmittedKnownCell",
-        "undoMove1x32CallerPlyCenterOmittedKnownCell"
+        "undoMove1x32CallerPlyCenterOmittedKnownCell",
+        "applyMove32CallerPlyCenterOmittedCenter",
+        "undoMove32CallerPlyCenterOmittedCenter",
+        "applyMove32CallerPlyCenterOmittedCenterKnownCell",
+        "undoMove32CallerPlyCenterOmittedCenterKnownCell"
       ],
-      "note": "Transition state profiles scale with caller ownership and bit budget. Odd-width caller-owned-ply layouts may omit the reflection-fixed center support field; eligible one-lane states then collapse playable plus all remaining support into one uint32, while eligible two-lane states use two words."
+      "note": "Transition profiles include center-slot specialization for odd-width center-omitted layouts. When the caller already knows it is executing the omitted center slot, zero support arithmetic disappears; low-lane moves that remain low also avoid any meta load/store."
     },
     {
       "id": 9,

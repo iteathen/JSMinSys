@@ -1379,3 +1379,154 @@ export function undoMove1x32CallerPlyCenterOmittedKnownCell(
   return cell;
 }
 
+export function applyMove32CallerPlyCenterOmittedCenter(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+) {
+  const cell = landingCells[index];
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[CENTER_OMIT2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CENTER_OMIT2_META] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CENTER_OMIT2_PLAYABLE_LO] = playableLo;
+  } else {
+    let meta = state[CENTER_OMIT2_META];
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle;
+    state[CENTER_OMIT2_META] = meta;
+  }
+
+  landingCells[index] = next;
+  return cell;
+}
+
+export function undoMove32CallerPlyCenterOmittedCenter(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = 1 << cell;
+
+  landingCells[index] = cell;
+
+  if (cell < 32) {
+    let playableLo = state[CENTER_OMIT2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CENTER_OMIT2_META] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CENTER_OMIT2_PLAYABLE_LO] = playableLo;
+  } else {
+    let meta = state[CENTER_OMIT2_META];
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle;
+    state[CENTER_OMIT2_META] = meta;
+  }
+  return cell;
+}
+
+export function applyMove32CallerPlyCenterOmittedCenterKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[CENTER_OMIT2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CENTER_OMIT2_META] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CENTER_OMIT2_PLAYABLE_LO] = playableLo;
+  } else {
+    let meta = state[CENTER_OMIT2_META];
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle;
+    state[CENTER_OMIT2_META] = meta;
+  }
+
+  landingCells[index] = next;
+  return cell;
+}
+
+export function undoMove32CallerPlyCenterOmittedCenterKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  lastRowStart,
+  lowLaneAboveLimit,
+) {
+  const bit = 1 << cell;
+
+  landingCells[index] = cell;
+
+  if (cell < 32) {
+    let playableLo = state[CENTER_OMIT2_PLAYABLE_LO];
+
+    if (cell < lastRowStart) {
+      if (cell < lowLaneAboveLimit) playableLo ^= bit | (bit << columns);
+      else {
+        playableLo ^= bit;
+        state[CENTER_OMIT2_META] ^= bit >>> lowLaneAboveLimit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CENTER_OMIT2_PLAYABLE_LO] = playableLo;
+  } else {
+    let meta = state[CENTER_OMIT2_META];
+    let toggle = bit;
+    if (cell < lastRowStart) toggle |= bit << columns;
+    meta ^= toggle;
+    state[CENTER_OMIT2_META] = meta;
+  }
+  return cell;
+}
+

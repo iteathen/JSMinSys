@@ -1,5 +1,5 @@
 {
-  "version": "0.87.0",
+  "version": "0.88.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2836,6 +2836,175 @@
         },
         "expression": "LOAD + 2*STORE + 5..7 ALU/control",
         "note": "Retained cell and prepared top boundary reduce one-word caller-ply undo to 10-12 L1 cycles."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyCenterOmittedCenter",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-center-slot-profile",
+      "preconditions": [
+        "landingCells[index] is the current center landing cell",
+        "the selected transition index is already known to correspond to the omitted reflection-fixed physical center column",
+        "caller does not add a hot center-slot test solely to reach this profile when claiming the governing-unit reduction",
+        "caller owns exact ply/rank independently",
+        "the center support field is omitted, so its support delta is exactly zero",
+        "state uses CENTER_OMIT2_PLAYABLE_LO plus CENTER_OMIT2_META layout",
+        "configured board cell count is 33..64",
+        "configured columns is odd",
+        "landing and geometry invariants match the corresponding center-omitted general profile"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16,
+          "max": 24.5
+        },
+        "hotL2Predicted": {
+          "min": 24,
+          "max": 40.5
+        },
+        "expression": "low/same: 2*LOAD+2*STORE+7..11 ALU/control; low-to-high: 3*LOAD+3*STORE+11 ALU/control; high lane: 2*LOAD+2*STORE+7..11 ALU/control",
+        "note": "Low-lane center moves that stay low never touch meta because support delta is zero and playable-high is unchanged. Crossing/high paths still remove the zero support add."
+      }
+    },
+    {
+      "name": "undoMove32CallerPlyCenterOmittedCenter",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-center-slot-profile",
+      "preconditions": [
+        "landingCells[index] is immediately above the center move being undone or beyond cellCount",
+        "the selected transition index is already known to correspond to the omitted reflection-fixed physical center column",
+        "caller does not add a hot center-slot test solely to reach this profile when claiming the governing-unit reduction",
+        "caller owns exact ply/rank independently",
+        "the center support field is omitted, so its support delta is exactly zero",
+        "state uses CENTER_OMIT2_PLAYABLE_LO plus CENTER_OMIT2_META layout",
+        "configured board cell count is 33..64",
+        "configured columns is odd",
+        "landing and geometry invariants match the corresponding center-omitted general profile"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16,
+          "max": 24.5
+        },
+        "hotL2Predicted": {
+          "min": 24,
+          "max": 40.5
+        },
+        "expression": "low/same: 2*LOAD+2*STORE+7..11 ALU/control; low-to-high: 3*LOAD+3*STORE+11 ALU/control; high lane: 2*LOAD+2*STORE+7..11 ALU/control",
+        "note": "Symmetric center undo deletes zero support arithmetic and avoids meta traffic when the playable toggle remains entirely low."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyCenterOmittedCenterKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-center-slot-known-cell-profile",
+      "preconditions": [
+        "caller already holds the exact current center landing cell",
+        "the selected transition index is already known to correspond to the omitted reflection-fixed physical center column",
+        "caller does not add a hot center-slot test solely to reach this profile when claiming the governing-unit reduction",
+        "caller owns exact ply/rank independently",
+        "the center support field is omitted, so its support delta is exactly zero",
+        "state uses CENTER_OMIT2_PLAYABLE_LO plus CENTER_OMIT2_META layout",
+        "configured board cell count is 33..64",
+        "configured columns is odd",
+        "landing and geometry invariants match the corresponding center-omitted general profile"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 12,
+          "max": 20.5
+        },
+        "hotL2Predicted": {
+          "min": 16,
+          "max": 28.5
+        },
+        "expression": "low/same: LOAD+2*STORE+7..11 ALU/control; low-to-high: 2*LOAD+3*STORE+11 ALU/control; high lane: LOAD+2*STORE+7..11 ALU/control",
+        "note": "Known-cell low/same center apply saves one meta load, one meta store, and the zero-delta add versus the general center-omitted known-cell profile."
+      }
+    },
+    {
+      "name": "undoMove32CallerPlyCenterOmittedCenterKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "<<",
+        ">>>",
+        "<",
+        "="
+      ],
+      "status": "implemented-center-slot-known-cell-profile",
+      "preconditions": [
+        "caller retains the exact played center cell",
+        "lastRowStart and lowLaneAboveLimit were prepared during initialization",
+        "the selected transition index is already known to correspond to the omitted reflection-fixed physical center column",
+        "caller does not add a hot center-slot test solely to reach this profile when claiming the governing-unit reduction",
+        "caller owns exact ply/rank independently",
+        "the center support field is omitted, so its support delta is exactly zero",
+        "state uses CENTER_OMIT2_PLAYABLE_LO plus CENTER_OMIT2_META layout",
+        "configured board cell count is 33..64",
+        "configured columns is odd",
+        "landing and geometry invariants match the corresponding center-omitted general profile"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 11,
+          "max": 19.5
+        },
+        "hotL2Predicted": {
+          "min": 15,
+          "max": 27.5
+        },
+        "expression": "low/same: LOAD+2*STORE+6..10 ALU/control; low-to-high: 2*LOAD+3*STORE+10 ALU/control; high lane: LOAD+2*STORE+6..10 ALU/control",
+        "note": "Prepared-boundary center undo removes meta traffic on low/same paths and eliminates the otherwise unavoidable zero support subtraction."
       }
     },
     {
@@ -5792,11 +5961,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 204,
+    "functionsImplemented": 208,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 204,
+    "functionsWithCycleCount": 208,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -7419,6 +7588,24 @@
           "before": "caller-ply known-cell one-lane: apply 15.5-17.5 / undo 14.5-16.5 L1",
           "after": "apply 11-13 / undo 10-12 L1",
           "mechanism": "compose one-word state packing with caller-known/retained cell"
+        }
+      ]
+    },
+    {
+      "id": "round-081",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "center-omitted center-slot transition profiles",
+          "before": "general center-omitted functions load/store meta and add/subtract a known zero support delta",
+          "after": "low/same center path avoids meta entirely; all center paths delete zero support arithmetic",
+          "mechanism": "specialize the already-known omitted center slot rather than treating its zero delta as ordinary support state"
+        },
+        {
+          "function": "known-cell center-slot profile",
+          "before": "general center-omitted known-cell low/same path: 2*LOAD + 3*STORE + 8..12 ALU",
+          "after": "LOAD + 2*STORE + 7..11 ALU",
+          "mechanism": "compose center zero-delta ownership with caller-known landing cell"
         }
       ]
     }
