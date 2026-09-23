@@ -37,45 +37,48 @@ function combine(a,left,right,out,intersect){
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[out]=n;return 0;
 }
 function prepareValid(g,a,d,n){
-  for(let w=0;w<g.coordWords;w+=1){const remaining=n-w*32;a.valid[d*g.coordWords+w]=remaining>=32?0xffffffff:remaining>0?(0xffffffff>>>(32-remaining)):0;}
+  const cw=g.coordWords,base=d*cw;
+  for(let w=0;w<cw;w+=1){const remaining=n-w*32;a.valid[base+w]=remaining>=32?0xffffffff:remaining>0?(0xffffffff>>>(32-remaining)):0;}
 }
 function prepareUpsets(g,a,d,basis,bi,n){
-  for(let i=0;i<n;i+=1){const row=(d*g.maxBasis+i)*g.coordWords;for(let w=0;w<g.coordWords;w+=1)a.up[row+w]=0;
+  const cw=g.coordWords,depthBase=d*g.maxBasis*cw;
+  for(let i=0;i<n;i+=1){const row=depthBase+i*cw;for(let w=0;w<cw;w+=1)a.up[row+w]=0;
     for(let j=0;j<n;j+=1)if(a.profile.shapeSubset(g,basis[bi+i],basis[bi+j]))a.up[row+(j>>>5)]|=1<<(j&31);
   }
 }
 function prepareImages(g,a,d,cell,mover,basis,bi){
-  const n=a.size[d],cn=a.size[d+1];
+  const n=a.size[d],cn=a.size[d+1],cw=g.coordWords,nextValid=(d+1)*cw,nextBasis=(d+1)*g.maxBasis;
   for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.profile.removeCell(g,id,cell);a.top1[i]=0;
-    const row=i*g.coordWords;for(let w=0;w<g.coordWords;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
+    const row=i*cw;for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
     for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
-      if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<g.coordWords;w+=1)out[row+w]=a.valid[(d+1)*g.coordWords+w];}
-      else for(let j=0;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[(d+1)*g.maxBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+      if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
+      else for(let j=0;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
     }
   }
 }
 function covers(g,a,d,childBase,out){
-  const n=a.size[d],cw=g.coordWords;
+  const n=a.size[d],cw=g.coordWords,validBase=d*cw,upBase=d*g.maxBasis*cw;
   for(let w=0;w<cw;w+=1){a.target[w]=a.words[childBase+w];a.cover[w]=0;}a.next[0]=0;let level=0;
   while(level>=0){if(!spend(a))return a.error;const b=level*cw;let any=0;for(let w=0;w<cw;w+=1)any|=a.target[b+w];
-    if(!any){for(let w=0;w<cw;w+=1){a.temp[w]=a.cover[b+w];a.temp[cw+w]=a.valid[d*cw+w]&~a.adjoint[w];}if(insert(a,out))return a.error;level-=1;continue;}
+    if(!any){for(let w=0;w<cw;w+=1){a.temp[w]=a.cover[b+w];a.temp[cw+w]=a.valid[validBase+w]&~a.adjoint[w];}if(insert(a,out))return a.error;level-=1;continue;}
     let lane=0;while(lane<cw&&!a.target[b+lane])lane+=1;const mask=1<<firstSetBitIndex32(a.target[b+lane]);
     let i=a.next[level];while(i<n&&!(a.image0[i*cw+lane]&mask))i+=1;if(i===n){level-=1;continue;}
-    a.next[level]=i+1;for(let w=0;w<cw;w+=1){a.target[b+cw+w]=a.target[b+w]&~a.image0[i*cw+w];a.cover[b+cw+w]=a.cover[b+w]|a.up[(d*g.maxBasis+i)*cw+w];}
+    const upRow=upBase+i*cw;
+    a.next[level]=i+1;for(let w=0;w<cw;w+=1){a.target[b+cw+w]=a.target[b+w]&~a.image0[i*cw+w];a.cover[b+cw+w]=a.cover[b+w]|a.up[upRow+w];}
     level+=1;a.next[level]=0;
   }
   return 0;
 }
 function preimage(g,a,d,child,out,cell,mover,basis,bi){
-  const cw=g.coordWords;a.count[out]=0;
+  const cw=g.coordWords,size=a.size[d],upBase=d*g.maxBasis*cw;a.count[out]=0;
   for(let j=0;j<a.count[child];j+=1){const cb=a.base[child]+j*a.recordWords;for(let w=0;w<cw;w+=1)a.adjoint[w]=0;
-    for(let i=0;i<a.size[d];i+=1){if(a.top1[i])continue;let ok=1;for(let w=0;w<cw;w+=1)if(a.image1[i*cw+w]&a.words[cb+cw+w]){ok=0;break;}
-      if(ok)for(let w=0;w<cw;w+=1)a.adjoint[w]|=a.up[(d*g.maxBasis+i)*cw+w];
+    for(let i=0;i<size;i+=1){if(a.top1[i])continue;let ok=1;for(let w=0;w<cw;w+=1)if(a.image1[i*cw+w]&a.words[cb+cw+w]){ok=0;break;}
+      if(ok){const upRow=upBase+i*cw;for(let w=0;w<cw;w+=1)a.adjoint[w]|=a.up[upRow+w];}
     }
     if(covers(g,a,d,cb,out))return a.error;
   }
-  if(mover===0){const singleton=g.singletonByCell[cell];if(singleton>=0)for(let i=0;i<a.size[d];i+=1)if(basis[bi+i]===singleton){
-    for(let w=0;w<cw;w+=1){a.temp[w]=a.up[(d*g.maxBasis+i)*cw+w];a.temp[cw+w]=0;}if(insert(a,out))return a.error;break;
+  if(mover===0){const singleton=g.singletonByCell[cell];if(singleton>=0)for(let i=0;i<size;i+=1)if(basis[bi+i]===singleton){
+    const upRow=upBase+i*cw;for(let w=0;w<cw;w+=1){a.temp[w]=a.up[upRow+w];a.temp[cw+w]=0;}if(insert(a,out))return a.error;break;
   }}
   return 0;
 }
@@ -83,12 +86,12 @@ function buildAt(g,a,d,remaining,basis,bi,n){
   if(!spend(a))return a.error;const slot=d*12,rank=a.rootRank+d;a.size[d]=n;prepareValid(g,a,d,n);
   if(rank===g.cellCount){universal(a,slot);a.count[slot+1]=0;universal(a,slot+2);a.count[slot+3]=0;return 0;}
   if(!remaining){a.count[slot]=0;a.count[slot+1]=0;universal(a,slot+2);universal(a,slot+3);return 0;}
-  prepareUpsets(g,a,d,basis,bi,n);const mover=rank&1;
+  prepareUpsets(g,a,d,basis,bi,n);const mover=rank&1,childBi=(d+1)*g.maxBasis,childSlot=(d+1)*12;
   for(let h=0;h<4;h+=1){if(mover)universal(a,slot+h);else a.count[slot+h]=0;}
-  for(let c=0;c<g.columns;c+=1){const height=a.heights[c];if(height>=g.rows)continue;const cell=height*g.columns+c,childBi=(d+1)*g.maxBasis;
+  for(let c=0;c<g.columns;c+=1){const height=a.heights[c];if(height>=g.rows)continue;const cell=height*g.columns+c;
     const cn=connect4RbaCofactorBasis(g,a.profile,basis,bi,n,cell,a.basis,childBi,a.seen);a.heights[c]=height+1;
     if(buildAt(g,a,d+1,remaining-1,a.basis,childBi,cn))return a.error;a.heights[c]=height;prepareImages(g,a,d,cell,mover,basis,bi);
-    for(let h=0;h<4;h+=1){if(preimage(g,a,d,(d+1)*12+h,slot+4+h,cell,mover,basis,bi))return a.error;
+    for(let h=0;h<4;h+=1){if(preimage(g,a,d,childSlot+h,slot+4+h,cell,mover,basis,bi))return a.error;
       if(combine(a,slot+h,slot+4+h,slot+8+h,mover))return a.error;swap(a,slot+8+h,slot+h);
       if(d===0)swap(a,slot+4+h,a.actionBase+c*4+h);
     }
