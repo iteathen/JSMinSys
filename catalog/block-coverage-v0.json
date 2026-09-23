@@ -204,10 +204,12 @@
       "functions": [
         "normalizeMinimal2x32InPlace",
         "normalizeMaximal2x32InPlace",
+        "normalizeMinimalI32InPlace",
+        "normalizeMaximalI32InPlace",
         "normalizeMinimal2xI32InPlace",
         "normalizeMaximal2xI32InPlace"
       ],
-      "note": "Unsigned and signed-bit-pattern ordered antichain profiles are independently costed; signed lanes avoid complement normalization."
+      "note": "Ordered antichain normalization has unsigned/signed two-lane profiles plus initialization-selected one-lane signed profiles. Configured frontiers that fit one 32-bit lane do not pay high-lane candidate/comparison loads or stores; wider frontiers retain the two-lane forms."
     },
     {
       "id": 15,

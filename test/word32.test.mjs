@@ -170,7 +170,14 @@ import {
   reflectPacked3Columns9,
   reflectPacked3Columns10,
 } from '../src/mix32.mjs';
-import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace, normalizeMinimal2xI32InPlace, normalizeMaximal2xI32InPlace } from '../src/frontier32.mjs';
+import {
+  normalizeMinimal2x32InPlace,
+  normalizeMaximal2x32InPlace,
+  normalizeMinimal2xI32InPlace,
+  normalizeMaximal2xI32InPlace,
+  normalizeMinimalI32InPlace,
+  normalizeMaximalI32InPlace,
+} from '../src/frontier32.mjs';
 import {
   negateScore32,
   raiseLowerBound32,
@@ -541,6 +548,26 @@ test('signed frontier normalization profiles', () => {
   const hi2 = new Int32Array(3);
   assert.equal(normalizeMaximal2xI32InPlace(lo2, hi2, 3), 1);
   assert.equal(lo2[0], high | 1);
+});
+
+test('one-lane signed frontier normalization profiles', () => {
+  const minimalWords = new Int32Array([0b0100, 0b0011, 0b0111]);
+  const minimal = normalizeMinimalI32InPlace(minimalWords, 3);
+  assert.equal(minimal, 2);
+  assert.equal(
+    (minimalWords[0] === 0b0011 && minimalWords[1] === 0b0100)
+      || (minimalWords[0] === 0b0100 && minimalWords[1] === 0b0011),
+    true,
+  );
+
+  const maximalWords = new Int32Array([0b0111, 0b0011, 0b0100]);
+  const maximal = normalizeMaximalI32InPlace(maximalWords, 3);
+  assert.equal(maximal, 1);
+  assert.equal(maximalWords[0], 0b0111);
+
+  const bit31 = new Int32Array([0x80000000, 0x80000001]);
+  assert.equal(normalizeMinimalI32InPlace(bit31, 2), 1);
+  assert.equal(bit31[0], -2147483648);
 });
 
 test('search scalar blocks', () => {

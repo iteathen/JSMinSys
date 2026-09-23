@@ -95,3 +95,46 @@ export function normalizeMaximal2xI32InPlace(lo, hi, length) {
   }
   return retained;
 }
+
+export function normalizeMinimalI32InPlace(words, length) {
+  let retained = 0;
+  for (let index = 0; index < length; index += 1) {
+    const candidate = words[index];
+    let rejected = 0;
+
+    for (let scan = 0; scan < retained; scan += 1) {
+      const existing = words[scan];
+      if ((existing & candidate) === existing) {
+        rejected = 1;
+        break;
+      }
+    }
+    if (rejected !== 0) continue;
+
+    words[retained] = candidate;
+    retained += 1;
+  }
+  return retained;
+}
+
+export function normalizeMaximalI32InPlace(words, length) {
+  let retained = 0;
+  for (let index = 0; index < length; index += 1) {
+    const candidate = words[index];
+    let rejected = 0;
+
+    for (let scan = 0; scan < retained; scan += 1) {
+      const existing = words[scan];
+      if ((candidate & existing) === candidate) {
+        rejected = 1;
+        break;
+      }
+    }
+    if (rejected !== 0) continue;
+
+    words[retained] = candidate;
+    retained += 1;
+  }
+  return retained;
+}
+
