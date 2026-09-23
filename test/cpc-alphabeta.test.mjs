@@ -72,7 +72,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   // Two odd-remainder columns form an even frontier pool. Every surviving P0
   // requirement is covered by a true upper-response cell, so P0 gets an exact
   // no-win upper bound even though the old all-even guard would reject this q.
-  const positive=[0,1,0,0],q=connect4RbaFromMoves(positive,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  const positive=[0,1,0,0],q=connect4RbaFromMoves(positive,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g,{frontierResponse:true});
   let odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-q.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_BOUND);
@@ -103,7 +103,7 @@ test('CPC recognizes exact fork loss after enabling move',()=>{
   // 0-based: P0 1, P1 1, P0 2, P1 1, P0 3.
   // P1 to move; P0 has distinct playable bottom singleton targets at columns 0 and 4.
   const q=connect4RbaFromMoves([1,1,2,1,3],{geometry:g,canonical:false});
-  const s=prepareConnect4CpcScratch(g,{frontierResponse:true});
+  const s=prepareConnect4CpcScratch(g);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
   assert.deepEqual([...s.interval],[3,3]);
 });
