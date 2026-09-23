@@ -227,8 +227,11 @@
       "status": "implemented",
       "functions": [
         "queueEnqueue32",
-        "queueDequeue32"
-      ]
+        "queueDequeue32",
+        "queueTryEnqueue32",
+        "queueTryDequeue32"
+      ],
+      "note": "Sequence atomics publish ordinary payload accesses. Blocking and nonblocking CAS-reservation profiles are separately costed; callers choose according to progress semantics."
     },
     {
       "id": 20,
