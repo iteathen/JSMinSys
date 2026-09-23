@@ -88,10 +88,11 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   targets.fill(0);
 
   // A second basis pass handles both the mover minimal-pair guard and the
-  // opponent's playable pair-to-fork precursor relation.
-  for(let i=0;i<basisSize;i+=1){
+  // opponent's playable pair-to-fork precursor relation. Skip the singleton
+  // prefix once, then stop at the triple boundary.
+  let i=0;while(i<basisSize&&basis[basisOffset+i]<g.pairShapeStart)i+=1;
+  for(;i<basisSize;i+=1){
     const id=basis[basisOffset+i];
-    if(id<g.pairShapeStart)continue;
     if(id>=g.tripleShapeStart)break;
     const base=id*4,a=g.shapeCells[base],b=g.shapeCells[base+1];
 
@@ -237,9 +238,8 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
     const coord=offset+(player?g.p1Offset:g.p0Offset),store=player*g.maxBasis;
     let count=0;
     for(let i=0;i<basisSize;i+=1){
+      const id=basis[basisOffset+i];if(id>=g.pairShapeStart)break;
       if(!coordHas(words,coord,i))continue;
-      const id=basis[basisOffset+i];
-      if(g.shapeSize[id]!==1)continue;
       const cell=g.shapeCells[id*4];
       if(connect4CpcTargetOwner32(g,words,offset,cell)!==player)continue;
       scratch.projectedCells[store+count]=cell;
@@ -272,7 +272,10 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   if(terminal){scratch.interval[0]=terminal;scratch.interval[1]=terminal;return CPC_EXACT;}
 
   const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
-  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
+  for(let w=0;w<g.coordWords;w+=1){
+    p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];
+    if(p0Any&&p1Any)break;
+  }
   if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
 
   if(!p0Any)scratch.interval[1]=2;
