@@ -43,7 +43,9 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   return {words:result,basis:rootBasis,reflected};
 }
 function bothCoordinatesEmpty(g,words,base){
-  let any=0;for(let w=0;w<g.coordWords;w+=1)any|=words[base+g.p0Offset+w]|words[base+g.p1Offset+w];return any===0;
+  const p0=base+g.p0Offset,p1=base+g.p1Offset;let any=0;
+  for(let w=0;w<g.coordWords;w+=1)any|=words[p0+w]|words[p1+w];
+  return any===0;
 }
 function rootCanonicalColumn(g,orderIndex,reflected){const caller=g.actionOrder[orderIndex];return reflected?g.mirrorColumn[caller]:caller;}
 
