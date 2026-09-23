@@ -1,6 +1,6 @@
-import {emitSortedSetBits32,permuteBitsSpan32Into} from '../src/basis32.mjs';
+import {emitSortedSetBits32} from '../src/basis32.mjs';
 import {publishSpan32} from '../src/widekey32.mjs';
-import {connect4RbaRemoveCell,connect4RbaShapeContains,connect4RbaShapeSubset} from './rba-connect4-geometry.mjs';
+import {connect4RbaShapeContains} from './rba-connect4-geometry.mjs';
 
 export function connect4RbaTerminal(g,words,offset){return words[offset+g.metaOffset]&3;}
 export function connect4RbaRank(g,words,offset){return words[offset+g.metaOffset]>>>2;}
@@ -18,16 +18,16 @@ export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffse
   }
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
-export function connect4RbaCofactorBasis(g,parent,parentOffset,count,cell,out,outOffset,seen){
+export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
   for(let i=0;i<count;i+=1){
-    const id=connect4RbaRemoveCell(g,parent[parentOffset+i],cell);
+    const id=profile.removeCell(g,parent[parentOffset+i],cell);
     if(id>=0)seen[id>>>5]|=1<<(id&31);
   }
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 
-export function connect4RbaCofactor(g,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex){
+export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex){
   const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
   if(terminal||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
@@ -46,16 +46,16 @@ export function connect4RbaCofactor(g,source,src,basis,bi,n,column,target,dst,ch
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,basis,bi,n,cell,childBasis,ci,seen);sizes[sizeIndex]=cn;
+  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen);sizes[sizeIndex]=cn;
   for(let p=0;p<2;p+=1){
     const sourceCoord=src+(p?g.p1Offset:g.p0Offset),targetCoord=dst+(p?g.p1Offset:g.p0Offset);
     for(let i=0;i<n;i+=1){
       if(!(source[sourceCoord+(i>>>5)]&(1<<(i&31))))continue;
-      const id=basis[bi+i],removed=connect4RbaRemoveCell(g,id,cell);
+      const id=basis[bi+i],removed=profile.removeCell(g,id,cell);
       if(p!==player&&removed!==id)continue;
       const image=p===player?removed:id;
       if(image<0)continue;
-      for(let j=0;j<cn;j+=1)if(connect4RbaShapeSubset(g,image,childBasis[ci+j]))
+      for(let j=0;j<cn;j+=1)if(profile.shapeSubset(g,image,childBasis[ci+j]))
         target[targetCoord+(j>>>5)]|=1<<(j&31);
     }
   }
@@ -69,7 +69,7 @@ function compareSupport(g,words,offset,reflected){
   }
   return 0;
 }
-export function connect4RbaCanonicalize(g,words,offset,basis,bi,n,scratch){
+export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratch){
   for(let c=0;c<g.columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
   scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
   const primary=compareSupport(g,words,offset,scratch.mirror);
@@ -80,8 +80,8 @@ export function connect4RbaCanonicalize(g,words,offset,basis,bi,n,scratch){
   const rn=emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
   for(let i=0;i<rn;i+=1)scratch.inverse[scratch.mirrorBasis[i]]=i;
   for(let i=0;i<n;i+=1)scratch.map[i]=scratch.inverse[g.reflect[basis[bi+i]]];
-  permuteBitsSpan32Into(scratch.mirror,g.p0Offset,g.coordWords,words,offset+g.p0Offset,scratch.map,0,n);
-  permuteBitsSpan32Into(scratch.mirror,g.p1Offset,g.coordWords,words,offset+g.p1Offset,scratch.map,0,n);
+  profile.permuteBits(scratch.mirror,g.p0Offset,g.coordWords,words,offset+g.p0Offset,scratch.map,0,n);
+  profile.permuteBits(scratch.mirror,g.p1Offset,g.coordWords,words,offset+g.p1Offset,scratch.map,0,n);
 
   if(primary===0){
     let w=g.p0Offset;while(w<g.keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
