@@ -177,46 +177,58 @@ function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
   return 1;
 }
 
-// Pooled-frontier paired response plus the L=1 synchronized-frontier
-// specialization. Odd-remainder columns contribute their currently playable
-// frontier cells to an even pool. Pairing those frontiers deterministically
-// gives an additional exact pair blocker: the attacker cannot own both ends of
-// a pair. The omitted frontier cells are never counted as vertical responses.
+// Pooled-frontier response plus a deterministic synchronized channel for
+// each ascending pair of odd-remainder columns. For pair (a,b), consume
+// L=min(remaining[a],remaining[b]) equal-depth cross pairs. Both remainders
+// are odd, so L is odd and the longer post-channel tail is even; it therefore
+// returns to the ordinary vertical paired response. This is one exact member
+// of the qualified synchronized-channel family, not a search over pairings.
 function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch){
   // The parity of the odd-column frontier pool equals the parity of the total
-  // remaining cell count, so reject odd pools without scanning columns.
+  // remaining cell count, so reject odd pools without constructing channels.
   const rank=words[offset+g.metaOffset]>>>2;
   if(((g.cellCount-rank)&1)!==0)return 0;
 
-  const coord=offset+(player?g.p1Offset:g.p0Offset),pairMasks=scratch.forkTargets32;
-  let pairCount=-1;
+  // Reuse immediate-threat scratch after tactical closure has consumed it.
+  // partner[c] is the synchronized mate column; depthLimit[c] is channel L.
+  const partner=scratch.threatColumns,depthLimit=scratch.threatCells;
+  partner.fill(0xffffffff);depthLimit.fill(0);
+  let pending=-1;
+  for(let c=0;c<g.columns;c+=1){
+    const remaining=g.rows-words[offset+c];
+    if(!(remaining&1))continue;
+    if(pending<0){pending=c;continue;}
+    const other=pending,otherRemaining=g.rows-words[offset+other],limit=Math.min(remaining,otherRemaining);
+    partner[c]=other;partner[other]=c;depthLimit[c]=limit;depthLimit[other]=limit;pending=-1;
+  }
+  if(pending>=0)return 0;
+
+  const coord=offset+(player?g.p1Offset:g.p0Offset);
   for(let i=0;i<basisSize;i+=1){
     if(!coordHas(words,coord,i))continue;
     const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-    let covered=0,frontierMask=0;
+    let covered=0;
+
+    // Vertical upper-response cells remain valid outside synchronized prefixes.
     for(let j=0;j<size;j+=1){
       const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
       if((row&1)!==g.pairedResponseRowParity)continue;
-      const height=words[offset+column];
-      if(((g.rows-height)&1)!==0&&row===height){
-        if(pairMasks)frontierMask=(frontierMask|((1<<column)>>>0))>>>0;
-        continue;
-      }
+      const height=words[offset+column],remaining=g.rows-height,depth=row-height;
+      if((remaining&1)&&depth<depthLimit[column])continue;
       covered=1;break;
     }
-    if(!covered&&pairMasks&&frontierMask){
-      if(pairCount<0){
-        pairCount=0;let pending=-1;
-        for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0){
-          if(pending<0)pending=c;
-          else{
-            pairMasks[pairCount++]=(((1<<pending)>>>0)|((1<<c)>>>0))>>>0;
-            pending=-1;
-          }
-        }
+
+    // Inside a synchronized prefix, equal-depth endpoints form an exact pair
+    // blocker: the attacker can own at most one endpoint of each cross pair.
+    if(!covered){
+      for(let j=0;j<size&&!covered;j+=1){
+        const cell=g.shapeCells[base+j],column=g.cellColumn[cell],mate=partner[column];
+        if(mate===0xffffffff)continue;
+        const depth=g.cellRow[cell]-words[offset+column];
+        if(depth>=depthLimit[column])continue;
+        const mateCell=(words[offset+mate]+depth)*g.columns+mate;
+        for(let k=0;k<size;k+=1)if(g.shapeCells[base+k]===mateCell){covered=1;break;}
       }
-      for(let p=0;p<pairCount;p+=1)
-        if((frontierMask&pairMasks[p])===pairMasks[p]){covered=1;break;}
     }
     if(!covered)return 0;
   }
