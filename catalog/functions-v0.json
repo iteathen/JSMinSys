@@ -7810,7 +7810,7 @@
       ],
       "status": "implemented",
       "preconditions": [
-        "control is an Int32Array or BigInt64Array-compatible Atomics.wait carrier admitted by the application profile",
+        "control is an Int32Array over shared storage compatible with Atomics.wait",
         "caller established no useful work before parking",
         "observed is the previously read wake value"
       ],
