@@ -11,8 +11,7 @@ import {
   bitToggleI32,
   firstSetBitIndex32,
   popcount32,
-  subset32,
-} from '../src/word32.mjs';
+  subset32,, cardinalityClass32 } from '../src/word32.mjs';
 import {
   and2x32Into,
   or2x32Into,
@@ -656,6 +655,14 @@ test('move-slot index space removes hot physical-column remap', () => {
   assert.equal(landing[slot], 11);
   assert.equal(undoMove32(state, landing, slot, 7, 42, supportDelta), 4);
   assert.equal(landing[slot], 4);
+});
+
+test('one-lane cardinality classification', () => {
+  assert.equal(cardinalityClass32(0), 0);
+  assert.equal(cardinalityClass32(1), 1);
+  assert.equal(cardinalityClass32(0x80000000), 1);
+  assert.equal(cardinalityClass32(0b1010), 2);
+  assert.equal(cardinalityClass32(0xffffffff), 2);
 });
 
 test('trusted legality and coordinate reference decode', () => {

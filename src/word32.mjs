@@ -42,3 +42,9 @@ export function bitClearI32(word, mask) {
 export function bitToggleI32(word, mask) {
   return word ^ mask;
 }
+
+export function cardinalityClass32(word) {
+  if (word === 0) return 0;
+  return (word & (word - 1)) === 0 ? 1 : 2;
+}
+
