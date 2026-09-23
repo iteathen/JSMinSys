@@ -151,10 +151,14 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
 
 function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
   for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0)return 0;
-  const coord=offset+(player?g.p1Offset:g.p0Offset);
-  for(let i=0;i<basisSize;i+=1){
-    if(!coordHas(words,coord,i))continue;
-    if(!g.pairedResponseCover[basis[basisOffset+i]])return 0;
+  const coord=offset+(player?g.p1Offset:g.p0Offset),cover=g.pairedResponseCover,cw=g.coordWords;
+  for(let w=0;w<cw;w+=1){
+    let bits=words[coord+w]>>>0;const indexBase=w<<5;
+    while(bits){
+      const i=indexBase+firstSetBitIndex32(bits);if(i>=basisSize)break;
+      if(!cover[basis[basisOffset+i]])return 0;
+      bits=(bits&(bits-1))>>>0;
+    }
   }
   return 1;
 }
