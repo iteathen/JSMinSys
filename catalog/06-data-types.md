@@ -48,6 +48,12 @@ Typed arrays are allowed as fixed-width, contiguous storage.
 
 This is the default typed storage for 32-bit words unless a narrower representation is proven better for a particular structure.
 
+### Construction
+
+`new Uint32Array(length)` is admitted as the normalized operation `Uint32Array.construct`.
+
+Construction is not presumed cheap. Its NEES cycle count is parameterized by requested length, V8 allocation path, page state, and GC/runtime state.
+
 ### Other typed-array element widths
 
 These are members of the admissible storage family but require use-specific qualification before becoming preferred forms:
