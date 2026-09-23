@@ -102,8 +102,10 @@
       "name": "hash-mix32",
       "status": "implemented",
       "functions": [
-        "mix32"
-      ]
+        "mix32",
+        "mix32Strong"
+      ],
+      "note": "Fast bijective mixer is default; stronger two-multiply avalanche remains independently costed."
     },
     {
       "id": 10,
