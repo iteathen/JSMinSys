@@ -160,9 +160,15 @@
         "applyMove32PackedMeta",
         "undoMove32PackedMeta",
         "applyMove32PackedMetaKnownCell",
-        "undoMove32PackedMetaKnownCell"
+        "undoMove32PackedMetaKnownCell",
+        "supportFromPackedAll32",
+        "playableFromPackedAll32",
+        "applyMove1x32PackedAll",
+        "undoMove1x32PackedAll",
+        "applyMove1x32PackedAllKnownCell",
+        "undoMove1x32PackedAllKnownCell"
       ],
-      "note": "Transition state now has lane-count, rank ownership, support+rank packing, and conditional high-playable packing profiles. When rankBits + highCellCount + supportBits fits one uint32, high playable is packed between rank and support, deleting its separate load/store pair on crossing and high-lane moves. Support remains a one-shift extraction for reflection."
+      "note": "Transition profiles now scale physical state packing with configured bit budget. If rank + playable + support all fit one uint32, one-lane state collapses to a single word; otherwise packed support/rank and multiword variants remain. Reflection always receives support-only extraction."
     },
     {
       "id": 9,

@@ -1021,3 +1021,100 @@ export function undoMove32PackedMetaKnownCell(
   return cell;
 }
 
+export const PACKED_ALL1_META = 0;
+
+export function supportFromPackedAll32(code, supportShift) {
+  return code >>> supportShift;
+}
+
+export function playableFromPackedAll32(code, rankBits, playableMask) {
+  return (code >>> rankBits) & playableMask;
+}
+
+export function applyMove1x32PackedAll(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const cell = landingCells[index];
+  const next = cell + columns;
+  const bit = (1 << cell) << rankBits;
+  let meta = state[PACKED_ALL1_META];
+
+  if (next < cellCount) meta ^= bit | (bit << columns);
+  else meta ^= bit;
+
+  landingCells[index] = next;
+  state[PACKED_ALL1_META] = meta + combinedDelta;
+  return cell;
+}
+
+export function undoMove1x32PackedAll(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = (1 << cell) << rankBits;
+  let meta = state[PACKED_ALL1_META];
+
+  if (next < cellCount) meta ^= bit | (bit << columns);
+  else meta ^= bit;
+
+  landingCells[index] = cell;
+  state[PACKED_ALL1_META] = meta - combinedDelta;
+  return cell;
+}
+
+export function applyMove1x32PackedAllKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const next = cell + columns;
+  const bit = (1 << cell) << rankBits;
+  let meta = state[PACKED_ALL1_META];
+
+  if (next < cellCount) meta ^= bit | (bit << columns);
+  else meta ^= bit;
+
+  landingCells[index] = next;
+  state[PACKED_ALL1_META] = meta + combinedDelta;
+  return cell;
+}
+
+export function undoMove1x32PackedAllKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  lastRowStart,
+  rankBits,
+  combinedDelta,
+) {
+  const bit = (1 << cell) << rankBits;
+  let meta = state[PACKED_ALL1_META];
+
+  if (cell < lastRowStart) meta ^= bit | (bit << columns);
+  else meta ^= bit;
+
+  landingCells[index] = cell;
+  state[PACKED_ALL1_META] = meta - combinedDelta;
+  return cell;
+}
+

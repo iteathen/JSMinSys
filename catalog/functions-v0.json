@@ -1,5 +1,5 @@
 {
-  "version": "0.74.0",
+  "version": "0.75.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2107,6 +2107,236 @@
         },
         "expression": "low/same: 2*LOAD+3*STORE+7..11 ALU/control; low-to-high: 2*LOAD+3*STORE+12 ALU/control; high lane: LOAD+2*STORE+8..12 ALU/control",
         "note": "Retained cell and prepared geometry combine with packed high playable; crossing/high undo no longer touches a separate high-lane state word."
+      }
+    },
+    {
+      "name": "supportFromPackedAll32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-fully-packed-state-profile",
+      "preconditions": [
+        "supportShift identifies the configured support field",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Support remains the top field and is extracted by one unsigned shift."
+      }
+    },
+    {
+      "name": "playableFromPackedAll32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-fully-packed-state-profile",
+      "preconditions": [
+        "playableMask selects exactly cellCount playable bits",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "External playable extraction is shift+mask; transition updates playable in-place inside the meta word."
+      }
+    },
+    {
+      "name": "applyMove1x32PackedAll",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-fully-packed-state-profile",
+      "preconditions": [
+        "landingCells[index] is the current next playable cell",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16,
+          "max": 18
+        },
+        "hotL2Predicted": {
+          "min": 24,
+          "max": 26
+        },
+        "expression": "2*LOAD + 2*STORE + 7..9 ALU/control",
+        "note": "One packed state word replaces separate playable and packed support/rank words; packing the playable bit adds one shift while one load/store pair disappears."
+      }
+    },
+    {
+      "name": "undoMove1x32PackedAll",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-fully-packed-state-profile",
+      "preconditions": [
+        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16,
+          "max": 18
+        },
+        "hotL2Predicted": {
+          "min": 24,
+          "max": 26
+        },
+        "expression": "2*LOAD + 2*STORE + 7..9 ALU/control",
+        "note": "General undo uses one packed state load/store plus maintained landing state."
+      }
+    },
+    {
+      "name": "applyMove1x32PackedAllKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-fully-packed-known-cell-profile",
+      "preconditions": [
+        "caller already holds the exact current landing cell for this transition index",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 12,
+          "max": 14
+        },
+        "hotL2Predicted": {
+          "min": 16,
+          "max": 18
+        },
+        "expression": "LOAD + 2*STORE + 7..9 ALU/control",
+        "note": "Known-cell fully packed apply needs one state load and one state+landing store pair."
+      }
+    },
+    {
+      "name": "undoMove1x32PackedAllKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-fully-packed-known-cell-profile",
+      "preconditions": [
+        "caller retains the exact played cell returned by paired apply",
+        "lastRowStart was prepared during initialization",
+        "configured cellCount <= 32",
+        "rank occupies the low rankBits bits",
+        "playable occupies the next cellCount bits",
+        "support occupies the remaining configured field above playable",
+        "rankBits + cellCount + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "supportShift = rankBits + cellCount",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "reflection extracts support with supportFromPackedAll32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 11,
+          "max": 13
+        },
+        "hotL2Predicted": {
+          "min": 15,
+          "max": 17
+        },
+        "expression": "LOAD + 2*STORE + 6..8 ALU/control",
+        "note": "Retained cell plus full one-word state removes both landing read and separate playable/meta state traffic."
       }
     },
     {
@@ -4305,11 +4535,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 160,
+    "functionsImplemented": 166,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 160,
+    "functionsWithCycleCount": 166,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5728,6 +5958,24 @@
           "before": "known-cell packed support+ply worst L1: apply 26 / undo 25",
           "after": "packed-meta worst L1: apply 22.5 / undo 21.5",
           "mechanism": "same high-playable packing composed with caller-known/retained cell profiles"
+        }
+      ]
+    },
+    {
+      "id": "round-068",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove1x32PackedAll / undoMove1x32PackedAll",
+          "before": "packed support+ply one-lane: 19.5-21.5 L1",
+          "after": "fully packed one-word state: 16-18 L1",
+          "mechanism": "pack playable between low rank and high support, deleting one state load/store pair"
+        },
+        {
+          "function": "applyMove1x32PackedAllKnownCell / undoMove1x32PackedAllKnownCell",
+          "before": "known-cell packed support+ply: apply 15.5-17.5 / undo 14.5-16.5 L1",
+          "after": "fully packed: apply 12-14 / undo 11-13 L1",
+          "mechanism": "compose caller-known/retained cell with single-word playable+rank+support state"
         }
       ]
     }
