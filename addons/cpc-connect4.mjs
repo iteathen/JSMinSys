@@ -184,34 +184,38 @@ function synchronizedFrontierResponseNoWin(g,words,offset,basis,basisOffset,basi
   }
   if(pending>=0)return 0;
 
-  const coord=offset+(player?g.p1Offset:g.p0Offset);
-  for(let i=0;i<basisSize;i+=1){
-    if(!coordHas(words,coord,i))continue;
-    const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-    let covered=0;
+  const coord=offset+(player?g.p1Offset:g.p0Offset),cw=g.coordWords;
+  for(let w=0;w<cw;w+=1){
+    let bits=words[coord+w]>>>0;const indexBase=w<<5;
+    while(bits){
+      const i=indexBase+firstSetBitIndex32(bits);if(i>=basisSize)break;
+      const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
+      let covered=0;
 
-    // Vertical upper-response cells remain valid outside synchronized prefixes.
-    for(let j=0;j<size;j+=1){
-      const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
-      if((row&1)!==g.pairedResponseRowParity)continue;
-      const height=words[offset+column],remaining=g.rows-height,depth=row-height;
-      if((remaining&1)&&depth<depthLimit[column])continue;
-      covered=1;break;
-    }
-
-    // Inside a synchronized prefix, equal-depth endpoints form an exact pair
-    // blocker: the attacker can own at most one endpoint of each cross pair.
-    if(!covered){
-      for(let j=0;j<size&&!covered;j+=1){
-        const cell=g.shapeCells[base+j],column=g.cellColumn[cell],mate=partner[column];
-        if(mate===0xffffffff)continue;
-        const depth=g.cellRow[cell]-words[offset+column];
-        if(depth>=depthLimit[column])continue;
-        const mateCell=(words[offset+mate]+depth)*g.columns+mate;
-        for(let k=0;k<size;k+=1)if(g.shapeCells[base+k]===mateCell){covered=1;break;}
+      // Vertical upper-response cells remain valid outside synchronized prefixes.
+      for(let j=0;j<size;j+=1){
+        const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
+        if((row&1)!==g.pairedResponseRowParity)continue;
+        const height=words[offset+column],remaining=g.rows-height,depth=row-height;
+        if((remaining&1)&&depth<depthLimit[column])continue;
+        covered=1;break;
       }
+
+      // Inside a synchronized prefix, equal-depth endpoints form an exact pair
+      // blocker: the attacker can own at most one endpoint of each cross pair.
+      if(!covered){
+        for(let j=0;j<size&&!covered;j+=1){
+          const cell=g.shapeCells[base+j],column=g.cellColumn[cell],mate=partner[column];
+          if(mate===0xffffffff)continue;
+          const depth=g.cellRow[cell]-words[offset+column];
+          if(depth>=depthLimit[column])continue;
+          const mateCell=(words[offset+mate]+depth)*g.columns+mate;
+          for(let k=0;k<size;k+=1)if(g.shapeCells[base+k]===mateCell){covered=1;break;}
+        }
+      }
+      if(!covered)return 0;
+      bits=(bits&(bits-1))>>>0;
     }
-    if(!covered)return 0;
   }
   return 1;
 }
