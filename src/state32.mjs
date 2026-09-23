@@ -587,6 +587,18 @@ export function sideFromPackedSupport32(code, rankShift) {
   return (code >>> rankShift) & 1;
 }
 
+export function plyFromPackedRankLow32(code, rankMask) {
+  return code & rankMask;
+}
+
+export function supportFromPackedRankLow32(code, rankBits) {
+  return code >>> rankBits;
+}
+
+export function sideFromPackedRankLow32(code) {
+  return code & 1;
+}
+
 export function applyMove1x32PackedPly(
   state,
   landingCells,

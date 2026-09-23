@@ -1,5 +1,5 @@
 {
-  "version": "0.67.0",
+  "version": "0.68.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1469,6 +1469,66 @@
       }
     },
     {
+      "name": "plyFromPackedRankLow32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-packed-state-rank-low-profile",
+      "preconditions": [
+        "rank occupies the low rankBits bits",
+        "rankMask === (1<<rankBits)-1 for the configured rank width"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Low-field rank extraction is one AND."
+      }
+    },
+    {
+      "name": "supportFromPackedRankLow32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-packed-state-rank-low-profile",
+      "preconditions": [
+        "rank occupies the low rankBits bits",
+        "support occupies the remaining configured packed field above rank"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "One unsigned shift removes the low rank field and presents support-only bits to reflection."
+      }
+    },
+    {
+      "name": "sideFromPackedRankLow32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-packed-state-rank-low-profile",
+      "preconditions": [
+        "rank occupies the low bits and its least-significant bit is ply parity",
+        "player 0 starts and turns alternate"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Rank parity is bit 0, so side-to-move is one AND rather than shift plus AND."
+      }
+    },
+    {
       "name": "applyMove1x32PackedPly",
       "source": "src/state32.mjs",
       "block": "apply-undo-transition",
@@ -1485,13 +1545,12 @@
       "status": "implemented-packed-state-profile",
       "preconditions": [
         "configured cellCount <= 32",
-        "landingCells[index] is the current next playable cell",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1526,13 +1585,12 @@
       "status": "implemented-packed-state-profile",
       "preconditions": [
         "configured cellCount <= 32",
-        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1567,13 +1625,12 @@
       "status": "implemented-packed-state-profile",
       "preconditions": [
         "configured board cell count is 33..64",
-        "landingCells[index] is the current next playable cell",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1608,13 +1665,12 @@
       "status": "implemented-packed-state-profile",
       "preconditions": [
         "configured board cell count is 33..64",
-        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1652,10 +1708,10 @@
         "caller already holds the exact current landing cell for this transition index",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1694,10 +1750,10 @@
         "lastRowStart was prepared during initialization",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1735,10 +1791,10 @@
         "caller already holds the exact current landing cell for this transition index",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -1778,10 +1834,10 @@
         "lastRowStart and lowLaneAboveLimit were prepared during initialization",
         "support encoding uses 3 bits per configured column",
         "configured rows <= 7 so a legal support-field increment never overflows its 3-bit field",
-        "rankShift = 3*columns and rankShift + rankBits <= 32",
-        "combinedDelta = supportDelta + rankIncrement was prepared per transition index during initialization",
-        "rankIncrement represents one in the packed rank field",
-        "reflection/canonicalization extracts support with supportMask before calling support-only reflection functions"
+        "packed support and rank fields are disjoint and their configured total width is <= 32",
+        "combinedDelta encodes one support-field increment plus one rank increment in the selected packed layout",
+        "combinedDelta was prepared per transition index during initialization",
+        "reflection/canonicalization extracts support with the matching selected-layout extraction before support-only reflection"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -3957,11 +4013,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 148,
+    "functionsImplemented": 151,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 148,
+    "functionsWithCycleCount": 151,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5254,6 +5310,24 @@
           "before": "4 fixed cycles",
           "after": "3 fixed cycles",
           "mechanism": "prepare count-32 once at initialization"
+        }
+      ]
+    },
+    {
+      "id": "round-061",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "sideFromPackedRankLow32",
+          "before": "support-low/rank-high packed side extraction: 2 cycles",
+          "after": "rank-low packed side extraction: 1 cycle",
+          "mechanism": "place rank parity at bit 0 so side is packed & 1"
+        },
+        {
+          "function": "supportFromPackedRankLow32 / plyFromPackedRankLow32",
+          "before": "support-low/rank-high extraction: 1 cycle each",
+          "after": "rank-low/support-high extraction: still 1 cycle each",
+          "mechanism": "swap packed field order without increasing support/reflection or rank extraction cost"
         }
       ]
     }

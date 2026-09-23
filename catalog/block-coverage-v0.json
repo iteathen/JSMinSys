@@ -150,9 +150,12 @@
         "applyMove1x32PackedPly",
         "undoMove1x32PackedPly",
         "applyMove32PackedPly",
-        "undoMove32PackedPly"
+        "undoMove32PackedPly",
+        "plyFromPackedRankLow32",
+        "supportFromPackedRankLow32",
+        "sideFromPackedRankLow32"
       ],
-      "note": "Transition profiles include separate-ply, caller-owned-ply, and packed support+ply representations, each with ordinary and known-cell forms where useful. Packed state is selected only when support+rank fits one uint32 and rows fit the 3-bit support field; combined deltas remove duplicate state traffic. Reflection remains support-only via explicit masking."
+      "note": "Packed support+ply transition arithmetic is layout-agnostic when combined deltas are prepared consistently. Support-low/rank-high remains compatible; rank-low/support-high is preferred when side-to-move is hot because support and ply extraction stay at one operation while side parity becomes packed&1."
     },
     {
       "id": 9,
@@ -205,7 +208,7 @@
         "reflectPacked3Columns10",
         "canonicalMin32"
       ],
-      "note": "Initialization selects exact register-only packed-3 reflection profiles. The 6/7 profile fuses final alignment; the 10-column profile extracts its upper reversed pair directly from the source code. Packed physical state, when selected, masks rank away before reflection."
+      "note": "Reflection always consumes support-only bits. Packed physical state may use support-low/rank-high or rank-low/support-high; the matching one-operation extraction removes rank before any reflection function."
     },
     {
       "id": 13,

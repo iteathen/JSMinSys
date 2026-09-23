@@ -173,6 +173,9 @@ import {
   plyFromPackedSupport32,
   supportFromPackedSupport32,
   sideFromPackedSupport32,
+  plyFromPackedRankLow32,
+  supportFromPackedRankLow32,
+  sideFromPackedRankLow32,
   applyMove1x32PackedPly,
   undoMove1x32PackedPly,
   applyMove32PackedPly,
@@ -613,6 +616,47 @@ test('packed support+ply transition profile preserves support-only reflection bo
   assert.equal(packed2[PACKED_PLY2_PLAYABLE_HI], ordinary2[STATE_PLAYABLE_HI]);
   assert.deepEqual(landingPacked2, landingOrdinary2);
   assert.equal(packed2[PACKED_PLY2_SUPPORT_PLY], 0);
+});
+
+test('rank-low packed support+ply layout keeps extraction cheap', () => {
+  const ordinary = new Uint32Array(4);
+  const packed = new Uint32Array(2);
+  const landingOrdinary = new Uint32Array(4);
+  const landingPacked = new Uint32Array(4);
+  fillLandingCells32(landingOrdinary, 4);
+  fillLandingCells32(landingPacked, 4);
+  ordinary[STATE_PLAYABLE_LO] = 0b1111;
+  packed[PACKED_PLY1_PLAYABLE_LO] = 0b1111;
+
+  const rankBits = 5;
+  const rankMask = (1 << rankBits) - 1;
+  const supportDelta = 1 << 6;
+  const combinedDelta = 1 + (supportDelta << rankBits);
+
+  applyMove1x32KnownCell(
+    ordinary, landingOrdinary, 2, 2, 4, 16, supportDelta,
+  );
+  applyMove1x32PackedPlyKnownCell(
+    packed, landingPacked, 2, 2, 4, 16, combinedDelta,
+  );
+
+  assert.equal(
+    supportFromPackedRankLow32(packed[PACKED_PLY1_SUPPORT_PLY], rankBits),
+    ordinary[STATE_SUPPORT_CODE],
+  );
+  assert.equal(
+    plyFromPackedRankLow32(packed[PACKED_PLY1_SUPPORT_PLY], rankMask),
+    ordinary[STATE_PLY],
+  );
+  assert.equal(sideFromPackedRankLow32(packed[PACKED_PLY1_SUPPORT_PLY]), 1);
+
+  undoMove1x32KnownCell(
+    ordinary, landingOrdinary, 2, 2, 4, 12, supportDelta,
+  );
+  undoMove1x32PackedPlyKnownCell(
+    packed, landingPacked, 2, 2, 4, 12, combinedDelta,
+  );
+  assert.equal(packed[PACKED_PLY1_SUPPORT_PLY], 0);
 });
 
 test('mix and reflection blocks', () => {
