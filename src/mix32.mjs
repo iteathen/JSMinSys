@@ -11,12 +11,15 @@ export function mix32(value) {
 export function reflectPacked3x32(code, columns, rankShift) {
   const rank = code >>> rankShift;
   let reflected = (rank << rankShift) >>> 0;
+  let sourceShift = 0;
+  const lastColumn = columns - 1;
+  let targetShift = (lastColumn << 1) + lastColumn;
+
   for (let column = 0; column < columns; column += 1) {
-    const value = (code >>> (column * 3)) & 7;
-    reflected = (
-      reflected
-      | (value << ((columns - 1 - column) * 3))
-    ) >>> 0;
+    const value = (code >>> sourceShift) & 7;
+    reflected = (reflected | (value << targetShift)) >>> 0;
+    sourceShift += 3;
+    targetShift -= 3;
   }
   return reflected;
 }
