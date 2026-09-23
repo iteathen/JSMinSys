@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
     "addons/rba-tt32.mjs",
@@ -75,7 +75,10 @@
     "current-player immediate terminal supersedes an opponent fork in exact CPC control",
     "distinct playable singleton fork closes as exact loss for side to move",
     "CPC-only and CPC+Four-Front alpha-beta match independent exact oracles on 4x4 and late/rank-28 7x6 controls",
-    "A/B benchmark records Four-Front node reduction separately from recursive front-step/runtime cost"
+    "A/B benchmark records Four-Front node reduction separately from recursive front-step/runtime cost",
+    "pooled-frontier paired response qualified with exact positive/negative 4x4 oracle controls",
+    "fixed L=1 synchronized-frontier pair blocker qualified as an opt-in CPC extension",
+    "rank-16+ prefixes of maintained standard-7x6 benchmark fixtures scanned with zero frontier-extension interval/kind changes"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -96,7 +99,7 @@
     "exactCpc": [
       "terminal state",
       "one/both-sided residual exhaustion interval",
-      "guarded paired-response no-win interval",
+      "guarded all-even paired-response no-win interval",
       "current-player immediate terminal",
       "distinct playable opponent singleton fork",
       "forced single immediate block"
@@ -106,7 +109,13 @@
       "future CPC fork pairs whose response/race guards are not yet closed"
     ],
     "cachePolicy": "Only globally exact q values are stored as exact cache entries. Narrow alpha/beta returns remain local search bounds.",
-    "moveOrderPolicy": "CPC-only mode uses immutable initialization-prepared actionOrder and no per-depth action-order scratch."
+    "moveOrderPolicy": "CPC-only mode uses immutable initialization-prepared actionOrder and no per-depth action-order scratch.",
+    "optionalLongRange": [
+      "pooled-frontier paired-response no-win interval",
+      "fixed L=1 synchronized-frontier pair blockers for <=32 configured columns; wider profiles conservatively skip only that bitmask specialization",
+      "selected at initialization and currently opt-in pending useful standard-board closure evidence"
+    ],
+    "frontierResponsePolicy": "The existing all-even paired-response theorem remains the default production path. The pooled/synchronized extension is qualified but opt-in."
   },
   "fourFrontRole": {
     "status": "qualified-experimental-reference",
