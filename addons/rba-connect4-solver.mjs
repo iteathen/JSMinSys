@@ -2,7 +2,7 @@ import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
-import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
+import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
@@ -158,6 +158,7 @@ export function prepareConnect4CpcRbaEvaluator({
     actions:new Uint32Array(g.columns),
     actionLower:new Uint32Array(g.columns),
     actionUpper:new Uint32Array(g.columns),
+    actionPriority:new Int32Array(g.columns),
     childPresent:new Uint32Array(g.columns),
     lower:1,upper:3,count:0,witness:-1,
     cpcCalls:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,
@@ -174,6 +175,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
   const n=t.basisSize[q];
   if(!g.lineCount||!n||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
+  const rank=connect4RbaRank(g,t.keys,base),mover=rank&1;
 
   state.cpcCalls+=1;
   const kind=evaluateConnect4Cpc32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
@@ -246,6 +248,8 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
     state.actionLower[count]=lo;
     state.actionUpper[count]=hi;
+    const primary=mover?4-lo:hi,secondary=mover?4-hi:lo,certainty=2-(hi-lo);
+    state.actionPriority[count]=(primary<<24)|(secondary<<20)|(certainty<<18)|((rank+1)<<8)|(g.columns-oi);
     count+=1;
     childBase+=g.keyWords;
     childBi+=g.maxBasis;
@@ -254,4 +258,48 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(!count)return RBA_QUERY_UNCOVERED;
   state.count=count;
   return RBA_BRANCH;
+}
+
+
+export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,rootWitnessOut,witnessIndex=0){
+  if(code>=1&&code<=3){
+    if(!rbaTtPublishExactOwned32(t,q,owner,code))return -1;
+    if(q===rootQ&&(connect4RbaTerminal(state.g,t.keys,q*t.keyWords)||state.witness>=0)){
+      rootWitnessOut[witnessIndex]=state.witness;rbaTtMarkDone32(t);
+    }
+    return -1;
+  }
+  if(code!==RBA_BRANCH)return -1;
+  return rbaTtPublishSurplus32(
+    t,q,owner,state.lower,state.upper,
+    state.keys,0,state.childBasis,0,state.g.maxBasis,
+    state.childBasisSize,state.actions,state.actionLower,state.actionUpper,
+    state.childPresent,state.actionPriority,state.count,
+  );
+}
+
+export function reconcileConnect4CpcRbaEvent32(
+  t,q,g,rootReflected,rootWitnessOut,resetTargets,witnessIndex=0,
+){
+  if(t.phase[q]===RBA_TT_PHASE_PENDING_ATTACH)
+    if(!rbaTtManagerAttachDependencies32(t,q,resetTargets))return -1;
+  if(t.phase[q]===RBA_TT_PHASE_ATTACHED){
+    rbaTtReconcile32(t,q,connect4RbaRank(g,t.keys,q*t.keyWords)&1);
+    if(Atomics.load(t.control,RBA_TT_STOP))return -1;
+  }
+  rbaTtSignalParents32(t,q);
+  if(t.exact[q]){
+    if(q===t.control[RBA_TT_ROOT]){
+      const witness=selectConnect4RbaRootWitness32(t,g,q,rootReflected);
+      if(witness>=-1){
+        rootWitnessOut[witnessIndex]=witness;
+        if(t.count[q])rbaTtDetachDependencies32(t,q);
+        rbaTtMarkDone32(t);
+        return 1;
+      }
+      return 0;
+    }
+    if(t.count[q])rbaTtDetachDependencies32(t,q);
+  }
+  return 0;
 }
