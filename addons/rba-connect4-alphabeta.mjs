@@ -124,15 +124,16 @@ function search(state,depth,alpha,beta){
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
-    childDepth=depth+1,childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
+    childDepth=depth+1,childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis,
+    actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
   let legal=0;
   // Four-Front needs a parent action-bound prepass because the reusable arena
   // is overwritten by child recursion. CPC-only mode needs no such pass: the
   // ordinary search loop can detect whether any action survives its filters.
   if(useFront){
-    for(let oi=0;oi<g.columns;oi+=1){
+    for(let oi=actionStart;oi<actionEnd;oi+=1){
       const column=g.actionOrder[oi];
-      if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+      if(words[keyOffset+column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
       legal+=1;
       const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
@@ -143,9 +144,9 @@ function search(state,depth,alpha,beta){
   }
 
   let best=-2,cut=0;
-  for(let oi=0;oi<g.columns;oi+=1){
+  for(let oi=actionStart;oi<actionEnd;oi+=1){
     const column=g.actionOrder[oi];
-    if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    if(words[keyOffset+column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     if(!useFront)legal=1;
     let value;
     if(useFront&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
@@ -158,7 +159,7 @@ function search(state,depth,alpha,beta){
       if(term<0)continue;
       if(term)value=absToRelative(term,mover);
       else{
-        connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[depth+1],state.coord);
+        connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
         value=-search(state,childDepth,-beta,-alpha);
       }
     }
@@ -211,19 +212,21 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }
   let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,row=0,childKey=g.keyWords,childBasis=g.maxBasis;
+    usePreempt=preemptCount>1&&g.columns<=32,row=0,childKey=g.keyWords,childBasis=g.maxBasis,
+    forcedCaller=forced<0?-1:reflected?g.mirrorColumn[forced]:forced,
+    actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,actionEnd=forcedCaller>=0?actionStart+1:g.columns;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
-    for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
+    for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
       const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
-      if(state.words[column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+      if(state.words[column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
       const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
       state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
     }
   }
-  for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
+  for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
     const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
-    if(state.words[column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    if(state.words[column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     // If the mover's exact root value is a loss, every surviving legal action
     // has that same value. The first initialization-ordered action is therefore
     // already the deterministic optimal witness.
