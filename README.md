@@ -25,6 +25,10 @@ The project works upward from the cheapest qualified operations rather than down
 5. Redesign the representation when the structure is not doing enough work.
 6. Add machinery only under extreme pressure.
 
+## Runtime configuration
+
+Geometry is configured at initialization and is immutable during hot execution. JSMinSys uses initialization to prepare constants/tables, but hot functions remain correct across supported configured widths and heights unless explicitly documented as representation-specific specializations.
+
 ## Numerical direction
 
 The working hypothesis is a 32-bit word domain for hot computation. Wider logical values are composed from additional 32-bit words rather than BigInt unless measurement produces contrary evidence.
@@ -42,7 +46,7 @@ Slow operations are allowed when their cost can be accounted for faithfully. JSM
 
 The current catalog implementation is exported from `src/index.mjs`.
 
-- 55 catalog functions implemented
+- 63 catalog functions implemented
 - 20 of 20 research blocks implemented
 - typed capacity allocation admitted and costed through NEES
 - coordinate decode is implemented only as a comparison/reference anti-candidate
