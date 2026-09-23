@@ -77,7 +77,7 @@ export function undoMove1x32(
  * One-lane transition profile for integrations that already own ply/rank as a
  * live caller scalar. This primitive deliberately does not load, store, or
  * advance ply. Select it only when doing so deletes duplicate state work rather
- * than moving the same work into a new caller-maintained field.
+ * than moving the same work into caller-maintained state.
  */
 export function applyMove1x32CallerPly(
   state,
