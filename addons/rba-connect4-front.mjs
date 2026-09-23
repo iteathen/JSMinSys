@@ -7,8 +7,9 @@ export const RBA_BOUNDARY_INCOMPLETE=6,RBA_BOUNDARY_CAPACITY=7;
 export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=100000,profile=prepareConnect4RbaExecutionProfile(g)}={}){
   if(!Number.isInteger(depth)||depth<0||!Number.isInteger(capacity)||capacity<1||
      !Number.isInteger(budget)||budget<1)throw new RangeError('RBA front arena bounds');
-  const actionBase=(depth+1)*12,slots=actionBase+g.columns*4,recordWords=g.generatorWords;
-  const base=Uint32Array.from({length:slots},(_,slot)=>slot*capacity*recordWords);
+  const actionBase=(depth+1)*12,slots=actionBase+g.columns*4,recordWords=g.generatorWords,
+    base=new Uint32Array(slots),slotStride=capacity*recordWords;
+  for(let slot=0;slot<slots;slot+=1)base[slot]=slot*slotStride;
   return {depth,capacity,budget,steps:0,error:0,actionBase,recordWords,profile,
     words:new Uint32Array(slots*capacity*recordWords),count:new Uint32Array(slots),base,
     basis:new Uint32Array((depth+1)*g.maxBasis),size:new Uint32Array(depth+1),
