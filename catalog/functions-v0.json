@@ -1,5 +1,5 @@
 {
-  "version": "0.33.0",
+  "version": "0.34.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1001,6 +1001,9 @@
       "primitives": [
         "LD32",
         ">",
+        "<",
+        "&",
+        "~",
         "+",
         "="
       ],
@@ -1009,16 +1012,17 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "4 + N*(L+5) + H*L",
+        "expression": "6 + P*(2*L+7) + T*(L+4) + H*L",
         "parameters": {
-          "N": "candidate count",
+          "P": "floor(candidateCount/2)",
+          "T": "candidateCount & 1",
           "L": "load cycles",
-          "H": "1 when a playable/better candidate exists, otherwise 0"
+          "H": "1 when a selected candidate exists, otherwise 0"
         },
-        "hotL1Predicted": "4 + 9*N + 4*H",
-        "hotL2Predicted": "4 + 17*N + 12*H",
-        "example7HitL1Cycles": 71,
-        "note": "Scores are scanned directly in preferred order; the order vector is loaded only once for the winning index."
+        "hotL1Predicted": "6 + 15*P + 8*T + 4*H",
+        "hotL2Predicted": "6 + 31*P + 16*T + 12*H",
+        "example7HitL1Cycles": 63,
+        "note": "Pairwise unrolling halves loop-control frequency while retaining one final order lookup."
       },
       "preconditions": [
         "scoresInOrder is already laid out in the same preferred order as order",
@@ -1317,6 +1321,33 @@
       }
     },
     {
+      "name": "popcount2x32SparseHigh",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        ">>>",
+        "-",
+        "&",
+        "+",
+        "=",
+        "Math.imul",
+        "==="
+      ],
+      "status": "implemented-distribution-profile",
+      "preconditions": [
+        "choose this profile when hi===0 occurs often enough to justify the branch",
+        "use fixed-cost popcount2x32 when upper-lane occupancy is usually nonzero"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 16,
+        "maxCycles": 31,
+        "note": "hi===0 path costs branch/test + one SWAR popcount; hi!==0 path costs branch/test + full two-lane popcount. Break-even against fixed 29-cycle popcount2x32 occurs when hi===0 exceeds about 13.3% under this serial ledger."
+      }
+    },
+    {
       "name": "popcount2x32",
       "source": "src/word64x32.mjs",
       "block": "popcount",
@@ -1516,11 +1547,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 67,
+    "functionsImplemented": 68,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 67,
+    "functionsWithCycleCount": 68,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2163,6 +2194,24 @@
           "before": "two-lane undo selected for all <=64-cell boards",
           "after": "25-27 L1 / 57-59 L2 for <=32-cell configured boards",
           "mechanism": "initialization-selected one-lane state transition"
+        }
+      ]
+    },
+    {
+      "id": "round-027",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayable32",
+          "before": "71 L1 cycles for N=7 with a hit",
+          "after": "63 L1 cycles for N=7 with a hit",
+          "mechanism": "pairwise unroll candidate scan to halve loop-control work"
+        },
+        {
+          "function": "popcount2x32SparseHigh",
+          "before": "29-cycle fixed two-lane popcount",
+          "after": "16-cycle hi==0 path / 31-cycle hi!=0 path",
+          "mechanism": "explicit distribution-specific upper-lane-zero fast path"
         }
       ]
     }
