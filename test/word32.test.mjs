@@ -102,8 +102,9 @@ test('indexed and table blocks', () => {
   const tags = new Uint32Array(8);
   const values = new Uint32Array(8);
   ttReplace32(tags, values, 3, 99, 1234);
-  assert.equal(ttProbeIndex32(tags, 7, 3, 99, 0xffffffff), 3);
-  assert.equal(ttProbeIndex32(tags, 7, 3, 98, 0xffffffff), 0xffffffff);
+  const ttIndex = powerOfTwoIndex32(3, 7);
+  assert.equal(ttProbeIndex32(tags, ttIndex, 99, 0xffffffff), 3);
+  assert.equal(ttProbeIndex32(tags, ttIndex, 98, 0xffffffff), 0xffffffff);
   assert.equal(values[3], 1234);
   assert.equal(selectGreater32(4, 9), 9);
   assert.equal(selectLess32(4, 9), 4);
@@ -198,12 +199,12 @@ test('search scalar blocks', () => {
   assert.equal(raiseLowerBound32(-1, 1), 1);
   assert.equal(lowerUpperBound32(1, -1), -1);
   assert.equal(cutoff32(1, 1), true);
-  const scores = new Int32Array([0, 1, 2, -2147483648, 4, 3, 2]);
   const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
-  assert.equal(argMaxPlayable32(scores, order, 7, 0xffffffff), 4);
+  const scoresInOrder = new Int32Array([-2147483648, 2, 4, 1, 3, 0, 2]);
+  assert.equal(argMaxPlayable32(scoresInOrder, order, 7, 0xffffffff), 4);
 
-  scores.fill(-2147483648);
-  assert.equal(argMaxPlayable32(scores, order, 7, 0xffffffff), 0xffffffff);
+  scoresInOrder.fill(-2147483648);
+  assert.equal(argMaxPlayable32(scoresInOrder, order, 7, 0xffffffff), 0xffffffff);
 });
 
 
