@@ -136,7 +136,7 @@ test('apply and undo support state', () => {
   for (let cell = 32; cell < 42; cell += 1) cellHi[cell] = (1 << (cell - 32)) >>> 0;
   for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
 
-  const cell = applyMove32(state, heights, moveColumns, 3, 7, 6, 21);
+  const cell = applyMove32(state, heights, moveColumns, 3);
   assert.equal(cell, 3);
   assert.equal(state[STATE_PLY], 1);
   assert.equal(state[STATE_SIDE], 1);
@@ -145,7 +145,7 @@ test('apply and undo support state', () => {
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 10)) !== 0, true);
   assert.equal(state[STATE_SUPPORT_CODE], ((1 << 9) + (1 << 21)) >>> 0);
 
-  const undone = undoMove32(state, heights, moveColumns, 7, 6, 21);
+  const undone = undoMove32(state, heights, moveColumns);
   assert.equal(undone, 3);
   assert.equal(state[STATE_PLY], 0);
   assert.equal(state[STATE_SIDE], 0);
@@ -326,13 +326,13 @@ test('high-lane apply and undo derives masks without lookup tables', () => {
   heights[5] = 4;
   state[STATE_PLAYABLE_HI] = 1 << 1;
 
-  const cell = applyMove32(state, heights, moveColumns, 5, 7, 6, 21);
+  const cell = applyMove32(state, heights, moveColumns, 5);
   assert.equal(cell, 33);
   assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 1)) !== 0, false);
 
-  const undone = undoMove32(state, heights, moveColumns, 7, 6, 21);
+  const undone = undoMove32(state, heights, moveColumns);
   assert.equal(undone, 33);
   assert.equal(heights[5], 4);
   assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, false);
