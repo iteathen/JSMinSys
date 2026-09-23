@@ -21,7 +21,7 @@ export function zero2x32(a0, a1) {
 }
 
 export function equal2x32(a0, a1, b0, b1) {
-  return ((a0 ^ b0) | (a1 ^ b1)) === 0;
+  return a0 === b0 && a1 === b1;
 }
 
 export function shl2x32Lt32Into(dst, di, lo, hi, count) {
