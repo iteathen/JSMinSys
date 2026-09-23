@@ -205,9 +205,10 @@
         "mix32",
         "mix32Medium",
         "mix32Strong",
-        "mix3x32Locator"
+        "mix3x32Locator",
+        "mix3x32PowerOfTwoIndex"
       ],
-      "note": "Locator mixing has scalar-strength alternatives plus a joint three-coordinate profile. mix3x32Locator is preferred when an exact triple is already available and collision resolution compares the full tuple; hashes never become identity."
+      "note": "Joint triple locator profiles include a full 32-bit locator and a direct power-of-two index. The direct index removes the final odd-multiply permutation when exact tuple equality owns identity; integrations with linear probing must still qualify probe locality because bucket adjacency is permuted."
     },
     {
       "id": 10,

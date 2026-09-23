@@ -267,7 +267,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix3x32Locator, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix3x32Locator, mix3x32PowerOfTwoIndex, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1483,6 +1483,37 @@ test('joint triple locator mixes exact-key coordinates without becoming identity
   }
   assert.equal(occupied, 256);
   assert.ok(maxBucket < 40);
+});
+
+test('direct triple power-of-two index preserves primary collision partition', () => {
+  const multiplier = 0x7feb352d;
+  const masks = [7, 31, 255, 1023, 0x3fff];
+
+  for (const mask of masks) {
+    for (let i = 0; i < 2048; i += 1) {
+      const a = Math.imul(i + 1, 0x9e3779b1);
+      const b = Math.imul(i + 7, 0x85ebca6b);
+      const c = Math.imul(i + 13, 0xc2b2ae35);
+      const direct = mix3x32PowerOfTwoIndex(a, b, c, mask);
+      const oldIndex = mix3x32Locator(a, b, c) & mask;
+
+      // Odd multiplication is a permutation modulo 2^k. Multiplying the
+      // direct index by the old finalizer therefore reproduces the old bucket.
+      assert.equal(Math.imul(direct, multiplier) & mask, oldIndex);
+    }
+  }
+
+  // Distinct direct buckets remain distinct after the old odd-multiply
+  // permutation, so primary collision classes are unchanged.
+  const mask = 255;
+  const seen = new Int16Array(mask + 1);
+  seen.fill(-1);
+  for (let i = 0; i < 1024; i += 1) {
+    const direct = mix3x32PowerOfTwoIndex(i, i * 3, i * 7, mask);
+    const oldIndex = mix3x32Locator(i, i * 3, i * 7) & mask;
+    if (seen[direct] < 0) seen[direct] = oldIndex;
+    else assert.equal(seen[direct], oldIndex);
+  }
 });
 
 test('mix and reflection blocks', () => {

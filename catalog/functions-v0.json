@@ -1,5 +1,5 @@
 {
-  "version": "0.94.0",
+  "version": "0.95.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3337,6 +3337,33 @@
       "resultDomain": "int32 bit pattern; mask directly for power-of-two table addressing"
     },
     {
+      "name": "mix3x32PowerOfTwoIndex",
+      "source": "src/mix32.mjs",
+      "block": "mix32",
+      "primitives": [
+        "Math.imul",
+        "^",
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-joint-power-of-two-index-profile",
+      "preconditions": [
+        "a, b, and c are exact key coordinates already available as int32/uint32 bit patterns",
+        "capacityMask = capacity-1 for a positive power-of-two capacity",
+        "capacityMask is a nonnegative int32 mask",
+        "the result is only the probe start index; exact tuple equality remains authoritative for hits",
+        "integration measures probe-length/locality before replacing an established linear-probing locator because the removed odd multiply permutes adjacent bucket labels even though primary collision classes are identical"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 14,
+        "note": "Three coordinate IMULs, two combine XORs, one xorshift fold, and final capacity AND. Deletes mix3x32Locator's final odd IMUL plus a separate powerOfTwoIndex32 AND by returning the index directly."
+      },
+      "resultDomain": "nonnegative power-of-two table index under the capacityMask precondition"
+    },
+    {
       "name": "mix32",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -6369,11 +6396,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 221,
+    "functionsImplemented": 222,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 221,
+    "functionsWithCycleCount": 222,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8116,6 +8143,18 @@
           "before": "dual continuing-child path performs best select and beta update after cutoff test",
           "after": "2 operations when score lowers beta, 3 for best-only/no-bound path; cutoff remains 1",
           "mechanism": "use alpha<beta<=value dual invariant"
+        }
+      ]
+    },
+    {
+      "id": "round-088",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "mix3x32PowerOfTwoIndex",
+          "before": "mix3x32Locator + powerOfTwoIndex32 = 17 cycles",
+          "after": "14 fixed cycles",
+          "mechanism": "for a 2^k table, omit the final odd multiplier and return the folded low-k bits directly; odd multiplication only permutes primary buckets modulo 2^k"
         }
       ]
     }
