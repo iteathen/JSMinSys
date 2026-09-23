@@ -75,6 +75,7 @@ test('two-lane wordwise blocks', () => {
   assert.equal(zero2x32(0, 1), false);
   assert.equal(equal2x32(1, 2, 1, 2), true);
   assert.equal(equal2x32(1, 2, 1, 3), false);
+  assert.equal(equal2x32(0x80000000, 2, 0x80000000, 2), true);
 });
 
 
@@ -139,7 +140,7 @@ import {
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
 import { mix32, mix32Medium, mix32Strong, fillReflect3Tables32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
-import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace } from '../src/frontier32.mjs';
+import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace, normalizeMinimal2xI32InPlace, normalizeMaximal2xI32InPlace } from '../src/frontier32.mjs';
 import {
   negateScore32,
   raiseLowerBound32,
@@ -217,6 +218,18 @@ test('frontier normalization blocks', () => {
   const maximal = normalizeMaximal2x32InPlace(lo2, hi2, 3);
   assert.equal(maximal, 1);
   assert.equal(lo2[0], 0b0111);
+});
+
+test('signed frontier normalization profiles', () => {
+  const high = 1 << 31;
+  const lo = new Int32Array([high, high | 1, 1]);
+  const hi = new Int32Array(3);
+  assert.equal(normalizeMinimal2xI32InPlace(lo, hi, 3), 2);
+
+  const lo2 = new Int32Array([high | 1, high, 1]);
+  const hi2 = new Int32Array(3);
+  assert.equal(normalizeMaximal2xI32InPlace(lo2, hi2, 3), 1);
+  assert.equal(lo2[0], high | 1);
 });
 
 test('search scalar blocks', () => {
