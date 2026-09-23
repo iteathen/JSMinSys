@@ -1,5 +1,5 @@
 {
-  "version": "0.109.0",
+  "version": "0.110.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -7843,17 +7843,497 @@
         "expression": "ATOMIC_LOAD(stop) + stop_zero*ATOMIC_LOAD(done) + short_circuit/control",
         "note": "Short-circuit avoids the done load once stop is already observed."
       }
+    },
+    {
+      "name": "equalSpan32At",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "!==",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(2*L+CMP+loop_control)",
+        "note": "Runtime-sized exact lane equality."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected and both spans are readable"
+      ]
+    },
+    {
+      "name": "subsetSpan32At",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "&",
+        "~",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(2*L+NOT+AND+TEST+loop_control)",
+        "note": "Runtime-sized subset relation."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected and both spans are readable"
+      ]
+    },
+    {
+      "name": "orSpan32Into",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "|",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(2*L+OR+S+loop_control)",
+        "note": "Runtime-sized wordwise union."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected",
+        "destination span is writable"
+      ]
+    },
+    {
+      "name": "andSpan32Into",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(2*L+AND+S+loop_control)",
+        "note": "Runtime-sized wordwise intersection."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected",
+        "destination span is writable"
+      ]
+    },
+    {
+      "name": "andNotSpan32Into",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(2*L+NOT+AND+S+loop_control)",
+        "note": "Runtime-sized A-and-not-B transform."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected",
+        "destination span is writable"
+      ]
+    },
+    {
+      "name": "reverseSpan32Into",
+      "source": "src/span32.mjs",
+      "block": "runtime-sized-word-span",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "+",
+        "-",
+        "+=",
+        "<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "COUNT*(L+S+index_arithmetic+loop_control)",
+        "note": "Runtime-sized reversal for initialization-selected coordinate spans."
+      },
+      "preconditions": [
+        "count is initialization-selected",
+        "destination does not destructively overlap unread source"
+      ]
+    },
+    {
+      "name": "insertMinimalSpan32InPlace",
+      "source": "src/relational32.mjs",
+      "block": "multiword-antichain-skyline",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "<",
+        "+=",
+        "-=",
+        "*",
+        "+",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "dominance_scan(LENGTH,WORDS)+removal_scan(LENGTH,WORDS)+admission_copy(WORDS)",
+        "note": "Runtime-sized subset-minimal skyline insertion."
+      },
+      "preconditions": [
+        "recordWords and capacity are initialization-selected",
+        "candidate is a complete record"
+      ]
+    },
+    {
+      "name": "productJoinMinimalSpan32Into",
+      "source": "src/relational32.mjs",
+      "block": "multiword-antichain-skyline",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "|",
+        "===",
+        "<",
+        "+=",
+        "-=",
+        "*",
+        "+",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "LEFT*RIGHT*(WORDS*(2*L+OR+S)+skyline_cost)",
+        "note": "Runtime-sized streamed join product with immediate absorption."
+      },
+      "preconditions": [
+        "recordWords and capacity are initialization-selected",
+        "scratch has recordWords lanes"
+      ]
+    },
+    {
+      "name": "mixSpan32Locator32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "^",
+        ">>>",
+        "Math.imul",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(L+2*XOR+SHR+IMUL+loop_control)",
+        "note": "Runtime-sized locator; exact key equality remains authoritative."
+      },
+      "preconditions": [
+        "wordCount is the complete initialization-selected key width"
+      ]
+    },
+    {
+      "name": "probeSpan32IdSlot32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "+",
+        "&",
+        "*",
+        "~",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "PROBES*(slot_load+occupancy_test+hit_candidate*WORDS*(key_load+compare)+probe_advance)",
+        "note": "Runtime-sized exact open-addressed probe."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected",
+        "capacityMask is power-of-two capacity minus one",
+        "at least one empty slot exists"
+      ]
+    },
+    {
+      "name": "publishSpanIdSlot32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "*",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(L+S+loop_control)+slot_store",
+        "note": "Runtime-sized exact-key publication."
+      },
+      "preconditions": [
+        "wordCount is initialization-selected",
+        "slot is reserved"
+      ]
+    },
+    {
+      "name": "reduceMaxIntervals32Into",
+      "source": "src/interval32.mjs",
+      "block": "exact-interval-evidence",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">",
+        "+=",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L+(COUNT-1)*(2*L+2*CMP+loop_control)+2*S",
+        "note": "Runtime-count componentwise max interval reduction."
+      },
+      "preconditions": [
+        "count >= 1 and is initialization/application bounded",
+        "input intervals are valid"
+      ]
+    },
+    {
+      "name": "reduceMinIntervals32Into",
+      "source": "src/interval32.mjs",
+      "block": "exact-interval-evidence",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "<",
+        "+=",
+        "+",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L+(COUNT-1)*(2*L+2*CMP+loop_control)+2*S",
+        "note": "Runtime-count componentwise min interval reduction."
+      },
+      "preconditions": [
+        "count >= 1 and is initialization/application bounded",
+        "input intervals are valid"
+      ]
+    },
+    {
+      "name": "permuteBitsSpan32Into",
+      "source": "src/basis32.mjs",
+      "block": "sparse-basis-transform-remap",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "<<",
+        ">>>",
+        "|=",
+        "+=",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "OUT_WORDS*S+COUNT*(source_test+mapped_set_when_active)",
+        "note": "Runtime-sized packed-bit permutation."
+      },
+      "preconditions": [
+        "outWordCount and count are initialization-selected",
+        "mapped destinations fit output span",
+        "output does not overlap source"
+      ]
+    },
+    {
+      "name": "publishDependencies32",
+      "source": "src/worker32.mjs",
+      "block": "worker-execution-substrate",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "+",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "COUNT*(5*L+5*S+index_arithmetic+loop_control)",
+        "note": "Runtime-count dependency-row publication."
+      },
+      "preconditions": [
+        "count fits caller-provisioned spans"
+      ]
+    },
+    {
+      "name": "retainFirstRunnableDependency32",
+      "source": "src/worker32.mjs",
+      "block": "worker-execution-substrate",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">=",
+        "===",
+        "&&",
+        "!",
+        "+",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "SCANNED*(child_load+execution/resolved/state_checks+loop_control)+retained*S",
+        "note": "Runtime-count direct retained-dependency handoff."
+      },
+      "preconditions": [
+        "caller serializes execution state",
+        "negative child ids denote absent dependencies"
+      ]
+    },
+    {
+      "name": "applyMoveSpan32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">>>",
+        "&",
+        "^=",
+        "<<",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "landing_load+2*index_extract+current_toggle+optional_above_toggle+landing_store",
+        "note": "Runtime-sized playable-bitset transition; no packed support-width assumption."
+      },
+      "preconditions": [
+        "geometry is initialization-selected",
+        "playable has ceil(cellCount/32) lanes",
+        "landingCells[column] is legal"
+      ]
+    },
+    {
+      "name": "undoMoveSpan32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">>>",
+        "&",
+        "^=",
+        "<<",
+        "+",
+        "-",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "landing_load+2*index_extract+current_toggle+optional_above_toggle+landing_store",
+        "note": "Runtime-sized playable-bitset undo."
+      },
+      "preconditions": [
+        "geometry is initialization-selected",
+        "playable has ceil(cellCount/32) lanes",
+        "caller supplies a column with a move to undo"
+      ]
     }
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 277,
-    "catalogBlocks": 29,
-    "blocksCompleteWithoutNewPrimitive": 28,
+    "functionsImplemented": 295,
+    "catalogBlocks": 30,
+    "blocksCompleteWithoutNewPrimitive": 29,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 277,
+    "functionsWithCycleCount": 295,
     "functionsMissingCycleCount": 0,
-    "blocksComplete": 29,
+    "blocksComplete": 30,
     "blocksCompletedWithAdmittedPrimitive": 1
   },
   "decisions": [
@@ -9828,6 +10308,18 @@
           "before": "applications compose queue claim, generation validation, ownership release, dependency publication, retained-child handoff, wake/park, and stop polling directly",
           "after": "fixed numeric worker transitions are exported so applications retain only the outer loop, evaluator, and domain publication policy",
           "mechanism": "factor recurring ownership/scheduling mechanics without introducing a worker framework or domain outcome codes"
+        }
+      ]
+    },
+    {
+      "id": "round-105",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "runtime-configured geometry substrate",
+          "before": "fixed 3/6/8-word, seven-action and <=64-cell helpers were the only implementations of several newly used shapes",
+          "after": "runtime-sized span/key/front/interval/dependency/bitset-transition functions provide the general path; fixed forms remain optional specializations",
+          "mechanism": "derive widths and counts at initialization and loop over prepared spans instead of hard-coding proving-workload geometry"
         }
       ]
     }
