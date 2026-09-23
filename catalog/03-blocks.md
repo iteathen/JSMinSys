@@ -432,3 +432,57 @@ The first blocks worth lowering against the candidate symbol set are:
 13. fixed small candidate selection
 
 These cover a large fraction of the meaningful work while avoiding premature commitment to solver-specific machinery.
+
+## 21. Fixed-lane relational set
+
+Recurring packed relational carriers often use three, six, or eight uint32 lanes.
+The admitted profiles keep these widths explicit instead of introducing arbitrary-width
+objects or wide-integer semantics. Operations cover exact equality, subset/dominance,
+and lane-local Boolean joins/intersections.
+
+## 22. Multiword antichain skyline
+
+Six-word fixed records may be maintained as a subset-minimal antichain. The block
+rejects dominated candidates, removes retained generators dominated by a new
+candidate, and admits only within caller-owned fixed capacity. A streamed pairwise
+OR product performs immediate skyline absorption without materializing a Cartesian
+product.
+
+## 23. Wide exact-key transposition operations
+
+Eight-word identities use a locator only to choose a probe start. Exact equality
+still compares every identity word. Publication writes the complete key before
+publishing the dense id slot; synchronization and lifetime remain caller-owned.
+
+## 24. Exact interval evidence
+
+Durable semantic [lower, upper] evidence is distinct from alpha/beta search
+windows. Tightening is monotone intersection; incompatible evidence reports a
+conflict. Fixed-degree up-to-seven min/max reductions provide Bellman-style
+aggregation without allocating candidate objects.
+
+## 25. Sparse basis transform / remap
+
+Prepared action-major maps can transform sparse ordered IDs through caller-owned
+bitset scratch, deduplicate them, and emit canonical ascending IDs. Three-word
+packed coordinates may be remapped through a prepared local-index permutation.
+The block carries no board/game semantics.
+
+## 26. Intrusive generation-stamped work list
+
+A caller-serialized intrusive list may coalesce duplicate membership, remove an
+arbitrary member in O(1), pop from the head, and stamp the item generation at
+publication. The block intentionally performs no hidden Atomics; applications
+must supply the synchronization regime when shared execution requires one.
+
+## 27. Fixed seven-slot mask
+
+Seven-slot candidate sets use one scalar mask for membership, add/remove, and
+least-set-slot selection. This avoids manufacturing parallel membership arrays
+for small fixed-degree decisions.
+
+## 28. Immutable span publication
+
+A caller-owned scalar copy publishes a fixed derived span without allocation or
+bulk-copy machinery. Publication ordering, lifetime, and aliasing preconditions
+remain explicit at the governing application unit.
