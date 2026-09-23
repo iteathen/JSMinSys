@@ -77,6 +77,11 @@ export function ttReplace32(tags, values, index, tag, value) {
   return index;
 }
 
+export function ttUpdateValue32(values, index, value) {
+  values[index] = value;
+  return index;
+}
+
 export function selectGreater32(a, b) {
   return a >= b ? a : b;
 }

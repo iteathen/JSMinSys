@@ -200,9 +200,10 @@
       "status": "implemented",
       "functions": [
         "ttHit32",
-        "ttReplace32"
+        "ttReplace32",
+        "ttUpdateValue32"
       ],
-      "note": "Caller computes and retains the table index once; probe is a boolean tag hit and replacement reuses the same index."
+      "note": "TT probe retains the prepared index. Full replacement writes tag+value for misses/replacements; proven hits may use ttUpdateValue32 to update only the value and avoid an identical tag store."
     },
     {
       "id": 12,

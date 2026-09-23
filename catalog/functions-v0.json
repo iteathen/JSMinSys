@@ -1,5 +1,5 @@
 {
-  "version": "0.79.0",
+  "version": "0.80.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -719,6 +719,29 @@
         "expression": "2*STORE_COST",
         "note": "Two indexed stores. NEES store profile gives 0.5-cycle hot/local throughput minimum per store; cache ownership/coherence remains symbolic.",
         "hotLocalMinimumCycles": 1
+      }
+    },
+    {
+      "name": "ttUpdateValue32",
+      "source": "src/indexed32.mjs",
+      "block": "tt-probe-replace",
+      "primitives": [
+        "ST32",
+        "="
+      ],
+      "status": "implemented-hit-update-profile",
+      "preconditions": [
+        "caller retained index from the probe",
+        "caller has just proved tags[index] === tag with ttHit32 or equivalent exact tag check",
+        "tag identity does not change for this update"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "STORE_COST",
+        "hotLocalMinimumCycles": 0.5,
+        "note": "Hit update writes only the value. Full ttReplace32 remains for misses/replacements that must publish a tag."
       }
     },
     {
@@ -4747,11 +4770,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 173,
+    "functionsImplemented": 174,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 173,
+    "functionsWithCycleCount": 174,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6254,6 +6277,18 @@
           "before": "high10 table: 19 L1 fixed; sparse-high: 16/25 L1",
           "after": "16-cycle hi==0 / 21-cycle hi!=0 under L1 table residency",
           "mechanism": "compute low exact count once, skip high table load when hi is zero, otherwise use the configured 10-bit table"
+        }
+      ]
+    },
+    {
+      "id": "round-073",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "ttUpdateValue32",
+          "before": "ttReplace32 on a proven hit: 2*STORE_COST",
+          "after": "STORE_COST",
+          "mechanism": "reuse caller-owned tag-match proof and avoid rewriting an identical tag"
         }
       ]
     }

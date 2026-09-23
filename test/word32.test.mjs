@@ -102,6 +102,7 @@ import {
   powerOfTwoIndex32,
   ttHit32,
   ttReplace32,
+  ttUpdateValue32,
   selectGreater32,
   selectLess32,
 } from '../src/indexed32.mjs';
@@ -167,6 +168,9 @@ test('indexed and table blocks', () => {
   assert.equal(ttHit32(tags, ttIndex, 99), true);
   assert.equal(ttHit32(tags, ttIndex, 98), false);
   assert.equal(values[3], 1234);
+  assert.equal(ttUpdateValue32(values, ttIndex, 5678), ttIndex);
+  assert.equal(tags[ttIndex], 99);
+  assert.equal(values[ttIndex], 5678);
   assert.equal(selectGreater32(4, 9), 9);
   assert.equal(selectLess32(4, 9), 4);
 });
