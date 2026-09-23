@@ -93,7 +93,7 @@ export function rbaBranchManagerStep32(
   if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
      !Number.isInteger(budget)||budget<1)
     throw new RangeError('invalid RBA branch-manager configuration');
-  if(!rbaTtEnter32(t,owner))return 0;
+  if(!rbaTtEnter32(t,owner))return -1;
   let processed=0,merged=0;
   try{
     while(processed<budget&&!Atomics.load(t.control,RBA_TT_STOP)){
@@ -128,8 +128,9 @@ export function runRbaBranchManagerLoop32(
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA manager wait');
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchManagerStep32(t,reconcile,{owner,budget,context,manager}))
-      Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
+    const step=rbaBranchManagerStep32(t,reconcile,{owner,budget,context,manager});
+    if(step<0)continue;
+    if(!step)Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
 }
@@ -145,11 +146,11 @@ export function rbaBranchWorkerStep32(
     throw new TypeError('RBA worker callbacks required');
 
   const resetBefore=applyWorkerReset32(t,worker);
-  if(resetBefore<0)return 0;
+  if(resetBefore<0)return -1;
   if(resetBefore>0)return 1;
 
   if(worker.q===-1){
-    if(!rbaTtEnter32(t,worker.owner))return 0;
+    if(!rbaTtEnter32(t,worker.owner))return -1;
     worker.q=rbaTtTake32(t,worker.owner);
     worker.expose=worker.workerCount>1&&
       t.control[RBA_TT_READY_COUNT]<worker.readyTarget?1:0;
@@ -165,10 +166,10 @@ export function rbaBranchWorkerStep32(
   }
 
   const resetAfter=applyWorkerReset32(t,worker);
-  if(resetAfter<0)return 0;
+  if(resetAfter<0)return -1;
   if(resetAfter>0)return 1;
 
-  if(!rbaTtEnter32(t,worker.owner))return 0;
+  if(!rbaTtEnter32(t,worker.owner))return -1;
   const q=worker.q;
   let next=-1;
   try{
@@ -208,8 +209,9 @@ export function runRbaBranchWorkerLoop32(
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA worker wait');
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchWorkerStep32(t,worker,evaluate,publish,context))
-      Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
+    const step=rbaBranchWorkerStep32(t,worker,evaluate,publish,context);
+    if(step<0)continue;
+    if(!step)Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
     if(metrics){
       metrics[0]=worker.claims;
       metrics[1]=worker.branches;

@@ -6,7 +6,7 @@ import {
   rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,rbaTtRelease32,rbaTtRecycle32,
   rbaTtManagerMergeDuplicate32,rbaTtManagerInspectReady32,
-  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,
+  RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,RBA_TT_LOCK,
   RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
 import {
@@ -216,4 +216,21 @@ test('manager inspects newest surplus before an old head window',()=>{
   assert.equal(t.readyMember[canonical],1);
   assert.equal(rbaBranchReadyCount32(t),5,
     'dedupe should replace redundant work with its unresolved canonical q');
+});
+
+test('worker and manager distinguish TT contention from true idle',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
+  rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
+  const state=makeState(),worker=prepareRbaBranchWorker32({owner:2,workerCount:1,state,resetTargets});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const context={resetTargets};
+
+  Atomics.store(t.control,RBA_TT_LOCK,99);
+  assert.equal(rbaBranchWorkerStep32(t,worker,evaluate,publish,context),-1);
+  assert.equal(rbaBranchManagerStep32(t,reconcile,{context,manager}),-1);
+  Atomics.store(t.control,RBA_TT_LOCK,0);
+
+  assert.equal(rbaBranchWorkerStep32(t,worker,evaluate,publish,context),1);
+  assert.notEqual(worker.q,-1);
 });
