@@ -37,6 +37,20 @@ export function xorTupleHash32(ids, count) {
   return hash >>> 0;
 }
 
+export function xorTupleHash10x32(ids) {
+  let hash = Math.imul(ids[0] + 1, 0x9e3779b1);
+  hash ^= Math.imul(ids[1] + 1, 0x2423441b);
+  hash ^= Math.imul(ids[2] + 1, 0xaa0f0e85);
+  hash ^= Math.imul(ids[3] + 1, 0x2ffad8ef);
+  hash ^= Math.imul(ids[4] + 1, 0xb5e6a359);
+  hash ^= Math.imul(ids[5] + 1, 0x3bd26dc3);
+  hash ^= Math.imul(ids[6] + 1, 0xc1be382d);
+  hash ^= Math.imul(ids[7] + 1, 0x47aa0297);
+  hash ^= Math.imul(ids[8] + 1, 0xcd95cd01);
+  hash ^= Math.imul(ids[9] + 1, 0x5381976b);
+  return hash >>> 0;
+}
+
 export function updateXorTupleHash32(hash, slot, oldValue, newValue) {
   const multiplier = 0x9e3779b1 + Math.imul(slot, 0x85ebca6a);
   return (hash

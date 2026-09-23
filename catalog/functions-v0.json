@@ -1,5 +1,5 @@
 {
-  "version": "0.99.0",
+  "version": "0.100.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3519,6 +3519,37 @@
       }
     },
     {
+      "name": "xorTupleHash10x32",
+      "source": "src/mix32.mjs",
+      "block": "hash-mix32",
+      "primitives": [
+        "LD32",
+        "+",
+        "Math.imul",
+        "^",
+        ">>>",
+        "="
+      ],
+      "status": "implemented-exact-ten-tuple-profile",
+      "preconditions": [
+        "configured ordered tuple length is exactly 10 and immutable after initialization",
+        "ids has at least 10 exact uint32-compatible coordinates in the same slot order as xorTupleHash32",
+        "initialization selects this exact-count profile once; there is no hot tuple-length dispatch",
+        "the returned uint32 is the same separable fingerprint as xorTupleHash32(ids, 10)",
+        "exact tuple equality remains authoritative and bucket addressing still avalanches the raw fingerprint before masking"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 90,
+        "hotL2Predicted": 170,
+        "hotL3Predicted": 520,
+        "expression": "10*LOAD + 10*ADD + 10*IMUL + 9*XOR + uint32 normalization",
+        "note": "Exact ten-slot specialization removes generic loop tests/branches/increments and multiplier progression. It is algebraically identical to xorTupleHash32(ids,10), so collision behavior is unchanged."
+      }
+    },
+    {
       "name": "updateXorTupleHash32",
       "source": "src/mix32.mjs",
       "block": "hash-mix32",
@@ -6630,11 +6661,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 229,
+    "functionsImplemented": 230,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 229,
+    "functionsWithCycleCount": 230,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8455,6 +8486,18 @@
           "before": "a child whose transition already knows changed chunk slots still recomputes the entire 10-slot hash",
           "after": "load the parent fingerprint and apply a 15-cycle reversible hash update per changed slot",
           "mechanism": "make tuple hashing delta-compatible so unchanged coordinates perform no hash work"
+        }
+      ]
+    },
+    {
+      "id": "round-093",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "ten-slot residual class full hash",
+          "before": "generic separable builder costs 133 L1 ledger cycles for the fixed 10-coordinate tuple",
+          "after": "exact unrolled builder costs 90 L1 ledger cycles",
+          "mechanism": "select the immutable FRONTIER_SLOTS=10 shape at initialization and remove loop control plus multiplier progression without changing the fingerprint"
         }
       ]
     }

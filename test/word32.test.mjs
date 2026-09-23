@@ -375,7 +375,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, xorTupleHash32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1569,6 +1569,27 @@ test('one-lane caller meta makes known-cell undo landing-only', () => {
     base[CALLER_PLY1_SUPPORT_CODE],
   );
   assert.deepEqual(landingFast, landingBase);
+});
+
+test('exact ten-slot tuple hash matches generic separable builder', () => {
+  const vectors = [
+    new Uint32Array(10),
+    new Uint32Array([1,2,3,4,5,6,7,8,9,10]),
+    new Uint32Array([
+      0xffffffff, 0x80000000, 0x7fffffff, 3, 5, 8, 13, 21, 34, 55,
+    ]),
+  ];
+  for (const ids of vectors) {
+    assert.equal(xorTupleHash10x32(ids), xorTupleHash32(ids, 10));
+  }
+
+  const ids = new Uint32Array(10);
+  for (let i = 0; i < 4096; i += 1) {
+    for (let slot = 0; slot < 10; slot += 1) {
+      ids[slot] = Math.imul(i + slot * 31, slot + 5) >>> 0;
+    }
+    assert.equal(xorTupleHash10x32(ids), xorTupleHash32(ids, 10));
+  }
 });
 
 test('separable tuple hash updates from exact slot deltas', () => {
