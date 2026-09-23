@@ -92,10 +92,13 @@
       "name": "apply-undo-state-transition",
       "status": "implemented",
       "functions": [
+        "sideFromPly32",
+        "applyMove1x32",
+        "undoMove1x32",
         "applyMove32",
-        "undoMove32",
-        "sideFromPly32"
-      ]
+        "undoMove32"
+      ],
+      "note": "Initialization selects one-lane transitions for <=32 cells or two-lane transitions for 33..64 cells; geometry remains runtime-configured and invariant thereafter."
     },
     {
       "id": 9,
