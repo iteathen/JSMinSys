@@ -238,6 +238,27 @@ Specific use remains subject to NEES representation and total-cost qualification
 
 `SharedArrayBuffer` is admissible only when shared-memory execution itself is justified.
 
+### JMS-DATA-006 — Runtime-configured geometry
+
+Board/application geometry MAY be selected at runtime during initialization.
+
+Once selected, geometry is invariant for the lifetime of the configured execution instance, but JSMinSys hot mechanical functions MUST NOT assume one hard-coded board size unless the function is explicitly named and documented as a size-specific specialization.
+
+Initialization SHOULD derive reusable scalar or table invariants such as:
+
+- columns;
+- cell count;
+- last row;
+- per-column support deltas;
+- landing-cell initialization;
+- coordinate lookup tables;
+- reflection contribution tables;
+- other representation-specific constants.
+
+Hot functions MAY require those prepared values as preconditions rather than reconstructing them repeatedly.
+
+A specialization for one configured geometry MAY exist as an alternative function, but it MUST NOT silently replace the general runtime-configured contract.
+
 ## 8. Operation vocabulary
 
 The machine-readable operation authority is `catalog/catalog-v0.json`.
