@@ -55,11 +55,17 @@ function prepareUpsets(g,a,d,basis,bi,n){
 }
 function prepareImages(g,a,d,cell,mover,basis,bi){
   const n=a.size[d],cn=a.size[d+1],cw=g.coordWords,nextValid=(d+1)*cw,nextBasis=(d+1)*g.maxBasis;
+  let pair=0;while(pair<cn&&a.basis[nextBasis+pair]<g.pairShapeStart)pair+=1;
+  let triple=pair;while(triple<cn&&a.basis[nextBasis+triple]<g.tripleShapeStart)triple+=1;
+  let quad=triple;while(quad<cn&&a.basis[nextBasis+quad]<g.quadShapeStart)quad+=1;
   for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.profile.removeCell(g,id,cell);a.top1[i]=0;
     const row=i*cw;for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
     for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
       if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
-      else for(let j=0;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+      else{
+        const start=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad;
+        for(let j=start;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+      }
     }
   }
 }
