@@ -110,11 +110,13 @@ function releaseEdge(t,e){const child=t.child[e];if(child<0)return 0;if(t.edgeAt
 export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,count){
   if(t.execution[q]!==owner||count<1||count>t.edgeCapacity||(count|0)!==count){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
   if(!rbaTtTighten32(t,q,stateLo,stateHi))return -1;
-  const edgeBase=q*t.edgeCapacity;
+  const edgeBase=q*t.edgeCapacity,keyStride=t.keyWords;
+  let childKey=keyOffset,childBasis=basisOffset;
   for(let i=0;i<count;i+=1){let child=-1;const lo=actionLo[i],hi=actionHi[i];
     if(lo<1||hi>3||lo>hi){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
-    if(childPresent[i]){child=rbaTtIntern32(t,keys,keyOffset+i*t.keyWords,basis,basisOffset+i*basisStride,basisSizes[i]);if(child<0)return -1;if(!rbaTtTighten32(t,child,lo,hi))return -1;}
+    if(childPresent[i]){child=rbaTtIntern32(t,keys,childKey,basis,childBasis,basisSizes[i]);if(child<0)return -1;if(!rbaTtTighten32(t,child,lo,hi))return -1;}
     const e=edgeBase+i;t.child[e]=child;t.childGeneration[e]=child<0?0:t.generation[child];t.edgeLabel[e]=labels[i];t.edgeLower[e]=lo;t.edgeUpper[e]=hi;t.edgeAttached[e]=0;t.edgeNext[e]=-1;t.edgePrev[e]=-1;t.count[q]=i+1;
+    childKey+=keyStride;childBasis+=basisStride;
   }
   t.phase[q]=2;rbaTtSignal32(t,q);let next=-1;
   for(let i=0;i<count;i+=1){const child=t.child[edgeBase+i];if(child>=0&&t.execution[child]===0&&!t.exact[child]&&t.phase[child]===0){t.execution[child]=owner;next=child;break;}}
