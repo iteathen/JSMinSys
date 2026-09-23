@@ -1,5 +1,5 @@
 {
-  "version": "0.29.0",
+  "version": "0.30.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -725,6 +725,7 @@
       "preconditions": [
         "support encoding uses 3 bits per column",
         "configured columns are immutable after initialization",
+        "initialTargetShift = 3*(columns-1) was prepared during initialization",
         "packed support fits uint32",
         "rank/ply metadata is represented separately"
       ],
@@ -732,11 +733,11 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "6 + 9*C",
+        "expression": "3 + 9*C",
         "parameters": {
           "C": "configured columns"
         },
-        "note": "Separating rank/ply removes rank extraction/reinsertion; unsigned coercion remains only at scalar return."
+        "note": "Initial target shift is configuration-precomputed; the hot fallback performs only the column loop plus final unsigned return coercion."
       }
     },
     {
@@ -1977,6 +1978,18 @@
           "before": "6 L1 / 14 L2 index-or-sentinel probe",
           "after": "ttHit32: 5 L1 / 13 L2 boolean hit",
           "mechanism": "caller retains prepared index; delete redundant select"
+        }
+      ]
+    },
+    {
+      "id": "round-023",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3Direct32",
+          "before": "6 + 9*C cycles",
+          "after": "3 + 9*C cycles",
+          "mechanism": "precompute 3*(columns-1) during initialization"
         }
       ]
     }
