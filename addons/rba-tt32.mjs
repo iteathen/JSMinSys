@@ -120,8 +120,8 @@ export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,
 }
 export function rbaTtPublishExactOwned32(t,q,owner,v){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);if(!rbaTtSetExact32(t,q,v))return 0;return rbaTtReleaseExecution32(t,q,owner);}
 export function rbaTtAttachDependencies32(t,q){
-  if(t.phase[q]!==2)return 0;const base=q*t.edgeCapacity;
-  for(let i=0;i<t.count[q];i+=1){const e=base+i,child=t.child[e];if(child<0)continue;if(!rbaTtValid32(t,child,t.childGeneration[e]))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+  if(t.phase[q]!==2)return 0;const base=q*t.edgeCapacity,count=t.count[q];
+  for(let i=0;i<count;i+=1){const e=base+i,child=t.child[e];if(child<0)continue;if(!rbaTtValid32(t,child,t.childGeneration[e]))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
     const head=t.parentHead[child];t.edgeNext[e]=head;t.edgePrev[e]=-1;if(head!==-1)t.edgePrev[head]=e;t.parentHead[child]=e;t.edgeAttached[e]=1;}
   t.phase[q]=3;return 1;
 }
