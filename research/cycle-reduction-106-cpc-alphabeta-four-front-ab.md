@@ -179,3 +179,119 @@ The same-binary comparison is preferred over comparing one-shot timings from dif
 The preserved fork-preemption research also proves that two endpoint-preemption orders can reach the same forced macro-successor under stated playability/first-win guards.
 
 That fact is retained as proof-graph normalization evidence only. It is **not** currently used to skip an entire alpha-beta child: a shared forced descendant does not by itself prove that every non-macro attacker alternative from the two physical child states is value-equivalent. A production branch merge requires that stronger subsumption/equivalence proof first.
+
+
+## Support-lift terminal-response closure
+
+A later CPC continuation promoted two exact one-ply support consequences without adding recursion, a timeline scheduler, per-depth scratch, or another basis scan.
+
+The player-local singleton scan already records every active singleton target for each player in a compact bitset. CPC now reuses the opponent bitset for two first-win certificates:
+
+```text
+forced block:
+  exactly one opponent singleton is playable now
+  -> mover must occupy its support cell
+  -> that placement exposes another opponent singleton one row above
+  -> opponent terminalizes next ply
+  -> exact mover loss
+
+universal lift:
+  no opponent singleton is playable now
+  -> every legal mover action raises one column
+  -> every such raised frontier exposes an opponent singleton
+  -> opponent terminalizes next ply on every continuation
+  -> exact mover loss
+```
+
+Current-player immediate terminal detection remains earlier in CPC, so a shallower mover win supersedes these obligations exactly as required by first-win semantics.
+
+Independent 4x4 oracle controls include:
+
+```text
+forced-block lift:
+  moves 001001113
+  P1 to move
+  exact oracle P0 win
+  CPC exact [P0 win, P0 win]
+
+universal lift:
+  moves 000011121222
+  P0 to move
+  exact oracle P1 win
+  CPC exact [P1 win, P1 win]
+```
+
+Qualification head:
+
+`f0ccab34f0851bb55fa5007986d3119e68a5bfe2`
+
+Qualification run:
+
+`35910168846`
+
+Result:
+
+```text
+tests 122
+pass  122
+fail  0
+
+verify              green
+node-compatibility  green
+schema              green
+```
+
+The closure also reduced deterministic search work on the maintained controls. On the standard 7x6 rank-28 control
+
+```text
+4000330062302363634622612564
+```
+
+production CPC-first alpha-beta fell from 54 nodes/cofactors to 49, about a 9.3% reduction, while returning the same exact P0 win and column-2 witness.
+
+The maintained 4x4 controls also decreased:
+
+```text
+moves       before   after
+0101          1714    1648
+121203          43      41
+01132          372     325
+212031         110      98
+0313202        237     227
+```
+
+The implementation reuses the already-populated opponent singleton bitset. It adds only support-cell bit tests and, for the universal form, a short legal-column scan. No new residual/basis traversal is introduced.
+
+## Synchronized-channel extension update
+
+The frontier-response experiment now preserves the earlier pooled / fixed-`L=1` policy and additionally tries one deterministic maximal synchronized channel over ascending pairs of odd-remainder columns:
+
+```text
+L = min(remaining[a], remaining[b])
+```
+
+Because both paired remainders are odd, `L` is odd and the longer post-channel tail is even, allowing ordinary vertical pairing afterward. This is one nonrecursive member of the already-qualified synchronized-channel theorem family; CPC does not enumerate channel templates.
+
+The benchmark prefix A/B was corrected so the `on` scratch actually enables `frontierResponse`. After that correction, the maintained rank-16-or-later standard-7x6 prefix scan still reported:
+
+```text
+frontierResponseScan: []
+```
+
+Therefore the production decision remains unchanged:
+
+```text
+production:
+  cheap CPC/NDC tactical closure
+  + support-lift terminal response
+  + all-even paired response
+  + exact alpha-beta fallback
+
+experimental / opt-in:
+  pooled + synchronized frontier-response closure
+
+reference only:
+  recursive Four-Front
+```
+
+The synchronized extension remains valuable as qualified research and for smaller-board compression, but it has not demonstrated additional CPC interval/kind closure on the maintained standard-7x6 prefix controls.
