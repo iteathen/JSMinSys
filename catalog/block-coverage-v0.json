@@ -85,10 +85,11 @@
       "status": "implemented",
       "functions": [
         "fillLandingCells32",
+        "fillLandingCellsByOrder32",
         "landingCell32",
         "playableColumn32"
       ],
-      "note": "Initialization prepares per-column next landing cells; hot landing lookup is one load and transitions update by configured column stride."
+      "note": "Initialization may index landing cells by physical column or permute them once into preferred move-slot order. Hot landing lookup and transitions then consume that configured index directly; geometry stride remains physical columns."
     },
     {
       "id": 7,
@@ -210,8 +211,11 @@
       "functions": [
         "selectGreater32",
         "selectLess32",
-        "argMaxPlayable32"
-      ]
+        "argMaxPlayable32",
+        "argMaxPlayableSlot32",
+        "physicalColumnFromMoveSlot32"
+      ],
+      "note": "Physical-column and move-slot selection profiles coexist. Move-slot indexing removes the recursive order remap only when move-indexed transition data is aligned at initialization; physical-column recovery remains an explicitly costed external-boundary load."
     },
     {
       "id": 17,

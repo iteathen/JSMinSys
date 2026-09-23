@@ -40,3 +40,35 @@ export function argMaxPlayable32(scoresInOrder, order, count, none) {
   }
   return bestIndex < 0 ? none : order[bestIndex];
 }
+
+export function argMaxPlayableSlot32(scoresInOrder, count) {
+  let bestIndex = -1;
+  let bestScore = -2147483648;
+  let index = 0;
+  const paired = count & ~1;
+
+  for (; index < paired; index += 2) {
+    let score = scoresInOrder[index];
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = index;
+    }
+
+    score = scoresInOrder[index + 1];
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = index + 1;
+    }
+  }
+
+  if (index < count) {
+    const score = scoresInOrder[index];
+    if (score > bestScore) bestIndex = index;
+  }
+  return bestIndex;
+}
+
+export function physicalColumnFromMoveSlot32(order, slot) {
+  return order[slot];
+}
+

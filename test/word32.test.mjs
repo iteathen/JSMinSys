@@ -166,6 +166,8 @@ import {
   lowerUpperBound32,
   cutoff32,
   argMaxPlayable32,
+  argMaxPlayableSlot32,
+  physicalColumnFromMoveSlot32,
 } from '../src/search32.mjs';
 
 test('apply and undo support state', () => {
@@ -392,6 +394,7 @@ import {
 } from '../src/word64x32.mjs';
 import {
   playableColumn32,
+  fillLandingCellsByOrder32,
   fillCoordinateTables32,
   decodeColumn32,
   decodeRow32,
@@ -462,6 +465,32 @@ test('two-lane set iteration and cardinality', () => {
   assert.equal(popcount2x32(0xffffffff, 0x3ff), 42);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0), 32);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0x3ff), 42);
+});
+
+test('move-slot index space removes hot physical-column remap', () => {
+  const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
+  const scores = new Int32Array([-2147483648, 2, 4, 1, 3, 0, 2]);
+
+  const slot = argMaxPlayableSlot32(scores, 7);
+  assert.equal(slot, 2);
+  assert.equal(physicalColumnFromMoveSlot32(order, slot), 4);
+
+  scores.fill(-2147483648);
+  assert.equal(argMaxPlayableSlot32(scores, 7), -1);
+
+  const landing = new Uint32Array(7);
+  assert.equal(fillLandingCellsByOrder32(landing, order, 7), 7);
+  assert.deepEqual(landing, new Uint32Array([3, 2, 4, 1, 5, 0, 6]));
+
+  // Hot transition consumes slot 2 directly. The landing value, not the slot
+  // ordinal, supplies the physical cell; columns remains the physical stride.
+  const state = new Uint32Array(4);
+  for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
+  const supportDelta = 1 << (4 * 3);
+  assert.equal(applyMove32(state, landing, slot, 7, 42, supportDelta), 4);
+  assert.equal(landing[slot], 11);
+  assert.equal(undoMove32(state, landing, slot, 7, 42, supportDelta), 4);
+  assert.equal(landing[slot], 4);
 });
 
 test('trusted legality and coordinate reference decode', () => {

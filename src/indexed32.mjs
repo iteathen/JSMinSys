@@ -3,6 +3,11 @@ export function fillLandingCells32(landingCells, columns) {
   return columns;
 }
 
+export function fillLandingCellsByOrder32(landingCells, order, columns) {
+  for (let slot = 0; slot < columns; slot += 1) landingCells[slot] = order[slot];
+  return columns;
+}
+
 export function landingCell32(landingCells, column) {
   return landingCells[column];
 }

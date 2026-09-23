@@ -22,8 +22,9 @@ export function sideFromPly32(ply) {
  * - supportDelta: precomputed change to the configured support encoding for
  *   this column. Rank/ply is represented separately by STATE_PLY.
  *
- * landingCells[column] stores the next playable cell index for the column.
- * Initialization sets landingCells[column] = column.
+ * landingCells[index] stores the next playable physical cell for the selected
+ * transition index. The index may be a physical column or an initialization-
+ * configured move slot when all move-indexed data is aligned to that slot order.
  */
 export function applyMove1x32(
   state,

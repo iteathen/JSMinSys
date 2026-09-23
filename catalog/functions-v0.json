@@ -1,5 +1,5 @@
 {
-  "version": "0.41.0",
+  "version": "0.42.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -316,6 +316,36 @@
           "C": "configured column count"
         },
         "note": "Initialization-only. Prepares next-landing-cell state once for the configured board."
+      }
+    },
+    {
+      "name": "fillLandingCellsByOrder32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization",
+      "preconditions": [
+        "landingCells and order capacities are >= configured columns",
+        "order contains each configured physical column exactly once",
+        "preferred move order is immutable after initialization"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2 + C*(3 + LOAD + STORE_COST)",
+        "parameters": {
+          "C": "configured column count",
+          "LOAD": "order-table load cost",
+          "STORE_COST": "landing-cell store cost"
+        },
+        "note": "Initialization-only. Permutes landing-cell indexing into preferred move-slot order once; this setup cost is not hidden in the hot selection ledger."
       }
     },
     {
@@ -1554,6 +1584,68 @@
       ]
     },
     {
+      "name": "argMaxPlayableSlot32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "<",
+        "&",
+        "~",
+        "+",
+        "="
+      ],
+      "status": "implemented-move-slot-profile",
+      "preconditions": [
+        "scoresInOrder is laid out in the initialization-selected preferred move-slot order",
+        "scores for unplayable candidates equal -2147483648",
+        "all playable scores are greater than -2147483648",
+        "hot transition data such as landingCells and support deltas uses the same move-slot index space",
+        "callers consume the returned slot directly in recursion; physical-column recovery is deferred to an external boundary when needed"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "4 + P*(2*L+7) + T*(L+4)",
+        "parameters": {
+          "P": "floor(candidateCount/2)",
+          "T": "candidateCount & 1",
+          "L": "score load cycles"
+        },
+        "hotL1Predicted": "4 + 15*P + 8*T",
+        "hotL2Predicted": "4 + 31*P + 16*T",
+        "example7L1Cycles": 57,
+        "example7L2Cycles": 113,
+        "note": "Returns the preferred move slot directly, with -1 naturally representing no playable candidate. Deletes the final select and order-table load from argMaxPlayable32."
+      }
+    },
+    {
+      "name": "physicalColumnFromMoveSlot32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32"
+      ],
+      "status": "implemented-boundary-mapping",
+      "preconditions": [
+        "order is the immutable slot-to-physical-column map selected at initialization",
+        "slot is a valid selected move slot",
+        "use at an external/output boundary rather than before every hot transition when claiming the move-slot reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 4,
+        "hotL2Predicted": 12,
+        "hotL3Predicted": 47,
+        "expression": "LOAD(order[slot])",
+        "note": "Makes the deferred physical-column recovery cost explicit. A recursive engine that remaps every selected slot before apply does not receive the governing-unit win."
+      }
+    },
+    {
       "name": "atomicTryClaim32",
       "source": "src/atomic32.mjs",
       "block": "atomic-claim-release",
@@ -2258,11 +2350,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 94,
+    "functionsImplemented": 97,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 94,
+    "functionsWithCycleCount": 97,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3109,6 +3201,24 @@
           "before": "state-owned ply profile: 27-35.5 L1 / 59-75.5 L2 cycles",
           "after": "21.5-30 L1 / 45.5-62 L2 cycles",
           "mechanism": "same caller-owned-rank elimination for the two-lane state profile"
+        }
+      ]
+    },
+    {
+      "id": "round-035",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayableSlot32",
+          "before": "argMaxPlayable32: 63 L1 / 127 L2 cycles for N=7 with a selected candidate",
+          "after": "57 L1 / 113 L2 cycles for N=7",
+          "mechanism": "make preferred move order the hot index space; return slot directly and delete final select/order lookup"
+        },
+        {
+          "function": "fillLandingCellsByOrder32",
+          "before": "physical-column-indexed landing state required a hot slot-to-column remap before transition",
+          "after": "one initialization-time permutation; transition consumes selected move slot directly",
+          "mechanism": "align landing/support/score ownership at configuration time"
         }
       ]
     }
