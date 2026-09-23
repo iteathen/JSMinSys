@@ -1,6 +1,5 @@
-export function landingCell32(heights, column, columns, rows, invalidCell) {
-  const row = heights[column];
-  return row < rows ? row * columns + column : invalidCell;
+export function landingCell32(heights, column, columns) {
+  return heights[column] * columns + column;
 }
 
 export function maskContains32(owned, required) {
