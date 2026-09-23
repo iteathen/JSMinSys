@@ -162,6 +162,10 @@ test('mix and reflection blocks', () => {
   assert.equal(mixed.size, 4096);
   assert.equal(mix32Strong(0), 0);
   assert.notEqual(mix32(0x12345678), mix32Strong(0x12345678));
+  assert.equal(
+    powerOfTwoIndex32(mix32(0xfedcba98), 0xff),
+    (mix32(0xfedcba98) >>> 0) & 0xff,
+  );
   const tables7 = new Uint32Array(768);
   assert.equal(fillReflect3Tables32(tables7, 7, 3), 21);
   const code = ((1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
