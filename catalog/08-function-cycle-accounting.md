@@ -1,5 +1,8 @@
 # Function cycle accounting — v0
 
+> **NEES authority notice:** This file is a historical/research snapshot from the JSMinSys bootstrap. NEES Draft 0.5+ is the authoritative source for cost profiles, cycle accounting, evidence semantics, and function-ledger interpretation. If this file conflicts with NEES, NEES wins. JSMinSys retains only admission/restriction policy.
+
+
 JSMinSys requires every admissible emitted operation to have a cycle model. The authoritative machine-readable map is `catalog/cycle-model-v0.json`.
 
 ## Hard invariant
