@@ -183,9 +183,10 @@ export function sumMetricViews32(metricViews, metricWidth, out) {
 }
 
 export function sharedViewBytes32(record) {
-  let bytes = 0;
-  for (const value of Object.values(record)) {
-    if (ArrayBuffer.isView(value)) bytes += value.byteLength;
+  let bytes=0;
+  for(const key in record){
+    const value=record[key];
+    if(ArrayBuffer.isView(value))bytes+=value.byteLength;
   }
   return bytes;
 }
