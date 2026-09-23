@@ -33,12 +33,6 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
   };
 }
 
-function coordAny(g,words,base){
-  let any=0;
-  for(let w=0;w<g.coordWords;w+=1)any|=words[base+w];
-  return any!==0;
-}
-
 function coordHas(words,base,index){
   return (words[base+(index>>>5)]&(1<<(index&31)))!==0;
 }
@@ -277,8 +271,8 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   const meta=words[offset+g.metaOffset],terminal=meta&3,rank=meta>>>2,mover=rank&1;
   if(terminal){scratch.interval[0]=terminal;scratch.interval[1]=terminal;return CPC_EXACT;}
 
-  const p0Any=coordAny(g,words,offset+g.p0Offset);
-  const p1Any=coordAny(g,words,offset+g.p1Offset);
+  const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
+  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
   if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
 
   if(!p0Any)scratch.interval[1]=2;
