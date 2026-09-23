@@ -8,8 +8,10 @@ export function queueEnqueue32(
 ) {
   const position = Atomics.add(enqueue, 0, 1);
   const slot = position & mask;
-  while (Atomics.load(sequence, slot) !== position) {
-    Atomics.wait(sequence, slot, Atomics.load(sequence, slot));
+  let observed = Atomics.load(sequence, slot);
+  while (observed !== position) {
+    Atomics.wait(sequence, slot, observed);
+    observed = Atomics.load(sequence, slot);
   }
   Atomics.store(values, slot, value);
   Atomics.store(sequence, slot, position + 1);
@@ -27,8 +29,10 @@ export function queueDequeue32(
   const position = Atomics.add(dequeue, 0, 1);
   const slot = position & mask;
   const ready = position + 1;
-  while (Atomics.load(sequence, slot) !== ready) {
-    Atomics.wait(sequence, slot, Atomics.load(sequence, slot));
+  let observed = Atomics.load(sequence, slot);
+  while (observed !== ready) {
+    Atomics.wait(sequence, slot, observed);
+    observed = Atomics.load(sequence, slot);
   }
   const value = Atomics.load(values, slot);
   Atomics.store(sequence, slot, position + capacity);
