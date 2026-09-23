@@ -1,5 +1,5 @@
 {
-  "version": "0.31.0",
+  "version": "0.32.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -561,12 +561,13 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 6,
-        "note": "One invertible xorshift + one odd IMUL + unsigned result coercion. The full uint32 transform is bijective; masked-bucket avalanche is weaker than medium/strong variants."
+        "cycles": 5,
+        "note": "one-xorshift hash bit-pattern result; final >>>0 conversion removed because locator/index consumers use identical 32-bit bits."
       },
       "preconditions": [
         "hash output is used as locator/index material, not semantic identity"
-      ]
+      ],
+      "resultDomain": "int32 bit pattern; unsigned conversion is deferred to a consumer only when numerically required"
     },
     {
       "name": "mix32Medium",
@@ -586,9 +587,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 8,
-        "note": "One IMUL with two xorshift stages; middle-cost alternative between mix32 and mix32Strong."
-      }
+        "cycles": 7,
+        "note": "two-xorshift hash bit-pattern result; final >>>0 conversion removed because locator/index consumers use identical 32-bit bits."
+      },
+      "resultDomain": "int32 bit pattern; unsigned conversion is deferred to a consumer only when numerically required"
     },
     {
       "name": "mix32Strong",
@@ -605,9 +607,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 13,
-        "note": "Two-IMUL stronger-avalanche alternative retained for workloads where reduced bucket collisions justify the additional five cycles."
-      }
+        "cycles": 12,
+        "note": "strong two-IMUL hash bit-pattern result; final >>>0 conversion removed because locator/index consumers use identical 32-bit bits."
+      },
+      "resultDomain": "int32 bit pattern; unsigned conversion is deferred to a consumer only when numerically required"
     },
     {
       "name": "fillReflect3Tables32",
@@ -2039,6 +2042,30 @@
           "before": "22-cycle x24 lookup used for <=16 support bits",
           "after": "14 L1 / 30 L2 / 100 L3",
           "mechanism": "omit third table lookup for configured supports <=16 bits"
+        }
+      ]
+    },
+    {
+      "id": "round-025",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "mix32",
+          "before": "6 cycles",
+          "after": "5 cycles",
+          "mechanism": "return raw int32 bit pattern; defer unsigned numeric conversion"
+        },
+        {
+          "function": "mix32Medium",
+          "before": "8 cycles",
+          "after": "7 cycles",
+          "mechanism": "return raw int32 bit pattern"
+        },
+        {
+          "function": "mix32Strong",
+          "before": "13 cycles",
+          "after": "12 cycles",
+          "mechanism": "return raw int32 bit pattern"
         }
       ]
     }
