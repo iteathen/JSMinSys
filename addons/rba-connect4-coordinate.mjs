@@ -93,7 +93,8 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
 }
 
 function compareReflectedSupport(g,words,offset){
-  for(let c=0;c<g.columns;c+=1){
+  const half=g.columns>>>1;
+  for(let c=0;c<half;c+=1){
     const a=words[offset+c],b=words[offset+g.mirrorColumn[c]];
     if(a<b)return -1;if(a>b)return 1;
   }
