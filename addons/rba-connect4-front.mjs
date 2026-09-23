@@ -42,8 +42,15 @@ function prepareValid(g,a,d,n){
 }
 function prepareUpsets(g,a,d,basis,bi,n){
   const cw=g.coordWords,depthBase=d*g.maxBasis*cw;
-  for(let i=0;i<n;i+=1){const row=depthBase+i*cw;for(let w=0;w<cw;w+=1)a.up[row+w]=0;
-    for(let j=0;j<n;j+=1)if(a.profile.shapeSubset(g,basis[bi+i],basis[bi+j]))a.up[row+(j>>>5)]|=1<<(j&31);
+  let pair=0;while(pair<n&&basis[bi+pair]<g.pairShapeStart)pair+=1;
+  let triple=pair;while(triple<n&&basis[bi+triple]<g.tripleShapeStart)triple+=1;
+  let quad=triple;while(quad<n&&basis[bi+quad]<g.quadShapeStart)quad+=1;
+  for(let i=0;i<n;i+=1){
+    const row=depthBase+i*cw;for(let w=0;w<cw;w+=1)a.up[row+w]=0;
+    a.up[row+(i>>>5)]|=1<<(i&31);
+    const id=basis[bi+i],start=id<g.pairShapeStart?pair:
+      id<g.tripleShapeStart?triple:id<g.quadShapeStart?quad:n;
+    for(let j=start;j<n;j+=1)if(a.profile.shapeSubset(g,id,basis[bi+j]))a.up[row+(j>>>5)]|=1<<(j&31);
   }
 }
 function prepareImages(g,a,d,cell,mover,basis,bi){
