@@ -1,4 +1,5 @@
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
+import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
@@ -8,9 +9,9 @@ export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
 
 export function prepareConnect4RbaEvaluator({geometry,boundaryDepth=2,boundaryCapacity=256,boundaryBudget=100000}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  const g=geometry;
-  return {g,scratch:prepareConnect4RbaCoordinateScratch(g),
-    boundary:prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget}),
+  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g);
+  return {g,profile,scratch:prepareConnect4RbaCoordinateScratch(g),
+    boundary:prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile}),
     keys:new Uint32Array(g.columns*g.keyWords),childBasis:new Uint32Array(g.columns*g.maxBasis),
     childBasisSize:new Uint32Array(g.columns),actions:new Uint32Array(g.columns),
     actionLower:new Uint32Array(g.columns),actionUpper:new Uint32Array(g.columns),
@@ -26,7 +27,7 @@ export function assertConnect4RbaTtCompatibility(t,g){
 
 export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  const g=geometry,words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g);
+  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g);
   let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis;
   let n=connect4RbaBasisFromSupport(g,words,src,basis,bi,scratch.seen);
   for(let p=0;p<2;p+=1){const off=src+(p?g.p1Offset:g.p0Offset);for(let i=0;i<n;i+=1)words[off+(i>>>5)]|=1<<(i&31);}
@@ -34,11 +35,11 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
     if(!Number.isInteger(column)||column<0||column>=g.columns)throw new RangeError('invalid column');
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
     if(words[src+column]>=g.rows)throw new RangeError('column full');
-    connect4RbaCofactor(g,words,src,basis,bi,n,column,words,dst,basis,ci,scratch.seen,scratch.size,0);
+    connect4RbaCofactor(g,profile,words,src,basis,bi,n,column,words,dst,basis,ci,scratch.seen,scratch.size,0);
     const oldSrc=src;src=dst;dst=oldSrc;const oldBi=bi;bi=ci;ci=oldBi;n=scratch.size[0];
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
-  const reflected=canonical?connect4RbaCanonicalize(g,result,0,rootBasis,0,n,scratch):0;
+  const reflected=canonical?connect4RbaCanonicalize(g,profile,result,0,rootBasis,0,n,scratch):0;
   return {words:result,basis:rootBasis,reflected};
 }
 function bothCoordinatesEmpty(g,words,base){
@@ -81,11 +82,11 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
       const childBase=count*g.keyWords,childBi=count*g.maxBasis;
-      const term=connect4RbaCofactor(g,t.keys,base,t.basis,q*t.basisCapacity,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count);
+      const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,q*t.basisCapacity,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count);
       state.transitions+=1;
       if(term<0||(term&&(term<lo||term>hi)))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
-      else{connect4RbaCanonicalize(g,state.keys,childBase,state.childBasis,childBi,state.childBasisSize[count],state.scratch);state.childPresent[count]=1;}
+      else{connect4RbaCanonicalize(g,state.profile,state.keys,childBase,state.childBasis,childBi,state.childBasisSize[count],state.scratch);state.childPresent[count]=1;}
     }
     state.actionLower[count]=lo;state.actionUpper[count]=hi;count+=1;
   }
