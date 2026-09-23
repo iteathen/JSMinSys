@@ -36,6 +36,14 @@ Examples:
 
 Cross-word carry, borrow, and shifts are implemented only where the representation actually requires them.
 
+### Signed bit-pattern lane
+
+Status: **admissible optimization profile**
+
+When a 32-bit value is used purely as a bit pattern rather than as an unsigned JavaScript Number, the same physical bits MAY be represented through `Int32Array` / int32 scalar semantics.
+
+This can remove otherwise-required `>>> 0` normalization and makes bit-31 containment comparisons cheaper. It MUST NOT be used where unsigned numeric ordering, serialization, range checks, or arithmetic magnitude are semantically required.
+
 ## Typed arrays
 
 Status: **admissible storage family**
