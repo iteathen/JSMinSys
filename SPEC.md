@@ -269,6 +269,24 @@ Proving-workload constants such as a particular board width, row count, cell cou
 
 The general path may reject configurations that exceed JavaScript/TypedArray/index representation limits, but such limits MUST be validated explicitly during initialization rather than encoded as an unrelated proving-workload dimension.
 
+### JMS-DATA-008 — Initialization-time specialization selection
+
+Board/configuration-specific optimizations MAY be selected with ordinary initialization-time `if`/`else` logic after the configured geometry and representation invariants are known.
+
+The selected implementation MAY use a narrower fixed-width or precomputed specialization when its preconditions are established by initialization. Examples include:
+
+- fixed word-count Boolean/skyline operations;
+- fixed coordinate-lane permutations;
+- dense precomputed transition or subset tables;
+- fixed candidate-count reducers;
+- packed representations whose row/column bounds are proved by configuration.
+
+The recurring hot path SHOULD receive the selected implementation directly and SHOULD NOT repeatedly test board width, height, or another cold configuration discriminator merely to choose among equivalent implementations.
+
+Every specialization selected this way MUST preserve the same authoritative semantics as the geometry-general path. A specialization MAY be disabled by configuration, memory budget, runtime qualification, or governing-unit evidence without changing correctness.
+
+Selection itself is cold policy. The cost of any selected fast path remains subject to NEES governing-unit qualification; initialization-time selection does not make a specialization automatically preferable.
+
 ## 8. Operation vocabulary
 
 The machine-readable operation authority is `catalog/catalog-v0.json`.
