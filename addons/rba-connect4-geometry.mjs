@@ -58,8 +58,11 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
       lineShape[l*16+bits]=shapeMap.get(keyOf(cells));
     }
   }
+  let pairShapeStart=shapeCount,tripleShapeStart=shapeCount;
   for(let id=0;id<shapeCount;id+=1){
     const cells=shapeList[id],size=cells.length;shapeSize[id]=size;
+    if(size>=2&&pairShapeStart===shapeCount)pairShapeStart=id;
+    if(size>=3&&tripleShapeStart===shapeCount)tripleShapeStart=id;
     for(let i=0;i<size;i+=1)shapeCells[id*4+i]=cells[i];
     if(size===1)singletonByCell[cells[0]]=id;
     const reflected=cells.map(cell=>((cell/columns)|0)*columns+(columns-1-(cell%columns))).sort((a,b)=>a-b);
@@ -115,7 +118,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
     lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,
-    pairedResponseRowParity:(rows-1)&1,
+    pairShapeStart,tripleShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn};
 }
 
