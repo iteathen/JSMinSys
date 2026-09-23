@@ -28,10 +28,10 @@ export function createMetricViews32(workerCount, metricWidth) {
       || !Number.isInteger(metricWidth) || metricWidth < 0) {
     throw new RangeError('invalid metric view dimensions');
   }
-  return Array.from(
-    { length: workerCount },
-    () => new Float64Array(new SharedArrayBuffer(metricWidth * 8)),
-  );
+  const views=new Array(workerCount),bytes=metricWidth*8;
+  for(let worker=0;worker<workerCount;worker+=1)
+    views[worker]=new Float64Array(new SharedArrayBuffer(bytes));
+  return views;
 }
 
 export function createManagedThreadSession32({
