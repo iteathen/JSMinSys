@@ -10,7 +10,7 @@ export const CPC_EXACT=1;
 export const CPC_BOUND=2;
 export const CPC_RESTRICT=3;
 
-export function prepareConnect4CpcScratch(g){
+export function prepareConnect4CpcScratch(g,{frontierResponse=true}={}){
   const cellWords=Math.ceil(g.cellCount/32);
   return {
     threatCells:new Uint32Array(g.columns),
@@ -27,6 +27,7 @@ export function prepareConnect4CpcScratch(g){
     preemptionMask32:new Uint32Array(1),
     forcedColumn:new Int32Array(1),
     interval:new Uint32Array(2),
+    frontierResponse:frontierResponse?1:0,
   };
 }
 
@@ -282,11 +283,14 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
 
   // Long-range response closure is intentionally after the cheap tactical
   // exact/restriction checks so unresolved nodes alone pay its residual scan.
-  if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
-    scratch.interval[1]=Math.min(scratch.interval[1],2);
-  if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
-    scratch.interval[0]=Math.max(scratch.interval[0],2);
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  // frontierResponse is selected once at initialization for qualification A/B.
+  if(scratch.frontierResponse){
+    if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
+      scratch.interval[1]=Math.min(scratch.interval[1],2);
+    if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
+      scratch.interval[0]=Math.max(scratch.interval[0],2);
+    if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  }
 
   collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
   if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
