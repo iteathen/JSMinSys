@@ -1,5 +1,5 @@
 {
-  "version": "0.46.0",
+  "version": "0.47.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1970,6 +1970,36 @@
       }
     },
     {
+      "name": "argMaxPlayableSlot7ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 7 and immutable after initialization",
+        "at least one candidate is playable",
+        "the seven scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 12,
+        "expression": "6*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "The seven score loads disappear only when the producer already owns the scores as live scalars. Register-local assignments are modeled as eliminable moves under the current NEES snapshot."
+      }
+    },
+    {
       "name": "physicalColumnFromMoveSlot32",
       "source": "src/search32.mjs",
       "block": "fixed-candidate-selection",
@@ -2698,11 +2728,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 106,
+    "functionsImplemented": 107,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 106,
+    "functionsWithCycleCount": 107,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3647,6 +3677,18 @@
           "before": "caller-ply undo: 19.5-21.5 L1 one-lane; 21.5-30 L1 two-lane",
           "after": "15.5-17.5 L1 one-lane; 17.5-26 L1 two-lane",
           "mechanism": "compose caller-owned ply with retained apply result"
+        }
+      ]
+    },
+    {
+      "id": "round-040",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayableSlot7ScalarsNonempty32",
+          "before": "argMaxPlayableSlot7Nonempty32: 40 L1 / 96 L2 / 341 L3 cycles",
+          "after": "12-cycle compare/select network when seven scores are already live scalars",
+          "mechanism": "keep score production and selection in the same scalar value domain; delete score-array reloads"
         }
       ]
     }

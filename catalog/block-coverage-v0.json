@@ -222,9 +222,10 @@
         "argMaxPlayable32",
         "argMaxPlayableSlot32",
         "physicalColumnFromMoveSlot32",
-        "argMaxPlayableSlot7Nonempty32"
+        "argMaxPlayableSlot7Nonempty32",
+        "argMaxPlayableSlot7ScalarsNonempty32"
       ],
-      "note": "Physical-column and move-slot selection profiles coexist. Runtime initialization may additionally select the exact seven-slot nonempty profile when configured width is 7; all other widths retain generic move-slot/physical-column selectors. Move-slot indexing removes recursive order remaps only when transition data shares that configured index space."
+      "note": "Physical-column, move-slot, exact-seven-slot, and scalar-producer profiles coexist. The scalar seven-slot profile removes score-array loads only when score production already has all seven values live and no caller loads/spills them solely to satisfy the selector. Runtime initialization still owns candidate count/order; move-slot indexing remains aligned with transition data."
     },
     {
       "id": 17,

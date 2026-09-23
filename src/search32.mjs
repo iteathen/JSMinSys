@@ -112,3 +112,40 @@ export function physicalColumnFromMoveSlot32(order, slot) {
   return order[slot];
 }
 
+export function argMaxPlayableSlot7ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+  score5,
+  score6,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+  if (score4 > bestScore) {
+    bestScore = score4;
+    bestIndex = 4;
+  }
+  if (score5 > bestScore) {
+    bestScore = score5;
+    bestIndex = 5;
+  }
+  if (score6 > bestScore) bestIndex = 6;
+
+  return bestIndex;
+}
+
