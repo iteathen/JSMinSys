@@ -10,8 +10,6 @@ export function applyMove32(
   state,
   heights,
   moveColumns,
-  cellLo,
-  cellHi,
   column,
   columns,
   rows,
@@ -20,8 +18,10 @@ export function applyMove32(
   const ply = state[STATE_PLY];
   const row = heights[column];
   const cell = row * columns + column;
-  const bitLo = cellLo[cell];
-  const bitHi = cellHi[cell];
+  let bitLo = 0;
+  let bitHi = 0;
+  if (cell < 32) bitLo = (1 << cell) >>> 0;
+  else bitHi = (1 << (cell - 32)) >>> 0;
 
   state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] | bitLo) >>> 0;
   state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] | bitHi) >>> 0;
@@ -30,8 +30,8 @@ export function applyMove32(
 
   if (row + 1 < rows) {
     const above = cell + columns;
-    playableLo = (playableLo | cellLo[above]) >>> 0;
-    playableHi = (playableHi | cellHi[above]) >>> 0;
+    if (above < 32) playableLo = (playableLo | ((1 << above) >>> 0)) >>> 0;
+    else playableHi = (playableHi | ((1 << (above - 32)) >>> 0)) >>> 0;
   }
   state[STATE_PLAYABLE_LO] = playableLo;
   state[STATE_PLAYABLE_HI] = playableHi;
@@ -52,8 +52,6 @@ export function undoMove32(
   state,
   heights,
   moveColumns,
-  cellLo,
-  cellHi,
   columns,
   rows,
   rankShift,
@@ -62,8 +60,10 @@ export function undoMove32(
   const column = moveColumns[ply];
   const row = heights[column] - 1;
   const cell = row * columns + column;
-  const bitLo = cellLo[cell];
-  const bitHi = cellHi[cell];
+  let bitLo = 0;
+  let bitHi = 0;
+  if (cell < 32) bitLo = (1 << cell) >>> 0;
+  else bitHi = (1 << (cell - 32)) >>> 0;
 
   state[STATE_PLY] = ply;
   state[STATE_SIDE] = 1 - state[STATE_SIDE];
@@ -81,8 +81,8 @@ export function undoMove32(
   let playableHi = state[STATE_PLAYABLE_HI];
   if (row + 1 < rows) {
     const above = cell + columns;
-    playableLo = (playableLo & ~cellLo[above]) >>> 0;
-    playableHi = (playableHi & ~cellHi[above]) >>> 0;
+    if (above < 32) playableLo = (playableLo & ~((1 << above) >>> 0)) >>> 0;
+    else playableHi = (playableHi & ~((1 << (above - 32)) >>> 0)) >>> 0;
   }
 
   state[STATE_PLAYABLE_LO] = (playableLo | bitLo) >>> 0;
