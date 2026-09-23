@@ -1,9 +1,7 @@
 export const STATE_PLY = 0;
-export const STATE_SUPPORT_LO = 1;
-export const STATE_SUPPORT_HI = 2;
-export const STATE_PLAYABLE_LO = 3;
-export const STATE_PLAYABLE_HI = 4;
-export const STATE_SUPPORT_CODE = 5;
+export const STATE_PLAYABLE_LO = 1;
+export const STATE_PLAYABLE_HI = 2;
+export const STATE_SUPPORT_CODE = 3;
 
 export function sideFromPly32(ply) {
   return ply & 1;
@@ -35,7 +33,6 @@ export function applyMove32(
   const next = cell + columns;
 
   if (cell < 32) {
-    state[STATE_SUPPORT_LO] = state[STATE_SUPPORT_LO] | bit;
     let playableLo = state[STATE_PLAYABLE_LO] & ~bit;
 
     if (next < cellCount) {
@@ -46,7 +43,6 @@ export function applyMove32(
 
     state[STATE_PLAYABLE_LO] = playableLo;
   } else {
-    state[STATE_SUPPORT_HI] = state[STATE_SUPPORT_HI] | bit;
     let playableHi = state[STATE_PLAYABLE_HI] & ~bit;
 
     if (next < cellCount) {
@@ -81,7 +77,6 @@ export function undoMove32(
   state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] - supportDelta;
 
   if (cell < 32) {
-    state[STATE_SUPPORT_LO] = state[STATE_SUPPORT_LO] & ~bit;
     let playableLo = state[STATE_PLAYABLE_LO];
 
     if (next < cellCount) {
@@ -92,7 +87,6 @@ export function undoMove32(
 
     state[STATE_PLAYABLE_LO] = playableLo | bit;
   } else {
-    state[STATE_SUPPORT_HI] = state[STATE_SUPPORT_HI] & ~bit;
     let playableHi = state[STATE_PLAYABLE_HI];
 
     if (next < cellCount) {
