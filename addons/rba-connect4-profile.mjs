@@ -6,6 +6,10 @@ function removeDense(g,id,cell){return g.removeByCell[cell*g.shapeCount+id];}
 function removeSparse(g,id,cell){return connect4RbaRemoveCell(g,id,cell);}
 function subsetDense(g,a,b){return g.subsetTable[a*g.shapeCount+b];}
 function subsetSparse(g,a,b){return connect4RbaShapeSubset(g,a,b);}
+function prepareSubsetDense(g,a){return a*g.shapeCount;}
+function prepareSubsetSparse(g,a){return a;}
+function subsetDensePrepared(g,row,b){return g.subsetTable[row+b];}
+function subsetSparsePrepared(g,a,b){return connect4RbaShapeSubset(g,a,b);}
 
 function permute3(out,outOffset,outWordCount,source,sourceOffset,map,mapOffset,count){
   return permuteBits3x32Into(out,outOffset,source,sourceOffset,map,mapOffset,count);
@@ -55,6 +59,8 @@ export function prepareConnect4RbaExecutionProfile(g){
   return {
     removeCell:denseRemove?removeDense:removeSparse,
     shapeSubset:denseSubset?subsetDense:subsetSparse,
+    prepareSubset:denseSubset?prepareSubsetDense:prepareSubsetSparse,
+    shapeSubsetPrepared:denseSubset?subsetDensePrepared:subsetSparsePrepared,
     permuteBits:coordinate3?permute3:permuteSpan,
     permuteCoordinates:coordinate3?permutePair3:permutePairSpan,
     insertFront:front6?insert6:insertSpan,
