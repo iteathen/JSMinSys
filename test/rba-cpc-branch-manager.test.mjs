@@ -7,8 +7,8 @@ import {
   connect4RbaFromMoves,
   prepareConnect4CpcRbaEvaluator,
   evaluateConnect4CpcRbaTt32,
-  publishConnect4RbaEvaluation32,
-  reconcileConnect4RbaEvent32,
+  publishConnect4CpcRbaEvaluation32,
+  reconcileConnect4CpcRbaEvent32,
 } from '../addons/rba-connect4-solver.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
@@ -20,7 +20,7 @@ import {
   RBA_TT_DONE,
 } from '../addons/rba-tt32.mjs';
 import {
-  prepareRbaBranchWorker32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
+  prepareRbaBranchWorker32,prepareRbaBranchManager32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
 } from '../addons/rba-branch-manager.mjs';
 
 function solveDistributed(g,moves){
@@ -33,21 +33,23 @@ function solveDistributed(g,moves){
   rbaTtSetRoot32(t,rootQ);
   rbaTtEnqueue32(t,rootQ);
   const witness=new Int32Array(1);witness[0]=-2;
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
   const state=prepareConnect4CpcRbaEvaluator({geometry:g});
-  const worker=prepareRbaBranchWorker32({owner:2,workerCount:2,state});
-  const context={rootQ,rootReflected:root.reflected,witness,g};
+  const worker=prepareRbaBranchWorker32({owner:2,workerCount:2,state,resetTargets});
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets});
+  const context={rootQ,rootReflected:root.reflected,witness,g,resetTargets};
 
   const evaluate=(table,q,s,_expose,c)=>
     evaluateConnect4CpcRbaTt32(table,q,s,c.rootQ,c.rootReflected);
   const publish=(table,q,owner,s,code,c)=>
-    publishConnect4RbaEvaluation32(table,q,owner,s,code,c.rootQ,c.witness,0);
+    publishConnect4CpcRbaEvaluation32(table,q,owner,s,code,c.rootQ,c.witness,0);
   const reconcile=(table,q,c)=>
-    reconcileConnect4RbaEvent32(table,q,c.g,c.rootReflected,c.witness,0);
+    reconcileConnect4CpcRbaEvent32(table,q,c.g,c.rootReflected,c.witness,c.resetTargets,0);
 
   let turns=0;
   while(!Atomics.load(t.control,RBA_TT_DONE)&&turns<200000){
     const a=rbaBranchWorkerStep32(t,worker,evaluate,publish,context);
-    const b=rbaBranchManagerStep32(t,reconcile,{context});
+    const b=rbaBranchManagerStep32(t,reconcile,{context,manager});
     if(!a&&!b&&worker.q===-1)throw new Error('distributed RBA stalled');
     turns+=1;
   }

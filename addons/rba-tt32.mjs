@@ -31,7 +31,8 @@ export function createRbaTt32({
     control:i32(RBA_TT_CONTROL_WORDS),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
     basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
-    lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),link:i32(capacity),bucket:u32(capacity),
+    lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),priority:i32(capacity),redirect:i32(capacity),
+    link:i32(capacity),bucket:u32(capacity),
     readyNext:i32(capacity),readyPrev:i32(capacity),readyMember:u32(capacity),readyGeneration:u32(capacity),
     eventNext:i32(capacity),eventPrev:i32(capacity),eventMember:u32(capacity),eventGeneration:u32(capacity),
     count:u32(capacity),parentHead:i32(capacity),
@@ -39,7 +40,7 @@ export function createRbaTt32({
     edgeNext:i32(capacity*edgeCapacity),edgePrev:i32(capacity*edgeCapacity),
     edgeLabel:u32(capacity*edgeCapacity),edgeAttached:u32(capacity*edgeCapacity),
     edgeLower:u32(capacity*edgeCapacity),edgeUpper:u32(capacity*edgeCapacity)};
-  t.buckets.fill(-1);t.parentHead.fill(-1);t.child.fill(-1);t.readyNext.fill(-1);t.readyPrev.fill(-1);
+  t.buckets.fill(-1);t.parentHead.fill(-1);t.child.fill(-1);t.redirect.fill(-1);t.readyNext.fill(-1);t.readyPrev.fill(-1);
   t.eventNext.fill(-1);t.eventPrev.fill(-1);t.edgeNext.fill(-1);t.edgePrev.fill(-1);
   t.control[RBA_TT_READY_HEAD]=t.control[RBA_TT_READY_TAIL]=-1;
   t.control[RBA_TT_EVENT_HEAD]=t.control[RBA_TT_EVENT_TAIL]=-1;t.control[RBA_TT_ROOT]=-1;
@@ -52,29 +53,51 @@ export function rbaTtFail32(t,code){Atomics.compareExchange(t.control,RBA_TT_ERR
 export function rbaTtValid32(t,q,g){return q>=0&&q<t.capacity&&t.live[q]&&t.generation[q]===g?1:0;}
 export function rbaTtSetRoot32(t,q){if(!t.live[q])return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.control[RBA_TT_ROOT]=q;t.control[RBA_TT_ROOT_GENERATION]=t.generation[q];return q;}
 
-export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize){
+export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,priority=0){
   const keyWords=t.keyWords,basisCapacity=t.basisCapacity;
-  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
-  const hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
-  for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
-    if(t.locator[q]!==hash)continue;
-    const base=q*keyWords;let w=0;
-    while(w<keyWords&&t.keys[base+w]===words[offset+w])w+=1;
-    if(w===keyWords){if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}t.refs[q]+=1;return q;}
+  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
+    rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;
   }
-  const q=t.control[RBA_TT_FREE];
+  const hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask,q=t.control[RBA_TT_FREE];
   if(q<0){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);t.locator[q]=hash;
   if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
-  t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.count[q]=0;t.parentHead[q]=-1;
-  t.readyMember[q]=0;t.eventMember[q]=0;t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;
-  t.control[RBA_TT_LIVE]+=1;return q;
+  t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
+  t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
+  t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;t.control[RBA_TT_LIVE]+=1;return q;
+}
+export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize,priority=0){
+  const keyWords=t.keyWords,hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
+  for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
+    if(!t.live[q]||t.redirect[q]>=0||t.locator[q]!==hash)continue;
+    const base=q*keyWords;let w=0;
+    while(w<keyWords&&t.keys[base+w]===words[offset+w])w+=1;
+    if(w===keyWords){
+      if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
+      t.refs[q]+=1;if(priority>t.priority[q])t.priority[q]=priority;return q;
+    }
+  }
+  return rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,priority);
+}
+export function rbaTtFindEquivalent32(t,q){
+  if(!t.live[q]||t.redirect[q]>=0)return -1;
+  const hash=t.locator[q],keyWords=t.keyWords,base=q*keyWords,bucket=t.bucket[q];
+  let best=q;
+  for(let scan=t.buckets[bucket];scan!==-1;scan=t.link[scan]){
+    if(scan===q||!t.live[scan]||t.redirect[scan]>=0||t.locator[scan]!==hash)continue;
+    const other=scan*keyWords;let w=0;
+    while(w<keyWords&&t.keys[other+w]===t.keys[base+w])w+=1;
+    if(w===keyWords&&(t.exact[scan]>t.exact[best]||
+      (t.exact[scan]===t.exact[best]&&scan<best)))best=scan;
+  }
+  return best===q?-1:best;
 }
 export function rbaTtRetain32(t,q,g){if(!rbaTtValid32(t,q,g))return 0;if(t.refs[q]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);t.refs[q]+=1;return 1;}
-function unqueueReady(t,q){if(!t.readyMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,q);t.execution[q]=0;return 1;}
+export function rbaTtUnqueueReady32(t,q){if(!t.readyMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,q);if(t.execution[q]===RBA_TT_EXECUTION_QUEUED)t.execution[q]=0;return 1;}
+function unqueueEvent(t,q){if(!t.eventMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember,q);return 1;}
 export function rbaTtRecycle32(t,q){
   if(!t.live[q]||t.refs[q]||t.execution[q]||t.readyMember[q]||t.eventMember[q]||t.count[q]||t.parentHead[q]!==-1)return 0;
   const bucket=t.bucket[q];let prev=-1,scan=t.buckets[bucket];
@@ -83,7 +106,7 @@ export function rbaTtRecycle32(t,q){
   if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
   t.live[q]=0;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;return 1;
 }
-export function rbaTtRelease32(t,q,g){if(!rbaTtValid32(t,q,g)||!t.refs[q])return 0;const refs=t.refs[q]-1;t.refs[q]=refs;if(refs)return 1;if(t.readyMember[q])unqueueReady(t,q);if(t.count[q])rbaTtSignal32(t,q);rbaTtRecycle32(t,q);return 1;}
+export function rbaTtRelease32(t,q,g){if(!rbaTtValid32(t,q,g)||!t.refs[q])return 0;const refs=t.refs[q]-1;t.refs[q]=refs;if(refs)return 1;if(t.readyMember[q])rbaTtUnqueueReady32(t,q);if(t.count[q])rbaTtSignal32(t,q);rbaTtRecycle32(t,q);return 1;}
 export function rbaTtEnqueue32(t,q){
   if(!t.live[q]||!t.refs[q]||t.execution[q]!==0||t.exact[q]||t.phase[q]!==0||t.readyMember[q])return 0;
   t.execution[q]=1;intrusiveEnqueueTailStamped32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,t.readyGeneration,t.generation,q);return 1;
@@ -122,6 +145,159 @@ export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,
   t.phase[q]=2;rbaTtSignal32(t,q);let next=-1;
   for(let i=0;i<count;i+=1){const child=t.child[edgeBase+i];if(child>=0&&t.execution[child]===0&&!t.exact[child]&&t.phase[child]===0){t.execution[child]=owner;next=child;break;}}
   rbaTtReleaseExecution32(t,q,owner);return next;
+}
+export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count){
+  if(t.execution[q]!==owner||count<1||count>t.edgeCapacity||(count|0)!==count){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+  if(!rbaTtTighten32(t,q,stateLo,stateHi))return -1;
+  const edgeBase=q*t.edgeCapacity,keyStride=t.keyWords;
+  let childKey=keyOffset,childBasis=basisOffset;
+  for(let i=0;i<count;i+=1){
+    let child=-1;const lo=actionLo[i],hi=actionHi[i],priority=priorities?priorities[i]|0:0;
+    if(lo<1||hi>3||lo>hi){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+    if(childPresent[i]){
+      child=rbaTtAllocate32(t,keys,childKey,basis,childBasis,basisSizes[i],priority);
+      if(child<0)return -1;
+      if(!rbaTtTighten32(t,child,lo,hi))return -1;
+    }
+    const e=edgeBase+i;t.child[e]=child;t.childGeneration[e]=child<0?0:t.generation[child];
+    t.edgeLabel[e]=labels[i];t.edgeLower[e]=lo;t.edgeUpper[e]=hi;t.edgeAttached[e]=0;
+    t.edgeNext[e]=-1;t.edgePrev[e]=-1;t.count[q]=i+1;
+    childKey+=keyStride;childBasis+=basisStride;
+  }
+  t.phase[q]=RBA_TT_PHASE_PENDING_ATTACH;rbaTtSignal32(t,q);
+  let next=-1;
+  for(let i=0;i<count;i+=1){
+    const child=t.child[edgeBase+i];
+    if(child<0||t.exact[child]||t.phase[child]!==RBA_TT_PHASE_NEW)continue;
+    if(next<0){t.execution[child]=owner;next=child;}
+    else rbaTtEnqueue32(t,child);
+  }
+  rbaTtReleaseExecution32(t,q,owner);
+  return next;
+}
+
+function managerRedirectAttachedParents(t,duplicate,canonical){
+  let e=t.parentHead[duplicate],moved=0;
+  while(e!==-1){
+    const next=t.edgeNext[e],head=t.parentHead[canonical];
+    if(t.refs[canonical]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+    t.refs[canonical]+=1;
+    if(t.refs[duplicate])t.refs[duplicate]-=1;
+    t.child[e]=canonical;t.childGeneration[e]=t.generation[canonical];
+    t.edgePrev[e]=-1;t.edgeNext[e]=head;if(head!==-1)t.edgePrev[head]=e;
+    t.parentHead[canonical]=e;moved+=1;e=next;
+  }
+  t.parentHead[duplicate]=-1;
+  return moved;
+}
+
+export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets){
+  if(duplicate<0||canonical<0||duplicate===canonical||!t.live[duplicate]||!t.live[canonical])return 0;
+  if(t.redirect[duplicate]>=0)return t.redirect[duplicate]===canonical?1:0;
+  if(t.locator[duplicate]!==t.locator[canonical])return 0;
+  const keyWords=t.keyWords,a=duplicate*keyWords,b=canonical*keyWords;
+  for(let w=0;w<keyWords;w+=1)if(t.keys[a+w]!==t.keys[b+w])return 0;
+
+  if(t.lower[duplicate]>t.lower[canonical]||t.upper[duplicate]<t.upper[canonical])
+    if(!rbaTtTighten32(t,canonical,t.lower[duplicate],t.upper[duplicate]))return 0;
+  if(t.priority[duplicate]>t.priority[canonical])t.priority[canonical]=t.priority[duplicate];
+
+  managerRedirectAttachedParents(t,duplicate,canonical);
+  const wasQueued=t.readyMember[duplicate]?1:0;
+  if(wasQueued)rbaTtUnqueueReady32(t,duplicate);
+  if(t.eventMember[duplicate])unqueueEvent(t,duplicate);
+
+  const owner=t.execution[duplicate];
+  if(owner>RBA_TT_EXECUTION_QUEUED&&resetTargets&&owner-2<resetTargets.length)
+    Atomics.store(resetTargets,owner-2,-1);
+
+  t.redirect[duplicate]=canonical;
+  if((wasQueued||owner>RBA_TT_EXECUTION_QUEUED)&&
+     t.execution[canonical]===RBA_TT_EXECUTION_FREE&&!t.exact[canonical]&&
+     t.phase[canonical]===RBA_TT_PHASE_NEW&&!t.readyMember[canonical])rbaTtEnqueue32(t,canonical);
+
+  if(!t.execution[duplicate]&&!t.refs[duplicate]&&t.count[duplicate])
+    rbaTtDetachDependencies32(t,duplicate);
+  if(!t.execution[duplicate]&&!t.refs[duplicate])rbaTtRecycle32(t,duplicate);
+  return 1;
+}
+
+export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
+  if(t.phase[q]!==RBA_TT_PHASE_PENDING_ATTACH)return 0;
+  const base=q*t.edgeCapacity,count=t.count[q];
+  for(let i=0;i<count;i+=1){
+    const e=base+i;let child=t.child[e];
+    if(child<0)continue;
+    while(t.redirect[child]>=0)child=t.redirect[child];
+    const equivalent=rbaTtFindEquivalent32(t,child);
+    if(equivalent>=0){
+      const original=t.child[e],generation=t.childGeneration[e];
+      rbaTtManagerMergeDuplicate32(t,child,equivalent,resetTargets);
+      child=equivalent;
+      if(t.child[e]===original){
+        if(t.refs[child]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+        t.refs[child]+=1;
+        if(rbaTtValid32(t,original,generation)&&t.refs[original])t.refs[original]-=1;
+        t.child[e]=child;t.childGeneration[e]=t.generation[child];
+        if(!t.refs[original]&&!t.execution[original]&&t.count[original])rbaTtDetachDependencies32(t,original);
+        if(!t.refs[original]&&!t.execution[original])rbaTtRecycle32(t,original);
+      }
+    }else if(child!==t.child[e]){
+      const original=t.child[e],generation=t.childGeneration[e];
+      if(t.refs[child]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
+      t.refs[child]+=1;
+      if(rbaTtValid32(t,original,generation)&&t.refs[original])t.refs[original]-=1;
+      t.child[e]=child;t.childGeneration[e]=t.generation[child];
+    }
+    if(!rbaTtValid32(t,child,t.childGeneration[e]))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+    const head=t.parentHead[child];t.edgeNext[e]=head;t.edgePrev[e]=-1;
+    if(head!==-1)t.edgePrev[head]=e;t.parentHead[child]=e;t.edgeAttached[e]=1;
+  }
+  t.phase[q]=RBA_TT_PHASE_ATTACHED;return 1;
+}
+
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
+  let q=t.control[RBA_TT_READY_HEAD],seen=0,merged=0,best=-1,bestPriority=-2147483648;
+  while(q!==-1&&seen<budget){
+    const next=t.readyNext[q];
+    if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
+      rbaTtUnqueueReady32(t,q);
+    }else{
+      const equivalent=rbaTtFindEquivalent32(t,q);
+      if(equivalent>=0){merged+=rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);}
+      else if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
+    }
+    q=next;seen+=1;
+  }
+  if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
+    const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
+    if(p!==-1)t.readyNext[p]=n;if(n!==-1)t.readyPrev[n]=p;else t.control[RBA_TT_READY_TAIL]=p;
+    t.readyPrev[best]=-1;t.readyNext[best]=head;if(head!==-1)t.readyPrev[head]=best;
+    else t.control[RBA_TT_READY_TAIL]=best;t.control[RBA_TT_READY_HEAD]=best;
+  }
+  return merged;
+}
+
+export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
+  let q=start,seen=0;
+  while(seen<budget){
+    if(q>=t.capacity)q=0;
+    if(t.live[q]){
+      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW){
+        const equivalent=rbaTtFindEquivalent32(t,q);
+        if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+      }
+      if(t.live[q]&&t.exact[q]&&q!==t.control[RBA_TT_ROOT]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
+      if(t.live[q]&&t.redirect[q]>=0&&!t.execution[q]&&!t.refs[q]&&t.count[q])rbaTtDetachDependencies32(t,q);
+      if(t.live[q]&&!t.execution[q]&&!t.refs[q]&&!t.count[q]&&t.parentHead[q]===-1){
+        if(t.readyMember[q])rbaTtUnqueueReady32(t,q);
+        if(t.eventMember[q])unqueueEvent(t,q);
+        rbaTtRecycle32(t,q);
+      }
+    }
+    q+=1;seen+=1;
+  }
+  return q>=t.capacity?0:q;
 }
 export function rbaTtPublishExactOwned32(t,q,owner,v){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);if(!rbaTtSetExact32(t,q,v))return 0;return rbaTtReleaseExecution32(t,q,owner);}
 export function rbaTtAttachDependencies32(t,q){
