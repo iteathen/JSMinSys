@@ -20,8 +20,9 @@ export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffse
 }
 export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed=null){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  const remove=profile.prepareRemove(g,cell);
   for(let i=0;i<count;i+=1){
-    const id=profile.removeCell(g,parent[parentOffset+i],cell);
+    const id=profile.removePrepared(g,parent[parentOffset+i],remove);
     if(removed)removed[i]=id;
     if(id>=0)seen[id>>>5]|=1<<(id&31);
   }
@@ -63,11 +64,12 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   while(childTriple<cn&&childBasis[ci+childTriple]<g.tripleShapeStart)childTriple+=1;
   let childQuad=childTriple;
   while(childQuad<cn&&childBasis[ci+childQuad]<g.quadShapeStart)childQuad+=1;
+  const remove=removed?0:profile.prepareRemove(g,cell);
   for(let p=0;p<2;p+=1){
     const sourceCoord=src+(p?g.p1Offset:g.p0Offset),targetCoord=dst+(p?g.p1Offset:g.p0Offset);
     for(let i=0;i<n;i+=1){
       if(!(source[sourceCoord+(i>>>5)]&(1<<(i&31))))continue;
-      const id=basis[bi+i],raw=removed?removed[i]:profile.removeCell(g,id,cell),
+      const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
         imageRemoved=raw===0xffffffff?-1:raw;
       if(p!==player&&imageRemoved!==id)continue;
       const image=p===player?imageRemoved:id;
