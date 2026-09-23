@@ -46,8 +46,8 @@ Slow operations are allowed when their cost can be accounted for faithfully. JSM
 
 The current catalog implementation is exported from `src/index.mjs`.
 
-- 277 catalog functions implemented
-- 29 of 29 research blocks implemented
+- 295 catalog functions implemented
+- 30 of 30 research blocks implemented
 - fixed-width relational/RBA-enabling blocks cover 3/6/8-lane sets, six-word skylines, exact wide keys, durable intervals, sparse remaps, and generation-stamped intrusive work lists
 - worker execution substrate covers stamped take/validate/release, fixed dependency publication, retained-child handoff, wake/park, and stop/done polling while leaving the outer loop and evaluator application-owned
 - typed capacity allocation admitted and costed through NEES
@@ -86,26 +86,16 @@ domain result/status interpretation, and the external solve API. The cold add-on
 is cataloged separately in `catalog/addons-v0.json`; it does not enlarge the
 sealed hot vocabulary.
 
-### Integrated RBA + TT add-on
+### Runtime-configured RBA + TT + solver add-ons
 
-`addons/rba-tt8x32.mjs` is a hot specialized add-on for the selected relational
-carrier. It combines persistent RBA q storage and exact shared-TT mechanics:
+The RBA add-on stack derives its carrier from application configuration at initialization. It does not assume a 7x6 board, 69-line basis, eight-word q, or seven actions.
 
-- exact eight-word q identity;
-- immutable q-attached basis data (up to 69 IDs);
-- generation/reference/execution lifetime;
-- exact lower/upper semantic intervals;
-- up to seven scalar/materialized dependencies;
-- incoming-parent topology and child pins;
-- ready and coalesced event membership;
-- recycling and generation reuse; and
-- generic min/max Bellman interval reconciliation.
+- `addons/rba-tt32.mjs` takes initialization-selected `keyWords`, `basisCapacity`, and `edgeCapacity`.
+- `addons/rba-connect4-geometry.mjs` derives winning lines, residual shapes, coordinate lanes, q layout, reflection, action order, and capacities from configured columns/rows.
+- `addons/rba-connect4-coordinate.mjs` supplies native cofactor/basis/reflection mechanics over that prepared profile.
+- `addons/rba-connect4-front.mjs` supplies the configured four-front algebra.
+- `addons/rba-connect4-solver.mjs` supplies RBA-native evaluation, publication, reconciliation, and cold ingress.
 
-The application still owns the meaning of q, cofactor/front construction and
-queries, dependency-label semantics, minimizing/maximizing policy, root witness
-policy, proof identity, external ingress and result presentation.
+Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general paths use runtime-sized spans and one height word per configured column, so rows above seven and boards above 64 cells do not require board reconstruction or a new solver representation.
 
-The add-on is deliberately fixed at the current 8-word / 69-basis / 7-edge
-carrier rather than growing a general TT/database abstraction. Its hot functions
-compose admitted JSMinSys operations/helpers; `createRbaTt8x32` is cold setup.
-See `catalog/rba-tt-addon-v0.json`.
+See `catalog/rba-addon-v0.json`.
