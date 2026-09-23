@@ -91,7 +91,7 @@ export function rbaTtFindEquivalent32(t,q){
     const other=scan*keyWords;let w=0;
     while(w<keyWords&&t.keys[other+w]===t.keys[base+w])w+=1;
     if(w===keyWords&&(t.exact[scan]>t.exact[best]||
-      (t.exact[scan]===t.exact[best]&&t.generation[scan]<t.generation[best])))best=scan;
+      (t.exact[scan]===t.exact[best]&&scan<best)))best=scan;
   }
   return best===q?-1:best;
 }
