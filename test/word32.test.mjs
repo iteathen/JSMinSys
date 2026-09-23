@@ -133,6 +133,15 @@ import {
   undoMove1x32,
   applyMove32,
   undoMove32,
+  applyMove1x32CallerPly,
+  undoMove1x32CallerPly,
+  applyMove32CallerPly,
+  undoMove32CallerPly,
+  CALLER_PLY1_PLAYABLE_LO,
+  CALLER_PLY1_SUPPORT_CODE,
+  CALLER_PLY2_PLAYABLE_LO,
+  CALLER_PLY2_PLAYABLE_HI,
+  CALLER_PLY2_SUPPORT_CODE,
   STATE_PLY,
   sideFromPly32,
   STATE_PLAYABLE_LO,
@@ -180,6 +189,72 @@ test('apply and undo support state', () => {
   assert.equal(sideFromPly32(state[STATE_PLY]), 0);
   assert.equal(landingCells[3], 3);
   assert.equal(state[STATE_SUPPORT_CODE], 0);
+});
+
+test('caller-owned ply transition profiles match state-owned transition mechanics', () => {
+  // <=32-cell profile.
+  const base1 = new Uint32Array(4);
+  const caller1 = new Uint32Array(2);
+  const landingBase1 = new Uint32Array(4);
+  const landingCaller1 = new Uint32Array(4);
+  fillLandingCells32(landingBase1, 4);
+  fillLandingCells32(landingCaller1, 4);
+  for (let column = 0; column < 4; column += 1) {
+    base1[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
+    caller1[CALLER_PLY1_PLAYABLE_LO] |= (1 << column) >>> 0;
+  }
+
+  const delta1 = 1 << 6;
+  assert.equal(
+    applyMove1x32CallerPly(caller1, landingCaller1, 2, 4, 16, delta1),
+    applyMove1x32(base1, landingBase1, 2, 4, 16, delta1),
+  );
+  assert.equal(caller1[CALLER_PLY1_PLAYABLE_LO], base1[STATE_PLAYABLE_LO]);
+  assert.equal(caller1[CALLER_PLY1_SUPPORT_CODE], base1[STATE_SUPPORT_CODE]);
+  assert.deepEqual(landingCaller1, landingBase1);
+  assert.equal(
+    undoMove1x32CallerPly(caller1, landingCaller1, 2, 4, 16, delta1),
+    undoMove1x32(base1, landingBase1, 2, 4, 16, delta1),
+  );
+  assert.equal(caller1[CALLER_PLY1_PLAYABLE_LO], base1[STATE_PLAYABLE_LO]);
+  assert.equal(caller1[CALLER_PLY1_SUPPORT_CODE], base1[STATE_SUPPORT_CODE]);
+  assert.deepEqual(landingCaller1, landingBase1);
+
+  // Two-lane profile. 7x6 is only a test geometry; the primitive remains
+  // runtime-configured. Repeated column 3 moves exercise the 31->38 lane edge.
+  const base2 = new Uint32Array(4);
+  const caller2 = new Uint32Array(3);
+  const landingBase2 = new Uint32Array(7);
+  const landingCaller2 = new Uint32Array(7);
+  fillLandingCells32(landingBase2, 7);
+  fillLandingCells32(landingCaller2, 7);
+  for (let column = 0; column < 7; column += 1) {
+    base2[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
+    caller2[CALLER_PLY2_PLAYABLE_LO] |= (1 << column) >>> 0;
+  }
+
+  const delta2 = 1 << 9;
+  for (let move = 0; move < 5; move += 1) {
+    assert.equal(
+      applyMove32CallerPly(caller2, landingCaller2, 3, 7, 42, delta2),
+      applyMove32(base2, landingBase2, 3, 7, 42, delta2),
+    );
+    assert.equal(caller2[CALLER_PLY2_PLAYABLE_LO], base2[STATE_PLAYABLE_LO]);
+    assert.equal(caller2[CALLER_PLY2_PLAYABLE_HI], base2[STATE_PLAYABLE_HI]);
+    assert.equal(caller2[CALLER_PLY2_SUPPORT_CODE], base2[STATE_SUPPORT_CODE]);
+    assert.deepEqual(landingCaller2, landingBase2);
+  }
+
+  for (let move = 0; move < 5; move += 1) {
+    assert.equal(
+      undoMove32CallerPly(caller2, landingCaller2, 3, 7, 42, delta2),
+      undoMove32(base2, landingBase2, 3, 7, 42, delta2),
+    );
+    assert.equal(caller2[CALLER_PLY2_PLAYABLE_LO], base2[STATE_PLAYABLE_LO]);
+    assert.equal(caller2[CALLER_PLY2_PLAYABLE_HI], base2[STATE_PLAYABLE_HI]);
+    assert.equal(caller2[CALLER_PLY2_SUPPORT_CODE], base2[STATE_SUPPORT_CODE]);
+    assert.deepEqual(landingCaller2, landingBase2);
+  }
 });
 
 test('mix and reflection blocks', () => {

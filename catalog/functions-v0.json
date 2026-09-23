@@ -1,5 +1,5 @@
 {
-  "version": "0.40.0",
+  "version": "0.41.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -725,6 +725,177 @@
         "caller supplies the exact column being undone",
         "at least one move exists"
       ]
+    },
+    {
+      "name": "applyMove1x32CallerPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-owned-ply-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "configured columns and cellCount are immutable for the engine instance",
+        "landingCells[column] is the current next playable cell",
+        "supportDelta is the precomputed support-only delta for the selected column",
+        "column is already legal",
+        "caller already owns ply/rank as a live scalar for an independent recursive/identity requirement",
+        "selecting this profile does not introduce a new caller-side mutable ply field or duplicate update",
+        "initialization/integration selects this state layout once; there is no hot profile dispatch",
+        "side to move, when needed, is derived from the caller-owned ply via ply & 1"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 19.5,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 43.5,
+          "max": 45.5
+        },
+        "expression": "3*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "Deletes the state-owned ply load, store, and increment only when the caller already owns that scalar; otherwise use applyMove1x32."
+      }
+    },
+    {
+      "name": "undoMove1x32CallerPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-owned-ply-profile",
+      "preconditions": [
+        "configured cellCount <= 32",
+        "configured columns and cellCount are immutable for the engine instance",
+        "caller supplies the exact column being undone",
+        "supportDelta is the precomputed support-only delta for the supplied column",
+        "at least one move exists",
+        "caller already owns ply/rank as a live scalar for an independent recursive/identity requirement",
+        "selecting this profile does not introduce a new caller-side mutable ply field or duplicate update",
+        "initialization/integration selects this state layout once; there is no hot profile dispatch",
+        "side to move, when needed, is derived from the caller-owned ply via ply & 1"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 19.5,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 43.5,
+          "max": 45.5
+        },
+        "expression": "3*LOAD + 3*STORE + 6..8 ALU/control",
+        "note": "Deletes the duplicate state-owned ply load/store/decrement; caller-owned rank restoration is outside this primitive because it already exists in the qualifying integration."
+      }
+    },
+    {
+      "name": "applyMove32CallerPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-owned-ply-profile",
+      "preconditions": [
+        "configured columns and cellCount are immutable for the engine instance",
+        "configured board cell count is 33..64 for this two-lane selected profile",
+        "landingCells[column] is the current next playable cell",
+        "supportDelta is the precomputed support-only delta for the selected column",
+        "column is already legal",
+        "caller already owns ply/rank as a live scalar for an independent recursive/identity requirement",
+        "selecting this profile does not introduce a new caller-side mutable ply field or duplicate update",
+        "initialization/integration selects this state layout once; there is no hot profile dispatch",
+        "side to move, when needed, is derived from the caller-owned ply via ply & 1"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 21.5,
+          "max": 30
+        },
+        "hotL2Predicted": {
+          "min": 45.5,
+          "max": 62
+        },
+        "expression": "normal lane: 3*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 4*STORE + 12 ALU/control",
+        "note": "Removes one state load, one state store, and the ply increment from the two-lane profile when rank is already caller-owned."
+      }
+    },
+    {
+      "name": "undoMove32CallerPly",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-caller-owned-ply-profile",
+      "preconditions": [
+        "configured columns and cellCount are immutable for the engine instance",
+        "configured board cell count is 33..64 for this two-lane selected profile",
+        "landingCells[column] points to the cell immediately above the move being undone, or beyond cellCount when full",
+        "supportDelta is the precomputed support-only delta for the selected column",
+        "caller supplies the exact column being undone",
+        "at least one move exists",
+        "caller already owns ply/rank as a live scalar for an independent recursive/identity requirement",
+        "selecting this profile does not introduce a new caller-side mutable ply field or duplicate update",
+        "initialization/integration selects this state layout once; there is no hot profile dispatch",
+        "side to move, when needed, is derived from the caller-owned ply via ply & 1"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 21.5,
+          "max": 30
+        },
+        "hotL2Predicted": {
+          "min": 45.5,
+          "max": 62
+        },
+        "expression": "normal lane: 3*LOAD + 3*STORE + 8..12 ALU/control; cross-lane above: 4*LOAD + 4*STORE + 12 ALU/control",
+        "note": "Removes duplicate state-owned ply traffic/decrement while preserving reversible playable/support mechanics."
+      }
     },
     {
       "name": "mix32",
@@ -2087,11 +2258,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 90,
+    "functionsImplemented": 94,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 90,
+    "functionsWithCycleCount": 94,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2920,6 +3091,24 @@
           "before": "C2 direct 20; C3-C5 lookup 13 L1; C6-C8 lookup 21 L1; C9-C10 lookup 28 L1, plus reflection-table initialization",
           "after": "C1 no-op; C2 4; C3 6; C4 9; C5 12; C6-C7 15; C8 14; C9 17; C10 21 fixed cycles",
           "mechanism": "initialization selects an exact register-only 3-bit field-swap network; configured geometry becomes control-plane choice rather than hot-loop discovery"
+        }
+      ]
+    },
+    {
+      "id": "round-034",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove1x32CallerPly / undoMove1x32CallerPly",
+          "before": "state-owned ply profile: 25-27 L1 / 57-59 L2 cycles",
+          "after": "19.5-21.5 L1 / 43.5-45.5 L2 cycles",
+          "mechanism": "integration-selected compact state deletes duplicate ply load/store/arithmetic when recursion already owns rank"
+        },
+        {
+          "function": "applyMove32CallerPly / undoMove32CallerPly",
+          "before": "state-owned ply profile: 27-35.5 L1 / 59-75.5 L2 cycles",
+          "after": "21.5-30 L1 / 45.5-62 L2 cycles",
+          "mechanism": "same caller-owned-rank elimination for the two-lane state profile"
         }
       ]
     }

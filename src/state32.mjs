@@ -3,6 +3,12 @@ export const STATE_PLAYABLE_LO = 1;
 export const STATE_PLAYABLE_HI = 2;
 export const STATE_SUPPORT_CODE = 3;
 
+export const CALLER_PLY1_PLAYABLE_LO = 0;
+export const CALLER_PLY1_SUPPORT_CODE = 1;
+export const CALLER_PLY2_PLAYABLE_LO = 0;
+export const CALLER_PLY2_PLAYABLE_HI = 1;
+export const CALLER_PLY2_SUPPORT_CODE = 2;
+
 export function sideFromPly32(ply) {
   return ply & 1;
 }
@@ -64,6 +70,56 @@ export function undoMove1x32(
   state[STATE_PLAYABLE_LO] = playable;
   landingCells[column] = cell;
   state[STATE_SUPPORT_CODE] = state[STATE_SUPPORT_CODE] - supportDelta;
+  return cell;
+}
+
+/**
+ * One-lane transition profile for integrations that already own ply/rank as a
+ * live caller scalar. This primitive deliberately does not load, store, or
+ * advance ply. Select it only when doing so deletes duplicate state work rather
+ * than moving the same work into a new caller-maintained field.
+ */
+export function applyMove1x32CallerPly(
+  state,
+  landingCells,
+  column,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const cell = landingCells[column];
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let playable = state[CALLER_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[CALLER_PLY1_PLAYABLE_LO] = playable;
+  landingCells[column] = next;
+  state[CALLER_PLY1_SUPPORT_CODE] = state[CALLER_PLY1_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+
+export function undoMove1x32CallerPly(
+  state,
+  landingCells,
+  column,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const next = landingCells[column];
+  const cell = next - columns;
+  const bit = 1 << cell;
+  let playable = state[CALLER_PLY1_PLAYABLE_LO];
+
+  if (next < cellCount) playable ^= bit | (1 << next);
+  else playable ^= bit;
+
+  state[CALLER_PLY1_PLAYABLE_LO] = playable;
+  landingCells[column] = cell;
+  state[CALLER_PLY1_SUPPORT_CODE] = state[CALLER_PLY1_SUPPORT_CODE] - supportDelta;
   return cell;
 }
 
@@ -158,3 +214,90 @@ export function undoMove32(
   }
   return cell;
 }
+
+/**
+ * Two-lane transition profile for integrations that already own ply/rank as a
+ * live caller scalar. State stores only playable lanes plus support code.
+ */
+export function applyMove32CallerPly(
+  state,
+  landingCells,
+  column,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const cell = landingCells[column];
+  const bit = 1 << cell;
+  const next = cell + columns;
+
+  if (cell < 32) {
+    let playableLo = state[CALLER_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CALLER_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CALLER_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[CALLER_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[CALLER_PLY2_PLAYABLE_HI] = playableHi;
+  }
+
+  landingCells[column] = next;
+  state[CALLER_PLY2_SUPPORT_CODE] = state[CALLER_PLY2_SUPPORT_CODE] + supportDelta;
+  return cell;
+}
+
+export function undoMove32CallerPly(
+  state,
+  landingCells,
+  column,
+  columns,
+  cellCount,
+  supportDelta,
+) {
+  const next = landingCells[column];
+  const cell = next - columns;
+  const bit = 1 << cell;
+
+  landingCells[column] = cell;
+  state[CALLER_PLY2_SUPPORT_CODE] = state[CALLER_PLY2_SUPPORT_CODE] - supportDelta;
+
+  if (cell < 32) {
+    let playableLo = state[CALLER_PLY2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        state[CALLER_PLY2_PLAYABLE_HI] ^= aboveBit;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[CALLER_PLY2_PLAYABLE_LO] = playableLo;
+  } else {
+    let playableHi = state[CALLER_PLY2_PLAYABLE_HI];
+
+    if (next < cellCount) playableHi ^= bit | (1 << next);
+    else playableHi ^= bit;
+
+    state[CALLER_PLY2_PLAYABLE_HI] = playableHi;
+  }
+  return cell;
+}
+

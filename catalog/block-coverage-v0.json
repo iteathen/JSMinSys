@@ -111,9 +111,13 @@
         "applyMove1x32",
         "undoMove1x32",
         "applyMove32",
-        "undoMove32"
+        "undoMove32",
+        "applyMove1x32CallerPly",
+        "undoMove1x32CallerPly",
+        "applyMove32CallerPly",
+        "undoMove32CallerPly"
       ],
-      "note": "Initialization selects one-lane transitions for <=32 cells or two-lane transitions for 33..64 cells; geometry remains runtime-configured and invariant thereafter."
+      "note": "Initialization/integration selects one-lane (<=32 cells) or two-lane (33..64 cells) transitions. Where the owning recursion already carries ply/rank independently, caller-owned-ply profiles omit the duplicate state word and its load/store/arithmetic; otherwise the state-owned-ply profiles remain authoritative. Geometry is runtime-configured and invariant after initialization."
     },
     {
       "id": 9,
