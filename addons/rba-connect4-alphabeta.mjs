@@ -123,7 +123,8 @@ function search(state,depth,alpha,beta){
   if(semantic[1]<beta)beta=semantic[1];
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns;
+    usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
+    childDepth=depth+1,childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
   let legal=0;
   // Four-Front needs a parent action-bound prepass because the reusable arena
   // is overwritten by child recursion. CPC-only mode needs no such pass: the
@@ -151,15 +152,14 @@ function search(state,depth,alpha,beta){
       value=state.actionLo[row+column];
     }else{
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
-      const childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
       const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
-        words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1,state.coord.map);
+        words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map);
       state.cofactors+=1;
       if(term<0)continue;
       if(term)value=absToRelative(term,mover);
       else{
         connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[depth+1],state.coord);
-        value=-search(state,depth+1,-beta,-alpha);
+        value=-search(state,childDepth,-beta,-alpha);
       }
     }
     if(value>best)best=value;
@@ -211,7 +211,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }
   let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,row=0;
+    usePreempt=preemptCount>1&&g.columns<=32,row=0,childKey=g.keyWords,childBasis=g.maxBasis;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
     for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
       const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
@@ -232,7 +232,6 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];state.frontActionExact+=1;
     }else{
-    const childKey=g.keyWords,childBasis=g.maxBasis;
     const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map);
     state.cofactors+=1;if(term<0)continue;
