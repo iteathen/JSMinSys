@@ -116,6 +116,7 @@ test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle
 test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>{
   const columns=7,rows=6,g=prepareConnect4RbaGeometry({columns,rows});
   const fixtures=[
+    [4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
     [2,0,5,3,6,3,5,2,3,3,3,5,0,5,0,0,1,6,1,4,3,4,2,6,6,0,6,4],
     [6,0,2,1,5,2,1,1,1,0,5,2,5,2,4,1,0,1,4,3,2,6,6,6,6,2,4,4,0,6,0,3,4,5,4],
     [1,3,2,0,4,6,1,0,2,4,5,2,2,3,1,1,1,5,1,3,2,4,6,0,4,4,6,2,0,4,3,3],
