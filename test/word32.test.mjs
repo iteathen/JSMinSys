@@ -272,7 +272,7 @@ import {
   atomicAdd32,
   atomicSub32,
 } from '../src/atomic32.mjs';
-import { queueEnqueue32, queueDequeue32 } from '../src/queue32.mjs';
+import { queueEnqueue32, queueDequeue32, queueTryEnqueue32, queueTryDequeue32 } from '../src/queue32.mjs';
 
 test('two-lane shifts and arithmetic', () => {
   const dst = new Uint32Array(2);
@@ -383,7 +383,7 @@ test('bounded shared queue blocks without waiting', () => {
   const sequence = new Int32Array(new SharedArrayBuffer(4 * 4));
   const values = new Int32Array(new SharedArrayBuffer(4 * 4));
   for (let i = 0; i < 4; i += 1) sequence[i] = i;
-  assert.equal(queueEnqueue32(enqueue, sequence, values, 3, 4, 77), 0);
+  assert.equal(queueEnqueue32(enqueue, sequence, values, 3, 77), 0);
   assert.equal(queueDequeue32(dequeue, sequence, values, 3, 4), 77);
   assert.equal(sequence[0], 4);
 });
@@ -473,4 +473,19 @@ test('one-lane full-column transition', () => {
   assert.equal(undoMove1x32(state, landingCells, column, 4, 16, supportDelta), 15);
   assert.equal(landingCells[column], 15);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 15)) !== 0, true);
+});
+
+
+test('nonblocking queue try paths', () => {
+  const enqueue = new Int32Array(new SharedArrayBuffer(4));
+  const dequeue = new Int32Array(new SharedArrayBuffer(4));
+  const sequence = new Int32Array(new SharedArrayBuffer(4 * 4));
+  const values = new Int32Array(new SharedArrayBuffer(4 * 4));
+  const out = new Int32Array(1);
+  for (let i = 0; i < 4; i += 1) sequence[i] = i;
+
+  assert.equal(queueTryEnqueue32(enqueue, sequence, values, 3, 55), true);
+  assert.equal(queueTryDequeue32(dequeue, sequence, values, 3, 4, out, 0), true);
+  assert.equal(out[0], 55);
+  assert.equal(queueTryDequeue32(dequeue, sequence, values, 3, 4, out, 0), false);
 });
