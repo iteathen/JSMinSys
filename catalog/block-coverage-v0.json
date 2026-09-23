@@ -225,7 +225,7 @@
         "reflectPacked3Columns10",
         "canonicalMin32"
       ],
-      "note": "Reflection always consumes support-only bits. Packed physical state may use support-low/rank-high or rank-low/support-high; the matching one-operation extraction removes rank before any reflection function."
+      "note": "Reflection consumes support-only bits. Register-only configured profiles fuse final alignment wherever profitable: C6/7 use prepared final shifts, and C9/C10 combine the last 12-bit half exchange with their required output alignment."
     },
     {
       "id": 13,

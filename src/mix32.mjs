@@ -124,16 +124,14 @@ export function reflectPacked3Columns9(code) {
   const high = code >>> 24;
   let x = ((code & 0x1c71c7) << 3) | ((code & 0xe38e38) >>> 3);
   x = ((x & 0x03f03f) << 6) | ((x & 0xfc0fc0) >>> 6);
-  x = ((x << 12) | (x >>> 12)) & 0xffffff;
-  return high | (x << 3);
+  return high | (((x << 15) | (x >>> 9)) & 0x07fffff8);
 }
 
 export function reflectPacked3Columns10(code) {
   const high = (code >>> 27) | ((code >>> 21) & 0x38);
   let x = ((code & 0x1c71c7) << 3) | ((code & 0xe38e38) >>> 3);
   x = ((x & 0x03f03f) << 6) | ((x & 0xfc0fc0) >>> 6);
-  x = ((x << 12) | (x >>> 12)) & 0xffffff;
-  return high | (x << 6);
+  return high | (((x << 18) | (x >>> 6)) & 0x3fffffc0);
 }
 
 export function canonicalMin32(value, reflected) {

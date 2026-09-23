@@ -1,5 +1,5 @@
 {
-  "version": "0.80.0",
+  "version": "0.81.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2761,8 +2761,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 17,
-        "note": "Reverse the low eight fields in registers and move the ninth field to the low end; no table memory."
+        "cycles": 16,
+        "note": "Reverse the low eight fields and fuse the final 12-bit half exchange with the required left-by-3 alignment; ninth field is already extracted to the low end."
       }
     },
     {
@@ -2785,8 +2785,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 20,
-        "note": "Reverse the low eight fields, extract the upper two reversed fields directly from the original packed code, then combine the blocks; no table memory."
+        "cycles": 19,
+        "note": "Reverse the low eight fields, extract the upper pair directly, and fuse the final 12-bit half exchange with left-by-6 alignment."
       }
     },
     {
@@ -6289,6 +6289,24 @@
           "before": "ttReplace32 on a proven hit: 2*STORE_COST",
           "after": "STORE_COST",
           "mechanism": "reuse caller-owned tag-match proof and avoid rewriting an identical tag"
+        }
+      ]
+    },
+    {
+      "id": "round-074",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3Columns9",
+          "before": "17 fixed cycles",
+          "after": "16 fixed cycles",
+          "mechanism": "fuse final 24-bit half rotation with output left alignment using one masked wider rotate"
+        },
+        {
+          "function": "reflectPacked3Columns10",
+          "before": "20 fixed cycles",
+          "after": "19 fixed cycles",
+          "mechanism": "same fused final rotation/alignment after direct upper-pair extraction"
         }
       ]
     }
