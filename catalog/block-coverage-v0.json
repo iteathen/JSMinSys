@@ -72,9 +72,11 @@
       "name": "legal-landing-cell",
       "status": "implemented",
       "functions": [
+        "fillLandingCells32",
         "landingCell32",
         "playableColumn32"
-      ]
+      ],
+      "note": "Initialization prepares per-column next landing cells; hot landing lookup is one load and transitions update by configured column stride."
     },
     {
       "id": 7,
