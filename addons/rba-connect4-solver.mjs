@@ -1,4 +1,4 @@
-import {prepareConnect4RbaGeometry,prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
+import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
@@ -6,7 +6,8 @@ import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies3
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
 export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
 
-export function prepareConnect4RbaEvaluator({geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),boundaryDepth=2,boundaryCapacity=256,boundaryBudget=100000}={}){
+export function prepareConnect4RbaEvaluator({geometry,boundaryDepth=2,boundaryCapacity=256,boundaryBudget=100000}={}){
+  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   const g=geometry;
   return {g,scratch:prepareConnect4RbaCoordinateScratch(g),
     boundary:prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget}),
@@ -23,7 +24,8 @@ export function assertConnect4RbaTtCompatibility(t,g){
   return 1;
 }
 
-export function connect4RbaFromMoves(moves,{geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),canonical=true}={}){
+export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
+  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   const g=geometry,words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g);
   let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis;
   let n=connect4RbaBasisFromSupport(g,words,src,basis,bi,scratch.seen);
