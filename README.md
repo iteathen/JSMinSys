@@ -85,3 +85,27 @@ Applications still own root/table initialization, thread roles and workerData,
 domain result/status interpretation, and the external solve API. The cold add-on
 is cataloged separately in `catalog/addons-v0.json`; it does not enlarge the
 sealed hot vocabulary.
+
+### Integrated RBA + TT add-on
+
+`addons/rba-tt8x32.mjs` is a hot specialized add-on for the selected relational
+carrier. It combines persistent RBA q storage and exact shared-TT mechanics:
+
+- exact eight-word q identity;
+- immutable q-attached basis data (up to 69 IDs);
+- generation/reference/execution lifetime;
+- exact lower/upper semantic intervals;
+- up to seven scalar/materialized dependencies;
+- incoming-parent topology and child pins;
+- ready and coalesced event membership;
+- recycling and generation reuse; and
+- generic min/max Bellman interval reconciliation.
+
+The application still owns the meaning of q, cofactor/front construction and
+queries, dependency-label semantics, minimizing/maximizing policy, root witness
+policy, proof identity, external ingress and result presentation.
+
+The add-on is deliberately fixed at the current 8-word / 69-basis / 7-edge
+carrier rather than growing a general TT/database abstraction. Its hot functions
+compose admitted JSMinSys operations/helpers; `createRbaTt8x32` is cold setup.
+See `catalog/rba-tt-addon-v0.json`.
