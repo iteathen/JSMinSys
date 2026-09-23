@@ -13,8 +13,8 @@ export function sideFromPly32(ply) {
  * Geometry is selected during initialization and then invariant:
  * - columns: configured board width
  * - cellCount: configured columns * rows
- * - supportDelta: precomputed total change to the configured support encoding
- *   for this column, including any embedded rank/ply increment
+ * - supportDelta: precomputed change to the configured support encoding for
+ *   this column. Rank/ply is represented separately by STATE_PLY.
  *
  * landingCells[column] stores the next playable cell index for the column.
  * Initialization sets landingCells[column] = column.
