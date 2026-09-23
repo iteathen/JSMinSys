@@ -106,9 +106,11 @@
         "fillLandingCellsByOrder32",
         "landingCell32",
         "playableColumn32",
-        "playableKnownCell32"
+        "playableKnownCell32",
+        "heightFromPacked3Support32",
+        "landingCellFromPacked3Support32"
       ],
-      "note": "Initialization may index landing cells by physical column or move slot. If a caller already observed the current landing cell for scoring, legality, or a known-cell transition, playableKnownCell32 reuses that scalar and avoids a second load. Otherwise playableColumn32 remains the direct load+compare form."
+      "note": "Landing/legality profiles now cover maintained landing arrays and packed-support-derived geometry. When packed 3-bit support is already independently required and a column field shift is prepared/owned, heightFromPacked3Support32 can eliminate a duplicate heights[] mirror; landingCellFromPacked3Support32 derives the physical cell in 6 cycles. Maintained landingCell32 remains preferred when its total load plus update traffic is cheaper."
     },
     {
       "id": 7,

@@ -1,5 +1,5 @@
 {
-  "version": "0.101.0",
+  "version": "0.102.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -464,6 +464,56 @@
       "preconditions": [
         "landingCells was initialized for the configured board"
       ]
+    },
+    {
+      "name": "heightFromPacked3Support32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-packed-support-height-profile",
+      "preconditions": [
+        "supportCode stores the selected column height in a 3-bit field and configured rows <= 7",
+        "fieldShift is the exact shift for the selected column and is immutable for the configured geometry",
+        "caller already owns supportCode for independent transition, identity, or reflection work and does not load it solely for this helper",
+        "any fieldShift load or hot derivation remains separately accounted; this function claims only shift+mask work"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "One variable/fixed right shift plus mask extracts a 3-bit height from the already-owned packed support scalar."
+      }
+    },
+    {
+      "name": "landingCellFromPacked3Support32",
+      "source": "src/indexed32.mjs",
+      "block": "legal-landing-cell",
+      "primitives": [
+        ">>>",
+        "&",
+        "Math.imul",
+        "+"
+      ],
+      "status": "implemented-packed-support-landing-profile",
+      "preconditions": [
+        "supportCode stores 3-bit heights for the configured columns and configured rows <= 7",
+        "fieldShift is the exact immutable shift for the selected physical column",
+        "columns and column are the configured geometry/selected physical column and the resulting cell index fits int32",
+        "caller already owns supportCode for independent work; no support load is introduced solely for landing derivation",
+        "fieldShift preparation or loading is separately accounted",
+        "select against maintained landingCell32 at the governing unit; do not delete a maintained landing array if its total load/store profile is cheaper"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 6,
+        "note": "Shift+mask extracts height, IMUL by configured columns and ADD physical column derive the landing cell without a height-array load."
+      }
     },
     {
       "name": "maskContains32",
@@ -6694,11 +6744,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 231,
+    "functionsImplemented": 233,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 231,
+    "functionsWithCycleCount": 233,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8543,6 +8593,24 @@
           "before": "canonical key producer stores three scratch coordinates, then the locator reloads all three before hashing",
           "after": "required scratch publication and the 16-cycle locator consume the same already-live producer scalars",
           "mechanism": "fuse the producer/publication/hash boundary so scratch remains the multi-value return channel without becoming the hash input"
+        }
+      ]
+    },
+    {
+      "id": "round-095",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "runtime column height ownership",
+          "before": "pinned IsoMax maintains heights[] even though supportCode already stores the same per-column heights in 3-bit fields",
+          "after": "eligible callers extract height from the independently required packed support scalar in 2 cycles",
+          "mechanism": "delete duplicate mutable height state when packed support is already the authority and shift ownership is proved"
+        },
+        {
+          "function": "landing-cell derivation without height array",
+          "before": "height-array path pays LOAD + IMUL + ADD (8 L1 ledger cycles) before transition work",
+          "after": "packed support path costs 6 cycles with an already-owned field shift",
+          "mechanism": "reuse packed height bits directly; height-array stores on apply/undo can disappear when no other consumer requires the mirror"
         }
       ]
     }

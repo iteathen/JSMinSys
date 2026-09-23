@@ -12,6 +12,20 @@ export function landingCell32(landingCells, column) {
   return landingCells[column];
 }
 
+export function heightFromPacked3Support32(supportCode, fieldShift) {
+  return (supportCode >>> fieldShift) & 7;
+}
+
+export function landingCellFromPacked3Support32(
+  supportCode,
+  fieldShift,
+  columns,
+  column,
+) {
+  return Math.imul((supportCode >>> fieldShift) & 7, columns) + column;
+}
+
+
 export function maskContainsI32(owned, required) {
   return (owned & required) === required;
 }

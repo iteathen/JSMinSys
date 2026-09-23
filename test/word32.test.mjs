@@ -90,6 +90,8 @@ test('two-lane wordwise blocks', () => {
 import {
   fillLandingCells32,
   landingCell32,
+  heightFromPacked3Support32,
+  landingCellFromPacked3Support32,
   maskContainsI32,
   maskContains2xI32,
   maskContains32,
@@ -133,6 +135,36 @@ test('single-required-lane containment matches two-lane containment', () => {
   assert.equal(
     maskContains32(ownedHi, highRequired),
     maskContains2x32(ownedLo, ownedHi, 0, highRequired),
+  );
+});
+
+test('packed support can replace duplicate height storage', () => {
+  const columns = 7;
+  let support = 0;
+  const heights = [0, 1, 2, 3, 4, 5, 6];
+  for (let column = 0; column < columns; column += 1) {
+    support |= heights[column] << (column * 3);
+  }
+
+  for (let column = 0; column < columns; column += 1) {
+    const shift = column * 3;
+    assert.equal(
+      heightFromPacked3Support32(support, shift),
+      heights[column],
+    );
+    assert.equal(
+      landingCellFromPacked3Support32(support, shift, columns, column),
+      heights[column] * columns + column,
+    );
+  }
+
+  const columns4 = 4;
+  const support4 = (3 | (0 << 3) | (2 << 6) | (1 << 9)) >>> 0;
+  assert.equal(heightFromPacked3Support32(support4, 0), 3);
+  assert.equal(heightFromPacked3Support32(support4, 6), 2);
+  assert.equal(
+    landingCellFromPacked3Support32(support4, 6, columns4, 2),
+    10,
   );
 });
 
