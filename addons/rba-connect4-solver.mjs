@@ -74,7 +74,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     }
   }
 
-  let count=0;
+  let count=0,childBase=0,childBi=0;
   for(let oi=0;oi<g.columns;oi+=1){
     const column=q===rootQ?rootCanonicalColumn(g,oi,rootReflected):g.actionOrder[oi];
     if(t.keys[base+column]>=g.rows)continue;
@@ -83,7 +83,6 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
-      const childBase=count*g.keyWords,childBi=count*g.maxBasis;
       const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,basisBase,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map);
       state.transitions+=1;
       if(term<0||(term&&(term<lo||term>hi)))return RBA_QUERY_UNCOVERED;
@@ -91,6 +90,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
       else{connect4RbaCanonicalize(g,state.profile,state.keys,childBase,state.childBasis,childBi,state.childBasisSize[count],state.scratch);state.childPresent[count]=1;}
     }
     state.actionLower[count]=lo;state.actionUpper[count]=hi;count+=1;
+    childBase+=g.keyWords;childBi+=g.maxBasis;
   }
   if(!count)return RBA_QUERY_UNCOVERED;state.count=count;return RBA_BRANCH;
 }
