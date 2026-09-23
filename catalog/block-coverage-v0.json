@@ -207,9 +207,13 @@
         "normalizeMinimalI32InPlace",
         "normalizeMaximalI32InPlace",
         "normalizeMinimal2xI32InPlace",
-        "normalizeMaximal2xI32InPlace"
+        "normalizeMaximal2xI32InPlace",
+        "normalizeMinimalI32LazyInPlace",
+        "normalizeMaximalI32LazyInPlace",
+        "normalizeMinimal2xI32LazyInPlace",
+        "normalizeMaximal2xI32LazyInPlace"
       ],
-      "note": "Ordered antichain normalization has unsigned/signed two-lane profiles plus initialization-selected one-lane signed profiles. Configured frontiers that fit one 32-bit lane do not pay high-lane candidate/comparison loads or stores; wider frontiers retain the two-lane forms."
+      "note": "Frontier normalization now has lane-selected signed profiles and nonempty lazy-compaction variants. Lazy forms leave the accepted prefix untouched and start writes only after the first rejection, replacing the accepted-store count R with moved accepted entries M. Generic profiles remain for empty/unspecialized callers."
     },
     {
       "id": 15,

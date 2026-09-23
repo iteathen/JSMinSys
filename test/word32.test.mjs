@@ -177,6 +177,10 @@ import {
   normalizeMaximal2xI32InPlace,
   normalizeMinimalI32InPlace,
   normalizeMaximalI32InPlace,
+  normalizeMinimalI32LazyInPlace,
+  normalizeMaximalI32LazyInPlace,
+  normalizeMinimal2xI32LazyInPlace,
+  normalizeMaximal2xI32LazyInPlace,
 } from '../src/frontier32.mjs';
 import {
   negateScore32,
@@ -568,6 +572,53 @@ test('one-lane signed frontier normalization profiles', () => {
   const bit31 = new Int32Array([0x80000000, 0x80000001]);
   assert.equal(normalizeMinimalI32InPlace(bit31, 2), 1);
   assert.equal(bit31[0], -2147483648);
+});
+
+test('lazy frontier compaction skips accepted-prefix rewrites', () => {
+  const minimalBase = new Int32Array([0b0100, 0b0011, 0b0111, 0b1000]);
+  const minimalLazy = new Int32Array(minimalBase);
+  const minimalExpected = normalizeMinimalI32InPlace(minimalBase, 4);
+  const minimalActual = normalizeMinimalI32LazyInPlace(minimalLazy, 4);
+  assert.equal(minimalActual, minimalExpected);
+  assert.deepEqual(
+    [...minimalLazy.slice(0, minimalActual)],
+    [...minimalBase.slice(0, minimalExpected)],
+  );
+
+  const maximalBase = new Int32Array([0b1111, 0b0111, 0b0011, 0b1000]);
+  const maximalLazy = new Int32Array(maximalBase);
+  const maximalExpected = normalizeMaximalI32InPlace(maximalBase, 4);
+  const maximalActual = normalizeMaximalI32LazyInPlace(maximalLazy, 4);
+  assert.equal(maximalActual, maximalExpected);
+  assert.deepEqual(
+    [...maximalLazy.slice(0, maximalActual)],
+    [...maximalBase.slice(0, maximalExpected)],
+  );
+
+  const noReject = new Int32Array([1, 2, 4, 8]);
+  const noRejectBefore = new Int32Array(noReject);
+  assert.equal(normalizeMinimalI32LazyInPlace(noReject, 4), 4);
+  assert.deepEqual(noReject, noRejectBefore);
+
+  const loMinBase = new Int32Array([0b0100, 0b0011, 0b0111, 0b1000]);
+  const hiMinBase = new Int32Array([0, 1, 1, 2]);
+  const loMinLazy = new Int32Array(loMinBase);
+  const hiMinLazy = new Int32Array(hiMinBase);
+  const min2Expected = normalizeMinimal2xI32InPlace(loMinBase, hiMinBase, 4);
+  const min2Actual = normalizeMinimal2xI32LazyInPlace(loMinLazy, hiMinLazy, 4);
+  assert.equal(min2Actual, min2Expected);
+  assert.deepEqual([...loMinLazy.slice(0, min2Actual)], [...loMinBase.slice(0, min2Expected)]);
+  assert.deepEqual([...hiMinLazy.slice(0, min2Actual)], [...hiMinBase.slice(0, min2Expected)]);
+
+  const loMaxBase = new Int32Array([0b1111, 0b0111, 0b0011, 0b1000]);
+  const hiMaxBase = new Int32Array([3, 3, 1, 0]);
+  const loMaxLazy = new Int32Array(loMaxBase);
+  const hiMaxLazy = new Int32Array(hiMaxBase);
+  const max2Expected = normalizeMaximal2xI32InPlace(loMaxBase, hiMaxBase, 4);
+  const max2Actual = normalizeMaximal2xI32LazyInPlace(loMaxLazy, hiMaxLazy, 4);
+  assert.equal(max2Actual, max2Expected);
+  assert.deepEqual([...loMaxLazy.slice(0, max2Actual)], [...loMaxBase.slice(0, max2Expected)]);
+  assert.deepEqual([...hiMaxLazy.slice(0, max2Actual)], [...hiMaxBase.slice(0, max2Expected)]);
 });
 
 test('search scalar blocks', () => {

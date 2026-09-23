@@ -1,5 +1,5 @@
 {
-  "version": "0.54.0",
+  "version": "0.55.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1791,6 +1791,124 @@
       }
     },
     {
+      "name": "normalizeMinimalI32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-lazy-compaction-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nondecreasing set cardinality",
+        "words uses Int32 bit-pattern storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(L+3) + C*(L+5) + M*(S+1)",
+        "hotL1Predicted": "3 + 7*N + 9*C + 1.5*M",
+        "hotL2Predicted": "3 + 15*N + 17*C + 1.5*M",
+        "note": "M is accepted entries moved after the first rejection. Accepted prefix entries are never rewritten; if no rejection occurs M=0. N/C terms are conservatively left equal to the ordinary one-lane ledger."
+      }
+    },
+    {
+      "name": "normalizeMaximalI32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-lazy-compaction-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nonincreasing set cardinality",
+        "words uses Int32 bit-pattern storage"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(L+3) + C*(L+5) + M*(S+1)",
+        "hotL1Predicted": "3 + 7*N + 9*C + 1.5*M",
+        "hotL2Predicted": "3 + 15*N + 17*C + 1.5*M",
+        "note": "Lazy compaction writes only accepted entries after the first rejection; no-rejection inputs perform zero stores."
+      }
+    },
+    {
+      "name": "normalizeMinimal2xI32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-lazy-compaction-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nondecreasing set cardinality",
+        "lo/hi arrays use Int32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 11*N + 16*C + 2*M",
+        "hotL2Predicted": "3 + 27*N + 32*C + 2*M",
+        "note": "M is accepted entries that actually move after the first rejection. The accepted prefix incurs no lo/hi stores."
+      }
+    },
+    {
+      "name": "normalizeMaximal2xI32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-lazy-compaction-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nonincreasing set cardinality",
+        "lo/hi arrays use Int32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + N*(2*L+3) + C*(2*L+8) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 11*N + 16*C + 2*M",
+        "hotL2Predicted": "3 + 27*N + 32*C + 2*M",
+        "note": "Two-lane lazy compaction suppresses all accepted-prefix stores while retaining the same ordered containment comparisons."
+      }
+    },
+    {
       "name": "normalizeMinimal2xI32InPlace",
       "source": "src/frontier32.mjs",
       "block": "frontier-normalization",
@@ -2927,11 +3045,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 115,
+    "functionsImplemented": 119,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 115,
+    "functionsWithCycleCount": 119,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -3996,6 +4114,24 @@
           "before": "two-lane signed: 2 + 11*N + 16*C + 2*R hot-L1 ledger",
           "after": "one-lane signed: 2 + 7*N + 9*C + 1.5*R",
           "mechanism": "same one-lane representation reduction for maximal antichains"
+        }
+      ]
+    },
+    {
+      "id": "round-048",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "normalizeMinimalI32LazyInPlace / normalizeMaximalI32LazyInPlace",
+          "before": "one-lane signed store term R*(S+1)",
+          "after": "nonempty lazy profile uses M*(S+1), M=accepted entries actually moved after first rejection",
+          "mechanism": "leave accepted prefix in place; begin compaction only after the first rejected entry"
+        },
+        {
+          "function": "normalizeMinimal2xI32LazyInPlace / normalizeMaximal2xI32LazyInPlace",
+          "before": "two-lane signed store term R*(2S+1)",
+          "after": "nonempty lazy profile uses M*(2S+1)",
+          "mechanism": "same delayed-compaction structure; no-rejection calls perform zero stores"
         }
       ]
     }
