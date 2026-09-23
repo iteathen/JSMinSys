@@ -119,7 +119,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, fillReflect3Tables32, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, fillReflect3Tables32, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace } from '../src/frontier32.mjs';
 import {
   negateScore32,
@@ -157,8 +157,9 @@ test('mix and reflection blocks', () => {
   const tables7 = new Uint32Array(1024);
   assert.equal(fillReflect3Tables32(tables7, 7), 21);
   const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
-  const reflected = reflectPacked3x32(code, tables7, 0xffe00000);
+  const reflected = reflectPacked3x24(code, tables7, 0xffe00000);
   assert.equal(reflected, reflectPacked3Direct32(code, 7, 21));
+  assert.equal(reflectPacked3x32(code, tables7, 0xffe00000), reflected);
   assert.equal((reflected >>> 21), 2);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
@@ -166,7 +167,7 @@ test('mix and reflection blocks', () => {
   const tables4 = new Uint32Array(1024);
   assert.equal(fillReflect3Tables32(tables4, 4), 12);
   const code4 = ((2 << 12) | 1 | (2 << 3) | (3 << 6) | (4 << 9)) >>> 0;
-  const reflected4 = reflectPacked3x32(code4, tables4, 0xfffff000);
+  const reflected4 = reflectPacked3x24(code4, tables4, 0xfffff000);
   assert.equal(reflected4, reflectPacked3Direct32(code4, 4, 12));
   assert.equal(reflected4 >>> 12, 2);
   assert.equal(reflected4 & 7, 4);
@@ -257,6 +258,8 @@ test('two-lane shifts and arithmetic', () => {
 
   add2x32Into(dst, 0, 0xffffffff, 1, 1, 2);
   assert.deepEqual([...dst], [0, 4]);
+  add2x32Into(dst, 0, 5, 1, 7, 2);
+  assert.deepEqual([...dst], [12, 3]);
 
   sub2x32Into(dst, 0, 0, 4, 1, 2);
   assert.deepEqual([...dst], [0xffffffff, 1]);
