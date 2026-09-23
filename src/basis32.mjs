@@ -58,3 +58,14 @@ export function permuteBits3x32Into(out, outOffset, source, sourceOffset, map, m
   }
   return outOffset;
 }
+
+export function permuteBitsSpan32Into(out, outOffset, outWordCount, source, sourceOffset, map, mapOffset, count) {
+  for (let word = 0; word < outWordCount; word += 1) out[outOffset + word] = 0;
+  for (let index = 0; index < count; index += 1) {
+    if (source[sourceOffset + (index >>> 5)] & (1 << (index & 31))) {
+      const target = map[mapOffset + index];
+      out[outOffset + (target >>> 5)] |= 1 << (target & 31);
+    }
+  }
+  return outOffset;
+}
