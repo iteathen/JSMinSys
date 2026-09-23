@@ -29,3 +29,16 @@ export function popcount32(word) {
 export function subset32(a, b) {
   return (a & ~b) === 0;
 }
+
+
+export function bitSetI32(word, mask) {
+  return word | mask;
+}
+
+export function bitClearI32(word, mask) {
+  return word & ~mask;
+}
+
+export function bitToggleI32(word, mask) {
+  return word ^ mask;
+}
