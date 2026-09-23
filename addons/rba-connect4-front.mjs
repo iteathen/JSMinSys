@@ -121,8 +121,9 @@ export function buildConnect4RbaFourFront(g,a,words,offset,basis,bi,n){
   return buildAt(g,a,0,a.depth,basis,bi,n);
 }
 function member(a,slot,words,p0,p1,cw){
-  for(let i=0;i<a.count[slot];i+=1){const b=a.base[slot]+i*a.recordWords;let ok=1;
-    for(let w=0;w<cw;w+=1)if((a.words[b+w]&~words[p0+w])||(a.words[b+cw+w]&words[p1+w])){ok=0;break;}
+  const count=a.count[slot],base=a.base[slot],recordWords=a.recordWords,front=a.words;
+  for(let i=0;i<count;i+=1){const b=base+i*recordWords;let ok=1;
+    for(let w=0;w<cw;w+=1)if((front[b+w]&~words[p0+w])||(front[b+cw+w]&words[p1+w])){ok=0;break;}
     if(ok)return 1;
   }return 0;
 }
