@@ -1,5 +1,5 @@
 {
-  "version": "0.17.0",
+  "version": "0.18.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -551,7 +551,76 @@
       }
     },
     {
+      "name": "fillReflect3Tables32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "|",
+        "<<",
+        ">>>",
+        "+",
+        "-",
+        "*",
+        "/",
+        "Math.floor",
+        "<",
+        ">=",
+        "===",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization",
+      "preconditions": [
+        "3*columns <= 32",
+        "tables has at least 1024 Uint32 entries"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "REFLECT3_TABLE_BUILD(C, inspectedBits, setBits)",
+        "parameters": {
+          "C": "configured columns",
+          "inspectedBits": "total inner bit iterations across the 1024 generated table entries",
+          "setBits": "inner iterations whose source bit is set"
+        },
+        "note": "Initialization-only setup. Cost is value/control dependent because the builder materializes 1024 contribution entries and computes configured bit destinations."
+      }
+    },
+    {
       "name": "reflectPacked3x32",
+      "source": "src/mix32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "LD32",
+        "&",
+        "|",
+        ">>>",
+        "+",
+        "="
+      ],
+      "status": "implemented-precomputed",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 31,
+        "hotL2Predicted": 63,
+        "hotL3Predicted": 203,
+        "expression": "4*LOAD + 10 index/mask/shift operations + 4*OR + final uint32 coercion",
+        "note": "Configuration-precomputed contribution tables make hot reflection independent of column count."
+      },
+      "preconditions": [
+        "tables were built by fillReflect3Tables32 for the configured columns",
+        "rankMask preserves all non-support bits",
+        "3-bit-per-column packed support encoding fits uint32"
+      ]
+    },
+    {
+      "name": "reflectPacked3Direct32",
       "source": "src/mix32.mjs",
       "block": "canonical-reflection",
       "primitives": [
@@ -566,22 +635,22 @@
         "<",
         "="
       ],
-      "status": "implemented",
+      "status": "implemented-direct-fallback",
+      "preconditions": [
+        "support encoding uses 3 bits per column",
+        "columns and rankShift are initialization-time configuration invariants",
+        "packed representation fits uint32"
+      ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
         "expression": "8 + 10*C",
         "parameters": {
-          "C": "runtime-configured column count, immutable after initialization"
+          "C": "configured columns"
         },
-        "note": "Incremental source/target shifts remove per-column multiplication while preserving runtime-configured width. This primitive is specifically for 3-bit-per-column packed support encodings."
-      },
-      "preconditions": [
-        "support encoding uses 3 bits per column",
-        "columns and rankShift are initialization-time configuration invariants",
-        "packed representation fits uint32"
-      ]
+        "note": "Direct arithmetic fallback avoids reflection-table memory traffic; preferable when lookup tables are cold or configured width is small."
+      }
     },
     {
       "name": "canonicalMin32",
@@ -1231,11 +1300,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 58,
+    "functionsImplemented": 60,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 58,
+    "functionsWithCycleCount": 60,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1530,6 +1599,30 @@
           "before": "not present",
           "after": "explicit initialization cost",
           "mechanism": "move landing-cell coordinate construction to configuration phase"
+        }
+      ]
+    },
+    {
+      "id": "round-011",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x32",
+          "before": "8 + 10*C direct arithmetic cycles",
+          "after": "31 L1 / 63 L2 / 203 L3, independent of C",
+          "mechanism": "configuration-time 4x256 contribution tables"
+        },
+        {
+          "function": "reflectPacked3Direct32",
+          "before": "implicit old implementation",
+          "after": "8 + 10*C",
+          "mechanism": "retain direct fallback as separately costed alternative"
+        },
+        {
+          "function": "fillReflect3Tables32",
+          "before": "not present",
+          "after": "explicit initialization-only symbolic cost",
+          "mechanism": "move reflection permutation construction to configuration phase"
         }
       ]
     }
