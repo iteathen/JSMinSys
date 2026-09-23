@@ -10,7 +10,7 @@ export const CPC_EXACT=1;
 export const CPC_BOUND=2;
 export const CPC_RESTRICT=3;
 
-export function prepareConnect4CpcScratch(g,{frontierResponse=false}={}){
+export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdvisory=false}={}){
   const cellWords=Math.ceil(g.cellCount/32);
   return {
     threatCells:new Uint32Array(g.columns),
@@ -28,6 +28,7 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false}={}){
     forcedColumn:new Int32Array(1),
     interval:new Uint32Array(2),
     frontierResponse:frontierResponse?1:0,
+    projectedAdvisory:projectedAdvisory?1:0,
   };
 }
 
@@ -334,7 +335,7 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   }
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
-  collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
+  if(scratch.projectedAdvisory)collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
   if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
   if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
