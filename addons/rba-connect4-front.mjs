@@ -116,15 +116,15 @@ export function buildConnect4RbaFourFront(g,a,words,offset,basis,bi,n){
   for(let c=0;c<g.columns;c+=1)a.heights[c]=words[offset+c];a.rootRank=words[offset+g.metaOffset]>>>2;
   return buildAt(g,a,0,a.depth,basis,bi,n);
 }
-function member(g,a,slot,words,offset){
-  const cw=g.coordWords,p0=offset+g.p0Offset,p1=offset+g.p1Offset;
+function member(a,slot,words,p0,p1,cw){
   for(let i=0;i<a.count[slot];i+=1){const b=a.base[slot]+i*a.recordWords;let ok=1;
     for(let w=0;w<cw;w+=1)if((a.words[b+w]&~words[p0+w])||(a.words[b+cw+w]&words[p1+w])){ok=0;break;}
     if(ok)return 1;
   }return 0;
 }
 export function queryConnect4RbaFourFront(g,a,slot,words,offset){
-  const lower=member(g,a,slot+1,words,offset)?3:member(g,a,slot,words,offset)?2:1;
-  const upper=member(g,a,slot+3,words,offset)?3:member(g,a,slot+2,words,offset)?2:1;
+  const cw=g.coordWords,p0=offset+g.p0Offset,p1=offset+g.p1Offset;
+  const lower=member(a,slot+1,words,p0,p1,cw)?3:member(a,slot,words,p0,p1,cw)?2:1;
+  const upper=member(a,slot+3,words,p0,p1,cw)?3:member(a,slot+2,words,p0,p1,cw)?2:1;
   return lower|(upper<<2);
 }
