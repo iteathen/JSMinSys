@@ -1,5 +1,5 @@
 {
-  "version": "0.10.0",
+  "version": "0.11.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -423,15 +423,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 72.5,
-          "max": 85.5
+          "min": 68.5,
+          "max": 79.5
         },
         "hotL2Predicted": {
-          "min": 152.5,
-          "max": 181.5
+          "min": 132.5,
+          "max": 143.5
         },
-        "expression": "noAbove unchanged; above: 12*LOAD + 9*STORE + 33 ALU/control",
-        "note": "Playable words are held in locals and stored once, removing 2 state loads + 2 state stores on the above-cell path."
+        "expression": "noAbove: 8*LOAD + 9*STORE + 32..33 ALU/control; above: 8*LOAD + 9*STORE + 41..43 ALU/control",
+        "note": "Played/above cell masks are derived from the cell index, deleting 2-4 mask-table loads. Range reflects low/high lane mask construction and above-cell path."
       }
     },
     {
@@ -458,15 +458,15 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 76,
-          "max": 91
+          "min": 72,
+          "max": 85
         },
         "hotL2Predicted": {
-          "min": 164,
-          "max": 195
+          "min": 144,
+          "max": 157
         },
-        "expression": "noAbove unchanged; above: 13*LOAD + 8*STORE + 35 ALU/control",
-        "note": "Playable words are held in locals and stored once, removing 2 state loads + 2 state stores on the above-cell path."
+        "expression": "noAbove: 9*LOAD + 8*STORE + 32..33 ALU/control; above: 9*LOAD + 8*STORE + 43..45 ALU/control",
+        "note": "Played/above cell masks are derived from the cell index, deleting 2-4 mask-table loads. Range reflects low/high lane construction and above-cell path."
       }
     },
     {
@@ -1236,6 +1236,24 @@
           "before": "3-13 cycles",
           "after": "4-8 cycles",
           "mechanism": "classify by lane emptiness before single-word bit test"
+        }
+      ]
+    },
+    {
+      "id": "round-004",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32",
+          "before": "72.5-85.5 L1 / 152.5-181.5 L2",
+          "after": "68.5-79.5 L1 / 132.5-143.5 L2",
+          "mechanism": "derive played/above bit masks from cell index instead of loading cellLo/cellHi tables"
+        },
+        {
+          "function": "undoMove32",
+          "before": "76-91 L1 / 164-195 L2",
+          "after": "72-85 L1 / 144-157 L2",
+          "mechanism": "derive played/above bit masks from cell index instead of loading cellLo/cellHi tables"
         }
       ]
     }
