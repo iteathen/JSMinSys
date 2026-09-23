@@ -81,7 +81,7 @@ export function rbaTtRecycle32(t,q){
   if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
   t.live[q]=0;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;return 1;
 }
-export function rbaTtRelease32(t,q,g){if(!rbaTtValid32(t,q,g)||!t.refs[q])return 0;t.refs[q]-=1;if(!t.refs[q]&&t.readyMember[q])unqueueReady(t,q);if(!t.refs[q]&&t.count[q])rbaTtSignal32(t,q);rbaTtRecycle32(t,q);return 1;}
+export function rbaTtRelease32(t,q,g){if(!rbaTtValid32(t,q,g)||!t.refs[q])return 0;const refs=t.refs[q]-1;t.refs[q]=refs;if(refs)return 1;if(t.readyMember[q])unqueueReady(t,q);if(t.count[q])rbaTtSignal32(t,q);rbaTtRecycle32(t,q);return 1;}
 export function rbaTtEnqueue32(t,q){
   if(!t.live[q]||!t.refs[q]||t.execution[q]!==0||t.exact[q]||t.phase[q]!==0||t.readyMember[q])return 0;
   t.execution[q]=1;intrusiveEnqueueTailStamped32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,t.readyGeneration,t.generation,q);return 1;
