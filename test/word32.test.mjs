@@ -180,6 +180,14 @@ import {
   plyFromPackedRankLow32,
   supportFromPackedRankLow32,
   sideFromPackedRankLow32,
+  PACKED_META2_PLAYABLE_LO,
+  PACKED_META2_META,
+  supportFromPackedMeta32,
+  playableHighFromPackedMeta32,
+  applyMove32PackedMeta,
+  undoMove32PackedMeta,
+  applyMove32PackedMetaKnownCell,
+  undoMove32PackedMetaKnownCell,
   applyMove1x32PackedPly,
   undoMove1x32PackedPly,
   applyMove32PackedPly,
@@ -663,6 +671,115 @@ test('rank-low packed support+ply layout keeps extraction cheap', () => {
     packed, landingPacked, 2, 2, 4, 12, combinedDelta,
   );
   assert.equal(packed[PACKED_PLY1_SUPPORT_PLY], 0);
+});
+
+test('packed high-playable meta state matches separate two-lane state', () => {
+  const columns = 6;
+  const rows = 6;
+  const cellCount = columns * rows;
+  const rankBits = 6;
+  const highBits = cellCount - 32;
+  const highMask = (1 << highBits) - 1;
+  const supportShift = rankBits + highBits;
+  const supportDelta = 1 << (2 * 3);
+  const combinedDelta = 1 + (supportDelta << supportShift);
+
+  const ordinary = new Uint32Array(4);
+  const packed = new Uint32Array(2);
+  const landingOrdinary = new Uint32Array(columns);
+  const landingPacked = new Uint32Array(columns);
+  landingOrdinary[2] = 26;
+  landingPacked[2] = 26;
+  ordinary[STATE_PLAYABLE_LO] = 1 << 26;
+  packed[PACKED_META2_PLAYABLE_LO] = 1 << 26;
+
+  assert.equal(
+    applyMove32(ordinary, landingOrdinary, 2, columns, cellCount, supportDelta),
+    26,
+  );
+  assert.equal(
+    applyMove32PackedMeta(
+      packed, landingPacked, 2, columns, cellCount, rankBits, combinedDelta,
+    ),
+    26,
+  );
+  assert.equal(packed[PACKED_META2_PLAYABLE_LO], ordinary[STATE_PLAYABLE_LO]);
+  assert.equal(
+    playableHighFromPackedMeta32(packed[PACKED_META2_META], rankBits, highMask),
+    ordinary[STATE_PLAYABLE_HI],
+  );
+  assert.equal(
+    supportFromPackedMeta32(packed[PACKED_META2_META], supportShift),
+    ordinary[STATE_SUPPORT_CODE],
+  );
+  assert.equal(
+    plyFromPackedRankLow32(packed[PACKED_META2_META], (1 << rankBits) - 1),
+    ordinary[STATE_PLY],
+  );
+
+  assert.equal(
+    applyMove32(ordinary, landingOrdinary, 2, columns, cellCount, supportDelta),
+    32,
+  );
+  assert.equal(
+    applyMove32PackedMeta(
+      packed, landingPacked, 2, columns, cellCount, rankBits, combinedDelta,
+    ),
+    32,
+  );
+  assert.equal(
+    playableHighFromPackedMeta32(packed[PACKED_META2_META], rankBits, highMask),
+    ordinary[STATE_PLAYABLE_HI],
+  );
+  assert.equal(
+    supportFromPackedMeta32(packed[PACKED_META2_META], supportShift),
+    ordinary[STATE_SUPPORT_CODE],
+  );
+
+  assert.equal(
+    undoMove32PackedMeta(
+      packed, landingPacked, 2, columns, cellCount, rankBits, combinedDelta,
+    ),
+    undoMove32(ordinary, landingOrdinary, 2, columns, cellCount, supportDelta),
+  );
+  assert.equal(
+    undoMove32PackedMetaKnownCell(
+      packed, landingPacked, 2, 26, columns, cellCount - columns,
+      32 - columns, rankBits, combinedDelta,
+    ),
+    undoMove32KnownCell(
+      ordinary, landingOrdinary, 2, 26, columns, cellCount - columns,
+      32 - columns, supportDelta,
+    ),
+  );
+  assert.equal(packed[PACKED_META2_PLAYABLE_LO], ordinary[STATE_PLAYABLE_LO]);
+  assert.equal(
+    playableHighFromPackedMeta32(packed[PACKED_META2_META], rankBits, highMask),
+    ordinary[STATE_PLAYABLE_HI],
+  );
+  assert.equal(packed[PACKED_META2_META], 0);
+  assert.deepEqual(landingPacked, landingOrdinary);
+
+  const knownOrdinary = new Uint32Array(4);
+  const knownPacked = new Uint32Array(2);
+  const knownLandingOrdinary = new Uint32Array(columns);
+  const knownLandingPacked = new Uint32Array(columns);
+  knownLandingOrdinary[2] = 26;
+  knownLandingPacked[2] = 26;
+  knownOrdinary[STATE_PLAYABLE_LO] = 1 << 26;
+  knownPacked[PACKED_META2_PLAYABLE_LO] = 1 << 26;
+
+  applyMove32KnownCell(
+    knownOrdinary, knownLandingOrdinary, 2, 26, columns, cellCount, supportDelta,
+  );
+  applyMove32PackedMetaKnownCell(
+    knownPacked, knownLandingPacked, 2, 26, columns, cellCount,
+    rankBits, combinedDelta,
+  );
+  assert.equal(
+    playableHighFromPackedMeta32(knownPacked[PACKED_META2_META], rankBits, highMask),
+    knownOrdinary[STATE_PLAYABLE_HI],
+  );
 });
 
 test('mix and reflection blocks', () => {

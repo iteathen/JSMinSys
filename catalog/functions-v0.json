@@ -1,5 +1,5 @@
 {
-  "version": "0.73.0",
+  "version": "0.74.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1876,6 +1876,237 @@
         },
         "expression": "normal lane: 2*LOAD + 3*STORE + 7..11 ALU/control; cross-lane above: 3*LOAD + 4*STORE + 11 ALU/control",
         "note": "Packed support+ply combines state-owned rank with the retained-cell/prepared-boundary undo reductions."
+      }
+    },
+    {
+      "name": "supportFromPackedMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-packed-high-profile",
+      "preconditions": [
+        "supportShift identifies the configured support field",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Support remains the high field, so one unsigned shift removes rank and packed high-playable bits."
+      }
+    },
+    {
+      "name": "playableHighFromPackedMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>",
+        "&"
+      ],
+      "status": "implemented-packed-high-profile",
+      "preconditions": [
+        "highMask selects exactly cellCount-32 high-lane playable bits",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "External high-playable extraction costs shift+mask; hot transitions update those bits in-place inside the meta word."
+      }
+    },
+    {
+      "name": "applyMove32PackedMeta",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-high-profile",
+      "preconditions": [
+        "landingCells[index] is the current next playable cell",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 18,
+          "max": 26.5
+        },
+        "hotL2Predicted": {
+          "min": 34,
+          "max": 50.5
+        },
+        "expression": "low/same: 3*LOAD+3*STORE+8..12 ALU/control; low-to-high: 3*LOAD+3*STORE+13 ALU/control; high lane: 2*LOAD+2*STORE+9..13 ALU/control",
+        "note": "Eliminates the separate high-lane state word. Crossing/high paths trade one packing shift for one deleted load and store."
+      }
+    },
+    {
+      "name": "undoMove32PackedMeta",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-high-profile",
+      "preconditions": [
+        "landingCells[index] points immediately above the move being undone or beyond cellCount when full",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 18,
+          "max": 26.5
+        },
+        "hotL2Predicted": {
+          "min": 34,
+          "max": 50.5
+        },
+        "expression": "low/same: 3*LOAD+3*STORE+8..12 ALU/control; low-to-high: 3*LOAD+3*STORE+13 ALU/control; high lane: 2*LOAD+2*STORE+9..13 ALU/control",
+        "note": "General undo packs high playable with rank/support, deleting the separate high word on crossing/high paths."
+      }
+    },
+    {
+      "name": "applyMove32PackedMetaKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-high-known-cell-profile",
+      "preconditions": [
+        "caller already holds the exact current landing cell for this transition index",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 14,
+          "max": 22.5
+        },
+        "hotL2Predicted": {
+          "min": 26,
+          "max": 38.5
+        },
+        "expression": "low/same: 2*LOAD+3*STORE+8..12 ALU/control; low-to-high: 2*LOAD+3*STORE+13 ALU/control; high lane: LOAD+2*STORE+9..13 ALU/control",
+        "note": "Known-cell profile removes landing load as before, and packed high playable additionally removes the high-lane load/store pair."
+      }
+    },
+    {
+      "name": "undoMove32PackedMetaKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "-",
+        "<<",
+        ">>>",
+        "<",
+        "="
+      ],
+      "status": "implemented-packed-high-known-cell-profile",
+      "preconditions": [
+        "caller retains the exact played cell returned by paired apply",
+        "lastRowStart and lowLaneAboveLimit were prepared during initialization",
+        "configured board cell count is 33..64",
+        "rank occupies the low rankBits bits",
+        "high playable occupies the next highCellCount = cellCount-32 bits",
+        "support occupies the remaining configured field above high playable",
+        "rankBits + (cellCount-32) + 3*columns <= 32",
+        "configured rows <= 7 so support-field increments cannot carry between fields",
+        "combinedDelta = rankIncrement + (supportDelta << supportShift) was prepared per transition index",
+        "supportShift = rankBits + (cellCount-32)",
+        "reflection extracts support with supportFromPackedMeta32 before support-only reflection"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 13,
+          "max": 21.5
+        },
+        "hotL2Predicted": {
+          "min": 25,
+          "max": 37.5
+        },
+        "expression": "low/same: 2*LOAD+3*STORE+7..11 ALU/control; low-to-high: 2*LOAD+3*STORE+12 ALU/control; high lane: LOAD+2*STORE+8..12 ALU/control",
+        "note": "Retained cell and prepared geometry combine with packed high playable; crossing/high undo no longer touches a separate high-lane state word."
       }
     },
     {
@@ -4074,11 +4305,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 154,
+    "functionsImplemented": 160,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 154,
+    "functionsWithCycleCount": 160,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5479,6 +5710,24 @@
           "before": "owned paths constructed signed differences even though any non-equal slot is unavailable",
           "after": "direct sequence equality only; success and unavailable paths each -2 cycles",
           "mechanism": "reservation ownership removes the need to classify non-equal sequence distance"
+        }
+      ]
+    },
+    {
+      "id": "round-067",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32PackedMeta / undoMove32PackedMeta",
+          "before": "packed support+ply cross path: 4 loads + 4 stores; separate high playable word",
+          "after": "packed-meta cross path: 3 loads + 3 stores + one packing shift",
+          "mechanism": "pack high playable between low rank and high support when total configured bit budget fits 32"
+        },
+        {
+          "function": "applyMove32PackedMetaKnownCell / undoMove32PackedMetaKnownCell",
+          "before": "known-cell packed support+ply worst L1: apply 26 / undo 25",
+          "after": "packed-meta worst L1: apply 22.5 / undo 21.5",
+          "mechanism": "same high-playable packing composed with caller-known/retained cell profiles"
         }
       ]
     }

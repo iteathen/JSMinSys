@@ -849,3 +849,175 @@ export function undoMove32PackedPlyKnownCell(
   return cell;
 }
 
+export const PACKED_META2_PLAYABLE_LO = 0;
+export const PACKED_META2_META = 1;
+
+export function supportFromPackedMeta32(code, supportShift) {
+  return code >>> supportShift;
+}
+
+export function playableHighFromPackedMeta32(code, rankBits, highMask) {
+  return (code >>> rankBits) & highMask;
+}
+
+export function applyMove32PackedMeta(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const cell = landingCells[index];
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let meta = state[PACKED_META2_META];
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_META2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        meta ^= aboveBit << rankBits;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_META2_PLAYABLE_LO] = playableLo;
+  } else {
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle << rankBits;
+  }
+
+  landingCells[index] = next;
+  state[PACKED_META2_META] = meta + combinedDelta;
+  return cell;
+}
+
+export function undoMove32PackedMeta(
+  state,
+  landingCells,
+  index,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const next = landingCells[index];
+  const cell = next - columns;
+  const bit = 1 << cell;
+  let meta = state[PACKED_META2_META];
+
+  landingCells[index] = cell;
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_META2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        meta ^= aboveBit << rankBits;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_META2_PLAYABLE_LO] = playableLo;
+  } else {
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle << rankBits;
+  }
+
+  state[PACKED_META2_META] = meta - combinedDelta;
+  return cell;
+}
+
+export function applyMove32PackedMetaKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  cellCount,
+  rankBits,
+  combinedDelta,
+) {
+  const bit = 1 << cell;
+  const next = cell + columns;
+  let meta = state[PACKED_META2_META];
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_META2_PLAYABLE_LO];
+
+    if (next < cellCount) {
+      const aboveBit = 1 << next;
+      if (next < 32) playableLo ^= bit | aboveBit;
+      else {
+        playableLo ^= bit;
+        meta ^= aboveBit << rankBits;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_META2_PLAYABLE_LO] = playableLo;
+  } else {
+    let toggle = bit;
+    if (next < cellCount) toggle |= 1 << next;
+    meta ^= toggle << rankBits;
+  }
+
+  landingCells[index] = next;
+  state[PACKED_META2_META] = meta + combinedDelta;
+  return cell;
+}
+
+export function undoMove32PackedMetaKnownCell(
+  state,
+  landingCells,
+  index,
+  cell,
+  columns,
+  lastRowStart,
+  lowLaneAboveLimit,
+  rankBits,
+  combinedDelta,
+) {
+  const bit = 1 << cell;
+  let meta = state[PACKED_META2_META];
+
+  landingCells[index] = cell;
+
+  if (cell < 32) {
+    let playableLo = state[PACKED_META2_PLAYABLE_LO];
+
+    if (cell < lastRowStart) {
+      if (cell < lowLaneAboveLimit) playableLo ^= bit | (bit << columns);
+      else {
+        playableLo ^= bit;
+        meta ^= (bit >>> lowLaneAboveLimit) << rankBits;
+      }
+    } else {
+      playableLo ^= bit;
+    }
+
+    state[PACKED_META2_PLAYABLE_LO] = playableLo;
+  } else {
+    let toggle = bit;
+    if (cell < lastRowStart) toggle |= bit << columns;
+    meta ^= toggle << rankBits;
+  }
+
+  state[PACKED_META2_META] = meta - combinedDelta;
+  return cell;
+}
+

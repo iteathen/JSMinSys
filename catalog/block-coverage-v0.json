@@ -154,9 +154,15 @@
         "undoMove32PackedPly",
         "plyFromPackedRankLow32",
         "supportFromPackedRankLow32",
-        "sideFromPackedRankLow32"
+        "sideFromPackedRankLow32",
+        "supportFromPackedMeta32",
+        "playableHighFromPackedMeta32",
+        "applyMove32PackedMeta",
+        "undoMove32PackedMeta",
+        "applyMove32PackedMetaKnownCell",
+        "undoMove32PackedMetaKnownCell"
       ],
-      "note": "Packed support+ply transition arithmetic is layout-agnostic when combined deltas are prepared consistently. Support-low/rank-high remains compatible; rank-low/support-high is preferred when side-to-move is hot because support and ply extraction stay at one operation while side parity becomes packed&1."
+      "note": "Transition state now has lane-count, rank ownership, support+rank packing, and conditional high-playable packing profiles. When rankBits + highCellCount + supportBits fits one uint32, high playable is packed between rank and support, deleting its separate load/store pair on crossing and high-lane moves. Support remains a one-shift extraction for reflection."
     },
     {
       "id": 9,
