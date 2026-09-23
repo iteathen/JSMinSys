@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "profile": "x86_64-amd-zen3",
   "purpose": "Every admissible emission has a cycle model so function costs can reduce to fixed, ranged, symbolic, or unbounded cycle totals.",
   "modelKinds": {
@@ -427,11 +427,19 @@
       "expr": "ATOMIC_NOTIFY(waiterCount, schedulerState)",
       "note": "Wake cost depends on waiters, runtime path, scheduler and OS.",
       "status": "provisional"
+    },
+    "Uint32Array.construct": {
+      "kind": "expression",
+      "expr": "TYPED_ARRAY_ALLOC_U32(length, typedArrayAllocationPath, pageState, gcState)",
+      "neesOperation": "memory.allocate.typed.u32",
+      "bytesExpression": "4 * length",
+      "note": "Authoritative cost comes from NEES. Includes view/object creation, backing-store allocation, zero initialization/zero-page provisioning, GC/external-memory accounting, and page commitment/fault effects.",
+      "status": "nees-authoritative-symbolic-reference"
     }
   },
   "coverage": {
-    "admissibleOperationCount": 62,
-    "costModelCount": 62,
+    "admissibleOperationCount": 63,
+    "costModelCount": 63,
     "missing": [],
     "complete": true
   },
@@ -439,6 +447,7 @@
   "parentCostAuthority": {
     "repository": "iteathen/NEES",
     "minimumVersion": "Draft 0.5",
-    "rule": "NEES cost profiles override this snapshot"
+    "rule": "NEES cost profiles override this snapshot",
+    "minimumCommit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69"
   }
 }
