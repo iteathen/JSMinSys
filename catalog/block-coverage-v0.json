@@ -37,8 +37,13 @@
         "shl2x32Into",
         "ushr2x32Into",
         "add2x32Into",
-        "sub2x32Into"
-      ]
+        "sub2x32Into",
+        "shl2x32Lt32Into",
+        "shl2x32Ge32Into",
+        "ushr2x32Lt32Into",
+        "ushr2x32Ge32Into"
+      ],
+      "note": "Generic and caller-range-proven cross-word shift profiles coexist; known count ranges avoid runtime dispatch."
     },
     {
       "id": 3,
