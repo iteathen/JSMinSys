@@ -91,9 +91,10 @@ export function rbaTtTake32(t,owner){
   for(;;){const q=t.control[RBA_TT_READY_HEAD];if(q===-1)return -1;
     if(t.readyGeneration[q]!==t.generation[q]||t.execution[q]!==1){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
     intrusivePopHeadStamped32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember);
-    if(t.refs[q]&&!t.exact[q]){t.execution[q]=owner;return q;}t.execution[q]=0;rbaTtRecycle32(t,q);}
+    if(t.refs[q]&&!t.exact[q]){t.execution[q]=owner;return q;}
+    t.execution[q]=0;if(!t.refs[q])rbaTtRecycle32(t,q);}
 }
-export function rbaTtReleaseExecution32(t,q,owner){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.execution[q]=0;rbaTtRecycle32(t,q);return 1;}
+export function rbaTtReleaseExecution32(t,q,owner){if(t.execution[q]!==owner)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.execution[q]=0;if(!t.refs[q])rbaTtRecycle32(t,q);return 1;}
 export function rbaTtSignal32(t,q){if(!t.live[q])return 0;return intrusiveEnqueueOnceTailStamped32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember,t.eventGeneration,t.generation,q);}
 export function rbaTtTakeEvent32(t){const q=t.control[RBA_TT_EVENT_HEAD];if(q===-1)return -1;if(t.eventGeneration[q]!==t.generation[q]||!t.live[q]){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}return intrusivePopHeadStamped32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember);}
 export function rbaTtTighten32(t,q,lo,hi){
@@ -143,5 +144,5 @@ export function rbaTtReconcile32(t,q,minimize){
 }
 export function rbaTtEnqueueDependencies32(t,q){const base=q*t.edgeCapacity,count=t.count[q];let n=0;for(let i=0;i<count;i+=1){const child=t.child[base+i];if(child>=0)n+=rbaTtEnqueue32(t,child);}return n;}
 export function rbaTtSignalParents32(t,q){let n=0;for(let e=t.parentHead[q];e!==-1;e=t.edgeNext[e])n+=rbaTtSignal32(t,(e/t.edgeCapacity)|0);return n;}
-export function rbaTtDetachDependencies32(t,q){const base=q*t.edgeCapacity,n=t.count[q];t.count[q]=0;for(let i=0;i<n;i+=1)releaseEdge(t,base+i);t.phase[q]=4;rbaTtRecycle32(t,q);return n;}
+export function rbaTtDetachDependencies32(t,q){const base=q*t.edgeCapacity,n=t.count[q];t.count[q]=0;for(let i=0;i<n;i+=1)releaseEdge(t,base+i);t.phase[q]=4;if(!t.refs[q])rbaTtRecycle32(t,q);return n;}
 export function rbaTtMarkDone32(t){Atomics.store(t.control,RBA_TT_DONE,1);Atomics.add(t.control,RBA_TT_WAKE,1);Atomics.notify(t.control,RBA_TT_WAKE);return 1;}
