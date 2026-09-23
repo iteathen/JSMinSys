@@ -14,17 +14,28 @@ const cases=[
     [1,3,2,0,4,6,1,0,2,4,5,2,2,3,1,1,1,5,1,3,2,4,6,0,4,4,6,2,0,4,3,3,6,3,5],
   ]},
 ];
-const modes=[['cpc-alpha-beta',RBA_AB_CPC_ONLY],['cpc-four-front-alpha-beta',RBA_AB_CPC_FOUR_FRONT]];
+const modes=[
+  ['cpc-alpha-beta',RBA_AB_CPC_ONLY,true],
+  ['cpc-no-frontier-response-alpha-beta',RBA_AB_CPC_ONLY,false],
+  ['cpc-four-front-alpha-beta',RBA_AB_CPC_FOUR_FRONT,true],
+];
+const WARMUP=3,REPEATS=9;
 const rows=[];
 for(const group of cases){
   const g=prepareConnect4RbaGeometry({columns:group.columns,rows:group.rows});
   for(const moves of group.fixtures){
     const root=connect4RbaFromMoves(moves,{geometry:g});
-    for(const [name,mode] of modes){
-      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
+    for(const [name,mode,cpcFrontierResponse] of modes){
+      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536,cpcFrontierResponse});
       const start=performance.now(),result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected}),elapsedMs=performance.now()-start;
-      rows.push({geometry:`${group.columns}x${group.rows}`,moves:moves.join(''),mode:name,value:result.value,move:result.move,elapsedMs,...result.metrics});
+      for(let i=0;i<WARMUP;i+=1)solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
+      const samples=new Float64Array(REPEATS);
+      for(let i=0;i<REPEATS;i+=1){
+        const t=performance.now();solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});samples[i]=performance.now()-t;
+      }
+      samples.sort();const warmMedianMs=samples[REPEATS>>>1],warmMinMs=samples[0];
+      rows.push({geometry:`${group.columns}x${group.rows}`,moves:moves.join(''),mode:name,value:result.value,move:result.move,elapsedMs,warmMedianMs,warmMinMs,...result.metrics});
     }
   }
 }
-console.log(JSON.stringify({kind:'rba-cpc-alpha-beta-ab-v2',rows},null,2));
+console.log(JSON.stringify({kind:'rba-cpc-alpha-beta-ab-v3',warmup:WARMUP,repeats:REPEATS,rows},null,2));
