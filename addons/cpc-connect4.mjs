@@ -183,12 +183,7 @@ function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
 // are odd, so L is odd and the longer post-channel tail is even; it therefore
 // returns to the ordinary vertical paired response. This is one exact member
 // of the qualified synchronized-channel family, not a search over pairings.
-function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch){
-  // The parity of the odd-column frontier pool equals the parity of the total
-  // remaining cell count, so reject odd pools without constructing channels.
-  const rank=words[offset+g.metaOffset]>>>2;
-  if(((g.cellCount-rank)&1)!==0)return 0;
-
+function synchronizedFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch,maximal){
   // Reuse immediate-threat scratch after tactical closure has consumed it.
   // partner[c] is the synchronized mate column; depthLimit[c] is channel L.
   const partner=scratch.threatColumns,depthLimit=scratch.threatCells;
@@ -198,7 +193,7 @@ function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player
     const remaining=g.rows-words[offset+c];
     if(!(remaining&1))continue;
     if(pending<0){pending=c;continue;}
-    const other=pending,otherRemaining=g.rows-words[offset+other],limit=Math.min(remaining,otherRemaining);
+    const other=pending,otherRemaining=g.rows-words[offset+other],limit=maximal?Math.min(remaining,otherRemaining):1;
     partner[c]=other;partner[other]=c;depthLimit[c]=limit;depthLimit[other]=limit;pending=-1;
   }
   if(pending>=0)return 0;
@@ -233,6 +228,19 @@ function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player
     if(!covered)return 0;
   }
   return 1;
+}
+
+function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch){
+  // The parity of the odd-column frontier pool equals the parity of the total
+  // remaining cell count, so reject odd pools without constructing channels.
+  const rank=words[offset+g.metaOffset]>>>2;
+  if(((g.cellCount-rank)&1)!==0)return 0;
+
+  // L=1 preserves the pooled-frontier certificate and adds fixed first-pair
+  // blockers. A maximal synchronized channel is a different exact policy, not
+  // a replacement; accept either policy so the extension is monotone.
+  if(synchronizedFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch,0))return 1;
+  return synchronizedFrontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch,1);
 }
 
 function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
