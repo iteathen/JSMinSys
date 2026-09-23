@@ -107,7 +107,7 @@ import {
   applyMove32,
   undoMove32,
   STATE_PLY,
-  STATE_SIDE,
+  sideFromPly32,
   STATE_SUPPORT_LO,
   STATE_SUPPORT_HI,
   STATE_PLAYABLE_LO,
@@ -125,28 +125,24 @@ import {
 } from '../src/search32.mjs';
 
 test('apply and undo support state', () => {
-  const state = new Uint32Array(7);
+  const state = new Uint32Array(6);
   const heights = new Uint8Array(7);
-  const moveColumns = new Uint8Array(42);
-  const cellLo = new Uint32Array(42);
-  const cellHi = new Uint32Array(42);
-  for (let cell = 0; cell < 32; cell += 1) cellLo[cell] = (1 << cell) >>> 0;
-  for (let cell = 32; cell < 42; cell += 1) cellHi[cell] = (1 << (cell - 32)) >>> 0;
   for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
 
-  const cell = applyMove32(state, heights, moveColumns, 3);
+  const supportDelta = ((1 << 9) + (1 << 21)) >>> 0;
+  const cell = applyMove32(state, heights, 3, 7, 5, supportDelta);
   assert.equal(cell, 3);
   assert.equal(state[STATE_PLY], 1);
-  assert.equal(state[STATE_SIDE], 1);
+  assert.equal(sideFromPly32(state[STATE_PLY]), 1);
   assert.equal(heights[3], 1);
   assert.equal((state[STATE_SUPPORT_LO] & (1 << 3)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 10)) !== 0, true);
   assert.equal(state[STATE_SUPPORT_CODE], ((1 << 9) + (1 << 21)) >>> 0);
 
-  const undone = undoMove32(state, heights, moveColumns);
+  const undone = undoMove32(state, heights, 3, 7, 5, supportDelta);
   assert.equal(undone, 3);
   assert.equal(state[STATE_PLY], 0);
-  assert.equal(state[STATE_SIDE], 0);
+  assert.equal(sideFromPly32(state[STATE_PLY]), 0);
   assert.equal(heights[3], 0);
   assert.equal(state[STATE_SUPPORT_LO], 0);
   assert.equal(state[STATE_SUPPORT_HI], 0);
@@ -156,10 +152,15 @@ test('apply and undo support state', () => {
 test('mix and reflection blocks', () => {
   assert.equal(mix32(0), 0);
   const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
-  const reflected = reflectPacked3x32(code);
+  const reflected = reflectPacked3x32(code, 7, 21);
   assert.equal((reflected >>> 21), 2);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
+  const code4 = ((2 << 12) | 1 | (2 << 3) | (3 << 6) | (4 << 9)) >>> 0;
+  const reflected4 = reflectPacked3x32(code4, 4, 12);
+  assert.equal(reflected4 >>> 12, 2);
+  assert.equal(reflected4 & 7, 4);
+  assert.equal((reflected4 >>> 9) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
 });
 
@@ -318,22 +319,46 @@ test('typed capacity allocation', () => {
 
 
 test('high-lane apply and undo derives masks without lookup tables', () => {
-  const state = new Uint32Array(7);
+  const state = new Uint32Array(6);
   const heights = new Uint8Array(7);
-  const moveColumns = new Uint8Array(42);
   heights[5] = 4;
   state[STATE_PLAYABLE_HI] = 1 << 1;
 
-  const cell = applyMove32(state, heights, moveColumns, 5);
+  const supportDelta = ((1 << 15) + (1 << 21)) >>> 0;
+  const cell = applyMove32(state, heights, 5, 7, 5, supportDelta);
   assert.equal(cell, 33);
   assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 1)) !== 0, false);
 
-  const undone = undoMove32(state, heights, moveColumns);
+  const undone = undoMove32(state, heights, 5, 7, 5, supportDelta);
   assert.equal(undone, 33);
   assert.equal(heights[5], 4);
   assert.equal((state[STATE_SUPPORT_HI] & (1 << 1)) !== 0, false);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 1)) !== 0, true);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, false);
+});
+
+
+test('runtime-configured 4x4 transition', () => {
+  const state = new Uint32Array(6);
+  const heights = new Uint8Array(4);
+  state[STATE_PLAYABLE_LO] = 0b1111;
+  const column = 2;
+  const supportDelta = ((1 << 6) + (1 << 12)) >>> 0;
+
+  const cell = applyMove32(state, heights, column, 4, 3, supportDelta);
+  assert.equal(cell, 2);
+  assert.equal(heights[column], 1);
+  assert.equal(sideFromPly32(state[STATE_PLY]), 1);
+  assert.equal((state[STATE_SUPPORT_LO] & (1 << 2)) !== 0, true);
+  assert.equal((state[STATE_PLAYABLE_LO] & (1 << 6)) !== 0, true);
+  assert.equal(state[STATE_SUPPORT_CODE], supportDelta);
+
+  const undone = undoMove32(state, heights, column, 4, 3, supportDelta);
+  assert.equal(undone, 2);
+  assert.equal(heights[column], 0);
+  assert.equal(sideFromPly32(state[STATE_PLY]), 0);
+  assert.equal(state[STATE_SUPPORT_LO], 0);
+  assert.equal(state[STATE_SUPPORT_CODE], 0);
 });
