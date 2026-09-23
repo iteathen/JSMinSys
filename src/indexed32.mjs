@@ -7,6 +7,15 @@ export function landingCell32(landingCells, column) {
   return landingCells[column];
 }
 
+export function maskContainsI32(owned, required) {
+  return (owned & required) === required;
+}
+
+export function maskContains2xI32(owned0, owned1, required0, required1) {
+  return (owned0 & required0) === required0
+    && (owned1 & required1) === required1;
+}
+
 export function maskContains32(owned, required) {
   return ((owned & required) ^ required) === 0;
 }
