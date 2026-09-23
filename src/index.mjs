@@ -16,3 +16,4 @@ export * from './basis32.mjs';
 export * from './slotmask32.mjs';
 export * from './intrusive32.mjs';
 export * from './worker32.mjs';
+export * from './span32.mjs';
