@@ -28,9 +28,9 @@ const frontierResponseScan=[];
   }
 }
 const modes=[
-  ['cpc-alpha-beta',RBA_AB_CPC_ONLY,true],
-  ['cpc-no-frontier-response-alpha-beta',RBA_AB_CPC_ONLY,false],
-  ['cpc-four-front-alpha-beta',RBA_AB_CPC_FOUR_FRONT,true],
+  ['cpc-alpha-beta',RBA_AB_CPC_ONLY,false],
+  ['cpc-frontier-response-alpha-beta',RBA_AB_CPC_ONLY,true],
+  ['cpc-four-front-alpha-beta',RBA_AB_CPC_FOUR_FRONT,false],
 ];
 const WARMUP=3,REPEATS=9;
 const rows=[];
