@@ -25,14 +25,16 @@ export function applyMove32(
 
   state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] | bitLo) >>> 0;
   state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] | bitHi) >>> 0;
-  state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] & ~bitLo) >>> 0;
-  state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] & ~bitHi) >>> 0;
+  let playableLo = (state[STATE_PLAYABLE_LO] & ~bitLo) >>> 0;
+  let playableHi = (state[STATE_PLAYABLE_HI] & ~bitHi) >>> 0;
 
   if (row + 1 < rows) {
     const above = cell + columns;
-    state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] | cellLo[above]) >>> 0;
-    state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] | cellHi[above]) >>> 0;
+    playableLo = (playableLo | cellLo[above]) >>> 0;
+    playableHi = (playableHi | cellHi[above]) >>> 0;
   }
+  state[STATE_PLAYABLE_LO] = playableLo;
+  state[STATE_PLAYABLE_HI] = playableHi;
 
   heights[column] = row + 1;
   moveColumns[ply] = column;
@@ -75,13 +77,15 @@ export function undoMove32(
   state[STATE_SUPPORT_LO] = (state[STATE_SUPPORT_LO] & ~bitLo) >>> 0;
   state[STATE_SUPPORT_HI] = (state[STATE_SUPPORT_HI] & ~bitHi) >>> 0;
 
+  let playableLo = state[STATE_PLAYABLE_LO];
+  let playableHi = state[STATE_PLAYABLE_HI];
   if (row + 1 < rows) {
     const above = cell + columns;
-    state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] & ~cellLo[above]) >>> 0;
-    state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] & ~cellHi[above]) >>> 0;
+    playableLo = (playableLo & ~cellLo[above]) >>> 0;
+    playableHi = (playableHi & ~cellHi[above]) >>> 0;
   }
 
-  state[STATE_PLAYABLE_LO] = (state[STATE_PLAYABLE_LO] | bitLo) >>> 0;
-  state[STATE_PLAYABLE_HI] = (state[STATE_PLAYABLE_HI] | bitHi) >>> 0;
+  state[STATE_PLAYABLE_LO] = (playableLo | bitLo) >>> 0;
+  state[STATE_PLAYABLE_HI] = (playableHi | bitHi) >>> 0;
   return cell;
 }
