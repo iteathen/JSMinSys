@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,
+  createRbaTt32,rbaTtAllocate32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,
   rbaTtPublishSurplus32,rbaTtPublishExactOwned32,
   rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
-  rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,
+  rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,rbaTtRelease32,rbaTtRecycle32,
+  rbaTtManagerMergeDuplicate32,
   RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,
   RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
@@ -174,4 +175,25 @@ test('manager event budget bounds one scheduling turn',()=>{
   const processed=rbaBranchManagerStep32(t,()=>{}, {budget:1,manager});
   assert.equal(processed,1);
   assert.equal(t.control[RBA_TT_EVENT_COUNT],2);
+});
+
+
+test('redirect pin keeps canonical q alive until pending duplicate lifetime ends',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const canonical=rbaTtIntern32(t,key(2),0,emptyBasis,0,0);
+  const duplicate=rbaTtAllocate32(t,key(2),0,emptyBasis,0,0,1);
+  const cg=t.generation[canonical],dg=t.generation[duplicate];
+
+  assert.equal(rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets),1);
+  assert.equal(t.redirect[duplicate],canonical);
+  assert.equal(t.refs[canonical],2,'redirect did not pin canonical');
+
+  rbaTtRelease32(t,canonical,cg);
+  assert.equal(t.live[canonical],1,'canonical recycled while redirect still depended on it');
+  assert.equal(t.refs[canonical],1);
+
+  rbaTtRelease32(t,duplicate,dg);
+  rbaTtRecycle32(t,duplicate);
+  assert.equal(t.live[duplicate],0);
+  assert.equal(t.refs[canonical],0,'redirect pin was not released with duplicate row');
 });
