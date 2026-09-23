@@ -1,5 +1,10 @@
-export function landingCell32(heights, column, columns) {
-  return heights[column] * columns + column;
+export function fillLandingCells32(landingCells, columns) {
+  for (let column = 0; column < columns; column += 1) landingCells[column] = column;
+  return columns;
+}
+
+export function landingCell32(landingCells, column) {
+  return landingCells[column];
 }
 
 export function maskContains32(owned, required) {
@@ -38,8 +43,8 @@ export function selectLess32(a, b) {
   return a <= b ? a : b;
 }
 
-export function playableColumn32(heights, column, rows) {
-  return heights[column] < rows;
+export function playableColumn32(landingCells, column, cellCount) {
+  return landingCells[column] < cellCount;
 }
 
 export function fillCoordinateTables32(rowByCell, columnByCell, columns, rows) {
