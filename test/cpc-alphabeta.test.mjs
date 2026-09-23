@@ -132,14 +132,18 @@ test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle
     const oracle=exact(columns,rows,moves,memo);
     const root=connect4RbaFromMoves(moves,{geometry:g});
     const a=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536});
+    const x=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cpcFrontierResponse:true,cacheCapacity:65536});
     const b=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_FOUR_FRONT,boundaryDepth:2,boundaryCapacity:2048,boundaryBudget:2000000,cacheCapacity:65536});
     const ra=solveConnect4RbaAlphaBeta(root,{state:a,reflected:root.reflected});
+    const rx=solveConnect4RbaAlphaBeta(root,{state:x,reflected:root.reflected});
     const rb=solveConnect4RbaAlphaBeta(root,{state:b,reflected:root.reflected});
     assert.equal(ra.value,oracle.value,JSON.stringify({moves,oracle,ra}));
+    assert.equal(rx.value,oracle.value,JSON.stringify({moves,oracle,rx}));
     assert.equal(rb.value,oracle.value,JSON.stringify({moves,oracle,rb}));
     assert.equal(ra.move,oracle.move,JSON.stringify({moves,oracle,ra}));
+    assert.equal(rx.move,oracle.move,JSON.stringify({moves,oracle,rx}));
     assert.equal(rb.move,oracle.move,JSON.stringify({moves,oracle,rb}));
-    assert.equal(ra.metrics.frontCalls,0);
+    assert.equal(ra.metrics.frontCalls,0);assert.equal(rx.metrics.frontCalls,0);
     assert.ok(rb.metrics.frontCalls>0);
   }
 });
@@ -157,11 +161,15 @@ test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>
   const memo=new Map();
   for(const moves of fixtures){
     const oracle=exact(columns,rows,moves,memo),root=connect4RbaFromMoves(moves,{geometry:g});
-    for(const mode of [RBA_AB_CPC_ONLY,RBA_AB_CPC_FOUR_FRONT]){
-      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
+    for(const [mode,cpcFrontierResponse] of [
+      [RBA_AB_CPC_ONLY,false],
+      [RBA_AB_CPC_ONLY,true],
+      [RBA_AB_CPC_FOUR_FRONT,false],
+    ]){
+      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,cpcFrontierResponse,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
       const result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
-      assert.equal(result.value,oracle.value,JSON.stringify({moves,mode,oracle,result}));
-      assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,oracle,result}));
+      assert.equal(result.value,oracle.value,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
+      assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
     }
   }
 });
