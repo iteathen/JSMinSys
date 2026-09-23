@@ -95,7 +95,7 @@ function buildAt(g,a,d,remaining,basis,bi,n){
   return 0;
 }
 export function buildConnect4RbaFourFront(g,a,words,offset,basis,bi,n){
-  a.steps=0;a.error=0;for(let s=0;s<g.columns*4;s+=1)a.count[a.actionBase+s]=0;
+  a.steps=0;a.error=0;
   for(let c=0;c<g.columns;c+=1)a.heights[c]=words[offset+c];a.rootRank=words[offset+g.metaOffset]>>>2;
   return buildAt(g,a,0,a.depth,basis,bi,n);
 }
