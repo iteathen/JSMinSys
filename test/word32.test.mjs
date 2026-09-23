@@ -6,6 +6,9 @@ import {
   bitSet32,
   bitClear32,
   bitToggle32,
+  bitSetI32,
+  bitClearI32,
+  bitToggleI32,
   firstSetBitIndex32,
   popcount32,
   subset32,
@@ -40,6 +43,17 @@ test('popcount32', () => {
   assert.equal(popcount32(0xf0f0f0f0), 16);
 });
 
+test('signed bit-pattern profile', () => {
+  const high = 1 << 31;
+  assert.equal(bitSetI32(0, high), high);
+  assert.equal(bitClearI32(high, high), 0);
+  assert.equal(bitToggleI32(0, high), high);
+  assert.equal(maskContainsI32(high, high), true);
+  assert.equal(maskContainsI32(0, high), false);
+  assert.equal(maskContains2xI32(high, high, high, high), true);
+  assert.equal(clearLowestSetBitI32(high | 1), high);
+});
+
 test('subset32', () => {
   assert.equal(subset32(0b0011, 0b1111), true);
   assert.equal(subset32(0b10000, 0b1111), false);
@@ -67,6 +81,8 @@ test('two-lane wordwise blocks', () => {
 import {
   fillLandingCells32,
   landingCell32,
+  maskContainsI32,
+  maskContains2xI32,
   maskContains32,
   maskContains2x32,
   residualBase32,
@@ -227,6 +243,7 @@ import {
   add2x32Into,
   sub2x32Into,
   firstSetBitIndex2x32,
+  clearLowestSetBitI32,
   clearLowestSetBit32,
   cardinalityClass2x32,
   popcount2x32SparseHigh,
