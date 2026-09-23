@@ -1,5 +1,5 @@
 {
-  "version": "0.13.0",
+  "version": "0.14.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -403,6 +403,25 @@
       }
     },
     {
+      "name": "sideFromPly32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented",
+      "preconditions": [
+        "player 0 starts and turns alternate"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Side to move is derived from ply parity instead of maintained as independent mutable state."
+      }
+    },
+    {
       "name": "applyMove32",
       "source": "src/state32.mjs",
       "block": "apply-undo-transition",
@@ -414,10 +433,9 @@
         "~",
         ">>>",
         "+",
-        "-",
+        "*",
         "<<",
         "<",
-        "<=",
         "="
       ],
       "status": "implemented",
@@ -426,19 +444,20 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 50.5,
-          "max": 60
+          "min": 41.5,
+          "max": 53
         },
         "hotL2Predicted": {
-          "min": 98.5,
-          "max": 116
+          "min": 81.5,
+          "max": 101
         },
-        "expression": "lane-specialized 7x6 transition; low->low 55.5 L1, low->high 60 L1, high-full 50.5 L1, high-row4 55.5 L1",
-        "note": "Only the affected support lane is loaded/stored. Only the affected playable lane is normally touched; the other playable lane is touched only when an above-cell crosses bit 31/32. Cell and support shifts use shifts/adds rather than multiply."
+        "expression": "dynamic geometry, lane-specialized: 5*LOAD + 5*STORE + 19..24 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 26 ALU/control",
+        "note": "Dimensions are runtime-configured but immutable. Caller supplies precomputed supportDelta; move-column history and side-to-move maintenance are eliminated from the primitive."
       },
       "preconditions": [
-        "Connect4 geometry is 7 columns x 6 rows",
-        "support-code rank increment is bit 21",
+        "configured columns and lastRow are immutable for the engine instance",
+        "configured board cell count is <= 64 for this two-lane mask primitive",
+        "supportDelta is precomputed during initialization for the selected column and support encoding",
         "column is already legal"
       ]
     },
@@ -455,9 +474,9 @@
         ">>>",
         "+",
         "-",
+        "*",
         "<<",
         "<",
-        "<=",
         "="
       ],
       "status": "implemented",
@@ -466,19 +485,21 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
         "hotL1Predicted": {
-          "min": 54,
-          "max": 64.5
+          "min": 41.5,
+          "max": 54
         },
         "hotL2Predicted": {
-          "min": 110,
-          "max": 128.5
+          "min": 81.5,
+          "max": 102
         },
-        "expression": "lane-specialized 7x6 undo; high-full 54 L1, low->low/high-row4 60 L1, low->high 64.5 L1",
-        "note": "Only affected lanes are touched. Cell/support coordinate arithmetic is specialized to the fixed Connect4 representation."
+        "expression": "dynamic geometry, lane-specialized: 5*LOAD + 5*STORE + 19..25 ALU/control; cross-lane above case: 6*LOAD + 6*STORE + 27 ALU/control",
+        "note": "Caller-owned undo column removes move-history traffic; side-to-move is derived from ply parity."
       },
       "preconditions": [
-        "Connect4 geometry is 7 columns x 6 rows",
-        "support-code rank increment is bit 21",
+        "configured columns and lastRow are immutable for the engine instance",
+        "configured board cell count is <= 64 for this two-lane mask primitive",
+        "supportDelta is precomputed during initialization for the supplied column",
+        "caller supplies the exact column being undone",
         "at least one move exists"
       ]
     },
@@ -510,19 +531,29 @@
         "&",
         "|",
         "<<",
-        ">>>"
+        ">>>",
+        "-",
+        "+",
+        "+=",
+        "-=",
+        "<",
+        "="
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "fixed",
-        "cycles": 22,
-        "note": "Fixed 7-column bit permutation: eight masks, six shifts, seven ORs, final unsigned coercion."
+        "kind": "expression",
+        "expression": "8 + 10*C",
+        "parameters": {
+          "C": "runtime-configured column count, immutable after initialization"
+        },
+        "note": "Incremental source/target shifts remove per-column multiplication while preserving runtime-configured width. This primitive is specifically for 3-bit-per-column packed support encodings."
       },
       "preconditions": [
-        "seven 3-bit packed columns occupy bits 0..20",
-        "rank/metadata begins at bit 21 and must be preserved"
+        "support encoding uses 3 bits per column",
+        "columns and rankShift are initialization-time configuration invariants",
+        "packed representation fits uint32"
       ]
     },
     {
@@ -1131,11 +1162,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 55,
+    "functionsImplemented": 56,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 55,
+    "functionsWithCycleCount": 56,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1273,7 +1304,7 @@
     },
     {
       "id": "round-005",
-      "status": "implemented-pending-qualification",
+      "status": "partially-superseded-runtime-geometry-correction",
       "changes": [
         {
           "function": "reflectPacked3x32",
@@ -1297,7 +1328,7 @@
     },
     {
       "id": "round-006",
-      "status": "implemented-pending-qualification",
+      "status": "partially-superseded-runtime-geometry-correction",
       "changes": [
         {
           "function": "applyMove32",
@@ -1328,6 +1359,36 @@
           "before": "22 L1 / 54 L2",
           "after": "4-cycle hot-local floor with scalar sources",
           "mechanism": "remove forced source-array loads from primitive API"
+        }
+      ]
+    },
+    {
+      "id": "round-007",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32",
+          "before": "invalid 7x6-only specialization",
+          "after": "41.5-53 L1 / 81.5-101 L2 under runtime-configured geometry",
+          "mechanism": "retain lane specialization, derive side from ply, remove move-history write, consume init-precomputed supportDelta"
+        },
+        {
+          "function": "undoMove32",
+          "before": "invalid 7x6-only specialization",
+          "after": "41.5-54 L1 / 81.5-102 L2 under runtime-configured geometry",
+          "mechanism": "caller supplies undo column; derive side from ply; consume init-precomputed supportDelta"
+        },
+        {
+          "function": "reflectPacked3x32",
+          "before": "invalid 7-column-only 22-cycle specialization",
+          "after": "8 + 10*C cycles",
+          "mechanism": "restore runtime-configured columns and replace per-column multiplies with incremental shifts"
+        },
+        {
+          "function": "sideFromPly32",
+          "before": "maintained state word",
+          "after": "1-cycle derivation",
+          "mechanism": "turn alternation makes side-to-move equal ply parity"
         }
       ]
     }
