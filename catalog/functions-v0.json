@@ -1,5 +1,5 @@
 {
-  "version": "0.68.0",
+  "version": "0.69.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2657,6 +2657,48 @@
       }
     },
     {
+      "name": "maxValueCutsOff32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        ">="
+      ],
+      "status": "implemented-cutoff-first-profile",
+      "preconditions": [
+        "caller enters the child-result update with alpha < beta",
+        "on true, caller cuts off before computing/storing a raised alpha",
+        "on false, caller may then apply raiseLowerBound32(alpha,value)"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Under alpha<beta, max(alpha,value)>=beta iff value>=beta. Cutoff children avoid the 2-cycle lower-bound select."
+      }
+    },
+    {
+      "name": "minValueCutsOff32",
+      "source": "src/search32.mjs",
+      "block": "alpha-beta-bound-update",
+      "primitives": [
+        "<="
+      ],
+      "status": "implemented-cutoff-first-profile",
+      "preconditions": [
+        "caller enters the child-result update with alpha < beta",
+        "on true, caller cuts off before computing/storing a lowered beta",
+        "on false, caller may then apply lowerUpperBound32(beta,value)"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Under alpha<beta, min(beta,value)<=alpha iff value<=alpha. Cutoff children avoid the 2-cycle upper-bound select."
+      }
+    },
+    {
       "name": "argMaxPlayable32",
       "source": "src/search32.mjs",
       "block": "fixed-candidate-selection",
@@ -4013,11 +4055,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 151,
+    "functionsImplemented": 153,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 151,
+    "functionsWithCycleCount": 153,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5328,6 +5370,24 @@
           "before": "support-low/rank-high extraction: 1 cycle each",
           "after": "rank-low/support-high extraction: still 1 cycle each",
           "mechanism": "swap packed field order without increasing support/reflection or rank extraction cost"
+        }
+      ]
+    },
+    {
+      "id": "round-062",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "maxValueCutsOff32",
+          "before": "raiseLowerBound32 + cutoff32 = 3 cycles before recognizing cutoff",
+          "after": "1 cycle on cutoff path; 1+2 = 3 cycles on non-cutoff path",
+          "mechanism": "use alpha<beta invariant to test child value against beta before bound update"
+        },
+        {
+          "function": "minValueCutsOff32",
+          "before": "lowerUpperBound32 + cutoff32 = 3 cycles before recognizing cutoff",
+          "after": "1 cycle on cutoff path; 1+2 = 3 cycles on non-cutoff path",
+          "mechanism": "dual cutoff-first test against alpha"
         }
       ]
     }

@@ -273,8 +273,11 @@
         "negateScore32",
         "raiseLowerBound32",
         "lowerUpperBound32",
-        "cutoff32"
-      ]
+        "cutoff32",
+        "maxValueCutsOff32",
+        "minValueCutsOff32"
+      ],
+      "note": "Alpha-beta primitives include ordinary bound updates/cutoff plus cutoff-first child-result predicates. When the caller already has alpha<beta, testing value>=beta or value<=alpha first removes bound-update work on cutoff paths without increasing non-cutoff serial cost."
     },
     {
       "id": 18,
