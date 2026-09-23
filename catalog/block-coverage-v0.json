@@ -246,9 +246,13 @@
         "normalizeMinimalI32LazyInPlace",
         "normalizeMaximalI32LazyInPlace",
         "normalizeMinimal2xI32LazyInPlace",
-        "normalizeMaximal2xI32LazyInPlace"
+        "normalizeMaximal2xI32LazyInPlace",
+        "normalizeMinimalU32LazyInPlace",
+        "normalizeMaximalU32LazyInPlace",
+        "normalizeMinimal2x32LazyInPlace",
+        "normalizeMaximal2x32LazyInPlace"
       ],
-      "note": "Ordered frontier normalization has lane-selected and lazy-compaction profiles. Nonempty lazy variants seed entry 0 as accepted without loading it, then leave the accepted prefix untouched and begin stores only after the first rejection."
+      "note": "Frontier normalization now has signed/unsigned, one-/two-lane, and seeded lazy-compaction profiles. Signed bit-pattern storage is cheapest when selectable; Uint32 owners retain bit-31 correctness while still avoiding the first candidate and accepted-prefix rewrites."
     },
     {
       "id": 15,

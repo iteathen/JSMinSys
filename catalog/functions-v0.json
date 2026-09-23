@@ -1,5 +1,5 @@
 {
-  "version": "0.75.0",
+  "version": "0.76.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2841,6 +2841,130 @@
       }
     },
     {
+      "name": "normalizeMinimalU32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-one-lane-unsigned-lazy-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nondecreasing set cardinality",
+        "words uses Uint32 bit-pattern storage",
+        "all masks fit one 32-bit lane"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + (N-1)*(L+4) + C*(L+5) + M*(S+1)",
+        "hotL1Predicted": "3 + 8*(N-1) + 9*C + 1.5*M",
+        "hotL2Predicted": "3 + 16*(N-1) + 17*C + 1.5*M",
+        "note": "Seeded/lazy one-lane unsigned minimal normalization. Candidate complement is computed once per inspected entry; M counts accepted entries moved after first rejection."
+      }
+    },
+    {
+      "name": "normalizeMaximalU32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-one-lane-unsigned-lazy-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nonincreasing set cardinality",
+        "words uses Uint32 bit-pattern storage",
+        "all masks fit one 32-bit lane"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + (N-1)*(L+3) + C*(L+6) + M*(S+1)",
+        "hotL1Predicted": "3 + 7*(N-1) + 10*C + 1.5*M",
+        "hotL2Predicted": "3 + 15*(N-1) + 18*C + 1.5*M",
+        "note": "Bit-31-safe unsigned maximal containment uses candidate & ~existing == 0. Signed storage remains one comparison operation cheaper when selectable."
+      }
+    },
+    {
+      "name": "normalizeMinimal2x32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-two-lane-unsigned-lazy-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nondecreasing set cardinality",
+        "lo/hi arrays use Uint32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + (N-1)*(2*L+5) + C*(2*L+8) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 13*(N-1) + 16*C + 2*M",
+        "hotL2Predicted": "3 + 29*(N-1) + 32*C + 2*M",
+        "note": "Unsigned two-lane minimal profile composes first-entry seeding with delayed compaction while retaining per-candidate complements."
+      }
+    },
+    {
+      "name": "normalizeMaximal2x32LazyInPlace",
+      "source": "src/frontier32.mjs",
+      "block": "frontier-normalization",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-two-lane-unsigned-lazy-profile",
+      "preconditions": [
+        "length > 0",
+        "input ordered by nonincreasing set cardinality",
+        "lo/hi arrays use Uint32 bit-pattern lanes"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + (N-1)*(2*L+3) + C*(2*L+10) + M*(2*S+1)",
+        "hotL1Predicted": "3 + 11*(N-1) + 18*C + 2*M",
+        "hotL2Predicted": "3 + 27*(N-1) + 34*C + 2*M",
+        "note": "Unsigned two-lane maximal profile seeds the first entry and only stores accepted entries that move after the first rejection."
+      }
+    },
+    {
       "name": "normalizeMinimalI32LazyInPlace",
       "source": "src/frontier32.mjs",
       "block": "frontier-normalization",
@@ -4535,11 +4659,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 166,
+    "functionsImplemented": 170,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 166,
+    "functionsWithCycleCount": 170,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5976,6 +6100,24 @@
           "before": "known-cell packed support+ply: apply 15.5-17.5 / undo 14.5-16.5 L1",
           "after": "fully packed: apply 12-14 / undo 11-13 L1",
           "mechanism": "compose caller-known/retained cell with single-word playable+rank+support state"
+        }
+      ]
+    },
+    {
+      "id": "round-069",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "normalizeMinimalU32LazyInPlace / normalizeMaximalU32LazyInPlace",
+          "before": "Uint32 one-lane callers had no seeded lazy profile",
+          "after": "one-lane bit-31-safe lazy normalization with no first-entry load or accepted-prefix rewrites",
+          "mechanism": "apply ordered-frontier invariants without requiring Int32 storage"
+        },
+        {
+          "function": "normalizeMinimal2x32LazyInPlace / normalizeMaximal2x32LazyInPlace",
+          "before": "unsigned two-lane normalizers rewrote every accepted entry and processed entry 0",
+          "after": "seeded lazy compaction replaces R stores with moved-entry M stores and N with N-1 candidate iterations",
+          "mechanism": "compose first-entry proof with delayed compaction for Uint32 lanes"
         }
       ]
     }

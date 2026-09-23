@@ -231,6 +231,10 @@ import {
   normalizeMaximalI32LazyInPlace,
   normalizeMinimal2xI32LazyInPlace,
   normalizeMaximal2xI32LazyInPlace,
+  normalizeMinimalU32LazyInPlace,
+  normalizeMaximalU32LazyInPlace,
+  normalizeMinimal2x32LazyInPlace,
+  normalizeMaximal2x32LazyInPlace,
 } from '../src/frontier32.mjs';
 import {
   negateScore32,
@@ -1080,6 +1084,41 @@ test('lazy frontier normalizers seed the first accepted entry', () => {
   assert.equal(normalizeMaximal2xI32LazyInPlace(loMax, hiMax, 1), 1);
   assert.deepEqual([...loMin, ...hiMin], [-2147483648, 1]);
   assert.deepEqual([...loMax, ...hiMax], [-2147483648, 1]);
+});
+
+test('unsigned lazy frontier profiles preserve bit-31 semantics', () => {
+  const oneMinimal = new Uint32Array([0x80000000, 0x80000001, 0x00000002]);
+  assert.equal(normalizeMinimalU32LazyInPlace(oneMinimal, 3), 2);
+  assert.deepEqual([...oneMinimal.slice(0, 2)], [0x80000000, 0x00000002]);
+
+  const oneMaximal = new Uint32Array([0x80000001, 0x80000000, 0x00000001]);
+  assert.equal(normalizeMaximalU32LazyInPlace(oneMaximal, 3), 1);
+  assert.equal(oneMaximal[0], 0x80000001);
+
+  const loMinBase = new Uint32Array([0x80000000, 0x80000001, 0x00000002]);
+  const hiMinBase = new Uint32Array([0, 0, 1]);
+  const loMinLazy = new Uint32Array(loMinBase);
+  const hiMinLazy = new Uint32Array(hiMinBase);
+  const minExpected = normalizeMinimal2x32InPlace(loMinBase, hiMinBase, 3);
+  const minActual = normalizeMinimal2x32LazyInPlace(loMinLazy, hiMinLazy, 3);
+  assert.equal(minActual, minExpected);
+  assert.deepEqual([...loMinLazy.slice(0, minActual)], [...loMinBase.slice(0, minExpected)]);
+  assert.deepEqual([...hiMinLazy.slice(0, minActual)], [...hiMinBase.slice(0, minExpected)]);
+
+  const loMaxBase = new Uint32Array([0x80000003, 0x80000001, 0x00000001]);
+  const hiMaxBase = new Uint32Array([1, 1, 0]);
+  const loMaxLazy = new Uint32Array(loMaxBase);
+  const hiMaxLazy = new Uint32Array(hiMaxBase);
+  const maxExpected = normalizeMaximal2x32InPlace(loMaxBase, hiMaxBase, 3);
+  const maxActual = normalizeMaximal2x32LazyInPlace(loMaxLazy, hiMaxLazy, 3);
+  assert.equal(maxActual, maxExpected);
+  assert.deepEqual([...loMaxLazy.slice(0, maxActual)], [...loMaxBase.slice(0, maxExpected)]);
+  assert.deepEqual([...hiMaxLazy.slice(0, maxActual)], [...hiMaxBase.slice(0, maxExpected)]);
+
+  const noReject = new Uint32Array([1, 2, 4, 8]);
+  const before = new Uint32Array(noReject);
+  assert.equal(normalizeMinimalU32LazyInPlace(noReject, 4), 4);
+  assert.deepEqual(noReject, before);
 });
 
 test('search scalar blocks', () => {

@@ -262,3 +262,127 @@ export function normalizeMaximal2xI32LazyInPlace(lo, hi, length) {
   return retained;
 }
 
+export function normalizeMinimalU32LazyInPlace(words, length) {
+  let index = 1;
+
+  prefix: for (; index < length; index += 1) {
+    const candidate = words[index];
+    const inverse = ~candidate;
+    for (let scan = 0; scan < index; scan += 1) {
+      if ((words[scan] & inverse) === 0) break prefix;
+    }
+  }
+
+  let retained = index;
+  index += 1;
+
+  outer: for (; index < length; index += 1) {
+    const candidate = words[index];
+    const inverse = ~candidate;
+    for (let scan = 0; scan < retained; scan += 1) {
+      if ((words[scan] & inverse) === 0) continue outer;
+    }
+
+    words[retained] = candidate;
+    retained += 1;
+  }
+  return retained;
+}
+
+export function normalizeMaximalU32LazyInPlace(words, length) {
+  let index = 1;
+
+  prefix: for (; index < length; index += 1) {
+    const candidate = words[index];
+    for (let scan = 0; scan < index; scan += 1) {
+      if ((candidate & ~words[scan]) === 0) break prefix;
+    }
+  }
+
+  let retained = index;
+  index += 1;
+
+  outer: for (; index < length; index += 1) {
+    const candidate = words[index];
+    for (let scan = 0; scan < retained; scan += 1) {
+      if ((candidate & ~words[scan]) === 0) continue outer;
+    }
+
+    words[retained] = candidate;
+    retained += 1;
+  }
+  return retained;
+}
+
+export function normalizeMinimal2x32LazyInPlace(lo, hi, length) {
+  let index = 1;
+
+  prefix: for (; index < length; index += 1) {
+    const candidateLo = lo[index];
+    const candidateHi = hi[index];
+    const inverseLo = ~candidateLo;
+    const inverseHi = ~candidateHi;
+
+    for (let scan = 0; scan < index; scan += 1) {
+      if ((lo[scan] & inverseLo) === 0 && (hi[scan] & inverseHi) === 0) {
+        break prefix;
+      }
+    }
+  }
+
+  let retained = index;
+  index += 1;
+
+  outer: for (; index < length; index += 1) {
+    const candidateLo = lo[index];
+    const candidateHi = hi[index];
+    const inverseLo = ~candidateLo;
+    const inverseHi = ~candidateHi;
+
+    for (let scan = 0; scan < retained; scan += 1) {
+      if ((lo[scan] & inverseLo) === 0 && (hi[scan] & inverseHi) === 0) {
+        continue outer;
+      }
+    }
+
+    lo[retained] = candidateLo;
+    hi[retained] = candidateHi;
+    retained += 1;
+  }
+  return retained;
+}
+
+export function normalizeMaximal2x32LazyInPlace(lo, hi, length) {
+  let index = 1;
+
+  prefix: for (; index < length; index += 1) {
+    const candidateLo = lo[index];
+    const candidateHi = hi[index];
+
+    for (let scan = 0; scan < index; scan += 1) {
+      if ((candidateLo & ~lo[scan]) === 0 && (candidateHi & ~hi[scan]) === 0) {
+        break prefix;
+      }
+    }
+  }
+
+  let retained = index;
+  index += 1;
+
+  outer: for (; index < length; index += 1) {
+    const candidateLo = lo[index];
+    const candidateHi = hi[index];
+
+    for (let scan = 0; scan < retained; scan += 1) {
+      if ((candidateLo & ~lo[scan]) === 0 && (candidateHi & ~hi[scan]) === 0) {
+        continue outer;
+      }
+    }
+
+    lo[retained] = candidateLo;
+    hi[retained] = candidateHi;
+    retained += 1;
+  }
+  return retained;
+}
+
