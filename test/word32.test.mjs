@@ -283,6 +283,14 @@ import {
   argMaxPlayableSlot9Nonempty32,
   argMaxPlayableSlot10Nonempty32,
   argMaxPlayableSlot7Nonempty32,
+  argMaxPlayableSlot2ScalarsNonempty32,
+  argMaxPlayableSlot3ScalarsNonempty32,
+  argMaxPlayableSlot4ScalarsNonempty32,
+  argMaxPlayableSlot5ScalarsNonempty32,
+  argMaxPlayableSlot6ScalarsNonempty32,
+  argMaxPlayableSlot8ScalarsNonempty32,
+  argMaxPlayableSlot9ScalarsNonempty32,
+  argMaxPlayableSlot10ScalarsNonempty32,
   argMaxPlayableSlot7ScalarsNonempty32,
   physicalColumnFromMoveSlot32,
 } from '../src/search32.mjs';
@@ -1442,6 +1450,33 @@ test('configured exact selectors cover runtime candidate counts 2 through 10', (
     scores[count - 1] = count;
     assert.equal(select(scores), count - 1);
     assert.equal(select(scores), argMaxPlayableSlot32(scores, count));
+  }
+});
+
+test('scalar-producer selectors cover runtime candidate counts 2 through 10', () => {
+  const profiles = [
+    [2, argMaxPlayableSlot2ScalarsNonempty32],
+    [3, argMaxPlayableSlot3ScalarsNonempty32],
+    [4, argMaxPlayableSlot4ScalarsNonempty32],
+    [5, argMaxPlayableSlot5ScalarsNonempty32],
+    [6, argMaxPlayableSlot6ScalarsNonempty32],
+    [8, argMaxPlayableSlot8ScalarsNonempty32],
+    [9, argMaxPlayableSlot9ScalarsNonempty32],
+    [10, argMaxPlayableSlot10ScalarsNonempty32],
+    [7, argMaxPlayableSlot7ScalarsNonempty32],
+  ].sort((a, b) => a[0] - b[0]);
+
+  for (const [count, select] of profiles) {
+    const scores = Array(count).fill(-2147483648);
+    const winner = Math.floor(count / 2);
+    scores[winner] = 17;
+    if (winner + 1 < count) scores[winner + 1] = 17;
+
+    assert.equal(select(...scores), winner);
+
+    scores.fill(-2147483648);
+    scores[count - 1] = count;
+    assert.equal(select(...scores), count - 1);
   }
 });
 

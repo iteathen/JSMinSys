@@ -1,5 +1,5 @@
 {
-  "version": "0.83.0",
+  "version": "0.84.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3698,6 +3698,156 @@
       }
     },
     {
+      "name": "argMaxPlayableSlot2ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 2 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 2 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 2,
+        "expression": "1*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 2 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot3ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 3 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 3 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 4,
+        "expression": "2*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 3 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot4ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 4 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 4 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 6,
+        "expression": "3*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 4 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot5ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 5 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 5 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 8,
+        "expression": "4*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 5 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot6ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 6 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 6 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 10,
+        "expression": "5*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 6 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
       "name": "argMaxPlayableSlot7ScalarsNonempty32",
       "source": "src/search32.mjs",
       "block": "fixed-candidate-selection",
@@ -3725,6 +3875,96 @@
           "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
         },
         "note": "The seven score loads disappear only when the producer already owns the scores as live scalars. Register-local assignments are modeled as eliminable moves under the current NEES snapshot."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot8ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 8 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 8 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 14,
+        "expression": "7*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 8 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot9ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 9 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 9 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 16,
+        "expression": "8*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 9 scores as live scalars. Initialization selects the exact scalar arity once."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot10ScalarsNonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        ">",
+        "="
+      ],
+      "status": "implemented-scalar-producer-profile",
+      "preconditions": [
+        "configured candidate count is exactly 10 and immutable after initialization",
+        "at least one candidate is playable",
+        "the 10 scores are already live scalar results of unavoidable score production",
+        "the caller does not load an array solely to populate these scalar arguments when claiming the governing-unit reduction",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "score arguments are supplied in configured preferred move-slot order",
+        "ties preserve first/preferred slot because updates use strict greater-than"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotPredicted": 18,
+        "expression": "9*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "All score loads disappear only when the producer already owns these 10 scores as live scalars. Initialization selects the exact scalar arity once."
       }
     },
     {
@@ -5026,11 +5266,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 182,
+    "functionsImplemented": 190,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 182,
+    "functionsWithCycleCount": 190,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6587,6 +6827,18 @@
           "before": "generic argMaxPlayableSlot32 pays pair-loop setup/control for configured widths other than 7",
           "after": "exact-count unrolled selectors cost N*LOAD + (N-1)*COMPARE_SELECT; L1 = 6*N-2",
           "mechanism": "extend initialization-selected exact candidate-count specialization across the full 2..10 configured packed-column range"
+        }
+      ]
+    },
+    {
+      "id": "round-077",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayableSlot{2..6,8..10}ScalarsNonempty32",
+          "before": "only configured count 7 could eliminate score-array loads when producer already owned live scalar scores",
+          "after": "all configured counts 2..10 have scalar selectors costing 2*(N-1) cycles",
+          "mechanism": "extend producer-owned scalar selection across the same runtime-configured width range as exact array selectors"
         }
       ]
     }

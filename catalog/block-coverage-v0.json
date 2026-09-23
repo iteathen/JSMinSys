@@ -290,9 +290,17 @@
         "argMaxPlayableSlot6Nonempty32",
         "argMaxPlayableSlot8Nonempty32",
         "argMaxPlayableSlot9Nonempty32",
-        "argMaxPlayableSlot10Nonempty32"
+        "argMaxPlayableSlot10Nonempty32",
+        "argMaxPlayableSlot2ScalarsNonempty32",
+        "argMaxPlayableSlot3ScalarsNonempty32",
+        "argMaxPlayableSlot4ScalarsNonempty32",
+        "argMaxPlayableSlot5ScalarsNonempty32",
+        "argMaxPlayableSlot6ScalarsNonempty32",
+        "argMaxPlayableSlot8ScalarsNonempty32",
+        "argMaxPlayableSlot9ScalarsNonempty32",
+        "argMaxPlayableSlot10ScalarsNonempty32"
       ],
-      "note": "Candidate selection supports generic dynamic count, exact configured counts 2..10, and a scalar-producer C7 profile. Initialization selects the exact-count array selector once, so runtime-configured widths receive the same no-loop-control treatment as seven columns."
+      "note": "Candidate selection supports generic count, exact array-backed configured counts 2..10, and scalar-producer configured counts 2..10. Scalar profiles apply only when score production already owns values as live scalars; initialization selects arity once with no hot width dispatch."
     },
     {
       "id": 17,

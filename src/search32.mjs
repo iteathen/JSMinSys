@@ -402,6 +402,136 @@ export function physicalColumnFromMoveSlot32(order, slot) {
   return order[slot];
 }
 
+export function argMaxPlayableSlot2ScalarsNonempty32(
+  score0,
+  score1,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestIndex = 1;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot3ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestIndex = 2;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot4ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestIndex = 3;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot5ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+
+  if (score4 > bestScore) {
+    bestIndex = 4;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot6ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+  score5,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+
+  if (score4 > bestScore) {
+    bestScore = score4;
+    bestIndex = 4;
+  }
+
+  if (score5 > bestScore) {
+    bestIndex = 5;
+  }
+
+  return bestIndex;
+}
+
 export function argMaxPlayableSlot7ScalarsNonempty32(
   score0,
   score1,
@@ -435,6 +565,174 @@ export function argMaxPlayableSlot7ScalarsNonempty32(
     bestIndex = 5;
   }
   if (score6 > bestScore) bestIndex = 6;
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot8ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+  score5,
+  score6,
+  score7,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+
+  if (score4 > bestScore) {
+    bestScore = score4;
+    bestIndex = 4;
+  }
+
+  if (score5 > bestScore) {
+    bestScore = score5;
+    bestIndex = 5;
+  }
+
+  if (score6 > bestScore) {
+    bestScore = score6;
+    bestIndex = 6;
+  }
+
+  if (score7 > bestScore) {
+    bestIndex = 7;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot9ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+  score5,
+  score6,
+  score7,
+  score8,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+
+  if (score4 > bestScore) {
+    bestScore = score4;
+    bestIndex = 4;
+  }
+
+  if (score5 > bestScore) {
+    bestScore = score5;
+    bestIndex = 5;
+  }
+
+  if (score6 > bestScore) {
+    bestScore = score6;
+    bestIndex = 6;
+  }
+
+  if (score7 > bestScore) {
+    bestScore = score7;
+    bestIndex = 7;
+  }
+
+  if (score8 > bestScore) {
+    bestIndex = 8;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot10ScalarsNonempty32(
+  score0,
+  score1,
+  score2,
+  score3,
+  score4,
+  score5,
+  score6,
+  score7,
+  score8,
+  score9,
+) {
+  let bestIndex = 0;
+  let bestScore = score0;
+
+  if (score1 > bestScore) {
+    bestScore = score1;
+    bestIndex = 1;
+  }
+
+  if (score2 > bestScore) {
+    bestScore = score2;
+    bestIndex = 2;
+  }
+
+  if (score3 > bestScore) {
+    bestScore = score3;
+    bestIndex = 3;
+  }
+
+  if (score4 > bestScore) {
+    bestScore = score4;
+    bestIndex = 4;
+  }
+
+  if (score5 > bestScore) {
+    bestScore = score5;
+    bestIndex = 5;
+  }
+
+  if (score6 > bestScore) {
+    bestScore = score6;
+    bestIndex = 6;
+  }
+
+  if (score7 > bestScore) {
+    bestScore = score7;
+    bestIndex = 7;
+  }
+
+  if (score8 > bestScore) {
+    bestScore = score8;
+    bestIndex = 8;
+  }
+
+  if (score9 > bestScore) {
+    bestIndex = 9;
+  }
 
   return bestIndex;
 }
