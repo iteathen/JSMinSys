@@ -62,3 +62,26 @@ node --test test/*.test.mjs
 ```
 
 to verify catalog/admission consistency and behavior.
+
+## Cold host add-ons
+
+Host lifecycle that is intentionally outside JMS-RESTRICTED/JMS-SEALED hot
+execution lives under `addons/`. These modules may use Node host mechanisms
+such as worker threads, promises, timers, rich errors, and ordinary objects when
+their cost belongs to cold session setup/teardown rather than the hot kernel.
+
+`addons/branch-manager-host.mjs` provides reusable branch-manager-style thread
+session mechanics:
+
+- file-worker execArgv sanitation;
+- worker/error/exit bookkeeping;
+- fail-closed first-error signaling;
+- deadline and AbortSignal cancellation;
+- stop/wake teardown and terminate+join cleanup;
+- prepared numeric metric views and aggregation; and
+- shared TypedArray byte accounting.
+
+Applications still own root/table initialization, thread roles and workerData,
+domain result/status interpretation, and the external solve API. The cold add-on
+is cataloged separately in `catalog/addons-v0.json`; it does not enlarge the
+sealed hot vocabulary.
