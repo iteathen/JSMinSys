@@ -69,6 +69,7 @@ import {
   landingCell32,
   maskContains32,
   maskContains2x32,
+  residualBase32,
   residualTransition32,
   powerOfTwoIndex32,
   ttProbeIndex32,
@@ -93,7 +94,9 @@ test('indexed and table blocks', () => {
   assert.equal(maskContains2x32(0x80000000, 0x80000000, 0x80000000, 0x80000000), true);
 
   const transitions = new Uint32Array([10, 11, 12, 20, 21, 22]);
-  assert.equal(residualTransition32(transitions, 1, 2, 3), 22);
+  const transitionBase = residualBase32(1, 3);
+  assert.equal(transitionBase, 3);
+  assert.equal(residualTransition32(transitions, transitionBase, 2), 22);
   assert.equal(powerOfTwoIndex32(0x1234, 0xff), 0x34);
 
   const tags = new Uint32Array(8);
@@ -197,11 +200,12 @@ test('search scalar blocks', () => {
   assert.equal(raiseLowerBound32(-1, 1), 1);
   assert.equal(lowerUpperBound32(1, -1), -1);
   assert.equal(cutoff32(1, 1), true);
-  const scores = new Int32Array([0, 1, 2, 8, 4, 3, 2]);
-  const heights = new Uint8Array(7);
-  heights[3] = 6;
+  const scores = new Int32Array([0, 1, 2, -2147483648, 4, 3, 2]);
   const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
-  assert.equal(argMaxPlayable32(scores, heights, order, 7, 6, 0xffffffff), 4);
+  assert.equal(argMaxPlayable32(scores, order, 7, 0xffffffff), 4);
+
+  scores.fill(-2147483648);
+  assert.equal(argMaxPlayable32(scores, order, 7, 0xffffffff), 0xffffffff);
 });
 
 
