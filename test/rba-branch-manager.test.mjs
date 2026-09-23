@@ -5,7 +5,7 @@ import {
   rbaTtPublishSurplus32,rbaTtPublishExactOwned32,
   rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,rbaTtRelease32,rbaTtRecycle32,
-  rbaTtManagerMergeDuplicate32,
+  rbaTtManagerMergeDuplicate32,rbaTtManagerInspectReady32,
   RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,
   RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
@@ -196,4 +196,21 @@ test('redirect pin keeps canonical q alive until pending duplicate lifetime ends
   rbaTtRecycle32(t,duplicate);
   assert.equal(t.live[duplicate],0);
   assert.equal(t.refs[canonical],0,'redirect pin was not released with duplicate row');
+});
+
+test('manager inspects newest surplus before an old head window',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const canonical=rbaTtIntern32(t,key(20),0,emptyBasis,0,0);
+  for(let tag=1;tag<=4;tag++){
+    const q=rbaTtIntern32(t,key(tag),0,emptyBasis,0,0,tag);
+    assert.equal(rbaTtEnqueue32(t,q),1);
+  }
+  const duplicate=rbaTtAllocate32(t,key(20),0,emptyBasis,0,0,99);
+  assert.equal(rbaTtEnqueue32(t,duplicate),1);
+  assert.equal(rbaBranchReadyCount32(t),5);
+
+  assert.equal(rbaTtManagerInspectReady32(t,resetTargets,1),1,
+    'one-item manager window did not inspect newest surplus');
+  assert.equal(t.redirect[duplicate],canonical);
+  assert.equal(rbaBranchReadyCount32(t),4);
 });
