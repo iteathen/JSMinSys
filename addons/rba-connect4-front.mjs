@@ -17,7 +17,7 @@ export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=1000
     up:new Uint32Array((depth+1)*g.maxBasis*g.coordWords),
     seen:new Uint32Array(g.shapeWordCount),temp:new Uint32Array(recordWords),
     image0:new Uint32Array(g.maxBasis*g.coordWords),image1:new Uint32Array(g.maxBasis*g.coordWords),
-    removed:new Int32Array(g.maxBasis),top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
+    top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
     target:new Uint32Array((g.maxBasis+1)*g.coordWords),cover:new Uint32Array((g.maxBasis+1)*g.coordWords),
     next:new Uint32Array(g.maxBasis+1),heights:new Uint32Array(g.columns),rootRank:0};
 }
@@ -60,7 +60,7 @@ function prepareImages(g,a,d,cell,mover,basis,bi){
   let pair=0;while(pair<cn&&a.basis[nextBasis+pair]<g.pairShapeStart)pair+=1;
   let triple=pair;while(triple<cn&&a.basis[nextBasis+triple]<g.tripleShapeStart)triple+=1;
   let quad=triple;while(quad<cn&&a.basis[nextBasis+quad]<g.quadShapeStart)quad+=1;
-  for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.removed[i];a.top1[i]=0;
+  for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.profile.removeCell(g,id,cell);a.top1[i]=0;
     const row=i*cw;for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
     for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
       if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
@@ -106,7 +106,7 @@ function buildAt(g,a,d,remaining,basis,bi,n){
   prepareUpsets(g,a,d,basis,bi,n);const mover=rank&1,childBi=(d+1)*g.maxBasis,childSlot=(d+1)*12;
   for(let h=0;h<4;h+=1){if(mover)universal(a,slot+h);else a.count[slot+h]=0;}
   for(let c=0;c<g.columns;c+=1){const height=a.heights[c];if(height>=g.rows)continue;const cell=height*g.columns+c;
-    const cn=connect4RbaCofactorBasis(g,a.profile,basis,bi,n,cell,a.basis,childBi,a.seen,a.removed);a.heights[c]=height+1;
+    const cn=connect4RbaCofactorBasis(g,a.profile,basis,bi,n,cell,a.basis,childBi,a.seen);a.heights[c]=height+1;
     if(buildAt(g,a,d+1,remaining-1,a.basis,childBi,cn))return a.error;a.heights[c]=height;prepareImages(g,a,d,cell,mover,basis,bi);
     for(let h=0;h<4;h+=1){if(preimage(g,a,d,childSlot+h,slot+4+h,cell,mover,basis,bi))return a.error;
       if(combine(a,slot+h,slot+4+h,slot+8+h,mover))return a.error;swap(a,slot+8+h,slot+h);
