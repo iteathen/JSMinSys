@@ -1,0 +1,68 @@
+{
+  "version": "0.2.0",
+  "status": "runtime-configured-hot-addon",
+  "modules": [
+    "addons/rba-tt32.mjs",
+    "addons/rba-connect4-geometry.mjs",
+    "addons/rba-connect4-coordinate.mjs",
+    "addons/rba-connect4-front.mjs",
+    "addons/rba-connect4-solver.mjs"
+  ],
+  "geometryContract": {
+    "configurationTime": [
+      "columns",
+      "rows",
+      "optional actionOrder"
+    ],
+    "derived": [
+      "cellCount",
+      "winning-line count",
+      "residual-shape vocabulary",
+      "basisCapacity",
+      "coordWords",
+      "keyWords",
+      "edgeCapacity",
+      "reflection",
+      "action priority"
+    ],
+    "supportRepresentation": "one uint32 height per configured column in q identity; no 3-bit row limit",
+    "limits": "Only explicit JS/TypedArray/uint32 profile limits validated during initialization; no proving-workload board dimensions are authoritative."
+  },
+  "ttContract": {
+    "configured": [
+      "keyWords",
+      "basisCapacity",
+      "edgeCapacity"
+    ],
+    "owns": [
+      "exact q identity",
+      "immutable basis payload",
+      "generation/ref/execution lifetime",
+      "lower/upper exact evidence",
+      "dependency topology",
+      "ready/event membership",
+      "recycling"
+    ]
+  },
+  "solverContract": {
+    "owns": [
+      "Connect4 residual cofactor semantics",
+      "support-local basis transport",
+      "reflection canonicalization",
+      "four-front construction/query",
+      "RBA-native child preparation",
+      "generic min/max reconciliation glue"
+    ],
+    "excludes": [
+      "physical-board reconstruction after ingress",
+      "alternate fallback solver",
+      "fixed board dimension",
+      "proof/certificate identity"
+    ]
+  },
+  "qualification": [
+    "4x4 coordinate/front/solve controls",
+    "10x10 coordinate/front controls",
+    "10x10 derived carrier has 10 edges and runtime-computed key/basis widths"
+  ]
+}
