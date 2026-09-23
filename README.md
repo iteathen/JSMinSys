@@ -49,7 +49,7 @@ The current catalog implementation is exported from `src/index.mjs`.
 - 295 catalog functions implemented
 - 30 of 30 research blocks implemented
 - fixed-width relational/RBA-enabling blocks cover 3/6/8-lane sets, six-word skylines, exact wide keys, durable intervals, sparse remaps, and generation-stamped intrusive work lists
-- worker execution substrate covers stamped take/validate/release, fixed dependency publication, retained-child handoff, wake/park, and stop/done polling while leaving the outer loop and evaluator application-owned
+- worker execution substrate covers stamped take/validate/release, runtime-count dependency publication, retained-child handoff, wake/park, and stop/done polling while leaving the outer loop and evaluator application-owned
 - typed capacity allocation admitted and costed through NEES
 - coordinate decode is implemented only as a comparison/reference anti-candidate
 - `Number.isInteger` was reviewed and rejected as unnecessary inside the sealed scope
@@ -97,5 +97,7 @@ The RBA add-on stack derives its carrier from application configuration at initi
 - `addons/rba-connect4-solver.mjs` supplies RBA-native evaluation, publication, reconciliation, and cold ingress.
 
 Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general paths use runtime-sized spans and one height word per configured column, so rows above seven and boards above 64 cells do not require board reconstruction or a new solver representation.
+
+**Initialization-time specialization:** `prepareConnect4RbaExecutionProfile()` selects eligible fast paths once after geometry preparation. Current selectors include dense versus sparse residual transition/subset relations, 3-word versus runtime-span coordinate permutation, and 6-word versus runtime-span skyline/product. The hot path calls the selected implementation without re-testing board width/height. The dense-table choice is additionally bounded by the initialization specialization memory budget.
 
 See `catalog/rba-addon-v0.json`.
