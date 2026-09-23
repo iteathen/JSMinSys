@@ -1,10 +1,12 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "source": "catalog/03-blocks.md",
   "summary": {
     "catalogBlocks": 20,
+    "complete": 20,
     "completeWithoutNewPrimitive": 19,
-    "deferredMissingPrimitive": 1
+    "completeWithAdmittedPrimitive": 1,
+    "deferredMissingPrimitive": 0
   },
   "blocks": [
     {
@@ -198,18 +200,14 @@
     {
       "id": 20,
       "name": "capacity-growth-rehash",
-      "status": "partially-implemented-deferred",
+      "status": "implemented-with-admitted-primitive",
       "functions": [
+        "allocateTypedCapacity",
         "isPowerOfTwo32",
         "nextPowerOfTwo32",
         "rehashOverwrite32"
       ],
-      "deferred": [
-        "allocateTypedCapacity"
-      ],
-      "missingPrimitives": [
-        "new / typed-array construction"
-      ]
+      "admittedPrimitive": "Uint32Array.construct"
     }
   ]
 }
