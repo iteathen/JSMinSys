@@ -14,17 +14,24 @@ export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
   return {mask:capacity-1,keyWords,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
     keys:new Uint32Array(capacity*keyWords)};
 }
-export function probeConnect4RbaExactCache32(cache,words,offset){
-  const keyWords=cache.keyWords,slot=mixSpan32Locator32(words,offset,keyWords)&cache.mask;
+function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot){
   if(cache.stamp[slot]!==cache.epoch)return 0;
-  const base=slot*keyWords;
+  const keyWords=cache.keyWords,base=slot*keyWords;
   for(let w=0;w<keyWords;w+=1)if(cache.keys[base+w]!==words[offset+w])return 0;
   return cache.value[slot];
 }
-export function storeConnect4RbaExactCache32(cache,words,offset,value){
-  const keyWords=cache.keyWords,slot=mixSpan32Locator32(words,offset,keyWords)&cache.mask;
+function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot){
+  const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;return value;
+}
+export function probeConnect4RbaExactCache32(cache,words,offset){
+  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
+  return probeConnect4RbaExactCacheSlot32(cache,words,offset,slot);
+}
+export function storeConnect4RbaExactCache32(cache,words,offset,value){
+  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
+  return storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot);
 }
 function resetConnect4RbaExactCache32(cache){
   let epoch=(cache.epoch+1)>>>0;
@@ -86,7 +93,8 @@ function search(state,depth,alpha,beta){
   // search() is reached only after connect4RbaCofactor returned nonterminal;
   // terminal cofactors are consumed directly by the parent. Root terminal
   // handling remains in solveConnect4RbaAlphaBeta().
-  const cached=probeConnect4RbaExactCache32(state.cache,words,keyOffset);
+  const cache=state.cache,cacheSlot=mixSpan32Locator32(words,keyOffset,cache.keyWords)&cache.mask;
+  const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4Cpc32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
@@ -94,7 +102,7 @@ function search(state,depth,alpha,beta){
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
-    storeConnect4RbaExactCache32(state.cache,words,keyOffset,value);
+    storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
     return absToRelative(value,mover);
   }
   if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
@@ -107,7 +115,7 @@ function search(state,depth,alpha,beta){
     if(f){if(f[0]>semantic[0])semantic[0]=f[0];if(f[1]<semantic[1])semantic[1]=f[1];}
   }
   if(semantic[0]===semantic[1]){
-    const abs=relativeToAbs(semantic[0],mover);storeConnect4RbaExactCache32(state.cache,words,keyOffset,abs);return semantic[0];
+    const abs=relativeToAbs(semantic[0],mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semantic[0];
   }
   if(semantic[0]>=beta){state.cutoffs+=1;return semantic[0];}
   if(semantic[1]<=alpha){state.cutoffs+=1;return semantic[1];}
@@ -164,7 +172,7 @@ function search(state,depth,alpha,beta){
   // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
   // may be valid alpha/beta bounds but are not global q truth.
   if(!cut&&alphaOrig===-2&&betaOrig===2){
-    const abs=relativeToAbs(best,mover);storeConnect4RbaExactCache32(state.cache,words,keyOffset,abs);
+    const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
   }
   return best;
 }
