@@ -236,9 +236,12 @@
       "status": "implemented",
       "functions": [
         "residualBase32",
-        "residualTransition32"
+        "residualTransition32",
+        "fillResidualActionMajor32",
+        "residualActionBase32",
+        "residualTransitionActionMajor32"
       ],
-      "note": "Class-major transition base is computed once per class and reused across actions."
+      "note": "Residual transitions support both class-major and action-major prepared-base layouts. Class-major fits fixed-class/varying-action loops; action-major fits the pinned fixed-action/varying-class residual loop. Initialization transpose cost remains explicit."
     },
     {
       "id": 16,

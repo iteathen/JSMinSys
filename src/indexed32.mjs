@@ -38,6 +38,31 @@ export function residualTransition32(table, classBase, actionIndex) {
   return table[classBase + actionIndex];
 }
 
+export function fillResidualActionMajor32(
+  destination,
+  classMajor,
+  classCount,
+  actionCount,
+) {
+  let out = 0;
+  for (let action = 0; action < actionCount; action += 1) {
+    let sourceIndex = action;
+    for (let classIndex = 0; classIndex < classCount; classIndex += 1) {
+      destination[out] = classMajor[sourceIndex];
+      out += 1;
+      sourceIndex += actionCount;
+    }
+  }
+}
+
+export function residualActionBase32(actionIndex, classCount) {
+  return actionIndex * classCount;
+}
+
+export function residualTransitionActionMajor32(table, actionBase, classIndex) {
+  return table[actionBase + classIndex];
+}
+
 export function powerOfTwoIndex32(hash, capacityMask) {
   return hash & capacityMask;
 }

@@ -92,6 +92,9 @@ import {
   maskContains2x32,
   residualBase32,
   residualTransition32,
+  fillResidualActionMajor32,
+  residualActionBase32,
+  residualTransitionActionMajor32,
   powerOfTwoIndex32,
   ttHit32,
   ttReplace32,
@@ -118,6 +121,14 @@ test('indexed and table blocks', () => {
   const transitionBase = residualBase32(1, 3);
   assert.equal(transitionBase, 3);
   assert.equal(residualTransition32(transitions, transitionBase, 2), 22);
+
+  const actionMajor = new Uint32Array(6);
+  fillResidualActionMajor32(actionMajor, transitions, 2, 3);
+  assert.deepEqual(actionMajor, new Uint32Array([10, 20, 11, 21, 12, 22]));
+  const actionBase = residualActionBase32(2, 2);
+  assert.equal(actionBase, 4);
+  assert.equal(residualTransitionActionMajor32(actionMajor, actionBase, 1), 22);
+
   assert.equal(powerOfTwoIndex32(0x1234, 0xff), 0x34);
 
   const tags = new Uint32Array(8);

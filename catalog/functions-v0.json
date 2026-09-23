@@ -1,5 +1,5 @@
 {
-  "version": "0.64.0",
+  "version": "0.65.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -560,6 +560,81 @@
       "preconditions": [
         "classBase was computed once for the current class/action-count pair"
       ]
+    },
+    {
+      "name": "fillResidualActionMajor32",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented-initialization-layout-profile",
+      "preconditions": [
+        "destination and classMajor each have capacity >= classCount*actionCount",
+        "classMajor is laid out classIndex*actionCount + actionIndex",
+        "called during initialization/layout preparation rather than the hot transition loop"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + A*(3 + C*(5 + LOAD + STORE_COST))",
+        "parameters": {
+          "A": "actionCount",
+          "C": "classCount",
+          "LOAD": "source table load cost during initialization",
+          "STORE_COST": "destination store cost during initialization"
+        },
+        "note": "Initialization transpose writes the action-major table sequentially. Setup cost is explicit and can be avoided when the producer emits action-major layout directly."
+      }
+    },
+    {
+      "name": "residualActionBase32",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "*"
+      ],
+      "status": "implemented-action-major-profile",
+      "preconditions": [
+        "action-major table layout is actionIndex*classCount + classIndex",
+        "actionIndex remains fixed across the consuming inner loop"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 3,
+        "note": "Compute actionIndex*classCount once and reuse while class/term index varies."
+      }
+    },
+    {
+      "name": "residualTransitionActionMajor32",
+      "source": "src/indexed32.mjs",
+      "block": "residual-transition",
+      "primitives": [
+        "LD32",
+        "+"
+      ],
+      "status": "implemented-action-major-profile",
+      "preconditions": [
+        "actionBase was computed once for the fixed action/class-count pair",
+        "table uses action-major layout"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 5,
+        "hotL2Predicted": 13,
+        "hotL3Predicted": 48,
+        "expression": "ADD + LOAD",
+        "note": "Same prepared-base lookup cost as class-major, but the hoisted dimension matches fixed-action/varying-class loops."
+      }
     },
     {
       "name": "powerOfTwoIndex32",
@@ -3786,11 +3861,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 141,
+    "functionsImplemented": 144,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 141,
+    "functionsWithCycleCount": 144,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -5035,6 +5110,24 @@
           "before": "blocking consumer fast path includes reservation ATOMIC_RMW",
           "after": "owned consumer uses caller-local position; per-slot wait/release atomics only",
           "mechanism": "single/external-serialized consumer deletes locked shared reservation increment"
+        }
+      ]
+    },
+    {
+      "id": "round-058",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "residualActionBase32 / residualTransitionActionMajor32",
+          "before": "fixed-action/varying-class direct addressing: T*(IMUL+ADD+LOAD) = 8*T L1",
+          "after": "action-major prepared base: IMUL + T*(ADD+LOAD) = 3 + 5*T L1",
+          "mechanism": "transpose residual table so the dimension fixed by the hot loop owns the hoisted base"
+        },
+        {
+          "function": "fillResidualActionMajor32",
+          "before": "no action-major preparation path",
+          "after": "explicit initialization transpose, or zero transpose cost when producer emits action-major natively",
+          "mechanism": "make layout conversion/setup cost visible"
         }
       ]
     }
