@@ -1,5 +1,5 @@
 {
-  "version": "0.11.0",
+  "version": "0.12.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -494,26 +494,23 @@
       "source": "src/mix32.mjs",
       "block": "canonical-reflection",
       "primitives": [
-        ">>>",
-        "<<",
         "&",
         "|",
-        "*",
-        "-",
-        "+",
-        "<",
-        "="
+        "<<",
+        ">>>"
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "expression",
-        "expression": "columns==7 && rankShift==21 ? 26 : (7..9 + 16*C)",
-        "connect4Cycles": 26,
-        "genericPredictedCycles": "7 + 16*C when columns!=7; 9 + 16*C when columns==7 but rankShift!=21",
-        "note": "Connect4 path replaces the loop with fixed masks/shifts. If inlined with proven constants, the two guard branches may disappear, giving a 22-cycle body."
-      }
+        "kind": "fixed",
+        "cycles": 22,
+        "note": "Fixed 7-column bit permutation: eight masks, six shifts, seven ORs, final unsigned coercion."
+      },
+      "preconditions": [
+        "seven 3-bit packed columns occupy bits 0..20",
+        "rank/metadata begins at bit 21 and must be preserved"
+      ]
     },
     {
       "name": "canonicalMin32",
@@ -543,9 +540,8 @@
         "~",
         "===",
         "!==",
-        "!",
         "<",
-        "+",
+        "+=",
         "="
       ],
       "status": "implemented",
@@ -553,11 +549,14 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "2 + N*(2*L+3) + C1*(2*L+10) + C2*(2*L+10) + K*(2*S+1) + R*(2*S+1)",
-        "note": "N=input entries; C1=first-pass subset checks; C2=filter subset checks; K=retained entries copied during filtering; R=accepted candidates; L=load cycles; S=store cycles.",
-        "hotL1Predicted": "2 + 11*N + 18*C1 + 18*C2 + 2*K + 2*R",
-        "hotL2Predicted": "2 + 27*N + 34*C1 + 34*C2 + 2*K + 2*R"
-      }
+        "expression": "2 + N*(2*L+3) + C*(2*L+10) + R*(2*S+1)",
+        "note": "N=input entries; C=subset checks in the single rejection scan; R=accepted entries; L=load cycles; S=store cycles. Cardinality order proves the second compaction scan unnecessary.",
+        "hotL1Predicted": "2 + 11*N + 18*C + 2*R",
+        "hotL2Predicted": "2 + 27*N + 34*C + 2*R"
+      },
+      "preconditions": [
+        "input ordered by nondecreasing set cardinality"
+      ]
     },
     {
       "name": "normalizeMaximal2x32InPlace",
@@ -570,9 +569,8 @@
         "~",
         "===",
         "!==",
-        "!",
         "<",
-        "+",
+        "+=",
         "="
       ],
       "status": "implemented",
@@ -580,11 +578,14 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "2 + N*(2*L+3) + C1*(2*L+10) + C2*(2*L+10) + K*(2*S+1) + R*(2*S+1)",
-        "note": "N=input entries; C1=first-pass subset checks; C2=filter subset checks; K=retained entries copied during filtering; R=accepted candidates; L=load cycles; S=store cycles.",
-        "hotL1Predicted": "2 + 11*N + 18*C1 + 18*C2 + 2*K + 2*R",
-        "hotL2Predicted": "2 + 27*N + 34*C1 + 34*C2 + 2*K + 2*R"
-      }
+        "expression": "2 + N*(2*L+3) + C*(2*L+10) + R*(2*S+1)",
+        "note": "N=input entries; C=subset checks in the single rejection scan; R=accepted entries; L=load cycles; S=store cycles. Cardinality order proves the second compaction scan unnecessary.",
+        "hotL1Predicted": "2 + 11*N + 18*C + 2*R",
+        "hotL2Predicted": "2 + 27*N + 34*C + 2*R"
+      },
+      "preconditions": [
+        "input ordered by nonincreasing set cardinality"
+      ]
     },
     {
       "name": "negateScore32",
@@ -1254,6 +1255,30 @@
           "before": "76-91 L1 / 164-195 L2",
           "after": "72-85 L1 / 144-157 L2",
           "mechanism": "derive played/above bit masks from cell index instead of loading cellLo/cellHi tables"
+        }
+      ]
+    },
+    {
+      "id": "round-005",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x32",
+          "before": "26 Connect4 function-local cycles",
+          "after": "22 cycles",
+          "mechanism": "remove unused generic geometry fallback; retain only the proving workload's fixed packed layout"
+        },
+        {
+          "function": "normalizeMinimal2x32InPlace",
+          "before": "two subset-scan phases for accepted candidates",
+          "after": "one rejection scan",
+          "mechanism": "exploit nondecreasing-cardinality input invariant"
+        },
+        {
+          "function": "normalizeMaximal2x32InPlace",
+          "before": "two subset-scan phases for accepted candidates",
+          "after": "one rejection scan",
+          "mechanism": "exploit nonincreasing-cardinality input invariant"
         }
       ]
     }
