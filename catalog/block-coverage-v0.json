@@ -1,10 +1,10 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "source": "catalog/03-blocks.md",
   "summary": {
-    "catalogBlocks": 28,
-    "complete": 28,
-    "completeWithoutNewPrimitive": 27,
+    "catalogBlocks": 29,
+    "complete": 29,
+    "completeWithoutNewPrimitive": 28,
     "completeWithAdmittedPrimitive": 1,
     "deferredMissingPrimitive": 0
   },
@@ -502,6 +502,24 @@
         "publishSpan32"
       ],
       "note": "Caller-owned scalar span publication exposes derived immutable payload cost without bulk-copy or allocation machinery."
+    },
+    {
+      "id": 29,
+      "name": "worker-execution-substrate",
+      "status": "implemented",
+      "functions": [
+        "takeOwnedStampedWork32",
+        "validateOwnedWork32",
+        "releaseOwnedWork32",
+        "publishResolvedValue32",
+        "publishDependencies7x32",
+        "retainFirstRunnableDependency7x32",
+        "observeWake32",
+        "signalWake32",
+        "parkOnWake32",
+        "workerStopOrDone32"
+      ],
+      "note": "Generic fixed-storage worker mechanics cover stamped take/validation/release, resolved publication, <=7 dependency publication, retained-child handoff, wake observation/signaling, parking, and stop/done polling. Domain evaluation and the outer loop remain application-owned."
     }
   ]
 }
