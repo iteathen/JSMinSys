@@ -52,9 +52,10 @@ export function queueTryEnqueue32(
     const observed = Atomics.load(sequence, slot);
     const difference = (observed - position) | 0;
     if (difference === 0) {
-      if (Atomics.compareExchange(enqueue, 0, position, position + 1) !== position) continue;
+      const ready = position + 1;
+      if (Atomics.compareExchange(enqueue, 0, position, ready) !== position) continue;
       values[slot] = value;
-      Atomics.store(sequence, slot, position + 1);
+      Atomics.store(sequence, slot, ready);
       return true;
     }
     if (difference < 0) return false;
@@ -85,3 +86,41 @@ export function queueTryDequeue32(
     if (difference < 0) return false;
   }
 }
+
+export function queueTryEnqueueOwnedPosition32(
+  sequence,
+  values,
+  mask,
+  position,
+  value,
+) {
+  const slot = position & mask;
+  const observed = Atomics.load(sequence, slot);
+  const difference = (observed - position) | 0;
+  if (difference !== 0) return false;
+
+  values[slot] = value;
+  Atomics.store(sequence, slot, position + 1);
+  return true;
+}
+
+export function queueTryDequeueOwnedPosition32(
+  sequence,
+  values,
+  mask,
+  capacity,
+  position,
+  out,
+  outIndex,
+) {
+  const slot = position & mask;
+  const ready = position + 1;
+  const observed = Atomics.load(sequence, slot);
+  const difference = (observed - ready) | 0;
+  if (difference !== 0) return false;
+
+  out[outIndex] = values[slot];
+  Atomics.store(sequence, slot, position + capacity);
+  return true;
+}
+

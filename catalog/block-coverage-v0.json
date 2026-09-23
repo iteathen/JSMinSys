@@ -271,9 +271,11 @@
         "queueEnqueue32",
         "queueDequeue32",
         "queueTryEnqueue32",
-        "queueTryDequeue32"
+        "queueTryDequeue32",
+        "queueTryEnqueueOwnedPosition32",
+        "queueTryDequeueOwnedPosition32"
       ],
-      "note": "Sequence atomics publish ordinary payload accesses. Blocking and nonblocking CAS-reservation profiles are separately costed; callers choose according to progress semantics."
+      "note": "Blocking, generic nonblocking, and independently selectable owned-producer/owned-consumer profiles coexist. A sole or externally serialized side keeps its reservation position caller-local, deleting the shared counter load/CAS/retry while per-slot sequence atomics retain payload publication/acquisition. Caller-local position advance remains explicitly accounted."
     },
     {
       "id": 20,

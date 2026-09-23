@@ -678,7 +678,14 @@ import {
   atomicAdd32,
   atomicSub32,
 } from '../src/atomic32.mjs';
-import { queueEnqueue32, queueDequeue32, queueTryEnqueue32, queueTryDequeue32 } from '../src/queue32.mjs';
+import {
+  queueEnqueue32,
+  queueDequeue32,
+  queueTryEnqueue32,
+  queueTryDequeue32,
+  queueTryEnqueueOwnedPosition32,
+  queueTryDequeueOwnedPosition32,
+} from '../src/queue32.mjs';
 
 test('two-lane shifts and arithmetic', () => {
   const dst = new Uint32Array(2);
@@ -870,6 +877,67 @@ test('bounded shared queue blocks without waiting', () => {
   assert.equal(sequence[0], 4);
 });
 
+
+test('caller-owned queue positions remove reservation CAS', () => {
+  const capacity = 4;
+  const mask = capacity - 1;
+  const sequence = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const values = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const out = new Int32Array(1);
+  for (let slot = 0; slot < capacity; slot += 1) sequence[slot] = slot;
+
+  let enqueuePosition = 0;
+  let dequeuePosition = 0;
+
+  assert.equal(
+    queueTryEnqueueOwnedPosition32(sequence, values, mask, enqueuePosition, 77),
+    true,
+  );
+  enqueuePosition = (enqueuePosition + 1) | 0;
+
+  assert.equal(
+    queueTryDequeueOwnedPosition32(
+      sequence,
+      values,
+      mask,
+      capacity,
+      dequeuePosition,
+      out,
+      0,
+    ),
+    true,
+  );
+  dequeuePosition = (dequeuePosition + 1) | 0;
+  assert.equal(out[0], 77);
+  assert.equal(enqueuePosition, 1);
+  assert.equal(dequeuePosition, 1);
+
+  // Position 1 is empty until its matching sequence is published.
+  assert.equal(
+    queueTryDequeueOwnedPosition32(
+      sequence,
+      values,
+      mask,
+      capacity,
+      dequeuePosition,
+      out,
+      0,
+    ),
+    false,
+  );
+
+  for (let value = 0; value < capacity; value += 1) {
+    assert.equal(
+      queueTryEnqueueOwnedPosition32(sequence, values, mask, enqueuePosition, value),
+      true,
+    );
+    enqueuePosition = (enqueuePosition + 1) | 0;
+  }
+  assert.equal(
+    queueTryEnqueueOwnedPosition32(sequence, values, mask, enqueuePosition, 99),
+    false,
+  );
+});
 
 test('typed capacity allocation', () => {
   const storage = allocateTypedCapacity(8);

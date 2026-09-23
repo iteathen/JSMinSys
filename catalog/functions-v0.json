@@ -1,5 +1,5 @@
 {
-  "version": "0.55.0",
+  "version": "0.56.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2422,8 +2422,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "unbounded",
-        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + STORE_COST + ATOMIC_STORE + 7",
-        "note": "No blocking wait or notify. Retry count has no finite bound under contention, so elapsed active cycles remain unbounded in the worst case."
+        "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + STORE_COST + ATOMIC_STORE + 6",
+        "note": "No blocking wait or notify. The successful path computes position+1 once and reuses it for reservation and publication. CAS retry count remains contention-dependent and unbounded."
       }
     },
     {
@@ -2456,6 +2456,73 @@
         "kind": "unbounded",
         "fastPath": "2*ATOMIC_LOAD + ATOMIC_RMW + LOAD + STORE_COST + ATOMIC_STORE + 8",
         "note": "No blocking wait or notify. CAS retry count remains contention-dependent and unbounded in the worst case."
+      }
+    },
+    {
+      "name": "queueTryEnqueueOwnedPosition32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.store",
+        "ST32",
+        "&",
+        "-",
+        "|",
+        "!==",
+        "+"
+      ],
+      "status": "implemented-owned-producer-profile",
+      "preconditions": [
+        "exactly one producer owns this queue position, or producer access is externally serialized",
+        "caller supplies the exact current int32 enqueue position",
+        "caller advances its local enqueue position by one only after a true result",
+        "caller-local position advance is accounted separately and is not hidden by this function ledger",
+        "sequence atomic store publishes the ordinary payload store",
+        "caller accepts false when the owned position's slot is not currently available"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 5",
+        "unavailablePath": "ATOMIC_LOAD + 4",
+        "callerSuccessAdvance": "ADD + int32-coercion",
+        "note": "Eliminates the shared enqueue-counter atomic load, reservation CAS, and retry loop. Per-slot sequence synchronization remains. The caller-owned position advance costs two ALU operations under the current int32 ledger."
+      }
+    },
+    {
+      "name": "queueTryDequeueOwnedPosition32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.store",
+        "LD32",
+        "ST32",
+        "&",
+        "-",
+        "|",
+        "!==",
+        "+"
+      ],
+      "status": "implemented-owned-consumer-profile",
+      "preconditions": [
+        "exactly one consumer owns this queue position, or consumer access is externally serialized",
+        "caller supplies the exact current int32 dequeue position",
+        "caller advances its local dequeue position by one only after a true result",
+        "caller-local position advance is accounted separately and is not hidden by this function ledger",
+        "sequence atomic observation makes the ordinary payload load visible before slot release",
+        "caller accepts false when the owned position's slot is not ready"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 6",
+        "unavailablePath": "ATOMIC_LOAD + 5",
+        "callerSuccessAdvance": "ADD + int32-coercion",
+        "note": "Eliminates the shared dequeue-counter atomic load, reservation CAS, and retry loop. It can be selected independently of producer ownership."
       }
     },
     {
@@ -3045,11 +3112,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 119,
+    "functionsImplemented": 121,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 119,
+    "functionsWithCycleCount": 121,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4132,6 +4199,30 @@
           "before": "two-lane signed store term R*(2S+1)",
           "after": "nonempty lazy profile uses M*(2S+1)",
           "mechanism": "same delayed-compaction structure; no-rejection calls perform zero stores"
+        }
+      ]
+    },
+    {
+      "id": "round-049",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "queueTryEnqueue32",
+          "before": "successful fast path local term +7",
+          "after": "successful fast path local term +6",
+          "mechanism": "compute position+1 once and reuse it for CAS reservation and sequence publication"
+        },
+        {
+          "function": "queueTryEnqueueOwnedPosition32",
+          "before": "generic nonblocking producer: 2 atomic loads + CAS RMW + retry possibility",
+          "after": "owned producer: one sequence atomic load + publication atomic store; no reservation CAS/retry",
+          "mechanism": "single/external-serialized producer keeps reservation position caller-local"
+        },
+        {
+          "function": "queueTryDequeueOwnedPosition32",
+          "before": "generic nonblocking consumer: 2 atomic loads + CAS RMW + retry possibility",
+          "after": "owned consumer: one sequence atomic load + release atomic store; no reservation CAS/retry",
+          "mechanism": "single/external-serialized consumer keeps reservation position caller-local"
         }
       ]
     }
