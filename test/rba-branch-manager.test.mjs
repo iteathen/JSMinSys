@@ -43,7 +43,7 @@ function evaluate(t,q,state){
     state.count=2;
     return 4;
   }
-  return tag===2?3:2;
+  return tag===2?2:3;
 }
 
 function publish(t,q,owner,state,code){
