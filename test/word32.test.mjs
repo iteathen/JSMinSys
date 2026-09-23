@@ -232,6 +232,12 @@ import {
   undoMove32CallerPlyCenterOmitted,
   applyMove32CallerPlyCenterOmittedKnownCell,
   undoMove32CallerPlyCenterOmittedKnownCell,
+  CALLER_META2_PLAYABLE_LO,
+  supportFromCallerPlyMeta32,
+  playableHighFromCallerPlyMeta32,
+  advanceMirroredSupport32,
+  applyMove32CallerPlyMetaKnownCell,
+  undoMove32CallerPlyMetaKnownCell,
   applyMove32CallerPlyCenterOmittedCenter,
   undoMove32CallerPlyCenterOmittedCenter,
   applyMove32CallerPlyCenterOmittedCenterKnownCell,
@@ -1281,6 +1287,113 @@ test('fully packed one-lane state matches separate transition state', () => {
     ),
   );
   assert.equal(knownPacked[PACKED_ALL1_META], 0b111 << rankBits);
+});
+
+test('caller-carried meta restores support/high by recursive ownership', () => {
+  const columns = 7;
+  const cellCount = 42;
+  const highBits = cellCount - 32;
+  const highMask = (1 << highBits) - 1;
+  const column = 3;
+  const supportDelta = 1 << (3 * column);
+  const packedSupportDelta = supportDelta << highBits;
+  const mirroredSupportDelta = 1 << (3 * (columns - 1 - column));
+
+  const base = new Uint32Array(3);
+  const fast = new Uint32Array(1);
+  const landingBase = new Uint32Array(columns);
+  const landingFast = new Uint32Array(columns);
+  landingBase[column] = 31;
+  landingFast[column] = 31;
+  base[CALLER_PLY2_PLAYABLE_LO] = 0x80000000;
+  fast[CALLER_META2_PLAYABLE_LO] = 0x80000000;
+
+  const parentMeta = 0;
+  const parentReflected = 0;
+
+  applyMove32CallerPlyKnownCell(
+    base, landingBase, column, 31, columns, cellCount, supportDelta,
+  );
+  const childMeta = applyMove32CallerPlyMetaKnownCell(
+    fast, landingFast, column, 31, columns, cellCount,
+    parentMeta, packedSupportDelta,
+  );
+  const childReflected = advanceMirroredSupport32(
+    parentReflected, mirroredSupportDelta,
+  );
+
+  assert.equal(fast[CALLER_META2_PLAYABLE_LO], base[CALLER_PLY2_PLAYABLE_LO]);
+  assert.equal(
+    playableHighFromCallerPlyMeta32(childMeta, highMask),
+    base[CALLER_PLY2_PLAYABLE_HI],
+  );
+  assert.equal(
+    supportFromCallerPlyMeta32(childMeta, highBits),
+    base[CALLER_PLY2_SUPPORT_CODE],
+  );
+  assert.equal(
+    childReflected,
+    reflectPacked3Columns6To7(base[CALLER_PLY2_SUPPORT_CODE], 9, 15),
+  );
+
+  applyMove32CallerPlyKnownCell(
+    base, landingBase, column, 38, columns, cellCount, supportDelta,
+  );
+  const grandchildMeta = applyMove32CallerPlyMetaKnownCell(
+    fast, landingFast, column, 38, columns, cellCount,
+    childMeta, packedSupportDelta,
+  );
+  const grandchildReflected = advanceMirroredSupport32(
+    childReflected, mirroredSupportDelta,
+  );
+  assert.equal(
+    playableHighFromCallerPlyMeta32(grandchildMeta, highMask),
+    base[CALLER_PLY2_PLAYABLE_HI],
+  );
+  assert.equal(
+    supportFromCallerPlyMeta32(grandchildMeta, highBits),
+    base[CALLER_PLY2_SUPPORT_CODE],
+  );
+  assert.equal(
+    grandchildReflected,
+    reflectPacked3Columns6To7(base[CALLER_PLY2_SUPPORT_CODE], 9, 15),
+  );
+
+  undoMove32CallerPlyKnownCell(
+    base, landingBase, column, 38, columns, cellCount - columns,
+    32 - columns, supportDelta,
+  );
+  undoMove32CallerPlyMetaKnownCell(
+    fast, landingFast, column, 38, columns, cellCount - columns,
+    32 - columns,
+  );
+  assert.equal(fast[CALLER_META2_PLAYABLE_LO], base[CALLER_PLY2_PLAYABLE_LO]);
+  assert.equal(
+    playableHighFromCallerPlyMeta32(childMeta, highMask),
+    base[CALLER_PLY2_PLAYABLE_HI],
+  );
+  assert.equal(
+    supportFromCallerPlyMeta32(childMeta, highBits),
+    base[CALLER_PLY2_SUPPORT_CODE],
+  );
+
+  undoMove32CallerPlyKnownCell(
+    base, landingBase, column, 31, columns, cellCount - columns,
+    32 - columns, supportDelta,
+  );
+  undoMove32CallerPlyMetaKnownCell(
+    fast, landingFast, column, 31, columns, cellCount - columns,
+    32 - columns,
+  );
+  assert.equal(fast[CALLER_META2_PLAYABLE_LO], base[CALLER_PLY2_PLAYABLE_LO]);
+  assert.equal(parentMeta, 0);
+  assert.equal(parentReflected, 0);
+  assert.deepEqual(landingFast, landingBase);
+
+  assert.equal(
+    advanceMirroredSupport32(0, 1 << 12),
+    reflectPacked3Columns6To7(1 << 6, 9, 15),
+  );
 });
 
 test('mix and reflection blocks', () => {

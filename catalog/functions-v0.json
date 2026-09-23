@@ -1,5 +1,5 @@
 {
-  "version": "0.89.0",
+  "version": "0.90.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3008,6 +3008,180 @@
       }
     },
     {
+      "name": "supportFromCallerPlyMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        ">>>"
+      ],
+      "status": "implemented-caller-carried-meta-profile",
+      "preconditions": [
+        "highBits identifies the packed playable-high width",
+        "configured board cell count is 33..64",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact legal landing cell for this transition index",
+        "caller retains the parent meta scalar across recursive descent rather than mutating it in place",
+        "meta low highBits bits encode playable-high and upper bits encode full packed support",
+        "highBits = cellCount-32 and highBits + 3*columns <= 31",
+        "configured rows <= 7 so legal 3-bit support fields cannot overflow",
+        "packedSupportDelta is the support-only column delta shifted left by highBits and was prepared during initialization",
+        "caller maintains a reflected support scalar with the mirrored support delta for canonicalization",
+        "parent reflected support remains live across recursive descent; undo performs no reflected-support update",
+        "integration must reject this profile if extra live scalars cause register spills that erase the governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Full support is extracted from the already-live caller meta with one shift; no state load."
+      }
+    },
+    {
+      "name": "playableHighFromCallerPlyMeta32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "&"
+      ],
+      "status": "implemented-caller-carried-meta-profile",
+      "preconditions": [
+        "highMask selects exactly cellCount-32 playable-high bits",
+        "configured board cell count is 33..64",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact legal landing cell for this transition index",
+        "caller retains the parent meta scalar across recursive descent rather than mutating it in place",
+        "meta low highBits bits encode playable-high and upper bits encode full packed support",
+        "highBits = cellCount-32 and highBits + 3*columns <= 31",
+        "configured rows <= 7 so legal 3-bit support fields cannot overflow",
+        "packedSupportDelta is the support-only column delta shifted left by highBits and was prepared during initialization",
+        "caller maintains a reflected support scalar with the mirrored support delta for canonicalization",
+        "parent reflected support remains live across recursive descent; undo performs no reflected-support update",
+        "integration must reject this profile if extra live scalars cause register spills that erase the governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "Playable-high is the low field of the caller meta."
+      }
+    },
+    {
+      "name": "advanceMirroredSupport32",
+      "source": "src/state32.mjs",
+      "block": "canonical-reflection",
+      "primitives": [
+        "+"
+      ],
+      "status": "implemented-caller-incremental-reflection-profile",
+      "preconditions": [
+        "reflectedSupport is the exact support-only reflection of the parent",
+        "mirroredSupportDelta is the initialization-precomputed delta for the mirrored physical column",
+        "the legal support update cannot overflow its configured 3-bit field",
+        "parent reflectedSupport remains live across recursive descent"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "One ADD advances the reflected support. Recursive return restores the parent scalar without any undo operation."
+      }
+    },
+    {
+      "name": "applyMove32CallerPlyMetaKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "+",
+        "<<",
+        "<",
+        ">=",
+        "="
+      ],
+      "status": "implemented-caller-carried-meta-known-cell-profile",
+      "preconditions": [
+        "configured board cell count is 33..64",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact legal landing cell for this transition index",
+        "caller retains the parent meta scalar across recursive descent rather than mutating it in place",
+        "meta low highBits bits encode playable-high and upper bits encode full packed support",
+        "highBits = cellCount-32 and highBits + 3*columns <= 31",
+        "configured rows <= 7 so legal 3-bit support fields cannot overflow",
+        "packedSupportDelta is the support-only column delta shifted left by highBits and was prepared during initialization",
+        "caller maintains a reflected support scalar with the mirrored support delta for canonicalization",
+        "parent reflected support remains live across recursive descent; undo performs no reflected-support update",
+        "integration must reject this profile if extra live scalars cause register spills that erase the governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 8.5,
+          "max": 17
+        },
+        "hotL2Predicted": {
+          "min": 8.5,
+          "max": 25
+        },
+        "expression": "low/same: LOAD+2*STORE+8..12 ALU/control; low-to-high: LOAD+2*STORE+12 ALU/control; high lane: STORE_COST+8..12 ALU/control",
+        "callerIdentityAdvance": "advanceMirroredSupport32 = 1 ADD when mirrored delta is already a live/prepared scalar",
+        "note": "Apply returns child meta instead of cell because the known-cell caller already owns the undo token. Support and playable-high never enter mutable state."
+      }
+    },
+    {
+      "name": "undoMove32CallerPlyMetaKnownCell",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "^",
+        "|",
+        "<<",
+        "<",
+        ">=",
+        "="
+      ],
+      "status": "implemented-caller-carried-meta-known-cell-profile",
+      "preconditions": [
+        "caller retains the exact played cell across recursive work",
+        "lastRowStart and lowLaneAboveLimit were prepared during initialization",
+        "configured board cell count is 33..64",
+        "caller already owns ply/rank independently",
+        "caller already holds the exact legal landing cell for this transition index",
+        "caller retains the parent meta scalar across recursive descent rather than mutating it in place",
+        "meta low highBits bits encode playable-high and upper bits encode full packed support",
+        "highBits = cellCount-32 and highBits + 3*columns <= 31",
+        "configured rows <= 7 so legal 3-bit support fields cannot overflow",
+        "packedSupportDelta is the support-only column delta shifted left by highBits and was prepared during initialization",
+        "caller maintains a reflected support scalar with the mirrored support delta for canonicalization",
+        "parent reflected support remains live across recursive descent; undo performs no reflected-support update",
+        "integration must reject this profile if extra live scalars cause register spills that erase the governing-unit reduction"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 2.5,
+          "max": 15
+        },
+        "hotL2Predicted": {
+          "min": 2.5,
+          "max": 23
+        },
+        "expression": "high lane: STORE_COST+2 control; low lane: LOAD+2*STORE+6..10 ALU/control; crossing omits high restoration because parent meta is caller-retained",
+        "note": "Undo restores landing and, only when the played cell was low, playable-low. Support, playable-high, and reflected support revert by lexical parent ownership."
+      }
+    },
+    {
       "name": "mix32",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -5961,11 +6135,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 208,
+    "functionsImplemented": 213,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 208,
+    "functionsWithCycleCount": 213,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -7624,6 +7798,30 @@
           "before": "equality-first ready comparison skipped int32 normalization at rollover",
           "after": "retain equality-first optimization with explicit ready normalization",
           "mechanism": "preserve wrap correctness while keeping signed-difference work off the success path"
+        }
+      ]
+    },
+    {
+      "id": "round-083",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "applyMove32CallerPlyMetaKnownCell",
+          "before": "caller-ply center-omitted known-cell apply: 13-21.5 L1 with high/support meta in mutable state",
+          "after": "caller-carried full-support meta: 8.5-17 L1 function-local, plus one ADD to advance mirrored support",
+          "mechanism": "return child playable-high+support scalar; retain parent scalar on recursion stack instead of loading/storing meta state"
+        },
+        {
+          "function": "undoMove32CallerPlyMetaKnownCell",
+          "before": "caller-ply center-omitted known-cell undo: 12-20.5 L1",
+          "after": "2.5-15 L1",
+          "mechanism": "parent meta/reflection survive descent, so undo never restores support or playable-high"
+        },
+        {
+          "function": "advanceMirroredSupport32",
+          "before": "configured 7-column register reflection: 14 cycles before canonical comparison",
+          "after": "1 ADD per child",
+          "mechanism": "incrementally maintain reflected support with initialization-precomputed mirrored delta"
         }
       ]
     }

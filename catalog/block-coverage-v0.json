@@ -185,9 +185,13 @@
         "applyMove32CallerPlyCenterOmittedCenter",
         "undoMove32CallerPlyCenterOmittedCenter",
         "applyMove32CallerPlyCenterOmittedCenterKnownCell",
-        "undoMove32CallerPlyCenterOmittedCenterKnownCell"
+        "undoMove32CallerPlyCenterOmittedCenterKnownCell",
+        "supportFromCallerPlyMeta32",
+        "playableHighFromCallerPlyMeta32",
+        "applyMove32CallerPlyMetaKnownCell",
+        "undoMove32CallerPlyMetaKnownCell"
       ],
-      "note": "Transition profiles include center-slot specialization for odd-width center-omitted layouts. When the caller already knows it is executing the omitted center slot, zero support arithmetic disappears; low-lane moves that remain low also avoid any meta load/store."
+      "note": "Recursive transition profiles include caller-carried meta when caller-owned ply and high playable + full support fit below the sign bit. Known-cell apply returns the child meta scalar; mutable state retains only playable-low and landing cells, so recursive return restores support/high by parent scalar ownership rather than undo stores."
     },
     {
       "id": 9,
@@ -241,9 +245,10 @@
         "reflectPacked3Columns10",
         "canonicalMin32",
         "fillReflectExactSmall32",
-        "reflectPacked3ExactTable32"
+        "reflectPacked3ExactTable32",
+        "advanceMirroredSupport32"
       ],
-      "note": "Reflection supports register-only configured networks, byte-contribution tables, and exact C3/C4 cache profiles. Exact tables are admitted only where 2 KiB/16 KiB storage can plausibly remain L1-hot and beat the 6/9-cycle register networks; cache and allocation costs stay explicit."
+      "note": "Reflection may be recomputed by configured register/table profiles or maintained incrementally by recursion. A caller-owned reflected-support scalar advances by one mirrored delta ADD and needs no undo; emitted-code qualification must reject the profile if added live scalars spill."
     },
     {
       "id": 13,
