@@ -15,15 +15,15 @@ export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
     keys:new Uint32Array(capacity*keyWords)};
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
+  const keyWords=cache.keyWords,slot=mixSpan32Locator32(words,offset,keyWords)&cache.mask;
   if(cache.stamp[slot]!==cache.epoch)return 0;
-  const base=slot*cache.keyWords;
-  for(let w=0;w<cache.keyWords;w+=1)if(cache.keys[base+w]!==words[offset+w])return 0;
+  const base=slot*keyWords;
+  for(let w=0;w<keyWords;w+=1)if(cache.keys[base+w]!==words[offset+w])return 0;
   return cache.value[slot];
 }
 export function storeConnect4RbaExactCache32(cache,words,offset,value){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
-  publishSpan32(cache.keys,slot*cache.keyWords,words,offset,cache.keyWords);
+  const keyWords=cache.keyWords,slot=mixSpan32Locator32(words,offset,keyWords)&cache.mask;
+  publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;return value;
 }
 function resetConnect4RbaExactCache32(cache){
