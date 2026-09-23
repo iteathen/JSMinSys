@@ -1644,3 +1644,18 @@ export function undoMove1x32CallerPlyMetaKnownCell(
   return cell;
 }
 
+
+export function restoreCallerOwnedResidualFrame32(
+  state,
+  p0Index,
+  p1Index,
+  statusIndex,
+  parentP0Class,
+  parentP1Class,
+  knownParentStatus,
+) {
+  state[p0Index] = parentP0Class;
+  state[p1Index] = parentP1Class;
+  state[statusIndex] = knownParentStatus;
+  return knownParentStatus;
+}

@@ -195,9 +195,10 @@
         "supportFromCallerPlyMeta1x32",
         "playableFromCallerPlyMeta1x32",
         "applyMove1x32CallerPlyMetaKnownCell",
-        "undoMove1x32CallerPlyMetaKnownCell"
+        "undoMove1x32CallerPlyMetaKnownCell",
+        "restoreCallerOwnedResidualFrame32"
       ],
-      "note": "Caller-carried recursive profiles now cover eligible one- and two-lane layouts. When one-lane playable+support fit below the sign bit, known-cell apply uses only scalar ALU plus the landing store and undo is landing-only; parent meta ownership restores all other state."
+      "note": "Apply/undo profiles cover caller-owned ply, known cells, packed/caller-carried support/playable state, and caller-owned residual-frame restoration. When parent residual classes are already live from independent node work and parent status is proved before descent, restoreCallerOwnedResidualFrame32 permits class/status history streams to be omitted; spill/frame traffic must be qualified at the recursive governing unit."
     },
     {
       "id": 9,

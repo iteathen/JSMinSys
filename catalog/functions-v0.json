@@ -1,5 +1,5 @@
 {
-  "version": "0.102.0",
+  "version": "0.103.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -970,6 +970,35 @@
         "kind": "fixed",
         "cycles": 2,
         "note": "Compare + predicted select."
+      }
+    },
+    {
+      "name": "restoreCallerOwnedResidualFrame32",
+      "source": "src/state32.mjs",
+      "block": "apply-undo-transition",
+      "primitives": [
+        "ST32",
+        "="
+      ],
+      "status": "implemented-caller-owned-residual-frame-profile",
+      "preconditions": [
+        "caller already owns the exact parent p0Class and p1Class scalars from independent current-node work and does not reload them solely for undo",
+        "knownParentStatus was proved before descent; in the pinned ordinary IsoMax recursion an expanded parent is STATUS_ONGOING",
+        "the recursion frame naturally preserves parentP0Class, parentP1Class, and knownParentStatus across the child call without allocating an explicit history object/array",
+        "state is the selected typed scalar state representation and p0Index/p1Index/statusIndex are immutable layout indices",
+        "the selected apply path omits per-ply class/status history writes; otherwise this restore helper alone does not justify the claimed governing-unit reduction",
+        "integration must reject the profile if added live-scalar spills or call-frame traffic exceed the deleted history traffic"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3*STORE_COST",
+        "parameters": {
+          "STORE_COST": "NEES store cost for the selected local state ownership/cache scenario"
+        },
+        "hotLocalMinimumCycles": 1.5,
+        "note": "Undo restores two caller-owned parent residual classes plus the already-proved parent status with three state stores and no history loads."
       }
     },
     {
@@ -6744,11 +6773,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 233,
+    "functionsImplemented": 234,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 233,
+    "functionsWithCycleCount": 234,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8611,6 +8640,18 @@
           "before": "height-array path pays LOAD + IMUL + ADD (8 L1 ledger cycles) before transition work",
           "after": "packed support path costs 6 cycles with an already-owned field shift",
           "mechanism": "reuse packed height bits directly; height-array stores on apply/undo can disappear when no other consumer requires the mirror"
+        }
+      ]
+    },
+    {
+      "id": "round-096",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "residual class/status undo ownership",
+          "before": "each child writes p0Class/p1Class/status to per-ply history and undo later reloads the parent triple before restoring state",
+          "after": "eligible recursion keeps parent p0Class/p1Class as caller-owned frame scalars and restores known ongoing parent status directly",
+          "mechanism": "use recursion lifetime as the natural undo owner instead of maintaining duplicate explicit history streams"
         }
       ]
     }

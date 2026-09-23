@@ -406,6 +406,7 @@ import {
   STATE_PLAYABLE_LO,
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
+  restoreCallerOwnedResidualFrame32,
 } from '../src/state32.mjs';
 import { mix32, mix32Medium, mix32Strong, mix2x32PowerOfTwoIndex, mix3x32Locator, mix3x32PowerOfTwoIndex, publish3x32Locator32, xorTupleHash32, xorTupleHash10x32, updateXorTupleHash32, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
@@ -465,6 +466,24 @@ import {
   argMaxPlayableSlot7ScalarsNonempty32,
   physicalColumnFromMoveSlot32,
 } from '../src/search32.mjs';
+
+test('caller-owned residual frame restores parent without history loads', () => {
+  const frame = new Uint32Array([101, 202, 3, 999]);
+  const parentP0 = 17;
+  const parentP1 = 29;
+  const ongoing = 0;
+
+  assert.equal(
+    restoreCallerOwnedResidualFrame32(
+      frame, 0, 1, 2, parentP0, parentP1, ongoing,
+    ),
+    ongoing,
+  );
+  assert.equal(frame[0], parentP0);
+  assert.equal(frame[1], parentP1);
+  assert.equal(frame[2], ongoing);
+  assert.equal(frame[3], 999);
+});
 
 test('apply and undo support state', () => {
   const state = new Uint32Array(4);
