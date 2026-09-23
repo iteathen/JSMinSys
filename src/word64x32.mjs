@@ -99,13 +99,13 @@ export function cardinalityClass2x32(lo, hi) {
 }
 
 export function popcount2x32(lo, hi) {
-  let a = lo >>> 0;
+  let a = lo;
   a = a - ((a >>> 1) & 0x55555555);
   a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
   a = (a + (a >>> 4)) & 0x0f0f0f0f;
   const ac = Math.imul(a, 0x01010101) >>> 24;
 
-  let b = hi >>> 0;
+  let b = hi;
   b = b - ((b >>> 1) & 0x55555555);
   b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
   b = (b + (b >>> 4)) & 0x0f0f0f0f;
