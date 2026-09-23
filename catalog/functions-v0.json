@@ -1,5 +1,5 @@
 {
-  "version": "0.107.0",
+  "version": "0.108.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -6865,17 +6865,758 @@
         "bytesExpression": "4 * length",
         "note": "Dynamic allocation is deliberately parameterized rather than assigned a false scalar. Cost includes typed-array/view creation, backing-store allocation, zero initialization/zero-page provisioning, GC/external-memory accounting, and page commitment/fault effects."
       }
+    },
+    {
+      "name": "equal3x32At",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "===",
+        "&&"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "6*L + 3*CMP + short_circuit_branch_terms",
+        "note": "Three-lane exact equality. L and branch realization remain scenario-dependent; no cross-lane carry or widening."
+      },
+      "preconditions": [
+        "a/aOffset and b/bOffset each address at least three readable 32-bit lanes"
+      ]
+    },
+    {
+      "name": "subset3x32At",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "&",
+        "~",
+        "|",
+        "==="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "6*L + 3*AND + 3*NOT + 2*OR + TESTZ",
+        "note": "Three-lane subset test using lane-local bit relations only."
+      },
+      "preconditions": [
+        "a/aOffset and b/bOffset each address at least three readable 32-bit lanes"
+      ]
+    },
+    {
+      "name": "or3x32Into",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "|"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "6*L + 3*OR + 3*S",
+        "note": "Three-lane wordwise union into caller-owned storage."
+      },
+      "preconditions": [
+        "output span has three writable lanes",
+        "output may alias an input only when each destination lane is safe for forward scalar stores"
+      ]
+    },
+    {
+      "name": "and3x32Into",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "6*L + 3*AND + 3*S",
+        "note": "Three-lane wordwise intersection into caller-owned storage."
+      },
+      "preconditions": [
+        "output span has three writable lanes"
+      ]
+    },
+    {
+      "name": "andNot3x32Into",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "6*L + 3*NOT + 3*AND + 3*S",
+        "note": "Three-lane A AND NOT B transform without wider integer semantics."
+      },
+      "preconditions": [
+        "output span has three writable lanes"
+      ]
+    },
+    {
+      "name": "equal6x32At",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "===",
+        "&&"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "12*L + 6*CMP + short_circuit_branch_terms",
+        "note": "Six-lane exact equality for fixed relational records."
+      },
+      "preconditions": [
+        "each input span has six readable lanes"
+      ]
+    },
+    {
+      "name": "subset6x32At",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "&",
+        "~",
+        "|",
+        "==="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "12*L + 6*AND + 6*NOT + 5*OR + TESTZ",
+        "note": "Six-lane subset/dominance test for fixed relational records."
+      },
+      "preconditions": [
+        "each input span has six readable lanes"
+      ]
+    },
+    {
+      "name": "or6x32Into",
+      "source": "src/fixedset32.mjs",
+      "block": "fixed-lane-relational-set",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "|"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "12*L + 6*OR + 6*S",
+        "note": "Six-lane wordwise join into caller-owned storage."
+      },
+      "preconditions": [
+        "output span has six writable lanes"
+      ]
+    },
+    {
+      "name": "equal8x32At",
+      "source": "src/fixedset32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "===",
+        "&&"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "16*L + 8*CMP + short_circuit_branch_terms",
+        "note": "Exact fixed-width eight-lane identity comparison; intended for authoritative keys rather than hash-only identity."
+      },
+      "preconditions": [
+        "each input span has eight readable lanes"
+      ]
+    },
+    {
+      "name": "insertMinimal6x32InPlace",
+      "source": "src/relational32.mjs",
+      "block": "multiword-antichain-skyline",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "===",
+        "<",
+        "+=",
+        "-=",
+        "*",
+        "+",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "dominance_scan(length,6,L) + removal_scan(length,6,L,S) + admission_copy(6,S)",
+        "note": "Streaming subset-minimal skyline insertion. Cost is data-dependent on retained length, rejection point and number of removed generators."
+      },
+      "preconditions": [
+        "records are six consecutive lanes",
+        "length <= capacity",
+        "candidate span does not alias a retained record that may be swap-removed"
+      ]
+    },
+    {
+      "name": "productJoinMinimal6x32Into",
+      "source": "src/relational32.mjs",
+      "block": "multiword-antichain-skyline",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "~",
+        "|",
+        "===",
+        "<",
+        "+=",
+        "-=",
+        "*",
+        "+",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "LEFT*RIGHT*(6*(2*L+OR+S) + skyline_cost(current_length))",
+        "note": "Streams pairwise six-lane OR joins directly through local/global minimal absorption; no Cartesian-product array is materialized."
+      },
+      "preconditions": [
+        "scratch has six writable lanes",
+        "out capacity is fixed and caller-owned",
+        "left/right records are immutable during the call",
+        "output does not destructively overlap unread left/right records"
+      ]
+    },
+    {
+      "name": "mix8x32Locator32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "^",
+        ">>>",
+        "Math.imul",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "8*(L + 2*XOR + SHR + IMUL) + loop_control",
+        "note": "Eight-word chained locator matching the current exact-key producer pattern; locator remains non-authoritative."
+      },
+      "preconditions": [
+        "words[offset..offset+7] is the complete fixed identity span"
+      ]
+    },
+    {
+      "name": "probe8x32IdSlot32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "===",
+        "&&",
+        "<",
+        "+=",
+        "+",
+        "&",
+        "*",
+        "~",
+        "=",
+        "BRANCH"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "PROBES*(slot_load + occupancy_test + hit_candidate*(up_to_8*(key_load+compare)) + probe_advance)",
+        "note": "Open-addressed exact eight-word probe over dense IDs. Every key word participates in equality; empty returns complemented slot."
+      },
+      "preconditions": [
+        "capacityMask is power-of-two capacity minus one",
+        "hashSlots empty entries equal emptyId",
+        "stored ids address complete eight-word rows"
+      ]
+    },
+    {
+      "name": "publish8x32IdSlot32",
+      "source": "src/widekey32.mjs",
+      "block": "wide-exact-key-tt",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "*",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "8*(L+S) + slot_store + loop_control",
+        "note": "Publishes a complete eight-word key then its dense-id hash slot; caller owns synchronization/publication ordering."
+      },
+      "preconditions": [
+        "slot is reserved for this id",
+        "words has eight writable lanes at id*8",
+        "hashSlots[slot] publication ordering is externally owned"
+      ]
+    },
+    {
+      "name": "publishSpan32",
+      "source": "src/widekey32.mjs",
+      "block": "immutable-span-publication",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "+=",
+        "<",
+        "+"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "COUNT*(L+S+loop_control)",
+        "note": "Scalar publication of an immutable derived span into caller-owned storage; no allocation or bulk-copy builtin."
+      },
+      "preconditions": [
+        "target/source ranges are valid",
+        "caller owns lifetime and any synchronization",
+        "overlap, if any, is safe for forward scalar copying"
+      ]
+    },
+    {
+      "name": "tightenInterval32",
+      "source": "src/interval32.mjs",
+      "block": "exact-interval-evidence",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "<",
+        ">",
+        "===",
+        "&&",
+        "?:",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L + bound_select_tests + conflict_test + change_test + changed*(2*S)",
+        "note": "Intersects durable lower/upper evidence monotonically. Conflict returns -1 without weakening stored evidence; exact tightening is distinguished."
+      },
+      "preconditions": [
+        "stored bounds and incoming bounds use the same ordered value domain",
+        "stored lower <= stored upper before entry"
+      ]
+    },
+    {
+      "name": "reduceMaxIntervals7x32Into",
+      "source": "src/interval32.mjs",
+      "block": "exact-interval-evidence",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">",
+        "+=",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L + (COUNT-1)*(2*L+2*CMP+loop_control) + 2*S",
+        "note": "Fixed-degree up-to-seven componentwise max reduction for exact action intervals."
+      },
+      "preconditions": [
+        "1 <= count <= 7",
+        "each input interval is valid"
+      ]
+    },
+    {
+      "name": "reduceMinIntervals7x32Into",
+      "source": "src/interval32.mjs",
+      "block": "exact-interval-evidence",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "<",
+        "+=",
+        "+",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L + (COUNT-1)*(2*L+2*CMP+loop_control) + 2*S",
+        "note": "Fixed-degree up-to-seven componentwise min reduction for exact action intervals."
+      },
+      "preconditions": [
+        "1 <= count <= 7",
+        "each input interval is valid"
+      ]
+    },
+    {
+      "name": "emitSortedSetBits32",
+      "source": "src/basis32.mjs",
+      "block": "sparse-basis-transform-remap",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "Math.clz32",
+        "&",
+        "-",
+        "*",
+        "+",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(L+word_loop) + SET_BITS*(CLZ + bit_clear + S + index_arithmetic)",
+        "note": "Enumerates a caller-owned bitset in ascending bit-index order without allocation."
+      },
+      "preconditions": [
+        "out has capacity for every set bit represented by seen[0..wordCount)"
+      ]
+    },
+    {
+      "name": "transformDedupSortedActionMajor32",
+      "source": "src/basis32.mjs",
+      "block": "sparse-basis-transform-remap",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "!==",
+        ">>>",
+        "&",
+        "|=",
+        "<<",
+        "Math.clz32",
+        "-",
+        "*",
+        "+",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "SEEN_WORDS*S + COUNT*(2*L+map_index+sentinel_test+bit_set) + SEEN_WORDS*L + UNIQUE*(CLZ+bit_clear+S+index_arithmetic)",
+        "note": "Prepared action-major ID mapping fused with deduplication and sorted emission through caller-owned bitset scratch."
+      },
+      "preconditions": [
+        "table[actionBase+sourceId] is either a valid mapped nonnegative id or missingValue",
+        "seen spans the full mapped-id domain",
+        "out capacity >= number of unique mapped ids"
+      ]
+    },
+    {
+      "name": "permuteBits3x32Into",
+      "source": "src/basis32.mjs",
+      "block": "sparse-basis-transform-remap",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "&",
+        "<<",
+        ">>>",
+        "|=",
+        "+=",
+        "+",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3*S + COUNT*(source_test_load+map_load_when_set+index_arithmetic+conditional_destination_update)",
+        "note": "Permutes a packed three-lane bit coordinate through a prepared local-index map."
+      },
+      "preconditions": [
+        "count <= 96",
+        "every map entry addressed by an active source bit is in [0,95]",
+        "output does not overlap source"
+      ]
+    },
+    {
+      "name": "slotMask7Contains32",
+      "source": "src/slotmask32.mjs",
+      "block": "fixed-slot-mask",
+      "primitives": [
+        "&",
+        "<<",
+        "!=="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "SHIFT + AND + TESTNZ",
+        "note": "Tests membership in a caller-validated seven-slot mask."
+      },
+      "preconditions": [
+        "slot is in [0,6]"
+      ]
+    },
+    {
+      "name": "slotMask7Add32",
+      "source": "src/slotmask32.mjs",
+      "block": "fixed-slot-mask",
+      "primitives": [
+        "|",
+        "<<",
+        "&"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "SHIFT + OR + AND",
+        "note": "Adds one slot while explicitly retaining only seven mask bits."
+      },
+      "preconditions": [
+        "slot is in [0,6]"
+      ]
+    },
+    {
+      "name": "slotMask7Remove32",
+      "source": "src/slotmask32.mjs",
+      "block": "fixed-slot-mask",
+      "primitives": [
+        "&",
+        "~",
+        "<<"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "SHIFT + NOT + 2*AND",
+        "note": "Removes one slot while explicitly retaining only seven mask bits."
+      },
+      "preconditions": [
+        "slot is in [0,6]"
+      ]
+    },
+    {
+      "name": "slotMask7First32",
+      "source": "src/slotmask32.mjs",
+      "block": "fixed-slot-mask",
+      "primitives": [
+        "Math.clz32",
+        "&",
+        "-"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*AND + NEGATE + CLZ + SUB",
+        "note": "Returns the least set slot; zero naturally returns -1 through clz32 semantics."
+      },
+      "preconditions": [
+        "only low seven mask bits are semantically live"
+      ]
+    },
+    {
+      "name": "intrusiveEnqueueTailStamped32",
+      "source": "src/intrusive32.mjs",
+      "block": "intrusive-generation-worklist",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "===",
+        "+=",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "control_and_item_loads + generation_load + link/member/stamp_stores + count_update",
+        "note": "Serialized intrusive tail insertion stamps current generation into queue membership. No atomics are hidden inside the block."
+      },
+      "preconditions": [
+        "caller exclusively owns or externally serializes the list",
+        "item is not already a member",
+        "control indices identify head/tail/count"
+      ]
+    },
+    {
+      "name": "intrusiveEnqueueOnceTailStamped32",
+      "source": "src/intrusive32.mjs",
+      "block": "intrusive-generation-worklist",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "!",
+        "===",
+        "+=",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "member_load + member_hit_return_or_enqueue_cost",
+        "note": "Coalescing serialized tail insertion: existing membership performs no relink; new membership is generation-stamped."
+      },
+      "preconditions": [
+        "caller exclusively owns or externally serializes the list",
+        "control indices identify head/tail/count"
+      ]
+    },
+    {
+      "name": "intrusiveRemove32",
+      "source": "src/intrusive32.mjs",
+      "block": "intrusive-generation-worklist",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "!",
+        "===",
+        "-=",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "member_load + linked_neighbor_loads + boundary_tests + link/member_stores + count_update",
+        "note": "O(1) arbitrary intrusive removal under external serialization."
+      },
+      "preconditions": [
+        "caller exclusively owns or externally serializes the list",
+        "next/prev/member represent one consistent list"
+      ]
+    },
+    {
+      "name": "intrusivePopHeadStamped32",
+      "source": "src/intrusive32.mjs",
+      "block": "intrusive-generation-worklist",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "===",
+        "-=",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "head_load + empty_test + successor_load + boundary_test + link/member_stores + count_update",
+        "note": "Serialized O(1) head pop. Generation stamp remains available to the caller for validation after removal."
+      },
+      "preconditions": [
+        "caller exclusively owns or externally serializes the list",
+        "next/prev/member represent one consistent list"
+      ]
+    },
+    {
+      "name": "intrusiveTicketValid32",
+      "source": "src/intrusive32.mjs",
+      "block": "intrusive-generation-worklist",
+      "primitives": [
+        "LD32",
+        "==="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "2*L + CMP",
+        "note": "Compares captured membership generation with current item generation."
+      },
+      "preconditions": [
+        "item indexes both generation arrays"
+      ]
     }
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 237,
-    "catalogBlocks": 20,
-    "blocksCompleteWithoutNewPrimitive": 19,
+    "functionsImplemented": 267,
+    "catalogBlocks": 28,
+    "blocksCompleteWithoutNewPrimitive": 27,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 237,
+    "functionsWithCycleCount": 267,
     "functionsMissingCycleCount": 0,
-    "blocksComplete": 20,
+    "blocksComplete": 28,
     "blocksCompletedWithAdmittedPrimitive": 1
   },
   "decisions": [
@@ -8808,6 +9549,36 @@
           "before": "64K prefix produced a large measured workload win relative to the earlier 4K policy",
           "after": "classified as initialization/configuration selection over the existing residualTransition32 lookup rather than a missing hot primitive",
           "mechanism": "keep capacity/memory tradeoff visible at the application governing unit instead of hard-coding a workload-specific size into JSMinSys"
+        }
+      ]
+    },
+    {
+      "id": "round-101",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "fixed-width relational carriers",
+          "before": "applications hand-compose recurring three-, six-, and eight-word relations",
+          "after": "specialized lane-exact set/equality/join profiles are exported",
+          "mechanism": "admit the recurring fixed widths without introducing arbitrary-width machinery"
+        },
+        {
+          "function": "multiword antichain algebra",
+          "before": "applications hand-code six-word skyline insertion and streamed products",
+          "after": "fixed six-word minimal absorption and streamed join-product blocks are exported",
+          "mechanism": "retain caller-owned fixed arenas while deleting duplicated dominance machinery"
+        },
+        {
+          "function": "wide exact identity and durable bounds",
+          "before": "eight-word exact probe/publication and semantic interval intersection are application-local",
+          "after": "wide-key and exact-interval blocks are exported",
+          "mechanism": "separate locator from exact identity and alpha/beta windows from durable evidence"
+        },
+        {
+          "function": "basis/remap and intrusive scheduling substrate",
+          "before": "applications repeat sparse transform/dedup/permutation and generation-stamped list logic",
+          "after": "prepared action-major transforms, packed remap, and serialized intrusive stamped work-list blocks are exported",
+          "mechanism": "provide low-level reusable structure without importing Connect4 semantics"
         }
       ]
     }
