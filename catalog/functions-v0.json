@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -188,10 +188,9 @@
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "range",
-        "minCycles": 2,
-        "maxCycles": 6,
-        "note": "Predicted-path range: zero path is compare+branch; nonzero path adds negate, AND, CLZ and subtraction. Add 15-19 cycles for a branch misprediction."
+        "kind": "fixed",
+        "cycles": 4,
+        "note": "Branchless zero/nonzero handling: zero naturally maps to -1 through clz32(0)=32."
       }
     },
     {
@@ -211,8 +210,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 15,
-        "note": "Static serial count for the current SWAR implementation: shifts/masks/adds/subtract plus one IMUL."
+        "cycles": 14,
+        "note": "SWAR popcount with redundant input uint32 coercion removed under the uint32 input invariant."
       }
     },
     {
@@ -267,6 +266,7 @@
       "block": "winning-line-test",
       "primitives": [
         "&",
+        "^",
         "==="
       ],
       "status": "implemented",
@@ -274,8 +274,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 2,
-        "note": "AND + equality test."
+        "cycles": 3,
+        "note": "Correct unsigned containment including bit 31: AND + XOR + zero test."
       }
     },
     {
@@ -284,6 +284,7 @@
       "block": "winning-line-test",
       "primitives": [
         "&",
+        "^",
         "===",
         "&&"
       ],
@@ -292,9 +293,9 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "range",
-        "minCycles": 3,
-        "maxCycles": 5,
-        "note": "First lane AND/test plus predicted short-circuit; second lane adds AND/test when evaluated."
+        "minCycles": 4,
+        "maxCycles": 7,
+        "note": "Correct unsigned two-lane containment with predicted short-circuit; bit-31-safe."
       }
     },
     {
@@ -492,8 +493,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 14,
-        "note": "OR/coercion + 3 shift/XOR stages + 2 IMUL + final uint32 coercion."
+        "cycles": 13,
+        "note": "Initial signed coercion removed; first shift/XOR already performs the required 32-bit coercion. Final unsigned coercion retained."
       }
     },
     {
@@ -516,12 +517,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "5 + 16*C",
-        "note": "C is columns. Includes loop control under predicted branches; for Connect4 C=7 => 117 cycles.",
-        "parameters": {
-          "C": "column count"
-        },
-        "connect4Cycles": 117
+        "expression": "columns==7 && rankShift==21 ? 26 : (7..9 + 16*C)",
+        "connect4Cycles": 26,
+        "genericPredictedCycles": "7 + 16*C when columns!=7; 9 + 16*C when columns==7 but rankShift!=21",
+        "note": "Connect4 path replaces the loop with fixed masks/shifts. If inlined with proven constants, the two guard branches may disappear, giving a 22-cycle body."
       }
     },
     {
@@ -985,8 +984,8 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "fixed",
-        "cycles": 31,
-        "note": "Two SWAR popcounts plus final add."
+        "cycles": 29,
+        "note": "Two SWAR popcounts with redundant lane input coercions removed, plus final add."
       }
     },
     {
@@ -1069,21 +1068,18 @@
       "source": "src/capacity32.mjs",
       "block": "capacity-growth-rehash",
       "primitives": [
-        "<",
-        "<<=",
-        "=",
+        "-",
+        "Math.clz32",
+        "<<",
         ">>>"
       ],
       "status": "implemented",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "expression",
-        "expression": "3 + 3*K",
-        "note": "K is the number of loop iterations/shifts. Includes final loop test and uint32 coercion.",
-        "parameters": {
-          "K": "number of left-shift iterations"
-        }
+        "kind": "fixed",
+        "cycles": 5,
+        "note": "Subtract + CLZ + subtract + shift + uint32 coercion. Removes the value-dependent loop; value 0/1 remain correct, though value 1 was cheaper in the old loop."
       }
     },
     {
@@ -1161,5 +1157,61 @@
     "branchRule": "Predicted branch baseline is 1 cycle; add 15-19 cycles per modeled Zen 3 misprediction.",
     "memoryRule": "L1 dependent load=4 cycles; L2=12; L3≈47. Hot/local store uses the NEES 0.5-cycle throughput minimum only where explicitly stated.",
     "limitation": "These totals are additive accounting values, not guaranteed wall-clock latency. NEES governing-unit evidence remains authoritative."
-  }
+  },
+  "optimizationHistory": [
+    {
+      "id": "round-001",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x32",
+          "before": "117 cycles at Connect4 C=7",
+          "after": "26 cycles function-local / 22 if guards fold",
+          "mechanism": "fixed-mask/shuffle fast path"
+        },
+        {
+          "function": "firstSetBitIndex32",
+          "before": "2-6 cycles",
+          "after": "4 cycles",
+          "mechanism": "use clz32(0)=32 to eliminate zero branch and standardize empty sentinel to -1"
+        },
+        {
+          "function": "popcount32",
+          "before": "15 cycles",
+          "after": "14 cycles",
+          "mechanism": "remove redundant input uint32 coercion"
+        },
+        {
+          "function": "popcount2x32",
+          "before": "31 cycles",
+          "after": "29 cycles",
+          "mechanism": "remove two redundant lane coercions"
+        },
+        {
+          "function": "mix32",
+          "before": "14 cycles",
+          "after": "13 cycles",
+          "mechanism": "remove redundant initial signed coercion"
+        },
+        {
+          "function": "nextPowerOfTwo32",
+          "before": "3 + 3*K cycles",
+          "after": "5 cycles",
+          "mechanism": "replace shift loop with clz32"
+        },
+        {
+          "function": "maskContains32",
+          "before": "2-cycle but incorrect for bit31",
+          "after": "3-cycle correct",
+          "mechanism": "repair unsigned containment before optimization"
+        },
+        {
+          "function": "maskContains2x32",
+          "before": "3-5-cycle but incorrect for bit31",
+          "after": "4-7-cycle correct",
+          "mechanism": "repair unsigned containment before optimization"
+        }
+      ]
+    }
+  ]
 }
