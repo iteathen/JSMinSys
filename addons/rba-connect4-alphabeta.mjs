@@ -177,7 +177,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
   state.basisSize[0]=root.basis.length;
-  const mover=connect4RbaRank(g,state.words,0)&1,terminal=connect4RbaTerminal(g,state.words,0);
+  const rootMeta=state.words[g.metaOffset],mover=(rootMeta>>>2)&1,terminal=rootMeta&3;
   if(terminal)return {value:terminal,relative:absToRelative(terminal,mover),move:-1,metrics:metrics(state)};
   const cpcKind=evaluateConnect4Cpc32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
   let rootLo=state.cpc.interval[0],rootHi=state.cpc.interval[1];
