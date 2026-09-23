@@ -1659,3 +1659,23 @@ export function restoreCallerOwnedResidualFrame32(
   state[statusIndex] = knownParentStatus;
   return knownParentStatus;
 }
+
+// Runtime-sized bitset transition. Geometry is fixed at initialization; the
+// playable carrier may span any caller-provisioned number of uint32 lanes.
+export function applyMoveSpan32(playable, landingCells, column, columns, cellCount) {
+  const cell = landingCells[column];
+  const next = cell + columns;
+  playable[cell >>> 5] ^= 1 << (cell & 31);
+  if (next < cellCount) playable[next >>> 5] ^= 1 << (next & 31);
+  landingCells[column] = next;
+  return cell;
+}
+
+export function undoMoveSpan32(playable, landingCells, column, columns, cellCount) {
+  const next = landingCells[column];
+  const cell = next - columns;
+  playable[cell >>> 5] ^= 1 << (cell & 31);
+  if (next < cellCount) playable[next >>> 5] ^= 1 << (next & 31);
+  landingCells[column] = cell;
+  return cell;
+}
