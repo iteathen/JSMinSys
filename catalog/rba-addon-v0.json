@@ -1,12 +1,13 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
     "addons/rba-tt32.mjs",
     "addons/rba-connect4-geometry.mjs",
     "addons/rba-connect4-coordinate.mjs",
     "addons/rba-connect4-front.mjs",
-    "addons/rba-connect4-solver.mjs"
+    "addons/rba-connect4-solver.mjs",
+    "addons/rba-connect4-profile.mjs"
   ],
   "geometryContract": {
     "configurationTime": [
@@ -63,6 +64,20 @@
   "qualification": [
     "4x4 coordinate/front/solve controls",
     "10x10 coordinate/front controls",
-    "10x10 derived carrier has 10 edges and runtime-computed key/basis widths"
-  ]
+    "10x10 derived carrier has 10 edges and runtime-computed key/basis widths",
+    "fast-profile versus zero-specialization-budget equivalence on configured board"
+  ],
+  "specializationContract": {
+    "selection": "cold initialization only",
+    "selector": "prepareConnect4RbaExecutionProfile",
+    "currentChoices": [
+      "dense vs sparse residual cell-removal lookup",
+      "dense vs sparse residual subset lookup",
+      "3-word vs runtime-span coordinate permutation",
+      "6-word vs runtime-span skyline insertion/product"
+    ],
+    "memoryPolicy": "dense geometry tables are admitted only when they fit the initialization specializationBudgetBytes",
+    "hotPolicy": "selected functions are invoked directly by the prepared evaluator/front arena; no recurring width/height branch chooses the implementation",
+    "correctness": "every specialization must remain semantically equivalent to the runtime-configured general path"
+  }
 }
