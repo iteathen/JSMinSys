@@ -38,3 +38,15 @@ export function selectGreater32(a, b) {
 export function selectLess32(a, b) {
   return a <= b ? a : b;
 }
+
+export function playableColumn32(heights, column, rows) {
+  return heights[column] < rows;
+}
+
+export function decodeColumn32(cell, columns) {
+  return cell % columns;
+}
+
+export function decodeRow32(cell, columns) {
+  return Math.floor(cell / columns);
+}
