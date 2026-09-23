@@ -93,10 +93,13 @@ test('dependency queue, parent signaling, detach and recycle preserve generation
   const retained=rbaTtPublishPrepared7x32(t,root,5,1,3,keys,0,bs,0,69,sizes,labels,lo,hi,1,1);
   assert.ok(retained>=0);rbaTtAttachDependencies7x32(t,root);
   const child=t.child[root*7],generation=t.generation[child];
+  // Branch publication already coalesced one parent event. Consume it so a
+  // subsequent child update must publish a fresh parent event.
+  assert.equal(rbaTtTakeEvent32(t),root);
   // Retained child is already owned, so enqueue does not duplicate it.
   assert.equal(rbaTtEnqueueDependencies7x32(t,root),0);
-  assert.ok(rbaTtSignalParents32(t,child)>=1);
-  assert.ok(rbaTtTakeEvent32(t)>=0);
+  assert.equal(rbaTtSignalParents32(t,child),1);
+  assert.equal(rbaTtTakeEvent32(t),root);
   assert.equal(rbaTtDetachDependencies7x32(t,root),1);
   assert.equal(t.parentHead[child],-1);
   t.execution[child]=0;
