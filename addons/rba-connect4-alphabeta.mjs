@@ -140,7 +140,7 @@ function search(state,depth,alpha,beta){
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
       const childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
       const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
-        words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1,state.coord.map,state.coord.inverse);
+        words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1,state.coord.map);
       state.cofactors+=1;
       if(term<0)continue;
       if(term)value=absToRelative(term,mover);
@@ -213,7 +213,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }else{
     const childKey=g.keyWords,childBasis=g.maxBasis;
     const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
-      state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map,state.coord.inverse);
+      state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map);
     state.cofactors+=1;if(term<0)continue;
     if(term)value=absToRelative(term,mover);
     else{
