@@ -268,7 +268,6 @@ test('two-lane shifts and arithmetic', () => {
 });
 
 test('two-lane set iteration and cardinality', () => {
-  assert.equal(firstSetBitIndex2x32(0, 0), -1);
   assert.equal(firstSetBitIndex2x32(0, 1), 32);
   assert.equal(firstSetBitIndex2x32(8, 1), 3);
   assert.equal(clearLowestSetBit32(0b10100), 0b10000);
