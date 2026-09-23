@@ -76,7 +76,6 @@ export function undoMove32(
   const bit = (1 << cell) >>> 0;
 
   state[STATE_PLY] = ply;
-  state[STATE_SIDE] = 1 - state[STATE_SIDE];
   heights[column] = row;
   state[STATE_SUPPORT_CODE] = (state[STATE_SUPPORT_CODE] - supportDelta) >>> 0;
 
