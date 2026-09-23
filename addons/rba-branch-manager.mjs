@@ -94,7 +94,7 @@ export function rbaBranchManagerStep32(
      !Number.isInteger(budget)||budget<1)
     throw new RangeError('invalid RBA branch-manager configuration');
   if(!rbaTtEnter32(t,owner))return 0;
-  let processed=0;
+  let processed=0,merged=0;
   try{
     while(processed<budget&&!Atomics.load(t.control,RBA_TT_STOP)){
       const q=rbaTtTakeEvent32(t);
@@ -105,18 +105,19 @@ export function rbaBranchManagerStep32(
       if(Atomics.load(t.control,RBA_TT_STOP))break;
     }
     if(manager){
-      manager.dedupes+=rbaTtManagerInspectReady32(t,manager.resetTargets,budget);
+      merged=rbaTtManagerInspectReady32(t,manager.resetTargets,budget);
+      manager.dedupes+=merged;
       manager.scanCursor=rbaTtManagerClean32(t,manager.resetTargets,manager.scanCursor,budget);
       manager.maintenancePasses+=1;
     }
   }finally{
     rbaTtLeave32(t);
   }
-  if(processed||manager){
+  if(processed||merged){
     Atomics.add(t.control,RBA_TT_WAKE,1);
     Atomics.notify(t.control,RBA_TT_WAKE);
   }
-  return processed;
+  return processed+merged;
 }
 
 export function runRbaBranchManagerLoop32(
