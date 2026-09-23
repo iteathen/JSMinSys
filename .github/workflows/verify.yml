@@ -20,6 +20,7 @@ jobs:
       - run: node tools/verify-catalog.mjs
       - run: node tools/audit-runtime-geometry.mjs
       - run: node --test test/*.test.mjs
+      - run: node tools/bench-rba-cpc-ab.mjs
 
   schema:
     runs-on: ubuntu-latest
