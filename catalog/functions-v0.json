@@ -1,5 +1,5 @@
 {
-  "version": "0.63.0",
+  "version": "0.64.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2852,6 +2852,70 @@
       ]
     },
     {
+      "name": "queueEnqueueOwnedNext32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.wait",
+        "Atomics.store",
+        "Atomics.notify",
+        "ST32",
+        "&",
+        "!==",
+        "+",
+        "|"
+      ],
+      "status": "implemented-owned-producer-blocking-profile",
+      "preconditions": [
+        "exactly one producer owns this queue position, or producer access is externally serialized",
+        "caller supplies the exact current int32 enqueue position and replaces it with the returned next position",
+        "blocking progress may depend on Atomics.wait/notify for per-slot sequence changes",
+        "sequence atomic publication establishes payload visibility"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "unbounded",
+        "fastPath": "1 + ATOMIC_LOAD + 2 + STORE_COST + ATOMIC_STORE + 2 + ATOMIC_NOTIFY",
+        "waitIterationActiveCost": "ATOMIC_WAIT + ATOMIC_LOAD + 1",
+        "note": "Removes the generic blocking producer's reservation ATOMIC_RMW. The extra int32 normalization makes the publication position caller-ready; elapsed wait time remains unbounded."
+      }
+    },
+    {
+      "name": "queueDequeueOwnedNext32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.wait",
+        "Atomics.store",
+        "Atomics.notify",
+        "LD32",
+        "ST32",
+        "&",
+        "!==",
+        "+",
+        "|"
+      ],
+      "status": "implemented-owned-consumer-blocking-profile",
+      "preconditions": [
+        "exactly one consumer owns this queue position, or consumer access is externally serialized",
+        "caller supplies the exact current int32 dequeue position and replaces it with the returned next position",
+        "out/outIndex is caller-owned output storage and does not require hot allocation",
+        "blocking progress may depend on Atomics.wait/notify for per-slot sequence changes",
+        "sequence atomic observation establishes payload visibility before release"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "unbounded",
+        "fastPath": "1 + 2 + ATOMIC_LOAD + 1 + LOAD + STORE_COST + ATOMIC_STORE + 1 + ATOMIC_NOTIFY",
+        "waitIterationActiveCost": "ATOMIC_WAIT + ATOMIC_LOAD + 1",
+        "note": "Removes the generic blocking consumer's reservation ATOMIC_RMW. Caller output storage permits returning the caller-ready next position without allocation."
+      }
+    },
+    {
       "name": "queueTryEnqueue32",
       "source": "src/queue32.mjs",
       "block": "shared-queue",
@@ -3722,11 +3786,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 139,
+    "functionsImplemented": 141,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 139,
+    "functionsWithCycleCount": 141,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4953,6 +5017,24 @@
           "before": "owned boolean function + caller success advance = function fast path + 2 ALU",
           "after": "next-position profile = function fast path + 1 extra internal ALU",
           "mechanism": "reuse the ready position as caller reservation state"
+        }
+      ]
+    },
+    {
+      "id": "round-057",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "queueEnqueueOwnedNext32",
+          "before": "blocking producer fast path includes reservation ATOMIC_RMW",
+          "after": "owned producer uses caller-local position; per-slot wait/publication atomics only",
+          "mechanism": "single/external-serialized producer deletes locked shared reservation increment"
+        },
+        {
+          "function": "queueDequeueOwnedNext32",
+          "before": "blocking consumer fast path includes reservation ATOMIC_RMW",
+          "after": "owned consumer uses caller-local position; per-slot wait/release atomics only",
+          "mechanism": "single/external-serialized consumer deletes locked shared reservation increment"
         }
       ]
     }

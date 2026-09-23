@@ -162,3 +162,47 @@ export function queueTryDequeueOwnedNext32(
   return nextPosition;
 }
 
+export function queueEnqueueOwnedNext32(
+  sequence,
+  values,
+  mask,
+  position,
+  value,
+) {
+  const slot = position & mask;
+  let observed = Atomics.load(sequence, slot);
+  while (observed !== position) {
+    Atomics.wait(sequence, slot, observed);
+    observed = Atomics.load(sequence, slot);
+  }
+
+  const nextPosition = (position + 1) | 0;
+  values[slot] = value;
+  Atomics.store(sequence, slot, nextPosition);
+  Atomics.notify(sequence, slot, 1);
+  return nextPosition;
+}
+
+export function queueDequeueOwnedNext32(
+  sequence,
+  values,
+  mask,
+  capacity,
+  position,
+  out,
+  outIndex,
+) {
+  const slot = position & mask;
+  const nextPosition = (position + 1) | 0;
+  let observed = Atomics.load(sequence, slot);
+  while (observed !== nextPosition) {
+    Atomics.wait(sequence, slot, observed);
+    observed = Atomics.load(sequence, slot);
+  }
+
+  out[outIndex] = values[slot];
+  Atomics.store(sequence, slot, position + capacity);
+  Atomics.notify(sequence, slot, 1);
+  return nextPosition;
+}
+

@@ -859,6 +859,8 @@ import {
   queueTryDequeueOwnedPosition32,
   queueTryEnqueueOwnedNext32,
   queueTryDequeueOwnedNext32,
+  queueEnqueueOwnedNext32,
+  queueDequeueOwnedNext32,
 } from '../src/queue32.mjs';
 
 test('two-lane shifts and arithmetic', () => {
@@ -1197,6 +1199,46 @@ test('owned queue next-position profiles reuse publication increment', () => {
     ),
     -2147483648,
   );
+});
+
+test('owned blocking queue positions remove reservation RMW', () => {
+  const capacity = 4;
+  const mask = capacity - 1;
+  const sequence = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const values = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const out = new Int32Array(1);
+  for (let slot = 0; slot < capacity; slot += 1) sequence[slot] = slot;
+
+  let enqueuePosition = 0;
+  let dequeuePosition = 0;
+
+  enqueuePosition = queueEnqueueOwnedNext32(
+    sequence, values, mask, enqueuePosition, 123,
+  );
+  assert.equal(enqueuePosition, 1);
+
+  dequeuePosition = queueDequeueOwnedNext32(
+    sequence, values, mask, capacity, dequeuePosition, out, 0,
+  );
+  assert.equal(dequeuePosition, 1);
+  assert.equal(out[0], 123);
+  assert.equal(sequence[0], capacity);
+
+  const wrapSequence = new Int32Array(new SharedArrayBuffer(4));
+  const wrapValues = new Int32Array(new SharedArrayBuffer(4));
+  const wrapOut = new Int32Array(1);
+  wrapSequence[0] = 0x7fffffff;
+  const wrapped = queueEnqueueOwnedNext32(
+    wrapSequence, wrapValues, 0, 0x7fffffff, 7,
+  );
+  assert.equal(wrapped, -2147483648);
+  assert.equal(
+    queueDequeueOwnedNext32(
+      wrapSequence, wrapValues, 0, 1, 0x7fffffff, wrapOut, 0,
+    ),
+    -2147483648,
+  );
+  assert.equal(wrapOut[0], 7);
 });
 
 test('typed capacity allocation', () => {

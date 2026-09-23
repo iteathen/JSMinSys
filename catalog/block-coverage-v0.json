@@ -292,9 +292,11 @@
         "queueTryEnqueueOwnedPosition32",
         "queueTryDequeueOwnedPosition32",
         "queueTryEnqueueOwnedNext32",
-        "queueTryDequeueOwnedNext32"
+        "queueTryDequeueOwnedNext32",
+        "queueEnqueueOwnedNext32",
+        "queueDequeueOwnedNext32"
       ],
-      "note": "Blocking, generic nonblocking, owned-position boolean, and owned-position next-return profiles coexist. Owned-next variants reuse the sequence publication/ready increment as caller reservation state, deleting the separate caller success advance while preserving per-slot atomic synchronization."
+      "note": "Queue profiles now separate blocking/nonblocking and shared/owned reservation semantics. Owned blocking sides remove the locked reservation RMW while preserving per-slot Atomics.wait/notify and sequence publication/acquisition; returned next positions keep caller reservation state local."
     },
     {
       "id": 20,
