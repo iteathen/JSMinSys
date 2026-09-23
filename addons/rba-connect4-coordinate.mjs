@@ -7,7 +7,7 @@ export function connect4RbaRank(g,words,offset){return words[offset+g.metaOffset
 export function connect4RbaPlayer(g,words,offset){return (words[offset+g.metaOffset]>>>2)&1;}
 
 export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffset,seen){
-  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  seen.fill(0,0,g.shapeWordCount);
   for(let line=0;line<g.lineCount;line+=1){
     const base=line*4;let bits=0;
     for(let i=0;i<4;i+=1){
@@ -19,7 +19,7 @@ export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffse
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed=null){
-  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  seen.fill(0,0,g.shapeWordCount);
   for(let i=0;i<count;i+=1){
     const id=profile.removeCell(g,parent[parentOffset+i],cell);
     if(removed)removed[i]=id;
@@ -35,7 +35,7 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   const cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
-  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
+  target.fill(0,dst+g.p0Offset,dst+g.keyWords);
   sizes[sizeIndex]=0;
 
   const singleton=g.singletonByCell[cell];
@@ -104,7 +104,7 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
   const primary=compareReflectedSupport(g,words,offset);
   if(primary<0)return 0;
 
-  for(let w=0;w<g.shapeWordCount;w+=1)scratch.seen[w]=0;
+  scratch.seen.fill(0,0,g.shapeWordCount);
   for(let i=0;i<n;i+=1){const id=g.reflect[basis[bi+i]];scratch.seen[id>>>5]|=1<<(id&31);}
   const rn=emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
   for(let i=0;i<rn;i+=1)scratch.inverse[scratch.mirrorBasis[i]]=i;
