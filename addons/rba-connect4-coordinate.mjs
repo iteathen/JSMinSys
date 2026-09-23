@@ -28,7 +28,7 @@ export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cel
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 
-export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null){
+export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,index=null){
   const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
   if(terminal||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
@@ -54,15 +54,17 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  // Child basis ids are sorted by residual cardinality. Find each class
-  // boundary once, then coordinate propagation never tests a too-small child
-  // as a possible superset of the current image.
-  let childPair=0;
-  while(childPair<cn&&childBasis[ci+childPair]<g.pairShapeStart)childPair+=1;
-  let childTriple=childPair;
-  while(childTriple<cn&&childBasis[ci+childTriple]<g.tripleShapeStart)childTriple+=1;
-  let childQuad=childTriple;
-  while(childQuad<cn&&childBasis[ci+childQuad]<g.quadShapeStart)childQuad+=1;
+  // Build exact child-id -> basis-index entries in existing scratch while
+  // deriving size-class boundaries. Every image queried below is guaranteed to
+  // belong to this child basis, so stale entries for absent ids are irrelevant.
+  let childPair=cn,childTriple=cn,childQuad=cn;
+  for(let j=0;j<cn;j+=1){
+    const childId=childBasis[ci+j];
+    if(index)index[childId]=j;
+    if(childPair===cn&&childId>=g.pairShapeStart)childPair=j;
+    if(childTriple===cn&&childId>=g.tripleShapeStart)childTriple=j;
+    if(childQuad===cn&&childId>=g.quadShapeStart)childQuad=j;
+  }
   for(let p=0;p<2;p+=1){
     const sourceCoord=src+(p?g.p1Offset:g.p0Offset),targetCoord=dst+(p?g.p1Offset:g.p0Offset);
     for(let i=0;i<n;i+=1){
@@ -73,14 +75,17 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
       const image=p===player?imageRemoved:id;
       if(image<0)continue;
 
-      // Equal-cardinality residuals satisfy subset iff they are identical.
-      // The exact image is guaranteed to be present in the child basis because
-      // that basis is the union of every parent removal image. Locate that one
-      // sorted id directly, then run subset tests only against strictly larger
-      // residual classes.
-      let lo=0,hi=cn;
-      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
-      target[targetCoord+(lo>>>5)]|=1<<(lo&31);
+      // Equal-cardinality residuals satisfy subset iff identical. Prefer the
+      // once-per-child inverse map; retain binary-search fallback for callers
+      // that do not supply coordinate index scratch.
+      let exact;
+      if(index)exact=index[image];
+      else{
+        let lo=0,hi=cn;
+        while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
+        exact=lo;
+      }
+      target[targetCoord+(exact>>>5)]|=1<<(exact&31);
 
       let j=image<g.pairShapeStart?childPair:
         image<g.tripleShapeStart?childTriple:
