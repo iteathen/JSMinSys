@@ -16,6 +16,23 @@ for (const fn of functions.functions) {
   for (const primitive of fn.primitives) {
     assert.ok(admitted.has(primitive), `${fn.name}: primitive is not admitted: ${primitive}`);
   }
+  assert.ok(fn.cycleCount && typeof fn.cycleCount === 'object', `${fn.name}: missing cycleCount`);
+  assert.equal(
+    fn.cycleCount.profile,
+    'node26-v8-14.6/x86_64-amd-zen3',
+    `${fn.name}: unexpected cycle profile`,
+  );
+  assert.ok(
+    ['fixed', 'range', 'scenario', 'expression', 'unbounded'].includes(fn.cycleCount.kind),
+    `${fn.name}: invalid cycleCount kind ${fn.cycleCount.kind}`,
+  );
+  if (fn.cycleCount.kind === 'fixed') {
+    assert.ok(Number.isFinite(fn.cycleCount.cycles) && fn.cycleCount.cycles >= 0, `${fn.name}: invalid fixed cycle count`);
+  }
+  if (fn.cycleCount.kind === 'range') {
+    assert.ok(Number.isFinite(fn.cycleCount.minCycles) && Number.isFinite(fn.cycleCount.maxCycles), `${fn.name}: invalid cycle range`);
+    assert.ok(fn.cycleCount.minCycles >= 0 && fn.cycleCount.maxCycles >= fn.cycleCount.minCycles, `${fn.name}: invalid cycle bounds`);
+  }
 }
 
 for (const block of coverage.blocks) {
@@ -53,8 +70,15 @@ for (const path of sourceFiles) {
   }
 }
 
+assert.equal(
+  functions.summary.functionsWithCycleCount,
+  functions.functions.length,
+  'cycle-count summary does not cover every implemented function',
+);
+assert.equal(functions.summary.functionsMissingCycleCount, 0, 'implemented functions missing cycle counts');
+
 console.log(
-  `JSMinSys catalog verified: ${functions.functions.length} implemented functions, ` +
+  `JSMinSys catalog verified: ${functions.functions.length} implemented functions, all cycle-counted, ` +
   `${coverage.summary.completeWithoutNewPrimitive}/${coverage.summary.catalogBlocks} blocks complete without new primitives, ` +
   `${functions.deferred.length} deferred function(s).`,
 );
