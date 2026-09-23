@@ -187,3 +187,114 @@ test('search scalar blocks', () => {
   const order = new Uint8Array([3, 2, 4, 1, 5, 0, 6]);
   assert.equal(argMaxPlayable32(scores, heights, order, 7, 6, 0xffffffff), 4);
 });
+
+
+import {
+  shl2x32Into,
+  ushr2x32Into,
+  add2x32Into,
+  sub2x32Into,
+  firstSetBitIndex2x32,
+  clearLowestSetBit32,
+  cardinalityClass2x32,
+  popcount2x32,
+} from '../src/word64x32.mjs';
+import {
+  playableColumn32,
+  decodeColumn32,
+  decodeRow32,
+} from '../src/indexed32.mjs';
+import {
+  isPowerOfTwo32,
+  nextPowerOfTwo32,
+  rehashOverwrite32,
+} from '../src/capacity32.mjs';
+import {
+  atomicTryClaim32,
+  atomicRelease32,
+  atomicExchange32,
+  atomicAdd32,
+  atomicSub32,
+} from '../src/atomic32.mjs';
+import { queueEnqueue32, queueDequeue32 } from '../src/queue32.mjs';
+
+test('two-lane shifts and arithmetic', () => {
+  const dst = new Uint32Array(2);
+
+  shl2x32Into(dst, 0, 1, 0, 32);
+  assert.deepEqual([...dst], [0, 1]);
+
+  shl2x32Into(dst, 0, 0x80000000, 0, 1);
+  assert.deepEqual([...dst], [0, 1]);
+
+  ushr2x32Into(dst, 0, 0, 1, 32);
+  assert.deepEqual([...dst], [1, 0]);
+
+  ushr2x32Into(dst, 0, 0, 1, 1);
+  assert.deepEqual([...dst], [0x80000000, 0]);
+
+  add2x32Into(dst, 0, 0xffffffff, 1, 1, 2);
+  assert.deepEqual([...dst], [0, 4]);
+
+  sub2x32Into(dst, 0, 0, 4, 1, 2);
+  assert.deepEqual([...dst], [0xffffffff, 1]);
+});
+
+test('two-lane set iteration and cardinality', () => {
+  assert.equal(firstSetBitIndex2x32(0, 0), -1);
+  assert.equal(firstSetBitIndex2x32(0, 1), 32);
+  assert.equal(firstSetBitIndex2x32(8, 1), 3);
+  assert.equal(clearLowestSetBit32(0b10100), 0b10000);
+  assert.equal(cardinalityClass2x32(0, 0), 0);
+  assert.equal(cardinalityClass2x32(8, 0), 1);
+  assert.equal(cardinalityClass2x32(8, 1), 2);
+  assert.equal(cardinalityClass2x32(0b1010, 0), 2);
+  assert.equal(popcount2x32(0xffffffff, 0x3ff), 42);
+});
+
+test('trusted legality and coordinate reference decode', () => {
+  const heights = new Uint8Array([0, 6, 2]);
+  assert.equal(playableColumn32(heights, 0, 6), true);
+  assert.equal(playableColumn32(heights, 1, 6), false);
+  assert.equal(decodeColumn32(23, 7), 2);
+  assert.equal(decodeRow32(23, 7), 3);
+});
+
+test('capacity helpers and overwrite rehash', () => {
+  assert.equal(isPowerOfTwo32(1), true);
+  assert.equal(isPowerOfTwo32(8), true);
+  assert.equal(isPowerOfTwo32(10), false);
+  assert.equal(nextPowerOfTwo32(9), 16);
+
+  const oldHashes = new Uint32Array([1, 5, 0xffffffff, 9]);
+  const oldValues = new Uint32Array([10, 50, 0, 90]);
+  const newHashes = new Uint32Array(8);
+  newHashes.fill(0xffffffff);
+  const newValues = new Uint32Array(8);
+  assert.equal(rehashOverwrite32(oldHashes, oldValues, 4, newHashes, newValues, 7, 0xffffffff), 8);
+  assert.equal(newHashes[1], 9);
+  assert.equal(newValues[1], 90);
+  assert.equal(newHashes[5], 5);
+  assert.equal(newValues[5], 50);
+});
+
+test('atomic blocks', () => {
+  const words = new Int32Array(new SharedArrayBuffer(16));
+  assert.equal(atomicTryClaim32(words, 0, 0, 7), true);
+  assert.equal(atomicTryClaim32(words, 0, 0, 8), false);
+  assert.equal(atomicExchange32(words, 1, 5), 0);
+  assert.equal(atomicAdd32(words, 1, 3), 5);
+  assert.equal(atomicSub32(words, 1, 2), 8);
+  assert.equal(atomicRelease32(words, 0, 0), 0);
+});
+
+test('bounded shared queue blocks without waiting', () => {
+  const enqueue = new Int32Array(new SharedArrayBuffer(4));
+  const dequeue = new Int32Array(new SharedArrayBuffer(4));
+  const sequence = new Int32Array(new SharedArrayBuffer(4 * 4));
+  const values = new Int32Array(new SharedArrayBuffer(4 * 4));
+  for (let i = 0; i < 4; i += 1) sequence[i] = i;
+  assert.equal(queueEnqueue32(enqueue, sequence, values, 3, 4, 77), 0);
+  assert.equal(queueDequeue32(dequeue, sequence, values, 3, 4), 77);
+  assert.equal(sequence[0], 4);
+});
