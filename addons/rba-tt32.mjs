@@ -53,19 +53,20 @@ export function rbaTtValid32(t,q,g){return q>=0&&q<t.capacity&&t.live[q]&&t.gene
 export function rbaTtSetRoot32(t,q){if(!t.live[q])return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.control[RBA_TT_ROOT]=q;t.control[RBA_TT_ROOT_GENERATION]=t.generation[q];return q;}
 
 export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize){
-  if(basisSize<0||basisSize>t.basisCapacity||(basisSize|0)!==basisSize){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
-  const hash=mixSpan32Locator32(words,offset,t.keyWords),bucket=hash&t.bucketMask;
+  const keyWords=t.keyWords,basisCapacity=t.basisCapacity;
+  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+  const hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
   for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
-    const base=q*t.keyWords;let w=0;
-    while(w<t.keyWords&&t.keys[base+w]===words[offset+w])w+=1;
-    if(w===t.keyWords){if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}t.refs[q]+=1;return q;}
+    const base=q*keyWords;let w=0;
+    while(w<keyWords&&t.keys[base+w]===words[offset+w])w+=1;
+    if(w===keyWords){if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}t.refs[q]+=1;return q;}
   }
   const q=t.control[RBA_TT_FREE];
   if(q<0){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
-  publishSpan32(t.keys,q*t.keyWords,words,offset,t.keyWords);
-  if(basisSize)publishSpan32(t.basis,q*t.basisCapacity,basis,basisOffset,basisSize);
+  publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
+  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.count[q]=0;t.parentHead[q]=-1;
   t.readyMember[q]=0;t.eventMember[q]=0;t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;
