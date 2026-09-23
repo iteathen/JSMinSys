@@ -167,6 +167,7 @@ import {
   cutoff32,
   argMaxPlayable32,
   argMaxPlayableSlot32,
+  argMaxPlayableSlot7Nonempty32,
   physicalColumnFromMoveSlot32,
 } from '../src/search32.mjs';
 
@@ -475,6 +476,7 @@ test('move-slot index space removes hot physical-column remap', () => {
 
   const slot = argMaxPlayableSlot32(scores, 7);
   assert.equal(slot, 2);
+  assert.equal(argMaxPlayableSlot7Nonempty32(scores), 2);
   assert.equal(physicalColumnFromMoveSlot32(order, slot), 4);
 
   scores.fill(-2147483648);

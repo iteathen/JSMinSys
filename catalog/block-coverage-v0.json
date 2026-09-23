@@ -213,9 +213,10 @@
         "selectLess32",
         "argMaxPlayable32",
         "argMaxPlayableSlot32",
-        "physicalColumnFromMoveSlot32"
+        "physicalColumnFromMoveSlot32",
+        "argMaxPlayableSlot7Nonempty32"
       ],
-      "note": "Physical-column and move-slot selection profiles coexist. Move-slot indexing removes the recursive order remap only when move-indexed transition data is aligned at initialization; physical-column recovery remains an explicitly costed external-boundary load."
+      "note": "Physical-column and move-slot selection profiles coexist. Runtime initialization may additionally select the exact seven-slot nonempty profile when configured width is 7; all other widths retain generic move-slot/physical-column selectors. Move-slot indexing removes recursive order remaps only when transition data shares that configured index space."
     },
     {
       "id": 17,

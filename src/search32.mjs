@@ -68,6 +68,46 @@ export function argMaxPlayableSlot32(scoresInOrder, count) {
   return bestIndex;
 }
 
+export function argMaxPlayableSlot7Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 4;
+  }
+
+  score = scoresInOrder[5];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 5;
+  }
+
+  score = scoresInOrder[6];
+  if (score > bestScore) bestIndex = 6;
+
+  return bestIndex;
+}
+
 export function physicalColumnFromMoveSlot32(order, slot) {
   return order[slot];
 }

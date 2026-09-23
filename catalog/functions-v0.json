@@ -1,5 +1,5 @@
 {
-  "version": "0.43.0",
+  "version": "0.44.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1622,6 +1622,38 @@
       }
     },
     {
+      "name": "argMaxPlayableSlot7Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 7 and immutable after initialization",
+        "initialization selects this profile once; there is no hot profile dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 40,
+        "hotL2Predicted": 96,
+        "hotL3Predicted": 341,
+        "expression": "7*LOAD + 6*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining six comparisons. The nonempty precondition makes an explicit no-candidate sentinel path unnecessary."
+      }
+    },
+    {
       "name": "physicalColumnFromMoveSlot32",
       "source": "src/search32.mjs",
       "block": "fixed-candidate-selection",
@@ -2350,11 +2382,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 97,
+    "functionsImplemented": 98,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 97,
+    "functionsWithCycleCount": 98,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2371,6 +2403,20 @@
       "reason": "Cost magnitude does not control admission. NEES now provides an explicit parameterized allocation-cycle model; the application author decides whether the cost is worthwhile.",
       "neesOperation": "memory.allocate.typed.u32",
       "neesAuthorityCommit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69"
+    },
+    {
+      "candidate": "relaxed shared queue via dropped/overwritten/duplicate work",
+      "disposition": "not-admitted-for-current-proving-runtime",
+      "reason": "Pinned IsoMax execution uses conserved worker accounting with no dropped credit, detects duplicate remote reaches, and recovers dead workers. Existing nonblocking try-queue profiles are the supported synchronization relaxation; stronger loss/overwrite semantics require a different explicitly qualified fault policy.",
+      "evidence": {
+        "repository": "iteathen/connect4",
+        "commit": "a26ef2254c850243f68505eeff1d849ad0f4f0c0",
+        "files": [
+          "components/isometric/execution/worker.mjs",
+          "components/isometric/execution/branch-manager.mjs",
+          "components/isometric/execution/conserved-delta.mjs"
+        ]
+      }
     }
   ],
   "cycleCountAuthority": {
@@ -3237,6 +3283,18 @@
           "before": "16-cycle hi==0 / 31-cycle hi!=0",
           "after": "16-cycle hi==0 / 27-cycle hi!=0",
           "mechanism": "reuse fused two-lane accumulation on the nonzero-high path"
+        }
+      ]
+    },
+    {
+      "id": "round-037",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayableSlot7Nonempty32",
+          "before": "generic move-slot N=7: 57 L1 / 113 L2 / 358 L3 cycles",
+          "after": "40 L1 / 96 L2 / 341 L3 cycles",
+          "mechanism": "initialization selects an exact seven-slot unrolled scan; ongoing/nonempty invariant removes count, loop, tail, and none handling"
         }
       ]
     }
