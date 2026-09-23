@@ -72,6 +72,34 @@ Currently admissible:
 
 These are admitted as source-level control/value-selection operations. Their actual V8 lowering and branch behavior remain qualification concerns.
 
+
+## Assignment and update operators
+
+The observed application-level assignment/update forms are admissible:
+
+- `=`
+- `+=`
+- `-=`
+- `*=`
+- `&=`
+- `|=`
+- `^=`
+- `<<=`
+
+These are source-level emission forms, not necessarily new primitive capabilities. Compound forms decompose into an admitted transform plus write-back when V8 does not fuse them.
+
+## Nullish, optional, type, and meta operators
+
+The observed application syntax is also admissible:
+
+- `??`
+- `?.`
+- `instanceof`
+- `typeof`
+- `void`
+
+These are mostly control/validation/cold-path constructs rather than preferred hot-kernel primitives. Admission means they may be emitted where required; it does not make them part of the minimal hot basis.
+
 ## Memory and control capabilities
 
 The minimal machine model also admits equivalent capabilities for:
@@ -93,7 +121,31 @@ Already identified as potentially useful and admissible subject to assembly qual
 - `Math.imul` — explicit 32-bit multiplication
 - `Math.clz32` — 32-bit leading-zero count
 
-Other `Math.*` helpers observed historically (`floor`, `trunc`, `ceil`, `round`, `min`, `max`) remain cataloged demands rather than part of this explicit allow-list until separately admitted.
+The following observed `Math.*` helpers are now admissible as well:
+
+- `Math.floor`
+- `Math.trunc`
+- `Math.ceil`
+- `Math.round`
+- `Math.min`
+- `Math.max`
+
+They remain subject to cost qualification and may be eliminated by representation where possible.
+
+## Atomic operations
+
+The observed shared-memory operations are admissible:
+
+- `Atomics.load`
+- `Atomics.store`
+- `Atomics.compareExchange`
+- `Atomics.exchange`
+- `Atomics.add`
+- `Atomics.sub`
+- `Atomics.wait`
+- `Atomics.notify`
+
+These are explicitly **not** classified as cheap primitives merely by admission. Their cost includes cache-line ownership, coherence, contention, and in the wait/notify case potentially scheduler/kernel activity. They remain architecture-specific mechanisms to avoid unless the execution design proves them necessary.
 
 ## Storage direction
 
