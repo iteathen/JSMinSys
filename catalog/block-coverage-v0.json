@@ -63,9 +63,10 @@
         "cardinalityClass2x32",
         "clearIsolatedBitI32",
         "clearIsolatedBit32",
-        "clearLowestSetBitI32"
+        "clearLowestSetBitI32",
+        "firstSetHighBitIndex32"
       ],
-      "note": "General first-set-bit, caller-isolated-bit, caller-isolated clear, clear-lowest-bit, and one/two-lane cardinality profiles coexist. Once a hot iterator has isolated lsb, it should reuse that bit both for indexing and for XOR clearing rather than recomputing the lowest-bit relation."
+      "note": "Set-bit/cardinality profiles reuse caller-owned lane facts. A known high lane uses firstSetHighBitIndex32 without lane selection; cardinalityClass32 applies whenever exactly one lane remains relevant, including two-lane callers that already proved the other lane empty."
     },
     {
       "id": 4,

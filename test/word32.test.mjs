@@ -10,6 +10,7 @@ import {
   bitClearI32,
   bitToggleI32,
   firstSetBitIndex32,
+  firstSetHighBitIndex32,
   popcount32,
   popcount32Sparse,
   subset32,
@@ -38,6 +39,9 @@ test('first set bit index', () => {
   assert.equal(firstSetBitIndex32(1), 0);
   assert.equal(firstSetBitIndex32(0x80000000), 31);
   assert.equal(firstSetBitIndex32(0b1001000), 3);
+  assert.equal(firstSetHighBitIndex32(1), 32);
+  assert.equal(firstSetHighBitIndex32(1 << 9), 41);
+  assert.equal(firstSetHighBitIndex32(0x80000000), 63);
 });
 
 test('popcount32', () => {

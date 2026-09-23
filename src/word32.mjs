@@ -18,6 +18,10 @@ export function firstSetBitIndex32(word) {
   return 31 - Math.clz32(word & -word);
 }
 
+export function firstSetHighBitIndex32(hi) {
+  return 63 - Math.clz32(hi & -hi);
+}
+
 export function popcount32(word) {
   let x = word;
   x = x - ((x >>> 1) & 0x55555555);
