@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
     "addons/rba-tt32.mjs",
@@ -7,7 +7,9 @@
     "addons/rba-connect4-coordinate.mjs",
     "addons/rba-connect4-front.mjs",
     "addons/rba-connect4-solver.mjs",
-    "addons/rba-connect4-profile.mjs"
+    "addons/rba-connect4-profile.mjs",
+    "addons/cpc-connect4.mjs",
+    "addons/rba-connect4-alphabeta.mjs"
   ],
   "geometryContract": {
     "configurationTime": [
@@ -50,14 +52,17 @@
       "Connect4 residual cofactor semantics",
       "support-local basis transport",
       "reflection canonicalization",
-      "four-front construction/query",
+      "conservative CPC/NDC exact certificates and bounds",
+      "CPC-first exact negamax/alpha-beta traversal",
+      "optional four-front construction/query reference refinement",
       "RBA-native child preparation",
       "generic min/max reconciliation glue"
     ],
     "excludes": [
       "physical-board reconstruction after ingress",
-      "alternate fallback solver",
       "fixed board dimension",
+      "unqualified parity ownership as W/D/L authority",
+      "alpha/beta search windows as shared exact q evidence",
       "proof/certificate identity"
     ]
   },
@@ -65,7 +70,12 @@
     "4x4 coordinate/front/solve controls",
     "10x10 coordinate/front controls",
     "10x10 derived carrier has 10 edges and runtime-computed key/basis widths",
-    "fast-profile versus zero-specialization-budget equivalence on configured board"
+    "fast-profile versus zero-specialization-budget equivalence on configured board",
+    "CPC per-column XOR parity checked against literal event enumeration on 4x4 and 10x10",
+    "current-player immediate terminal supersedes an opponent fork in exact CPC control",
+    "distinct playable singleton fork closes as exact loss for side to move",
+    "CPC-only and CPC+Four-Front alpha-beta match independent exact oracles on 4x4 and late/rank-28 7x6 controls",
+    "A/B benchmark records Four-Front node reduction separately from recursive front-step/runtime cost"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -79,5 +89,38 @@
     "memoryPolicy": "dense geometry tables are admitted only when they fit the initialization specializationBudgetBytes",
     "hotPolicy": "selected functions are invoked directly by the prepared evaluator/front arena; no recurring width/height branch chooses the implementation",
     "correctness": "every specialization must remain semantically equivalent to the runtime-configured general path"
+  },
+  "cpcAlphaBetaContract": {
+    "primaryUnresolvedPath": "CPC/NDC exact closure -> fixed initialization-time action order -> one-ply RBA cofactor -> exact negamax/alpha-beta",
+    "temporalPolicy": "ordinary first-win order is supplied by traversal/negamax; explicit temporal metadata is required only when a CPC certificate jumps across intervening play",
+    "exactCpc": [
+      "terminal state",
+      "one/both-sided residual exhaustion interval",
+      "guarded paired-response no-win interval",
+      "current-player immediate terminal",
+      "distinct playable opponent singleton fork",
+      "forced single immediate block"
+    ],
+    "projectedOnly": [
+      "future singleton CPC owner from XOR of per-column event contributions",
+      "future CPC fork pairs whose response/race guards are not yet closed"
+    ],
+    "cachePolicy": "Only globally exact q values are stored as exact cache entries. Narrow alpha/beta returns remain local search bounds.",
+    "moveOrderPolicy": "CPC-only mode uses immutable initialization-prepared actionOrder and no per-depth action-order scratch."
+  },
+  "fourFrontRole": {
+    "status": "qualified-experimental-reference",
+    "purpose": "A/B comparison and symbolic-front research; not the primary unresolved fallback",
+    "reason": "Recursive Four-Front can reduce alpha-beta nodes but adds nested symbolic recursion and per-depth action-bound retention.",
+    "measuredControls": {
+      "unresolvedStandard7x6": {
+        "alphaBetaNodes": 54,
+        "fourFrontAlphaBetaNodes": 37,
+        "alphaBetaMs": 0.27128299999999683,
+        "fourFrontAlphaBetaMs": 6.743407999999988,
+        "fourFrontSteps": 3703,
+        "note": "single GitHub-runner control; directional evidence, not a universal performance claim"
+      }
+    }
   }
 }
