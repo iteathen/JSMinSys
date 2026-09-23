@@ -67,11 +67,10 @@ export function reflectPacked3x32(code, tables) {
   ) >>> 0;
 }
 
-export function reflectPacked3Direct32(code, columns) {
+export function reflectPacked3Direct32(code, columns, initialTargetShift) {
   let reflected = 0;
   let sourceShift = 0;
-  const lastColumn = columns - 1;
-  let targetShift = (lastColumn << 1) + lastColumn;
+  let targetShift = initialTargetShift;
 
   for (let column = 0; column < columns; column += 1) {
     const value = (code >>> sourceShift) & 7;
