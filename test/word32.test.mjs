@@ -214,6 +214,10 @@ test('search scalar blocks', () => {
 
   scoresInOrder.fill(-2147483648);
   assert.equal(argMaxPlayable32(scoresInOrder, order, 7, 0xffffffff), 0xffffffff);
+
+  const evenScores = new Int32Array([1, 7, 3, 5, 2, 4]);
+  const evenOrder = new Uint8Array([0, 1, 2, 3, 4, 5]);
+  assert.equal(argMaxPlayable32(evenScores, evenOrder, 6, 0xffffffff), 1);
 });
 
 
@@ -225,6 +229,7 @@ import {
   firstSetBitIndex2x32,
   clearLowestSetBit32,
   cardinalityClass2x32,
+  popcount2x32SparseHigh,
   popcount2x32,
 } from '../src/word64x32.mjs';
 import {
@@ -286,6 +291,8 @@ test('two-lane set iteration and cardinality', () => {
   assert.equal(cardinalityClass2x32(8, 1), 2);
   assert.equal(cardinalityClass2x32(0b1010, 0), 2);
   assert.equal(popcount2x32(0xffffffff, 0x3ff), 42);
+  assert.equal(popcount2x32SparseHigh(0xffffffff, 0), 32);
+  assert.equal(popcount2x32SparseHigh(0xffffffff, 0x3ff), 42);
 });
 
 test('trusted legality and coordinate reference decode', () => {
