@@ -103,9 +103,10 @@
       "status": "implemented",
       "functions": [
         "mix32",
+        "mix32Medium",
         "mix32Strong"
       ],
-      "note": "Fast bijective mixer is default; stronger two-multiply avalanche remains independently costed."
+      "note": "Three explicitly costed hash-mix strengths let the application trade bucket avalanche against cycles."
     },
     {
       "id": 10,
