@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
+import {prepareConnect4RbaExecutionProfile} from '../addons/rba-connect4-profile.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from '../addons/rba-connect4-front.mjs';
 import {connect4RbaFromMoves,prepareConnect4RbaEvaluator,evaluateConnect4RbaTt32,publishConnect4RbaEvaluation32,reconcileConnect4RbaEvent32,assertConnect4RbaTtCompatibility} from '../addons/rba-connect4-solver.mjs';
 import {createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,rbaTtTake32,rbaTtTakeEvent32,RBA_TT_DONE,RBA_TT_STOP} from '../addons/rba-tt32.mjs';
@@ -79,4 +80,39 @@ test('4x4 depth-zero shared-q traversal solves without a physical-state fallback
   }
   assert.equal(Atomics.load(t.control,RBA_TT_STOP),0);assert.equal(Atomics.load(t.control,RBA_TT_DONE),1);
   assert.equal(t.exact[rootQ],oracle.value);assert.equal(witness[0],oracle.move);
+});
+
+
+test('init-time specialization profile selects fast paths without changing semantics',()=>{
+  const fast=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const generic=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:0});
+  const wide=prepareConnect4RbaGeometry({columns:10,rows:10});
+  const fastProfile=prepareConnect4RbaExecutionProfile(fast);
+  const genericProfile=prepareConnect4RbaExecutionProfile(generic);
+  const wideProfile=prepareConnect4RbaExecutionProfile(wide);
+
+  assert.equal(fastProfile.removeMode,1);
+  assert.equal(fastProfile.subsetMode,1);
+  assert.equal(fastProfile.coordinateMode,3);
+  assert.equal(fastProfile.frontMode,6);
+
+  assert.equal(genericProfile.removeMode,0);
+  assert.equal(genericProfile.subsetMode,0);
+  assert.equal(genericProfile.coordinateMode,3);
+  assert.equal(genericProfile.frontMode,6);
+
+  assert.notEqual(wideProfile.coordinateMode,3);
+  assert.notEqual(wideProfile.frontMode,6);
+
+  const moves=[3,2,4,2,5];
+  const a=connect4RbaFromMoves(moves,{geometry:fast});
+  const b=connect4RbaFromMoves(moves,{geometry:generic});
+  assert.deepEqual(a.words,b.words);
+  assert.deepEqual(a.basis,b.basis);
+
+  const arenaFast=prepareConnect4RbaFrontArena(fast,{depth:2,capacity:2048,budget:2000000,profile:fastProfile});
+  const arenaGeneric=prepareConnect4RbaFrontArena(generic,{depth:2,capacity:2048,budget:2000000,profile:genericProfile});
+  assert.equal(buildConnect4RbaFourFront(fast,arenaFast,a.words,0,a.basis,0,a.basis.length),0);
+  assert.equal(buildConnect4RbaFourFront(generic,arenaGeneric,b.words,0,b.basis,0,b.basis.length),0);
+  assert.equal(queryConnect4RbaFourFront(fast,arenaFast,0,a.words,0),queryConnect4RbaFourFront(generic,arenaGeneric,0,b.words,0));
 });
