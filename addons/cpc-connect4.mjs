@@ -15,9 +15,9 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
   return {
     threatCells:new Uint32Array(g.columns),
     threatColumns:new Uint32Array(g.columns),
-    projectedCells:new Uint32Array(g.maxBasis*2),
-    projectedOwner:new Uint32Array(g.maxBasis*2),
-    projectedDistance:new Uint32Array(g.maxBasis*2),
+    projectedCells:projectedAdvisory?new Uint32Array(g.maxBasis*2):null,
+    projectedOwner:projectedAdvisory?new Uint32Array(g.maxBasis*2):null,
+    projectedDistance:projectedAdvisory?new Uint32Array(g.maxBasis*2):null,
     projectedCount:new Uint32Array(2),
     projectedForks:new Uint32Array(2),
     activeSingletonCells:new Uint32Array(cellWords),
