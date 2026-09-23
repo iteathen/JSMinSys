@@ -166,33 +166,40 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
 // gives an additional exact pair blocker: the attacker cannot own both ends of
 // a pair. The omitted frontier cells are never counted as vertical responses.
 function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player,scratch){
-  let poolCount=0;
-  for(let c=0;c<g.columns;c+=1)
-    if(((g.rows-words[offset+c])&1)!==0)scratch.threatColumns[poolCount++]=c;
-  if(poolCount&1)return 0;
-  const coord=offset+(player?g.p1Offset:g.p0Offset);
+  // The parity of the odd-column frontier pool equals the parity of the total
+  // remaining cell count, so reject odd pools without scanning columns.
+  const rank=words[offset+g.metaOffset]>>>2;
+  if(((g.cellCount-rank)&1)!==0)return 0;
+
+  const coord=offset+(player?g.p1Offset:g.p0Offset),pairMasks=scratch.forkTargets32;
+  let pairCount=-1;
   for(let i=0;i<basisSize;i+=1){
     if(!coordHas(words,coord,i))continue;
     const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-    let covered=0;
+    let covered=0,frontierMask=0;
     for(let j=0;j<size;j+=1){
       const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
       if((row&1)!==g.pairedResponseRowParity)continue;
       const height=words[offset+column];
-      if(((g.rows-height)&1)!==0&&row===height)continue;
+      if(((g.rows-height)&1)!==0&&row===height){
+        if(pairMasks)frontierMask=(frontierMask|((1<<column)>>>0))>>>0;
+        continue;
+      }
       covered=1;break;
     }
-    if(!covered){
-      for(let p=0;p<poolCount;p+=2){
-        const a=scratch.threatColumns[p],b=scratch.threatColumns[p+1];
-        const acell=words[offset+a]*g.columns+a,bcell=words[offset+b]*g.columns+b;
-        let hit=0;
-        for(let j=0;j<size;j+=1){
-          const cell=g.shapeCells[base+j];
-          if(cell===acell)hit|=1;else if(cell===bcell)hit|=2;
+    if(!covered&&pairMasks&&frontierMask){
+      if(pairCount<0){
+        pairCount=0;let pending=-1;
+        for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0){
+          if(pending<0)pending=c;
+          else{
+            pairMasks[pairCount++]=(((1<<pending)>>>0)|((1<<c)>>>0))>>>0;
+            pending=-1;
+          }
         }
-        if(hit===3){covered=1;break;}
       }
+      for(let p=0;p<pairCount;p+=1)
+        if((frontierMask&pairMasks[p])===pairMasks[p]){covered=1;break;}
     }
     if(!covered)return 0;
   }
@@ -245,11 +252,6 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   if(!p0Any)scratch.interval[1]=2;
   if(!p1Any)scratch.interval[0]=2;
 
-  if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
-    scratch.interval[1]=Math.min(scratch.interval[1],2);
-  if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
-    scratch.interval[0]=Math.max(scratch.interval[0],2);
-
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
   // Current-player immediate terminal supersedes all opponent obligations.
@@ -277,6 +279,14 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
       return CPC_EXACT;
     }
   }
+
+  // Long-range response closure is intentionally after the cheap tactical
+  // exact/restriction checks so unresolved nodes alone pay its residual scan.
+  if(mover===0&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch))
+    scratch.interval[1]=Math.min(scratch.interval[1],2);
+  if(mover===1&&frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch))
+    scratch.interval[0]=Math.max(scratch.interval[0],2);
+  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
   collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
   if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
