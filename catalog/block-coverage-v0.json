@@ -123,9 +123,10 @@
       "name": "transposition-cache-probe",
       "status": "implemented",
       "functions": [
-        "ttProbeIndex32",
+        "ttHit32",
         "ttReplace32"
-      ]
+      ],
+      "note": "Caller computes and retains the table index once; probe is a boolean tag hit and replacement reuses the same index."
     },
     {
       "id": 12,
