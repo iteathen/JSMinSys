@@ -267,7 +267,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, mix32Medium, mix32Strong, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Medium, mix32Strong, mix3x32Locator, fillReflect3Tables32, fillReflectExactSmall32, reflectPacked3ExactTable32, reflectPacked3x16, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import {
   reflectPacked3Columns2,
   reflectPacked3Columns3,
@@ -1459,6 +1459,28 @@ test('one-lane caller meta makes known-cell undo landing-only', () => {
     base[CALLER_PLY1_SUPPORT_CODE],
   );
   assert.deepEqual(landingFast, landingBase);
+});
+
+test('joint triple locator mixes exact-key coordinates without becoming identity', () => {
+  assert.equal(mix3x32Locator(0, 0, 0), 0);
+  assert.notEqual(mix3x32Locator(1, 0, 0), mix3x32Locator(0, 1, 0));
+  assert.notEqual(mix3x32Locator(0, 1, 0), mix3x32Locator(0, 0, 1));
+
+  const buckets = new Uint32Array(256);
+  for (let i = 0; i < 4096; i += 1) {
+    const a = i;
+    const b = Math.imul(i + 3, 17);
+    const c = Math.imul(i, 0x9e3779b1);
+    buckets[mix3x32Locator(a, b, c) & 0xff] += 1;
+  }
+  let occupied = 0;
+  let maxBucket = 0;
+  for (let i = 0; i < buckets.length; i += 1) {
+    if (buckets[i] !== 0) occupied += 1;
+    if (buckets[i] > maxBucket) maxBucket = buckets[i];
+  }
+  assert.equal(occupied, 256);
+  assert.ok(maxBucket < 40);
 });
 
 test('mix and reflection blocks', () => {

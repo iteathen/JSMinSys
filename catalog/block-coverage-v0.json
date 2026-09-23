@@ -204,9 +204,10 @@
       "functions": [
         "mix32",
         "mix32Medium",
-        "mix32Strong"
+        "mix32Strong",
+        "mix3x32Locator"
       ],
-      "note": "Three explicitly costed hash-mix strengths let the application trade bucket avalanche against cycles."
+      "note": "Locator mixing has scalar-strength alternatives plus a joint three-coordinate profile. mix3x32Locator is preferred when an exact triple is already available and collision resolution compares the full tuple; hashes never become identity."
     },
     {
       "id": 10,

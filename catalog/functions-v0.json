@@ -1,5 +1,5 @@
 {
-  "version": "0.92.0",
+  "version": "0.93.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3313,6 +3313,30 @@
       }
     },
     {
+      "name": "mix3x32Locator",
+      "source": "src/mix32.mjs",
+      "block": "mix32",
+      "primitives": [
+        "Math.imul",
+        "^",
+        ">>>"
+      ],
+      "status": "implemented-joint-locator-profile",
+      "preconditions": [
+        "a, b, and c are exact key coordinates already available as int32/uint32 bit patterns",
+        "the result is a locator only; exact tuple equality remains authoritative for cache hits",
+        "caller does not use the locator as semantic identity or omit collision checks"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 16,
+        "note": "Three coordinate-specific IMULs are XOR-combined, then one xorshift+IMUL finalizer. This jointly mixes the tuple instead of independently avalanching every coordinate."
+      },
+      "resultDomain": "int32 bit pattern; mask directly for power-of-two table addressing"
+    },
+    {
       "name": "mix32",
       "source": "src/mix32.mjs",
       "block": "mix32",
@@ -6301,11 +6325,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 218,
+    "functionsImplemented": 219,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 218,
+    "functionsWithCycleCount": 219,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -8018,6 +8042,18 @@
           "before": "every failed atomicTryClaim32 attempt pays locked compareExchange",
           "after": "observed mismatch pays ATOMIC_LOAD + comparison; matching observations still pay authoritative compareExchange",
           "mechanism": "use a sequentially-consistent load as an advisory rejection filter in high-mismatch regimes"
+        }
+      ]
+    },
+    {
+      "id": "round-086",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "mix3x32Locator",
+          "before": "three-coordinate locator composition using mix32 per coordinate plus combine/final mix is about 32 serial-ledger cycles",
+          "after": "16 fixed cycles",
+          "mechanism": "jointly mix the exact tuple once because the hash only addresses the table and exact coordinates still authorize hits"
         }
       ]
     }

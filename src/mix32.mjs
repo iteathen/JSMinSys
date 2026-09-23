@@ -20,6 +20,13 @@ export function mix32Strong(value) {
   return x;
 }
 
+export function mix3x32Locator(a, b, c) {
+  let x = Math.imul(a, 0x9e3779b1);
+  x ^= Math.imul(b, 0x85ebca6b);
+  x ^= Math.imul(c, 0xc2b2ae35);
+  return Math.imul(x ^ (x >>> 16), 0x7feb352d);
+}
+
 export function fillReflect3Tables32(tables, columns, byteCount) {
   const supportBits = columns * 3;
   let sourceBit = 0;
