@@ -259,6 +259,16 @@ Hot functions MAY require those prepared values as preconditions rather than rec
 
 A specialization for one configured geometry MAY exist as an alternative function, but it MUST NOT silently replace the general runtime-configured contract.
 
+### JMS-DATA-007 — General path required for geometry-general capability
+
+When JSMinSys or an add-on claims a capability for runtime-configured board/application geometry, at least one implementation path MUST derive all geometry-dependent widths, lane counts, candidate counts, and storage strides from initialization data.
+
+A fixed-size specialization MAY coexist with that path, but it MUST be explicitly named or documented as specialized and MUST NOT be the only implementation offered for a geometry-general capability.
+
+Proving-workload constants such as a particular board width, row count, cell count, winning-line count, residual-basis capacity, key width, or action count MUST NOT become hidden global limits.
+
+The general path may reject configurations that exceed JavaScript/TypedArray/index representation limits, but such limits MUST be validated explicitly during initialization rather than encoded as an unrelated proving-workload dimension.
+
 ## 8. Operation vocabulary
 
 The machine-readable operation authority is `catalog/catalog-v0.json`.
