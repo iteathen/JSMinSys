@@ -31,17 +31,12 @@ export function shl2x32Into(dst, di, lo, hi, count) {
     return dst;
   }
   if (count < 32) {
-    dst[di] = (lo << count) >>> 0;
-    dst[di + 1] = ((hi << count) | (lo >>> (32 - count))) >>> 0;
-    return dst;
-  }
-  if (count < 64) {
-    dst[di] = 0;
-    dst[di + 1] = (lo << (count - 32)) >>> 0;
+    dst[di] = lo << count;
+    dst[di + 1] = (hi << count) | (lo >>> (32 - count));
     return dst;
   }
   dst[di] = 0;
-  dst[di + 1] = 0;
+  dst[di + 1] = lo << (count - 32);
   return dst;
 }
 
@@ -52,16 +47,11 @@ export function ushr2x32Into(dst, di, lo, hi, count) {
     return dst;
   }
   if (count < 32) {
-    dst[di] = ((lo >>> count) | (hi << (32 - count))) >>> 0;
+    dst[di] = (lo >>> count) | (hi << (32 - count));
     dst[di + 1] = hi >>> count;
     return dst;
   }
-  if (count < 64) {
-    dst[di] = hi >>> (count - 32);
-    dst[di + 1] = 0;
-    return dst;
-  }
-  dst[di] = 0;
+  dst[di] = hi >>> (count - 32);
   dst[di + 1] = 0;
   return dst;
 }
@@ -70,14 +60,14 @@ export function add2x32Into(dst, di, a0, a1, b0, b1) {
   const lo = (a0 + b0) >>> 0;
   const carry = lo < a0 ? 1 : 0;
   dst[di] = lo;
-  dst[di + 1] = (a1 + b1 + carry) >>> 0;
+  dst[di + 1] = a1 + b1 + carry;
   return dst;
 }
 
 export function sub2x32Into(dst, di, a0, a1, b0, b1) {
   const borrow = a0 < b0 ? 1 : 0;
-  dst[di] = (a0 - b0) >>> 0;
-  dst[di + 1] = (a1 - b1 - borrow) >>> 0;
+  dst[di] = a0 - b0;
+  dst[di + 1] = a1 - b1 - borrow;
   return dst;
 }
 
