@@ -293,7 +293,8 @@
         "nextPowerOfTwo32",
         "rehashOverwrite32"
       ],
-      "admittedPrimitive": "Uint32Array.construct"
+      "admittedPrimitive": "Uint32Array.construct",
+      "note": "Capacity growth keeps allocation and rehash costs explicit. rehashOverwrite32 now performs only migration; new capacity is caller-known from newMask and is not reconstructed/returned by the primitive."
     }
   ]
 }

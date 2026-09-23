@@ -894,7 +894,7 @@ test('capacity helpers and overwrite rehash', () => {
   const newHashes = new Uint32Array(8);
   newHashes.fill(0xffffffff);
   const newValues = new Uint32Array(8);
-  assert.equal(rehashOverwrite32(oldHashes, oldValues, 4, newHashes, newValues, 7, 0xffffffff), 8);
+  rehashOverwrite32(oldHashes, oldValues, 4, newHashes, newValues, 7, 0xffffffff);
   assert.equal(newHashes[1], 9);
   assert.equal(newValues[1], 90);
   assert.equal(newHashes[5], 5);

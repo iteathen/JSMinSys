@@ -1,5 +1,5 @@
 {
-  "version": "0.59.0",
+  "version": "0.60.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3214,7 +3214,7 @@
         "ST32",
         "===",
         "&",
-        "+",
+        "+=",
         "=",
         "<"
       ],
@@ -3223,10 +3223,10 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "3 + N*(L+5) + K*(L+1+2*S)",
-        "note": "N=old slots scanned; K=non-empty entries rehashed; L=load cycles; S=store cycles.",
-        "hotL1Predicted": "3 + 9*N + 6*K",
-        "hotL2Predicted": "3 + 17*N + 14*K"
+        "expression": "2 + N*(L+5) + K*(L+1+2*S)",
+        "note": "N=old slots scanned; K=non-empty entries rehashed; L=load cycles; S=store cycles. Caller already owns newMask/capacity, so rehash emits no redundant capacity reconstruction.",
+        "hotL1Predicted": "2 + 9*N + 6*K",
+        "hotL2Predicted": "2 + 17*N + 14*K"
       }
     },
     {
@@ -4409,6 +4409,18 @@
           "before": "popcount2x32 fixed 25 cycles",
           "after": "2 + 5*K + BM; predicted-loop win for total K<=4",
           "mechanism": "same sparsity-sensitive exact count across both lanes"
+        }
+      ]
+    },
+    {
+      "id": "round-053",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "rehashOverwrite32",
+          "before": "3 + N*(L+5) + K*(L+1+2*S)",
+          "after": "2 + N*(L+5) + K*(L+1+2*S)",
+          "mechanism": "delete return newMask+1 because the caller supplied newMask and already owns capacity"
         }
       ]
     }

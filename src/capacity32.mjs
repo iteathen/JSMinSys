@@ -26,5 +26,4 @@ export function rehashOverwrite32(
     newHashes[target] = hash;
     newValues[target] = oldValues[index];
   }
-  return newMask + 1;
 }
