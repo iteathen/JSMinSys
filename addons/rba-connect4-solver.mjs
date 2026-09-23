@@ -43,9 +43,9 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   return {words:result,basis:rootBasis,reflected};
 }
 function bothCoordinatesEmpty(g,words,base){
-  const p0=base+g.p0Offset,p1=base+g.p1Offset;let any=0;
-  for(let w=0;w<g.coordWords;w+=1)any|=words[p0+w]|words[p1+w];
-  return any===0;
+  const p0=base+g.p0Offset,p1=base+g.p1Offset;
+  for(let w=0;w<g.coordWords;w+=1)if(words[p0+w]|words[p1+w])return 0;
+  return 1;
 }
 function rootCanonicalColumn(g,orderIndex,reflected){const caller=g.actionOrder[orderIndex];return reflected?g.mirrorColumn[caller]:caller;}
 
@@ -54,8 +54,8 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
-  if(!g.lineCount||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
-  const n=t.basisSize[q];if(!n)return RBA_EXACT_DRAW;
+  const n=t.basisSize[q];if(!g.lineCount||!n)return RBA_EXACT_DRAW;
+  if(bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
 
   state.boundaryCalls+=1;
   const outcome=buildConnect4RbaFourFront(g,state.boundary,t.keys,base,t.basis,basisBase,n);
