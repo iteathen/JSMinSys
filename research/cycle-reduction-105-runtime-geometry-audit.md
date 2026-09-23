@@ -81,3 +81,33 @@ Specialization is still encouraged when initialization can prove its
 preconditions and whole-operation measurement shows a win. It must remain an
 alternative selected from the configured profile, never the only path behind a
 geometry-general API.
+
+
+## Cold-selected optimization profiles
+
+The corrected general path does not prohibit board-size optimization. After
+geometry is prepared, `prepareConnect4RbaExecutionProfile` selects applicable
+specializations once.
+
+Current selections are structural rather than board-name based:
+
+- dense cell-removal lookup when its table fits the configured specialization
+  memory budget, otherwise sparse four-cell shape removal;
+- dense residual subset lookup when its table fits the remaining budget,
+  otherwise sparse set comparison;
+- three-word coordinate permutation when the configured coordinate width is
+  exactly three words, otherwise the runtime-span permutation; and
+- six-word skyline/product when a front generator is exactly six words,
+  otherwise the runtime-span implementation.
+
+The prepared front arena/evaluator holds those selected operations. Hot calls do
+not branch on columns or rows to choose them.
+
+Qualification compares a specialization-enabled configured board with the same
+board prepared using `specializationBudgetBytes: 0`, requiring identical q,
+basis and four-front query results. Wider 10x10 controls remain on the span
+coordinate/front path.
+
+This is the intended rule for future specializations: initialization may branch
+aggressively on proven configured invariants; the chosen hot implementation must
+remain exact and the general path must remain available.
