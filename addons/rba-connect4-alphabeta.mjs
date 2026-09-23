@@ -11,12 +11,12 @@ export const RBA_AB_CPC_FOUR_FRONT=1;
 export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
      !Number.isInteger(keyWords)||keyWords<1)throw new RangeError('invalid exact cache');
-  return {mask:capacity-1,keyWords,valid:new Uint8Array(capacity),value:new Uint8Array(capacity),
+  return {mask:capacity-1,keyWords,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
     keys:new Uint32Array(capacity*keyWords)};
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
   const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
-  if(!cache.valid[slot])return 0;
+  if(cache.stamp[slot]!==cache.epoch)return 0;
   const base=slot*cache.keyWords;
   for(let w=0;w<cache.keyWords;w+=1)if(cache.keys[base+w]!==words[offset+w])return 0;
   return cache.value[slot];
@@ -24,7 +24,12 @@ export function probeConnect4RbaExactCache32(cache,words,offset){
 export function storeConnect4RbaExactCache32(cache,words,offset,value){
   const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
   publishSpan32(cache.keys,slot*cache.keyWords,words,offset,cache.keyWords);
-  cache.value[slot]=value;cache.valid[slot]=1;return value;
+  cache.value[slot]=value;cache.stamp[slot]=cache.epoch;return value;
+}
+function resetConnect4RbaExactCache32(cache){
+  let epoch=(cache.epoch+1)>>>0;
+  if(!epoch){cache.stamp.fill(0);epoch=1;}
+  cache.epoch=epoch;
 }
 
 function absToRelative(value,mover){return value===2?0:mover===0?value-2:2-value;}
@@ -167,7 +172,7 @@ function search(state,depth,alpha,beta){
 export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(!state)throw new TypeError('prepared alpha-beta state required');
   const g=state.g;
-  state.words.fill(0);state.basis.fill(0);state.basisSize.fill(0);state.cache.valid.fill(0);
+  resetConnect4RbaExactCache32(state.cache);
   state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=state.cpcForced=state.cpcPrecursors=state.cpcProjectedForks=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
