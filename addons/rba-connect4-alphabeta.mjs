@@ -203,6 +203,10 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
     const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
     if(state.words[column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    // If the mover's exact root value is a loss, every surviving legal action
+    // has that same value. The first initialization-ordered action is therefore
+    // already the deterministic optimal witness.
+    if(rootExact===-1){best=-1;bestMove=caller;break;}
     let value;
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];state.frontActionExact+=1;
@@ -214,7 +218,13 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(term)value=absToRelative(term,mover);
     else{
       connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
-      value=rootExact!==null?-search(state,1,-2,2):-search(state,1,-beta,-alpha);
+      if(rootExact!==null){
+        // Exact root W/D/L only needs a one-step discrimination window to find
+        // the first action attaining that known value. For root win/draw the
+        // corresponding child target is -1/0 respectively.
+        const childAlpha=-rootExact;
+        value=-search(state,1,childAlpha,childAlpha+1);
+      }else value=-search(state,1,-beta,-alpha);
     }
     }
     if(value>best){best=value;bestMove=caller;}
