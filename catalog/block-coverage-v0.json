@@ -16,9 +16,13 @@
       "functions": [
         "bitTest32",
         "bitSet32",
+        "bitSetI32",
         "bitClear32",
-        "bitToggle32"
-      ]
+        "bitClearI32",
+        "bitToggle32",
+        "bitToggleI32"
+      ],
+      "note": "Numeric-uint32 and signed-bit-pattern forms are both explicit; bit-pattern forms avoid unnecessary unsigned scalar coercion."
     },
     {
       "id": 2,
@@ -44,7 +48,8 @@
         "firstSetBitIndex32",
         "firstSetBitIndex2x32",
         "clearLowestSetBit32",
-        "cardinalityClass2x32"
+        "cardinalityClass2x32",
+        "clearLowestSetBitI32"
       ]
     },
     {
@@ -85,9 +90,12 @@
       "name": "winning-line-test",
       "status": "implemented",
       "functions": [
+        "maskContainsI32",
+        "maskContains2xI32",
         "maskContains32",
         "maskContains2x32"
-      ]
+      ],
+      "note": "Signed bit-pattern containment is preferred when masks never require unsigned numeric interpretation."
     },
     {
       "id": 8,
