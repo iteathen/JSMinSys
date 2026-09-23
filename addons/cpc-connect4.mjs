@@ -173,35 +173,40 @@ function frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player
 
   const coord=offset+(player?g.p1Offset:g.p0Offset),pairMasks=scratch.forkTargets32;
   let pairCount=-1;
-  for(let i=0;i<basisSize;i+=1){
-    if(!coordHas(words,coord,i))continue;
-    const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-    let covered=0,frontierMask=0;
-    for(let j=0;j<size;j+=1){
-      const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
-      if((row&1)!==g.pairedResponseRowParity)continue;
-      const height=words[offset+column];
-      if(((g.rows-height)&1)!==0&&row===height){
-        if(pairMasks)frontierMask=(frontierMask|((1<<column)>>>0))>>>0;
-        continue;
+  for(let w=0;w<g.coordWords;w+=1){
+    let active=words[coord+w]>>>0;
+    while(active){
+      const bit=firstSetBitIndex32(active),i=(w<<5)+bit;
+      active=(active&(active-1))>>>0;
+      if(i>=basisSize)continue;
+      const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
+      let covered=0,frontierMask=0;
+      for(let j=0;j<size;j+=1){
+        const cell=g.shapeCells[base+j],column=g.cellColumn[cell],row=g.cellRow[cell];
+        if((row&1)!==g.pairedResponseRowParity)continue;
+        const height=words[offset+column];
+        if(((g.rows-height)&1)!==0&&row===height){
+          if(pairMasks)frontierMask=(frontierMask|((1<<column)>>>0))>>>0;
+          continue;
+        }
+        covered=1;break;
       }
-      covered=1;break;
-    }
-    if(!covered&&pairMasks&&frontierMask){
-      if(pairCount<0){
-        pairCount=0;let pending=-1;
-        for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0){
-          if(pending<0)pending=c;
-          else{
-            pairMasks[pairCount++]=(((1<<pending)>>>0)|((1<<c)>>>0))>>>0;
-            pending=-1;
+      if(!covered&&pairMasks&&frontierMask){
+        if(pairCount<0){
+          pairCount=0;let pending=-1;
+          for(let c=0;c<g.columns;c+=1)if(((g.rows-words[offset+c])&1)!==0){
+            if(pending<0)pending=c;
+            else{
+              pairMasks[pairCount++]=(((1<<pending)>>>0)|((1<<c)>>>0))>>>0;
+              pending=-1;
+            }
           }
         }
+        for(let p=0;p<pairCount;p+=1)
+          if((frontierMask&pairMasks[p])===pairMasks[p]){covered=1;break;}
       }
-      for(let p=0;p<pairCount;p+=1)
-        if((frontierMask&pairMasks[p])===pairMasks[p]){covered=1;break;}
+      if(!covered)return 0;
     }
-    if(!covered)return 0;
   }
   return 1;
 }
