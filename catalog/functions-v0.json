@@ -1,5 +1,5 @@
 {
-  "version": "0.15.0",
+  "version": "0.16.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -1045,39 +1045,75 @@
       }
     },
     {
+      "name": "fillCoordinateTables32",
+      "source": "src/indexed32.mjs",
+      "block": "coordinate-decode",
+      "primitives": [
+        "ST32",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization",
+      "preconditions": [
+        "rowByCell and columnByCell have capacity >= columns*rows",
+        "columns and rows are the configured immutable board dimensions"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "3 + R*(3 + C*(5 + 2*STORE_COST))",
+        "parameters": {
+          "C": "configured columns",
+          "R": "configured rows"
+        },
+        "note": "Initialization-only builder. With NEES hot/local 0.5-cycle store throughput this is approximately 3 + R*(3 + 6*C) serial ledger cycles."
+      }
+    },
+    {
       "name": "decodeColumn32",
       "source": "src/indexed32.mjs",
       "block": "coordinate-decode",
       "primitives": [
-        "%"
+        "LD32"
       ],
-      "status": "implemented-reference-anti-candidate",
+      "status": "implemented-precomputed",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "range",
-        "minCycles": 9,
-        "maxCycles": 14,
-        "note": "Integer-division/remainder core reference. This is an anti-candidate and source lowering remains realization-sensitive."
-      }
+        "kind": "scenario",
+        "hotL1Predicted": 4,
+        "hotL2Predicted": 12,
+        "hotL3Predicted": 47,
+        "expression": "LOAD(columnByCell[cell])",
+        "note": "Replaces runtime modulo with an initialization-precomputed coordinate lookup."
+      },
+      "preconditions": [
+        "columnByCell was built for the configured board during initialization"
+      ]
     },
     {
       "name": "decodeRow32",
       "source": "src/indexed32.mjs",
       "block": "coordinate-decode",
       "primitives": [
-        "/",
-        "Math.floor"
+        "LD32"
       ],
-      "status": "implemented-reference-anti-candidate",
+      "status": "implemented-precomputed",
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
-        "kind": "expression",
-        "expression": "DIV_CORE(9..14) + FLOAT_FLOOR",
-        "note": "Division core has a 9-14 cycle native reference; NEES currently leaves the exact Math.floor floating-path cost symbolic.",
-        "minCycles": 9
-      }
+        "kind": "scenario",
+        "hotL1Predicted": 4,
+        "hotL2Predicted": 12,
+        "hotL3Predicted": 47,
+        "expression": "LOAD(rowByCell[cell])",
+        "note": "Replaces runtime division/floor with an initialization-precomputed coordinate lookup."
+      },
+      "preconditions": [
+        "rowByCell was built for the configured board during initialization"
+      ]
     },
     {
       "name": "isPowerOfTwo32",
@@ -1164,11 +1200,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 56,
+    "functionsImplemented": 57,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 56,
+    "functionsWithCycleCount": 57,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -1409,6 +1445,30 @@
           "before": "2 atomic loads per failed wait iteration",
           "after": "1 atomic load per failed wait iteration",
           "mechanism": "reuse observed sequence value as Atomics.wait expected value"
+        }
+      ]
+    },
+    {
+      "id": "round-009",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "decodeColumn32",
+          "before": "9-14 cycle divide/remainder core",
+          "after": "4 L1 / 12 L2 / 47 L3",
+          "mechanism": "precompute columnByCell at initialization"
+        },
+        {
+          "function": "decodeRow32",
+          "before": "9-14 cycle divide core + symbolic Math.floor",
+          "after": "4 L1 / 12 L2 / 47 L3",
+          "mechanism": "precompute rowByCell at initialization"
+        },
+        {
+          "function": "fillCoordinateTables32",
+          "before": "not present",
+          "after": "initialization-only setup cost is explicitly cycle-accounted",
+          "mechanism": "move geometry decoding work to configuration phase"
         }
       ]
     }
