@@ -95,9 +95,13 @@ The RBA add-on stack derives its carrier from application configuration at initi
 - `addons/rba-connect4-coordinate.mjs` supplies native cofactor/basis/reflection mechanics over that prepared profile.
 - `addons/rba-connect4-front.mjs` supplies the configured four-front algebra.
 - `addons/rba-connect4-solver.mjs` supplies RBA-native evaluation, publication, reconciliation, and cold ingress.
+- `addons/cpc-connect4.mjs` supplies conservative CPC/NDC closure: per-column XOR event parity, exact exhaustion/paired-response bounds, immediate terminal/fork closure, forced-block restriction, and non-authoritative projected future forks.
+- `addons/rba-connect4-alphabeta.mjs` supplies the CPC-first exact negamax/alpha-beta control path. CPC-only mode iterates the immutable prepared action order directly and carries no per-depth action-order scratch.
 
 Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general paths use runtime-sized spans and one height word per configured column, so rows above seven and boards above 64 cells do not require board reconstruction or a new solver representation.
 
 **Initialization-time specialization:** `prepareConnect4RbaExecutionProfile()` selects eligible fast paths once after geometry preparation. Current selectors include dense versus sparse residual transition/subset relations, 3-word versus runtime-span coordinate permutation, and 6-word versus runtime-span skyline/product. The hot path calls the selected implementation without re-testing board width/height. The dense-table choice is additionally bounded by the initialization specialization memory budget.
 
 See `catalog/rba-addon-v0.json`.
+**Four-Front A/B status:** recursive Four-Front remains available as an experimental/reference refinement, not the primary unresolved fallback. On the qualified unresolved rank-28 standard-7x6 control it reduced alpha-beta nodes from 54 to 37 but increased measured runner time from about 0.27 ms to 6.74 ms while performing 3,703 front steps. This is directional single-run evidence; broader performance qualification remains required.
+
