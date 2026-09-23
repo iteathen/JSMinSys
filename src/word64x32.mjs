@@ -66,6 +66,10 @@ export function firstSetBitIndex2x32(lo, hi) {
   return 63 - Math.clz32(hi & -hi);
 }
 
+export function clearLowestSetBitI32(word) {
+  return word & (word - 1);
+}
+
 export function clearLowestSetBit32(word) {
   return (word & (word - 1)) >>> 0;
 }
