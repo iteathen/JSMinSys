@@ -72,7 +72,7 @@ import {
   residualBase32,
   residualTransition32,
   powerOfTwoIndex32,
-  ttProbeIndex32,
+  ttHit32,
   ttReplace32,
   selectGreater32,
   selectLess32,
@@ -103,8 +103,8 @@ test('indexed and table blocks', () => {
   const values = new Uint32Array(8);
   ttReplace32(tags, values, 3, 99, 1234);
   const ttIndex = powerOfTwoIndex32(3, 7);
-  assert.equal(ttProbeIndex32(tags, ttIndex, 99, 0xffffffff), 3);
-  assert.equal(ttProbeIndex32(tags, ttIndex, 98, 0xffffffff), 0xffffffff);
+  assert.equal(ttHit32(tags, ttIndex, 99), true);
+  assert.equal(ttHit32(tags, ttIndex, 98), false);
   assert.equal(values[3], 1234);
   assert.equal(selectGreater32(4, 9), 9);
   assert.equal(selectLess32(4, 9), 4);
@@ -136,14 +136,14 @@ test('apply and undo support state', () => {
   fillLandingCells32(landingCells, 7);
   for (let column = 0; column < 7; column += 1) state[STATE_PLAYABLE_LO] |= (1 << column) >>> 0;
 
-  const supportDelta = ((1 << 9) + (1 << 21)) >>> 0;
+  const supportDelta = 1 << 9;
   const cell = applyMove32(state, landingCells, 3, 7, 42, supportDelta);
   assert.equal(cell, 3);
   assert.equal(state[STATE_PLY], 1);
   assert.equal(sideFromPly32(state[STATE_PLY]), 1);
   assert.equal(landingCells[3], 10);
   assert.equal((state[STATE_PLAYABLE_LO] & (1 << 10)) !== 0, true);
-  assert.equal(state[STATE_SUPPORT_CODE], ((1 << 9) + (1 << 21)) >>> 0);
+  assert.equal(state[STATE_SUPPORT_CODE], 1 << 9);
 
   const undone = undoMove32(state, landingCells, 3, 7, 42, supportDelta);
   assert.equal(undone, 3);
@@ -164,20 +164,18 @@ test('mix and reflection blocks', () => {
   assert.notEqual(mix32(0x12345678), mix32Strong(0x12345678));
   const tables7 = new Uint32Array(1024);
   assert.equal(fillReflect3Tables32(tables7, 7), 21);
-  const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
-  const reflected = reflectPacked3x24(code, tables7, 0xffe00000);
-  assert.equal(reflected, reflectPacked3Direct32(code, 7, 21));
-  assert.equal(reflectPacked3x32(code, tables7, 0xffe00000), reflected);
-  assert.equal((reflected >>> 21), 2);
+  const code = ((1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
+  const reflected = reflectPacked3x24(code, tables7);
+  assert.equal(reflected, reflectPacked3Direct32(code, 7));
+  assert.equal(reflectPacked3x32(code, tables7), reflected);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
 
   const tables4 = new Uint32Array(1024);
   assert.equal(fillReflect3Tables32(tables4, 4), 12);
-  const code4 = ((2 << 12) | 1 | (2 << 3) | (3 << 6) | (4 << 9)) >>> 0;
-  const reflected4 = reflectPacked3x24(code4, tables4, 0xfffff000);
-  assert.equal(reflected4, reflectPacked3Direct32(code4, 4, 12));
-  assert.equal(reflected4 >>> 12, 2);
+  const code4 = (1 | (2 << 3) | (3 << 6) | (4 << 9)) >>> 0;
+  const reflected4 = reflectPacked3x24(code4, tables4);
+  assert.equal(reflected4, reflectPacked3Direct32(code4, 4));
   assert.equal(reflected4 & 7, 4);
   assert.equal((reflected4 >>> 9) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
@@ -361,7 +359,7 @@ test('high-lane apply and undo derives masks without lookup tables', () => {
   landingCells[5] = 33;
   state[STATE_PLAYABLE_HI] = 1 << 1;
 
-  const supportDelta = ((1 << 15) + (1 << 21)) >>> 0;
+  const supportDelta = 1 << 15;
   const cell = applyMove32(state, landingCells, 5, 7, 42, supportDelta);
   assert.equal(cell, 33);
   assert.equal((state[STATE_PLAYABLE_HI] & (1 << 8)) !== 0, true);
@@ -381,7 +379,7 @@ test('runtime-configured 4x4 transition', () => {
   fillLandingCells32(landingCells, 4);
   state[STATE_PLAYABLE_LO] = 0b1111;
   const column = 2;
-  const supportDelta = ((1 << 6) + (1 << 12)) >>> 0;
+  const supportDelta = 1 << 6;
 
   const cell = applyMove32(state, landingCells, column, 4, 16, supportDelta);
   assert.equal(cell, 2);
