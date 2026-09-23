@@ -112,23 +112,27 @@ function search(state,depth,alpha,beta){
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns;
   let legal=0;
-  for(let oi=0;oi<g.columns;oi+=1){
-    const column=g.actionOrder[oi];
-    if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
-    legal+=1;
-    if(useFront){
+  // Four-Front needs a parent action-bound prepass because the reusable arena
+  // is overwritten by child recursion. CPC-only mode needs no such pass: the
+  // ordinary search loop can detect whether any action survives its filters.
+  if(useFront){
+    for(let oi=0;oi<g.columns;oi+=1){
+      const column=g.actionOrder[oi];
+      if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+      legal+=1;
       const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
       state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
       if(rel[0]===rel[1])state.frontActionExact+=1;
     }
+    if(!legal)return 0;
   }
-  if(!legal)return 0;
 
   let best=-2,cut=0;
   for(let oi=0;oi<g.columns;oi+=1){
     const column=g.actionOrder[oi];
     if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced)||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    if(!useFront)legal=1;
     let value;
     if(useFront&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];
@@ -147,6 +151,7 @@ function search(state,depth,alpha,beta){
     if(alpha>=beta){state.cutoffs+=1;cut=1;break;}
     if(best===1)break;
   }
+  if(!legal)return 0;
   if(best===-2)best=semantic[0];
   // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
   // may be valid alpha/beta bounds but are not global q truth.
