@@ -85,7 +85,7 @@ function search(state,depth,alpha,beta){
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4Cpc32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
-  state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
+  if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
