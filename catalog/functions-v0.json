@@ -1,5 +1,5 @@
 {
-  "version": "0.34.0",
+  "version": "0.35.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -38,6 +38,25 @@
       }
     },
     {
+      "name": "bitSetI32",
+      "source": "src/word32.mjs",
+      "block": "set-bit",
+      "primitives": [
+        "|"
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "result is consumed as an int32 bit pattern; unsigned numeric interpretation is not required"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "OR only; no unsigned-number coercion."
+      }
+    },
+    {
       "name": "bitClear32",
       "source": "src/word32.mjs",
       "block": "clear-bit",
@@ -56,6 +75,26 @@
       }
     },
     {
+      "name": "bitClearI32",
+      "source": "src/word32.mjs",
+      "block": "clear-bit",
+      "primitives": [
+        "~",
+        "&"
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "result is consumed as an int32 bit pattern; unsigned numeric interpretation is not required"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "NOT + AND; no unsigned-number coercion."
+      }
+    },
+    {
       "name": "bitToggle32",
       "source": "src/word32.mjs",
       "block": "toggle-bit",
@@ -70,6 +109,25 @@
         "kind": "fixed",
         "cycles": 2,
         "note": "XOR + uint32 coercion/shift."
+      }
+    },
+    {
+      "name": "bitToggleI32",
+      "source": "src/word32.mjs",
+      "block": "toggle-bit",
+      "primitives": [
+        "^"
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "result is consumed as an int32 bit pattern; unsigned numeric interpretation is not required"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 1,
+        "note": "XOR only; no unsigned-number coercion."
       }
     },
     {
@@ -301,6 +359,26 @@
       }
     },
     {
+      "name": "maskContainsI32",
+      "source": "src/indexed32.mjs",
+      "block": "winning-line-test",
+      "primitives": [
+        "&",
+        "==="
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "owned and required use the same int32 bit-pattern representation"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Signed bit-pattern equality makes bit 31 safe without XOR normalization."
+      }
+    },
+    {
       "name": "maskContains2x32",
       "source": "src/indexed32.mjs",
       "block": "winning-line-test",
@@ -318,6 +396,28 @@
         "minCycles": 4,
         "maxCycles": 7,
         "note": "Correct unsigned two-lane containment with predicted short-circuit; bit-31-safe."
+      }
+    },
+    {
+      "name": "maskContains2xI32",
+      "source": "src/indexed32.mjs",
+      "block": "winning-line-test",
+      "primitives": [
+        "&",
+        "===",
+        "&&"
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "all lanes use the same int32 bit-pattern representation"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "range",
+        "minCycles": 3,
+        "maxCycles": 5,
+        "note": "First lane AND/equality plus short-circuit; second lane adds one AND/equality."
       }
     },
     {
@@ -1300,6 +1400,26 @@
       }
     },
     {
+      "name": "clearLowestSetBitI32",
+      "source": "src/word64x32.mjs",
+      "block": "next-set-bit",
+      "primitives": [
+        "-",
+        "&"
+      ],
+      "status": "implemented-signed-bit-pattern-profile",
+      "preconditions": [
+        "result is consumed as an int32 bit pattern"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 2,
+        "note": "Subtract + AND; no unsigned-number coercion."
+      }
+    },
+    {
       "name": "cardinalityClass2x32",
       "source": "src/word64x32.mjs",
       "block": "first-next-set-bit",
@@ -1547,11 +1667,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 68,
+    "functionsImplemented": 74,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 68,
+    "functionsWithCycleCount": 74,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -2212,6 +2332,48 @@
           "before": "29-cycle fixed two-lane popcount",
           "after": "16-cycle hi==0 path / 31-cycle hi!=0 path",
           "mechanism": "explicit distribution-specific upper-lane-zero fast path"
+        }
+      ]
+    },
+    {
+      "id": "round-028",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "bitSetI32",
+          "before": "bitSet32: 2 cycles",
+          "after": "1 cycle",
+          "mechanism": "signed bit-pattern result removes unsigned coercion"
+        },
+        {
+          "function": "bitClearI32",
+          "before": "bitClear32: 3 cycles",
+          "after": "2 cycles",
+          "mechanism": "signed bit-pattern result removes unsigned coercion"
+        },
+        {
+          "function": "bitToggleI32",
+          "before": "bitToggle32: 2 cycles",
+          "after": "1 cycle",
+          "mechanism": "signed bit-pattern result removes unsigned coercion"
+        },
+        {
+          "function": "maskContainsI32",
+          "before": "maskContains32: 3 cycles",
+          "after": "2 cycles",
+          "mechanism": "store/compare required mask as int32 bit pattern"
+        },
+        {
+          "function": "maskContains2xI32",
+          "before": "maskContains2x32: 4-7 cycles",
+          "after": "3-5 cycles",
+          "mechanism": "signed bit-pattern containment removes XOR normalization"
+        },
+        {
+          "function": "clearLowestSetBitI32",
+          "before": "clearLowestSetBit32: 3 cycles",
+          "after": "2 cycles",
+          "mechanism": "signed bit-pattern result removes unsigned coercion"
         }
       ]
     }
