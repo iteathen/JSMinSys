@@ -331,15 +331,17 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   // The prior all-even theorem remains the production baseline. The pooled/
   // synchronized frontier extension is selected once at initialization for A/B.
   if(mover===0){
-    const noWin=scratch.frontierResponse
-      ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
-      :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
-    if(noWin)scratch.interval[1]=Math.min(scratch.interval[1],2);
-  }else{
+    if(scratch.interval[1]===3){
+      const noWin=scratch.frontierResponse
+        ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
+        :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
+      if(noWin)scratch.interval[1]=2;
+    }
+  }else if(scratch.interval[0]===1){
     const noWin=scratch.frontierResponse
       ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch)
       :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
-    if(noWin)scratch.interval[0]=Math.max(scratch.interval[0],2);
+    if(noWin)scratch.interval[0]=2;
   }
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
