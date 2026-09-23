@@ -34,7 +34,8 @@ for(const name of [
 const addons=readFileSync('addons/index.mjs','utf8');
 for(const name of [
   'rba-tt32.mjs','rba-connect4-geometry.mjs','rba-connect4-coordinate.mjs',
-  'rba-connect4-front.mjs','rba-connect4-solver.mjs','rba-connect4-profile.mjs'
+  'rba-connect4-front.mjs','rba-connect4-solver.mjs','rba-connect4-profile.mjs',
+  'cpc-connect4.mjs','rba-connect4-alphabeta.mjs'
 ])assert.ok(addons.includes(name),`missing configured RBA export ${name}`);
 
 const spec=readFileSync('SPEC.md','utf8');
