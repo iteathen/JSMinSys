@@ -105,12 +105,16 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
   if(primary<0)return 0;
 
   for(let w=0;w<g.shapeWordCount;w+=1)scratch.seen[w]=0;
-  for(let i=0;i<n;i+=1){const id=g.reflect[basis[bi+i]];scratch.seen[id>>>5]|=1<<(id&31);}
-  const rn=emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
-  for(let i=0;i<rn;i+=1)scratch.inverse[scratch.mirrorBasis[i]]=i;
-  for(let i=0;i<n;i+=1)scratch.map[i]=scratch.inverse[g.reflect[basis[bi+i]]];
-  profile.permuteBits(scratch.mirror,g.p0Offset,g.coordWords,words,offset+g.p0Offset,scratch.map,0,n);
-  profile.permuteBits(scratch.mirror,g.p1Offset,g.coordWords,words,offset+g.p1Offset,scratch.map,0,n);
+  for(let i=0;i<n;i+=1){
+    const id=g.reflect[basis[bi+i]];scratch.map[i]=id;scratch.seen[id>>>5]|=1<<(id&31);
+  }
+  emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
+  for(let i=0;i<n;i+=1)scratch.inverse[scratch.mirrorBasis[i]]=i;
+  for(let i=0;i<n;i+=1)scratch.map[i]=scratch.inverse[scratch.map[i]];
+  profile.permuteCoordinates(
+    scratch.mirror,g.p0Offset,g.p1Offset,g.coordWords,
+    words,offset+g.p0Offset,offset+g.p1Offset,scratch.map,0,n,
+  );
 
   if(primary===0){
     let w=g.p0Offset;while(w<g.keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
