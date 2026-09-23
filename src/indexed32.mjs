@@ -28,8 +28,8 @@ export function powerOfTwoIndex32(hash, capacityMask) {
   return hash & capacityMask;
 }
 
-export function ttProbeIndex32(tags, index, tag, missIndex) {
-  return tags[index] === tag ? index : missIndex;
+export function ttHit32(tags, index, tag) {
+  return tags[index] === tag;
 }
 
 export function ttReplace32(tags, values, index, tag, value) {
