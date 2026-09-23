@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -319,6 +319,9 @@
       "Atomics.sub",
       "Atomics.wait",
       "Atomics.notify"
+    ],
+    "storageConstruction": [
+      "Uint32Array.construct"
     ]
   },
   "admissionNotes": [
@@ -326,7 +329,9 @@
     "division-modulus-and-exponentiation-are-legal-but-remain-optimization-targets",
     "increment-decrement-are-syntax-not-distinct-primitive-capabilities",
     "new-operation-families-require-explicit-admission",
-    "every-admissible-emission-must-have-cycle-model"
+    "every-admissible-emission-must-have-cycle-model",
+    "cost-magnitude-does-not-control-admission",
+    "slow-operations-are-admissible-when-cost-accounted"
   ],
   "admissibleData": {
     "scalarDomains": [
@@ -555,8 +560,8 @@
     "modelFile": "catalog/cycle-model-v0.json",
     "functionAccountingFile": "catalog/08-function-cycle-accounting.md",
     "coverage": {
-      "admissible": 62,
-      "mapped": 62,
+      "admissible": 63,
+      "mapped": 63,
       "missing": 0,
       "complete": true
     },
@@ -583,7 +588,8 @@
   "costAuthority": {
     "repository": "iteathen/NEES",
     "minimumVersion": "Draft 0.5",
-    "role": "authoritative runtime/CPU cost profiles and quantified execution-cost accounting"
+    "role": "authoritative runtime/CPU cost profiles and quantified execution-cost accounting",
+    "minimumCommit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69"
   },
   "parentStandard": {
     "repository": "iteathen/NEES",
