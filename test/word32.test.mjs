@@ -166,7 +166,7 @@ test('mix and reflection blocks', () => {
   assert.equal(fillReflect3Tables32(tables7, 7), 21);
   const code = ((1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
   const reflected = reflectPacked3x24(code, tables7);
-  assert.equal(reflected, reflectPacked3Direct32(code, 7));
+  assert.equal(reflected, reflectPacked3Direct32(code, 7, 18));
   assert.equal(reflectPacked3x32(code, tables7), reflected);
   assert.equal(reflected & 7, 3);
   assert.equal((reflected >>> 18) & 7, 1);
@@ -175,7 +175,7 @@ test('mix and reflection blocks', () => {
   assert.equal(fillReflect3Tables32(tables4, 4), 12);
   const code4 = (1 | (2 << 3) | (3 << 6) | (4 << 9)) >>> 0;
   const reflected4 = reflectPacked3x24(code4, tables4);
-  assert.equal(reflected4, reflectPacked3Direct32(code4, 4));
+  assert.equal(reflected4, reflectPacked3Direct32(code4, 4, 9));
   assert.equal(reflected4 & 7, 4);
   assert.equal((reflected4 >>> 9) & 7, 1);
   assert.equal(canonicalMin32(9, 4), 4);
