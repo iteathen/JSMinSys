@@ -205,6 +205,7 @@ import {
   decodeRow32,
 } from '../src/indexed32.mjs';
 import {
+  allocateTypedCapacity,
   isPowerOfTwo32,
   nextPowerOfTwo32,
   rehashOverwrite32,
@@ -297,4 +298,12 @@ test('bounded shared queue blocks without waiting', () => {
   assert.equal(queueEnqueue32(enqueue, sequence, values, 3, 4, 77), 0);
   assert.equal(queueDequeue32(dequeue, sequence, values, 3, 4), 77);
   assert.equal(sequence[0], 4);
+});
+
+
+test('typed capacity allocation', () => {
+  const storage = allocateTypedCapacity(8);
+  assert.equal(storage instanceof Uint32Array, true);
+  assert.equal(storage.length, 8);
+  assert.deepEqual([...storage], [0, 0, 0, 0, 0, 0, 0, 0]);
 });
