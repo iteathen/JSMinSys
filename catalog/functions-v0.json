@@ -1,5 +1,5 @@
 {
-  "version": "0.56.0",
+  "version": "0.57.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2864,6 +2864,67 @@
       }
     },
     {
+      "name": "fillPopcount10Table32",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        "LD32",
+        "ST32",
+        ">>>",
+        "&",
+        "+",
+        "<",
+        "+=",
+        "="
+      ],
+      "status": "implemented-initialization",
+      "preconditions": [
+        "table capacity >= 1024 Uint32 entries",
+        "called during configuration/setup, not the hot count loop"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "STORE_COST + 1023*(LOAD + STORE_COST + 5)",
+        "parameters": {
+          "LOAD": "table recurrence load cost",
+          "STORE_COST": "table store cost"
+        },
+        "note": "Initialization-only 4 KiB Uint32 table. Each entry reuses table[value>>>1] plus value&1; setup cost is explicit rather than hidden in the hot profile."
+      }
+    },
+    {
+      "name": "popcount2x32High10Table",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        "LD32",
+        ">>>",
+        "-",
+        "&",
+        "+",
+        "=",
+        "Math.imul"
+      ],
+      "status": "implemented-configured-cache-profile",
+      "preconditions": [
+        "configured high lane has at most 10 live bits (hi < 1024)",
+        "table was initialized by fillPopcount10Table32",
+        "choose this profile only when the table is expected to remain hot enough that its load cost beats the fixed two-lane SWAR ledger"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 19,
+        "hotL2Predicted": 27,
+        "hotL3Predicted": 62,
+        "expression": "14-cycle low-lane SWAR popcount + LOAD(table[hi]) + ADD",
+        "note": "Configured 33..42-cell-style lane widths are one use, but the contract is high-live-bits<=10 rather than a fixed board geometry. L1 wins versus fixed 25-cycle popcount2x32; L2/L3 intentionally do not."
+      }
+    },
+    {
       "name": "popcount2x32SparseHigh",
       "source": "src/word64x32.mjs",
       "block": "popcount",
@@ -3112,11 +3173,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 121,
+    "functionsImplemented": 123,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 121,
+    "functionsWithCycleCount": 123,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4223,6 +4284,24 @@
           "before": "generic nonblocking consumer: 2 atomic loads + CAS RMW + retry possibility",
           "after": "owned consumer: one sequence atomic load + release atomic store; no reservation CAS/retry",
           "mechanism": "single/external-serialized consumer keeps reservation position caller-local"
+        }
+      ]
+    },
+    {
+      "id": "round-050",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "popcount2x32High10Table",
+          "before": "fixed two-lane exact popcount: 25 cycles",
+          "after": "19 L1 / 27 L2 / 62 L3 cycles",
+          "mechanism": "initialization-selected 10-bit high-lane lookup plus ordinary low-lane SWAR; choose only under hot-table cache scenario"
+        },
+        {
+          "function": "fillPopcount10Table32",
+          "before": "no setup table",
+          "after": "explicit initialization cost for 1024-entry / 4 KiB table",
+          "mechanism": "make the memory-for-cycles trade visible instead of hiding setup"
         }
       ]
     }

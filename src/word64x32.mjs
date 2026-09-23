@@ -148,3 +148,20 @@ export function popcount2x32(lo, hi) {
   b = (b + (b >>> 4)) & 0x0f0f0f0f;
   return Math.imul(a + b, 0x01010101) >>> 24;
 }
+
+export function fillPopcount10Table32(table) {
+  table[0] = 0;
+  for (let value = 1; value < 1024; value += 1) {
+    table[value] = table[value >>> 1] + (value & 1);
+  }
+  return 1024;
+}
+
+export function popcount2x32High10Table(lo, hi, table) {
+  let x = lo;
+  x = x - ((x >>> 1) & 0x55555555);
+  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+  x = (x + (x >>> 4)) & 0x0f0f0f0f;
+  return (Math.imul(x, 0x01010101) >>> 24) + table[hi];
+}
+

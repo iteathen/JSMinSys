@@ -656,6 +656,8 @@ import {
   cardinalityClass2x32,
   popcount2x32SparseHigh,
   popcount2x32,
+  fillPopcount10Table32,
+  popcount2x32High10Table,
 } from '../src/word64x32.mjs';
 import {
   playableColumn32,
@@ -740,6 +742,28 @@ test('two-lane set iteration and cardinality', () => {
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0), 32);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0x3ff), 42);
   assert.equal(popcount2x32SparseHigh(0xffffffff, 0xffffffff), 64);
+});
+
+test('10-bit high-lane popcount table profile', () => {
+  const table = new Uint32Array(1024);
+  assert.equal(fillPopcount10Table32(table), 1024);
+  assert.equal(table[0], 0);
+  assert.equal(table[0x3ff], 10);
+  assert.equal(table[0x155], popcount32(0x155));
+
+  const vectors = [
+    [0, 0],
+    [0xffffffff, 0],
+    [0xffffffff, 0x3ff],
+    [0x12345678, 0x155],
+    [0x80000000, 0x200],
+  ];
+  for (const [lo, hi] of vectors) {
+    assert.equal(
+      popcount2x32High10Table(lo, hi, table),
+      popcount2x32(lo, hi),
+    );
+  }
 });
 
 test('move-slot index space removes hot physical-column remap', () => {

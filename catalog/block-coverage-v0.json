@@ -70,9 +70,11 @@
       "functions": [
         "popcount32",
         "popcount2x32SparseHigh",
-        "popcount2x32"
+        "popcount2x32",
+        "fillPopcount10Table32",
+        "popcount2x32High10Table"
       ],
-      "note": "Exact-count consumers remain where semantics require cardinality. The fixed two-lane profile fuses lane-local byte counts before one final accumulation; sparse-high keeps a one-lane fast path and is selected only when its measured/distribution break-even is favorable."
+      "note": "Exact popcount has one-lane SWAR, fused two-lane SWAR, sparse-high, and a configured high<=10-bit table profile. The 4 KiB table is initialization-accounted and selected only for hot-L1 use; wider or colder configurations retain the fixed SWAR profiles."
     },
     {
       "id": 5,
