@@ -274,6 +274,14 @@ import {
   minValueCutsOff32,
   argMaxPlayable32,
   argMaxPlayableSlot32,
+  argMaxPlayableSlot2Nonempty32,
+  argMaxPlayableSlot3Nonempty32,
+  argMaxPlayableSlot4Nonempty32,
+  argMaxPlayableSlot5Nonempty32,
+  argMaxPlayableSlot6Nonempty32,
+  argMaxPlayableSlot8Nonempty32,
+  argMaxPlayableSlot9Nonempty32,
+  argMaxPlayableSlot10Nonempty32,
   argMaxPlayableSlot7Nonempty32,
   argMaxPlayableSlot7ScalarsNonempty32,
   physicalColumnFromMoveSlot32,
@@ -1404,6 +1412,36 @@ test('10-bit high-lane popcount table profile', () => {
       popcount2x32High10Sparse(lo, hi, table),
       popcount2x32(lo, hi),
     );
+  }
+});
+
+test('configured exact selectors cover runtime candidate counts 2 through 10', () => {
+  const profiles = [
+    [2, argMaxPlayableSlot2Nonempty32],
+    [3, argMaxPlayableSlot3Nonempty32],
+    [4, argMaxPlayableSlot4Nonempty32],
+    [5, argMaxPlayableSlot5Nonempty32],
+    [6, argMaxPlayableSlot6Nonempty32],
+    [8, argMaxPlayableSlot8Nonempty32],
+    [9, argMaxPlayableSlot9Nonempty32],
+    [10, argMaxPlayableSlot10Nonempty32],
+    [7, argMaxPlayableSlot7Nonempty32],
+  ].sort((a, b) => a[0] - b[0]);
+
+  for (const [count, select] of profiles) {
+    const scores = new Int32Array(count);
+    scores.fill(-2147483648);
+    const winner = Math.floor(count / 2);
+    scores[winner] = 11;
+    if (winner + 1 < count) scores[winner + 1] = 11;
+
+    assert.equal(select(scores), winner);
+    assert.equal(select(scores), argMaxPlayableSlot32(scores, count));
+
+    scores.fill(-2147483648);
+    scores[count - 1] = count;
+    assert.equal(select(scores), count - 1);
+    assert.equal(select(scores), argMaxPlayableSlot32(scores, count));
   }
 });
 

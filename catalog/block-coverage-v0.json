@@ -282,9 +282,17 @@
         "argMaxPlayableSlot32",
         "physicalColumnFromMoveSlot32",
         "argMaxPlayableSlot7Nonempty32",
-        "argMaxPlayableSlot7ScalarsNonempty32"
+        "argMaxPlayableSlot7ScalarsNonempty32",
+        "argMaxPlayableSlot2Nonempty32",
+        "argMaxPlayableSlot3Nonempty32",
+        "argMaxPlayableSlot4Nonempty32",
+        "argMaxPlayableSlot5Nonempty32",
+        "argMaxPlayableSlot6Nonempty32",
+        "argMaxPlayableSlot8Nonempty32",
+        "argMaxPlayableSlot9Nonempty32",
+        "argMaxPlayableSlot10Nonempty32"
       ],
-      "note": "Physical-column, move-slot, exact-seven-slot, and scalar-producer profiles coexist. The scalar seven-slot profile removes score-array loads only when score production already has all seven values live and no caller loads/spills them solely to satisfy the selector. Runtime initialization still owns candidate count/order; move-slot indexing remains aligned with transition data."
+      "note": "Candidate selection supports generic dynamic count, exact configured counts 2..10, and a scalar-producer C7 profile. Initialization selects the exact-count array selector once, so runtime-configured widths receive the same no-loop-control treatment as seven columns."
     },
     {
       "id": 17,

@@ -76,6 +76,126 @@ export function argMaxPlayableSlot32(scoresInOrder, count) {
   return bestIndex;
 }
 
+export function argMaxPlayableSlot2Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestIndex = 1;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot3Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestIndex = 2;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot4Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestIndex = 3;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot5Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestIndex = 4;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot6Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 4;
+  }
+
+  score = scoresInOrder[5];
+  if (score > bestScore) {
+    bestIndex = 5;
+  }
+
+  return bestIndex;
+}
+
 export function argMaxPlayableSlot7Nonempty32(scoresInOrder) {
   let bestIndex = 0;
   let bestScore = scoresInOrder[0];
@@ -112,6 +232,168 @@ export function argMaxPlayableSlot7Nonempty32(scoresInOrder) {
 
   score = scoresInOrder[6];
   if (score > bestScore) bestIndex = 6;
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot8Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 4;
+  }
+
+  score = scoresInOrder[5];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 5;
+  }
+
+  score = scoresInOrder[6];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 6;
+  }
+
+  score = scoresInOrder[7];
+  if (score > bestScore) {
+    bestIndex = 7;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot9Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 4;
+  }
+
+  score = scoresInOrder[5];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 5;
+  }
+
+  score = scoresInOrder[6];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 6;
+  }
+
+  score = scoresInOrder[7];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 7;
+  }
+
+  score = scoresInOrder[8];
+  if (score > bestScore) {
+    bestIndex = 8;
+  }
+
+  return bestIndex;
+}
+
+export function argMaxPlayableSlot10Nonempty32(scoresInOrder) {
+  let bestIndex = 0;
+  let bestScore = scoresInOrder[0];
+
+  let score = scoresInOrder[1];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 1;
+  }
+
+  score = scoresInOrder[2];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 2;
+  }
+
+  score = scoresInOrder[3];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 3;
+  }
+
+  score = scoresInOrder[4];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 4;
+  }
+
+  score = scoresInOrder[5];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 5;
+  }
+
+  score = scoresInOrder[6];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 6;
+  }
+
+  score = scoresInOrder[7];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 7;
+  }
+
+  score = scoresInOrder[8];
+  if (score > bestScore) {
+    bestScore = score;
+    bestIndex = 8;
+  }
+
+  score = scoresInOrder[9];
+  if (score > bestScore) {
+    bestIndex = 9;
+  }
 
   return bestIndex;
 }

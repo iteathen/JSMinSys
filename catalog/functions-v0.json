@@ -1,5 +1,5 @@
 {
-  "version": "0.82.0",
+  "version": "0.83.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -3410,6 +3410,166 @@
       }
     },
     {
+      "name": "argMaxPlayableSlot2Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 2 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 10,
+        "hotL2Predicted": 26,
+        "hotL3Predicted": 96,
+        "expression": "2*LOAD + 1*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 1 comparisons. Initialization selects this exact-count path for configured width 2."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot3Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 3 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 16,
+        "hotL2Predicted": 40,
+        "hotL3Predicted": 145,
+        "expression": "3*LOAD + 2*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 2 comparisons. Initialization selects this exact-count path for configured width 3."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot4Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 4 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 22,
+        "hotL2Predicted": 54,
+        "hotL3Predicted": 194,
+        "expression": "4*LOAD + 3*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 3 comparisons. Initialization selects this exact-count path for configured width 4."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot5Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 5 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 28,
+        "hotL2Predicted": 68,
+        "hotL3Predicted": 243,
+        "expression": "5*LOAD + 4*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 4 comparisons. Initialization selects this exact-count path for configured width 5."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot6Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 6 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 34,
+        "hotL2Predicted": 82,
+        "hotL3Predicted": 292,
+        "expression": "6*LOAD + 5*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 5 comparisons. Initialization selects this exact-count path for configured width 6."
+      }
+    },
+    {
       "name": "argMaxPlayableSlot7Nonempty32",
       "source": "src/search32.mjs",
       "block": "fixed-candidate-selection",
@@ -3439,6 +3599,102 @@
           "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
         },
         "note": "Seeds from slot 0 and unrolls the remaining six comparisons. The nonempty precondition makes an explicit no-candidate sentinel path unnecessary."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot8Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 8 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 46,
+        "hotL2Predicted": 110,
+        "hotL3Predicted": 390,
+        "expression": "8*LOAD + 7*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 7 comparisons. Initialization selects this exact-count path for configured width 8."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot9Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 9 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 52,
+        "hotL2Predicted": 124,
+        "hotL3Predicted": 439,
+        "expression": "9*LOAD + 8*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 8 comparisons. Initialization selects this exact-count path for configured width 9."
+      }
+    },
+    {
+      "name": "argMaxPlayableSlot10Nonempty32",
+      "source": "src/search32.mjs",
+      "block": "fixed-candidate-selection",
+      "primitives": [
+        "LD32",
+        ">",
+        "="
+      ],
+      "status": "implemented-configured-profile",
+      "preconditions": [
+        "configured candidate count is exactly 10 and immutable after initialization",
+        "initialization selects this exact-count profile once; there is no hot candidate-count dispatch",
+        "at least one slot is playable",
+        "scoresInOrder uses the configured preferred move-slot order",
+        "unplayable scores equal -2147483648 and every playable score is greater",
+        "caller consumes the returned move slot directly or uses an explicitly costed external-boundary physical-column mapping"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": 58,
+        "hotL2Predicted": 138,
+        "hotL3Predicted": 488,
+        "expression": "10*LOAD + 9*COMPARE_SELECT",
+        "parameters": {
+          "COMPARE_SELECT": "2-cycle upper ledger for score > bestScore feeding conditional best update"
+        },
+        "note": "Seeds from slot 0 and unrolls the remaining 9 comparisons. Initialization selects this exact-count path for configured width 10."
       }
     },
     {
@@ -4770,11 +5026,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 174,
+    "functionsImplemented": 182,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 174,
+    "functionsWithCycleCount": 182,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6319,6 +6575,18 @@
           "before": "12 fixed cycles",
           "after": "11 fixed cycles",
           "mechanism": "fuse the final 12-bit half exchange with its left-by-3 output alignment"
+        }
+      ]
+    },
+    {
+      "id": "round-076",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "argMaxPlayableSlot{2..6,8..10}Nonempty32",
+          "before": "generic argMaxPlayableSlot32 pays pair-loop setup/control for configured widths other than 7",
+          "after": "exact-count unrolled selectors cost N*LOAD + (N-1)*COMPARE_SELECT; L1 = 6*N-2",
+          "mechanism": "extend initialization-selected exact candidate-count specialization across the full 2..10 configured packed-column range"
         }
       ]
     }
