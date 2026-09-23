@@ -63,8 +63,10 @@ function prepareImages(g,a,d,cell,mover,basis,bi){
     for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
       if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
       else{
-        const start=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad;
-        for(let j=start;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+        const classStart=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad,
+          largerStart=image<g.pairShapeStart?pair:image<g.tripleShapeStart?triple:image<g.quadShapeStart?quad:cn;
+        for(let j=classStart;j<largerStart;j+=1)if(a.basis[nextBasis+j]===image){out[row+(j>>>5)]|=1<<(j&31);break;}
+        for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubset(g,image,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
       }
     }
   }
