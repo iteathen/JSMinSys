@@ -78,9 +78,9 @@ function search(state,depth,alpha,beta){
   const mover=(meta>>>2)&1;
   state.nodes+=1;
 
-  const terminal=connect4RbaTerminal(g,words,keyOffset);
-  if(terminal)return absToRelative(terminal,mover);
-
+  // search() is reached only after connect4RbaCofactor returned nonterminal;
+  // terminal cofactors are consumed directly by the parent. Root terminal
+  // handling remains in solveConnect4RbaAlphaBeta().
   const cached=probeConnect4RbaExactCache32(state.cache,words,keyOffset);
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
