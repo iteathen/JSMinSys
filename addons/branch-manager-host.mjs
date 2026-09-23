@@ -174,10 +174,11 @@ export function managedThreadSessionState32(session) {
 }
 
 export function sumMetricViews32(metricViews, metricWidth, out) {
-  for (let index = 0; index < metricWidth; index += 1) out[index] = 0;
-  for (let worker = 0; worker < metricViews.length; worker += 1) {
-    const view = metricViews[worker];
-    for (let index = 0; index < metricWidth; index += 1) out[index] += view[index];
+  const workers=metricViews.length;
+  for(let index=0;index<metricWidth;index+=1){
+    let total=0;
+    for(let worker=0;worker<workers;worker+=1)total+=metricViews[worker][index];
+    out[index]=total;
   }
   return out;
 }
