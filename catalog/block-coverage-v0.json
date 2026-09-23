@@ -1,10 +1,10 @@
 {
-  "version": "0.2.0",
+  "version": "0.5.0",
   "source": "catalog/03-blocks.md",
   "summary": {
-    "catalogBlocks": 20,
-    "complete": 20,
-    "completeWithoutNewPrimitive": 19,
+    "catalogBlocks": 30,
+    "complete": 30,
+    "completeWithoutNewPrimitive": 29,
     "completeWithAdmittedPrimitive": 1,
     "deferredMissingPrimitive": 0
   },
@@ -196,7 +196,9 @@
         "playableFromCallerPlyMeta1x32",
         "applyMove1x32CallerPlyMetaKnownCell",
         "undoMove1x32CallerPlyMetaKnownCell",
-        "restoreCallerOwnedResidualFrame32"
+        "restoreCallerOwnedResidualFrame32",
+        "applyMoveSpan32",
+        "undoMoveSpan32"
       ],
       "note": "Apply/undo profiles cover caller-owned ply, known cells, packed/caller-carried support/playable state, and caller-owned residual-frame restoration. When parent residual classes are already live from independent node work and parent status is proved before descent, restoreCallerOwnedResidualFrame32 permits class/status history streams to be omitted; spill/frame traffic must be qualified at the recursive governing unit."
     },
@@ -407,6 +409,143 @@
       ],
       "admittedPrimitive": "Uint32Array.construct",
       "note": "Capacity growth keeps allocation and rehash costs explicit. rehashOverwrite32 now performs only migration; new capacity is caller-known from newMask and is not reconstructed/returned by the primitive."
+    },
+    {
+      "id": 21,
+      "name": "fixed-lane-relational-set",
+      "status": "implemented",
+      "functions": [
+        "equal3x32At",
+        "subset3x32At",
+        "or3x32Into",
+        "and3x32Into",
+        "andNot3x32Into",
+        "equal6x32At",
+        "subset6x32At",
+        "or6x32Into",
+        "equal8x32At"
+      ],
+      "note": "Fixed 3/6/8-lane relations cover recurring packed set carriers and exact wide identity without arbitrary-width generalization."
+    },
+    {
+      "id": 22,
+      "name": "multiword-antichain-skyline",
+      "status": "implemented",
+      "functions": [
+        "insertMinimal6x32InPlace",
+        "productJoinMinimal6x32Into",
+        "insertMinimalSpan32InPlace",
+        "productJoinMinimalSpan32Into"
+      ],
+      "note": "Six-word subset-minimal skyline insertion and streamed pairwise OR product preserve correlation while avoiding Cartesian-product materialization."
+    },
+    {
+      "id": 23,
+      "name": "wide-exact-key-tt",
+      "status": "implemented",
+      "functions": [
+        "equal8x32At",
+        "mix8x32Locator32",
+        "probe8x32IdSlot32",
+        "publish8x32IdSlot32",
+        "mixSpan32Locator32",
+        "probeSpan32IdSlot32",
+        "publishSpanIdSlot32"
+      ],
+      "note": "Eight-word locator/probe/publication keeps hash as locator and all eight words as authoritative identity."
+    },
+    {
+      "id": 24,
+      "name": "exact-interval-evidence",
+      "status": "implemented",
+      "functions": [
+        "tightenInterval32",
+        "reduceMaxIntervals7x32Into",
+        "reduceMinIntervals7x32Into",
+        "reduceMaxIntervals32Into",
+        "reduceMinIntervals32Into"
+      ],
+      "note": "Durable monotone semantic bounds are distinct from alpha/beta windows; fixed-degree Bellman reductions operate on up to seven intervals."
+    },
+    {
+      "id": 25,
+      "name": "sparse-basis-transform-remap",
+      "status": "implemented",
+      "functions": [
+        "emitSortedSetBits32",
+        "transformDedupSortedActionMajor32",
+        "permuteBits3x32Into",
+        "permuteBitsSpan32Into"
+      ],
+      "note": "Prepared action-major mapping, caller-owned bitset dedup/sorted emission, and three-lane permutation support sparse local bases without board/domain semantics."
+    },
+    {
+      "id": 26,
+      "name": "intrusive-generation-worklist",
+      "status": "implemented",
+      "functions": [
+        "intrusiveEnqueueTailStamped32",
+        "intrusiveEnqueueOnceTailStamped32",
+        "intrusiveRemove32",
+        "intrusivePopHeadStamped32",
+        "intrusiveTicketValid32"
+      ],
+      "note": "Serialized intrusive work-list blocks provide coalescing, O(1) removal, and generation stamps. They deliberately contain no hidden synchronization."
+    },
+    {
+      "id": 27,
+      "name": "fixed-slot-mask",
+      "status": "implemented",
+      "functions": [
+        "slotMask7Contains32",
+        "slotMask7Add32",
+        "slotMask7Remove32",
+        "slotMask7First32"
+      ],
+      "note": "Seven-slot mask operations cover small fixed-degree candidate sets without allocating score or membership arrays."
+    },
+    {
+      "id": 28,
+      "name": "immutable-span-publication",
+      "status": "implemented",
+      "functions": [
+        "publishSpan32"
+      ],
+      "note": "Caller-owned scalar span publication exposes derived immutable payload cost without bulk-copy or allocation machinery."
+    },
+    {
+      "id": 29,
+      "name": "worker-execution-substrate",
+      "status": "implemented",
+      "functions": [
+        "takeOwnedStampedWork32",
+        "validateOwnedWork32",
+        "releaseOwnedWork32",
+        "publishResolvedValue32",
+        "publishDependencies7x32",
+        "retainFirstRunnableDependency7x32",
+        "observeWake32",
+        "signalWake32",
+        "parkOnWake32",
+        "workerStopOrDone32",
+        "publishDependencies32",
+        "retainFirstRunnableDependency32"
+      ],
+      "note": "Generic fixed-storage worker mechanics cover stamped take/validation/release, resolved publication, <=7 dependency publication, retained-child handoff, wake observation/signaling, parking, and stop/done polling. Domain evaluation and the outer loop remain application-owned."
+    },
+    {
+      "id": 30,
+      "name": "runtime-sized-word-span",
+      "status": "implemented",
+      "functions": [
+        "equalSpan32At",
+        "subsetSpan32At",
+        "orSpan32Into",
+        "andSpan32Into",
+        "andNotSpan32Into",
+        "reverseSpan32Into"
+      ],
+      "note": "Initialization-selected word-count operations provide the geometry-general path; fixed-lane variants remain optional specializations."
     }
   ]
 }

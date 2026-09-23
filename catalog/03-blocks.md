@@ -432,3 +432,85 @@ The first blocks worth lowering against the candidate symbol set are:
 13. fixed small candidate selection
 
 These cover a large fraction of the meaningful work while avoiding premature commitment to solver-specific machinery.
+
+## 21. Fixed-lane relational set
+
+Recurring packed relational carriers often use three, six, or eight uint32 lanes.
+The admitted profiles keep these widths explicit instead of introducing arbitrary-width
+objects or wide-integer semantics. Operations cover exact equality, subset/dominance,
+and lane-local Boolean joins/intersections.
+
+## 22. Multiword antichain skyline
+
+Relational records may be maintained as a subset-minimal antichain. Runtime-sized records use the initialization-selected span path; six-word records remain an optional specialization. The block
+rejects dominated candidates, removes retained generators dominated by a new
+candidate, and admits only within caller-owned fixed capacity. A streamed pairwise
+OR product performs immediate skyline absorption without materializing a Cartesian
+product.
+
+## 23. Wide exact-key transposition operations
+
+Runtime-sized exact identities use a locator only to choose a probe start. Eight-word identities remain an optional specialization. Exact equality
+still compares every identity word. Publication writes the complete key before
+publishing the dense id slot; synchronization and lifetime remain caller-owned.
+
+## 24. Exact interval evidence
+
+Durable semantic [lower, upper] evidence is distinct from alpha/beta search
+windows. Tightening is monotone intersection; incompatible evidence reports a
+conflict. Runtime-count min/max reductions provide the geometry-general Bellman path; fixed-degree up-to-seven variants remain optional specializations.
+
+## 25. Sparse basis transform / remap
+
+Prepared action-major maps can transform sparse ordered IDs through caller-owned
+bitset scratch, deduplicate them, and emit canonical ascending IDs. Runtime-sized
+packed coordinates may be remapped through a prepared local-index permutation;
+three-word remapping remains an optional specialization.
+The block carries no board/game semantics.
+
+## 26. Intrusive generation-stamped work list
+
+A caller-serialized intrusive list may coalesce duplicate membership, remove an
+arbitrary member in O(1), pop from the head, and stamp the item generation at
+publication. The block intentionally performs no hidden Atomics; applications
+must supply the synchronization regime when shared execution requires one.
+
+## 27. Fixed seven-slot mask
+
+Seven-slot candidate sets use one scalar mask for membership, add/remove, and
+least-set-slot selection. This avoids manufacturing parallel membership arrays
+for small fixed-degree decisions.
+
+## 28. Immutable span publication
+
+A caller-owned scalar copy publishes a fixed derived span without allocation or
+bulk-copy machinery. Publication ordering, lifetime, and aliasing preconditions
+remain explicit at the governing application unit.
+
+## 29. Worker execution substrate
+
+The application owns its outer worker loop and domain evaluator. JSMinSys supplies
+the recurring fixed-storage mechanics underneath that loop:
+
+- stamped queue take with generation/currentness validation;
+- owned-work liveness validation and execution release;
+- resolved-value publication ordering;
+- runtime-count dependency-row publication (with fixed-degree specializations where profitable);
+- direct retention of one runnable dependency without mandatory queue round-trip;
+- atomic wake observation/signaling;
+- explicit worker parking; and
+- stop/completion polling.
+
+The block does not define domain result codes, game semantics, dependency meaning,
+or a worker framework. List/topology mutation remains externally serialized unless
+the selected helper explicitly uses Atomics. Blocking wait cost remains unbounded
+in the general cycle model and must be separated from active CPU work.
+
+
+## 30. Runtime-sized word spans
+
+Geometry-general applications select logical word counts during initialization.
+The span block provides exact equality, subset, wordwise Boolean transforms, and
+reversal over caller-owned typed storage. Fixed 1/2/3/6/8-word variants remain
+eligible specializations, but this span layer is the general path required by
+JMS-DATA-007.

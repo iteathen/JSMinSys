@@ -18,7 +18,10 @@ jobs:
         with:
           node-version: '26'
       - run: node tools/verify-catalog.mjs
+      - run: node tools/audit-runtime-geometry.mjs
       - run: node --test test/*.test.mjs
+      - run: node tools/bench-rba-cpc-ab.mjs
+      - run: node tools/bench-rba-addons.mjs
 
   schema:
     runs-on: ubuntu-latest
@@ -36,4 +39,4 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '26'
-      - run: for f in src/*.mjs tools/*.mjs test/*.mjs; do node --check "$f"; done
+      - run: for f in src/*.mjs addons/*.mjs tools/*.mjs test/*.mjs test/fixtures/*.mjs; do node --check "$f"; done
