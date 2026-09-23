@@ -205,6 +205,7 @@ import {
 } from '../src/word64x32.mjs';
 import {
   playableColumn32,
+  fillCoordinateTables32,
   decodeColumn32,
   decodeRow32,
 } from '../src/indexed32.mjs';
@@ -261,8 +262,17 @@ test('trusted legality and coordinate reference decode', () => {
   const heights = new Uint8Array([0, 6, 2]);
   assert.equal(playableColumn32(heights, 0, 6), true);
   assert.equal(playableColumn32(heights, 1, 6), false);
-  assert.equal(decodeColumn32(23, 7), 2);
-  assert.equal(decodeRow32(23, 7), 3);
+  const rowByCell = new Uint32Array(42);
+  const columnByCell = new Uint32Array(42);
+  assert.equal(fillCoordinateTables32(rowByCell, columnByCell, 7, 6), 42);
+  assert.equal(decodeColumn32(columnByCell, 23), 2);
+  assert.equal(decodeRow32(rowByCell, 23), 3);
+
+  const row4 = new Uint32Array(16);
+  const column4 = new Uint32Array(16);
+  assert.equal(fillCoordinateTables32(row4, column4, 4, 4), 16);
+  assert.equal(decodeColumn32(column4, 14), 2);
+  assert.equal(decodeRow32(row4, 14), 3);
 });
 
 test('capacity helpers and overwrite rehash', () => {
