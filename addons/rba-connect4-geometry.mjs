@@ -46,7 +46,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   const lineColumn=new Uint32Array(lineCount*4),lineRow=new Uint32Array(lineCount*4),lineShape=new Uint32Array(lineCount*16);
   const cellColumn=new Uint32Array(cellCount),cellRow=new Uint32Array(cellCount);
   for(let cell=0;cell<cellCount;cell+=1){cellColumn[cell]=cell%columns;cellRow[cell]=(cell/columns)|0;}
-  const shapeSize=new Uint32Array(shapeCount),shapeCells=new Uint32Array(shapeCount*4),reflect=new Uint32Array(shapeCount);
+  const shapeSize=new Uint32Array(shapeCount),shapeCells=new Uint32Array(shapeCount*4),reflect=new Uint32Array(shapeCount),
+    pairedResponseCover=new Uint8Array(shapeCount);
   const removeAt=new Int32Array(shapeCount*4),singletonByCell=new Int32Array(cellCount);
   shapeCells.fill(0xffffffff);removeAt.fill(-1);singletonByCell.fill(-1);
 
@@ -64,7 +65,10 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     if(size>=2&&pairShapeStart===shapeCount)pairShapeStart=id;
     if(size>=3&&tripleShapeStart===shapeCount)tripleShapeStart=id;
     if(size>=4&&quadShapeStart===shapeCount)quadShapeStart=id;
-    for(let i=0;i<size;i+=1)shapeCells[id*4+i]=cells[i];
+    for(let i=0;i<size;i+=1){
+      const cell=cells[i];shapeCells[id*4+i]=cell;
+      if((cellRow[cell]&1)===((rows-1)&1))pairedResponseCover[id]=1;
+    }
     if(size===1)singletonByCell[cells[0]]=id;
     const reflected=cells.map(cell=>((cell/columns)|0)*columns+(columns-1-(cell%columns))).sort((a,b)=>a-b);
     reflect[id]=shapeMap.get(keyOf(reflected));
@@ -126,7 +130,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
-    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,
+    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn};
 }
