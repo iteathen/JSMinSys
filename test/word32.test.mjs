@@ -119,7 +119,7 @@ import {
   STATE_PLAYABLE_HI,
   STATE_SUPPORT_CODE,
 } from '../src/state32.mjs';
-import { mix32, fillReflect3Tables32, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
+import { mix32, mix32Strong, fillReflect3Tables32, reflectPacked3x24, reflectPacked3x32, reflectPacked3Direct32, canonicalMin32 } from '../src/mix32.mjs';
 import { normalizeMinimal2x32InPlace, normalizeMaximal2x32InPlace } from '../src/frontier32.mjs';
 import {
   negateScore32,
@@ -154,6 +154,8 @@ test('apply and undo support state', () => {
 
 test('mix and reflection blocks', () => {
   assert.equal(mix32(0), 0);
+  assert.equal(mix32Strong(0), 0);
+  assert.notEqual(mix32(0x12345678), mix32Strong(0x12345678));
   const tables7 = new Uint32Array(1024);
   assert.equal(fillReflect3Tables32(tables7, 7), 21);
   const code = ((2 << 21) | (1 << 0) | (2 << 3) | (3 << 18)) >>> 0;
