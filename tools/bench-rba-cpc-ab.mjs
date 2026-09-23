@@ -18,7 +18,7 @@ const cases=[
 const frontierResponseScan=[];
 {
   const group=cases.find(x=>x.columns===7&&x.rows===6),g=prepareConnect4RbaGeometry({columns:7,rows:6});
-  const on=prepareConnect4CpcScratch(g),off=prepareConnect4CpcScratch(g,{frontierResponse:false});
+  const on=prepareConnect4CpcScratch(g,{frontierResponse:true}),off=prepareConnect4CpcScratch(g,{frontierResponse:false});
   for(const moves of group.fixtures)for(let rank=16;rank<=moves.length;rank+=1){
     const prefix=moves.slice(0,rank),q=connect4RbaFromMoves(prefix,{geometry:g,canonical:false});
     const onKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,on),onLo=on.interval[0],onHi=on.interval[1];
