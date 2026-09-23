@@ -1,10 +1,13 @@
 export const STATE_PLY = 0;
-export const STATE_SIDE = 1;
-export const STATE_SUPPORT_LO = 2;
-export const STATE_SUPPORT_HI = 3;
-export const STATE_PLAYABLE_LO = 4;
-export const STATE_PLAYABLE_HI = 5;
-export const STATE_SUPPORT_CODE = 6;
+export const STATE_SUPPORT_LO = 1;
+export const STATE_SUPPORT_HI = 2;
+export const STATE_PLAYABLE_LO = 3;
+export const STATE_PLAYABLE_HI = 4;
+export const STATE_SUPPORT_CODE = 5;
+
+export function sideFromPly32(ply) {
+  return ply & 1;
+}
 
 /**
  * Dynamic-geometry transition for boards whose cell mask fits two uint32 lanes.
@@ -58,7 +61,6 @@ export function applyMove32(
 
   heights[column] = row + 1;
   state[STATE_PLY] = ply + 1;
-  state[STATE_SIDE] = 1 - state[STATE_SIDE];
   state[STATE_SUPPORT_CODE] = (
     state[STATE_SUPPORT_CODE] + supportIncrement + rankIncrement
   ) >>> 0;
