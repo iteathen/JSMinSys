@@ -1,5 +1,5 @@
 {
-  "version": "0.28.0",
+  "version": "0.29.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -376,28 +376,27 @@
       }
     },
     {
-      "name": "ttProbeIndex32",
+      "name": "ttHit32",
       "source": "src/indexed32.mjs",
       "block": "tt-probe-replace",
       "primitives": [
         "LD32",
-        "===",
-        "?:"
+        "==="
       ],
       "status": "implemented",
+      "preconditions": [
+        "index was computed once and is retained by the caller for value access/replacement"
+      ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 6,
-        "hotL2Predicted": 14,
-        "hotL3Predicted": 49,
-        "expression": "LOAD + equality test + predicted select",
-        "note": "Power-of-two index masking is owned by powerOfTwoIndex32 and reused across probe/replacement."
-      },
-      "preconditions": [
-        "index was computed once from the hash/capacity mask and may be reused for value access or replacement"
-      ]
+        "hotL1Predicted": 5,
+        "hotL2Predicted": 13,
+        "hotL3Predicted": 48,
+        "expression": "LOAD + equality test",
+        "note": "Returning a boolean hit removes the redundant index-or-sentinel select; caller already owns the prepared index."
+      }
     },
     {
       "name": "ttReplace32",
@@ -504,7 +503,7 @@
         "configured columns and cellCount are immutable for the engine instance",
         "configured board cell count is <= 64 for this two-lane mask primitive",
         "landingCells[column] is the current next playable cell",
-        "supportDelta is precomputed during initialization for the selected column and support encoding",
+        "supportDelta is the precomputed support-only delta for the selected column; rank/ply is STATE_PLY",
         "column is already legal"
       ]
     },
@@ -543,7 +542,7 @@
         "configured columns and cellCount are immutable for the engine instance",
         "configured board cell count is <= 64 for this two-lane mask primitive",
         "landingCells[column] points to the cell immediately above the move being undone, or beyond cellCount when full",
-        "supportDelta is precomputed during initialization for the supplied column",
+        "supportDelta is the precomputed support-only delta for the selected column; rank/ply is STATE_PLY",
         "caller supplies the exact column being undone",
         "at least one move exists"
       ]
@@ -664,17 +663,17 @@
       "preconditions": [
         "tables were built by fillReflect3Tables32 for the configured columns",
         "3*columns <= 24",
-        "rankMask preserves all non-support bits"
+        "rank/ply metadata is represented separately from packed support"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 24,
-        "hotL2Predicted": 48,
-        "hotL3Predicted": 153,
-        "expression": "3*LOAD + 7 index/mask/shift operations + 3*OR + final uint32 coercion",
-        "note": "Three-byte precomputed reflection path for configured supports occupying at most 24 bits."
+        "hotL1Predicted": 22,
+        "hotL2Predicted": 46,
+        "hotL3Predicted": 151,
+        "expression": "3*LOAD + 7 index/mask/shift operations + 2*OR + final uint32 coercion",
+        "note": "Support-only reflection; separate rank ownership removes one mask and one OR from the prior path."
       }
     },
     {
@@ -694,16 +693,16 @@
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "scenario",
-        "hotL1Predicted": 31,
-        "hotL2Predicted": 63,
-        "hotL3Predicted": 203,
-        "expression": "4*LOAD + 10 index/mask/shift operations + 4*OR + final uint32 coercion",
-        "note": "Configuration-precomputed contribution tables make hot reflection independent of column count."
+        "hotL1Predicted": 29,
+        "hotL2Predicted": 61,
+        "hotL3Predicted": 201,
+        "expression": "4*LOAD + 9 index/mask/shift operations + 3*OR + final uint32 coercion",
+        "note": "Support-only reflection; rank/ply is no longer embedded in the reflected scalar."
       },
       "preconditions": [
         "tables were built by fillReflect3Tables32 for the configured columns",
-        "rankMask preserves all non-support bits",
-        "3-bit-per-column packed support encoding fits uint32"
+        "3*columns <= 32",
+        "rank/ply metadata is represented separately from packed support"
       ]
     },
     {
@@ -725,18 +724,19 @@
       "status": "implemented-direct-fallback",
       "preconditions": [
         "support encoding uses 3 bits per column",
-        "columns and rankShift are initialization-time configuration invariants",
-        "packed representation fits uint32"
+        "configured columns are immutable after initialization",
+        "packed support fits uint32",
+        "rank/ply metadata is represented separately"
       ],
       "cycleCount": {
         "profile": "node26-v8-14.6/x86_64-amd-zen3",
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
-        "expression": "8 + 9*C",
+        "expression": "6 + 9*C",
         "parameters": {
           "C": "configured columns"
         },
-        "note": "Unsigned conversion is delayed until the returned scalar; per-column redundant coercions are removed."
+        "note": "Separating rank/ply removes rank extraction/reinsertion; unsigned coercion remains only at scalar return."
       }
     },
     {
@@ -1947,6 +1947,36 @@
           "before": "up to 8192 value/bit inspections with repeated coordinate decode",
           "after": "1020 table-composition steps + 32 bit stages",
           "mechanism": "construct byte tables compositionally from single-bit contributions"
+        }
+      ]
+    },
+    {
+      "id": "round-022",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "reflectPacked3x24",
+          "before": "24 L1 / 48 L2",
+          "after": "22 L1 / 46 L2",
+          "mechanism": "separate rank/ply from packed support"
+        },
+        {
+          "function": "reflectPacked3x32",
+          "before": "31 L1 / 63 L2",
+          "after": "29 L1 / 61 L2",
+          "mechanism": "separate rank/ply from packed support"
+        },
+        {
+          "function": "reflectPacked3Direct32",
+          "before": "8 + 9*C cycles",
+          "after": "6 + 9*C cycles",
+          "mechanism": "remove rank extraction/reinsertion"
+        },
+        {
+          "function": "ttProbeIndex32",
+          "before": "6 L1 / 14 L2 index-or-sentinel probe",
+          "after": "ttHit32: 5 L1 / 13 L2 boolean hit",
+          "mechanism": "caller retains prepared index; delete redundant select"
         }
       ]
     }
