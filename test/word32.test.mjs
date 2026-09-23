@@ -80,8 +80,8 @@ import {
 
 test('indexed and table blocks', () => {
   const heights = new Uint8Array([0, 3, 6]);
-  assert.equal(landingCell32(heights, 1, 7, 6, 0xffffffff), 22);
-  assert.equal(landingCell32(heights, 2, 7, 6, 0xffffffff), 0xffffffff);
+  assert.equal(landingCell32(heights, 1, 7), 22);
+  assert.equal(landingCell32(heights, 0, 7), 0);
   assert.equal(maskContains32(0b1111, 0b0101), true);
   assert.equal(maskContains32(0b0011, 0b0101), false);
   assert.equal(maskContains32(0x80000000, 0x80000000), true);
