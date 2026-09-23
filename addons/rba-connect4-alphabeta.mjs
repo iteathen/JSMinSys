@@ -50,32 +50,10 @@ export function prepareConnect4RbaAlphaBeta({
       :null,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache:createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords}),
-    order:new Uint32Array(levels*g.columns),orderScore:new Int32Array(levels*g.columns),actionLo:new Int8Array(levels*g.columns),
-    actionHi:new Int8Array(levels*g.columns),actionKnown:new Uint8Array(levels*g.columns),
+    actionLo:new Int8Array(levels*g.columns),actionHi:new Int8Array(levels*g.columns),actionKnown:new Uint8Array(levels*g.columns),
     nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcForced:0,cpcProjectedForks:0,
     frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0};
-}
-
-function selectOrder(state,words,offset,depth,root,reflected){
-  const g=state.g,forced=state.cpc.forcedColumn[0],row=depth*g.columns;
-  let count=0;
-  for(let oi=0;oi<g.columns;oi+=1){
-    const caller=g.actionOrder[oi],column=root&&reflected?g.mirrorColumn[caller]:caller;
-    if(words[offset+column]>=g.rows)continue;
-    if(forced>=0&&column!==forced)continue;
-    state.order[row+count]=column;
-    state.orderScore[row+count]=(root?0:state.cpc.actionBias[column]*16)+(g.columns-g.priorityByColumn[root&&reflected?caller:column]);
-    count+=1;
-  }
-  // tiny in-place selection sort; ordering is advisory only.
-  for(let i=0;i<count;i+=1){
-    let best=i;
-    for(let j=i+1;j<count;j+=1)if(state.orderScore[row+j]>state.orderScore[row+best])best=j;
-    if(best!==i){let x=state.order[row+i];state.order[row+i]=state.order[row+best];state.order[row+best]=x;
-      x=state.orderScore[row+i];state.orderScore[row+i]=state.orderScore[row+best];state.orderScore[row+best]=x;}
-  }
-  return count;
 }
 
 function frontEvidence(state,words,offset,basis,basisOffset,basisSize,mover){
@@ -90,8 +68,8 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize,mover){
   return relative;
 }
 
-function search(state,depth,alpha,beta,root,rootReflected){
-  const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis;
+function search(state,depth,alpha,beta){
+  const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis,alphaOrig=alpha,betaOrig=beta;
   const words=state.words,basis=state.basis,n=state.basisSize[depth],meta=words[keyOffset+g.metaOffset];
   const mover=(meta>>>2)&1;
   state.nodes+=1;
@@ -125,44 +103,48 @@ function search(state,depth,alpha,beta,root,rootReflected){
   if(semantic[0]>alpha)alpha=semantic[0];
   if(semantic[1]<beta)beta=semantic[1];
 
-  const count=selectOrder(state,words,keyOffset,depth,root,rootReflected),row=depth*g.columns;
-  if(!count)return 0;
-
-  // Copy action-specific Four-Front evidence before descending because the arena
-  // is reused by recursive calls.
-  for(let i=0;i<count;i++){state.actionKnown[row+i]=0;state.actionLo[row+i]=-1;state.actionHi[row+i]=1;}
-  if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
-    for(let i=0;i<count;i++){
-      const column=state.order[row+i],packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
+  const forced=state.cpc.forcedColumn[0],row=depth*g.columns;
+  let legal=0;
+  for(let oi=0;oi<g.columns;oi+=1){
+    const column=g.actionOrder[oi];
+    if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced))continue;
+    legal+=1;
+    state.actionKnown[row+column]=0;state.actionLo[row+column]=-1;state.actionHi[row+column]=1;
+    if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,words,keyOffset);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
-      state.actionLo[row+i]=rel[0];state.actionHi[row+i]=rel[1];state.actionKnown[row+i]=1;if(rel[0]===rel[1])state.frontActionExact+=1;
+      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
+      if(rel[0]===rel[1])state.frontActionExact+=1;
     }
   }
+  if(!legal)return 0;
 
-  let best=-2,complete=1;
-  for(let i=0;i<count;i++){
+  let best=-2,cut=0;
+  for(let oi=0;oi<g.columns;oi+=1){
+    const column=g.actionOrder[oi];
+    if(words[keyOffset+column]>=g.rows||(forced>=0&&column!==forced))continue;
     let value;
-    if(state.actionKnown[row+i]&&state.actionLo[row+i]===state.actionHi[row+i]){
-      value=state.actionLo[row+i];
+    if(state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
+      value=state.actionLo[row+column];
     }else{
-      if(state.actionKnown[row+i]&&state.actionHi[row+i]<=alpha){state.cutoffs+=1;complete=0;continue;}
-      const column=state.order[row+i],childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
+      if(state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
+      const childKey=(depth+1)*g.keyWords,childBasis=(depth+1)*g.maxBasis;
       const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,depth+1);
       state.cofactors+=1;
       if(term<0)continue;
       if(!term)connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[depth+1],state.coord);
-      value=-search(state,depth+1,-beta,-alpha,0,0);
+      value=-search(state,depth+1,-beta,-alpha);
     }
     if(value>best)best=value;
     if(value>alpha)alpha=value;
-    if(alpha>=beta){state.cutoffs+=1;complete=0;break;}
+    if(alpha>=beta){state.cutoffs+=1;cut=1;break;}
     if(best===1)break;
   }
   if(best===-2)best=semantic[0];
-  // Full-window or fully enumerated node is exact; cutoff returns a valid bound
-  // to its caller but is deliberately not published into the exact cache.
-  if(complete){
+  // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
+  // may be valid alpha/beta bounds but are not global q truth.
+  if(!cut&&alphaOrig===-2&&betaOrig===2){
     const abs=relativeToAbs(best,mover);storeConnect4RbaExactCache32(state.cache,words,keyOffset,abs);
   }
   return best;
@@ -191,26 +173,29 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   const rootExact=rootLo===rootHi?absToRelative(rootLo,mover):null;
 
   let alpha=-2,beta=2,best=-2,bestMove=-1;
-  const count=selectOrder(state,state.words,0,0,1,reflected),row=0;
+  const forced=state.cpc.forcedColumn[0],row=0;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
-    for(let i=0;i<count;i++){
-      const column=state.order[row+i],packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0);
+    for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
+      const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
+      if(state.words[column]>=g.rows||(forced>=0&&column!==forced))continue;
+      const packed=queryConnect4RbaFourFront(g,state.front,state.front.actionBase+column*4,state.words,0);
       const lo=packed&3,hi=packed>>>2,rel=intervalToRelative(lo,hi,mover);
-      state.actionLo[row+i]=rel[0];state.actionHi[row+i]=rel[1];state.actionKnown[row+i]=1;
+      state.actionLo[row+column]=rel[0];state.actionHi[row+column]=rel[1];state.actionKnown[row+column]=1;
     }
   }
-  for(let i=0;i<count;i++){
-    const column=state.order[row+i],caller=reflected?g.mirrorColumn[column]:column;
+  for(let callerIndex=0;callerIndex<g.columns;callerIndex+=1){
+    const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
+    if(state.words[column]>=g.rows||(forced>=0&&column!==forced))continue;
     let value;
-    if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+i]&&state.actionLo[row+i]===state.actionHi[row+i]){
-      value=state.actionLo[row+i];state.frontActionExact+=1;
+    if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
+      value=state.actionLo[row+column];state.frontActionExact+=1;
     }else{
     const childKey=g.keyWords,childBasis=g.maxBasis;
     const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1);
     state.cofactors+=1;if(term<0)continue;
     if(!term)connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
-    value=rootExact!==null?-search(state,1,-2,2,0,0):-search(state,1,-beta,-alpha,0,0);
+    value=rootExact!==null?-search(state,1,-2,2):-search(state,1,-beta,-alpha);
     }
     if(value>best){best=value;bestMove=caller;}
     if(value>alpha)alpha=value;
