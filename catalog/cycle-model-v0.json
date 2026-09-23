@@ -1,0 +1,438 @@
+{
+  "version": "0.1.0",
+  "profile": "x86_64-amd-zen3",
+  "purpose": "Every admissible emission has a cycle model so function costs can reduce to fixed, ranged, symbolic, or unbounded cycle totals.",
+  "modelKinds": {
+    "fixed": "single cycle value",
+    "range": "inclusive min/max cycle interval",
+    "expression": "symbolic cycle expression using named profile parameters",
+    "unbounded": "blocking operation with no finite upper cycle bound"
+  },
+  "parameters": {
+    "ALU1": 1,
+    "IMUL32": 3,
+    "IDIV32": {
+      "min": 9,
+      "max": 14
+    },
+    "SHIFT32": 1,
+    "CMP32": 1,
+    "CLZ32": 1,
+    "L1D_LOAD": 4,
+    "L2_LOAD": 12,
+    "L3_LOAD": 47,
+    "BRANCH_MISPREDICT": {
+      "min": 15,
+      "max": 19
+    },
+    "SIMPLE_STORE_THROUGHPUT": 0.5,
+    "LOCKED_RMW": {
+      "min": 7.5,
+      "max": 12
+    }
+  },
+  "aggregation": {
+    "staticSerial": "Sum each executed emission's cycle model. Range values sum bounds. Expression values remain symbolic until cache/branch/runtime parameters are selected.",
+    "branches": "Count only the executed path. Add BRANCH_MISPREDICT when a modeled branch is mispredicted.",
+    "loops": "Multiply body cost by executed iteration count; retain symbolic counts when unknown.",
+    "calls": "Add callee cost plus call/return cost once those forms are qualified.",
+    "memory": "Evaluate LD32/ST32 using an explicit cache scenario; report hot-L1 and hot-L2 totals separately.",
+    "laterRefinement": "Assembly dependency/port analysis may refine the static serial estimate; static sums are a comparable accounting metric, not a wall-clock promise."
+  },
+  "operations": {
+    "+": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Target: ADD r32,r32.",
+      "status": "native-core-verified"
+    },
+    "-": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Target: SUB r32,*.",
+      "status": "native-core-verified"
+    },
+    "*": {
+      "kind": "fixed",
+      "cycles": 3,
+      "note": "Integer-specialized target: IMUL r32,r32.",
+      "status": "native-core-verified"
+    },
+    "/": {
+      "kind": "range",
+      "min": 9,
+      "max": 14,
+      "note": "IDIV32 core; surviving JavaScript guards are added after assembly qualification.",
+      "status": "native-core-reference"
+    },
+    "%": {
+      "kind": "range",
+      "min": 9,
+      "max": 14,
+      "note": "Remainder from integer divide core; surviving JavaScript guards are added after assembly qualification.",
+      "status": "native-core-reference"
+    },
+    "**": {
+      "kind": "expression",
+      "expr": "POW_JS(base, exponent)",
+      "note": "No stable single-instruction mapping; symbolic until emitted implementation is qualified.",
+      "status": "provisional"
+    },
+    "++": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "INC r32 native reference.",
+      "status": "native-core-verified"
+    },
+    "--": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "DEC/SUB-by-one ALU class; exact V8 form pending.",
+      "status": "native-core-reference"
+    },
+    "&": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "32-bit AND ALU class; exact V8 form still to be captured.",
+      "status": "native-core-provisional"
+    },
+    "|": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "32-bit OR ALU class; exact V8 form still to be captured.",
+      "status": "native-core-provisional"
+    },
+    "^": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "32-bit XOR ALU class; exact V8 form still to be captured.",
+      "status": "native-core-provisional"
+    },
+    "~": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "32-bit NOT/XOR-mask ALU class; exact V8 form pending.",
+      "status": "native-core-provisional"
+    },
+    "<<": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Fixed-count SHL class.",
+      "status": "native-core-verified"
+    },
+    ">>": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Fixed-count signed shift class; exact V8 form pending.",
+      "status": "native-core-provisional"
+    },
+    ">>>": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Fixed-count SHR class.",
+      "status": "native-core-verified"
+    },
+    "===": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP/TEST is 1 cycle; Boolean materialization may add one cycle.",
+      "status": "provisional"
+    },
+    "!==": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP/TEST is 1 cycle; Boolean materialization may add one cycle.",
+      "status": "provisional"
+    },
+    "<": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP is 1 cycle; materialized Boolean may add one cycle.",
+      "status": "provisional"
+    },
+    "<=": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP is 1 cycle; materialized Boolean may add one cycle.",
+      "status": "provisional"
+    },
+    ">": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP is 1 cycle; materialized Boolean may add one cycle.",
+      "status": "provisional"
+    },
+    ">=": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "CMP is 1 cycle; materialized Boolean may add one cycle.",
+      "status": "provisional"
+    },
+    "!": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "TEST/CMP plus optional Boolean materialization.",
+      "status": "provisional"
+    },
+    "&&": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT",
+      "note": "Operator overhead only; operands counted separately and only executed RHS included.",
+      "status": "provisional"
+    },
+    "||": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT",
+      "note": "Operator overhead only; operands counted separately and only executed RHS included.",
+      "status": "provisional"
+    },
+    "?:": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT",
+      "note": "Selection/control overhead; selected body counted separately.",
+      "status": "provisional"
+    },
+    "CONST32": {
+      "kind": "range",
+      "min": 0,
+      "max": 1,
+      "note": "Immediate may fold into consuming instruction; otherwise one materialization operation.",
+      "status": "provisional"
+    },
+    "LD32": {
+      "kind": "expression",
+      "expr": "CACHE_LOAD(level)",
+      "note": "Zen 3: L1D=4, L2=12, L3≈47 cycles; DRAM remains frequency/memory-system dependent.",
+      "status": "cache-profiled"
+    },
+    "ST32": {
+      "kind": "expression",
+      "expr": "0.5 + OWNERSHIP_PENALTY",
+      "note": "0.5-cycle simple-store throughput for local/hot line; ownership/coherence added separately.",
+      "status": "native-throughput-reference"
+    },
+    "ADDR": {
+      "kind": "range",
+      "min": 1,
+      "max": 3,
+      "note": "Simple address/LEA near 1 cycle; complex indexed forms can cost 2-3 on Zen 3.",
+      "status": "provisional"
+    },
+    "TESTZ": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "TEST/CMP ALU stage.",
+      "status": "native-core-reference"
+    },
+    "TESTNZ": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "TEST/CMP ALU stage.",
+      "status": "native-core-reference"
+    },
+    "BRANCH": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT",
+      "note": "Static baseline one cycle plus 15-19 cycle Zen 3 mispredict penalty.",
+      "status": "provisional"
+    },
+    "JUMP": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Static accounting unit for an executed unconditional transfer; frontend effects can overlap.",
+      "status": "provisional"
+    },
+    "Math.imul": {
+      "kind": "fixed",
+      "cycles": 3,
+      "note": "IMUL r32,r32.",
+      "status": "native-core-verified"
+    },
+    "Math.clz32": {
+      "kind": "fixed",
+      "cycles": 1,
+      "note": "Zen 3 LZCNT is 1 cycle, 1 µop.",
+      "status": "native-core-verified"
+    },
+    "Math.floor": {
+      "kind": "expression",
+      "expr": "isUint32?0:FLOAT_FLOOR",
+      "note": "Proven uint32/integral path is semantically redundant; floating path pending.",
+      "status": "provisional"
+    },
+    "Math.trunc": {
+      "kind": "expression",
+      "expr": "isUint32?0:FLOAT_TRUNC",
+      "note": "Proven uint32/integral path is semantically redundant; floating path pending.",
+      "status": "provisional"
+    },
+    "Math.ceil": {
+      "kind": "expression",
+      "expr": "isUint32?0:FLOAT_CEIL",
+      "note": "Proven uint32/integral path is semantically redundant; floating path pending.",
+      "status": "provisional"
+    },
+    "Math.round": {
+      "kind": "expression",
+      "expr": "isUint32?0:FLOAT_ROUND",
+      "note": "Proven uint32/integral path is semantically redundant; floating path pending.",
+      "status": "provisional"
+    },
+    "Math.min": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "Native min/compare stage is 1-cycle class; JS NaN/signed-zero semantics may add work.",
+      "status": "provisional"
+    },
+    "Math.max": {
+      "kind": "range",
+      "min": 1,
+      "max": 2,
+      "note": "Native max/compare stage is 1-cycle class; JS NaN/signed-zero semantics may add work.",
+      "status": "provisional"
+    },
+    "=": {
+      "kind": "expression",
+      "expr": "dst=register?0:ST32",
+      "note": "Register move may be eliminated; memory assignment uses store model.",
+      "status": "provisional"
+    },
+    "+=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "Add plus write-back.",
+      "status": "provisional"
+    },
+    "-=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "Subtract plus write-back.",
+      "status": "provisional"
+    },
+    "*=": {
+      "kind": "expression",
+      "expr": "dst=register?3:(LD32 + 3 + ST32)",
+      "note": "Multiply plus write-back.",
+      "status": "provisional"
+    },
+    "&=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "AND plus write-back.",
+      "status": "provisional"
+    },
+    "|=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "OR plus write-back.",
+      "status": "provisional"
+    },
+    "^=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "XOR plus write-back.",
+      "status": "provisional"
+    },
+    "<<=": {
+      "kind": "expression",
+      "expr": "dst=register?1:(LD32 + 1 + ST32)",
+      "note": "Shift plus write-back.",
+      "status": "provisional"
+    },
+    "??": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT",
+      "note": "Nullish test/control overhead; operand/access costs counted separately.",
+      "status": "provisional"
+    },
+    "?.": {
+      "kind": "expression",
+      "expr": "1 + miss*BRANCH_MISPREDICT + ACCESS_COST",
+      "note": "Nullish test plus guarded property/index access.",
+      "status": "provisional"
+    },
+    "instanceof": {
+      "kind": "expression",
+      "expr": "TYPE_CHAIN_TEST(depth)",
+      "note": "At least one type/prototype check; scales with optimized path/prototype depth.",
+      "status": "provisional"
+    },
+    "typeof": {
+      "kind": "expression",
+      "expr": "TYPE_TAG_TEST",
+      "note": "Type-tag discrimination; exact emitted sequence pending.",
+      "status": "provisional"
+    },
+    "void": {
+      "kind": "fixed",
+      "cycles": 0,
+      "note": "No extra work when result is discarded; operand evaluation counted separately.",
+      "status": "provisional"
+    },
+    "Atomics.load": {
+      "kind": "expression",
+      "expr": "ATOMIC_LOAD(cacheLevel, contention)",
+      "note": "Sequentially consistent shared load; cache/coherence state included.",
+      "status": "provisional"
+    },
+    "Atomics.store": {
+      "kind": "expression",
+      "expr": "ATOMIC_STORE(cacheLevel, ownership)",
+      "note": "Sequentially consistent shared store; ownership/coherence state included.",
+      "status": "provisional"
+    },
+    "Atomics.compareExchange": {
+      "kind": "range",
+      "min": 7.7,
+      "max": 12,
+      "note": "Uncontended Zen 3 locked CMPXCHG reference; contention may exceed.",
+      "status": "native-uncontended-reference"
+    },
+    "Atomics.exchange": {
+      "kind": "range",
+      "min": 7.5,
+      "max": 10,
+      "note": "Uncontended Zen 3 XCHG reference; contention may exceed.",
+      "status": "native-uncontended-reference"
+    },
+    "Atomics.add": {
+      "kind": "range",
+      "min": 7.65,
+      "max": 12,
+      "note": "Uncontended locked XADD reference; cache migration/contention may exceed.",
+      "status": "native-uncontended-reference"
+    },
+    "Atomics.sub": {
+      "kind": "range",
+      "min": 7.65,
+      "max": 12,
+      "note": "Provisional locked arithmetic RMW class; exact V8 form pending.",
+      "status": "native-uncontended-reference"
+    },
+    "Atomics.wait": {
+      "kind": "unbounded",
+      "note": "No finite upper cycle bound; split active CPU cycles from blocked elapsed cycles.",
+      "status": "blocking"
+    },
+    "Atomics.notify": {
+      "kind": "expression",
+      "expr": "ATOMIC_NOTIFY(waiterCount, schedulerState)",
+      "note": "Wake cost depends on waiters, runtime path, scheduler and OS.",
+      "status": "provisional"
+    }
+  },
+  "coverage": {
+    "admissibleOperationCount": 62,
+    "costModelCount": 62,
+    "missing": [],
+    "complete": true
+  }
+}
