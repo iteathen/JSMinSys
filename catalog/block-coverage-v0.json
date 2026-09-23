@@ -1,10 +1,10 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "source": "catalog/03-blocks.md",
   "summary": {
-    "catalogBlocks": 29,
-    "complete": 29,
-    "completeWithoutNewPrimitive": 28,
+    "catalogBlocks": 30,
+    "complete": 30,
+    "completeWithoutNewPrimitive": 29,
     "completeWithAdmittedPrimitive": 1,
     "deferredMissingPrimitive": 0
   },
@@ -196,7 +196,9 @@
         "playableFromCallerPlyMeta1x32",
         "applyMove1x32CallerPlyMetaKnownCell",
         "undoMove1x32CallerPlyMetaKnownCell",
-        "restoreCallerOwnedResidualFrame32"
+        "restoreCallerOwnedResidualFrame32",
+        "applyMoveSpan32",
+        "undoMoveSpan32"
       ],
       "note": "Apply/undo profiles cover caller-owned ply, known cells, packed/caller-carried support/playable state, and caller-owned residual-frame restoration. When parent residual classes are already live from independent node work and parent status is proved before descent, restoreCallerOwnedResidualFrame32 permits class/status history streams to be omitted; spill/frame traffic must be qualified at the recursive governing unit."
     },
@@ -431,7 +433,9 @@
       "status": "implemented",
       "functions": [
         "insertMinimal6x32InPlace",
-        "productJoinMinimal6x32Into"
+        "productJoinMinimal6x32Into",
+        "insertMinimalSpan32InPlace",
+        "productJoinMinimalSpan32Into"
       ],
       "note": "Six-word subset-minimal skyline insertion and streamed pairwise OR product preserve correlation while avoiding Cartesian-product materialization."
     },
@@ -443,7 +447,10 @@
         "equal8x32At",
         "mix8x32Locator32",
         "probe8x32IdSlot32",
-        "publish8x32IdSlot32"
+        "publish8x32IdSlot32",
+        "mixSpan32Locator32",
+        "probeSpan32IdSlot32",
+        "publishSpanIdSlot32"
       ],
       "note": "Eight-word locator/probe/publication keeps hash as locator and all eight words as authoritative identity."
     },
@@ -454,7 +461,9 @@
       "functions": [
         "tightenInterval32",
         "reduceMaxIntervals7x32Into",
-        "reduceMinIntervals7x32Into"
+        "reduceMinIntervals7x32Into",
+        "reduceMaxIntervals32Into",
+        "reduceMinIntervals32Into"
       ],
       "note": "Durable monotone semantic bounds are distinct from alpha/beta windows; fixed-degree Bellman reductions operate on up to seven intervals."
     },
@@ -465,7 +474,8 @@
       "functions": [
         "emitSortedSetBits32",
         "transformDedupSortedActionMajor32",
-        "permuteBits3x32Into"
+        "permuteBits3x32Into",
+        "permuteBitsSpan32Into"
       ],
       "note": "Prepared action-major mapping, caller-owned bitset dedup/sorted emission, and three-lane permutation support sparse local bases without board/domain semantics."
     },
@@ -517,9 +527,25 @@
         "observeWake32",
         "signalWake32",
         "parkOnWake32",
-        "workerStopOrDone32"
+        "workerStopOrDone32",
+        "publishDependencies32",
+        "retainFirstRunnableDependency32"
       ],
       "note": "Generic fixed-storage worker mechanics cover stamped take/validation/release, resolved publication, <=7 dependency publication, retained-child handoff, wake observation/signaling, parking, and stop/done polling. Domain evaluation and the outer loop remain application-owned."
+    },
+    {
+      "id": 30,
+      "name": "runtime-sized-word-span",
+      "status": "implemented",
+      "functions": [
+        "equalSpan32At",
+        "subsetSpan32At",
+        "orSpan32Into",
+        "andSpan32Into",
+        "andNotSpan32Into",
+        "reverseSpan32Into"
+      ],
+      "note": "Initialization-selected word-count operations provide the geometry-general path; fixed-lane variants remain optional specializations."
     }
   ]
 }
