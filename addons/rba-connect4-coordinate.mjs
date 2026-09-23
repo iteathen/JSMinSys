@@ -72,9 +72,19 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
       if(p!==player&&imageRemoved!==id)continue;
       const image=p===player?imageRemoved:id;
       if(image<0)continue;
-      let j=image<g.pairShapeStart?0:
-        image<g.tripleShapeStart?childPair:
-        image<g.quadShapeStart?childTriple:childQuad;
+
+      // Equal-cardinality residuals satisfy subset iff they are identical.
+      // The exact image is guaranteed to be present in the child basis because
+      // that basis is the union of every parent removal image. Locate that one
+      // sorted id directly, then run subset tests only against strictly larger
+      // residual classes.
+      let lo=0,hi=cn;
+      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
+      target[targetCoord+(lo>>>5)]|=1<<(lo&31);
+
+      let j=image<g.pairShapeStart?childPair:
+        image<g.tripleShapeStart?childTriple:
+        image<g.quadShapeStart?childQuad:cn;
       for(;j<cn;j+=1)if(profile.shapeSubset(g,image,childBasis[ci+j]))
         target[targetCoord+(j>>>5)]|=1<<(j&31);
     }
