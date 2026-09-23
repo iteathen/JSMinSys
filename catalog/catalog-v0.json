@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "status": "research-bootstrap",
   "workload": "Connect4 solver corpus",
   "sourcePins": {
@@ -577,12 +577,28 @@
   },
   "specification": {
     "path": "SPEC.md",
-    "version": "Draft 0.1",
+    "version": "Draft 0.2",
     "status": "provisional-normative-intent"
   },
   "costAuthority": {
     "repository": "iteathen/NEES",
-    "version": "Draft 0.5",
-    "role": "quantified execution-cost accounting authority"
+    "minimumVersion": "Draft 0.5",
+    "role": "authoritative runtime/CPU cost profiles and quantified execution-cost accounting"
+  },
+  "parentStandard": {
+    "repository": "iteathen/NEES",
+    "conformance": "NEES-EXTREME",
+    "minimumVersion": "Draft 0.5",
+    "adoption": "full",
+    "rule": "JSMinSys may narrow NEES but must not weaken it"
+  },
+  "localCostArtifacts": {
+    "authority": "non-authoritative research snapshot",
+    "rule": "NEES cost profiles override conflicting local cycle values",
+    "files": [
+      "catalog/07-operator-costs.md",
+      "catalog/08-function-cycle-accounting.md",
+      "catalog/cycle-model-v0.json"
+    ]
   }
 }
