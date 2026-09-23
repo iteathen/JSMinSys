@@ -118,6 +118,18 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   assert.deepEqual([...ns.interval],[1,3]);
 });
 
+test('CPC closes a forced block that lifts another opponent terminal singleton',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
+  // P1 to move after 001001113. P0 has one playable singleton in column 2.
+  // P1 must occupy that cell, but doing so raises column 2 by one and exposes
+  // a second P0 singleton immediately above it. No P1 immediate terminal exists.
+  const moves=[0,0,1,0,0,1,1,1,3];
+  const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
+  assert.equal(exact(columns,rows,moves).value,3);
+  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
+  assert.deepEqual([...s.interval],[3,3]);
+});
+
 test('CPC recognizes exact fork loss after enabling move',()=>{
   const g=prepareConnect4RbaGeometry({columns:5,rows:4});
   // 0-based: P0 1, P1 1, P0 2, P1 1, P0 3.
