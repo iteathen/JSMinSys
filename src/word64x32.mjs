@@ -57,8 +57,8 @@ export function ushr2x32Into(dst, di, lo, hi, count) {
 }
 
 export function add2x32Into(dst, di, a0, a1, b0, b1) {
-  const lo = (a0 + b0) >>> 0;
-  const carry = lo < a0 ? 1 : 0;
+  const lo = a0 + b0;
+  const carry = lo > 0xffffffff ? 1 : 0;
   dst[di] = lo;
   dst[di + 1] = a1 + b1 + carry;
   return dst;
