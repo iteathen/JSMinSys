@@ -79,9 +79,10 @@
         "fillPopcount10Table32",
         "popcount2x32High10Table",
         "popcount32Sparse",
-        "popcount2x32SparseBits"
+        "popcount2x32SparseBits",
+        "popcount2x32High10Sparse"
       ],
-      "note": "Exact popcount has fixed SWAR, set-bit-sparse, high-lane-distribution, and hot high<=10 table profiles. The fixed two-lane path now fuses lanes at the nibble-count stage and collapses bytes only once."
+      "note": "Exact popcount profiles now cover fixed fused SWAR, set-bit sparsity, high-lane emptiness, high<=10 table lookup, and their combined distribution/cache profile. Selection remains explicit from configured width, occupancy distribution, and cache evidence."
     },
     {
       "id": 5,

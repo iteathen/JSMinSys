@@ -185,6 +185,17 @@ export function fillPopcount10Table32(table) {
   return 1024;
 }
 
+export function popcount2x32High10Sparse(lo, hi, table) {
+  let x = lo;
+  x = x - ((x >>> 1) & 0x55555555);
+  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+  x = (x + (x >>> 4)) & 0x0f0f0f0f;
+  const lowCount = Math.imul(x, 0x01010101) >>> 24;
+
+  if (hi === 0) return lowCount;
+  return lowCount + table[hi];
+}
+
 export function popcount2x32High10Table(lo, hi, table) {
   let x = lo;
   x = x - ((x >>> 1) & 0x55555555);

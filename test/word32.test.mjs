@@ -1192,6 +1192,7 @@ import {
   popcount2x32,
   fillPopcount10Table32,
   popcount2x32High10Table,
+  popcount2x32High10Sparse,
 } from '../src/word64x32.mjs';
 import {
   playableColumn32,
@@ -1345,6 +1346,10 @@ test('10-bit high-lane popcount table profile', () => {
   for (const [lo, hi] of vectors) {
     assert.equal(
       popcount2x32High10Table(lo, hi, table),
+      popcount2x32(lo, hi),
+    );
+    assert.equal(
+      popcount2x32High10Sparse(lo, hi, table),
       popcount2x32(lo, hi),
     );
   }

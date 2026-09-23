@@ -1,5 +1,5 @@
 {
-  "version": "0.78.0",
+  "version": "0.79.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -4388,6 +4388,47 @@
       }
     },
     {
+      "name": "popcount2x32High10Sparse",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        "LD32",
+        ">>>",
+        "-",
+        "&",
+        "+",
+        "===",
+        "=",
+        "Math.imul"
+      ],
+      "status": "implemented-configured-distribution-profile",
+      "preconditions": [
+        "configured high lane has at most 10 live bits (hi < 1024)",
+        "table was initialized by fillPopcount10Table32",
+        "select this profile when hi===0 frequency and table cache residency beat the fixed high10-table or fused-SWAR alternatives",
+        "under an L1 table model it beats popcount2x32High10Table when hi===0 exceeds 40%"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "scenario",
+        "hotL1Predicted": {
+          "min": 16,
+          "max": 21
+        },
+        "hotL2Predicted": {
+          "min": 16,
+          "max": 29
+        },
+        "hotL3Predicted": {
+          "min": 16,
+          "max": 64
+        },
+        "expression": "14-cycle low-lane SWAR + branch/test + (hi!==0 ? LOAD(table[hi]) + ADD : 0)",
+        "note": "Composes high<=10 lookup with sparse-high early return. L1 is always below fixed 23-cycle two-lane SWAR; distribution determines whether it beats the branch-free 19-cycle L1 high10-table profile."
+      }
+    },
+    {
       "name": "popcount2x32SparseBits",
       "source": "src/word64x32.mjs",
       "block": "popcount",
@@ -4706,11 +4747,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 172,
+    "functionsImplemented": 173,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 172,
+    "functionsWithCycleCount": 173,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -6201,6 +6242,18 @@
           "before": "maskContains2x32: 4-7 cycles for every unsigned two-lane required mask",
           "after": "3 cycles when initialization proves one required lane is zero",
           "mechanism": "same preclassified lane specialization with bit-31-safe unsigned containment"
+        }
+      ]
+    },
+    {
+      "id": "round-072",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "popcount2x32High10Sparse",
+          "before": "high10 table: 19 L1 fixed; sparse-high: 16/25 L1",
+          "after": "16-cycle hi==0 / 21-cycle hi!=0 under L1 table residency",
+          "mechanism": "compute low exact count once, skip high table load when hi is zero, otherwise use the configured 10-bit table"
         }
       ]
     }
