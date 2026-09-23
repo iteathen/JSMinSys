@@ -1,5 +1,5 @@
 {
-  "version": "0.62.0",
+  "version": "0.63.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -2982,6 +2982,71 @@
       }
     },
     {
+      "name": "queueTryEnqueueOwnedNext32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.store",
+        "ST32",
+        "&",
+        "-",
+        "|",
+        "!==",
+        "+"
+      ],
+      "status": "implemented-owned-producer-next-profile",
+      "preconditions": [
+        "exactly one producer owns this queue position, or producer access is externally serialized",
+        "caller supplies the exact current int32 enqueue position",
+        "caller replaces its local enqueue position with the returned value",
+        "unchanged returned position means unavailable; changed position means success",
+        "sequence atomic store publishes the ordinary payload store"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "fastPath": "ATOMIC_LOAD + STORE_COST + ATOMIC_STORE + 6",
+        "unavailablePath": "ATOMIC_LOAD + 4",
+        "governingSuccess": "same as function fast path; no separate caller ADD/int32-coercion",
+        "note": "One extra internal int32 coercion turns the publication position into the caller's next reservation. Compared with the boolean owned profile plus caller advance, the governing success path saves one ALU cycle."
+      }
+    },
+    {
+      "name": "queueTryDequeueOwnedNext32",
+      "source": "src/queue32.mjs",
+      "block": "shared-queue",
+      "primitives": [
+        "Atomics.load",
+        "Atomics.store",
+        "LD32",
+        "ST32",
+        "&",
+        "-",
+        "|",
+        "!==",
+        "+"
+      ],
+      "status": "implemented-owned-consumer-next-profile",
+      "preconditions": [
+        "exactly one consumer owns this queue position, or consumer access is externally serialized",
+        "caller supplies the exact current int32 dequeue position",
+        "caller replaces its local dequeue position with the returned value",
+        "unchanged returned position means unavailable; changed position means success",
+        "sequence atomic observation makes the ordinary payload load visible before slot release"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "fastPath": "ATOMIC_LOAD + LOAD + STORE_COST + ATOMIC_STORE + 7",
+        "unavailablePath": "ATOMIC_LOAD + 6",
+        "governingSuccess": "same as function fast path; no separate caller ADD/int32-coercion",
+        "note": "Reuses the ready position as caller state. Governing success saves one ALU cycle versus boolean owned dequeue plus caller-side int32 advance."
+      }
+    },
+    {
       "name": "shl2x32Lt32Into",
       "source": "src/word64x32.mjs",
       "block": "cross-word-shift",
@@ -3657,11 +3722,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 137,
+    "functionsImplemented": 139,
     "catalogBlocks": 20,
     "blocksCompleteWithoutNewPrimitive": 19,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 137,
+    "functionsWithCycleCount": 139,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 20,
     "blocksCompletedWithAdmittedPrimitive": 1
@@ -4870,6 +4935,24 @@
           "before": "separate state-owned two-lane: 27-35.5 L1 apply/undo",
           "after": "packed state: 21.5-30 L1 apply/undo",
           "mechanism": "same configured physical-state packing on ordinary landing-loading two-lane paths"
+        }
+      ]
+    },
+    {
+      "id": "round-056",
+      "status": "implemented-pending-qualification",
+      "changes": [
+        {
+          "function": "queueTryEnqueueOwnedNext32",
+          "before": "owned boolean function + caller success advance = function fast path + 2 ALU",
+          "after": "next-position profile = function fast path + 1 extra internal ALU",
+          "mechanism": "reuse the publication nextPosition as caller reservation state"
+        },
+        {
+          "function": "queueTryDequeueOwnedNext32",
+          "before": "owned boolean function + caller success advance = function fast path + 2 ALU",
+          "after": "next-position profile = function fast path + 1 extra internal ALU",
+          "mechanism": "reuse the ready position as caller reservation state"
         }
       ]
     }

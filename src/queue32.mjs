@@ -124,3 +124,41 @@ export function queueTryDequeueOwnedPosition32(
   return true;
 }
 
+export function queueTryEnqueueOwnedNext32(
+  sequence,
+  values,
+  mask,
+  position,
+  value,
+) {
+  const slot = position & mask;
+  const observed = Atomics.load(sequence, slot);
+  const difference = (observed - position) | 0;
+  if (difference !== 0) return position;
+
+  const nextPosition = (position + 1) | 0;
+  values[slot] = value;
+  Atomics.store(sequence, slot, nextPosition);
+  return nextPosition;
+}
+
+export function queueTryDequeueOwnedNext32(
+  sequence,
+  values,
+  mask,
+  capacity,
+  position,
+  out,
+  outIndex,
+) {
+  const slot = position & mask;
+  const nextPosition = (position + 1) | 0;
+  const observed = Atomics.load(sequence, slot);
+  const difference = (observed - nextPosition) | 0;
+  if (difference !== 0) return position;
+
+  out[outIndex] = values[slot];
+  Atomics.store(sequence, slot, position + capacity);
+  return nextPosition;
+}
+

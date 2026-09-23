@@ -857,6 +857,8 @@ import {
   queueTryDequeue32,
   queueTryEnqueueOwnedPosition32,
   queueTryDequeueOwnedPosition32,
+  queueTryEnqueueOwnedNext32,
+  queueTryDequeueOwnedNext32,
 } from '../src/queue32.mjs';
 
 test('two-lane shifts and arithmetic', () => {
@@ -1150,6 +1152,50 @@ test('caller-owned queue positions remove reservation CAS', () => {
   assert.equal(
     queueTryEnqueueOwnedPosition32(sequence, values, mask, enqueuePosition, 99),
     false,
+  );
+});
+
+test('owned queue next-position profiles reuse publication increment', () => {
+  const capacity = 4;
+  const mask = capacity - 1;
+  const sequence = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const values = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * capacity));
+  const out = new Int32Array(1);
+  for (let slot = 0; slot < capacity; slot += 1) sequence[slot] = slot;
+
+  let enqueuePosition = 0;
+  let dequeuePosition = 0;
+
+  const nextEnqueue = queueTryEnqueueOwnedNext32(
+    sequence, values, mask, enqueuePosition, 91,
+  );
+  assert.notEqual(nextEnqueue, enqueuePosition);
+  enqueuePosition = nextEnqueue;
+
+  const nextDequeue = queueTryDequeueOwnedNext32(
+    sequence, values, mask, capacity, dequeuePosition, out, 0,
+  );
+  assert.notEqual(nextDequeue, dequeuePosition);
+  dequeuePosition = nextDequeue;
+  assert.equal(out[0], 91);
+
+  // Unavailable returns the unchanged owned position.
+  assert.equal(
+    queueTryDequeueOwnedNext32(
+      sequence, values, mask, capacity, dequeuePosition, out, 0,
+    ),
+    dequeuePosition,
+  );
+
+  // Int32 wrap remains caller-ready.
+  const wrapSequence = new Int32Array(new SharedArrayBuffer(4));
+  const wrapValues = new Int32Array(new SharedArrayBuffer(4));
+  wrapSequence[0] = 0x7fffffff;
+  assert.equal(
+    queueTryEnqueueOwnedNext32(
+      wrapSequence, wrapValues, 0, 0x7fffffff, 5,
+    ),
+    -2147483648,
   );
 });
 

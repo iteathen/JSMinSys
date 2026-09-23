@@ -290,9 +290,11 @@
         "queueTryEnqueue32",
         "queueTryDequeue32",
         "queueTryEnqueueOwnedPosition32",
-        "queueTryDequeueOwnedPosition32"
+        "queueTryDequeueOwnedPosition32",
+        "queueTryEnqueueOwnedNext32",
+        "queueTryDequeueOwnedNext32"
       ],
-      "note": "Blocking, generic nonblocking, and independently selectable owned-producer/owned-consumer profiles coexist. A sole or externally serialized side keeps its reservation position caller-local, deleting the shared counter load/CAS/retry while per-slot sequence atomics retain payload publication/acquisition. Caller-local position advance remains explicitly accounted."
+      "note": "Blocking, generic nonblocking, owned-position boolean, and owned-position next-return profiles coexist. Owned-next variants reuse the sequence publication/ready increment as caller reservation state, deleting the separate caller success advance while preserving per-slot atomic synchronization."
     },
     {
       "id": 20,
