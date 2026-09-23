@@ -3,6 +3,7 @@ import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
 export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
@@ -138,3 +139,119 @@ export function reconcileConnect4RbaEvent32(t,q,g,rootReflected,rootWitnessOut,w
   rbaTtEnqueueDependencies32(t,q);return 0;
 }
 export {RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY};
+
+
+export function prepareConnect4CpcRbaEvaluator({
+  geometry,
+  cpcFrontierResponse=false,
+  cpcProjectedAdvisory=false,
+}={}){
+  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
+  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g);
+  return {
+    g,profile,
+    scratch:prepareConnect4RbaCoordinateScratch(g),
+    cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),
+    keys:new Uint32Array(g.columns*g.keyWords),
+    childBasis:new Uint32Array(g.columns*g.maxBasis),
+    childBasisSize:new Uint32Array(g.columns),
+    actions:new Uint32Array(g.columns),
+    actionLower:new Uint32Array(g.columns),
+    actionUpper:new Uint32Array(g.columns),
+    childPresent:new Uint32Array(g.columns),
+    lower:1,upper:3,count:0,witness:-1,
+    cpcCalls:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,
+    cpcPrecursors:0,cpcProjectedForks:0,transitions:0,
+  };
+}
+
+export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
+  if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
+  const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,
+    terminal=connect4RbaTerminal(g,t.keys,base);
+  state.count=0;state.witness=-1;
+  if(terminal)return terminal;
+
+  const n=t.basisSize[q];
+  if(!g.lineCount||!n||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
+
+  state.cpcCalls+=1;
+  const kind=evaluateConnect4Cpc32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
+  state.lower=state.cpc.interval[0];state.upper=state.cpc.interval[1];
+  state.cpcPrecursors+=state.cpc.precursorCount[0];
+  if(state.cpc.projectedAdvisory)
+    state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
+  if(kind===CPC_EXACT)state.cpcExact+=1;
+  else if(kind===CPC_BOUND)state.cpcBounds+=1;
+  else if(kind===CPC_RESTRICT)state.cpcRestrictions+=1;
+
+  const forced=state.cpc.forcedColumn[0],
+    preemptCount=state.cpc.preemptionCount[0],
+    preemptMask=state.cpc.preemptionMask32[0],
+    usePreempt=preemptCount>1&&g.columns<=32;
+  if(forced>=0)state.cpcForced+=1;
+
+  // Non-root exact CPC evidence needs no dependency topology. Root exact value
+  // still needs child evidence unless it is already terminal, because caller-
+  // frame deterministic witness selection is a separate obligation.
+  if(kind===CPC_EXACT&&q!==rootQ)return state.lower;
+
+  let count=0,childBase=0,childBi=0;
+  const forcedCaller=forced<0?-1:
+    q===rootQ&&rootReflected?g.mirrorColumn[forced]:forced,
+    actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,
+    actionEnd=forcedCaller>=0?actionStart+1:g.columns;
+
+  for(let oi=actionStart;oi<actionEnd;oi+=1){
+    const caller=g.actionOrder[oi],
+      column=q===rootQ&&rootReflected?g.mirrorColumn[caller]:caller;
+    if(t.keys[base+column]>=g.rows)continue;
+    if(usePreempt&&!(preemptMask&((1<<column)>>>0)))continue;
+
+    state.actions[count]=column;
+    state.childPresent[count]=0;
+    let lo=1,hi=3;
+
+    const term=connect4RbaCofactor(
+      g,state.profile,
+      t.keys,base,t.basis,basisBase,n,column,
+      state.keys,childBase,state.childBasis,childBi,
+      state.scratch.seen,state.childBasisSize,count,state.scratch.map,
+    );
+    state.transitions+=1;
+    if(term<0){childBase+=g.keyWords;childBi+=g.maxBasis;continue;}
+
+    if(term){
+      lo=hi=term;
+    }else{
+      connect4RbaCanonicalize(
+        g,state.profile,state.keys,childBase,
+        state.childBasis,childBi,state.childBasisSize[count],state.scratch,
+      );
+      state.cpcCalls+=1;
+      const childKind=evaluateConnect4Cpc32(
+        g,state.keys,childBase,state.childBasis,childBi,state.childBasisSize[count],state.cpc,
+      );
+      lo=state.cpc.interval[0];hi=state.cpc.interval[1];
+      state.cpcPrecursors+=state.cpc.precursorCount[0];
+      if(state.cpc.projectedAdvisory)
+        state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
+      if(childKind===CPC_EXACT)state.cpcExact+=1;
+      else{
+        if(childKind===CPC_BOUND)state.cpcBounds+=1;
+        else if(childKind===CPC_RESTRICT)state.cpcRestrictions+=1;
+        state.childPresent[count]=1;
+      }
+    }
+
+    state.actionLower[count]=lo;
+    state.actionUpper[count]=hi;
+    count+=1;
+    childBase+=g.keyWords;
+    childBi+=g.maxBasis;
+  }
+
+  if(!count)return RBA_QUERY_UNCOVERED;
+  state.count=count;
+  return RBA_BRANCH;
+}
