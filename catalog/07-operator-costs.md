@@ -1,5 +1,8 @@
 # Operator cycle-cost catalog — v0
 
+> **NEES authority notice:** This file is a historical/research snapshot from the JSMinSys bootstrap. NEES Draft 0.5+ is the authoritative source for cost profiles, cycle accounting, evidence semantics, and function-ledger interpretation. If this file conflicts with NEES, NEES wins. JSMinSys retains only admission/restriction policy.
+
+
 This catalog tracks physical cost for admissible JSMinSys operations.
 
 ## Cycle-model completeness invariant
