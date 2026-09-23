@@ -18,16 +18,17 @@ export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffse
   }
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
-export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen){
+export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed=null){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
   for(let i=0;i<count;i+=1){
     const id=profile.removeCell(g,parent[parentOffset+i],cell);
+    if(removed)removed[i]=id;
     if(id>=0)seen[id>>>5]|=1<<(id&31);
   }
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 
-export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex){
+export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null){
   const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
   if(terminal||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
@@ -52,14 +53,15 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen);sizes[sizeIndex]=cn;
+  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
   for(let p=0;p<2;p+=1){
     const sourceCoord=src+(p?g.p1Offset:g.p0Offset),targetCoord=dst+(p?g.p1Offset:g.p0Offset);
     for(let i=0;i<n;i+=1){
       if(!(source[sourceCoord+(i>>>5)]&(1<<(i&31))))continue;
-      const id=basis[bi+i],removed=profile.removeCell(g,id,cell);
-      if(p!==player&&removed!==id)continue;
-      const image=p===player?removed:id;
+      const id=basis[bi+i],raw=removed?removed[i]:profile.removeCell(g,id,cell),
+        imageRemoved=raw===0xffffffff?-1:raw;
+      if(p!==player&&imageRemoved!==id)continue;
+      const image=p===player?imageRemoved:id;
       if(image<0)continue;
       for(let j=0;j<cn;j+=1)if(profile.shapeSubset(g,image,childBasis[ci+j]))
         target[targetCoord+(j>>>5)]|=1<<(j&31);
