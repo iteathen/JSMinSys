@@ -42,10 +42,22 @@ export function playableColumn32(heights, column, rows) {
   return heights[column] < rows;
 }
 
-export function decodeColumn32(cell, columns) {
-  return cell % columns;
+export function fillCoordinateTables32(rowByCell, columnByCell, columns, rows) {
+  let cell = 0;
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      rowByCell[cell] = row;
+      columnByCell[cell] = column;
+      cell += 1;
+    }
+  }
+  return cell;
 }
 
-export function decodeRow32(cell, columns) {
-  return Math.floor(cell / columns);
+export function decodeColumn32(columnByCell, cell) {
+  return columnByCell[cell];
+}
+
+export function decodeRow32(rowByCell, cell) {
+  return rowByCell[cell];
 }
