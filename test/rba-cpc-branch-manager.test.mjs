@@ -66,6 +66,23 @@ function solveDistributed(g,moves,basisCapacity=g.maxBasis){
   };
 }
 
+test('support-derived TT basis closes a late standard 7x6 control exactly',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    serial=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+      reflected:root.reflected,
+    }),
+    stored=solveDistributed(g,moves,g.maxBasis),
+    derived=solveDistributed(g,moves,0);
+  assert.equal(stored.value,serial.value,JSON.stringify({serial,stored}));
+  assert.equal(stored.move,serial.move,JSON.stringify({serial,stored}));
+  assert.equal(derived.value,serial.value,JSON.stringify({serial,derived}));
+  assert.equal(derived.move,serial.move,JSON.stringify({serial,derived}));
+  assert.equal(derived.basisBytes,0);
+});
+
 test('CPC-first branch-manager traversal agrees with exact CPC alpha-beta on 4x4 controls',()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4});
   const fixtures=[
