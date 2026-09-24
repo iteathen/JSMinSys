@@ -164,6 +164,41 @@
         "name": "STORE_F64_COST(cacheLevel,ownershipState)"
       },
       "note": "Float64Array store; locality/ownership and source lowering remain profile-sensitive."
+    },
+    "runtime.root.storage.setup": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ROOT_STORAGE_SETUP_COST(keyWords,maxBasis,gcState)"
+      },
+      "note": "Root ingress temporary/result storage setup; allocation, slicing, and initialization remain runtime/size dependent."
+    },
+    "runtime.move.validation": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "MOVE_VALIDATION_COST(moveCount,geometry,scenario)"
+      },
+      "note": "Per-move ingress validation/control work; retained symbolically until source-to-machine lowering is qualified."
+    },
+    "runtime.evaluate.fixed": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "EVALUATE_FIXED_COST(stateShape,scenario)"
+      },
+      "note": "Fixed non-subledger evaluator work such as state-field loads/stores, dispatch tests, and loop/control bookkeeping; explicitly nonzero."
+    },
+    "runtime.position_code.evaluate": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "POSITION_CODE_EVAL_COST(actions,scenario)"
+      },
+      "note": "Optional physical position-code child advancement/reflection/store work. Managed runtime selects this count to zero."
+    },
+    "runtime.publish.dispatch": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "PUBLISH_DISPATCH_COST(code,scenario)"
+      },
+      "note": "Result-code dispatch/control and argument selection before exact/surplus publication."
     }
   },
   "units": [
@@ -665,7 +700,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)+R*(C(control.test.u32)+C(control.branch)+CALL(rbaTtEnter32)+CALL(rbaTtReleaseExecution32)+CALL(rbaTtLeave32)+C(atomic.store.u32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "expression": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)+R*(C(control.test.u32)+C(control.branch)+CALL(rbaTtEnter32)+CALL(rbaTtReleaseExecution32)+CALL(rbaTtLeave32)+C(atomic.store.u32)+C(atomic.rmw.u32)+C(atomic.notify))",
         "parameters": {
           "R": "1 when a reset is pending; 0 on the ordinary no-reset path"
         },
@@ -716,7 +751,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "8*C(control.test.u32)+4*C(control.branch)+C(alu.sub.u32)+OBJECT_ALLOC(branchWorkerRecord)",
+        "expression": "8*C(control.test.u32)+4*C(control.branch)+C(alu.sub.u32)+C(runtime.object.allocate)",
         "note": "One-time worker preparation; reset-index range is proved here and removed from recurring steps."
       },
       "status": "decomposed"
@@ -795,7 +830,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(rbaTtEnter32)+T*(E*(CALL(rbaTtTakeEvent32)+CALLBACK(reconcile))+M*(CALL(rbaTtManagerInspectReady32)+CALL(rbaTtManagerClean32))+CALL(rbaTtLeave32)+N*(C(atomic.rmw.u32)+ATOMIC_NOTIFY))",
+        "expression": "CALL(rbaTtEnter32)+T*(E*(CALL(rbaTtTakeEvent32)+CALLBACK(reconcile))+M*(CALL(rbaTtManagerInspectReady32)+CALL(rbaTtManagerClean32))+CALL(rbaTtLeave32)+N*(C(atomic.rmw.u32)+C(atomic.notify)))",
         "parameters": {
           "T": "1 when the manager TT transaction is entered; 0 when entry fails",
           "E": "events processed in this manager turn",
@@ -924,7 +959,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+L*CALL(rbaTtReleaseExecution32)+A*C(atomic.store.u32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "expression": "CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+L*CALL(rbaTtReleaseExecution32)+A*C(atomic.store.u32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+C(atomic.notify))",
         "parameters": {
           "Q": "1 when a ready-claim TT transaction is entered; 0 otherwise",
           "E": "1 when q requires evaluation, else 0",
@@ -1908,7 +1943,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(2+2*P+V)*C(control.test.u32)+(1+2*P+V)*C(control.branch)+SAB_ALLOC(B)+V*TYPED_VIEW_CONSTRUCT+COPY_BYTES(B)+OBJECT_ALLOC(sharedGeometry)",
+        "expression": "(2+2*P+V)*C(control.test.u32)+(1+2*P+V)*C(control.branch)+V*C(memory.allocate.shared.bytes)+V*C(runtime.typed_view.construct)+V*C(runtime.array.copy)+C(runtime.object.allocate)",
         "parameters": {
           "P": "geometry property count",
           "V": "typed-array property count not already shared",
@@ -1960,7 +1995,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(3*W+2)*C(alu.imul.u32) + (2*W+6)*C(alu.add.u32) + C(alu.and.u32) + SAB_ALLOC(ALIGN8(8+4*W)+96*W) + (W+2)*TYPED_VIEW_CONSTRUCT + ARRAY_ALLOC(W) + TYPED_ARRAY_FILL(W) + (W+1)*C(memory.store.u32)",
+        "expression": "(3*W+2)*C(alu.imul.u32)+(2*W+6)*C(alu.add.u32)+C(alu.and.u32)+C(memory.allocate.shared.bytes)+(W+2)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+C(runtime.typed_array.fill)+(W+1)*C(memory.store.u32)",
         "parameters": {
           "W": "managed evaluator worker count"
         },
@@ -2070,7 +2105,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+TYPED_ARRAY_ALLOC(Float64Array,12)+(W+1)*URL_CONSTRUCT+(W+1)*WORKER_SPAWN+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+2*TIMER_READ+CALL(managedThreadSessionState32)+CALL(sumMetricViews32)+4*C(memory.load.u32)+COPY_BYTES(table.fault.byteLength)+2*CALL(sharedViewBytes32)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+C(runtime.typed_array.allocate)+(W+1)*C(runtime.url.construct)+(W+1)*C(runtime.worker.spawn)+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+2*C(runtime.timer.read)+CALL(managedThreadSessionState32)+CALL(sumMetricViews32)+4*C(memory.load.u32)+C(runtime.array.copy)+2*CALL(sharedViewBytes32)",
         "unboundedTerms": [
           "runtime.managed_wait",
           "runtime.managed_close"
@@ -2110,7 +2145,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
         "unboundedTerms": [
           "CALL(runRbaBranchManagerLoop32)"
         ],
@@ -2173,7 +2208,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)+11*C(runtime.counter.load)+12*C(memory.store.f64)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)+11*C(runtime.counter.load)+12*C(memory.store.f64)",
         "unboundedTerms": [
           "CALL(runRbaBranchWorkerLoop32)"
         ],
@@ -2620,6 +2655,14 @@
       "scope": "cold-ingress",
       "operations": [
         {
+          "op": "runtime.root.storage.setup",
+          "count": 1
+        },
+        {
+          "op": "runtime.move.validation",
+          "count": "M"
+        },
+        {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "connect4RbaBasisFromSupport"
@@ -2642,7 +2685,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "ROOT_STORAGE_SETUP + CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeight)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)+MOVE_VALIDATION(M)",
+        "expression": "C(runtime.root.storage.setup)+M*C(runtime.move.validation)+CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeight)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)",
         "parameters": {
           "M": "ingress move count",
           "PC": "1 when positionCode capability enabled, else 0"
@@ -2657,6 +2700,10 @@
       "name": "evaluateConnect4CpcRbaTt32",
       "scope": "hot",
       "operations": [
+        {
+          "op": "runtime.evaluate.fixed",
+          "count": 1
+        },
         {
           "op": "runtime.call.subledger",
           "count": 1,
@@ -2681,11 +2728,15 @@
           "op": "runtime.call.subledger",
           "count": "PC",
           "target": "rbaTtHasPositionCode32"
+        },
+        {
+          "op": "runtime.position_code.evaluate",
+          "count": "PC"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "EVAL_FIXED + CALL(evaluateConnect4CpcNonterminal32)+A*CALL(connect4RbaCofactorKnownHeight)+U*(CALL(connect4RbaCanonicalize)+CALL(evaluateConnect4CpcNonterminal32))+PC*POSITION_CODE_EVAL_COST",
+        "expression": "C(runtime.evaluate.fixed)+CALL(evaluateConnect4CpcNonterminal32)+A*CALL(connect4RbaCofactorKnownHeight)+U*(CALL(connect4RbaCanonicalize)+CALL(evaluateConnect4CpcNonterminal32))+PC*(CALL(rbaTtHasPositionCode32)+C(runtime.position_code.evaluate))",
         "parameters": {
           "A": "legal actions examined",
           "U": "nonterminal child actions requiring CPC",
@@ -2777,7 +2828,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcScratch)+ALLOC_EVALUATOR_ARRAYS(columns,maxBasis,shapeWordCount,PC)",
+        "expression": "CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcScratch)+(11+2*PC)*C(runtime.typed_array.allocate)",
         "parameters": {
           "PC": "1 when physical position-code capability is enabled, else 0"
         },
@@ -2810,6 +2861,10 @@
       "scope": "hot",
       "operations": [
         {
+          "op": "runtime.publish.dispatch",
+          "count": 1
+        },
+        {
           "op": "runtime.call.subledger",
           "count": "X",
           "target": "rbaTtPublishExactOwned32"
@@ -2822,7 +2877,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "PUBLISH_DISPATCH + X*CALL(rbaTtPublishExactOwned32)+(1-X)*CALL(rbaTtPublishSurplus32)",
+        "expression": "C(runtime.publish.dispatch)+X*CALL(rbaTtPublishExactOwned32)+(1-X)*CALL(rbaTtPublishSurplus32)",
         "parameters": {
           "X": "1 for exact result codes 1..3, 0 for branch publication"
         },
@@ -3996,7 +4051,7 @@
     "legacySymbolicVisible": 157,
     "missing": 0,
     "neesBoundOperations": 10,
-    "localExtensionOperations": 23
+    "localExtensionOperations": 28
   },
   "neesOperationBindings": {
     "alu.add.u32": {
