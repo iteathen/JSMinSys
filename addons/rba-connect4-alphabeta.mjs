@@ -52,8 +52,8 @@ function resetConnect4RbaExactCache32(cache){
   cache.epoch=epoch;
 }
 
-function absToRelative(value,mover){return value===2?0:mover===0?value-2:2-value;}
-function relativeToAbs(value,mover){return value===0?2:mover===0?value+2:2-value;}
+function absToRelative(value,mover){const mask=0-mover;return ((value-2)^mask)-mask;}
+function relativeToAbs(value,mover){const mask=0-mover;return 2+((value^mask)-mask);}
 export function prepareConnect4RbaAlphaBeta({
   geometry,
   mode=RBA_AB_CPC_ONLY,
@@ -93,9 +93,8 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize){
 }
 
 function searchCpcOnly(state,depth,alpha,beta){
-  const g=state.g,keyWords=g.keyWords,maxBasis=g.maxBasis,
-    keyOffset=depth*keyWords,basisOffset=depth*maxBasis,alphaOrig=alpha,betaOrig=beta;
-  const words=state.words,basis=state.basis,basisSize=state.basisSize,n=basisSize[depth],meta=words[keyOffset+g.metaOffset];
+  const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis,alphaOrig=alpha,betaOrig=beta;
+  const words=state.words,basis=state.basis,n=state.basisSize[depth],meta=words[keyOffset+g.metaOffset];
   const mover=(meta>>>2)&1;
   state.nodes+=1;
 
@@ -127,22 +126,20 @@ function searchCpcOnly(state,depth,alpha,beta){
   if(semanticHi<beta)beta=semanticHi;
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    profile=state.profile,coord=state.coord,seen=coord.seen,map=coord.map,inverse=coord.inverse,
-    rows=g.rows,actionOrder=g.actionOrder,usePreempt=preemptCount>1,
-    childDepth=depth+1,childKey=keyOffset+keyWords,childBasis=basisOffset+maxBasis,
+    usePreempt=preemptCount>1,childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
     actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
   let legal=0,best=-2,cut=0;
   for(let oi=actionStart;oi<actionEnd;oi+=1){
-    const column=actionOrder[oi],height=words[keyOffset+column];
-    if(height>=rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    const column=g.actionOrder[oi],height=words[keyOffset+column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     legal=1;
-    const term=connect4RbaCofactorKnownHeight(g,profile,words,keyOffset,basis,basisOffset,n,column,height,
-      words,childKey,basis,childBasis,seen,basisSize,childDepth,map,inverse);
+    const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
+      words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
     state.cofactors+=1;
     let value;
     if(term)value=absToRelative(term,mover);
     else{
-      connect4RbaCanonicalize(g,profile,words,childKey,basis,childBasis,basisSize[childDepth],coord);
+      connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
       value=-searchCpcOnly(state,childDepth,-beta,-alpha);
     }
     if(value>best)best=value;

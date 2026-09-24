@@ -2191,27 +2191,28 @@
       "scope": "hot-scalar",
       "operations": [
         {
-          "op": "control.test.u32",
-          "count": "1+N"
-        },
-        {
-          "op": "control.branch",
-          "count": "1+N"
-        },
-        {
           "op": "alu.sub.u32",
-          "count": "N"
+          "count": 3
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "expression",
-        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*C(alu.sub.u32)",
-        "parameters": {
-          "N": "1 when value is non-draw and mover-relative arithmetic executes; 0 for absolute draw"
-        },
-        "note": "Valid-value Negamax conversion. Unknown branch prediction remains visible through control.branch."
+        "kind": "fixed",
+        "cycles": 4,
+        "expression": "3*C(alu.sub.u32)+C(alu.xor.u32)",
+        "note": "Branchless valid-value conversion. mask=0-mover conditionally negates value-2 with XOR/subtract; fixed four-ALU path replaces mover/draw branches."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "branchless-mover-frame-conversion",
+        "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
+        "prior": "(1+N) tests + (1+N) branches + N subtract",
+        "new": "3 subtract + 1 XOR",
+        "rationale": "remove branch-prediction dependence from recursive exact/terminal/cache value conversion"
+      }
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32",
@@ -2502,32 +2503,32 @@
       "scope": "hot-scalar",
       "operations": [
         {
-          "op": "control.test.u32",
-          "count": "1+N"
+          "op": "alu.sub.u32",
+          "count": 2
         },
         {
-          "op": "control.branch",
-          "count": "1+N"
+          "op": "alu.xor.u32",
+          "count": 1
         },
         {
           "op": "alu.add.u32",
-          "count": "N*M"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": "N*(1-M)"
+          "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "expression",
-        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*M*C(alu.add.u32)+N*(1-M)*C(alu.sub.u32)",
-        "parameters": {
-          "N": "1 when relative value is non-draw; 0 for draw",
-          "M": "1 for mover 0 add path; 0 for mover 1 subtract path"
-        },
-        "note": "Mover-relative to absolute W/D/L conversion."
+        "kind": "fixed",
+        "cycles": 4,
+        "expression": "2*C(alu.sub.u32)+C(alu.xor.u32)+C(alu.add.u32)",
+        "note": "Branchless mover-relative to absolute conversion. XOR/subtract conditionally negates the relative value before adding the absolute draw offset."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "branchless-mover-frame-conversion",
+        "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
+        "prior": "(1+N) tests + (1+N) branches + non-draw add/subtract",
+        "new": "2 subtract + 1 XOR + 1 add",
+        "rationale": "fixed-cost conversion removes draw/mover branch prediction from exact-cache store paths"
+      }
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32",
@@ -10077,7 +10078,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "8+N*(9+8*A)"
+          "count": "8+N*(9+10*A)"
         },
         {
           "op": "runtime.field.store",
@@ -10171,7 +10172,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+8*A))*C(runtime.field.load)+(1+N*(5+3*A+2*S))*C(runtime.field.store)+(4+N*(5+3*A))*C(memory.load.u32)+2*N*C(memory.store.u32)+(3+N*(1+A))*C(alu.imul.u32)+(4+N*(7+5*A))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A))*C(alu.and.u32)+N*A*C(alu.shl.u32)+(2+3*N)*C(alu.shr.u32)+(3+N*(11+7*A))*C(control.test.u32)+(3+N*(11+7*A))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(searchCpcOnly))",
+        "expression": "(8+N*(9+10*A))*C(runtime.field.load)+(1+N*(5+3*A+2*S))*C(runtime.field.store)+(4+N*(5+3*A))*C(memory.load.u32)+2*N*C(memory.store.u32)+(3+N*(1+A))*C(alu.imul.u32)+(4+N*(7+5*A))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A))*C(alu.and.u32)+N*A*C(alu.shl.u32)+(2+3*N)*C(alu.shr.u32)+(3+N*(11+7*A))*C(control.test.u32)+(3+N*(11+7*A))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(searchCpcOnly))",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -10181,36 +10182,18 @@
           "T": "terminal cofactor children converted to mover-relative values",
           "S": "exact-cache stores executed by this invocation (0 or 1)"
         },
-        "note": "Production CPC-only Negamax recursion with action-loop immutable references hoisted once after CPC/cache/bound cutoffs. The field-load term conservatively claims only the unambiguous removal of g.actionOrder and g.rows object loads per examined action; repeated profile/coord/basisSize traversals removed by the same aliases remain over-accounted rather than treated as free.",
+        "note": "Production CPC-only Negamax recursion. Four-Front mode selection, parent-front evidence, action-bound prepass, and recurring useFront action checks are absent. Relative to the prior production path through search(F=Q=0), this removes three non-hit object-field loads, one non-hit row multiply, three non-hit control tests/branches, and three control tests/branches per examined action.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "pass": 2,
-        "candidate": "cpc-only-action-loop-alias-hoist",
-        "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
-        "countedDelta": "-2*C(runtime.field.load) per examined action",
-        "removed": "repeated g.actionOrder and g.rows object-field loads from the action loop; keyWords/maxBasis/basisSize/profile/coord scratch references are also reused locally",
-        "accounting": "Conservative: additional profile/coord/basisSize object-traversal savings are intentionally not subtracted from the governing expression until separately qualified."
-      },
-      "optimizationHistory": [
-        {
-          "pass": 1,
-          "candidate": "cpc-only-recursion-specialization",
-          "baseline": "67ecf83c1e0789a230afe1261464c23d217e9757",
-          "removed": "Four-Front mode checks, reusable-front prepass gate, per-action useFront dispatch, and depth*columns row calculation from production recursion",
-          "recurringControlDelta": "-3 non-hit tests/branches - 3 tests/branches per examined action",
-          "recurringScalarDelta": "-3 non-hit field loads - 1 non-hit integer multiply"
-        },
-        {
-          "pass": 2,
-          "candidate": "cpc-only-action-loop-alias-hoist",
-          "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
-          "countedDelta": "-2*C(runtime.field.load) per examined action",
-          "removed": "repeated g.actionOrder and g.rows object-field loads from the action loop; keyWords/maxBasis/basisSize/profile/coord scratch references are also reused locally",
-          "accounting": "Conservative: additional profile/coord/basisSize object-traversal savings are intentionally not subtracted from the governing expression until separately qualified."
-        }
-      ]
+        "candidate": "cpc-only-recursion-specialization",
+        "priorUnit": "addons/rba-connect4-alphabeta.mjs#search with F=0,Q=0",
+        "removed": "Four-Front mode checks, reusable-front prepass gate, per-action useFront dispatch, and depth*columns row calculation from production recursion",
+        "recurringControlDelta": "-3 non-hit tests/branches - 3 tests/branches per examined action",
+        "recurringScalarDelta": "-3 non-hit field loads - 1 non-hit integer multiply",
+        "semantics": "CPC-only search order, cofactor/canonicalization, alpha-beta windows, cache qualification and WDL results unchanged"
+      }
     }
   ],
   "summary": {
@@ -10322,7 +10305,7 @@
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
-    "addons/rba-connect4-alphabeta.mjs": "e5ed28ffdda766493ca2c64917ab682d6db6cbec",
+    "addons/rba-connect4-alphabeta.mjs": "1a6d5fce595b1f20a9b08899af776931d4c62c8c",
     "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
