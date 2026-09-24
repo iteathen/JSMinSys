@@ -146,14 +146,9 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
         :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
       actionCount+=1;
     }
-    if(actionCount){
+    for(let out=0;out<actionCount;out+=1){
       const slot=g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns);
-      ordered[orderRow]=g.actionOrder[slot];
-      let out=1;
-      for(let oi=0;oi<g.columns;oi+=1){
-        if(oi===slot||scores[oi]===MOVE_SCORE_NONE)continue;
-        ordered[orderRow+out]=g.actionOrder[oi];out+=1;
-      }
+      scores[slot]=MOVE_SCORE_NONE;ordered[orderRow+out]=g.actionOrder[slot];
     }
   }
   if(!actionCount)return 0;
