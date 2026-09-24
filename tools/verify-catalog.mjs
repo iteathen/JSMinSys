@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const catalog = JSON.parse(readFileSync('catalog/catalog-v0.json', 'utf8'));
 const functions = JSON.parse(readFileSync('catalog/functions-v0.json', 'utf8'));
 const coverage = JSON.parse(readFileSync('catalog/block-coverage-v0.json', 'utf8'));
 const cycleModel = JSON.parse(readFileSync('catalog/cycle-model-v0.json', 'utf8'));
+const addonCycleLedger = JSON.parse(readFileSync('catalog/addon-cycle-ledger-v0.json', 'utf8'));
 
 const admitted = new Set(Object.values(catalog.admissibleOperations).flat());
 const names = new Set();
@@ -89,8 +90,69 @@ assert.equal(
 );
 assert.equal(cycleModel.coverage.complete, true, 'cycle model coverage must be complete');
 
+const addonAllowedCostKinds = new Set(['fixed','range','scenario','expression','symbolic','unbounded']);
+const addonUnits = new Map();
+for (const unit of addonCycleLedger.units) {
+  assert.equal(typeof unit.unit, 'string', 'add-on cycle unit id missing');
+  assert.ok(!addonUnits.has(unit.unit), `duplicate add-on cycle unit ${unit.unit}`);
+  addonUnits.set(unit.unit, unit);
+  assert.equal(unit.cycleCount && typeof unit.cycleCount === 'object', true, `${unit.unit}: missing cycleCount`);
+  assert.ok(addonAllowedCostKinds.has(unit.cycleCount.kind), `${unit.unit}: invalid add-on cycleCount kind`);
+  assert.ok(Array.isArray(unit.operations) && unit.operations.length > 0, `${unit.unit}: missing operation ledger`);
+}
+
+const addonCostOps = new Set([
+  ...Object.keys(addonCycleLedger.neesOperationBindings ?? {}),
+  ...Object.keys(addonCycleLedger.localOperationExtensions ?? {}),
+]);
+for (const unit of addonCycleLedger.units) {
+  for (const operation of unit.operations) {
+    assert.equal(typeof operation.op, 'string', `${unit.unit}: operation id missing`);
+    assert.ok(addonCostOps.has(operation.op), `${unit.unit}: unbound add-on cost operation ${operation.op}`);
+  }
+}
+
+const declaredAddonUnits = new Set();
+for (const name of readdirSync('addons').filter((name) => name.endsWith('.mjs'))) {
+  const path = `addons/${name}`;
+  const source = readFileSync(path, 'utf8');
+  for (const match of source.matchAll(/(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)) {
+    declaredAddonUnits.add(`${path}#${match[1]}`);
+  }
+  for (const match of source.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/g)) {
+    declaredAddonUnits.add(`${path}#${match[1]}`);
+  }
+}
+declaredAddonUnits.add('addons/rba-connect4-managed-worker.mjs#<module-main>');
+declaredAddonUnits.add('addons/rba-connect4-managed-manager.mjs#<module-main>');
+
+for (const unit of declaredAddonUnits) {
+  assert.ok(addonUnits.has(unit), `add-on function/module missing cycle ledger: ${unit}`);
+}
+assert.equal(
+  addonCycleLedger.summary.units,
+  addonCycleLedger.units.length,
+  'add-on cycle-ledger summary unit count mismatch',
+);
+assert.equal(
+  addonCycleLedger.summary.missing,
+  0,
+  'add-on cycle-ledger summary reports missing units',
+);
+
+const managedDetailedSources = new Set([
+  'addons/rba-connect4-managed-host.mjs',
+  'addons/rba-connect4-managed-worker.mjs',
+  'addons/rba-connect4-managed-manager.mjs',
+]);
+for (const unit of addonCycleLedger.units) {
+  if (managedDetailedSources.has(unit.source)) {
+    assert.equal(unit.status, 'decomposed', `${unit.unit}: managed runtime may not use legacy symbolic fallback`);
+  }
+}
+
 console.log(
-  `JSMinSys catalog verified: ${functions.functions.length} implemented functions, all cycle-counted, ` +
+  `JSMinSys catalog verified: ${functions.functions.length} sealed functions + ${addonCycleLedger.units.length} add-on units cycle-ledgered, ` +
   `${coverage.summary.complete}/${coverage.summary.catalogBlocks} blocks complete, ` +
   `${functions.deferred.length} deferred function(s).`,
 );
