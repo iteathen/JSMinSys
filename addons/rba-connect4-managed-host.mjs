@@ -5,7 +5,6 @@ import {
   waitManagedThreadSession32,
   closeManagedThreadSession32,
   managedThreadSessionState32,
-  createMetricViews32,
   sumMetricViews32,
   sharedViewBytes32,
 } from './branch-manager-host.mjs';
@@ -28,14 +27,35 @@ const HOST_WORKER_DIED=101;
 const HOST_DEADLINE=102;
 const HOST_CANCELLED=103;
 const CONNECT4_CPC_RBA_METRIC_WIDTH=12;
+const WITNESS_OFFSET_BYTES=0;
+const RESET_OFFSET_BYTES=4;
 
 function geometryConfig32(g){
   return {
     columns:g.columns,
     rows:g.rows,
-    actionOrder:Array.from(g.actionOrder),
+    actionOrder:g.actionOrder,
     specializationBudgetBytes:g.specializationBudgetBytes,
   };
+}
+
+function prepareManagedRuntimeSlab32(workers){
+  const resetBytes=workers*Int32Array.BYTES_PER_ELEMENT,
+    metricBaseBytes=(RESET_OFFSET_BYTES+resetBytes+7)&~7,
+    metricStrideBytes=CONNECT4_CPC_RBA_METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT,
+    buffer=new SharedArrayBuffer(metricBaseBytes+workers*metricStrideBytes),
+    witness=new Int32Array(buffer,WITNESS_OFFSET_BYTES,1),
+    resetTargets=new Int32Array(buffer,RESET_OFFSET_BYTES,workers),
+    metricViews=new Array(workers);
+  witness[0]=-2;
+  resetTargets.fill(-2);
+  for(let i=0;i<workers;i+=1)
+    metricViews[i]=new Float64Array(
+      buffer,
+      metricBaseBytes+i*metricStrideBytes,
+      CONNECT4_CPC_RBA_METRIC_WIDTH,
+    );
+  return {buffer,witness,resetTargets,metricViews,metricBaseBytes,metricStrideBytes};
 }
 
 export async function runManagedConnect4CpcRba32(moves,{
@@ -47,7 +67,6 @@ export async function runManagedConnect4CpcRba32(moves,{
   timeoutMs=120000,
   signal,
   managerBudget=64,
-  readyTarget=workers*2,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
 }={}){
@@ -62,9 +81,8 @@ export async function runManagedConnect4CpcRba32(moves,{
     throw new RangeError('invalid managed Connect4 basis-set words');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid managed Connect4 timeout');
-  if(!Number.isInteger(managerBudget)||managerBudget<1||
-     !Number.isInteger(readyTarget)||readyTarget<0)
-    throw new RangeError('invalid managed Connect4 scheduling configuration');
+  if(!Number.isInteger(managerBudget)||managerBudget<1)
+    throw new RangeError('invalid managed Connect4 manager budget');
 
   const root=connect4RbaFromMoves(moves,{geometry}),
     table=createRbaTt32({
@@ -80,11 +98,7 @@ export async function runManagedConnect4CpcRba32(moves,{
   rbaTtSetRoot32(table,rootQ);
   rbaTtEnqueue32(table,rootQ);
 
-  const witness=new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
-  witness[0]=-2;
-  const resetTargets=new Int32Array(new SharedArrayBuffer(workers*Int32Array.BYTES_PER_ELEMENT));
-  resetTargets.fill(-2);
-  const metricViews=createMetricViews32(workers,CONNECT4_CPC_RBA_METRIC_WIDTH),
+  const runtime=prepareManagedRuntimeSlab32(workers),
     metricOut=new Float64Array(CONNECT4_CPC_RBA_METRIC_WIDTH),
     geometryConfig=geometryConfig32(geometry),
     session=createManagedThreadSession32({
@@ -105,9 +119,11 @@ export async function runManagedConnect4CpcRba32(moves,{
       new URL('./rba-connect4-managed-manager.mjs',import.meta.url),
       {
         table,
-        geometryConfig,
-        witnessBuffer:witness.buffer,
-        resetBuffer:resetTargets.buffer,
+        runtimeBuffer:runtime.buffer,
+        resetOffsetBytes:RESET_OFFSET_BYTES,
+        resetCount:workers,
+        metaOffset:geometry.metaOffset,
+        mirrorColumn:root.reflected?geometry.mirrorColumn:null,
         rootReflected:root.reflected,
         budget:managerBudget,
       },
@@ -120,12 +136,11 @@ export async function runManagedConnect4CpcRba32(moves,{
         {
           table,
           geometryConfig,
-          witnessBuffer:witness.buffer,
-          resetBuffer:resetTargets.buffer,
-          metricsBuffer:metricViews[i].buffer,
+          runtimeBuffer:runtime.buffer,
+          resetOffsetBytes:RESET_OFFSET_BYTES,
+          resetCount:workers,
+          metricOffsetBytes:runtime.metricBaseBytes+i*runtime.metricStrideBytes,
           owner:i+2,
-          workers,
-          readyTarget,
           rootReflected:root.reflected,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
@@ -140,7 +155,7 @@ export async function runManagedConnect4CpcRba32(moves,{
 
   const elapsedMs=performance.now()-started,
     host=managedThreadSessionState32(session);
-  sumMetricViews32(metricViews,CONNECT4_CPC_RBA_METRIC_WIDTH,metricOut);
+  sumMetricViews32(runtime.metricViews,CONNECT4_CPC_RBA_METRIC_WIDTH,metricOut);
   const errorCode=host.errorCode,
     exact=!errorCode&&Atomics.load(table.control,RBA_TT_DONE)===1;
 
@@ -149,7 +164,7 @@ export async function runManagedConnect4CpcRba32(moves,{
       errorCode===HOST_DEADLINE?'TIMEOUT':
       errorCode===HOST_CANCELLED?'INTERRUPTED':'FAILED',
     absoluteValue:exact?table.exact[rootQ]:0,
-    witness:exact?witness[0]:-1,
+    witness:exact?runtime.witness[0]:-1,
     errorCode,
     errors:host.errors,
     fault:Array.from(table.fault),
@@ -174,10 +189,7 @@ export async function runManagedConnect4CpcRba32(moves,{
     elapsedMs,
     cleanup:host.cleanup,
     workersExited:host.workersExited,
-    sharedBytes:sharedViewBytes32(table)+
-      witness.byteLength+
-      resetTargets.byteLength+
-      metricViews.reduce((n,v)=>n+v.byteLength,0),
+    sharedBytes:sharedViewBytes32(table)+runtime.buffer.byteLength,
     requestedWorkers:workers,
     workersUsed:workers,
     basisSetWords,
