@@ -185,6 +185,11 @@ export function rbaTtEnqueue32(t,q){
   if(!t.live[q]||!t.refs[q]||t.execution[q]!==0||t.exact[q]||t.phase[q]!==0||t.readyMember[q])return 0;
   t.execution[q]=1;intrusiveEnqueueTailStamped32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,t.readyGeneration,t.generation,q);return 1;
 }
+function enqueueKnownNew32(t,q){
+  t.execution[q]=RBA_TT_EXECUTION_QUEUED;
+  intrusiveEnqueueTailStamped32(t.control,RBA_TT_READY_HEAD,RBA_TT_READY_TAIL,RBA_TT_READY_COUNT,t.readyNext,t.readyPrev,t.readyMember,t.readyGeneration,t.generation,q);
+  return 1;
+}
 export function rbaTtTake32(t,owner){
   for(;;){const q=t.control[RBA_TT_READY_HEAD];if(q===-1)return -1;
     if(t.readyGeneration[q]!==t.generation[q]||t.execution[q]!==1){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
@@ -243,9 +248,11 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
   let next=-1;
   for(let i=0;i<count;i+=1){
     const child=t.child[edgeBase+i];
-    if(child<0||t.exact[child]||t.phase[child]!==RBA_TT_PHASE_NEW)continue;
+    if(child<0||t.exact[child])continue;
+    // Every surviving child was allocated above while this TT transaction is
+    // held: live, referenced, FREE, NEW, and not already queued are asserted.
     if(next<0){t.execution[child]=owner;next=child;}
-    else rbaTtEnqueue32(t,child);
+    else enqueueKnownNew32(t,child);
   }
   rbaTtReleaseExecution32(t,q,owner);
   return next;
