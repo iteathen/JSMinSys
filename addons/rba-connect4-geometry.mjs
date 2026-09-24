@@ -143,6 +143,27 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     cpcTargetOwnerBase};
 }
 
+export function shareConnect4RbaGeometry32(g){
+  if(!g||!Number.isSafeInteger(g.columns)||!Number.isSafeInteger(g.rows))
+    throw new TypeError('prepared Connect4 RBA geometry required');
+  const shared={};
+  for(const key in g){
+    const value=g[key];
+    if(!ArrayBuffer.isView(value)){
+      shared[key]=value;
+      continue;
+    }
+    if(value.buffer instanceof SharedArrayBuffer){
+      shared[key]=value;
+      continue;
+    }
+    const copy=new value.constructor(new SharedArrayBuffer(value.byteLength));
+    copy.set(value);
+    shared[key]=copy;
+  }
+  return shared;
+}
+
 export function prepareConnect4RbaCoordinateScratch(g){
   return {seen:new Uint32Array(g.shapeWordCount),mirrorBasis:new Uint32Array(g.maxBasis),
     inverse:new Uint32Array(g.shapeCount),map:new Uint32Array(g.maxBasis),
