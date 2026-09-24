@@ -5,8 +5,12 @@ import {
   runRbaBranchManagerLoop32,
 } from './rba-branch-manager.mjs';
 
-const witness=new Int32Array(workerData.witnessBuffer),
-  resetTargets=new Int32Array(workerData.resetBuffer),
+const witness=new Int32Array(workerData.runtimeBuffer,0,1),
+  resetTargets=new Int32Array(
+    workerData.runtimeBuffer,
+    workerData.resetOffsetBytes,
+    workerData.resetCount,
+  ),
   budget=workerData.budget??64,
   rootReflected=workerData.rootReflected?1:0,
   g={
