@@ -112,7 +112,6 @@ export function rbaBranchManagerStep32(
       reconcile(t,q,context);
       processed+=1;
       if(manager)manager.events+=1;
-      if(Atomics.load(t.control,RBA_TT_STOP))break;
     }
     if(manager){
       merged=rbaTtManagerInspectReady32(
@@ -163,8 +162,9 @@ export function rbaBranchWorkerStep32(
   if(worker.q===-1){
     if(!rbaTtEnter32(t,worker.owner))return 0;
     worker.q=rbaTtTake32(t,worker.owner);
-    worker.expose=worker.workerCount>1&&
-      t.control[RBA_TT_READY_COUNT]<worker.readyTarget?1:0;
+    // Surplus publication is unconditional; retain the legacy callback field
+    // at zero without paying a shared ready-count load on every claim.
+    worker.expose=0;
     rbaTtLeave32(t);
     if(worker.q===-1){worker.idlePolls+=1;return 0;}
     worker.claims+=1;
@@ -218,16 +218,24 @@ export function runRbaBranchWorkerLoop32(
   {context=null,waitMs=1,metrics=null}={},
 ){
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA worker wait');
+  let telemetry=0;
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
     if(!rbaBranchWorkerStep32(t,worker,evaluate,publish,context))
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
-    if(metrics){
+    telemetry+=1;
+    if(metrics&&(telemetry&1023)===0){
       metrics[0]=worker.claims;
       metrics[1]=worker.branches;
       metrics[2]=worker.evaluations;
       metrics[3]=worker.idlePolls;
     }
+  }
+  if(metrics){
+    metrics[0]=worker.claims;
+    metrics[1]=worker.branches;
+    metrics[2]=worker.evaluations;
+    metrics[3]=worker.idlePolls;
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
 }
