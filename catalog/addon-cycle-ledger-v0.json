@@ -10158,11 +10158,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "2+N*(3+3*A+3*O+A)"
+          "count": "2+N*(3+3*A+3*O+A+J+K)"
         },
         {
           "op": "memory.store.u32",
-          "count": "2*N+N*(O+L)"
+          "count": "2*N+N*(2*L+2*K)"
         },
         {
           "op": "alu.imul.u32",
@@ -10170,11 +10170,11 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "3+N*(5+5*A+3*O+2*L+A)"
+          "count": "3+N*(5+5*A+3*O+5*L+A+4*K+2*J)"
         },
         {
           "op": "alu.sub.u32",
-          "count": "N*(4+2*A)"
+          "count": "N*(4+2*A+K)"
         },
         {
           "op": "alu.and.u32",
@@ -10190,11 +10190,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+N*(7+5*A+U+4*O+3*L)"
+          "count": "3+N*(7+5*A+U+4*O+4*L+2*J)"
         },
         {
           "op": "control.branch",
-          "count": "3+N*(7+5*A+U+4*O+3*L)"
+          "count": "3+N*(7+5*A+U+4*O+4*L+2*J)"
         },
         {
           "op": "runtime.call.subledger",
@@ -10257,23 +10257,13 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "N*L*Z7",
-          "target": "argMaxPlayableSlot7Nonempty32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "N*L*(1-Z7)",
-          "target": "argMaxPlayableSlot32"
-        },
-        {
-          "op": "runtime.call.subledger",
           "count": "N*R",
           "target": "advanceConnect4LiveLineState32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+N*(6+10*A+4*O))*C(runtime.field.load)+(1+N*(3+3*A+2*S))*C(runtime.field.store)+(2+N*(3+3*A+3*O+A))*C(memory.load.u32)+(2*N+N*(O+L))*C(memory.store.u32)+(1+N*(1+A+L+A+L3))*C(alu.imul.u32)+(3+N*(5+5*A+3*O+2*L+A))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(1+N*(6+3*A+O))*C(alu.and.u32)+N*(A+O)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*N*R*C(alu.xor.u32)+(3+N*(7+5*A+U+4*O+3*L))*C(control.test.u32)+(3+N*(7+5*A+U+4*O+3*L))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32)+CALL(searchCpcOnly))",
+        "expression": "(4+N*(6+10*A+4*O))*C(runtime.field.load)+(1+N*(3+3*A+2*S))*C(runtime.field.store)+(2+N*(3+3*A+3*O+A+J+K))*C(memory.load.u32)+(2*N+N*(2*L+2*K))*C(memory.store.u32)+(1+N*(1+A+L+A+L3))*C(alu.imul.u32)+(3+N*(5+5*A+3*O+5*L+A+4*K+2*J))*C(alu.add.u32)+N*(4+2*A+K)*C(alu.sub.u32)+(1+N*(6+3*A+O))*C(alu.and.u32)+N*(A+O)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*N*R*C(alu.xor.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J))*C(control.test.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32)+CALL(searchCpcOnly))",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -10287,19 +10277,23 @@
           "L": "legal CPC-surviving moves scored and inserted into the ordered row",
           "L3": "legal moves scored by the three-word specialization; standard 7x6 has L3=L",
           "LG": "legal moves scored by the generic live-line evaluator; L3+LG=L",
-          "Z7": "1 for configured width 7, selecting the exact seven-slot selector; otherwise 0"
+          "Z7": "1 for configured width 7, selecting the exact seven-slot selector; otherwise 0",
+          "J": "total insertion score comparisons across legal scored moves; 0..L*(L-1)/2 plus one terminating comparison per non-front insertion where applicable",
+          "K": "total successful insertion shifts across legal scored moves; 0..L*(L-1)/2"
         },
-        "note": "Production CPC-only Negamax now orders CPC-surviving moves by exact live winning-line contribution. Live-line state remains in original physical orientation and a carried reflection parity maps canonical RBA columns back to physical cells. Static geometry order survives only as strict-greater tie order. All scorer, selector, live-state transition, reflection and scratch work is explicit.",
+        "note": "Production CPC-only Negamax computes the exact live-line score and stably insertion-orders each legal move immediately into the per-depth numeric row. Strict priorScore>=score termination preserves prepared center order on ties. This removes the separate repeated-argmax materialization pass. J/K expose data-dependent comparison/shift cost rather than hiding it.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "pass": 13,
-        "candidate": "restore-live-line-move-order-wiring",
-        "type": "correctness-of-intended-wiring",
-        "added": "existing exact live-line scorer + existing selector + per-depth live state/order",
-        "removed": "static center-out as primary branch ranking",
-        "tieBreak": "prepared geometry order only when live-line contribution scores are equal"
+        "pass": 14,
+        "candidate": "single-pass-stable-live-line-insertion-order",
+        "historicalSource": "Connect4 Sep. 8 fixed-width exact-solver ordering lineage",
+        "baseline": "03d329882d1dede5d677c8d07ab07b363e021489",
+        "removed": "separate L-call repeated-argmax full-order materialization pass",
+        "added": "stable insertion comparisons/shifts J/K while each score is produced",
+        "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
+        "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
       },
       "optimizationHistory": [
         {
@@ -10374,6 +10368,16 @@
           "added": "existing exact live-line scorer + existing selector + per-depth live state/order",
           "removed": "static center-out as primary branch ranking",
           "tieBreak": "prepared geometry order only when live-line contribution scores are equal"
+        },
+        {
+          "pass": 14,
+          "candidate": "single-pass-stable-live-line-insertion-order",
+          "historicalSource": "Connect4 Sep. 8 fixed-width exact-solver ordering lineage",
+          "baseline": "03d329882d1dede5d677c8d07ab07b363e021489",
+          "removed": "separate L-call repeated-argmax full-order materialization pass",
+          "added": "stable insertion comparisons/shifts J/K while each score is produced",
+          "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
+          "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
         }
       ]
     }
@@ -10487,7 +10491,7 @@
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
-    "addons/rba-connect4-alphabeta.mjs": "5990e87b7887bf3a993fdbd3bcc6ab2bb1b565ff",
+    "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
     "addons/cpc-connect4.mjs": "ebaf699a4c326e8c89d68039acb0369e566f50af",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",

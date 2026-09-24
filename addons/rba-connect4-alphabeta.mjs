@@ -139,16 +139,18 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const playerOffset=liveOffset+mover*live.wordCount;
     for(let oi=0;oi<g.columns;oi+=1){
       const column=g.actionOrder[oi],height=words[keyOffset+column];
-      if(height>=g.rows||!(actionMask&(1<<column))){scores[oi]=MOVE_SCORE_NONE;continue;}
-      const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn;
-      scores[oi]=live.wordCount===3
-        ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
-        :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
-      actionCount+=1;
-    }
-    for(let out=0;out<actionCount;out+=1){
-      const slot=g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns);
-      scores[slot]=MOVE_SCORE_NONE;ordered[orderRow+out]=g.actionOrder[slot];
+      if(height>=g.rows||!(actionMask&(1<<column)))continue;
+      const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
+        score=live.wordCount===3
+          ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
+          :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
+      let at=actionCount;
+      while(at>0){
+        const priorScore=scores[at-1];
+        if(priorScore>=score)break;
+        scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
+      }
+      scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
     }
   }
   if(!actionCount)return 0;
