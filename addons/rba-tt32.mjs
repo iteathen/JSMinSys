@@ -16,7 +16,7 @@ export const RBA_TT_CONTROL_WORDS=16;
 export const RBA_TT_EXECUTION_FREE=0,RBA_TT_EXECUTION_QUEUED=1;
 export const RBA_TT_PHASE_NEW=0,RBA_TT_PHASE_PENDING_ATTACH=2,RBA_TT_PHASE_ATTACHED=3,RBA_TT_PHASE_DETACHED=4;
 export const RBA_TT_ERR_CAPACITY=1,RBA_TT_ERR_CONFLICT=2,RBA_TT_ERR_GENERATION=3,RBA_TT_ERR_CONTRACT=4;
-const RBA_TT_BUCKET_NONE=0xffffffff;
+const RBA_TT_BUCKET_NONE=0xffffffff,RBA_TT_BUCKET_POSITION=0x80000000;
 
 export function createRbaTt32({
   capacity=4096,bucketCount=4096,keyWords,basisCapacity,edgeCapacity,
@@ -56,9 +56,24 @@ export function rbaTtLeave32(t){atomicReleaseNoNotify32(t.control,RBA_TT_LOCK,0)
 export function rbaTtFail32(t,code){Atomics.compareExchange(t.control,RBA_TT_ERROR,0,code);Atomics.store(t.control,RBA_TT_STOP,1);Atomics.add(t.control,RBA_TT_WAKE,1);Atomics.notify(t.control,RBA_TT_WAKE);return 0;}
 export function rbaTtValid32(t,q,g){return q>=0&&q<t.capacity&&t.live[q]&&t.generation[q]===g?1:0;}
 export function rbaTtSetRoot32(t,q){if(!t.live[q])return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.control[RBA_TT_ROOT]=q;t.control[RBA_TT_ROOT_GENERATION]=t.generation[q];return q;}
+function unlinkBucketRow32(t,q){
+  const tag=t.bucket[q];
+  if(tag===RBA_TT_BUCKET_NONE)return 1;
+  const slot=tag&t.bucketMask;let prev=-1,scan=t.buckets[slot];
+  while(scan!==q&&scan!==-1){prev=scan;scan=t.link[scan];}
+  if(scan===-1)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+  if(prev===-1)t.buckets[slot]=t.link[q];else t.link[prev]=t.link[q];
+  t.link[q]=-1;return 1;
+}
+function positionBucket32(t,q){return (t.bucket[q]&RBA_TT_BUCKET_POSITION)!==0?1:0;}
 export function rbaTtSetPositionCode32(t,q,lo,hi){
-  if(!t.live[q])return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
-  t.positionLo[q]=lo>>>0;t.positionHi[q]=hi>>>0;return q;
+  if(!t.live[q]||!(lo|hi))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+  if(!unlinkBucketRow32(t,q))return -1;
+  t.positionLo[q]=lo>>>0;t.positionHi[q]=hi>>>0;
+  const slot=(lo>>>0)&t.bucketMask;
+  t.bucket[q]=(RBA_TT_BUCKET_POSITION|slot)>>>0;
+  t.link[q]=t.buckets[slot];t.buckets[slot]=q;
+  return q;
 }
 
 function equalKeyXor32(words,a,b,n){
@@ -151,10 +166,11 @@ export function rbaTtRecycle32(t,q){
   if(!t.live[q]||t.refs[q]||t.execution[q]||t.readyMember[q]||t.eventMember[q]||t.count[q]||t.parentHead[q]!==-1)return 0;
   const redirect=t.redirect[q],bucket=t.bucket[q];
   if(bucket!==RBA_TT_BUCKET_NONE){
-    let prev=-1,scan=t.buckets[bucket];
+    const slot=bucket&t.bucketMask;
+    let prev=-1,scan=t.buckets[slot];
     while(scan!==q&&scan!==-1){prev=scan;scan=t.link[scan];}
     if(scan===-1)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
-    if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
+    if(prev===-1)t.buckets[slot]=t.link[q];else t.link[prev]=t.link[q];
   }
   t.live[q]=0;t.redirect[q]=-1;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;
   if(redirect>=0&&redirect<t.capacity&&t.live[redirect]&&t.refs[redirect])t.refs[redirect]-=1;
@@ -293,7 +309,8 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
     let equivalent=-1;
     if(t.bucket[child]!==RBA_TT_BUCKET_NONE&&t.inspectGeneration[child]!==t.generation[child]){
       t.inspectGeneration[child]=t.generation[child];
-      equivalent=rbaTtFindEquivalent32(t,child);
+      equivalent=positionBucket32(t,child)?
+        rbaTtFindEquivalentPosition32(t,child):rbaTtFindEquivalent32(t,child);
     }
     if(equivalent>=0){
       const original=t.child[e],generation=t.childGeneration[e];
@@ -319,6 +336,44 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
     if(head!==-1)t.edgePrev[head]=e;t.parentHead[child]=e;t.edgeAttached[e]=1;
   }
   t.phase[q]=RBA_TT_PHASE_ATTACHED;return 1;
+}
+
+function rbaTtFindEquivalentPosition32(t,q){
+  if(!t.live[q]||t.redirect[q]>=0||!positionBucket32(t,q))return -1;
+  const lo=t.positionLo[q],hi=t.positionHi[q],slot=t.bucket[q]&t.bucketMask;
+  let best=q;
+  for(let scan=t.buckets[slot];scan!==-1;scan=t.link[scan]){
+    if(scan===q||!t.live[scan]||t.redirect[scan]>=0||!positionBucket32(t,scan)||
+       t.positionLo[scan]!==lo||t.positionHi[scan]!==hi)continue;
+    if(t.exact[scan]>t.exact[best]||
+       (t.exact[scan]===t.exact[best]&&scan<best))best=scan;
+  }
+  return best===q?-1:best;
+}
+
+function managerNormalizePositionBucket32(t,seed,resetTargets){
+  if(seed<0||seed>=t.capacity||!t.live[seed]||t.redirect[seed]>=0||!positionBucket32(t,seed))return 0;
+  const lo=t.positionLo[seed],hi=t.positionHi[seed],slot=t.bucket[seed]&t.bucketMask;
+  let canonical=seed;
+  for(let scan=t.buckets[slot];scan!==-1;scan=t.link[scan]){
+    if(!t.live[scan]||t.redirect[scan]>=0||!positionBucket32(t,scan)||
+       t.positionLo[scan]!==lo||t.positionHi[scan]!==hi)continue;
+    if(t.exact[scan]>t.exact[canonical]||
+       (t.exact[scan]===t.exact[canonical]&&scan<canonical))canonical=scan;
+  }
+  let merged=0;
+  for(let scan=t.buckets[slot];scan!==-1;){
+    const next=t.link[scan];
+    if(scan!==canonical&&t.live[scan]&&t.redirect[scan]<0&&positionBucket32(t,scan)&&
+       t.positionLo[scan]===lo&&t.positionHi[scan]===hi){
+      t.inspectGeneration[scan]=t.generation[scan];
+      merged+=managerMergeKnownDuplicate32(t,scan,canonical,resetTargets);
+      t.control[RBA_TT_EXACT_POSITION_MERGES]+=1;
+    }
+    scan=next;
+  }
+  t.inspectGeneration[canonical]=t.generation[canonical];
+  return merged;
 }
 
 function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
@@ -543,7 +598,9 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
       if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
     }else{
       if(t.inspectGeneration[q]!==t.generation[q]){
-        if(t.bucket[q]===RBA_TT_BUCKET_NONE){
+        if(positionBucket32(t,q)){
+          merged+=managerNormalizePositionBucket32(t,q,resetTargets);
+        }else if(t.bucket[q]===RBA_TT_BUCKET_NONE){
           if(scratch&&linearCount<linearLimit){
             scratch[linearCount]=q;linearCount+=1;
           }else if(!scratch){
@@ -552,13 +609,7 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
             if(equivalent>=0)merged+=managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
           }
         }else{
-          const before=merged;
           merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
-          if(merged===before&&t.live[q]&&t.redirect[q]<0){
-            const equivalent=managerFindEquivalentLinear32(t,q);
-            if(equivalent>=0&&t.bucket[equivalent]===RBA_TT_BUCKET_NONE)
-              merged+=managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
-          }
         }
       }
       if(t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
@@ -608,8 +659,16 @@ export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
           }
         }else{
           t.inspectGeneration[q]=t.generation[q];
-          const equivalent=rbaTtFindEquivalent32(t,q);
-          if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+          if(positionBucket32(t,q)){
+            const equivalent=rbaTtFindEquivalentPosition32(t,q);
+            if(equivalent>=0){
+              managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
+              t.control[RBA_TT_EXACT_POSITION_MERGES]+=1;
+            }
+          }else{
+            const equivalent=rbaTtFindEquivalent32(t,q);
+            if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+          }
         }
       }
       if(t.live[q]&&t.exact[q]&&q!==t.control[RBA_TT_ROOT]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
