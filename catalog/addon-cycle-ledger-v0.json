@@ -374,6 +374,69 @@
         "name": "TYPED_ARRAY_SLICE_COST(length,gcState)"
       },
       "note": "TypedArray slice allocation and copy."
+    },
+    "runtime.promise.construct": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "PROMISE_CONSTRUCT_COST(runtimeState,gcState)"
+      },
+      "note": "Promise allocation/executor scheduling."
+    },
+    "runtime.promise.all": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "PROMISE_ALL_COST(count,runtimeState)"
+      },
+      "note": "Promise.all coordination."
+    },
+    "runtime.promise.allSettled": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "PROMISE_ALL_SETTLED_COST(count,runtimeState)"
+      },
+      "note": "Promise.allSettled coordination."
+    },
+    "runtime.timer.set": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TIMER_SET_COST(timerType,runtimeState)"
+      },
+      "note": "setTimeout/setInterval registration."
+    },
+    "runtime.timer.clear": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TIMER_CLEAR_COST(timerType,runtimeState)"
+      },
+      "note": "Timer cancellation."
+    },
+    "runtime.event.listener": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "EVENT_LISTENER_COST(action,event,runtimeState)"
+      },
+      "note": "EventEmitter/EventTarget listener registration/removal."
+    },
+    "runtime.worker.construct": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "WORKER_CONSTRUCT_COST(workerDataBytes,runtimeState)"
+      },
+      "note": "Node Worker construction/structured clone/startup."
+    },
+    "runtime.worker.terminate": {
+      "cost": {
+        "kind": "unbounded",
+        "min": 0
+      },
+      "note": "Worker termination/join can block."
+    },
+    "runtime.string.format": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STRING_FORMAT_COST(bytes,gcState)"
+      },
+      "note": "Error/string formatting."
     }
   },
   "units": [
@@ -381,37 +444,95 @@
       "unit": "addons/branch-manager-host.mjs#abort",
       "source": "addons/branch-manager-host.mjs",
       "name": "abort",
-      "scope": "legacy-addon",
+      "scope": "host-callback",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "failManagedThreadSession32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#abort,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+CALL(failManagedThreadSession32)",
+        "note": "Cancellation callback closes over managed session."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/branch-manager-host.mjs#closeManagedThreadSession32",
       "source": "addons/branch-manager-host.mjs",
       "name": "closeManagedThreadSession32",
-      "scope": "legacy-addon",
+      "scope": "cold-host-close",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "12+2*W"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "runtime.timer.clear",
+          "count": "0+TC"
+        },
+        {
+          "op": "runtime.event.listener",
+          "count": "0+AR"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.worker.terminate",
+          "count": "W"
+        },
+        {
+          "op": "runtime.promise.allSettled",
+          "count": 1
+        },
+        {
+          "op": "runtime.promise.all",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#closeManagedThreadSession32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "(12+2*W)*C(runtime.field.load)+C(runtime.field.store)+3*C(control.test.u32)+3*C(control.branch)+TC*C(runtime.timer.clear)+AR*C(runtime.event.listener)+C(atomic.store.u32)+C(atomic.rmw.u32)+C(atomic.notify)+W*C(runtime.worker.terminate)+C(runtime.promise.allSettled)+C(runtime.promise.all)",
+        "unboundedTerms": [
+          "C(runtime.worker.terminate)"
+        ],
+        "parameters": {
+          "W": "managed worker threads terminated",
+          "TC": "active timer/poll handles cleared (0..2)",
+          "AR": "1 when abort listener is registered and removed; 0 otherwise"
+        },
+        "note": "Managed close/terminate/join path; blocking termination remains explicitly unbounded."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/branch-manager-host.mjs#createManagedThreadSession32",
@@ -464,37 +585,84 @@
       "unit": "addons/branch-manager-host.mjs#createMetricViews32",
       "source": "addons/branch-manager-host.mjs",
       "name": "createMetricViews32",
-      "scope": "legacy-addon",
+      "scope": "cold-host",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+W"
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": "W"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "W"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "W"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#createMetricViews32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "2*C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(runtime.array.allocate)+(1+W)*C(alu.imul.u32)+W*C(memory.allocate.shared.bytes)+W*C(runtime.typed_view.construct)+W*C(memory.store.u32)+W*C(alu.add.u32)",
+        "parameters": {
+          "W": "worker metric views allocated"
+        },
+        "note": "Cold standalone metric-view allocation helper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/branch-manager-host.mjs#failManagedThreadSession32",
       "source": "addons/branch-manager-host.mjs",
       "name": "failManagedThreadSession32",
-      "scope": "legacy-addon",
+      "scope": "host-failure",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 8
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.notify",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#failManagedThreadSession32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "8*C(runtime.field.load)+2*C(atomic.rmw.u32)+C(atomic.store.u32)+C(atomic.notify)",
+        "note": "First-error publication, stop, wake and notify."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/branch-manager-host.mjs#filterFileWorkerExecArgv32",
@@ -620,19 +788,77 @@
       "unit": "addons/branch-manager-host.mjs#spawnManagedFileWorker32",
       "source": "addons/branch-manager-host.mjs",
       "name": "spawnManagedFileWorker32",
-      "scope": "legacy-addon",
+      "scope": "cold-host",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.object.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 8
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.worker.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.push",
+          "count": 2
+        },
+        {
+          "op": "runtime.promise.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.event.listener",
+          "count": 2
+        },
+        {
+          "op": "runtime.string.format",
+          "count": "ERR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ERR+BAD",
+          "target": "failManagedThreadSession32"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+BAD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "2*BAD"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#spawnManagedFileWorker32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(runtime.object.allocate)+8*C(runtime.field.load)+(1+E)*C(runtime.field.store)+C(control.test.u32)+C(control.branch)+C(runtime.worker.construct)+2*C(runtime.array.push)+C(runtime.promise.construct)+2*C(runtime.event.listener)+ERR*C(runtime.string.format)+(ERR+BAD)*CALL(failManagedThreadSession32)+(1+BAD)*C(alu.add.u32)+2*BAD*C(atomic.load.u32)",
+        "unboundedTerms": [
+          "C(runtime.worker.construct)"
+        ],
+        "parameters": {
+          "E": "1 when filtered execArgv is supplied to Worker options; 0 otherwise",
+          "ERR": "worker error callback executions (normally 0)",
+          "BAD": "unexpected worker exit callbacks before stop/done (normally 0)"
+        },
+        "note": "Cold worker lifecycle setup. Startup/runtime error callbacks remain explicit; Worker creation is runtime-dependent."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/branch-manager-host.mjs#sumMetricViews32",
@@ -680,19 +906,78 @@
       "unit": "addons/branch-manager-host.mjs#waitManagedThreadSession32",
       "source": "addons/branch-manager-host.mjs",
       "name": "waitManagedThreadSession32",
-      "scope": "legacy-addon",
+      "scope": "cold-host-wait",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "18+3*P"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 8
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 0
+        },
+        {
+          "op": "control.test.u32",
+          "count": "7+2*P"
+        },
+        {
+          "op": "control.branch",
+          "count": "7+2*P"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "abort"
+        },
+        {
+          "op": "runtime.event.listener",
+          "count": "2"
+        },
+        {
+          "op": "runtime.promise.construct",
           "count": 1
+        },
+        {
+          "op": "runtime.timer.set",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "failManagedThreadSession32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "2*P+1"
+        },
+        {
+          "op": "runtime.timer.clear",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 4
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#waitManagedThreadSession32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "(18+3*P)*C(runtime.field.load)+12*C(runtime.field.store)+(7+2*P)*C(control.test.u32)+(7+2*P)*C(control.branch)+A*CALL(abort)+2*C(runtime.event.listener)+C(runtime.promise.construct)+2*C(runtime.timer.set)+T*CALL(failManagedThreadSession32)+(2*P+1)*C(atomic.load.u32)+2*C(runtime.timer.clear)",
+        "unboundedTerms": [
+          "C(runtime.promise.construct)"
+        ],
+        "parameters": {
+          "A": "0/1 cancellation callback invocation before/during wait",
+          "T": "0/1 deadline callback invocation",
+          "P": "poll interval callbacks executed before resolution"
+        },
+        "note": "Managed wait is elapsed-time unbounded; active setup/poll/cancellation operations remain counted."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/cpc-connect4.mjs#cellMarked",
@@ -1526,19 +1811,39 @@
       "unit": "addons/rba-branch-manager.mjs#prepareRbaBranchManager32",
       "source": "addons/rba-branch-manager.mjs",
       "name": "prepareRbaBranchManager32",
-      "scope": "legacy-addon",
+      "scope": "cold",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 8
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-branch-manager.mjs#prepareRbaBranchManager32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "2*C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+8*C(runtime.field.store)",
+        "note": "One-time manager scratch/state allocation."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-branch-manager.mjs#prepareRbaBranchWorker32",
@@ -1659,19 +1964,23 @@
       "unit": "addons/rba-branch-manager.mjs#rbaBranchReadyCount32",
       "source": "addons/rba-branch-manager.mjs",
       "name": "rbaBranchReadyCount32",
-      "scope": "legacy-addon",
+      "scope": "manager-hot-read",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-branch-manager.mjs#rbaBranchReadyCount32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "C(runtime.field.load)+C(memory.load.u32)",
+        "note": "Ready-count shared control read."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-branch-manager.mjs#rbaBranchWorkerStep32",
@@ -3160,289 +3469,908 @@
       "unit": "addons/rba-connect4-front.mjs#buildAt",
       "source": "addons/rba-connect4-front.mjs",
       "name": "buildAt",
-      "scope": "legacy-addon",
+      "scope": "front-hot-recursive",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "spend"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PV",
+          "target": "prepareValid"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "universal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PU",
+          "target": "prepareUpsets"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "connect4RbaCofactorBasis"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "buildAt"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "prepareImages"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "4*C",
+          "target": "preimage"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "4*C",
+          "target": "combine"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SW",
+          "target": "swap"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "18+10*C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+6*C"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "4+6*C"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+3*C"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "6+7*C"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "C"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "8+8*C"
+        },
+        {
+          "op": "control.branch",
+          "count": "8+8*C"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#buildAt,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "CALL(spend)+PV*CALL(prepareValid)+U*CALL(universal)+PU*CALL(prepareUpsets)+C*(CALL(connect4RbaCofactorBasis)+CALL(buildAt)+CALL(prepareImages)+4*CALL(preimage)+4*CALL(combine))+SW*CALL(swap)+(18+10*C)*C(runtime.field.load)+(5+6*C)*C(memory.load.u32)+(4+6*C)*C(memory.store.u32)+(3+3*C)*C(alu.imul.u32)+(6+7*C)*C(alu.add.u32)+C*C(alu.sub.u32)+C(alu.and.u32)+(8+8*C)*C(control.test.u32)+(8+8*C)*C(control.branch)",
+        "unboundedTerms": [
+          "C*CALL(buildAt)"
+        ],
+        "parameters": {
+          "PV": "1 when node depth/rank requires valid-mask preparation",
+          "U": "universal-front initializations",
+          "PU": "1 when upset masks are prepared",
+          "C": "legal child columns recursively expanded",
+          "SW": "front slot swaps across child/hypothesis composition"
+        },
+        "note": "Recursive bounded-depth Four-Front construction; recursion is bounded by arena depth but represented compositionally rather than hidden."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#buildConnect4RbaFourFront",
       "source": "addons/rba-connect4-front.mjs",
       "name": "buildConnect4RbaFourFront",
-      "scope": "legacy-addon",
+      "scope": "front-wrapper",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.store",
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "4+2*C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+C"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "C"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*C"
+        },
+        {
+          "op": "alu.shr.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+C"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+C"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "buildAt"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#buildConnect4RbaFourFront,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "3*C(runtime.field.store)+(4+2*C)*C(runtime.field.load)+(1+C)*C(memory.load.u32)+C*C(memory.store.u32)+(2+2*C)*C(alu.add.u32)+C(alu.shr.u32)+(1+C)*C(control.test.u32)+(1+C)*C(control.branch)+CALL(buildAt)",
+        "parameters": {
+          "C": "configured columns whose root heights are copied"
+        },
+        "note": "Four-Front root construction wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#combine",
       "source": "addons/rba-connect4-front.mjs",
       "name": "combine",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "9+5*R"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+3*R"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+2*R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+4*R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+2*R"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+2*R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "swap"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "insertFrom"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "spend"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "I",
+          "target": "productJoin"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#combine,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(9+5*R)*C(runtime.field.load)+(4+3*R)*C(memory.load.u32)+2*C(memory.store.u32)+(2+2*R)*C(alu.imul.u32)+(3+4*R)*C(alu.add.u32)+(5+2*R)*C(control.test.u32)+(5+2*R)*C(control.branch)+U*CALL(swap)+R*CALL(insertFrom)+I*(CALL(spend)+CALLBACK(productJoin))",
+        "parameters": {
+          "U": "1 on union path that swaps left into output; 0 on intersection",
+          "R": "right records inserted on union path",
+          "I": "1 on intersection/product path; 0 otherwise"
+        },
+        "note": "Front union/intersection composition."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#covers",
       "source": "addons/rba-connect4-front.mjs",
       "name": "covers",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "14+8*STEP+6*SCAN"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+8*STEP+5*SCAN"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+6*STEP+3*SCAN"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+2*STEP"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "6+7*STEP+5*SCAN"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "4*STEP+2*SCAN"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "2*STEP"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SCAN"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "6+10*STEP+5*SCAN"
+        },
+        {
+          "op": "control.branch",
+          "count": "6+10*STEP+5*SCAN"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STEP",
+          "target": "spend"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BIT",
+          "target": "firstSetBitIndex32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "INS",
+          "target": "insert"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#covers,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(14+8*STEP+6*SCAN)*C(runtime.field.load)+(5+8*STEP+5*SCAN)*C(memory.load.u32)+(2+6*STEP+3*SCAN)*C(memory.store.u32)+(3+2*STEP)*C(alu.imul.u32)+(6+7*STEP+5*SCAN)*C(alu.add.u32)+(4*STEP+2*SCAN)*C(alu.and.u32)+2*STEP*C(alu.or.u32)+SCAN*C(alu.shl.u32)+(6+10*STEP+5*SCAN)*C(control.test.u32)+(6+10*STEP+5*SCAN)*C(control.branch)+STEP*CALL(spend)+BIT*CALL(firstSetBitIndex32)+INS*CALL(insert)",
+        "parameters": {
+          "STEP": "DFS cover-state iterations",
+          "SCAN": "basis/image candidate scans across DFS",
+          "BIT": "first-set-bit decodes",
+          "INS": "completed covers inserted"
+        },
+        "note": "Cover/preimage DFS with explicit budget, bit selection and insertion costs."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#insert",
       "source": "addons/rba-connect4-front.mjs",
       "name": "insert",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "insertFrom"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#insert,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "C(runtime.field.load)+CALL(insertFrom)",
+        "note": "Inserts arena temp record."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#insertFrom",
       "source": "addons/rba-connect4-front.mjs",
       "name": "insertFrom",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "spend"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "1-S",
+          "target": "insertFront"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "8"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#insertFrom,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(spend)+(1-S)*CALLBACK(insertFront)+8*C(runtime.field.load)+3*C(memory.load.u32)+(1+F)*C(memory.store.u32)+3*C(control.test.u32)+3*C(control.branch)",
+        "parameters": {
+          "S": "1 when spend fails and insertion is skipped; 0 otherwise",
+          "F": "1 when capacity failure stores error; 0 when count stores new size"
+        },
+        "note": "Front insertion through prepared profile callback."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#member",
       "source": "addons/rba-connect4-front.mjs",
       "name": "member",
-      "scope": "legacy-addon",
+      "scope": "front-query",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "7+4*R+3*W"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3+4*R+3*W"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+4*R+3*W"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+3*R+3*W"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+3*R+3*W"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#member,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(7+4*R+3*W)*C(runtime.field.load)+(3+4*R+3*W)*C(memory.load.u32)+R*C(alu.imul.u32)+(2+4*R+3*W)*C(alu.add.u32)+2*W*C(alu.and.u32)+(2+3*R+3*W)*C(control.test.u32)+(2+3*R+3*W)*C(control.branch)",
+        "parameters": {
+          "R": "front records scanned before membership success/end",
+          "W": "coordinate words compared across records"
+        },
+        "note": "Tests query coordinate against one front set."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#preimage",
       "source": "addons/rba-connect4-front.mjs",
       "name": "preimage",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "12+8*J+6*I"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+6*J+5*I"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+4*J+3*I"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+J+I"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "5+6*J+5*I"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "3*I"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "I"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+8*J+6*I"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+8*J+6*I"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "J",
+          "target": "covers"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "insert"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#preimage,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(12+8*J+6*I)*C(runtime.field.load)+(5+6*J+5*I)*C(memory.load.u32)+(1+4*J+3*I)*C(memory.store.u32)+(3+J+I)*C(alu.imul.u32)+(5+6*J+5*I)*C(alu.add.u32)+3*I*C(alu.and.u32)+I*C(alu.or.u32)+(5+8*J+6*I)*C(control.test.u32)+(5+8*J+6*I)*C(control.branch)+J*CALL(covers)+S*CALL(insert)",
+        "parameters": {
+          "J": "child front records processed",
+          "I": "parent residual/image compatibility scans",
+          "S": "optional mover singleton front insertion (0 or 1)"
+        },
+        "note": "Computes one-ply Four-Front preimage."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#prepareConnect4RbaFrontArena",
       "source": "addons/rba-connect4-front.mjs",
       "name": "prepareConnect4RbaFrontArena",
-      "scope": "legacy-addon",
+      "scope": "cold-front",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.integer.check",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 12
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "5+S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "8+S"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 18
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 24
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareConnect4RbaFrontArena,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "3*C(runtime.integer.check)+6*C(control.test.u32)+C(control.branch)+P*CALL(prepareConnect4RbaExecutionProfile)+12*C(runtime.field.load)+(5+S)*C(alu.add.u32)+(8+S)*C(alu.imul.u32)+18*C(runtime.typed_array.allocate)+S*C(memory.store.u32)+C(runtime.object.allocate)+24*C(runtime.field.store)",
+        "parameters": {
+          "P": "1 when caller did not provide prepared execution profile; 0 in normal prepared path",
+          "S": "front arena slots initialized"
+        },
+        "note": "Cold Four-Front arena allocation."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#prepareImages",
       "source": "addons/rba-connect4-front.mjs",
       "name": "prepareImages",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "18+11*N+7*U"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+7*N+5*U"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "4+W*N+5*N+2*U"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "8+8*N+5*U"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "4*N+2*U"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "2*N+2*U"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2*N+2*U"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N+2*U"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "8+10*N+4*U"
+        },
+        {
+          "op": "control.branch",
+          "count": "8+10*N+4*U"
+        },
+        {
+          "op": "runtime.callback",
+          "count": 1,
+          "target": "prepareRemove"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "N",
+          "target": "removePrepared"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "N",
+          "target": "prepareSubset"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "U",
+          "target": "shapeSubsetPrepared"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareImages,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(18+11*N+7*U)*C(runtime.field.load)+(5+7*N+5*U)*C(memory.load.u32)+(4+W*N+5*N+2*U)*C(memory.store.u32)+(3+N)*C(alu.imul.u32)+(8+8*N+5*U)*C(alu.add.u32)+(4*N+2*U)*C(alu.and.u32)+(2*N+2*U)*C(alu.or.u32)+(2*N+2*U)*C(alu.shl.u32)+(2*N+2*U)*C(alu.shr.u32)+(8+10*N+4*U)*C(control.test.u32)+(8+10*N+4*U)*C(control.branch)+CALLBACK(prepareRemove)+N*CALLBACK(removePrepared)+N*CALLBACK(prepareSubset)+U*CALLBACK(shapeSubsetPrepared)",
+        "parameters": {
+          "N": "parent residuals imaged",
+          "W": "coordWords zeroed/copied per residual",
+          "U": "subset-candidate tests across image upset expansion"
+        },
+        "note": "Builds mover/opponent cofactor image masks."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#prepareUpsets",
       "source": "addons/rba-connect4-front.mjs",
       "name": "prepareUpsets",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "10+7*N+5*U"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3*N+3*U"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W*N+2*N+U"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "5+5*N+4*U"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "3*N+U"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N+U"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N+U"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "N+U"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "6+W*N+7*N+3*U"
+        },
+        {
+          "op": "control.branch",
+          "count": "6+W*N+7*N+3*U"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "N",
+          "target": "prepareSubset"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "U",
+          "target": "shapeSubsetPrepared"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareUpsets,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(10+7*N+5*U)*C(runtime.field.load)+(3*N+3*U)*C(memory.load.u32)+(W*N+2*N+U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(5+5*N+4*U)*C(alu.add.u32)+(3*N+U)*C(alu.and.u32)+(N+U)*C(alu.or.u32)+(N+U)*C(alu.shl.u32)+(N+U)*C(alu.shr.u32)+(6+W*N+7*N+3*U)*C(control.test.u32)+(6+W*N+7*N+3*U)*C(control.branch)+N*CALLBACK(prepareSubset)+U*CALLBACK(shapeSubsetPrepared)",
+        "parameters": {
+          "N": "basis rows prepared",
+          "W": "coordWords cleared per upset row",
+          "U": "subset-candidate tests across upset expansion"
+        },
+        "note": "Precomputes per-residual upset masks."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#prepareValid",
       "source": "addons/rba-connect4-front.mjs",
       "name": "prepareValid",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "4+2*W"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*W"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+W"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+W"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareValid,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(4+2*W)*C(runtime.field.load)+W*C(memory.store.u32)+C(alu.imul.u32)+(2+2*W)*C(alu.add.u32)+C(alu.and.u32)+2*C(alu.shr.u32)+(3+W)*C(control.test.u32)+(3+W)*C(control.branch)",
+        "parameters": {
+          "W": "coordinate valid-mask words initialized"
+        },
+        "note": "Builds depth-local valid basis mask."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#queryConnect4RbaFourFront",
       "source": "addons/rba-connect4-front.mjs",
       "name": "queryConnect4RbaFourFront",
-      "scope": "legacy-addon",
+      "scope": "front-query",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.or.u32",
           "count": 1
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "member"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#queryConnect4RbaFourFront,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "4*C(runtime.field.load)+6*C(alu.add.u32)+C(alu.or.u32)+C(alu.shl.u32)+4*C(control.test.u32)+4*C(control.branch)+M*CALL(member)",
+        "parameters": {
+          "M": "member calls executed across short-circuit lower/upper tests (2..4)"
+        },
+        "note": "Four-Front W/D/L interval query."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#spend",
       "source": "addons/rba-connect4-front.mjs",
       "name": "spend",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#spend,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+(1+F)*C(runtime.field.store)+C(alu.add.u32)+C(control.test.u32)+C(control.branch)",
+        "parameters": {
+          "F": "1 when budget is exceeded and error is stored; 0 when steps are incremented"
+        },
+        "note": "Front work-budget accounting."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#swap",
       "source": "addons/rba-connect4-front.mjs",
       "name": "swap",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 4
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#swap,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+2*C(memory.load.u32)+4*C(memory.store.u32)",
+        "note": "Swaps two front slot base/count pairs."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-front.mjs#universal",
       "source": "addons/rba-connect4-front.mjs",
       "name": "universal",
-      "scope": "legacy-addon",
+      "scope": "front-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "3+2*W"
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+2*W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+W"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+W"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#universal,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(3+2*W)*C(runtime.field.load)+C(memory.load.u32)+(1+W)*C(memory.store.u32)+(1+2*W)*C(alu.add.u32)+(1+W)*C(control.test.u32)+(1+W)*C(control.branch)",
+        "parameters": {
+          "W": "record words zeroed"
+        },
+        "note": "Creates universal zero front record."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-geometry.mjs#connect4RbaRemoveCell",
@@ -8511,11 +9439,11 @@
   ],
   "summary": {
     "units": 178,
-    "decomposed": 154,
-    "legacySymbolicVisible": 24,
+    "decomposed": 178,
+    "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 10,
-    "localExtensionOperations": 53
+    "localExtensionOperations": 62
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -8615,7 +9543,8 @@
     "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "53399c9ae8a9d7d137f9e4723186f0400429cab3",
-    "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8"
+    "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
+    "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
