@@ -220,14 +220,19 @@ assert.equal(
   'add-on cycle-ledger summary reports missing units',
 );
 
-const managedDetailedSources = new Set([
+const requiredDetailedSources = new Set([
   'addons/rba-connect4-managed-host.mjs',
   'addons/rba-connect4-managed-worker.mjs',
   'addons/rba-connect4-managed-manager.mjs',
+  'addons/rba-connect4-alphabeta.mjs',
 ]);
 for (const unit of addonCycleLedger.units) {
-  if (managedDetailedSources.has(unit.source)) {
-    assert.equal(unit.status, 'decomposed', `${unit.unit}: managed runtime may not use legacy symbolic fallback`);
+  if (requiredDetailedSources.has(unit.source)) {
+    assert.equal(
+      unit.status,
+      'decomposed',
+      `${unit.unit}: required IsoMax execution source may not use legacy symbolic fallback`,
+    );
   }
 }
 
