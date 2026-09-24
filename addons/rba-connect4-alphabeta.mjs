@@ -76,7 +76,7 @@ export function prepareConnect4RbaAlphaBeta({
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
-    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,cpcPrecursors:0,
+    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,
     frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0};
 }
@@ -92,10 +92,9 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize){
   return packed;
 }
 
-function searchCpcOnly(state,depth,alpha,beta){
-  const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis,alphaOrig=alpha,betaOrig=beta;
-  const words=state.words,basis=state.basis,n=state.basisSize[depth],meta=words[keyOffset+g.metaOffset];
-  const mover=(meta>>>2)&1;
+function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,alpha,beta){
+  const g=state.g,alphaOrig=alpha,betaOrig=beta;
+  const words=state.words,basis=state.basis;
   state.nodes+=1;
 
   const cache=state.cache,cacheSlot=mixSpan32Locator32(words,keyOffset,cache.keyWords)&cache.mask;
@@ -103,7 +102,6 @@ function searchCpcOnly(state,depth,alpha,beta){
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
-  state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
     storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
@@ -111,7 +109,6 @@ function searchCpcOnly(state,depth,alpha,beta){
   }
   if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
   else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
-  if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
 
   let semanticLo,semanticHi;
   if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
@@ -125,30 +122,29 @@ function searchCpcOnly(state,depth,alpha,beta){
   if(semanticHi<beta)beta=semanticHi;
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1,childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
-    actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
-  let legal=0,best=-2,cut=0;
+    actionMask=preemptCount>1?preemptMask:-1,childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis;
+  let actionStart=0,actionEnd=g.columns;
+  if(forced>=0){actionStart=g.priorityByColumn[forced];actionEnd=actionStart+1;}
+  let best=-2;
   for(let oi=actionStart;oi<actionEnd;oi+=1){
     const column=g.actionOrder[oi],height=words[keyOffset+column];
-    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
-    legal=1;
+    if(height>=g.rows||!(actionMask&(1<<column)))continue;
     const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
       words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
     state.cofactors+=1;
     let value;
     if(term)value=absToRelative(term,mover);
     else{
-      connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
-      value=-searchCpcOnly(state,childDepth,-beta,-alpha);
+      const childN=state.basisSize[childDepth];
+      connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,childN,state.coord);
+      value=-searchCpcOnly(state,childDepth,childKey,childBasis,childN,mover^1,-beta,-alpha);
     }
-    if(value>best)best=value;
-    if(value>alpha)alpha=value;
-    if(alpha>=beta){state.cutoffs+=1;cut=1;break;}
+    if(value>best){best=value;if(value>alpha)alpha=value;}
+    if(alpha>=beta){state.cutoffs+=1;return best;}
     if(best===1)break;
   }
-  if(!legal)return 0;
-  if(best===-2)best=semanticLo;
-  if(!cut&&alphaOrig===-2&&betaOrig===2){
+  if(best===-2)return 0;
+  if(alphaOrig===-2&&betaOrig===2){
     const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
   }
   return best;
@@ -168,7 +164,6 @@ function search(state,depth,alpha,beta){
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
-  state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
     storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
@@ -176,7 +171,6 @@ function search(state,depth,alpha,beta){
   }
   if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
   else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
-  if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
 
   let semanticLo,semanticHi;
   if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
@@ -258,8 +252,8 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(!state)throw new TypeError('prepared alpha-beta state required');
   const g=state.g;
   resetConnect4RbaExactCache32(state.cache);
-  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=state.cpcForced=state.cpcPrecursors=0;
-  state.cpc.projectedForkTotal=0;
+  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=0;
+  state.cpc.projectedForkTotal=state.cpc.precursorTotal=state.cpc.forcedTotal=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
   state.basisSize[0]=root.basis.length;
@@ -267,9 +261,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(terminal)return {value:terminal,relative:absToRelative(terminal,mover),move:-1,metrics:metrics(state)};
   const cpcKind=evaluateConnect4CpcNonterminal32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
   let rootLo=state.cpc.interval[0],rootHi=state.cpc.interval[1];
-  state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT)state.cpcExact+=1;else if(cpcKind===CPC_BOUND)state.cpcBounds+=1;else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
-  if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const packed=frontEvidence(state,state.words,0,state.basis,0,state.basisSize[0]);
     if(packed>=0){
@@ -321,17 +313,18 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     state.cofactors+=1;
     if(term)value=absToRelative(term,mover);
     else{
-      connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
+      const childN=state.basisSize[1];
+      connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,childN,state.coord);
       if(rootExact!==null){
         // Exact root W/D/L only needs a one-step discrimination window to find
         // the first action attaining that known value. For root win/draw the
         // corresponding child target is -1/0 respectively.
         const childAlpha=-rootExact;
         value=state.mode===RBA_AB_CPC_ONLY
-          ?-searchCpcOnly(state,1,childAlpha,childAlpha+1)
+          ?-searchCpcOnly(state,1,childKey,childBasis,childN,mover^1,childAlpha,childAlpha+1)
           :-search(state,1,childAlpha,childAlpha+1);
       }else value=state.mode===RBA_AB_CPC_ONLY
-        ?-searchCpcOnly(state,1,-beta,-alpha)
+        ?-searchCpcOnly(state,1,childKey,childBasis,childN,mover^1,-beta,-alpha)
         :-search(state,1,-beta,-alpha);
     }
     }
@@ -344,6 +337,6 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   return {value:relativeToAbs(relative,mover),relative,move:bestMove,metrics:metrics(state)};
 }
 function metrics(s){return {nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
-  cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpcForced,cpcPrecursors:s.cpcPrecursors,cpcProjectedForks:s.cpc.projectedForkTotal,
+  cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
   frontCalls:s.frontCalls,frontExact:s.frontExact,
   frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}

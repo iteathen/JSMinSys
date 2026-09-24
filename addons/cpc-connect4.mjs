@@ -21,6 +21,8 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     projectedCount:new Uint32Array(2),
     projectedForks:new Uint32Array(2),
     projectedForkTotal:0,
+    precursorTotal:0,
+    forcedTotal:0,
     activeSingletonCells:new Uint32Array(cellWords),
     activeSingletonCellsOther:new Uint32Array(cellWords),
     forkTargets32:g.columns<=32?new Uint32Array(g.columns):null,
@@ -120,10 +122,11 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
     first=0;scratch.precursorCount[0]+=1;
   }
   if(first)return 0;
+  scratch.precursorTotal+=scratch.precursorCount[0];
 
   scratch.preemptionMask32[0]=intersection>>>0;
   const count=popcount32(intersection);scratch.preemptionCount[0]=count;
-  if(count===1)scratch.forcedColumn[0]=firstSetBitIndex32(intersection);
+  if(count===1){scratch.forcedColumn[0]=firstSetBitIndex32(intersection);scratch.forcedTotal+=1;}
   return count===0?-1:count;
 }
 
@@ -312,6 +315,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     scratch.forcedColumn[0]=column;
     scratch.preemptionMask32[0]=g.columns<=32?((1<<column)>>>0):0;
     scratch.preemptionCount[0]=1;
+    scratch.forcedTotal+=1;
   }else{
     // With no current singleton threat, a move changes support in one column.
     // If there are no opponent singleton targets at all this test cannot fire,
