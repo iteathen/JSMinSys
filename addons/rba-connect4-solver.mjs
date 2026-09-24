@@ -9,18 +9,12 @@ export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
 export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
 
 function positionCodeEmpty64(g,outLo,outHi,index){
-  const stride=g.rows+1,total=g.columns*stride;
-  if(stride>=32||total>64){outLo[index]=0;outHi[index]=0;return 0;}
-  let lo=0,hi=0;
-  for(let c=0;c<g.columns;c+=1){
-    const bit=c*stride;
-    if(bit<32)lo|=(1<<bit)>>>0;else hi|=(1<<(bit-32))>>>0;
-  }
-  outLo[index]=lo>>>0;outHi[index]=hi>>>0;return 1;
+  if(!g.positionMode){outLo[index]=0;outHi[index]=0;return 0;}
+  outLo[index]=g.positionEmptyLo;outHi[index]=g.positionEmptyHi;return 1;
 }
 
 function advancePositionCode64(g,lo,hi,column,height,player,outLo,outHi,index){
-  const bit=column*(g.rows+1)+height+player;
+  const bit=g.positionBitBase[column]+height+player;
   if(bit<32){
     const delta=(1<<bit)>>>0,next=(lo+delta)>>>0;
     outLo[index]=next;outHi[index]=(hi+(next<lo?1:0))>>>0;
@@ -36,13 +30,19 @@ function extractLane64(lo,hi,bit,width,mask){
 }
 
 function reflectPositionCode64(g,lo,hi,outLo,outHi,index){
-  const stride=g.rows+1,total=g.columns*stride;
-  if(stride>=32||total>64){outLo[index]=0;outHi[index]=0;return 0;}
-  const mask=(1<<stride)-1;
+  if(!g.positionMode){outLo[index]=0;outHi[index]=0;return 0;}
+  if(g.positionMode===49){
+    const l0=lo&127,l1=(lo>>>7)&127,l2=(lo>>>14)&127,l3=(lo>>>21)&127,
+      l4=((lo>>>28)|(hi<<4))&127,l5=(hi>>>3)&127,l6=(hi>>>10)&127;
+    outLo[index]=(l6|(l5<<7)|(l4<<14)|(l3<<21)|(l2<<28))>>>0;
+    outHi[index]=((l2>>>4)|(l1<<3)|(l0<<10))>>>0;
+    return 1;
+  }
+  const stride=g.positionStride,mask=(1<<stride)-1;
   let reflectedLo=0,reflectedHi=0;
   for(let c=0;c<g.columns;c+=1){
-    const source=g.mirrorColumn[c],lane=extractLane64(lo,hi,source*stride,stride,mask),
-      bit=c*stride;
+    const source=g.mirrorColumn[c],lane=extractLane64(lo,hi,g.positionBitBase[source],stride,mask),
+      bit=g.positionBitBase[c];
     if(bit>=32)reflectedHi|=(lane<<(bit-32))>>>0;
     else{
       reflectedLo|=(lane<<bit)>>>0;
