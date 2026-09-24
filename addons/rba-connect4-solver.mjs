@@ -253,7 +253,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   const forced=state.cpc.forcedColumn[0],
     preemptCount=state.cpc.preemptionCount[0],
     preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32;
+    usePreempt=preemptCount>1;
   if(forced>=0)state.cpcForced+=1;
 
   // Non-root exact CPC evidence needs no dependency topology. Root exact value
