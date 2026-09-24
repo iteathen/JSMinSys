@@ -446,9 +446,15 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
       if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
     }else{
       if(t.inspectGeneration[q]!==t.generation[q]){
-        if(t.bucket[q]===RBA_TT_BUCKET_NONE&&scratch&&linearCount<linearLimit){
-          scratch[linearCount]=q;linearCount+=1;
-        }else if(t.bucket[q]!==RBA_TT_BUCKET_NONE){
+        if(t.bucket[q]===RBA_TT_BUCKET_NONE){
+          if(scratch&&linearCount<linearLimit){
+            scratch[linearCount]=q;linearCount+=1;
+          }else if(!scratch){
+            t.inspectGeneration[q]=t.generation[q];
+            const equivalent=managerFindEquivalentLinear32(t,q);
+            if(equivalent>=0)merged+=managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
+          }
+        }else{
           merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
         }
       }
