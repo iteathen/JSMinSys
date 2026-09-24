@@ -73,7 +73,7 @@ export function prepareConnect4RbaEvaluator({geometry,boundaryDepth=2,boundaryCa
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g);
   return {g,profile,scratch:prepareConnect4RbaCoordinateScratch(g),
     boundary:prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile}),
-    keys:new Uint32Array(g.columns*g.keyWords),childBasis:new Uint32Array(g.columns*g.maxBasis),
+    basis:new Uint32Array(g.maxBasis),keys:new Uint32Array(g.columns*g.keyWords),childBasis:new Uint32Array(g.columns*g.maxBasis),
     childBasisSize:new Uint32Array(g.columns),actions:new Uint32Array(g.columns),
     actionLower:new Uint32Array(g.columns),actionUpper:new Uint32Array(g.columns),
     childPresent:new Uint32Array(g.columns),childPositionLo:new Uint32Array(g.columns),childPositionHi:new Uint32Array(g.columns),
@@ -82,7 +82,7 @@ export function prepareConnect4RbaEvaluator({geometry,boundaryDepth=2,boundaryCa
     transitions:0,actionClosures:0,actionsPruned:0};
 }
 export function assertConnect4RbaTtCompatibility(t,g){
-  if(t.keyWords!==g.keyWords||t.basisCapacity<g.maxBasis||t.edgeCapacity<g.columns)
+  if(t.keyWords!==g.keyWords||(t.basisCapacity&&t.basisCapacity<g.maxBasis)||t.edgeCapacity<g.columns)
     throw new RangeError('RBA TT/profile mismatch');
   return 1;
 }
@@ -114,14 +114,17 @@ function rootCanonicalColumn(g,orderIndex,reflected){const caller=g.actionOrder[
 
 export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
-  const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,terminal=connect4RbaTerminal(g,t.keys,base);
+  const g=state.g,base=q*t.keyWords,deriveBasis=t.basisCapacity===0,
+    basis=deriveBasis?state.basis:t.basis,basisBase=deriveBasis?0:q*t.basisCapacity,
+    terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
-  const n=t.basisSize[q];if(!n)return RBA_EXACT_DRAW;
+  const n=deriveBasis?connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen):t.basisSize[q];
+  if(!n)return RBA_EXACT_DRAW;
   if(bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
 
   state.boundaryCalls+=1;
-  const outcome=buildConnect4RbaFourFront(g,state.boundary,t.keys,base,t.basis,basisBase,n);
+  const outcome=buildConnect4RbaFourFront(g,state.boundary,t.keys,base,basis,basisBase,n);
   state.boundarySteps+=state.boundary.steps;if(outcome){state.boundaryFailures+=1;return outcome;}
   const interval=queryConnect4RbaFourFront(g,state.boundary,0,t.keys,base);
   state.lower=interval&3;state.upper=interval>>>2;const mover=connect4RbaRank(g,t.keys,base)&1;
@@ -147,7 +150,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
-      const term=connect4RbaCofactorKnownHeight(g,state.profile,t.keys,base,t.basis,basisBase,n,column,height,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
+      const term=connect4RbaCofactorKnownHeight(g,state.profile,t.keys,base,basis,basisBase,n,column,height,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
       state.transitions+=1;
       if(term&&(term<lo||term>hi))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
@@ -215,6 +218,7 @@ export function prepareConnect4CpcRbaEvaluator({
     g,profile,
     scratch:prepareConnect4RbaCoordinateScratch(g),
     cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),
+    basis:new Uint32Array(g.maxBasis),
     keys:new Uint32Array(g.columns*g.keyWords),
     childBasis:new Uint32Array(g.columns*g.maxBasis),
     childBasisSize:new Uint32Array(g.columns),
@@ -232,17 +236,18 @@ export function prepareConnect4CpcRbaEvaluator({
 
 export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
-  const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,
+  const g=state.g,base=q*t.keyWords,deriveBasis=t.basisCapacity===0,
+    basis=deriveBasis?state.basis:t.basis,basisBase=deriveBasis?0:q*t.basisCapacity,
     meta=t.keys[base+g.metaOffset],terminal=meta&3;
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
 
-  const n=t.basisSize[q];
+  const n=deriveBasis?connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen):t.basisSize[q];
   if(!n)return RBA_EXACT_DRAW;
   const rank=meta>>>2,mover=rank&1;
 
   state.cpcCalls+=1;
-  const kind=evaluateConnect4CpcNonterminal32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
+  const kind=evaluateConnect4CpcNonterminal32(g,t.keys,base,basis,basisBase,n,state.cpc);
   state.lower=state.cpc.interval[0];state.upper=state.cpc.interval[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(state.cpc.projectedAdvisory)
@@ -282,7 +287,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
     const term=connect4RbaCofactorKnownHeight(
       g,state.profile,
-      t.keys,base,t.basis,basisBase,n,column,height,
+      t.keys,base,basis,basisBase,n,column,height,
       state.keys,childBase,state.childBasis,childBi,
       state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse,
     );
