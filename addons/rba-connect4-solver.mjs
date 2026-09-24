@@ -2,7 +2,7 @@ import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
-import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSetPositionCode32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
+import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtHasPositionCode32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
@@ -232,13 +232,13 @@ export function prepareConnect4CpcRbaEvaluator({
 export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
   const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,
-    terminal=connect4RbaTerminal(g,t.keys,base);
+    meta=t.keys[base+g.metaOffset],terminal=meta&3;
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
 
   const n=t.basisSize[q];
-  if(!g.lineCount||!n||bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
-  const rank=connect4RbaRank(g,t.keys,base),mover=rank&1;
+  if(!g.lineCount||!n)return RBA_EXACT_DRAW;
+  const rank=meta>>>2,mover=rank&1;
 
   state.cpcCalls+=1;
   const kind=evaluateConnect4Cpc32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
@@ -262,7 +262,8 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(kind===CPC_EXACT&&q!==rootQ)return state.lower;
 
   let count=0,childBase=0,childBi=0;
-  const forcedCaller=forced<0?-1:
+  const coded=rbaTtHasPositionCode32(t,q),parentLo=coded?t.locator[q]:0,parentHi=coded?t.positionHi[q]:0,
+    nextRank=rank+1,forcedCaller=forced<0?-1:
     q===rootQ&&rootReflected?g.mirrorColumn[forced]:forced,
     actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,
     actionEnd=forcedCaller>=0?actionStart+1:g.columns;
@@ -289,8 +290,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(term){
       lo=hi=term;
     }else{
-      const parentLo=t.positionLo[q],parentHi=t.positionHi[q],height=t.keys[base+column];
-      const coded=(parentLo|parentHi)!==0;
+      const height=t.keys[base+column];
       if(coded)advancePositionCode64(g,parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
       else {state.childPositionLo[count]=0;state.childPositionHi[count]=0;}
       const childReflected=connect4RbaCanonicalize(
@@ -320,7 +320,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     state.actionLower[count]=lo;
     state.actionUpper[count]=hi;
     const primary=mover?4-lo:hi,secondary=mover?4-hi:lo,certainty=2-(hi-lo);
-    state.actionPriority[count]=(primary<<24)|(secondary<<20)|(certainty<<18)|((rank+1)<<8)|(g.columns-oi);
+    state.actionPriority[count]=(primary<<24)|(secondary<<20)|(certainty<<18)|(nextRank<<8)|(g.columns-oi);
     count+=1;
     childBase+=g.keyWords;
     childBi+=g.maxBasis;
@@ -341,19 +341,13 @@ export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,roo
     return -1;
   }
   if(code!==RBA_BRANCH)return -1;
-  const next=rbaTtPublishSurplus32(
+  return rbaTtPublishSurplus32(
     t,q,owner,state.lower,state.upper,
     state.keys,0,state.childBasis,0,state.g.maxBasis,
     state.childBasisSize,state.actions,state.actionLower,state.actionUpper,
     state.childPresent,state.actionPriority,state.count,
+    state.childPositionLo,state.childPositionHi,
   );
-  const edgeBase=q*t.edgeCapacity;
-  for(let i=0;i<state.count;i+=1){
-    const child=t.child[edgeBase+i];
-    if(child>=0&&state.childPresent[i]&&(state.childPositionLo[i]|state.childPositionHi[i]))
-      rbaTtSetPositionCode32(t,child,state.childPositionLo[i],state.childPositionHi[i]);
-  }
-  return next;
 }
 
 export function reconcileConnect4CpcRbaEvent32(
