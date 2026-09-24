@@ -123,7 +123,7 @@ function preimage(g,a,d,child,out,cell,mover,basis,bi){
     }
     if(covers(g,a,d,cb,out))return a.error;
   }
-  if(mover===0){const singleton=g.singletonByCell[cell];if(singleton>=0)for(let i=0;i<size;i+=1)if(basis[bi+i]===singleton){
+  if(mover===0&&g.lineCount){const singleton=cell;for(let i=0;i<size;i+=1)if(basis[bi+i]===singleton){
     const upRow=upBase+i*cw;for(let w=0;w<cw;w+=1){a.temp[w]=a.up[upRow+w];a.temp[cw+w]=0;}if(insert(a,out))return a.error;break;
   }}
   return 0;
