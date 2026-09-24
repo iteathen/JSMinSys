@@ -3,7 +3,7 @@ import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {connect4RbaCofactorKnownLegal,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
-import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
@@ -105,7 +105,7 @@ function search(state,depth,alpha,beta){
   const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
-  const cpcKind=evaluateConnect4Cpc32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
   if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
@@ -203,7 +203,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   state.basisSize[0]=root.basis.length;
   const rootMeta=state.words[g.metaOffset],mover=(rootMeta>>>2)&1,terminal=rootMeta&3;
   if(terminal)return {value:terminal,relative:absToRelative(terminal,mover),move:-1,metrics:metrics(state)};
-  const cpcKind=evaluateConnect4Cpc32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
   let rootLo=state.cpc.interval[0],rootHi=state.cpc.interval[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT)state.cpcExact+=1;else if(cpcKind===CPC_BOUND)state.cpcBounds+=1;else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
