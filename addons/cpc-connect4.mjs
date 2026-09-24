@@ -133,13 +133,11 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
 export function connect4CpcTargetOwner32(g,words,offset,targetCell){
   const targetColumn=g.cellColumn[targetCell],targetRow=g.cellRow[targetCell];
   let parity=0;
-  for(let column=0;column<g.columns;column+=1){
-    const height=words[offset+column];
-    const events=column===targetColumn
-      ? targetRow-height+1
-      : g.rows-height;
-    parity^=events&1;
-  }
+  for(let column=0;column<g.columns;column+=1)
+    parity^=(g.rows-words[offset+column])&1;
+  const height=words[offset+targetColumn];
+  parity^=(g.rows-height)&1;
+  parity^=(targetRow-height+1)&1;
   const mover=(words[offset+g.metaOffset]>>>2)&1;
   return mover^(parity^1);
 }
