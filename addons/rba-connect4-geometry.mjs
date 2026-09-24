@@ -11,16 +11,13 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   const lines=[];
   for(let row=0;row<rows;row+=1)for(let column=0;column<columns;column+=1){
-    for(const [dc,dr] of [[1,0],[0,1],[1,1],[1,-1]]){
-      if(column+3*dc<columns&&row+3*dr>=0&&row+3*dr<rows){
-        lines.push([
-          row*columns+column,
-          (row+dr)*columns+column+dc,
-          (row+2*dr)*columns+column+2*dc,
-          (row+3*dr)*columns+column+3*dc,
-        ]);
-      }
-    }
+    const cell=row*columns+column;
+    if(column+3<columns)lines.push([cell,cell+1,cell+2,cell+3]);
+    if(row+3<rows)lines.push([cell,cell+columns,cell+2*columns,cell+3*columns]);
+    if(column+3<columns&&row+3<rows)
+      lines.push([cell,cell+columns+1,cell+2*columns+2,cell+3*columns+3]);
+    if(column+3<columns&&row>=3)
+      lines.push([cell,cell-columns+1,cell-2*columns+2,cell-3*columns+3]);
   }
 
   const shapeMap=new Map(),shapeList=[];
@@ -128,11 +125,22 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   const priorityByColumn=new Uint32Array(columns),mirrorColumn=new Uint32Array(columns);
   for(let i=0;i<columns;i+=1){priorityByColumn[order[i]]=i;mirrorColumn[i]=columns-1-i;}
 
+  const positionStride=rows+1,positionBits=columns*positionStride,
+    positionMode=positionStride<32&&positionBits<=64?(columns===7&&rows===6?49:64):0,
+    positionBitBase=new Uint32Array(columns);
+  let positionEmptyLo=0,positionEmptyHi=0;
+  if(positionMode)for(let c=0;c<columns;c+=1){
+    const bit=c*positionStride;positionBitBase[c]=bit;
+    if(bit<32)positionEmptyLo|=(1<<bit)>>>0;
+    else positionEmptyHi|=(1<<(bit-32))>>>0;
+  }
+
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
     lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
-    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn};
+    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
+    positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0};
 }
 
 export function prepareConnect4RbaCoordinateScratch(g){
