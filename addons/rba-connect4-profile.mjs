@@ -57,5 +57,10 @@ export function prepareConnect4RbaExecutionProfile(g){
     permuteCoordinates:coordinate3?permutePair3:permutePairSpan,
     insertFront:front6?insert6:insertSpan,
     productJoin:front6?product6:productSpan,
+    // Cold qualification metadata; not read by the hot call graph.
+    removeMode:denseRemove?1:0,
+    subsetMode:denseSubset?1:0,
+    coordinateMode:coordinate3?3:0,
+    frontMode:front6?6:0,
   };
 }
