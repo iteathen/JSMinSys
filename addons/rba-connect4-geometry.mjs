@@ -41,7 +41,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   const maxBasis=lineCount,coordWords=Math.ceil(maxBasis/32),shapeWordCount=Math.ceil(shapeCount/32);
   const metaOffset=columns,p0Offset=metaOffset+1,p1Offset=p0Offset+coordWords,keyWords=p1Offset+coordWords;
   const lineColumn=new Uint32Array(lineCount*4),lineRow=new Uint32Array(lineCount*4),lineShape=new Uint32Array(lineCount*16);
-  const cellColumn=new Uint32Array(cellCount),cellRow=new Uint32Array(cellCount);
+  const cellColumn=new Uint32Array(cellCount),cellRow=new Uint32Array(cellCount),cellLineCount=new Uint32Array(cellCount);
   for(let cell=0;cell<cellCount;cell+=1){cellColumn[cell]=cell%columns;cellRow[cell]=(cell/columns)|0;}
   const shapeSize=new Uint32Array(shapeCount),shapeCells=new Uint32Array(shapeCount*4),reflect=new Uint32Array(shapeCount),
     pairedResponseCover=new Uint8Array(shapeCount);
@@ -50,7 +50,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   for(let l=0;l<lineCount;l+=1){
     const line=lines[l];
-    for(let i=0;i<4;i+=1){lineColumn[l*4+i]=line[i]%columns;lineRow[l*4+i]=(line[i]/columns)|0;}
+    for(let i=0;i<4;i+=1){lineColumn[l*4+i]=line[i]%columns;lineRow[l*4+i]=(line[i]/columns)|0;cellLineCount[line[i]]+=1;}
     for(let bits=1;bits<16;bits+=1){
       const cells=[];for(let i=0;i<4;i+=1)if(bits&(1<<i))cells.push(line[i]);cells.sort((a,b)=>a-b);
       lineShape[l*16+bits]=shapeMap.get(keyOf(cells));
@@ -136,7 +136,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
-    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
+    lineColumn,lineRow,lineShape,cellColumn,cellRow,cellLineCount,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
     positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0,

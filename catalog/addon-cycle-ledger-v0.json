@@ -4609,7 +4609,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "18+DENSE_R+DENSE_S"
+          "count": "19+DENSE_R+DENSE_S"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -4617,11 +4617,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "20*CELL+24*LINE+24*SHAPE+8*SUB"
+          "count": "20*CELL+28*LINE+24*SHAPE+8*SUB"
         },
         {
           "op": "memory.store.u32",
-          "count": "8*CELL+24*LINE+20*SHAPE+4*SUB"
+          "count": "8*CELL+28*LINE+20*SHAPE+4*SUB"
         },
         {
           "op": "alu.imul.u32",
@@ -4629,7 +4629,7 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "20*CELL+35*LINE+30*SHAPE+12*SUB"
+          "count": "20*CELL+39*LINE+30*SHAPE+12*SUB"
         },
         {
           "op": "alu.sub.u32",
@@ -4658,7 +4658,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "3*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+C(runtime.array.from)+C(runtime.map.construct)+15*LINE*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+C(runtime.map.clear)+(15*LINE+2*SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+2*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+C(runtime.object.allocate)",
+        "expression": "3*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+C(runtime.array.from)+C(runtime.map.construct)+15*LINE*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+C(runtime.map.clear)+(15*LINE+2*SHAPE)*C(runtime.array.join)+(19+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+2*C(runtime.typed_array.fill)+(20*CELL+28*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+28*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+39*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+C(runtime.object.allocate)",
         "parameters": {
           "CELL": "configured cell count iterations across geometry setup",
           "LINE": "winning-line records generated/scanned",
@@ -4667,7 +4667,7 @@
           "DENSE_R": "1 when dense remove table allocation is admitted, else 0",
           "DENSE_S": "1 when dense subset table allocation is admitted, else 0"
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized."
+        "note": "Cold initialization geometry ledger now also precomputes cellLineCount: the worker stone eval is one indexed load at runtime, while its line-incidence construction cost is paid once here."
       },
       "status": "decomposed"
     },
@@ -8143,15 +8143,15 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "15+14*S"
+          "count": "13+12*S+O*(2+2*S)"
         },
         {
           "op": "memory.load.u32",
-          "count": "4+12*S"
+          "count": "4+10*S+O*(2*S)"
         },
         {
           "op": "memory.store.u32",
-          "count": "2+5*S"
+          "count": "2+4*S+O*S"
         },
         {
           "op": "alu.add.u32",
@@ -8159,11 +8159,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "8+16*S"
+          "count": "6+12*S+O*(2+4*S)"
         },
         {
           "op": "control.branch",
-          "count": "8+16*S"
+          "count": "6+12*S+O*(2+4*S)"
         },
         {
           "op": "runtime.call.subledger",
@@ -8203,7 +8203,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "L*C(runtime.math.min)+(15+14*S)*C(runtime.field.load)+(4+12*S)*C(memory.load.u32)+(2+5*S)*C(memory.store.u32)+(3+4*S)*C(alu.add.u32)+(8+16*S)*C(control.test.u32)+(8+16*S)*C(control.branch)+U*CALL(rbaTtUnqueueReady32)+P*CALL(positionBucket32)+NP*CALL(managerNormalizePositionBucket32)+FL*CALL(managerFindEquivalentLinear32)+MK*CALL(managerMergeKnownDuplicate32)+NE*CALL(managerNormalizeEquivalentGroup32)+LB*CALL(managerNormalizeLinearBatch32)",
+        "expression": "L*C(runtime.math.min)+(13+12*S+O*(2+2*S))*C(runtime.field.load)+(4+10*S+O*(2*S))*C(memory.load.u32)+(2+4*S+O*S)*C(memory.store.u32)+(3+4*S)*C(alu.add.u32)+(6+12*S+O*(2+4*S))*C(control.test.u32)+(6+12*S+O*(2+4*S))*C(control.branch)+U*CALL(rbaTtUnqueueReady32)+P*CALL(positionBucket32)+NP*CALL(managerNormalizePositionBucket32)+FL*CALL(managerFindEquivalentLinear32)+MK*CALL(managerMergeKnownDuplicate32)+NE*CALL(managerNormalizeEquivalentGroup32)+LB*CALL(managerNormalizeLinearBatch32)",
         "parameters": {
           "L": "1 when bounded scratch route limit computes Math.min; 0 without scratch",
           "S": "ready rows inspected up to budget",
@@ -8213,9 +8213,10 @@
           "FL": "linear equivalence scans",
           "MK": "known duplicate merges",
           "NE": "semantic groups normalized",
-          "LB": "1 when a linear scratch batch is normalized"
+          "LB": "1 when a linear scratch batch is normalized",
+          "O": "1 when manager globally promotes the highest priority ready row; 0 in decentralized fight mode"
         },
-        "note": "Manager ready-queue inspection/dedupe/prioritization."
+        "note": "Manager can dedupe/clean ready work without globally ordering it. O=0 preserves queue contention order."
       },
       "status": "decomposed"
     },
@@ -8474,15 +8475,15 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+15*N"
+          "count": "18+15*N+3*G*N"
         },
         {
           "op": "memory.load.u32",
-          "count": "5+11*N"
+          "count": "5+11*N+3*G*N"
         },
         {
           "op": "memory.store.u32",
-          "count": "2+13*N"
+          "count": "2+13*N+G"
         },
         {
           "op": "runtime.integer.check",
@@ -8494,7 +8495,7 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "4+7*N"
+          "count": "4+7*N+2*G*N"
         },
         {
           "op": "alu.or.u32",
@@ -8502,11 +8503,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "9+13*N"
+          "count": "9+13*N+4*G*N"
         },
         {
           "op": "control.branch",
-          "count": "9+13*N"
+          "count": "9+13*N+4*G*N"
         },
         {
           "op": "runtime.call.subledger",
@@ -8546,15 +8547,16 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+15*N)*C(runtime.field.load)+(5+11*N)*C(memory.load.u32)+(2+13*N)*C(memory.store.u32)+C(runtime.integer.check)+(2+S*N)*C(alu.imul.u32)+(4+7*N)*C(alu.add.u32)+C(alu.or.u32)+(9+13*N)*C(control.test.u32)+(9+13*N)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*(CALL(rbaTtAllocateUnindexed32)+CALL(rbaTtTighten32))+CALL(rbaTtSignal32)+Q*CALL(enqueueKnownNew32)+CALL(rbaTtReleaseExecution32)",
+        "expression": "(18+15*N+3*G*N)*C(runtime.field.load)+(5+11*N+3*G*N)*C(memory.load.u32)+(2+13*N+G)*C(memory.store.u32)+C(runtime.integer.check)+(2+S*N)*C(alu.imul.u32)+(4+7*N+2*G*N)*C(alu.add.u32)+C(alu.or.u32)+(9+13*N+4*G*N)*C(control.test.u32)+(9+13*N+4*G*N)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*(CALL(rbaTtAllocateUnindexed32)+CALL(rbaTtTighten32))+CALL(rbaTtSignal32)+Q*CALL(enqueueKnownNew32)+CALL(rbaTtReleaseExecution32)",
         "parameters": {
           "N": "action rows materialized",
           "P": "present children allocated",
           "Q": "surplus children enqueued after one local continuation is retained",
           "S": "1 when basisSets are present and set-stride address arithmetic executes; 0 otherwise",
-          "F": "contract/bounds/allocation failure taken (0 or 1)"
+          "F": "contract/bounds/allocation failure taken (0 or 1)",
+          "G": "1 when retainHighestPriority scans unresolved children and retains the maximum producer-local eval; 0 for legacy first-child retention"
         },
-        "note": "Surplus publication path; Phase-1 exact Negamax does not execute this branch but it remains fully decomposed."
+        "note": "Surplus publication can retain either the first unresolved child or, for the spike, the highest producer-local priority. The manager does not need to schedule that choice."
       },
       "status": "decomposed"
     },
@@ -9533,12 +9535,12 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "7f0863343f18e950f1625656953a424241da070d",
-    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
+    "addons/rba-connect4-geometry.mjs": "fcaa79858169d1db62ed60d1b3ff88dc27cf201d",
     "addons/rba-connect4-managed-host.mjs": "85aae8a395692d15a33dc04f7dfc4bd43109eb5e",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
     "addons/rba-connect4-managed-worker.mjs": "942c00c1be0a5b7deb8d56a669a0fe34ccda8134",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
-    "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
+    "addons/rba-tt32.mjs": "8b4e17d55ebf8117db6a351703a237fd20c89fee",
     "addons/rba-connect4-alphabeta.mjs": "1cf4fc1881785067082146ac68d450e262addca6",
     "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",

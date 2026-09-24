@@ -246,7 +246,7 @@ export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,
   for(let i=0;i<count;i+=1){const child=t.child[edgeBase+i];if(child>=0&&t.execution[child]===0&&!t.exact[child]&&t.phase[child]===0){t.execution[child]=owner;next=child;break;}}
   rbaTtReleaseExecution32(t,q,owner);return next;
 }
-export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count,positionLo=null,positionHi=null,basisSets=null,basisSetStride=0){
+export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count,positionLo=null,positionHi=null,basisSets=null,basisSetStride=0,retainHighestPriority=0){
   if(t.execution[q]!==owner||count<1||count>t.edgeCapacity||(count|0)!==count){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
   if(!rbaTtTighten32(t,q,stateLo,stateHi))return -1;
   const edgeBase=q*t.edgeCapacity,keyStride=t.keyWords,coded=positionLo!==null&&positionHi!==null;
@@ -266,11 +266,26 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
     childKey+=keyStride;childBasis+=basisStride;
   }
   t.phase[q]=RBA_TT_PHASE_PENDING_ATTACH;rbaTtSignal32(t,q);
-  let next=-1;
+  let next=-1,retained=-1;
+  if(retainHighestPriority){
+    let best=-2147483648;
+    for(let i=0;i<count;i+=1){
+      const child=t.child[edgeBase+i];
+      if(child<0||t.exact[child])continue;
+      const priority=priorities?priorities[i]|0:0;
+      if(retained<0||priority>best){best=priority;retained=i;}
+    }
+    if(retained>=0){
+      next=t.child[edgeBase+retained];
+      t.execution[next]=owner;
+    }
+  }
   for(let i=0;i<count;i+=1){
     const child=t.child[edgeBase+i];
     if(child<0||t.exact[child])continue;
-    if(next<0){t.execution[child]=owner;next=child;}
+    if(retainHighestPriority){
+      if(i!==retained)enqueueKnownNew32(t,child);
+    }else if(next<0){t.execution[child]=owner;next=child;}
     else enqueueKnownNew32(t,child);
   }
   rbaTtReleaseExecution32(t,q,owner);
@@ -548,7 +563,7 @@ function managerFindEquivalentLinear32(t,q){
   return best===q?-1:best;
 }
 
-export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null,routeHeads=null,routeNext=null){
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null,routeHeads=null,routeNext=null,prioritizeReady=1){
   const linearLimit=scratch&&routeHeads&&routeNext?Math.min(budget,scratch.length,routeNext.length):0;
   let q=t.control[RBA_TT_READY_TAIL],seen=0,linearCount=0,merged=0;
   let best=-1,bestPriority=-2147483648;
@@ -579,7 +594,7 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
           }
         }
       }
-      if(t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
+      if(prioritizeReady&&t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
         best=q;bestPriority=t.priority[q];
       }
     }
@@ -589,8 +604,8 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
   if(linearCount)
     merged+=managerNormalizeLinearBatch32(t,resetTargets,scratch,linearCount,routeHeads,routeNext);
 
-  if(best>=0&&(!t.live[best]||t.redirect[best]>=0||!t.readyMember[best]))best=-1;
-  if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
+  if(prioritizeReady&&best>=0&&(!t.live[best]||t.redirect[best]>=0||!t.readyMember[best]))best=-1;
+  if(prioritizeReady&&best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
     const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
     if(p!==-1)t.readyNext[p]=n;if(n!==-1)t.readyPrev[n]=p;else t.control[RBA_TT_READY_TAIL]=p;
     t.readyPrev[best]=-1;t.readyNext[best]=head;if(head!==-1)t.readyPrev[head]=best;
