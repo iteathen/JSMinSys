@@ -1,0 +1,3654 @@
+{
+  "version": "0.1.0",
+  "profile": "node26-v8-14.6/x86_64-amd-zen3",
+  "authority": "NEES COST_ACCOUNTING.md Draft 0.5; JSMinSys SPEC JMS-COST-001..004",
+  "rule": "Every declared add-on function and managed module-main execution unit has a visible cycle ledger. Unknown historical add-on cost is symbolic, never zero.",
+  "localOperationExtensions": {
+    "atomic.load.u32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_LOAD_COST"
+      },
+      "note": "Acquire/shared load; coherence/locality dependent."
+    },
+    "atomic.store.u32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_STORE_COST"
+      },
+      "note": "Shared atomic store; coherence/locality dependent."
+    },
+    "atomic.notify": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_NOTIFY_COST(waiterCount,osState)"
+      },
+      "note": "Wake cost depends on waiter/OS state."
+    },
+    "runtime.call.subledger": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "CALL_LEDGER(target,scenario)"
+      },
+      "note": "Composition edge; resolved by target function ledger."
+    },
+    "runtime.callback": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "CALLBACK_LEDGER(target,scenario)"
+      },
+      "note": "Callback body resolved by supplied target ledger; call overhead remains profile-sensitive."
+    },
+    "runtime.object.allocate": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "OBJECT_ALLOC(type,gcState)"
+      },
+      "note": "V8 object allocation/GC state dependent."
+    },
+    "memory.allocate.shared.bytes": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "SHARED_ARRAY_BUFFER_ALLOC(bytes,pageState,gcState)"
+      },
+      "note": "Shared backing-store allocation and zero initialization."
+    },
+    "runtime.typed_view.construct": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TYPED_VIEW_CONSTRUCT(type)"
+      },
+      "note": "TypedArray view-object construction."
+    },
+    "runtime.typed_array.allocate": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TYPED_ARRAY_ALLOC(type,length,pageState,gcState)"
+      },
+      "note": "TypedArray allocation; maps to NEES typed-array allocation family."
+    },
+    "runtime.array.copy": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "COPY_BYTES(bytes,cacheLevel)"
+      },
+      "note": "Bulk copy cost remains locality and byte-count dependent."
+    },
+    "runtime.worker.spawn": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "WORKER_SPAWN(workerDataBytes,runtimeState)"
+      },
+      "note": "Node Worker construction plus structured-clone/startup."
+    },
+    "runtime.managed_wait": {
+      "cost": {
+        "kind": "unbounded",
+        "min": 0
+      },
+      "note": "Session wait may block with no finite elapsed upper bound."
+    },
+    "runtime.managed_close": {
+      "cost": {
+        "kind": "unbounded",
+        "min": 0
+      },
+      "note": "Worker terminate/join may block with no finite elapsed upper bound."
+    }
+  },
+  "units": [
+    {
+      "unit": "addons/branch-manager-host.mjs#abort",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "abort",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#abort,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#closeManagedThreadSession32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "closeManagedThreadSession32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#closeManagedThreadSession32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#createManagedThreadSession32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "createManagedThreadSession32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#createManagedThreadSession32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#createMetricViews32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "createMetricViews32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#createMetricViews32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#failManagedThreadSession32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "failManagedThreadSession32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#failManagedThreadSession32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#filterFileWorkerExecArgv32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "filterFileWorkerExecArgv32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#filterFileWorkerExecArgv32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#managedThreadSessionState32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "managedThreadSessionState32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#managedThreadSessionState32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#sharedViewBytes32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "sharedViewBytes32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#sharedViewBytes32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#spawnManagedFileWorker32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "spawnManagedFileWorker32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#spawnManagedFileWorker32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#sumMetricViews32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "sumMetricViews32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#sumMetricViews32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#waitManagedThreadSession32",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "waitManagedThreadSession32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/branch-manager-host.mjs#waitManagedThreadSession32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#cellMarked",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "cellMarked",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#cellMarked,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#collectPlayerSingletons",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "collectPlayerSingletons",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#collectPlayerSingletons,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#collectProjected",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "collectProjected",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#collectProjected,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#connect4CpcTargetOwner32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "connect4CpcTargetOwner32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#connect4CpcTargetOwner32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#connect4CpcTargetSupportDistance32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "connect4CpcTargetSupportDistance32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#connect4CpcTargetSupportDistance32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#coordHas",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "coordHas",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#coordHas,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#deriveForkPreemption32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "deriveForkPreemption32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#deriveForkPreemption32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#evaluateConnect4Cpc32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "evaluateConnect4Cpc32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#evaluateConnect4Cpc32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#evaluateConnect4CpcNonterminal32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "evaluateConnect4CpcNonterminal32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#evaluateConnect4CpcNonterminal32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#frontierResponseNoWin",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "frontierResponseNoWin",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#frontierResponseNoWin,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#pairedResponseNoWin",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "pairedResponseNoWin",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#pairedResponseNoWin,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#playableCell",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "playableCell",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#playableCell,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#prepareConnect4CpcScratch",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "prepareConnect4CpcScratch",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#prepareConnect4CpcScratch,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#synchronizedFrontierResponseNoWin",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "synchronizedFrontierResponseNoWin",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#synchronizedFrontierResponseNoWin,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#applyWorkerReset32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "applyWorkerReset32",
+      "scope": "hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2 + R"
+        },
+        {
+          "op": "control.branch",
+          "count": "2 + R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtEnter32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtReleaseExecution32"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "R"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "R"
+        },
+        {
+          "op": "atomic.notify",
+          "count": "R"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)+R*(C(control.test.u32)+C(control.branch)+CALL(rbaTtEnter32)+CALL(rbaTtReleaseExecution32)+C(atomic.store.u32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "parameters": {
+          "R": "1 when a reset is pending; 0 on the ordinary no-reset path"
+        },
+        "note": "Reset-index bounds are initialization assertions and are not charged per step."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#prepareRbaBranchManager32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "prepareRbaBranchManager32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-branch-manager.mjs#prepareRbaBranchManager32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#prepareRbaBranchWorker32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "prepareRbaBranchWorker32",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 8
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "8*C(control.test.u32)+4*C(control.branch)+C(alu.sub.u32)+OBJECT_ALLOC(branchWorkerRecord)",
+        "note": "One-time worker preparation; reset-index range is proved here and removed from recurring steps."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#rbaBranchManagerStep32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "rbaBranchManagerStep32",
+      "scope": "checked-wrapper",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaBranchManagerStepKnown32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "6*C(control.test.u32)+3*C(control.branch)+CALL(rbaBranchManagerStepKnown32)",
+        "note": "Checked public one-step API."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#rbaBranchManagerStepKnown32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "rbaBranchManagerStepKnown32",
+      "scope": "manager-hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtEnter32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "rbaTtTakeEvent32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "E",
+          "target": "reconcile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "rbaTtManagerInspectReady32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "rbaTtManagerClean32"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "N"
+        },
+        {
+          "op": "atomic.notify",
+          "count": "N"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(rbaTtEnter32)+E*(CALL(rbaTtTakeEvent32)+CALLBACK(reconcile))+M*(CALL(rbaTtManagerInspectReady32)+CALL(rbaTtManagerClean32))+N*(C(atomic.rmw.u32)+ATOMIC_NOTIFY)+CALL(rbaTtLeave32)",
+        "parameters": {
+          "E": "events processed in this manager turn",
+          "M": "1 when manager maintenance state is supplied",
+          "N": "1 when processed or merged work wakes waiters, else 0"
+        },
+        "note": "Known loop configuration removes recurring type/range validation and per-turn options-object construction."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#rbaBranchReadyCount32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "rbaBranchReadyCount32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-branch-manager.mjs#rbaBranchReadyCount32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#rbaBranchWorkerStep32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "rbaBranchWorkerStep32",
+      "scope": "checked-wrapper",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaBranchWorkerStepKnown32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(control.test.u32)+C(control.branch)+CALL(rbaBranchWorkerStepKnown32)",
+        "note": "Checked public one-step API."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#rbaBranchWorkerStepKnown32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "rbaBranchWorkerStepKnown32",
+      "scope": "worker-hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "applyWorkerReset32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "rbaTtTake32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "E",
+          "target": "evaluate"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "P",
+          "target": "publish"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "P"
+        },
+        {
+          "op": "atomic.notify",
+          "count": "P"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*CALL(applyWorkerReset32)+C*CALL(rbaTtTake32)+E*CALLBACK(evaluate)+P*(CALLBACK(publish)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)+TT_TRANSACTION_COST",
+        "parameters": {
+          "C": "1 when claiming from the ready queue, else 0",
+          "E": "1 when q requires evaluation, else 0",
+          "P": "1 when publishing evaluated q, else 0"
+        },
+        "note": "Lifetime-known callbacks remove recurring typeof checks; expose is asserted constant zero."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#runRbaBranchManagerLoop32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "runRbaBranchManagerLoop32",
+      "scope": "manager-hot-loop",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "rbaBranchManagerStepKnown32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "3*I + 1"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "P"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "I*(CALL(rbaBranchManagerStepKnown32)+3*C(atomic.load.u32)) + C(atomic.load.u32)",
+        "unboundedTerms": [
+          "P*C(atomic.wait)"
+        ],
+        "parameters": {
+          "I": "manager loop iterations",
+          "P": "park/wait count"
+        },
+        "note": "Callback/config validation is paid once at loop entry. Atomics.wait makes elapsed upper bound unbounded."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#runRbaBranchWorkerLoop32",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "runRbaBranchWorkerLoop32",
+      "scope": "worker-hot-loop",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "rbaBranchWorkerStepKnown32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "3*I + 1"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "P"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "4*S"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "publishMetrics"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "I*(CALL(rbaBranchWorkerStepKnown32)+3*C(atomic.load.u32)) + S*(4*C(memory.store.u32)+CALLBACK(publishMetrics)) + C(atomic.load.u32)",
+        "unboundedTerms": [
+          "P*C(atomic.wait)"
+        ],
+        "parameters": {
+          "I": "worker loop iterations",
+          "P": "park/wait count",
+          "S": "metric publications including final publication"
+        },
+        "note": "One telemetry counter owns both generic and domain metrics."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#absToRelative",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "absToRelative",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#absToRelative,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "createConnect4RbaExactCache32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#frontEvidence",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "frontEvidence",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#frontEvidence,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#metrics",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "metrics",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#metrics,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#prepareConnect4RbaAlphaBeta",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "prepareConnect4RbaAlphaBeta",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#prepareConnect4RbaAlphaBeta,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCache32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "probeConnect4RbaExactCache32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCache32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCacheSlot32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "probeConnect4RbaExactCacheSlot32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCacheSlot32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#relativeToAbs",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "relativeToAbs",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#relativeToAbs,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "resetConnect4RbaExactCache32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#search",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "search",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#search,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#solveConnect4RbaAlphaBeta",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "solveConnect4RbaAlphaBeta",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#solveConnect4RbaAlphaBeta,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "storeConnect4RbaExactCache32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCacheSlot32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "storeConnect4RbaExactCacheSlot32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCacheSlot32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#compareReflectedSupport",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "compareReflectedSupport",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#compareReflectedSupport,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaBasisFromSupport",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaBasisFromSupport",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaBasisFromSupport,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCanonicalize",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactor",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCofactor",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactor,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCofactorBasis",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCofactorKnownHeight",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownLegal",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCofactorKnownLegal",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownLegal,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaPlayer",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaPlayer",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaPlayer,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaRank",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaRank",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaRank,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaTerminal",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaTerminal",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaTerminal,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#buildAt",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "buildAt",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#buildAt,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#buildConnect4RbaFourFront",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "buildConnect4RbaFourFront",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#buildConnect4RbaFourFront,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#combine",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "combine",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#combine,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#covers",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "covers",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#covers,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#insert",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "insert",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#insert,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#insertFrom",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "insertFrom",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#insertFrom,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#member",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "member",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#member,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#preimage",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "preimage",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#preimage,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#prepareConnect4RbaFrontArena",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "prepareConnect4RbaFrontArena",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareConnect4RbaFrontArena,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#prepareImages",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "prepareImages",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareImages,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#prepareUpsets",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "prepareUpsets",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareUpsets,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#prepareValid",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "prepareValid",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#prepareValid,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#queryConnect4RbaFourFront",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "queryConnect4RbaFourFront",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#queryConnect4RbaFourFront,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#spend",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "spend",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#spend,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#swap",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "swap",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#swap,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-front.mjs#universal",
+      "source": "addons/rba-connect4-front.mjs",
+      "name": "universal",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-front.mjs#universal,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#connect4RbaRemoveCell",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "connect4RbaRemoveCell",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#connect4RbaRemoveCell,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#connect4RbaShapeContains",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "connect4RbaShapeContains",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#connect4RbaShapeContains,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#connect4RbaShapeSubset",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "connect4RbaShapeSubset",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#connect4RbaShapeSubset,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#prepareConnect4RbaCoordinateScratch",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "prepareConnect4RbaCoordinateScratch",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#prepareConnect4RbaCoordinateScratch,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "prepareConnect4RbaGeometry",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-geometry.mjs#shareConnect4RbaGeometry32",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "shareConnect4RbaGeometry32",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": "2 + 2*P + V"
+        },
+        {
+          "op": "control.branch",
+          "count": "1 + 2*P + V"
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": "V",
+          "bytes": "Σ view[i].byteLength"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "V"
+        },
+        {
+          "op": "runtime.array.copy",
+          "count": "V",
+          "bytes": "Σ view[i].byteLength"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2+2*P+V)*C(control.test.u32)+(1+2*P+V)*C(control.branch)+SAB_ALLOC(B)+V*TYPED_VIEW_CONSTRUCT+COPY_BYTES(B)+OBJECT_ALLOC(sharedGeometry)",
+        "parameters": {
+          "P": "geometry property count",
+          "V": "typed-array property count not already shared",
+          "B": "total bytes copied into shared backing stores"
+        },
+        "note": "One cold shared image replaces W independent geometry rebuilds."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-host.mjs#prepareManagedRuntimeSlab32",
+      "source": "addons/rba-connect4-managed-host.mjs",
+      "name": "prepareManagedRuntimeSlab32",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "alu.imul.u32",
+          "count": "3*W + 2"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*W + 6"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 1,
+          "bytes": "ALIGN8(8 + 4*W) + 96*W"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "W + 2"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W + 1"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(3*W+2)*C(alu.imul.u32) + (2*W+6)*C(alu.add.u32) + C(alu.and.u32) + SAB_ALLOC(ALIGN8(8+4*W)+96*W) + (W+2)*TYPED_VIEW_CONSTRUCT + (W+1)*C(memory.store.u32)",
+        "parameters": {
+          "W": "managed evaluator worker count"
+        },
+        "note": "Cold setup. SharedArrayBuffer allocation and typed-view construction remain explicit symbolic runtime costs."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-host.mjs#runManagedConnect4CpcRba32",
+      "source": "addons/rba-connect4-managed-host.mjs",
+      "name": "runManagedConnect4CpcRba32",
+      "scope": "cold-host",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "connect4RbaFromMoves"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createRbaTt32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtIntern32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareManagedRuntimeSlab32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "shareConnect4RbaGeometry32"
+        },
+        {
+          "op": "runtime.worker.spawn",
+          "count": "W+1"
+        },
+        {
+          "op": "runtime.managed_wait",
+          "count": 1
+        },
+        {
+          "op": "runtime.managed_close",
+          "count": 1
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "sumMetricViews32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(prepareManagedRuntimeSlab32)+CALL(shareConnect4RbaGeometry32)+(W+1)*WORKER_SPAWN+CALL(sumMetricViews32)+4*C(memory.load.u32)+HOST_BOOKKEEPING",
+        "unboundedTerms": [
+          "runtime.managed_wait",
+          "runtime.managed_close"
+        ],
+        "parameters": {
+          "W": "managed evaluator worker count"
+        },
+        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Active CPU work remains explicitly composed."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-manager.mjs#reconcile",
+      "source": "addons/rba-connect4-managed-manager.mjs",
+      "name": "reconcile",
+      "scope": "manager-hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "reconcileConnect4CpcRbaEvent32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(reconcileConnect4CpcRbaEvent32)",
+        "note": "Lifetime-captured manager state removes context-object transport."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-worker.mjs#evaluate",
+      "source": "addons/rba-connect4-managed-worker.mjs",
+      "name": "evaluate",
+      "scope": "hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "evaluateConnect4CpcRbaTt32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(evaluateConnect4CpcRbaTt32)",
+        "note": "Closure captures rootQ/rootReflected; no context-object loads remain."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-worker.mjs#publish",
+      "source": "addons/rba-connect4-managed-worker.mjs",
+      "name": "publish",
+      "scope": "hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishConnect4CpcRbaEvaluation32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(publishConnect4CpcRbaEvaluation32)",
+        "note": "Closure captures root/witness state; cost is the publication subledger."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-worker.mjs#publishMetrics",
+      "source": "addons/rba-connect4-managed-worker.mjs",
+      "name": "publishMetrics",
+      "scope": "sampled-cold",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 7
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 8
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "7*C(memory.load.u32) + 8*C(memory.store.u32)",
+        "note": "Executed only at the branch-worker telemetry cadence and final publication."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#insert6",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "insert6",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#insert6,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#insertSpan",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "insertSpan",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#insertSpan,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#permutePair3",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "permutePair3",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#permutePair3,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#permutePairSpan",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "permutePairSpan",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#permutePairSpan,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#prepareConnect4RbaExecutionProfile",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "prepareConnect4RbaExecutionProfile",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#prepareConnect4RbaExecutionProfile,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#prepareRemoveDense",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "prepareRemoveDense",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#prepareRemoveDense,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#prepareRemoveSparse",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "prepareRemoveSparse",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#prepareRemoveSparse,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#prepareSubsetDense",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "prepareSubsetDense",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#prepareSubsetDense,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#prepareSubsetSparse",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "prepareSubsetSparse",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#prepareSubsetSparse,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#product6",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "product6",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#product6,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#productSpan",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "productSpan",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#productSpan,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#removeDensePrepared",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "removeDensePrepared",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#removeDensePrepared,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#removeSparsePrepared",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "removeSparsePrepared",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#removeSparsePrepared,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#subsetDensePrepared",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "subsetDensePrepared",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#subsetDensePrepared,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-profile.mjs#subsetSparsePrepared",
+      "source": "addons/rba-connect4-profile.mjs",
+      "name": "subsetSparsePrepared",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-profile.mjs#subsetSparsePrepared,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#advancePositionCode64",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "advancePositionCode64",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#advancePositionCode64,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#assertConnect4RbaTtCompatibility",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "assertConnect4RbaTtCompatibility",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#assertConnect4RbaTtCompatibility,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#bothCoordinatesEmpty",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "bothCoordinatesEmpty",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#bothCoordinatesEmpty,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#connect4PositionCode64FromMoves",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "connect4PositionCode64FromMoves",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#connect4PositionCode64FromMoves,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#connect4RbaFromMoves",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "connect4RbaFromMoves",
+      "scope": "cold-ingress",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "connect4RbaBasisFromSupport"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PC",
+          "target": "connect4PositionCode64FromMoves"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "ROOT_STORAGE_SETUP + CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeight)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)+MOVE_VALIDATION(M)",
+        "parameters": {
+          "M": "ingress move count",
+          "PC": "1 when positionCode capability enabled, else 0"
+        },
+        "note": "Managed runtime sets PC=0 and therefore pays no physical position-code construction."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#evaluateConnect4CpcRbaTt32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "evaluateConnect4CpcRbaTt32",
+      "scope": "hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PC",
+          "target": "rbaTtHasPositionCode32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "EVAL_FIXED + CALL(evaluateConnect4CpcNonterminal32)+A*CALL(connect4RbaCofactorKnownHeight)+U*(CALL(connect4RbaCanonicalize)+CALL(evaluateConnect4CpcNonterminal32))+PC*POSITION_CODE_EVAL_COST",
+        "parameters": {
+          "A": "legal actions examined",
+          "U": "nonterminal child actions requiring CPC",
+          "PC": "1 when evaluator position-code capability is enabled, else 0"
+        },
+        "note": "Managed runtime uses PC=0, so TT position-code probe, child code advancement/reflection, and child code stores are absent."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#evaluateConnect4RbaTt32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "evaluateConnect4RbaTt32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#evaluateConnect4RbaTt32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#extractLane64",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "extractLane64",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#extractLane64,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#positionCodeEmpty64",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "positionCodeEmpty64",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#positionCodeEmpty64,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#prepareConnect4CpcRbaEvaluator",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "prepareConnect4CpcRbaEvaluator",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaCoordinateScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcScratch"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "11 + 2*PC"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcScratch)+ALLOC_EVALUATOR_ARRAYS(columns,maxBasis,shapeWordCount,PC)",
+        "parameters": {
+          "PC": "1 when physical position-code capability is enabled, else 0"
+        },
+        "note": "Managed runtime selects PC=0, deleting two child position-code arrays."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#prepareConnect4RbaEvaluator",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "prepareConnect4RbaEvaluator",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#prepareConnect4RbaEvaluator,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#publishConnect4CpcRbaEvaluation32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "publishConnect4CpcRbaEvaluation32",
+      "scope": "hot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "rbaTtPublishExactOwned32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-X",
+          "target": "rbaTtPublishSurplus32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "PUBLISH_DISPATCH + X*CALL(rbaTtPublishExactOwned32)+(1-X)*CALL(rbaTtPublishSurplus32)",
+        "parameters": {
+          "X": "1 for exact result codes 1..3, 0 for branch publication"
+        },
+        "note": "Position-code child arrays are supplied only when state.positionCoded is asserted."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#publishConnect4RbaEvaluation32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "publishConnect4RbaEvaluation32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#publishConnect4RbaEvaluation32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#reconcileConnect4CpcRbaEvent32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "reconcileConnect4CpcRbaEvent32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#reconcileConnect4CpcRbaEvent32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#reconcileConnect4RbaEvent32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "reconcileConnect4RbaEvent32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#reconcileConnect4RbaEvent32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#reflectPositionCode64",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "reflectPositionCode64",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#reflectPositionCode64,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#rootCanonicalColumn",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "rootCanonicalColumn",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#rootCanonicalColumn,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-solver.mjs#selectConnect4RbaRootWitness32",
+      "source": "addons/rba-connect4-solver.mjs",
+      "name": "selectConnect4RbaRootWitness32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-solver.mjs#selectConnect4RbaRootWitness32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#createRbaTt32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "createRbaTt32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#createRbaTt32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#enqueueKnownNew32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "enqueueKnownNew32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#enqueueKnownNew32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#equalKeyPrimaryFirst32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "equalKeyPrimaryFirst32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#equalKeyPrimaryFirst32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#equalKeyXor32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "equalKeyXor32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#equalKeyXor32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerBuildPrimaryRoutes32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerBuildPrimaryRoutes32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerBuildPrimaryRoutes32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerFindEquivalentLinear32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerFindEquivalentLinear32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerFindEquivalentLinear32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerMergeKnownDuplicate32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerMergeKnownDuplicate32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerMergeKnownDuplicate32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerNormalizeEquivalentGroup32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerNormalizeEquivalentGroup32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizeEquivalentGroup32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerNormalizeLinearBatch32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerNormalizeLinearBatch32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizeLinearBatch32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerNormalizePositionBucket32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerNormalizePositionBucket32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizePositionBucket32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#managerRedirectAttachedParents",
+      "source": "addons/rba-tt32.mjs",
+      "name": "managerRedirectAttachedParents",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerRedirectAttachedParents,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#positionBucket32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "positionBucket32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#positionBucket32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#primaryValue32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "primaryValue32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#primaryValue32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#primaryWord32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "primaryWord32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#primaryWord32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#publishBasisRow32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "publishBasisRow32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#publishBasisRow32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtAllocate32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtAllocate32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAllocate32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtAllocateUnindexed32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtAllocateUnindexed32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAllocateUnindexed32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtAttachDependencies32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtAttachDependencies32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAttachDependencies32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtDetachDependencies32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtDetachDependencies32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtDetachDependencies32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtEnqueue32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtEnqueue32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnqueue32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtEnqueueDependencies32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtEnqueueDependencies32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnqueueDependencies32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtEnter32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtEnter32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnter32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtFail32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtFail32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFail32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtFindEquivalent32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtFindEquivalent32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFindEquivalent32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtFindEquivalentPosition32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtFindEquivalentPosition32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFindEquivalentPosition32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtHasPositionCode32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtHasPositionCode32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtHasPositionCode32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtIntern32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtIntern32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtIntern32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtLeave32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtLeave32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtLeave32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtManagerAttachDependencies32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtManagerAttachDependencies32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerAttachDependencies32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtManagerClean32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtManagerClean32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerClean32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtManagerInspectReady32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtManagerInspectReady32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerInspectReady32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtManagerMergeDuplicate32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtManagerMergeDuplicate32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerMergeDuplicate32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtMarkDone32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtMarkDone32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtMarkDone32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtPositionHi32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtPositionHi32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPositionHi32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtPublishExactOwned32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtPublishExactOwned32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishExactOwned32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtPublishPrepared32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtPublishPrepared32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishPrepared32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtPublishSurplus32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtPublishSurplus32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishSurplus32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtReconcile32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtReconcile32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtReconcile32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtRecycle32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtRecycle32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRecycle32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtRelease32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtRelease32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRelease32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtReleaseExecution32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtReleaseExecution32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtReleaseExecution32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtRetain32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtRetain32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRetain32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtSetExact32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtSetExact32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetExact32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtSetPositionCode32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtSetPositionCode32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetPositionCode32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtSetRoot32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtSetRoot32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetRoot32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtSignal32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtSignal32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSignal32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtSignalParents32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtSignalParents32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSignalParents32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtTake32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtTake32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTake32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtTakeEvent32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtTakeEvent32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTakeEvent32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtTighten32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtTighten32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTighten32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtUnqueueReady32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtUnqueueReady32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtUnqueueReady32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#rbaTtValid32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "rbaTtValid32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtValid32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#releaseEdge",
+      "source": "addons/rba-tt32.mjs",
+      "name": "releaseEdge",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#releaseEdge,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#unlinkBucketRow32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "unlinkBucketRow32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#unlinkBucketRow32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#unqueueEvent",
+      "source": "addons/rba-tt32.mjs",
+      "name": "unqueueEvent",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#unqueueEvent,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-worker.mjs#<module-main>",
+      "source": "addons/rba-connect4-managed-worker.mjs",
+      "name": "<module-main>",
+      "scope": "managed-module-main",
+      "operations": [
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcRbaEvaluator"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchWorkerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchWorkerLoop32)"
+        ],
+        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-manager.mjs#<module-main>",
+      "source": "addons/rba-connect4-managed-manager.mjs",
+      "name": "<module-main>",
+      "scope": "managed-module-main",
+      "operations": [
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareRbaBranchManager32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchManagerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchManagerLoop32)"
+        ],
+        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
+      },
+      "status": "decomposed"
+    }
+  ],
+  "summary": {
+    "units": 176,
+    "decomposed": 21,
+    "legacySymbolicVisible": 155,
+    "missing": 0
+  }
+}
