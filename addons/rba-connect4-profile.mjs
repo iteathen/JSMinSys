@@ -1,4 +1,3 @@
-import {permuteBits3x32Into,permuteBitsSpan32Into} from '../src/basis32.mjs';
 import {insertMinimal6x32InPlace,productJoinMinimal6x32Into,insertMinimalSpan32InPlace,productJoinMinimalSpan32Into} from '../src/relational32.mjs';
 import {connect4RbaRemoveCell,connect4RbaShapeSubset} from './rba-connect4-geometry.mjs';
 
