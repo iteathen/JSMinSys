@@ -4576,397 +4576,1195 @@
       "unit": "addons/rba-tt32.mjs#createRbaTt32",
       "source": "addons/rba-tt32.mjs",
       "name": "createRbaTt32",
-      "scope": "legacy-addon",
+      "scope": "tt-cold",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.integer.check",
+          "count": 6
+        },
+        {
+          "op": "control.test.u32",
+          "count": 16
+        },
+        {
+          "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "u32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "i32"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": 8
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "8+Q"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+Q"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#createRbaTt32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "6*C(runtime.integer.check)+16*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+U*CALL(u32)+I*CALL(i32)+C(runtime.object.allocate)+8*C(runtime.typed_array.fill)+(8+Q)*C(memory.store.u32)+Q*C(alu.add.u32)+(1+Q)*C(control.test.u32)+(1+Q)*C(control.branch)",
+        "parameters": {
+          "U": "number of Uint32Array shared fields allocated by the selected TT schema",
+          "I": "number of Int32Array shared fields allocated",
+          "Q": "capacity rows linked into the free list"
+        },
+        "note": "Cold TT construction; every shared array allocation remains visible through u32/i32 subledgers."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#enqueueKnownNew32",
       "source": "addons/rba-tt32.mjs",
       "name": "enqueueKnownNew32",
-      "scope": "legacy-addon",
+      "scope": "tt-queue",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 12
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 0
+        },
+        {
+          "op": "control.branch",
+          "count": 0
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "intrusiveEnqueueTailStamped32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#enqueueKnownNew32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "12*C(runtime.field.load)+C(memory.load.u32)+C(memory.store.u32)+CALL(intrusiveEnqueueTailStamped32)",
+        "note": "Known-new surplus enqueue."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#equalKeyPrimaryFirst32",
       "source": "addons/rba-tt32.mjs",
       "name": "equalKeyPrimaryFirst32",
-      "scope": "legacy-addon",
+      "scope": "tt-key",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "memory.load.u32",
+          "count": "2+2*K"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "K-1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+G"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+G"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "G",
+          "target": "equalKeyXor32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#equalKeyPrimaryFirst32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(2+2*K)*C(memory.load.u32)+(2+2*K)*C(alu.add.u32)+K*C(alu.xor.u32)+(K-1)*C(alu.or.u32)+(5+G)*C(control.test.u32)+(5+G)*C(control.branch)+G*CALL(equalKeyXor32)",
+        "parameters": {
+          "K": "remaining unrolled key words compared after primary",
+          "G": "1 when generic equality fallback executes; 0 on specialized paths"
+        },
+        "note": "Primary-first exact key equality."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#equalKeyXor32",
       "source": "addons/rba-tt32.mjs",
       "name": "equalKeyXor32",
-      "scope": "legacy-addon",
+      "scope": "tt-key",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "memory.load.u32",
+          "count": "2*K"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "K-1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+G*K"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+G*K"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#equalKeyXor32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*K*C(memory.load.u32)+2*K*C(alu.add.u32)+K*C(alu.xor.u32)+(K-1)*C(alu.or.u32)+(3+G*K)*C(control.test.u32)+(3+G*K)*C(control.branch)",
+        "parameters": {
+          "K": "key words compared",
+          "G": "1 on generic loop path; 0 on specialized 14/7 unrolled paths"
+        },
+        "note": "Exact XOR key equality."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#i32",
       "source": "addons/rba-tt32.mjs",
       "name": "i32",
-      "scope": "legacy-addon",
+      "scope": "tt-cold-allocation",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#i32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "C(alu.imul.u32)+C(memory.allocate.shared.bytes)+C(runtime.typed_view.construct)",
+        "note": "Shared Int32Array backing allocation; byte count is n*4 and allocator/page/GC state remains symbolic."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerBuildPrimaryRoutes32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerBuildPrimaryRoutes32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.typed_array.fill",
           "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "3*G"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*G"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "3*G"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3*G"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "G"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+G"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+G"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "G",
+          "target": "primaryValue32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerBuildPrimaryRoutes32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "C(runtime.typed_array.fill)+3*G*C(runtime.field.load)+2*G*C(memory.load.u32)+3*G*C(memory.store.u32)+3*G*C(alu.add.u32)+G*C(alu.and.u32)+(1+G)*C(control.test.u32)+(1+G)*C(control.branch)+G*CALL(primaryValue32)",
+        "parameters": {
+          "G": "primary-equivalence groups routed"
+        },
+        "note": "Builds manager ephemeral low-byte route table."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerFindEquivalentLinear32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerFindEquivalentLinear32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "primaryWord32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1+S",
+          "target": "primaryValue32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "equalKeyPrimaryFirst32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "8+9*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+8*S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+5*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+10*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+10*S"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerFindEquivalentLinear32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(primaryWord32)+(1+S)*CALL(primaryValue32)+E*CALL(equalKeyPrimaryFirst32)+(8+9*S)*C(runtime.field.load)+(4+8*S)*C(memory.load.u32)+(1+S)*C(alu.imul.u32)+(3+5*S)*C(alu.add.u32)+(5+10*S)*C(control.test.u32)+(5+10*S)*C(control.branch)",
+        "parameters": {
+          "S": "capacity rows scanned",
+          "E": "rows whose primary discriminator matches and require exact comparison"
+        },
+        "note": "Linear fallback equivalence scan."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerMergeKnownDuplicate32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerMergeKnownDuplicate32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 28
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 19
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 8
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+2*R"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 24
+        },
+        {
+          "op": "control.branch",
+          "count": 24
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "managerRedirectAttachedParents"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "rbaTtUnqueueReady32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "unqueueEvent"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q",
+          "target": "rbaTtEnqueue32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "rbaTtDetachDependencies32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerMergeKnownDuplicate32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "28*C(runtime.field.load)+19*C(memory.load.u32)+8*C(memory.store.u32)+R*C(atomic.store.u32)+(4+2*R)*C(alu.add.u32)+R*C(alu.sub.u32)+24*C(control.test.u32)+24*C(control.branch)+T*CALL(rbaTtTighten32)+CALL(managerRedirectAttachedParents)+U*CALL(rbaTtUnqueueReady32)+E*CALL(unqueueEvent)+F*CALL(rbaTtFail32)+Q*CALL(rbaTtEnqueue32)+D*CALL(rbaTtDetachDependencies32)+C*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "T": "1 when duplicate bounds tighten canonical",
+          "U": "1 when duplicate was queued",
+          "E": "1 when duplicate had event membership",
+          "R": "1 when a running duplicate worker reset target is written",
+          "F": "refs saturation failure (0 or 1)",
+          "Q": "1 when canonical must be re-enqueued",
+          "D": "1 when duplicate dependencies detach",
+          "C": "1 when duplicate recycles"
+        },
+        "note": "Known exact-identity duplicate merge."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerNormalizeEquivalentGroup32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerNormalizeEquivalentGroup32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "2*S",
+          "target": "equalKeyXor32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "rbaTtManagerMergeDuplicate32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "10+12*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+11*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+2*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+7*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "6+11*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "6+11*S"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizeEquivalentGroup32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*S*CALL(equalKeyXor32)+M*CALL(rbaTtManagerMergeDuplicate32)+(10+12*S)*C(runtime.field.load)+(6+11*S)*C(memory.load.u32)+M*C(memory.store.u32)+(1+2*S)*C(alu.imul.u32)+(3+7*S)*C(alu.add.u32)+(6+11*S)*C(control.test.u32)+(6+11*S)*C(control.branch)",
+        "parameters": {
+          "S": "bucket rows scanned across canonical-selection and redirect passes",
+          "M": "matching noncanonical rows merged"
+        },
+        "note": "Normalizes semantic hash/equality group."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerNormalizeLinearBatch32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerNormalizeLinearBatch32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "primaryWord32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PV",
+          "target": "primaryValue32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "EQ",
+          "target": "equalKeyPrimaryFirst32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "managerBuildPrimaryRoutes32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "managerMergeKnownDuplicate32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "20+12*I+10*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+10*I+8*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+4*I+2*M"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "I+2*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "5+7*I+6*S"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "8+12*I+10*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "8+12*I+10*S"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizeLinearBatch32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(primaryWord32)+PV*CALL(primaryValue32)+EQ*CALL(equalKeyPrimaryFirst32)+2*CALL(managerBuildPrimaryRoutes32)+M*CALL(managerMergeKnownDuplicate32)+(20+12*I+10*S)*C(runtime.field.load)+(6+10*I+8*S)*C(memory.load.u32)+(2+4*I+2*M)*C(memory.store.u32)+(I+2*S)*C(alu.imul.u32)+(5+7*I+6*S)*C(alu.add.u32)+2*S*C(alu.and.u32)+(8+12*I+10*S)*C(control.test.u32)+(8+12*I+10*S)*C(control.branch)",
+        "parameters": {
+          "I": "within-batch pair comparisons during unique-group collapse",
+          "S": "TT rows streamed across two canonicalization passes",
+          "PV": "primaryValue32 calls",
+          "EQ": "exact primary-first key comparisons",
+          "M": "duplicate rows merged"
+        },
+        "note": "Bounded bulk normalization for unindexed surplus."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerNormalizePositionBucket32",
       "source": "addons/rba-tt32.mjs",
       "name": "managerNormalizePositionBucket32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": "1+2*S",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "managerMergeKnownDuplicate32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "10+14*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+13*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+3*M"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+2*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+7*S+2*M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "7+13*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "7+13*S"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerNormalizePositionBucket32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(1+2*S)*CALL(positionBucket32)+M*CALL(managerMergeKnownDuplicate32)+(10+14*S)*C(runtime.field.load)+(6+13*S)*C(memory.load.u32)+(2+3*M)*C(memory.store.u32)+C(alu.and.u32)+(1+2*S)*C(alu.shr.u32)+(3+7*S+2*M)*C(alu.add.u32)+(7+13*S)*C(control.test.u32)+(7+13*S)*C(control.branch)",
+        "parameters": {
+          "S": "bucket rows scanned across canonical-selection and merge passes",
+          "M": "duplicates merged"
+        },
+        "note": "Normalizes one exact position-code bucket group."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#managerRedirectAttachedParents",
       "source": "addons/rba-tt32.mjs",
       "name": "managerRedirectAttachedParents",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "8+8*E"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+7*E"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+8*E"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*E"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+4*E"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+4*E"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#managerRedirectAttachedParents,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+8*E)*C(runtime.field.load)+(1+7*E)*C(memory.load.u32)+(1+8*E)*C(memory.store.u32)+2*E*C(alu.add.u32)+E*C(alu.sub.u32)+(2+4*E)*C(control.test.u32)+(2+4*E)*C(control.branch)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "E": "attached parent edges redirected",
+          "F": "refs saturation failure (0 or 1)"
+        },
+        "note": "Moves attached parent edges from duplicate to canonical."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#positionBucket32",
       "source": "addons/rba-tt32.mjs",
       "name": "positionBucket32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#positionBucket32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "C(runtime.field.load)+C(memory.load.u32)+C(control.test.u32)",
+        "note": "Position-code bucket tag predicate."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#primaryValue32",
       "source": "addons/rba-tt32.mjs",
       "name": "primaryValue32",
-      "scope": "legacy-addon",
+      "scope": "tt-key",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#primaryValue32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(positionBucket32)+5*C(runtime.field.load)+2*C(memory.load.u32)+C(alu.imul.u32)+C(alu.add.u32)+2*C(control.test.u32)+2*C(control.branch)",
+        "note": "Primary discriminator read for indexed/unindexed q."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#primaryWord32",
       "source": "addons/rba-tt32.mjs",
       "name": "primaryWord32",
-      "scope": "legacy-addon",
+      "scope": "tt-key",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#primaryWord32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(control.test.u32)+2*C(control.branch)",
+        "note": "Initialization-selected primary key-word index."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#publishBasisRow32",
       "source": "addons/rba-tt32.mjs",
       "name": "publishBasisRow32",
-      "scope": "legacy-addon",
+      "scope": "tt-publish",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "5+2*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*B"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S+B"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "S+3*B"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*B"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "B"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+S+2*B"
+        },
+        {
+          "op": "control.branch",
+          "count": "4+S+2*B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "publishSpan32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#publishBasisRow32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(5+2*S)*C(runtime.field.load)+2*B*C(memory.load.u32)+(S+B)*C(memory.store.u32)+C(alu.imul.u32)+(S+3*B)*C(alu.add.u32)+2*B*C(alu.and.u32)+B*C(alu.or.u32)+B*C(alu.shl.u32)+B*C(alu.shr.u32)+(4+S+2*B)*C(control.test.u32)+(4+S+2*B)*C(control.branch)+P*CALL(publishSpan32)",
+        "parameters": {
+          "S": "basis-set words cleared when a set image is synthesized",
+          "B": "basis ids converted into set bits",
+          "P": "publishSpan32 calls: one for list basis or provided set basis, zero for synthesized set"
+        },
+        "note": "Basis row publication in either list or bitset TT ABI."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtAllocate32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtAllocate32",
-      "scope": "legacy-addon",
+      "scope": "tt-admission",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 20
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 5
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 24
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 3
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 8
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 10
+        },
+        {
+          "op": "control.branch",
+          "count": 10
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishBasisRow32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAllocate32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "20*C(runtime.field.load)+5*C(memory.load.u32)+24*C(memory.store.u32)+2*C(runtime.integer.check)+3*C(alu.imul.u32)+8*C(alu.add.u32)+C(alu.and.u32)+10*C(control.test.u32)+10*C(control.branch)+CALL(mixSpan32Locator32)+CALL(publishSpan32)+CALL(publishBasisRow32)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "F": "number of validation/capacity/generation/basis-publication failures taken (0 or 1)"
+        },
+        "note": "Indexed TT allocation and row initialization."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtAllocateUnindexed32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtAllocateUnindexed32",
-      "scope": "legacy-addon",
+      "scope": "tt-admission",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 21
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 25
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 8
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 12
+        },
+        {
+          "op": "control.branch",
+          "count": 12
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-C",
+          "target": "primaryWord32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishBasisRow32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAllocateUnindexed32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "21*C(runtime.field.load)+6*C(memory.load.u32)+25*C(memory.store.u32)+2*C(runtime.integer.check)+2*C(alu.imul.u32)+8*C(alu.add.u32)+C(alu.and.u32)+C(alu.or.u32)+3*C(alu.shr.u32)+12*C(control.test.u32)+12*C(control.branch)+CALL(publishSpan32)+(1-C)*CALL(primaryWord32)+CALL(publishBasisRow32)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "C": "1 when physical position code is supplied; 0 for semantic primary locator",
+          "F": "validation/capacity/generation/basis failure taken (0 or 1)"
+        },
+        "note": "Unindexed surplus row allocation."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtAttachDependencies32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtAttachDependencies32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "8+10*N"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3+8*N"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+7*N"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+6*N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+8*N"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+8*N"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "rbaTtValid32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtAttachDependencies32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+10*N)*C(runtime.field.load)+(3+8*N)*C(memory.load.u32)+(1+7*N)*C(memory.store.u32)+C(alu.imul.u32)+(2+6*N)*C(alu.add.u32)+(3+8*N)*C(control.test.u32)+(3+8*N)*C(control.branch)+N*CALL(rbaTtValid32)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "N": "dependency edges inspected",
+          "F": "invalid child-generation failure taken (0 or 1)"
+        },
+        "note": "Legacy direct dependency attachment."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtDetachDependencies32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtDetachDependencies32",
-      "scope": "legacy-addon",
+      "scope": "tt-lifetime",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+N"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "releaseEdge"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtDetachDependencies32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+2*C(memory.load.u32)+2*C(memory.store.u32)+C(alu.imul.u32)+(2+N)*C(alu.add.u32)+(2+N)*C(control.test.u32)+(2+N)*C(control.branch)+N*CALL(releaseEdge)+R*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "N": "dependency edges released",
+          "R": "1 when parent refs are zero and recycle is attempted"
+        },
+        "note": "Detaches all child dependencies."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtEnqueue32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtEnqueue32",
-      "scope": "legacy-addon",
+      "scope": "tt-queue",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 12
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "memory.store.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 6
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "intrusiveEnqueueTailStamped32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnqueue32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "12*C(runtime.field.load)+6*C(memory.load.u32)+C(memory.store.u32)+6*C(control.test.u32)+6*C(control.branch)+E*CALL(intrusiveEnqueueTailStamped32)",
+        "parameters": {
+          "E": "1 when all admission predicates pass; 0 otherwise"
+        },
+        "note": "Conditional ready enqueue."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtEnqueueDependencies32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtEnqueueDependencies32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "4+2*N"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+2*N"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+2*N"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "rbaTtEnqueue32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnqueueDependencies32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(4+2*N)*C(runtime.field.load)+(2+N)*C(memory.load.u32)+C(alu.imul.u32)+(2+2*N)*C(alu.add.u32)+(1+2*N)*C(control.test.u32)+(1+2*N)*C(control.branch)+P*CALL(rbaTtEnqueue32)",
+        "parameters": {
+          "N": "dependency edges inspected",
+          "P": "nonnegative child q enqueue attempts"
+        },
+        "note": "Dependency ready exposure."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtEnter32",
@@ -5015,619 +5813,1755 @@
       "unit": "addons/rba-tt32.mjs#rbaTtFail32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtFail32",
-      "scope": "legacy-addon",
+      "scope": "tt-failure",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.store.u32",
           "count": 1
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFail32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "2*C(atomic.rmw.u32)+C(atomic.store.u32)+C(atomic.notify)+4*C(runtime.field.load)",
+        "note": "Failure path compare-exchange, stop store, wake increment, and notify."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtFindEquivalent32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtFindEquivalent32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "8+7*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+7*S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+5*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+9*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "4+9*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "equalKeyXor32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFindEquivalent32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+7*S)*C(runtime.field.load)+(4+7*S)*C(memory.load.u32)+(1+S)*C(alu.imul.u32)+(3+5*S)*C(alu.add.u32)+(4+9*S)*C(control.test.u32)+(4+9*S)*C(control.branch)+E*CALL(equalKeyXor32)",
+        "parameters": {
+          "S": "bucket rows scanned",
+          "E": "rows with matching locator that require full exact key comparison"
+        },
+        "note": "Finds best equivalent semantic q."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtFindEquivalentPosition32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtFindEquivalentPosition32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": "1+S",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "8+8*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+8*S"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+4*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+10*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+10*S"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtFindEquivalentPosition32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(1+S)*CALL(positionBucket32)+(8+8*S)*C(runtime.field.load)+(4+8*S)*C(memory.load.u32)+C(alu.and.u32)+(1+S)*C(alu.shr.u32)+(3+4*S)*C(alu.add.u32)+(5+10*S)*C(control.test.u32)+(5+10*S)*C(control.branch)",
+        "parameters": {
+          "S": "position-code bucket rows scanned"
+        },
+        "note": "Exact physical-position equivalence scan."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtHasPositionCode32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtHasPositionCode32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "positionBucket32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtHasPositionCode32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(positionBucket32)",
+        "note": "Position-code presence wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtIntern32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtIntern32",
-      "scope": "legacy-addon",
+      "scope": "tt-admission",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "5+7*S+2*G*K"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2+7*S+2*G*K"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "S+G*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+7*S+2*G*K"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "K*S"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "(K-1)*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+8*S+G*K*S+2*H"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+8*S+G*K*S+2*H"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-H",
+          "target": "rbaTtAllocate32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtIntern32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(5+7*S+2*G*K)*C(runtime.field.load)+(2+7*S+2*G*K)*C(memory.load.u32)+H*C(memory.store.u32)+(S+G*S)*C(alu.imul.u32)+(3+7*S+2*G*K)*C(alu.add.u32)+C(alu.and.u32)+K*S*C(alu.xor.u32)+(K-1)*S*C(alu.or.u32)+(2+8*S+G*K*S+2*H)*C(control.test.u32)+(2+8*S+G*K*S+2*H)*C(control.branch)+CALL(mixSpan32Locator32)+F*CALL(rbaTtFail32)+(1-H)*CALL(rbaTtAllocate32)",
+        "parameters": {
+          "S": "bucket rows inspected",
+          "K": "key words compared on matching locator rows",
+          "G": "1 on generic key loop; 0 on unrolled 14-word path",
+          "H": "1 when an exact key hit returns existing q; 0 when allocation occurs",
+          "F": "capacity error on refs saturation (0 or 1)"
+        },
+        "note": "Exact TT interning with bucket-chain search."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtLeave32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtLeave32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "atomicReleaseNoNotify32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtLeave32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(atomicReleaseNoNotify32)",
+        "note": "Lock release delegates to sealed atomic primitive."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtManagerAttachDependencies32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtManagerAttachDependencies32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "15+18*N+7*R"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+14*N+6*R"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+10*N+5*R"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+7*N+3*R"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+18*N+7*R"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+18*N+7*R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "2*N",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "EP",
+          "target": "rbaTtFindEquivalentPosition32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "EK",
+          "target": "rbaTtFindEquivalent32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MP",
+          "target": "managerMergeKnownDuplicate32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MK",
+          "target": "rbaTtManagerMergeDuplicate32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "2*N",
+          "target": "rbaTtValid32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "rbaTtDetachDependencies32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerAttachDependencies32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(15+18*N+7*R)*C(runtime.field.load)+(5+14*N+6*R)*C(memory.load.u32)+(2+10*N+5*R)*C(memory.store.u32)+C(alu.imul.u32)+(3+7*N+3*R)*C(alu.add.u32)+R*C(alu.sub.u32)+(5+18*N+7*R)*C(control.test.u32)+(5+18*N+7*R)*C(control.branch)+2*N*CALL(positionBucket32)+EP*CALL(rbaTtFindEquivalentPosition32)+EK*CALL(rbaTtFindEquivalent32)+MP*CALL(managerMergeKnownDuplicate32)+MK*CALL(rbaTtManagerMergeDuplicate32)+2*N*CALL(rbaTtValid32)+F*CALL(rbaTtFail32)+D*CALL(rbaTtDetachDependencies32)+R*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "N": "dependency edges inspected",
+          "EP": "position-code equivalence scans",
+          "EK": "semantic equivalence scans",
+          "MP": "known position duplicate merges",
+          "MK": "checked semantic duplicate merges",
+          "F": "contract failure taken (0 or 1)",
+          "D": "old duplicate dependency detachments",
+          "R": "old duplicate rows recycled"
+        },
+        "note": "Manager attaches surplus dependencies after redirect normalization."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtManagerClean32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtManagerClean32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "12+18*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+15*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+6*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+2*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "7+20*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "7+20*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "EP",
+          "target": "rbaTtFindEquivalentPosition32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MK",
+          "target": "managerMergeKnownDuplicate32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FL",
+          "target": "managerFindEquivalentLinear32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "EK",
+          "target": "rbaTtFindEquivalent32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MM",
+          "target": "rbaTtManagerMergeDuplicate32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "rbaTtUnqueueReady32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "rbaTtDetachDependencies32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "unqueueEvent"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerClean32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(12+18*S)*C(runtime.field.load)+(4+15*S)*C(memory.load.u32)+(1+6*S)*C(memory.store.u32)+(3+2*S)*C(alu.add.u32)+(7+20*S)*C(control.test.u32)+(7+20*S)*C(control.branch)+P*CALL(positionBucket32)+EP*CALL(rbaTtFindEquivalentPosition32)+MK*CALL(managerMergeKnownDuplicate32)+FL*CALL(managerFindEquivalentLinear32)+EK*CALL(rbaTtFindEquivalent32)+MM*CALL(rbaTtManagerMergeDuplicate32)+U*CALL(rbaTtUnqueueReady32)+D*CALL(rbaTtDetachDependencies32)+E*CALL(unqueueEvent)+R*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "S": "rows inspected up to cleanup budget",
+          "P": "positionBucket32 tests",
+          "EP": "position equivalence scans",
+          "MK": "known duplicate merges",
+          "FL": "linear equivalence scans",
+          "EK": "semantic equivalence scans",
+          "MM": "checked semantic merges",
+          "U": "ready removals",
+          "D": "dependency detaches",
+          "E": "event removals",
+          "R": "row recycle calls"
+        },
+        "note": "Bounded TT cleanup/merge pass."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtManagerInspectReady32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtManagerInspectReady32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.math.min",
+          "count": "L"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "15+14*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+12*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+5*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+4*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "8+16*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "8+16*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "rbaTtUnqueueReady32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NP",
+          "target": "managerNormalizePositionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FL",
+          "target": "managerFindEquivalentLinear32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MK",
+          "target": "managerMergeKnownDuplicate32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NE",
+          "target": "managerNormalizeEquivalentGroup32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "LB",
+          "target": "managerNormalizeLinearBatch32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerInspectReady32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "L*C(runtime.math.min)+(15+14*S)*C(runtime.field.load)+(4+12*S)*C(memory.load.u32)+(2+5*S)*C(memory.store.u32)+(3+4*S)*C(alu.add.u32)+(8+16*S)*C(control.test.u32)+(8+16*S)*C(control.branch)+U*CALL(rbaTtUnqueueReady32)+P*CALL(positionBucket32)+NP*CALL(managerNormalizePositionBucket32)+FL*CALL(managerFindEquivalentLinear32)+MK*CALL(managerMergeKnownDuplicate32)+NE*CALL(managerNormalizeEquivalentGroup32)+LB*CALL(managerNormalizeLinearBatch32)",
+        "parameters": {
+          "L": "1 when bounded scratch route limit computes Math.min; 0 without scratch",
+          "S": "ready rows inspected up to budget",
+          "U": "invalid/resolved ready rows unqueued",
+          "P": "positionBucket32 tests",
+          "NP": "position groups normalized",
+          "FL": "linear equivalence scans",
+          "MK": "known duplicate merges",
+          "NE": "semantic groups normalized",
+          "LB": "1 when a linear scratch batch is normalized"
+        },
+        "note": "Manager ready-queue inspection/dedupe/prioritization."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtManagerMergeDuplicate32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtManagerMergeDuplicate32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 10
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 8
+        },
+        {
+          "op": "control.branch",
+          "count": 8
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "equalKeyXor32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "managerMergeKnownDuplicate32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtManagerMergeDuplicate32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "10*C(runtime.field.load)+6*C(memory.load.u32)+2*C(alu.imul.u32)+8*C(control.test.u32)+8*C(control.branch)+K*CALL(equalKeyXor32)+M*CALL(managerMergeKnownDuplicate32)",
+        "parameters": {
+          "K": "1 when locator matches and full key equality executes",
+          "M": "1 when exact key matches and merge executes"
+        },
+        "note": "Checked semantic duplicate merge."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtMarkDone32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtMarkDone32",
-      "scope": "legacy-addon",
+      "scope": "tt-completion",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.notify",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtMarkDone32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "3*C(runtime.field.load)+C(atomic.store.u32)+C(atomic.rmw.u32)+C(atomic.notify)",
+        "note": "Publishes DONE and wakes waiters."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtPositionHi32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtPositionHi32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPositionHi32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(positionBucket32)+C(runtime.field.load)+C(memory.load.u32)+C(alu.shr.u32)+C(control.test.u32)+C(control.branch)",
+        "note": "Position high-word wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtPublishExactOwned32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtPublishExactOwned32",
-      "scope": "legacy-addon",
+      "scope": "tt-publish",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-F",
+          "target": "rbaTtSetExact32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "rbaTtReleaseExecution32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishExactOwned32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+C(memory.load.u32)+2*C(control.test.u32)+2*C(control.branch)+F*CALL(rbaTtFail32)+(1-F)*CALL(rbaTtSetExact32)+S*CALL(rbaTtReleaseExecution32)",
+        "parameters": {
+          "F": "1 on ownership failure; 0 otherwise",
+          "S": "1 when exact set succeeds and execution releases; 0 on failure"
+        },
+        "note": "Owned exact q publication."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtPublishPrepared32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtPublishPrepared32",
-      "scope": "legacy-addon",
+      "scope": "tt-publish",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "15+12*N"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+8*N"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+12*N"
+        },
+        {
+          "op": "runtime.integer.check",
           "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+6*N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "7+10*N"
+        },
+        {
+          "op": "control.branch",
+          "count": "7+10*N"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "rbaTtIntern32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtSignal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtReleaseExecution32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishPrepared32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(15+12*N)*C(runtime.field.load)+(4+8*N)*C(memory.load.u32)+(2+12*N)*C(memory.store.u32)+C(runtime.integer.check)+2*C(alu.imul.u32)+(4+6*N)*C(alu.add.u32)+(7+10*N)*C(control.test.u32)+(7+10*N)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*(CALL(rbaTtIntern32)+CALL(rbaTtTighten32))+CALL(rbaTtSignal32)+CALL(rbaTtReleaseExecution32)",
+        "parameters": {
+          "N": "action rows published",
+          "P": "present child rows interned",
+          "F": "contract/child-bound failure taken (0 or 1)"
+        },
+        "note": "Legacy prepared dependency publication."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtPublishSurplus32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtPublishSurplus32",
-      "scope": "legacy-addon",
+      "scope": "tt-publish",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "18+15*N"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "5+11*N"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+13*N"
+        },
+        {
+          "op": "runtime.integer.check",
           "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+S*N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+7*N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "9+13*N"
+        },
+        {
+          "op": "control.branch",
+          "count": "9+13*N"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "rbaTtAllocateUnindexed32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtSignal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q",
+          "target": "enqueueKnownNew32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtReleaseExecution32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtPublishSurplus32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(18+15*N)*C(runtime.field.load)+(5+11*N)*C(memory.load.u32)+(2+13*N)*C(memory.store.u32)+C(runtime.integer.check)+(2+S*N)*C(alu.imul.u32)+(4+7*N)*C(alu.add.u32)+C(alu.or.u32)+(9+13*N)*C(control.test.u32)+(9+13*N)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*(CALL(rbaTtAllocateUnindexed32)+CALL(rbaTtTighten32))+CALL(rbaTtSignal32)+Q*CALL(enqueueKnownNew32)+CALL(rbaTtReleaseExecution32)",
+        "parameters": {
+          "N": "action rows materialized",
+          "P": "present children allocated",
+          "Q": "surplus children enqueued after one local continuation is retained",
+          "S": "1 when basisSets are present and set-stride address arithmetic executes; 0 otherwise",
+          "F": "contract/bounds/allocation failure taken (0 or 1)"
+        },
+        "note": "Surplus publication path; Phase-1 exact Negamax does not execute this branch but it remains fully decomposed."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtReconcile32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtReconcile32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "12+14*N+8*R"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+12*N+7*R"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "4+4*N"
+        },
+        {
+          "op": "alu.imul.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+8*N+5*R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "8+16*N+6*R"
+        },
+        {
+          "op": "control.branch",
+          "count": "8+16*N+6*R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "rbaTtTighten32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "releaseEdge"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtReconcile32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(12+14*N+8*R)*C(runtime.field.load)+(6+12*N+7*R)*C(memory.load.u32)+(4+4*N)*C(memory.store.u32)+C(alu.imul.u32)+(3+8*N+5*R)*C(alu.add.u32)+(8+16*N+6*R)*C(control.test.u32)+(8+16*N+6*R)*C(control.branch)+F*CALL(rbaTtFail32)+T*CALL(rbaTtTighten32)+R*CALL(releaseEdge)",
+        "parameters": {
+          "N": "dependency edges reduced",
+          "F": "contract/conflict failures",
+          "T": "child/q tighten calls",
+          "R": "edges released after exact/irrelevant determination"
+        },
+        "note": "Bellman interval reconciliation."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtRecycle32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtRecycle32",
-      "scope": "legacy-addon",
+      "scope": "tt-lifetime",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": "1",
+          "target": "positionBucket32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "18+4*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "13+4*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "7+M"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+4*S"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "1+R"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "14+4*S+4*R"
+        },
+        {
+          "op": "control.branch",
+          "count": "14+4*S+4*R"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRecycle32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(positionBucket32)+F*CALL(rbaTtFail32)+(18+4*S)*C(runtime.field.load)+(13+4*S)*C(memory.load.u32)+(7+M)*C(memory.store.u32)+(4+4*S)*C(alu.add.u32)+(1+R)*C(alu.sub.u32)+C(alu.and.u32)+(14+4*S+4*R)*C(control.test.u32)+(14+4*S+4*R)*C(control.branch)",
+        "parameters": {
+          "S": "bucket-chain rows scanned when unlinking",
+          "M": "1 when predecessor link is rewritten; 0 on head rewrite",
+          "R": "1 when redirect lifetime pin is released; 0 otherwise",
+          "F": "1 if bucket unlink contract fails; otherwise 0"
+        },
+        "note": "Row recycle and redirect-pin release."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtRelease32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtRelease32",
-      "scope": "legacy-addon",
+      "scope": "tt-lifetime",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtValid32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "rbaTtUnqueueReady32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "rbaTtSignal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 4
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+R"
+        },
+        {
+          "op": "alu.sub.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 6
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRelease32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(rbaTtValid32)+U*CALL(rbaTtUnqueueReady32)+S*CALL(rbaTtSignal32)+R*CALL(rbaTtRecycle32)+5*C(runtime.field.load)+4*C(memory.load.u32)+(1+R)*C(memory.store.u32)+C(alu.sub.u32)+6*C(control.test.u32)+6*C(control.branch)",
+        "parameters": {
+          "U": "1 when last release removes q from ready list",
+          "S": "1 when last release with dependencies signals q",
+          "R": "1 when refs reaches zero and recycle is attempted"
+        },
+        "note": "Stamped q release."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtReleaseExecution32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtReleaseExecution32",
-      "scope": "legacy-addon",
+      "scope": "tt-worker-release",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 3
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+4*F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtReleaseExecution32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+3*C(memory.load.u32)+(1+4*F)*C(memory.store.u32)+2*C(control.test.u32)+2*C(control.branch)+F*CALL(rbaTtFail32)+R*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "F": "1 on ownership contract failure; 0 otherwise",
+          "R": "1 when released q has no refs and recycle is attempted"
+        },
+        "note": "Execution ownership release."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtRetain32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtRetain32",
-      "scope": "legacy-addon",
+      "scope": "tt-lifetime",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtValid32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1-F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1-F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtRetain32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(rbaTtValid32)+F*CALL(rbaTtFail32)+2*C(runtime.field.load)+C(memory.load.u32)+(1-F)*C(memory.store.u32)+(1-F)*C(alu.add.u32)+2*C(control.test.u32)+2*C(control.branch)",
+        "parameters": {
+          "F": "1 when refs is saturated; 0 otherwise"
+        },
+        "note": "Stamped lifetime retain."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtSetExact32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtSetExact32",
-      "scope": "legacy-addon",
+      "scope": "tt-evidence",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtTighten32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetExact32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "CALL(rbaTtTighten32)",
+        "note": "Exact-value wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtSetPositionCode32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtSetPositionCode32",
-      "scope": "legacy-addon",
+      "scope": "tt-cold-position",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 7
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.or.u32",
           "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 4
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-F",
+          "target": "unlinkBucketRow32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetPositionCode32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "7*C(runtime.field.load)+2*C(memory.load.u32)+6*C(memory.store.u32)+C(alu.or.u32)+C(alu.and.u32)+4*C(alu.shr.u32)+2*C(alu.add.u32)+3*C(control.test.u32)+3*C(control.branch)+F*CALL(rbaTtFail32)+(1-F)*CALL(unlinkBucketRow32)",
+        "parameters": {
+          "F": "1 when row or code validation fails; 0 on valid code publication"
+        },
+        "note": "Reindexes q under exact physical position code."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtSetRoot32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtSetRoot32",
-      "scope": "legacy-addon",
+      "scope": "tt-cold",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
           "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSetRoot32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "4*C(runtime.field.load)+2*C(memory.load.u32)+2*C(memory.store.u32)+C(control.test.u32)+C(control.branch)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "F": "1 on invalid non-live root; 0 on valid path"
+        },
+        "note": "Root identity/generation publication."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtSignal32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtSignal32",
-      "scope": "legacy-addon",
+      "scope": "tt-event",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 10
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "intrusiveEnqueueOnceTailStamped32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSignal32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "10*C(runtime.field.load)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+S*CALL(intrusiveEnqueueOnceTailStamped32)",
+        "parameters": {
+          "S": "1 when q is live; 0 otherwise"
+        },
+        "note": "Coalesced event signal."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtSignalParents32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtSignalParents32",
-      "scope": "legacy-addon",
+      "scope": "tt-manager",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "4+3*E"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*E"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+E"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+E"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "rbaTtSignal32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtSignalParents32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(4+3*E)*C(runtime.field.load)+(1+2*E)*C(memory.load.u32)+2*E*C(alu.add.u32)+(1+E)*C(control.test.u32)+(1+E)*C(control.branch)+E*CALL(rbaTtSignal32)",
+        "parameters": {
+          "E": "attached parent edges signaled"
+        },
+        "note": "Signals all parent qs."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtTake32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtTake32",
-      "scope": "legacy-addon",
+      "scope": "tt-worker-claim",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "8+8*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+7*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+2*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+7*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+7*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "intrusivePopHeadStamped32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRecycle32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTake32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+8*S)*C(runtime.field.load)+(1+7*S)*C(memory.load.u32)+(1+2*S)*C(memory.store.u32)+S*C(alu.add.u32)+(2+7*S)*C(control.test.u32)+(2+7*S)*C(control.branch)+F*CALL(rbaTtFail32)+S*CALL(intrusivePopHeadStamped32)+R*CALL(rbaTtRecycle32)",
+        "parameters": {
+          "S": "ready rows popped before returning owned q or empty queue",
+          "F": "1 on stamped ownership contract failure; 0 otherwise",
+          "R": "resolved/retired rows recycled while skipping"
+        },
+        "note": "Worker claim loop."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtTakeEvent32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtTakeEvent32",
-      "scope": "legacy-addon",
+      "scope": "tt-event",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 9
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 4
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "intrusivePopHeadStamped32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTakeEvent32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "9*C(runtime.field.load)+4*C(memory.load.u32)+4*C(control.test.u32)+4*C(control.branch)+F*CALL(rbaTtFail32)+P*CALL(intrusivePopHeadStamped32)",
+        "parameters": {
+          "F": "1 on stale event contract failure; 0 otherwise",
+          "P": "1 when a valid event is popped; 0 for empty/failure"
+        },
+        "note": "Manager event dequeue."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtTighten32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtTighten32",
-      "scope": "legacy-addon",
+      "scope": "tt-evidence",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 6
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 10
+        },
+        {
+          "op": "control.branch",
+          "count": 10
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "rbaTtSignal32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtTighten32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.integer.check)+6*C(runtime.field.load)+2*C(memory.load.u32)+(2+E)*C(memory.store.u32)+10*C(control.test.u32)+10*C(control.branch)+F*CALL(rbaTtFail32)+S*CALL(rbaTtSignal32)",
+        "parameters": {
+          "F": "1 on invalid/conflicting interval; 0 otherwise",
+          "E": "1 when tightened interval becomes exact; 0 otherwise",
+          "S": "1 when interval changes and q is signaled; 0 on no-op/failure"
+        },
+        "note": "Monotone q-bound tightening."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtUnqueueReady32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtUnqueueReady32",
-      "scope": "legacy-addon",
+      "scope": "tt-queue",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 8
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "intrusiveRemove32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtUnqueueReady32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "8*C(runtime.field.load)+2*C(memory.load.u32)+E*C(memory.store.u32)+2*C(control.test.u32)+2*C(control.branch)+R*CALL(intrusiveRemove32)",
+        "parameters": {
+          "R": "1 when q is a ready member; 0 otherwise",
+          "E": "1 when queued execution marker is cleared; 0 otherwise"
+        },
+        "note": "Ready-list removal."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtValid32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtValid32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 3
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtValid32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "3*C(runtime.field.load)+2*C(memory.load.u32)+4*C(control.test.u32)+3*C(control.branch)",
+        "note": "Stamped q validity predicate."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#releaseEdge",
       "source": "addons/rba-tt32.mjs",
       "name": "releaseEdge",
-      "scope": "legacy-addon",
+      "scope": "tt-lifetime",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": 11
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+3*A"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+5*A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+3*A"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+3*A"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtRelease32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#releaseEdge,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "11*C(runtime.field.load)+(4+3*A)*C(memory.load.u32)+(1+5*A)*C(memory.store.u32)+(2+3*A)*C(control.test.u32)+(2+3*A)*C(control.branch)+R*CALL(rbaTtRelease32)",
+        "parameters": {
+          "A": "1 when edge is attached and parent linked-list unlink executes; 0 otherwise",
+          "R": "1 when edge has a child and stamped release executes"
+        },
+        "note": "Dependency edge detach/release."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#u32",
       "source": "addons/rba-tt32.mjs",
       "name": "u32",
-      "scope": "legacy-addon",
+      "scope": "tt-cold-allocation",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#u32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "C(alu.imul.u32)+C(memory.allocate.shared.bytes)+C(runtime.typed_view.construct)",
+        "note": "Shared Uint32Array backing allocation; byte count is n*4 and allocator/page/GC state remains symbolic."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#unlinkBucketRow32",
       "source": "addons/rba-tt32.mjs",
       "name": "unlinkBucketRow32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "8+3*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+3*S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+M"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+3*S"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+3*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "4+3*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#unlinkBucketRow32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+3*S)*C(runtime.field.load)+(4+3*S)*C(memory.load.u32)+(2+M)*C(memory.store.u32)+(2+3*S)*C(alu.add.u32)+C(alu.and.u32)+(4+3*S)*C(control.test.u32)+(4+3*S)*C(control.branch)+F*CALL(rbaTtFail32)",
+        "parameters": {
+          "S": "bucket-chain rows scanned before q",
+          "M": "1 when predecessor link is rewritten; 0 when bucket head is rewritten",
+          "F": "1 if q is missing from its claimed bucket; otherwise 0"
+        },
+        "note": "Bucket unlink with exact chain traversal cost."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-tt32.mjs#unqueueEvent",
       "source": "addons/rba-tt32.mjs",
       "name": "unqueueEvent",
-      "scope": "legacy-addon",
+      "scope": "tt-event",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 7
+        },
+        {
+          "op": "memory.load.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "intrusiveRemove32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#unqueueEvent,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "7*C(runtime.field.load)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+R*CALL(intrusiveRemove32)",
+        "parameters": {
+          "R": "1 when q is event-list member; 0 otherwise"
+        },
+        "note": "Event-list removal."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     }
   ],
   "summary": {
     "units": 178,
-    "decomposed": 72,
-    "legacySymbolicVisible": 106,
+    "decomposed": 128,
+    "legacySymbolicVisible": 50,
     "missing": 0,
     "neesBoundOperations": 10,
     "localExtensionOperations": 43
