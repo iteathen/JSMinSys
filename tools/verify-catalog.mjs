@@ -236,6 +236,40 @@ for (const unit of addonCycleLedger.units) {
   }
 }
 
+
+const isomaxLocalKernel = addonCycleLedger.isomaxLocalKernel;
+assert.equal(
+  isomaxLocalKernel?.targetCyclesPerNode,
+  1000,
+  'IsoMax local Negamax target must remain 1000 cycles/node',
+);
+assert.equal(
+  isomaxLocalKernel?.governingUnit,
+  'addons/rba-connect4-alphabeta.mjs#search',
+  'unexpected IsoMax governing local cycle unit',
+);
+assert.ok(
+  Array.isArray(isomaxLocalKernel?.requiredDetailedUnits)
+    && isomaxLocalKernel.requiredDetailedUnits.length > 0,
+  'IsoMax local kernel detailed-unit set missing',
+);
+for (const id of isomaxLocalKernel.requiredDetailedUnits) {
+  const unit = addonUnits.get(id);
+  assert.ok(unit, `IsoMax local cycle unit missing: ${id}`);
+  assert.equal(unit.status, 'decomposed', `${id}: IsoMax local cycle unit must be decomposed`);
+  assert.ok(
+    !unit.operations.some((operation) => operation.op === 'runtime.legacy.addon.body'),
+    `${id}: IsoMax local cycle unit may not hide work in legacy body cost`,
+  );
+  for (const operation of unit.operations.filter((entry) => entry.op === 'runtime.call.subledger')) {
+    assert.ok(
+      names.has(operation.target)
+        || [...addonUnits.values()].some((candidate) => candidate.name === operation.target),
+      `${id}: unresolved cycle subledger target ${operation.target}`,
+    );
+  }
+}
+
 console.log(
   `JSMinSys catalog verified: ${functions.functions.length} sealed functions + ${addonCycleLedger.units.length} add-on units cycle-ledgered, ` +
   `${coverage.summary.complete}/${coverage.summary.catalogBlocks} blocks complete, ` +
