@@ -7,5 +7,6 @@ export * from './rba-connect4-front.mjs';
 export * from './rba-connect4-solver.mjs';
 export * from './rba-connect4-profile.mjs';
 export * from './cpc-connect4.mjs';
+export * from './connect4-live-line-evaluator.mjs';
 export * from './rba-connect4-alphabeta.mjs';
 export * from './rba-connect4-managed-host.mjs';
