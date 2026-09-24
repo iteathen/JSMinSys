@@ -54,6 +54,21 @@ export function rbaTtFail32(t,code){Atomics.compareExchange(t.control,RBA_TT_ERR
 export function rbaTtValid32(t,q,g){return q>=0&&q<t.capacity&&t.live[q]&&t.generation[q]===g?1:0;}
 export function rbaTtSetRoot32(t,q){if(!t.live[q])return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);t.control[RBA_TT_ROOT]=q;t.control[RBA_TT_ROOT_GENERATION]=t.generation[q];return q;}
 
+function equalKeyXor32(words,a,b,n){
+  if(n===14)return (((words[a]^words[b])|
+    (words[a+1]^words[b+1])|(words[a+2]^words[b+2])|(words[a+3]^words[b+3])|
+    (words[a+4]^words[b+4])|(words[a+5]^words[b+5])|(words[a+6]^words[b+6])|
+    (words[a+7]^words[b+7])|(words[a+8]^words[b+8])|(words[a+9]^words[b+9])|
+    (words[a+10]^words[b+10])|(words[a+11]^words[b+11])|(words[a+12]^words[b+12])|
+    (words[a+13]^words[b+13]))===0)?1:0;
+  if(n===7)return (((words[a]^words[b])|(words[a+1]^words[b+1])|
+    (words[a+2]^words[b+2])|(words[a+3]^words[b+3])|(words[a+4]^words[b+4])|
+    (words[a+5]^words[b+5])|(words[a+6]^words[b+6]))===0)?1:0;
+  let diff=0;
+  for(let w=0;w<n;w+=1)diff|=words[a+w]^words[b+w];
+  return diff===0?1:0;
+}
+
 export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,priority=0){
   const keyWords=t.keyWords,basisCapacity=t.basisCapacity;
   if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
@@ -74,9 +89,17 @@ export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize,priorit
   const keyWords=t.keyWords,hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
   for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
     if(!t.live[q]||t.redirect[q]>=0||t.locator[q]!==hash)continue;
-    const base=q*keyWords;let w=0;
-    while(w<keyWords&&t.keys[base+w]===words[offset+w])w+=1;
-    if(w===keyWords){
+    const base=q*keyWords;let diff=0;
+    if(keyWords===14)diff=(t.keys[base]^words[offset])|
+      (t.keys[base+1]^words[offset+1])|(t.keys[base+2]^words[offset+2])|
+      (t.keys[base+3]^words[offset+3])|(t.keys[base+4]^words[offset+4])|
+      (t.keys[base+5]^words[offset+5])|(t.keys[base+6]^words[offset+6])|
+      (t.keys[base+7]^words[offset+7])|(t.keys[base+8]^words[offset+8])|
+      (t.keys[base+9]^words[offset+9])|(t.keys[base+10]^words[offset+10])|
+      (t.keys[base+11]^words[offset+11])|(t.keys[base+12]^words[offset+12])|
+      (t.keys[base+13]^words[offset+13]);
+    else for(let w=0;w<keyWords;w+=1)diff|=t.keys[base+w]^words[offset+w];
+    if(diff===0){
       if(t.refs[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
       t.refs[q]+=1;if(priority>t.priority[q])t.priority[q]=priority;return q;
     }
@@ -89,9 +112,8 @@ export function rbaTtFindEquivalent32(t,q){
   let best=q;
   for(let scan=t.buckets[bucket];scan!==-1;scan=t.link[scan]){
     if(scan===q||!t.live[scan]||t.redirect[scan]>=0||t.locator[scan]!==hash)continue;
-    const other=scan*keyWords;let w=0;
-    while(w<keyWords&&t.keys[other+w]===t.keys[base+w])w+=1;
-    if(w===keyWords&&(t.exact[scan]>t.exact[best]||
+    const other=scan*keyWords;
+    if(equalKeyXor32(t.keys,other,base,keyWords)&&(t.exact[scan]>t.exact[best]||
       (t.exact[scan]===t.exact[best]&&scan<best)))best=scan;
   }
   return best===q?-1:best;
@@ -199,7 +221,7 @@ export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets)
   if(t.redirect[duplicate]>=0)return t.redirect[duplicate]===canonical?1:0;
   if(t.locator[duplicate]!==t.locator[canonical])return 0;
   const keyWords=t.keyWords,a=duplicate*keyWords,b=canonical*keyWords;
-  for(let w=0;w<keyWords;w+=1)if(t.keys[a+w]!==t.keys[b+w])return 0;
+  if(!equalKeyXor32(t.keys,a,b,keyWords))return 0;
 
   if(t.lower[duplicate]>t.lower[canonical]||t.upper[duplicate]<t.upper[canonical])
     if(!rbaTtTighten32(t,canonical,t.lower[duplicate],t.upper[duplicate]))return 0;
@@ -265,27 +287,73 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
   t.phase[q]=RBA_TT_PHASE_ATTACHED;return 1;
 }
 
-export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
-  // Workers append new surplus at READY_TAIL. Inspect from the tail so the
-  // manager sees fresh surplus first. q identity is immutable within one
-  // generation, so duplicate probing is required only once per generation;
-  // later duplicates will find this already-inspected row as their canonical.
-  let q=t.control[RBA_TT_READY_TAIL],seen=0,merged=0,best=-1,bestPriority=-2147483648;
-  while(q!==-1&&seen<budget){
-    const previous=t.readyPrev[q];
-    if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
-      rbaTtUnqueueReady32(t,q);
-    }else{
-      let equivalent=-1;
-      if(t.inspectGeneration[q]!==t.generation[q]){
-        t.inspectGeneration[q]=t.generation[q];
-        equivalent=rbaTtFindEquivalent32(t,q);
+function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
+  if(seed<0||seed>=t.capacity||!t.live[seed]||t.redirect[seed]>=0)return 0;
+  const hash=t.locator[seed],keyWords=t.keyWords,base=seed*keyWords,bucket=t.bucket[seed];
+  let canonical=-1,merged=0;
+  for(let scan=t.buckets[bucket];scan!==-1;){
+    const next=t.link[scan];
+    if(t.live[scan]&&t.redirect[scan]<0&&t.locator[scan]===hash&&
+       equalKeyXor32(t.keys,scan*keyWords,base,keyWords)){
+      t.inspectGeneration[scan]=t.generation[scan];
+      if(canonical<0)canonical=scan;
+      else if(t.exact[scan]>t.exact[canonical]||
+              (t.exact[scan]===t.exact[canonical]&&scan<canonical)){
+        merged+=rbaTtManagerMergeDuplicate32(t,canonical,scan,resetTargets);
+        canonical=scan;
+      }else{
+        merged+=rbaTtManagerMergeDuplicate32(t,scan,canonical,resetTargets);
       }
-      if(equivalent>=0){merged+=rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);}
-      else if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
     }
-    q=previous;seen+=1;
+    scan=next;
   }
+  return merged;
+}
+
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null){
+  // Snapshot a bounded fresh-tail window before mutation. Bulk normalization
+  // may remove arbitrary duplicate members from the intrusive queue, so stable
+  // q ids avoid pointer-chasing through rows that have just been unqueued.
+  const limit=scratch?Math.min(budget,scratch.length):0;
+  let q=t.control[RBA_TT_READY_TAIL],seen=0;
+  while(q!==-1&&seen<limit){
+    scratch[seen]=q;
+    q=t.readyPrev[q];
+    seen+=1;
+  }
+
+  let merged=0,best=-1,bestPriority=-2147483648;
+  for(let i=0;i<seen;i+=1){
+    q=scratch[i];
+    if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
+      if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
+      continue;
+    }
+    if(t.inspectGeneration[q]!==t.generation[q])
+      merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
+    if(!t.live[q]||t.redirect[q]>=0||!t.readyMember[q])continue;
+    if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
+  }
+
+  // Fallback preserves the generic API for callers that do not provide manager
+  // scratch. It is intentionally not used by the prepared Branch Manager path.
+  if(!scratch){
+    q=t.control[RBA_TT_READY_TAIL];seen=0;
+    while(q!==-1&&seen<budget){
+      const previous=t.readyPrev[q];
+      if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
+        if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
+      }else{
+        if(t.inspectGeneration[q]!==t.generation[q])
+          merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
+        if(t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
+          best=q;bestPriority=t.priority[q];
+        }
+      }
+      q=previous;seen+=1;
+    }
+  }
+
   if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
     const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
     if(p!==-1)t.readyNext[p]=n;if(n!==-1)t.readyPrev[n]=p;else t.control[RBA_TT_READY_TAIL]=p;
