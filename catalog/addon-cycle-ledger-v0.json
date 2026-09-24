@@ -9692,11 +9692,33 @@
         "note": "Standard-7x6 fast path. Caller supplies prepared three-word offsets, so there is no loop or offset multiplication inside the evaluator."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker.mjs#Worker",
+      "source": "addons/worker.mjs",
+      "name": "Worker",
+      "scope": "worker-base-construction",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.object.allocate)+C(runtime.field.store)",
+        "note": "Cold/control-plane construction of the canonical nominal worker base. Allocation and the owner-field write remain explicit runtime costs; no scheduling or domain policy is hidden here."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 183,
-    "decomposed": 183,
+    "units": 184,
+    "decomposed": 184,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -9809,7 +9831,8 @@
     "addons/branch-manager-host.mjs": "53399c9ae8a9d7d137f9e4723186f0400429cab3",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a"
+    "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
+    "addons/worker.mjs": "b9d97fbc52e16959fcc57273491a6fe069196394"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
