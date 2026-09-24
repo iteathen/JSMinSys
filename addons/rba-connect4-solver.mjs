@@ -8,10 +8,19 @@ import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
 export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
 
-const POSITION49_EMPTY_LO=0x10204081,POSITION49_EMPTY_HI=0x408;
+function positionCodeEmpty64(g,outLo,outHi,index){
+  const stride=g.rows+1,total=g.columns*stride;
+  if(stride>=32||total>64){outLo[index]=0;outHi[index]=0;return 0;}
+  let lo=0,hi=0;
+  for(let c=0;c<g.columns;c+=1){
+    const bit=c*stride;
+    if(bit<32)lo|=(1<<bit)>>>0;else hi|=(1<<(bit-32))>>>0;
+  }
+  outLo[index]=lo>>>0;outHi[index]=hi>>>0;return 1;
+}
 
-function advancePosition49(lo,hi,column,height,player,outLo,outHi,index){
-  const bit=column*7+height+player;
+function advancePositionCode64(g,lo,hi,column,height,player,outLo,outHi,index){
+  const bit=column*(g.rows+1)+height+player;
   if(bit<32){
     const delta=(1<<bit)>>>0,next=(lo+delta)>>>0;
     outLo[index]=next;outHi[index]=(hi+(next<lo?1:0))>>>0;
@@ -20,24 +29,43 @@ function advancePosition49(lo,hi,column,height,player,outLo,outHi,index){
   }
 }
 
-function reflectPosition49(lo,hi,outLo,outHi,index){
-  const l0=lo&127,l1=(lo>>>7)&127,l2=(lo>>>14)&127,l3=(lo>>>21)&127,
-    l4=((lo>>>28)|((hi&7)<<4))&127,l5=(hi>>>3)&127,l6=(hi>>>10)&127;
-  outLo[index]=(l6|(l5<<7)|(l4<<14)|(l3<<21)|((l2&15)<<28))>>>0;
-  outHi[index]=((l2>>>4)|(l1<<3)|(l0<<10))>>>0;
+function extractLane64(lo,hi,bit,width,mask){
+  if(bit>=32)return (hi>>>(bit-32))&mask;
+  if(bit+width<=32)return (lo>>>bit)&mask;
+  return ((lo>>>bit)|(hi<<(32-bit)))&mask;
 }
 
-export function connect4PositionCode49FromMoves(moves,{geometry,reflected=0}={}){
-  if(!geometry||geometry.columns!==7||geometry.rows!==6)return {lo:0,hi:0};
-  const heights=new Uint32Array(7),loOut=new Uint32Array(1),hiOut=new Uint32Array(1);
-  let lo=POSITION49_EMPTY_LO,hi=POSITION49_EMPTY_HI,rank=0;
+function placeLane64(lane,bit,outLo,outHi){
+  if(bit>=32){outHi[0]|=(lane<<(bit-32))>>>0;return;}
+  outLo[0]|=(lane<<bit)>>>0;
+  if(bit+31>=32)outHi[0]|=lane>>>(32-bit);
+}
+
+function reflectPositionCode64(g,lo,hi,outLo,outHi,index){
+  const stride=g.rows+1,total=g.columns*stride;
+  if(stride>=32||total>64){outLo[index]=0;outHi[index]=0;return 0;}
+  const mask=(1<<stride)-1,tempLo=new Uint32Array(1),tempHi=new Uint32Array(1);
+  for(let c=0;c<g.columns;c+=1){
+    const source=g.mirrorColumn[c],
+      lane=extractLane64(lo,hi,source*stride,stride,mask);
+    placeLane64(lane,c*stride,tempLo,tempHi);
+  }
+  outLo[index]=tempLo[0];outHi[index]=tempHi[0];return 1;
+}
+
+export function connect4PositionCode64FromMoves(moves,{geometry,reflected=0}={}){
+  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
+  const g=geometry,heights=new Uint32Array(g.columns),
+    loOut=new Uint32Array(1),hiOut=new Uint32Array(1);
+  if(!positionCodeEmpty64(g,loOut,hiOut,0))return {lo:0,hi:0};
+  let lo=loOut[0],hi=hiOut[0],rank=0;
   for(const column of moves){
-    if(!Number.isInteger(column)||column<0||column>=7||heights[column]>=6)
-      throw new RangeError('invalid 7x6 position-code move');
-    advancePosition49(lo,hi,column,heights[column],rank&1,loOut,hiOut,0);
+    if(!Number.isInteger(column)||column<0||column>=g.columns||heights[column]>=g.rows)
+      throw new RangeError('invalid position-code move');
+    advancePositionCode64(g,lo,hi,column,heights[column],rank&1,loOut,hiOut,0);
     lo=loOut[0];hi=hiOut[0];heights[column]+=1;rank+=1;
   }
-  if(reflected){reflectPosition49(lo,hi,loOut,hiOut,0);lo=loOut[0];hi=hiOut[0];}
+  if(reflected){reflectPositionCode64(g,lo,hi,loOut,hiOut,0);lo=loOut[0];hi=hiOut[0];}
   return {lo,hi};
 }
 
@@ -75,7 +103,7 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
   const reflected=canonical?connect4RbaCanonicalize(g,profile,result,0,rootBasis,0,n,scratch):0;
-  const position=connect4PositionCode49FromMoves(moves,{geometry:g,reflected});
+  const position=connect4PositionCode64FromMoves(moves,{geometry:g,reflected});
   return {words:result,basis:rootBasis,reflected,positionLo:position.lo,positionHi:position.hi};
 }
 function bothCoordinatesEmpty(g,words,base){
@@ -264,13 +292,13 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     }else{
       const parentLo=t.positionLo[q],parentHi=t.positionHi[q],height=t.keys[base+column];
       const coded=(parentLo|parentHi)!==0;
-      if(coded)advancePosition49(parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
+      if(coded)advancePositionCode64(parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
       else {state.childPositionLo[count]=0;state.childPositionHi[count]=0;}
       const childReflected=connect4RbaCanonicalize(
         g,state.profile,state.keys,childBase,
         state.childBasis,childBi,state.childBasisSize[count],state.scratch,
       );
-      if(coded&&childReflected)reflectPosition49(
+      if(coded&&childReflected)reflectPositionCode64(
         state.childPositionLo[count],state.childPositionHi[count],
         state.childPositionLo,state.childPositionHi,count,
       );
