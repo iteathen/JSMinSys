@@ -89,7 +89,7 @@ export function assertConnect4RbaTtCompatibility(t,g){
   return 1;
 }
 
-export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
+export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode=true}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g);
   let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis;
@@ -104,8 +104,12 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
   const reflected=canonical?connect4RbaCanonicalize(g,profile,result,0,rootBasis,0,n,scratch):0;
-  const position=connect4PositionCode64FromMoves(moves,{geometry:g,reflected});
-  return {words:result,basis:rootBasis,reflected,positionLo:position.lo,positionHi:position.hi};
+  let positionLo=0,positionHi=0;
+  if(positionCode){
+    const position=connect4PositionCode64FromMoves(moves,{geometry:g,reflected});
+    positionLo=position.lo;positionHi=position.hi;
+  }
+  return {words:result,basis:rootBasis,reflected,positionLo,positionHi};
 }
 function bothCoordinatesEmpty(g,words,base){
   const p0=base+g.p0Offset,p1=base+g.p1Offset;
@@ -214,6 +218,7 @@ export function prepareConnect4CpcRbaEvaluator({
   geometry,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
+  positionCode=true,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g);
@@ -231,7 +236,9 @@ export function prepareConnect4CpcRbaEvaluator({
     actionUpper:new Uint32Array(g.columns),
     actionPriority:new Int32Array(g.columns),
     childPresent:new Uint32Array(g.columns),
-    childPositionLo:new Uint32Array(g.columns),childPositionHi:new Uint32Array(g.columns),
+    childPositionLo:positionCode?new Uint32Array(g.columns):null,
+    childPositionHi:positionCode?new Uint32Array(g.columns):null,
+    positionCode:positionCode?1:0,positionCoded:0,
     lower:1,upper:3,count:0,witness:-1,
     cpcCalls:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,
     cpcPrecursors:0,cpcProjectedForks:0,transitions:0,
@@ -274,7 +281,8 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(kind===CPC_EXACT&&q!==rootQ)return state.lower;
 
   let count=0,childBase=0,childBi=0;
-  const coded=rbaTtHasPositionCode32(t,q),parentLo=coded?t.locator[q]:0,parentHi=coded?rbaTtPositionHi32(t,q):0,
+  const coded=state.positionCode&&rbaTtHasPositionCode32(t,q),
+    parentLo=coded?t.locator[q]:0,parentHi=coded?rbaTtPositionHi32(t,q):0,
     nextRank=rank+1,forcedCaller=forced<0?-1:
     q===rootQ&&rootReflected?g.mirrorColumn[forced]:forced,
     actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,
@@ -304,7 +312,6 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
       lo=hi=term;
     }else{
       if(coded)advancePositionCode64(g,parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
-      else {state.childPositionLo[count]=0;state.childPositionHi[count]=0;}
       const childReflected=connect4RbaCanonicalize(
         g,state.profile,state.keys,childBase,
         state.childBasis,childBi,state.childBasisSize[count],state.scratch,
@@ -341,6 +348,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
   if(!count)return RBA_QUERY_UNCOVERED;
   state.count=count;
+  state.positionCoded=coded?1:0;
   return RBA_BRANCH;
 }
 
@@ -359,7 +367,8 @@ export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,roo
     state.keys,0,state.childBasis,0,state.g.maxBasis,
     state.childBasisSize,state.actions,state.actionLower,state.actionUpper,
     state.childPresent,state.actionPriority,state.count,
-    state.childPositionLo,state.childPositionHi,
+    state.positionCoded?state.childPositionLo:null,
+    state.positionCoded?state.childPositionHi:null,
     state.childBasisSet,state.g.shapeWordCount,
   );
 }
