@@ -9714,7 +9714,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "C(runtime.object.allocate)+C(runtime.field.store)",
-        "note": "Cold/control-plane construction of the canonical nominal worker base. Allocation and the owner-field write remain explicit runtime costs; no scheduling or domain policy is hidden here."
+        "note": "Cold/control-plane construction of the canonical nominal worker base. Instantiate before hot-loop entry, preferably during application initialization. Allocation and the owner-field write remain explicit runtime costs; no scheduling or domain policy is hidden here."
       },
       "status": "decomposed"
     },
@@ -9922,7 +9922,7 @@
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
-    "addons/worker.mjs": "3c108fd6940886c5ff5cb2a3c14647085b14712f"
+    "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
