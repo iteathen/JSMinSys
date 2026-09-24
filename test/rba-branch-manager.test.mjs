@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createRbaTt32,rbaTtAllocate32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,
+  createRbaTt32,rbaTtAllocate32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,rbaTtTake32,
   rbaTtPublishSurplus32,rbaTtPublishExactOwned32,
   rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,rbaTtRelease32,rbaTtRecycle32,
