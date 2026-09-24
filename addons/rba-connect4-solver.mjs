@@ -350,7 +350,7 @@ export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,roo
   const edgeBase=q*t.edgeCapacity;
   for(let i=0;i<state.count;i+=1){
     const child=t.child[edgeBase+i];
-    if(child>=0&&state.childPresent[i])
+    if(child>=0&&state.childPresent[i]&&(state.childPositionLo[i]|state.childPositionHi[i]))
       rbaTtSetPositionCode32(t,child,state.childPositionLo[i],state.childPositionHi[i]);
   }
   return next;
