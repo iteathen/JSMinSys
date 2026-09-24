@@ -93,7 +93,7 @@ function equalKeyXor32(words,a,b,n){
 
 export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,priority=0){
   const keyWords=t.keyWords,basisCapacity=t.basisCapacity;
-  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
+  if(basisSize<0||(basisCapacity&&basisSize>basisCapacity)||(basisSize|0)!==basisSize||(priority|0)!==priority){
     rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;
   }
   const hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask,q=t.control[RBA_TT_FREE];
@@ -101,7 +101,7 @@ export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,prior
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);t.locator[q]=hash;
-  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
+  if(basisSize&&basisCapacity)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
@@ -110,7 +110,7 @@ export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,prior
 export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisSize,priority=0,positionLo=0,positionHi=0){
   const keyWords=t.keyWords,basisCapacity=t.basisCapacity,q=t.control[RBA_TT_FREE],
     coded=(positionLo|positionHi)!==0;
-  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
+  if(basisSize<0||(basisCapacity&&basisSize>basisCapacity)||(basisSize|0)!==basisSize||(priority|0)!==priority){
     rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;
   }
   if(q<0){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
@@ -118,7 +118,7 @@ export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisS
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
   t.locator[q]=coded?positionLo>>>0:words[offset+primaryWord32(keyWords)];
-  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
+  if(basisSize&&basisCapacity)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=coded?2:1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
