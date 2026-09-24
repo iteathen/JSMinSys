@@ -35,22 +35,21 @@ function extractLane64(lo,hi,bit,width,mask){
   return ((lo>>>bit)|(hi<<(32-bit)))&mask;
 }
 
-function placeLane64(lane,bit,outLo,outHi){
-  if(bit>=32){outHi[0]|=(lane<<(bit-32))>>>0;return;}
-  outLo[0]|=(lane<<bit)>>>0;
-  if(bit+31>=32)outHi[0]|=lane>>>(32-bit);
-}
-
 function reflectPositionCode64(g,lo,hi,outLo,outHi,index){
   const stride=g.rows+1,total=g.columns*stride;
   if(stride>=32||total>64){outLo[index]=0;outHi[index]=0;return 0;}
-  const mask=(1<<stride)-1,tempLo=new Uint32Array(1),tempHi=new Uint32Array(1);
+  const mask=(1<<stride)-1;
+  let reflectedLo=0,reflectedHi=0;
   for(let c=0;c<g.columns;c+=1){
-    const source=g.mirrorColumn[c],
-      lane=extractLane64(lo,hi,source*stride,stride,mask);
-    placeLane64(lane,c*stride,tempLo,tempHi);
+    const source=g.mirrorColumn[c],lane=extractLane64(lo,hi,source*stride,stride,mask),
+      bit=c*stride;
+    if(bit>=32)reflectedHi|=(lane<<(bit-32))>>>0;
+    else{
+      reflectedLo|=(lane<<bit)>>>0;
+      if(bit+stride>32)reflectedHi|=lane>>>(32-bit);
+    }
   }
-  outLo[index]=tempLo[0];outHi[index]=tempHi[0];return 1;
+  outLo[index]=reflectedLo>>>0;outHi[index]=reflectedHi>>>0;return 1;
 }
 
 export function connect4PositionCode64FromMoves(moves,{geometry,reflected=0}={}){
