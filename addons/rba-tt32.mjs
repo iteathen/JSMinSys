@@ -95,7 +95,7 @@ export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisS
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
-  t.locator[q]=0;
+  t.locator[q]=words[offset+primaryWord32(keyWords)];
   if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
@@ -341,6 +341,10 @@ function primaryWord32(keyWords){
   return keyWords===14?8:keyWords===7?5:0;
 }
 
+function primaryValue32(t,q,keyWords,primary){
+  return t.bucket[q]===RBA_TT_BUCKET_NONE?t.locator[q]:t.keys[q*keyWords+primary];
+}
+
 function equalKeyPrimaryFirst32(words,a,b,n,primary){
   if(words[a+primary]!==words[b+primary])return 0;
   if(n===14&&primary===8)return (((words[a]^words[b])|
@@ -355,20 +359,29 @@ function equalKeyPrimaryFirst32(words,a,b,n,primary){
   return equalKeyXor32(words,a,b,n);
 }
 
-function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
+function managerBuildPrimaryRoutes32(t,scratch,groups,keyWords,primary,routeHeads,routeNext){
+  routeHeads.fill(-1);
+  for(let i=0;i<groups;i+=1){
+    const q=scratch[i],slot=primaryValue32(t,q,keyWords,primary)&255;
+    routeNext[i]=routeHeads[slot];routeHeads[slot]=i;
+  }
+}
+
+function managerNormalizeLinearBatch32(t,resetTargets,scratch,count,routeHeads,routeNext){
   const keyWords=t.keyWords,primary=primaryWord32(keyWords);
   let groups=0,merged=0;
 
-  // Compact fresh seeds into distinct exact-q groups without mutating TT
-  // topology. Duplicate fresh seeds remain live until the bulk merge pass.
+  // Fresh q are a tiny batch. Collapse duplicates inside the batch first so
+  // each exact state gets one group before touching the large TT.
   for(let i=0;i<count;i+=1){
     const seed=scratch[i];
     if(!t.live[seed]||t.redirect[seed]>=0||t.inspectGeneration[seed]===t.generation[seed])continue;
-    const seedBase=seed*keyWords;
+    const seedBase=seed*keyWords,seedPrimary=primaryValue32(t,seed,keyWords,primary);
     let known=0;
     for(let j=0;j<groups;j+=1){
       const representative=scratch[j];
-      if(!t.live[representative]||t.redirect[representative]>=0)continue;
+      if(!t.live[representative]||t.redirect[representative]>=0||
+         seedPrimary!==primaryValue32(t,representative,keyWords,primary))continue;
       if(equalKeyPrimaryFirst32(t.keys,seedBase,representative*keyWords,keyWords,primary)){
         known=1;break;
       }
@@ -377,16 +390,20 @@ function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
   }
   if(!groups)return 0;
 
-  // Pass 1: choose the same strongest/oldest canonical policy as the hashed
-  // path, amortized across every fresh equivalence group in this batch.
+  // The route table is ephemeral manager scratch, not TT identity. One low-byte
+  // mask routes most streamed rows to no candidate at all, while locator[] is
+  // reused as the contiguous discriminator cache for unindexed surplus rows.
+  managerBuildPrimaryRoutes32(t,scratch,groups,keyWords,primary,routeHeads,routeNext);
+
+  // Pass 1 selects the final canonical for every group.
   for(let scan=0;scan<t.capacity;scan+=1){
     if(!t.live[scan]||t.redirect[scan]>=0)continue;
-    const scanBase=scan*keyWords,scanPrimary=t.keys[scanBase+primary];
-    for(let i=0;i<groups;i+=1){
+    const scanPrimary=primaryValue32(t,scan,keyWords,primary);
+    for(let i=routeHeads[scanPrimary&255];i!==-1;i=routeNext[i]){
       const canonical=scratch[i];
-      if(!t.live[canonical]||t.redirect[canonical]>=0)continue;
-      const canonicalBase=canonical*keyWords;
-      if(scanPrimary!==t.keys[canonicalBase+primary])continue;
+      if(!t.live[canonical]||t.redirect[canonical]>=0||
+         scanPrimary!==primaryValue32(t,canonical,keyWords,primary))continue;
+      const scanBase=scan*keyWords,canonicalBase=canonical*keyWords;
       if(!equalKeyPrimaryFirst32(t.keys,scanBase,canonicalBase,keyWords,primary))continue;
       if(t.exact[scan]>t.exact[canonical]||
          (t.exact[scan]===t.exact[canonical]&&scan<canonical))scratch[i]=scan;
@@ -394,17 +411,17 @@ function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
     }
   }
 
-  // Pass 2: one more dense pass redirects every member directly to the final
-  // canonical. No hash, bucket lookup, locator check, or equality revalidation
-  // occurs inside the merge mutation itself.
+  // Canonical ids may have changed but their primary values cannot. Rebuild the
+  // tiny routes once, then bulk-redirect all exact members directly.
+  managerBuildPrimaryRoutes32(t,scratch,groups,keyWords,primary,routeHeads,routeNext);
   for(let scan=0;scan<t.capacity;scan+=1){
     if(!t.live[scan]||t.redirect[scan]>=0)continue;
-    const scanBase=scan*keyWords,scanPrimary=t.keys[scanBase+primary];
-    for(let i=0;i<groups;i+=1){
+    const scanPrimary=primaryValue32(t,scan,keyWords,primary);
+    for(let i=routeHeads[scanPrimary&255];i!==-1;i=routeNext[i]){
       const canonical=scratch[i];
-      if(scan===canonical||!t.live[canonical]||t.redirect[canonical]>=0)continue;
-      const canonicalBase=canonical*keyWords;
-      if(scanPrimary!==t.keys[canonicalBase+primary])continue;
+      if(scan===canonical||!t.live[canonical]||t.redirect[canonical]>=0||
+         scanPrimary!==primaryValue32(t,canonical,keyWords,primary))continue;
+      const scanBase=scan*keyWords,canonicalBase=canonical*keyWords;
       if(!equalKeyPrimaryFirst32(t.keys,scanBase,canonicalBase,keyWords,primary))continue;
       t.inspectGeneration[scan]=t.generation[scan];
       merged+=managerMergeKnownDuplicate32(t,scan,canonical,resetTargets);
@@ -422,12 +439,12 @@ function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
 function managerFindEquivalentLinear32(t,q){
   if(!t.live[q]||t.redirect[q]>=0)return -1;
   const keyWords=t.keyWords,primary=primaryWord32(keyWords),base=q*keyWords;
-  const primaryValue=t.keys[base+primary];
+  const primaryValue=primaryValue32(t,q,keyWords,primary);
   let best=q;
   for(let scan=0;scan<t.capacity;scan+=1){
     if(scan===q||!t.live[scan]||t.redirect[scan]>=0)continue;
     const other=scan*keyWords;
-    if(t.keys[other+primary]!==primaryValue)continue;
+    if(primaryValue32(t,scan,keyWords,primary)!==primaryValue)continue;
     if(!equalKeyPrimaryFirst32(t.keys,other,base,keyWords,primary))continue;
     if(t.exact[scan]>t.exact[best]||
        (t.exact[scan]===t.exact[best]&&scan<best))best=scan;
@@ -435,8 +452,8 @@ function managerFindEquivalentLinear32(t,q){
   return best===q?-1:best;
 }
 
-export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null){
-  const linearLimit=scratch?Math.min(8,scratch.length):0;
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null,routeHeads=null,routeNext=null){
+  const linearLimit=scratch&&routeHeads&&routeNext?Math.min(budget,scratch.length,routeNext.length):0;
   let q=t.control[RBA_TT_READY_TAIL],seen=0,linearCount=0,merged=0;
   let best=-1,bestPriority=-2147483648;
 
@@ -471,7 +488,9 @@ export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null
     q=previous;seen+=1;
   }
 
-  if(linearCount)merged+=managerNormalizeLinearBatch32(t,resetTargets,scratch,linearCount);
+  if(linearCount)merged+=managerNormalizeLinearBatch32(
+    t,resetTargets,scratch,linearCount,routeHeads,routeNext,
+  );
 
   if(best>=0&&(!t.live[best]||t.redirect[best]>=0||!t.readyMember[best]))best=-1;
   if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
