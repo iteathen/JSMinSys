@@ -19,19 +19,20 @@ export const RBA_TT_ERR_CAPACITY=1,RBA_TT_ERR_CONFLICT=2,RBA_TT_ERR_GENERATION=3
 const RBA_TT_BUCKET_NONE=0xffffffff;
 
 export function createRbaTt32({
-  capacity=4096,bucketCount=4096,keyWords,basisCapacity,edgeCapacity,
+  capacity=4096,bucketCount=4096,keyWords,basisCapacity,basisSetWords=0,edgeCapacity,
 }={}) {
   if(!Number.isSafeInteger(capacity)||capacity<1||capacity>0x1000000||
      !Number.isSafeInteger(bucketCount)||bucketCount<1||bucketCount>0x1000000||
      (bucketCount&(bucketCount-1))||
      !Number.isSafeInteger(keyWords)||keyWords<1||
      !Number.isSafeInteger(basisCapacity)||basisCapacity<0||
+     !Number.isSafeInteger(basisSetWords)||basisSetWords<0||
      !Number.isSafeInteger(edgeCapacity)||edgeCapacity<1) throw new RangeError('invalid RBA TT configuration');
   const u32=n=>new Uint32Array(new SharedArrayBuffer(n*4));
   const i32=n=>new Int32Array(new SharedArrayBuffer(n*4));
-  const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,edgeCapacity,
+  const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,basisSetWords,edgeCapacity,
     control:i32(RBA_TT_CONTROL_WORDS),fault:i32(4),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
-    basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
+    basis:u32(capacity*(basisSetWords||basisCapacity)),basisSize:u32(basisSetWords?0:capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
     lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),priority:i32(capacity),redirect:i32(capacity),
     inspectGeneration:u32(capacity),
@@ -76,6 +77,26 @@ export function rbaTtSetPositionCode32(t,q,lo,hi){
   return q;
 }
 
+function publishBasisRow32(t,q,basis,basisOffset,basisSize,basisSet=null,basisSetOffset=0){
+  const setWords=t.basisSetWords;
+  if(!setWords){
+    if(basisSize)publishSpan32(t.basis,q*t.basisCapacity,basis,basisOffset,basisSize);
+    return 1;
+  }
+  const base=q*setWords;
+  if(basisSet){
+    publishSpan32(t.basis,base,basisSet,basisSetOffset,setWords);
+    return 1;
+  }
+  for(let w=0;w<setWords;w+=1)t.basis[base+w]=0;
+  for(let i=0;i<basisSize;i+=1){
+    const id=basis[basisOffset+i],word=id>>>5;
+    if(word>=setWords)return 0;
+    t.basis[base+word]|=1<<(id&31);
+  }
+  return 1;
+}
+
 function equalKeyXor32(words,a,b,n){
   if(n===14)return (((words[a]^words[b])|
     (words[a+1]^words[b+1])|(words[a+2]^words[b+2])|(words[a+3]^words[b+3])|
@@ -101,13 +122,13 @@ export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,prior
   if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);t.locator[q]=hash;
-  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
-  t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
+  if(!publishBasisRow32(t,q,basis,basisOffset,basisSize)){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+  if(!t.basisSetWords)t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
   t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;t.control[RBA_TT_LIVE]+=1;return q;
 }
-export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisSize,priority=0,positionLo=0,positionHi=0){
+export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisSize,priority=0,positionLo=0,positionHi=0,basisSet=null,basisSetOffset=0){
   const keyWords=t.keyWords,basisCapacity=t.basisCapacity,q=t.control[RBA_TT_FREE],
     coded=(positionLo|positionHi)!==0;
   if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
@@ -118,8 +139,8 @@ export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisS
   t.control[RBA_TT_FREE]=t.link[q];
   publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
   t.locator[q]=coded?positionLo>>>0:words[offset+primaryWord32(keyWords)];
-  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
-  t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=coded?2:1;t.refs[q]=1;t.execution[q]=0;
+  if(!publishBasisRow32(t,q,basis,basisOffset,basisSize,basisSet,basisSetOffset)){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
+  if(!t.basisSetWords)t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=coded?2:1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
   if(coded){
@@ -225,7 +246,7 @@ export function rbaTtPublishPrepared32(t,q,owner,stateLo,stateHi,keys,keyOffset,
   for(let i=0;i<count;i+=1){const child=t.child[edgeBase+i];if(child>=0&&t.execution[child]===0&&!t.exact[child]&&t.phase[child]===0){t.execution[child]=owner;next=child;break;}}
   rbaTtReleaseExecution32(t,q,owner);return next;
 }
-export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count,positionLo=null,positionHi=null){
+export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,basis,basisOffset,basisStride,basisSizes,labels,actionLo,actionHi,childPresent,priorities,count,positionLo=null,positionHi=null,basisSets=null,basisSetStride=0){
   if(t.execution[q]!==owner||count<1||count>t.edgeCapacity||(count|0)!==count){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
   if(!rbaTtTighten32(t,q,stateLo,stateHi))return -1;
   const edgeBase=q*t.edgeCapacity,keyStride=t.keyWords,coded=positionLo!==null&&positionHi!==null;
@@ -235,7 +256,7 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
     if(lo<1||hi>3||lo>hi){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
     if(childPresent[i]){
       child=rbaTtAllocateUnindexed32(t,keys,childKey,basis,childBasis,basisSizes[i],priority,
-        coded?positionLo[i]:0,coded?positionHi[i]:0);
+        coded?positionLo[i]:0,coded?positionHi[i]:0,basisSets,basisSets?i*basisSetStride:0);
       if(child<0)return -1;
       if(!rbaTtTighten32(t,child,lo,hi))return -1;
     }
@@ -249,8 +270,6 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
   for(let i=0;i<count;i+=1){
     const child=t.child[edgeBase+i];
     if(child<0||t.exact[child])continue;
-    // Every surviving child was allocated above while this TT transaction is
-    // held: live, referenced, FREE, NEW, and not already queued are asserted.
     if(next<0){t.execution[child]=owner;next=child;}
     else enqueueKnownNew32(t,child);
   }
