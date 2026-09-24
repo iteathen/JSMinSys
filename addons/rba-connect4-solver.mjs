@@ -91,12 +91,14 @@ export function assertConnect4RbaTtCompatibility(t,g){
 
 export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode=true}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g);
-  let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis;
+  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g),
+    moveHistory=new Uint32Array(moves.length);
+  let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis,moveIndex=0;
   let n=connect4RbaBasisFromSupport(g,words,src,basis,bi,scratch.seen);
   for(let p=0;p<2;p+=1){const off=src+(p?g.p1Offset:g.p0Offset);for(let i=0;i<n;i+=1)words[off+(i>>>5)]|=1<<(i&31);}
   for(const column of moves){
     if(!Number.isInteger(column)||column<0||column>=g.columns)throw new RangeError('invalid column');
+    moveHistory[moveIndex++]=column;
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
     const height=words[src+column];if(height>=g.rows)throw new RangeError('column full');
     connect4RbaCofactorKnownHeight(g,profile,words,src,basis,bi,n,column,height,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
@@ -109,7 +111,7 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode
     const position=connect4PositionCode64FromMoves(moves,{geometry:g,reflected});
     positionLo=position.lo;positionHi=position.hi;
   }
-  return {words:result,basis:rootBasis,reflected,positionLo,positionHi};
+  return {words:result,basis:rootBasis,reflected,positionLo,positionHi,moveHistory};
 }
 function bothCoordinatesEmpty(g,words,base){
   const p0=base+g.p0Offset,p1=base+g.p1Offset;

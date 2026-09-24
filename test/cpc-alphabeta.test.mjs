@@ -46,6 +46,11 @@ function exact(columns,rows,moves,memo=new Map()){
   const result={value:best,move};memo.set(key,result);return result;
 }
 
+function assertOptimalWitness(columns,rows,moves,result,memo){
+  assert.ok(result.move>=0&&result.move<columns,JSON.stringify({moves,result}));
+  assert.equal(exact(columns,rows,[...moves,result.move],memo).value,result.value,JSON.stringify({moves,result}));
+}
+
 test('CPC per-column XOR parity equals literal future-event count on configured geometries',()=>{
   for(const [columns,rows,heightSets] of [
     [4,4,[[0,0,0,0],[1,2,0,3],[4,1,2,0]]],
@@ -177,6 +182,17 @@ test('CPC first-win ordering lets current immediate terminal supersede opponent 
   assert.deepEqual([...s.interval],[1,1]);
 });
 
+test('CPC alpha-beta uses live winning-line contribution for move ordering',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows}),moves=[],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    state=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+    result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
+  assert.equal(result.value,2);
+  // Empty 4x4: edge landing cells contribute to 3 live winning lines versus
+  // 2 for the two center cells. Static center-out would return column 1.
+  assert.equal(result.move,0);
+});
+
 test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle',()=>{
   const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
   const fixtures=[
@@ -199,9 +215,9 @@ test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle
     assert.equal(ra.value,oracle.value,JSON.stringify({moves,oracle,ra}));
     assert.equal(rx.value,oracle.value,JSON.stringify({moves,oracle,rx}));
     assert.equal(rb.value,oracle.value,JSON.stringify({moves,oracle,rb}));
-    assert.equal(ra.move,oracle.move,JSON.stringify({moves,oracle,ra}));
-    assert.equal(rx.move,oracle.move,JSON.stringify({moves,oracle,rx}));
-    assert.equal(rb.move,oracle.move,JSON.stringify({moves,oracle,rb}));
+    assertOptimalWitness(columns,rows,moves,ra,memo);
+    assertOptimalWitness(columns,rows,moves,rx,memo);
+    assertOptimalWitness(columns,rows,moves,rb,memo);
     assert.equal(ra.metrics.frontCalls,0);assert.equal(rx.metrics.frontCalls,0);
     assert.ok(rb.metrics.frontCalls>0);
   }
@@ -228,7 +244,7 @@ test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>
       const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,cpcFrontierResponse,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
       const result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
       assert.equal(result.value,oracle.value,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
-      assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
+      assertOptimalWitness(columns,rows,moves,result,memo);
     }
   }
 });
