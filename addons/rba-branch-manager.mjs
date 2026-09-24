@@ -1,4 +1,5 @@
 import {Worker} from './worker.mjs';
+import {BranchManager} from './branch-manager.mjs';
 import {
   rbaTtEnter32,
   rbaTtLeave32,
@@ -73,19 +74,37 @@ export function rbaBranchReadyCount32(t){
   return t.control[RBA_TT_READY_COUNT];
 }
 
-export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}={}){
-  if(!Number.isInteger(capacity)||capacity<1||!Number.isInteger(budget)||budget<1)
-    throw new RangeError('invalid RBA branch manager capacity');
-  return {
-    scanCursor:0,
-    resetTargets,
-    readyScratch:new Int32Array(budget),
-    routeHeads:new Int32Array(256),
-    routeNext:new Int32Array(budget),
-    events:0,
-    dedupes:0,
-    maintenancePasses:0,
-  };
+export class RbaBranchManager extends BranchManager {
+  constructor({owner=1,capacity,resetTargets=null,budget=64}={}){
+    if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
+       !Number.isInteger(capacity)||capacity<1||
+       !Number.isInteger(budget)||budget<1)
+      throw new RangeError('invalid RBA branch manager configuration');
+    super(owner);
+    this.budget=budget;
+    this.scanCursor=0;
+    this.resetTargets=resetTargets;
+    this.readyScratch=new Int32Array(budget);
+    this.routeHeads=new Int32Array(256);
+    this.routeNext=new Int32Array(budget);
+    this.events=0;
+    this.dedupes=0;
+    this.maintenancePasses=0;
+  }
+
+  run(t,reconcile,{context=null,waitMs=1}={}){
+    return runRbaBranchManagerLoop32(t,reconcile,{
+      owner:this.owner,
+      budget:this.budget,
+      context,
+      waitMs,
+      manager:this,
+    });
+  }
+}
+
+export function prepareRbaBranchManager32(options={}){
+  return new RbaBranchManager(options);
 }
 
 function applyWorkerReset32(t,worker){
