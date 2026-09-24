@@ -138,7 +138,7 @@ function search(state,depth,alpha,beta){
   if(semanticHi<beta)beta=semanticHi;
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
+    usePreempt=preemptCount>1,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
     childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
     actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
   let legal=0;
@@ -228,7 +228,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }
   let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,row=0,childKey=g.keyWords,childBasis=g.maxBasis,
+    usePreempt=preemptCount>1,row=0,childKey=g.keyWords,childBasis=g.maxBasis,
     forcedCaller=forced<0?-1:reflected?g.mirrorColumn[forced]:forced,
     actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,actionEnd=forcedCaller>=0?actionStart+1:g.columns;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
