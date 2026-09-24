@@ -1,6 +1,6 @@
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
-import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownLegal,connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtHasPositionCode32,rbaTtPositionHi32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
