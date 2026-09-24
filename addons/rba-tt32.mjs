@@ -478,11 +478,17 @@ export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
     if(t.live[q]){
       if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW&&
          t.inspectGeneration[q]!==t.generation[q]){
-        t.inspectGeneration[q]=t.generation[q];
         if(t.bucket[q]===RBA_TT_BUCKET_NONE){
-          const equivalent=managerFindEquivalentLinear32(t,q);
-          if(equivalent>=0)managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
+          // Queued surplus is normalized only by the bounded bulk scan.
+          // The fallback exists solely for a worker-retained q that otherwise
+          // has no ready-queue seed to expose its equivalence group.
+          if(t.execution[q]>RBA_TT_EXECUTION_QUEUED){
+            t.inspectGeneration[q]=t.generation[q];
+            const equivalent=managerFindEquivalentLinear32(t,q);
+            if(equivalent>=0)managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
+          }
         }else{
+          t.inspectGeneration[q]=t.generation[q];
           const equivalent=rbaTtFindEquivalent32(t,q);
           if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
         }
