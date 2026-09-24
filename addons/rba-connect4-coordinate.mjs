@@ -29,7 +29,7 @@ export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cel
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 
-export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null){
+export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
   const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
   if(terminal||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
@@ -54,15 +54,16 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  // Child basis ids are sorted by residual cardinality. Find each class
-  // boundary once, then coordinate propagation never tests a too-small child
-  // as a possible superset of the current image.
-  let childPair=0;
-  while(childPair<cn&&childBasis[ci+childPair]<g.pairShapeStart)childPair+=1;
-  let childTriple=childPair;
-  while(childTriple<cn&&childBasis[ci+childTriple]<g.tripleShapeStart)childTriple+=1;
-  let childQuad=childTriple;
-  while(childQuad<cn&&childBasis[ci+childQuad]<g.quadShapeStart)childQuad+=1;
+  // One child-basis pass publishes the exact id->index map already owned by
+  // coordinate scratch and discovers all cardinality boundaries.
+  let childPair=cn,childTriple=cn,childQuad=cn;
+  for(let j=0;j<cn;j+=1){
+    const id=childBasis[ci+j];
+    if(childIndex)childIndex[id]=j;
+    if(childPair===cn&&id>=g.pairShapeStart)childPair=j;
+    if(childTriple===cn&&id>=g.tripleShapeStart)childTriple=j;
+    if(childQuad===cn&&id>=g.quadShapeStart)childQuad=j;
+  }
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
@@ -81,8 +82,12 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
     // Both coordinates share the same residual image whenever they survive.
     // Locate and expand it once, then publish the resulting upset bits into
     // whichever player coordinates are active.
-    let lo=0,hi=cn;
-    while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
+    let lo;
+    if(childIndex)lo=childIndex[image];
+    else{
+      lo=0;let hi=cn;
+      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
+    }
     let targetWord=lo>>>5,targetMask=1<<(lo&31);
     if(write0)target[p0Target+targetWord]|=targetMask;
     if(write1)target[p1Target+targetWord]|=targetMask;
