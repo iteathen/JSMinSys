@@ -72,7 +72,7 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
     return set;
   }
 
-  function visit(ply){
+  function visit(ply,isTerminal=0){
     const physical=boardKey(board,heights,ply);
     if(visited.has(physical))return;
     visited.add(physical);states+=1;
@@ -89,6 +89,7 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
       if(!witness)witness={q,neutral,physical:[...qp]};
     }
 
+    if(isTerminal)return;
     const player=ply&1;
     for(let column=0;column<g.columns;column++){
       const row=heights[column];
@@ -96,11 +97,7 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
       const cell=row*g.columns+column;
       board[cell]=player;heights[column]=row+1;moves.push(column);
       const terminal=terminalAfterMove(g,board,cell,player);
-      if(!terminal)visit(ply+1);
-      else{
-        const childPhysical=boardKey(board,heights,ply+1);
-        if(!visited.has(childPhysical))visit(ply+1);
-      }
+      visit(ply+1,terminal);
       moves.pop();heights[column]=row;board[cell]=-1;
     }
   }
