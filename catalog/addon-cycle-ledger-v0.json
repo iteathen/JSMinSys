@@ -3325,19 +3325,44 @@
       "unit": "addons/rba-tt32.mjs#rbaTtEnter32",
       "source": "addons/rba-tt32.mjs",
       "name": "rbaTtEnter32",
-      "scope": "legacy-addon",
+      "scope": "tt-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "atomic.load.u32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-S",
+          "target": "atomicTryClaimLoadFirst32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#rbaTtEnter32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(1-S)*CALL(atomicTryClaimLoadFirst32)",
+        "parameters": {
+          "S": "1 when the TT STOP flag is already set; 0 otherwise"
+        },
+        "note": "TT entry keeps the existing parked-contention policy. The load-first try-claim avoids a locked RMW when the lock word is visibly nonzero; compareExchange remains final authority when the advisory load observes free."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "load-first-tt-claim-with-parked-contention",
+        "oldCycleExpression": "C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(1-S)*CALL(atomicTryClaim32)",
+        "newCycleExpression": "C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(1-S)*CALL(atomicTryClaimLoadFirst32)",
+        "heldLockDelta": "ATOMIC_LOAD + CMP_EQ - (ATOMIC_RMW + CMP_EQ)",
+        "freeLockDelta": "ATOMIC_LOAD + CMP_EQ",
+        "selectionRule": "beneficial only when TT-lock mismatch probability amortizes the advisory atomic load",
+        "preserved": "manager/worker contention still returns idle/parks; no immediate retry from reverted commit #8 is restored"
+      }
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtFail32",
@@ -3954,8 +3979,8 @@
   ],
   "summary": {
     "units": 178,
-    "decomposed": 20,
-    "legacySymbolicVisible": 158,
+    "decomposed": 21,
+    "legacySymbolicVisible": 157,
     "missing": 0,
     "neesBoundOperations": 10,
     "localExtensionOperations": 23
@@ -4052,6 +4077,7 @@
     "addons/rba-connect4-managed-host.mjs": "010e59d535f85dd07dfcdb63415859b1ff44e88b",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
     "addons/rba-connect4-managed-worker.mjs": "3869827a5cae15b87be9c3bc1e6a738e08d6c94f",
-    "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc"
+    "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
+    "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f"
   }
 }
