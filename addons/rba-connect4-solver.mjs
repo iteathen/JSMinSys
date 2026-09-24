@@ -291,14 +291,14 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     }else{
       const parentLo=t.positionLo[q],parentHi=t.positionHi[q],height=t.keys[base+column];
       const coded=(parentLo|parentHi)!==0;
-      if(coded)advancePositionCode64(parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
+      if(coded)advancePositionCode64(g,parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
       else {state.childPositionLo[count]=0;state.childPositionHi[count]=0;}
       const childReflected=connect4RbaCanonicalize(
         g,state.profile,state.keys,childBase,
         state.childBasis,childBi,state.childBasisSize[count],state.scratch,
       );
       if(coded&&childReflected)reflectPositionCode64(
-        state.childPositionLo[count],state.childPositionHi[count],
+        g,state.childPositionLo[count],state.childPositionHi[count],
         state.childPositionLo,state.childPositionHi,count,
       );
       state.cpcCalls+=1;
