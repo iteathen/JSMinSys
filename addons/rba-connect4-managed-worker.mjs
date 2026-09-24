@@ -5,10 +5,7 @@ import {
   RBA_AB_CPC_ONLY,
 } from './rba-connect4-alphabeta.mjs';
 import {publishConnect4CpcRbaEvaluation32} from './rba-connect4-solver.mjs';
-import {
-  prepareRbaBranchWorker32,
-  runRbaBranchWorkerLoop32,
-} from './rba-branch-manager.mjs';
+import {prepareRbaBranchWorker32} from './rba-branch-manager.mjs';
 import {RBA_TT_ROOT} from './rba-tt32.mjs';
 
 const table=workerData.table,
@@ -74,9 +71,8 @@ const publish=(t,q,owner,s,code)=>
   publishConnect4CpcRbaEvaluation32(
     t,q,owner,s,code,rootQ,witness,0,
   );
-runRbaBranchWorkerLoop32(
+worker.run(
   table,
-  worker,
   evaluate,
   publish,
   {waitMs:1},
