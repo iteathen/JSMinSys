@@ -15,6 +15,7 @@ export const RBA_TT_CONTROL_WORDS=16;
 export const RBA_TT_EXECUTION_FREE=0,RBA_TT_EXECUTION_QUEUED=1;
 export const RBA_TT_PHASE_NEW=0,RBA_TT_PHASE_PENDING_ATTACH=2,RBA_TT_PHASE_ATTACHED=3,RBA_TT_PHASE_DETACHED=4;
 export const RBA_TT_ERR_CAPACITY=1,RBA_TT_ERR_CONFLICT=2,RBA_TT_ERR_GENERATION=3,RBA_TT_ERR_CONTRACT=4;
+const RBA_TT_BUCKET_NONE=0xffffffff;
 
 export function createRbaTt32({
   capacity=4096,bucketCount=4096,keyWords,basisCapacity,edgeCapacity,
@@ -85,6 +86,23 @@ export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,prior
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
   t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;t.control[RBA_TT_LIVE]+=1;return q;
 }
+export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisSize,priority=0){
+  const keyWords=t.keyWords,basisCapacity=t.basisCapacity,q=t.control[RBA_TT_FREE];
+  if(basisSize<0||basisSize>basisCapacity||(basisSize|0)!==basisSize||(priority|0)!==priority){
+    rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;
+  }
+  if(q<0){rbaTtFail32(t,RBA_TT_ERR_CAPACITY);return -1;}
+  if(t.generation[q]===0xffffffff){rbaTtFail32(t,RBA_TT_ERR_GENERATION);return -1;}
+  t.control[RBA_TT_FREE]=t.link[q];
+  publishSpan32(t.keys,q*keyWords,words,offset,keyWords);
+  t.locator[q]=0;
+  if(basisSize)publishSpan32(t.basis,q*basisCapacity,basis,basisOffset,basisSize);
+  t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
+  t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
+  t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
+  t.bucket[q]=RBA_TT_BUCKET_NONE;t.link[q]=-1;t.control[RBA_TT_LIVE]+=1;
+  return q;
+}
 export function rbaTtIntern32(t,words,offset,basis,basisOffset,basisSize,priority=0){
   const keyWords=t.keyWords,hash=mixSpan32Locator32(words,offset,keyWords),bucket=hash&t.bucketMask;
   for(let q=t.buckets[bucket];q!==-1;q=t.link[q]){
@@ -123,10 +141,13 @@ export function rbaTtUnqueueReady32(t,q){if(!t.readyMember[q])return 0;intrusive
 function unqueueEvent(t,q){if(!t.eventMember[q])return 0;intrusiveRemove32(t.control,RBA_TT_EVENT_HEAD,RBA_TT_EVENT_TAIL,RBA_TT_EVENT_COUNT,t.eventNext,t.eventPrev,t.eventMember,q);return 1;}
 export function rbaTtRecycle32(t,q){
   if(!t.live[q]||t.refs[q]||t.execution[q]||t.readyMember[q]||t.eventMember[q]||t.count[q]||t.parentHead[q]!==-1)return 0;
-  const redirect=t.redirect[q],bucket=t.bucket[q];let prev=-1,scan=t.buckets[bucket];
-  while(scan!==q&&scan!==-1){prev=scan;scan=t.link[scan];}
-  if(scan===-1)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
-  if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
+  const redirect=t.redirect[q],bucket=t.bucket[q];
+  if(bucket!==RBA_TT_BUCKET_NONE){
+    let prev=-1,scan=t.buckets[bucket];
+    while(scan!==q&&scan!==-1){prev=scan;scan=t.link[scan];}
+    if(scan===-1)return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
+    if(prev===-1)t.buckets[bucket]=t.link[q];else t.link[prev]=t.link[q];
+  }
   t.live[q]=0;t.redirect[q]=-1;t.link[q]=t.control[RBA_TT_FREE];t.control[RBA_TT_FREE]=q;t.control[RBA_TT_LIVE]-=1;
   if(redirect>=0&&redirect<t.capacity&&t.live[redirect]&&t.refs[redirect])t.refs[redirect]-=1;
   return 1;
@@ -180,7 +201,7 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
     let child=-1;const lo=actionLo[i],hi=actionHi[i],priority=priorities?priorities[i]|0:0;
     if(lo<1||hi>3||lo>hi){rbaTtFail32(t,RBA_TT_ERR_CONTRACT);return -1;}
     if(childPresent[i]){
-      child=rbaTtAllocate32(t,keys,childKey,basis,childBasis,basisSizes[i],priority);
+      child=rbaTtAllocateUnindexed32(t,keys,childKey,basis,childBasis,basisSizes[i],priority);
       if(child<0)return -1;
       if(!rbaTtTighten32(t,child,lo,hi))return -1;
     }
@@ -216,13 +237,9 @@ function managerRedirectAttachedParents(t,duplicate,canonical){
   return moved;
 }
 
-export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets){
+function managerMergeKnownDuplicate32(t,duplicate,canonical,resetTargets){
   if(duplicate<0||canonical<0||duplicate===canonical||!t.live[duplicate]||!t.live[canonical])return 0;
   if(t.redirect[duplicate]>=0)return t.redirect[duplicate]===canonical?1:0;
-  if(t.locator[duplicate]!==t.locator[canonical])return 0;
-  const keyWords=t.keyWords,a=duplicate*keyWords,b=canonical*keyWords;
-  if(!equalKeyXor32(t.keys,a,b,keyWords))return 0;
-
   if(t.lower[duplicate]>t.lower[canonical]||t.upper[duplicate]<t.upper[canonical])
     if(!rbaTtTighten32(t,canonical,t.lower[duplicate],t.upper[duplicate]))return 0;
   if(t.priority[duplicate]>t.priority[canonical])t.priority[canonical]=t.priority[duplicate];
@@ -248,6 +265,16 @@ export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets)
   if(!t.execution[duplicate]&&!t.refs[duplicate])rbaTtRecycle32(t,duplicate);
   return 1;
 }
+}
+
+export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets){
+  if(duplicate<0||canonical<0||duplicate===canonical||!t.live[duplicate]||!t.live[canonical])return 0;
+  if(t.redirect[duplicate]>=0)return t.redirect[duplicate]===canonical?1:0;
+  if(t.locator[duplicate]!==t.locator[canonical])return 0;
+  const keyWords=t.keyWords,a=duplicate*keyWords,b=canonical*keyWords;
+  if(!equalKeyXor32(t.keys,a,b,keyWords))return 0;
+  return managerMergeKnownDuplicate32(t,duplicate,canonical,resetTargets);
+}
 
 export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
   if(t.phase[q]!==RBA_TT_PHASE_PENDING_ATTACH)return 0;
@@ -257,7 +284,7 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
     if(child<0)continue;
     while(t.redirect[child]>=0)child=t.redirect[child];
     let equivalent=-1;
-    if(t.inspectGeneration[child]!==t.generation[child]){
+    if(t.bucket[child]!==RBA_TT_BUCKET_NONE&&t.inspectGeneration[child]!==t.generation[child]){
       t.inspectGeneration[child]=t.generation[child];
       equivalent=rbaTtFindEquivalent32(t,child);
     }
@@ -291,8 +318,6 @@ function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
   if(seed<0||seed>=t.capacity||!t.live[seed]||t.redirect[seed]>=0)return 0;
   const hash=t.locator[seed],keyWords=t.keyWords,base=seed*keyWords,bucket=t.bucket[seed];
   let canonical=-1;
-  // Pass 1 selects the final canonical without mutating the bucket. This avoids
-  // redirect chains when a better canonical appears later in the traversal.
   for(let scan=t.buckets[bucket];scan!==-1;scan=t.link[scan]){
     if(!t.live[scan]||t.redirect[scan]>=0||t.locator[scan]!==hash||
        !equalKeyXor32(t.keys,scan*keyWords,base,keyWords))continue;
@@ -300,9 +325,6 @@ function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
        (t.exact[scan]===t.exact[canonical]&&scan<canonical))canonical=scan;
   }
   if(canonical<0)return 0;
-
-  // Pass 2 stamps and redirects every equivalent row directly to that one
-  // canonical q. Two bucket walks replace one complete bucket walk per duplicate.
   let merged=0;
   for(let scan=t.buckets[bucket];scan!==-1;){
     const next=t.link[scan];
@@ -316,50 +338,99 @@ function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
   return merged;
 }
 
-export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null){
-  // Snapshot a bounded fresh-tail window before mutation. Bulk normalization
-  // may remove arbitrary duplicate members from the intrusive queue, so stable
-  // q ids avoid pointer-chasing through rows that have just been unqueued.
-  const limit=scratch?Math.min(budget,scratch.length):0;
-  let q=t.control[RBA_TT_READY_TAIL],seen=0;
-  while(q!==-1&&seen<limit){
-    scratch[seen]=q;
-    q=t.readyPrev[q];
-    seen+=1;
-  }
+function primaryWord32(keyWords){
+  return keyWords===14?8:keyWords===7?5:0;
+}
 
-  let merged=0,best=-1,bestPriority=-2147483648;
-  for(let i=0;i<seen;i+=1){
-    q=scratch[i];
+function equalKeyPrimaryFirst32(words,a,b,n,primary){
+  if(words[a+primary]!==words[b+primary])return 0;
+  if(n===14&&primary===8)return (((words[a]^words[b])|
+    (words[a+1]^words[b+1])|(words[a+2]^words[b+2])|(words[a+3]^words[b+3])|
+    (words[a+4]^words[b+4])|(words[a+5]^words[b+5])|(words[a+6]^words[b+6])|
+    (words[a+7]^words[b+7])|
+    (words[a+9]^words[b+9])|(words[a+10]^words[b+10])|(words[a+11]^words[b+11])|
+    (words[a+12]^words[b+12])|(words[a+13]^words[b+13]))===0)?1:0;
+  if(n===7&&primary===5)return (((words[a]^words[b])|
+    (words[a+1]^words[b+1])|(words[a+2]^words[b+2])|(words[a+3]^words[b+3])|
+    (words[a+4]^words[b+4])|(words[a+6]^words[b+6]))===0)?1:0;
+  return equalKeyXor32(words,a,b,n);
+}
+
+function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
+  const keyWords=t.keyWords,primary=primaryWord32(keyWords);
+  let groups=0,merged=0;
+
+  // Collapse equal fresh seeds first so each surviving seed owns exactly one
+  // equivalence group before the single live-table pass.
+  for(let i=0;i<count;i+=1){
+    const seed=scratch[i];
+    if(!t.live[seed]||t.redirect[seed]>=0||t.inspectGeneration[seed]===t.generation[seed])continue;
+    const seedBase=seed*keyWords;
+    let duplicate=0;
+    for(let j=0;j<groups;j+=1){
+      const canonical=scratch[j];
+      if(!t.live[canonical]||t.redirect[canonical]>=0)continue;
+      if(equalKeyPrimaryFirst32(t.keys,seedBase,canonical*keyWords,keyWords,primary)){
+        t.inspectGeneration[seed]=t.generation[seed];
+        merged+=managerMergeKnownDuplicate32(t,seed,canonical,resetTargets);
+        duplicate=1;
+        break;
+      }
+    }
+    if(!duplicate){
+      scratch[groups]=seed;
+      t.inspectGeneration[seed]=t.generation[seed];
+      groups+=1;
+    }
+  }
+  if(!groups)return merged;
+
+  // One dense q-index pass normalizes every live duplicate for all fresh
+  // groups. Most rows die on one existing residual-word comparison.
+  for(let scan=0;scan<t.capacity;scan+=1){
+    if(!t.live[scan]||t.redirect[scan]>=0)continue;
+    const scanBase=scan*keyWords,scanPrimary=t.keys[scanBase+primary];
+    for(let i=0;i<groups;i+=1){
+      const canonical=scratch[i];
+      if(scan===canonical||!t.live[canonical]||t.redirect[canonical]>=0)continue;
+      const canonicalBase=canonical*keyWords;
+      if(scanPrimary!==t.keys[canonicalBase+primary])continue;
+      if(!equalKeyPrimaryFirst32(t.keys,scanBase,canonicalBase,keyWords,primary))continue;
+      t.inspectGeneration[scan]=t.generation[scan];
+      merged+=managerMergeKnownDuplicate32(t,scan,canonical,resetTargets);
+      break;
+    }
+  }
+  return merged;
+}
+
+export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null){
+  const linearLimit=scratch?Math.min(8,scratch.length):0;
+  let q=t.control[RBA_TT_READY_TAIL],seen=0,linearCount=0,merged=0;
+  let best=-1,bestPriority=-2147483648;
+
+  while(q!==-1&&seen<budget){
+    const previous=t.readyPrev[q];
     if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
       if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
-      continue;
-    }
-    if(t.inspectGeneration[q]!==t.generation[q])
-      merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
-    if(!t.live[q]||t.redirect[q]>=0||!t.readyMember[q])continue;
-    if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
-  }
-
-  // Fallback preserves the generic API for callers that do not provide manager
-  // scratch. It is intentionally not used by the prepared Branch Manager path.
-  if(!scratch){
-    q=t.control[RBA_TT_READY_TAIL];seen=0;
-    while(q!==-1&&seen<budget){
-      const previous=t.readyPrev[q];
-      if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
-        if(t.live[q]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
-      }else{
-        if(t.inspectGeneration[q]!==t.generation[q])
+    }else{
+      if(t.inspectGeneration[q]!==t.generation[q]){
+        if(t.bucket[q]===RBA_TT_BUCKET_NONE&&scratch&&linearCount<linearLimit){
+          scratch[linearCount]=q;linearCount+=1;
+        }else if(t.bucket[q]!==RBA_TT_BUCKET_NONE){
           merged+=managerNormalizeEquivalentGroup32(t,q,resetTargets);
-        if(t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
-          best=q;bestPriority=t.priority[q];
         }
       }
-      q=previous;seen+=1;
+      if(t.live[q]&&t.redirect[q]<0&&t.readyMember[q]&&t.priority[q]>bestPriority){
+        best=q;bestPriority=t.priority[q];
+      }
     }
+    q=previous;seen+=1;
   }
 
+  if(linearCount)merged+=managerNormalizeLinearBatch32(t,resetTargets,scratch,linearCount);
+
+  if(best>=0&&(!t.live[best]||t.redirect[best]>=0||!t.readyMember[best]))best=-1;
   if(best>=0&&best!==t.control[RBA_TT_READY_HEAD]){
     const p=t.readyPrev[best],n=t.readyNext[best],head=t.control[RBA_TT_READY_HEAD];
     if(p!==-1)t.readyNext[p]=n;if(n!==-1)t.readyPrev[n]=p;else t.control[RBA_TT_READY_TAIL]=p;
@@ -374,8 +445,8 @@ export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
   while(seen<budget){
     if(q>=t.capacity)q=0;
     if(t.live[q]){
-      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW&&
-         t.inspectGeneration[q]!==t.generation[q]){
+      if(t.bucket[q]!==RBA_TT_BUCKET_NONE&&t.redirect[q]<0&&
+         t.phase[q]===RBA_TT_PHASE_NEW&&t.inspectGeneration[q]!==t.generation[q]){
         t.inspectGeneration[q]=t.generation[q];
         const equivalent=rbaTtFindEquivalent32(t,q);
         if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
