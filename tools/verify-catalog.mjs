@@ -154,6 +154,17 @@ for (const unit of addonCycleLedger.units.filter((entry) => entry.status === 'de
       `${unit.unit}: cycle expression C(${match[1]}) lacks a bound operation`,
     );
   }
+  const symbolicParameters = new Set(Object.keys(unit.cycleCount.parameters ?? {}));
+  const uncoveredText = cycleText
+    .replace(/\\bCALLBACK\\([^)]*\\)/g, ' ')
+    .replace(/\\bCALL\\([^)]*\\)/g, ' ')
+    .replace(/\\bC\\([^)]*\\)/g, ' ');
+  for (const match of uncoveredText.matchAll(/\\b[A-Z][A-Z0-9_]*\\b/g)) {
+    assert.ok(
+      symbolicParameters.has(match[0]),
+      `${unit.unit}: unbound symbolic cycle term ${match[0]}`,
+    );
+  }
 }
 
 function gitBlobSha(source) {
