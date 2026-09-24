@@ -1661,6 +1661,24 @@
       "status": "legacy-symbolic-visible"
     },
     {
+      "unit": "addons/rba-connect4-geometry.mjs#keyOf",
+      "source": "addons/rba-connect4-geometry.mjs",
+      "name": "keyOf",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-geometry.mjs#keyOf,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
       "unit": "addons/rba-connect4-geometry.mjs#prepareConnect4RbaCoordinateScratch",
       "source": "addons/rba-connect4-geometry.mjs",
       "name": "prepareConnect4RbaCoordinateScratch",
@@ -1852,6 +1870,38 @@
       "status": "decomposed"
     },
     {
+      "unit": "addons/rba-connect4-managed-manager.mjs#<module-main>",
+      "source": "addons/rba-connect4-managed-manager.mjs",
+      "name": "<module-main>",
+      "scope": "managed-module-main",
+      "operations": [
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareRbaBranchManager32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchManagerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchManagerLoop32)"
+        ],
+        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
+      },
+      "status": "decomposed"
+    },
+    {
       "unit": "addons/rba-connect4-managed-manager.mjs#reconcile",
       "source": "addons/rba-connect4-managed-manager.mjs",
       "name": "reconcile",
@@ -1867,6 +1917,38 @@
         "kind": "expression",
         "expression": "CALL(reconcileConnect4CpcRbaEvent32)",
         "note": "Lifetime-captured manager state removes context-object transport."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-managed-worker.mjs#<module-main>",
+      "source": "addons/rba-connect4-managed-worker.mjs",
+      "name": "<module-main>",
+      "scope": "managed-module-main",
+      "operations": [
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcRbaEvaluator"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchWorkerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchWorkerLoop32)"
+        ],
+        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
       },
       "status": "decomposed"
     },
@@ -2665,6 +2747,24 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#equalKeyXor32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
+      "unit": "addons/rba-tt32.mjs#i32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "i32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#i32,scenario)",
         "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
       },
       "status": "legacy-symbolic-visible"
@@ -3552,6 +3652,24 @@
       "status": "legacy-symbolic-visible"
     },
     {
+      "unit": "addons/rba-tt32.mjs#u32",
+      "source": "addons/rba-tt32.mjs",
+      "name": "u32",
+      "scope": "legacy-addon",
+      "operations": [
+        {
+          "op": "runtime.legacy.addon.body",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "LEGACY_ADDON_LEDGER(addons/rba-tt32.mjs#u32,scenario)",
+        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+      },
+      "status": "legacy-symbolic-visible"
+    },
+    {
       "unit": "addons/rba-tt32.mjs#unlinkBucketRow32",
       "source": "addons/rba-tt32.mjs",
       "name": "unlinkBucketRow32",
@@ -3586,76 +3704,12 @@
         "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
       },
       "status": "legacy-symbolic-visible"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-worker.mjs#<module-main>",
-      "source": "addons/rba-connect4-managed-worker.mjs",
-      "name": "<module-main>",
-      "scope": "managed-module-main",
-      "operations": [
-        {
-          "op": "runtime.typed_view.construct",
-          "count": 3
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4CpcRbaEvaluator"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "runRbaBranchWorkerLoop32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)",
-        "unboundedTerms": [
-          "CALL(runRbaBranchWorkerLoop32)"
-        ],
-        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-manager.mjs#<module-main>",
-      "source": "addons/rba-connect4-managed-manager.mjs",
-      "name": "<module-main>",
-      "scope": "managed-module-main",
-      "operations": [
-        {
-          "op": "runtime.typed_view.construct",
-          "count": 2
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareRbaBranchManager32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "runRbaBranchManagerLoop32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
-        "unboundedTerms": [
-          "CALL(runRbaBranchManagerLoop32)"
-        ],
-        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
-      },
-      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 176,
+    "units": 179,
     "decomposed": 21,
-    "legacySymbolicVisible": 155,
+    "legacySymbolicVisible": 158,
     "missing": 0,
     "neesBoundOperations": 10,
     "localExtensionOperations": 14
