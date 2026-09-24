@@ -151,8 +151,8 @@ export async function runManagedConnect4CpcRba32(moves,{
     status:exact?'EXACT':
       errorCode===HOST_DEADLINE?'TIMEOUT':
       errorCode===HOST_CANCELLED?'INTERRUPTED':'FAILED',
-    absoluteValue:exact?table.exact[rootQ]:0,
-    witness:exact?runtime.witness[0]:-1,
+    rootWdl:exact?table.exact[rootQ]-2:null,
+    move:exact?runtime.witness[0]:-1,
     errorCode,
     errors:host.errors,
     fault:Array.from(table.fault),
