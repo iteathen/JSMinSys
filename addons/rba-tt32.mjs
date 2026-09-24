@@ -234,7 +234,11 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
     const e=base+i;let child=t.child[e];
     if(child<0)continue;
     while(t.redirect[child]>=0)child=t.redirect[child];
-    const equivalent=rbaTtFindEquivalent32(t,child);
+    let equivalent=-1;
+    if(t.inspectGeneration[child]!==t.generation[child]){
+      t.inspectGeneration[child]=t.generation[child];
+      equivalent=rbaTtFindEquivalent32(t,child);
+    }
     if(equivalent>=0){
       const original=t.child[e],generation=t.childGeneration[e];
       rbaTtManagerMergeDuplicate32(t,child,equivalent,resetTargets);
