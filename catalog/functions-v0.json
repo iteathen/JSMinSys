@@ -1,5 +1,5 @@
 {
-  "version": "0.110.0",
+  "version": "0.111.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -7341,6 +7341,35 @@
       ]
     },
     {
+      "name": "emitSortedSetBitsAt32",
+      "source": "src/basis32.mjs",
+      "block": "sparse-basis-transform-remap",
+      "primitives": [
+        "LD32",
+        "ST32",
+        "Math.clz32",
+        "&",
+        "-",
+        "*",
+        "+",
+        "+=",
+        "<",
+        "="
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "WORDS*(L+offset_index+word_loop) + SET_BITS*(CLZ + bit_clear + S + index_arithmetic)",
+        "note": "Offset-aware sorted bitset emission; same sparse-bit body as emitSortedSetBits32 plus caller-owned seenOffset address arithmetic."
+      },
+      "preconditions": [
+        "seenOffset and wordCount select a valid seen span",
+        "out has capacity for every set bit represented by seen[seenOffset..seenOffset+wordCount)"
+      ]
+    },
+    {
       "name": "transformDedupSortedActionMajor32",
       "source": "src/basis32.mjs",
       "block": "sparse-basis-transform-remap",
@@ -8327,11 +8356,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 295,
+    "functionsImplemented": 296,
     "catalogBlocks": 30,
     "blocksCompleteWithoutNewPrimitive": 29,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 295,
+    "functionsWithCycleCount": 296,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 30,
     "blocksCompletedWithAdmittedPrimitive": 1
