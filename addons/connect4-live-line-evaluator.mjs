@@ -56,16 +56,16 @@ export function advanceConnect4LiveLineState32(
   target,
   targetOffset,
 ){
-  const words=profile.wordCount,stateWords=profile.stateWords,through=profile.through,
-    throughBase=cell*words,blockedBase=targetOffset+(1-mover)*words;
+  const words=profile.wordCount,through=profile.through,
+    throughBase=cell*words,ownBase=mover*words,blockedBase=(1-mover)*words;
 
-  // Intended search use is same-frame in-place or disjoint preallocated depth
-  // frames. Partially overlapping unequal ranges are outside this hot contract.
-  for(let index=0;index<stateWords;index+=1)
-    target[targetOffset+index]=source[sourceOffset+index];
-
-  for(let word=0;word<words;word+=1)
-    target[blockedBase+word]=target[blockedBase+word]&~through[throughBase+word];
+  // Same-frame in-place and disjoint depth frames are both safe in one fused
+  // pass because player slices never overlap each other. Partially overlapping
+  // unequal ranges remain outside this hot contract.
+  for(let word=0;word<words;word+=1){
+    target[targetOffset+ownBase+word]=source[sourceOffset+ownBase+word];
+    target[targetOffset+blockedBase+word]=source[sourceOffset+blockedBase+word]&~through[throughBase+word];
+  }
 
   return target;
 }

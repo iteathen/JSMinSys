@@ -9609,19 +9609,19 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 3
+          "count": 2
         },
         {
           "op": "memory.load.u32",
-          "count": "S+2*W"
+          "count": "3*W"
         },
         {
           "op": "memory.store.u32",
-          "count": "S+W"
+          "count": "2*W"
         },
         {
           "op": "alu.add.u32",
-          "count": "1+3*S+4*W"
+          "count": "10*W"
         },
         {
           "op": "alu.sub.u32",
@@ -9629,7 +9629,7 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.not.u32",
@@ -9641,23 +9641,30 @@
         },
         {
           "op": "control.test.u32",
-          "count": "2+S+W"
+          "count": "1+W"
         },
         {
           "op": "control.branch",
-          "count": "2+S+W"
+          "count": "1+W"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "3*C(runtime.field.load)+(S+2*W)*C(memory.load.u32)+(S+W)*C(memory.store.u32)+(1+3*S+4*W)*C(alu.add.u32)+C(alu.sub.u32)+2*C(alu.imul.u32)+W*C(alu.not.u32)+W*C(alu.and.u32)+(2+S+W)*C(control.test.u32)+(2+S+W)*C(control.branch)",
+        "expression": "2*C(runtime.field.load)+3*W*C(memory.load.u32)+2*W*C(memory.store.u32)+10*W*C(alu.add.u32)+C(alu.sub.u32)+3*C(alu.imul.u32)+W*C(alu.not.u32)+W*C(alu.and.u32)+(1+W)*C(control.test.u32)+(1+W)*C(control.branch)",
         "parameters": {
-          "W": "line-bitset word count; 3 for standard 7x6",
-          "S": "live-line state words copied; 2*W"
+          "W": "line-bitset word count; 3 for standard 7x6"
         },
-        "note": "Copies the live-line frontier into caller-owned next-depth storage, then clears only the opponent's lines incident to the landing cell."
+        "note": "Recovered Sep. 12 frontier transition shape under the narrower JSMinSys contract: one fused pass copies the mover slice and writes the blocked opponent slice already masked. Same-frame in-place and disjoint depth frames are both valid; partial unequal overlap remains unsupported."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "fused-live-line-copy-cancel",
+        "historicalSource": "Connect4@44a1a2c572fff2cd9dfe931077f275e5836a2956",
+        "baseline": "f191c5f2885d9ae0a966096c1616d597f7fbc58c",
+        "removed": "one full opponent-slice reread/rewrite pass and one loop",
+        "standard7x6LedgerDelta": "-1 field load -3 u32 loads -3 u32 stores -1 add -2 loop tests/branches +1 integer multiply",
+        "semantics": "live-line state and landing-cell scores unchanged"
+      }
     },
     {
       "unit": "addons/connect4-live-line-evaluator.mjs#evaluateConnect4LiveLineCell32",
@@ -10486,7 +10493,7 @@
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
+    "addons/connect4-live-line-evaluator.mjs": "4fb1b8d36e25badd0a036af0caba0204e4238cd8",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
   },
