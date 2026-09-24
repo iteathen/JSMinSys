@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const catalog = JSON.parse(readFileSync('catalog/catalog-v0.json', 'utf8'));
@@ -105,11 +106,79 @@ const addonCostOps = new Set([
   ...Object.keys(addonCycleLedger.neesOperationBindings ?? {}),
   ...Object.keys(addonCycleLedger.localOperationExtensions ?? {}),
 ]);
+
+assert.equal(
+  addonCycleLedger.summary.neesBoundOperations,
+  Object.keys(addonCycleLedger.neesOperationBindings ?? {}).length,
+  'add-on NEES binding summary mismatch',
+);
+assert.equal(
+  addonCycleLedger.summary.localExtensionOperations,
+  Object.keys(addonCycleLedger.localOperationExtensions ?? {}).length,
+  'add-on local-extension summary mismatch',
+);
 for (const unit of addonCycleLedger.units) {
   for (const operation of unit.operations) {
     assert.equal(typeof operation.op, 'string', `${unit.unit}: operation id missing`);
     assert.ok(addonCostOps.has(operation.op), `${unit.unit}: unbound add-on cost operation ${operation.op}`);
   }
+}
+
+for (const unit of addonCycleLedger.units.filter((entry) => entry.status === 'decomposed')) {
+  assert.ok(
+    !unit.operations.some((operation) => operation.op === 'runtime.legacy.addon.body'),
+    `${unit.unit}: decomposed unit may not use legacy symbolic fallback`,
+  );
+  const cycleText = [
+    unit.cycleCount.expression,
+    unit.cycleCount.activeCycleExpression,
+    ...(unit.cycleCount.unboundedTerms ?? []),
+  ].filter(Boolean).join(' ');
+  for (const match of cycleText.matchAll(/\bCALL\(([^()\s,+*]+)\)/g)) {
+    assert.ok(
+      unit.operations.some((operation) =>
+        operation.op === 'runtime.call.subledger' && operation.target === match[1]),
+      `${unit.unit}: cycle expression CALL(${match[1]}) lacks a subledger operation`,
+    );
+  }
+  for (const match of cycleText.matchAll(/\bCALLBACK\(([^()\s,+*]+)\)/g)) {
+    assert.ok(
+      unit.operations.some((operation) =>
+        operation.op === 'runtime.callback' && operation.target === match[1]),
+      `${unit.unit}: cycle expression CALLBACK(${match[1]}) lacks a callback operation`,
+    );
+  }
+  for (const match of cycleText.matchAll(/\bC\(([^()\s,+*]+)\)/g)) {
+    assert.ok(
+      unit.operations.some((operation) => operation.op === match[1]),
+      `${unit.unit}: cycle expression C(${match[1]}) lacks a bound operation`,
+    );
+  }
+}
+
+function gitBlobSha(source) {
+  return createHash('sha1')
+    .update(`blob ${Buffer.byteLength(source)}\0`)
+    .update(source)
+    .digest('hex');
+}
+
+const decomposedSources = new Set(
+  addonCycleLedger.units
+    .filter((unit) => unit.status === 'decomposed')
+    .map((unit) => unit.source),
+);
+for (const source of decomposedSources) {
+  const expected = addonCycleLedger.decomposedSourceBlobs?.[source];
+  assert.match(expected ?? '', /^[0-9a-f]{40}$/, `${source}: missing decomposed source blob guard`);
+  assert.equal(
+    gitBlobSha(readFileSync(source, 'utf8')),
+    expected,
+    `${source}: decomposed source changed without refreshing its cycle ledger`,
+  );
+}
+for (const source of Object.keys(addonCycleLedger.decomposedSourceBlobs ?? {})) {
+  assert.ok(decomposedSources.has(source), `${source}: stale decomposed source blob guard`);
 }
 
 const declaredAddonUnits = new Set();
