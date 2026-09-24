@@ -39,6 +39,23 @@ test('geometry derives different native carrier sizes for 4x4 and 10x10',()=>{
   assert.equal(b.lineCount,238);assert.equal(b.edgeCapacity,10);assert.equal(b.coordWords,8);assert.equal(b.keyWords,27);assert.ok(b.shapeCount>625);
 });
 
+test('configured winning geometry implies singleton residual id equals physical cell',()=>{
+  for(const [columns,rows] of [[1,4],[4,1],[3,5],[7,6],[10,10]]){
+    const g=prepareConnect4RbaGeometry({columns,rows});
+    assert.ok(g.lineCount>0,columns+'x'+rows);
+    assert.equal(g.pairShapeStart,g.cellCount,columns+'x'+rows+' singleton prefix');
+    for(let cell=0;cell<g.cellCount;cell+=1){
+      assert.equal(g.shapeSize[cell],1,columns+'x'+rows+' cell '+cell+' size');
+      assert.equal(g.shapeCells[cell*4],cell,columns+'x'+rows+' cell '+cell+' id');
+    }
+    assert.equal('singletonByCell' in g,false,columns+'x'+rows+' redundant singleton map');
+  }
+  const none=prepareConnect4RbaGeometry({columns:3,rows:3});
+  assert.equal(none.lineCount,0);
+  assert.equal(none.shapeCount,0);
+});
+
+
 test('configured RBA coordinates match independent physical residuals on 4x4 and 10x10',()=>{
   for(const [columns,rows,moves] of [[4,4,[0,1,0,1,2]],[10,10,[4,5,4,5,3,6,2,7,1]]]){
     const g=prepareConnect4RbaGeometry({columns,rows}),r=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),p=position(columns,rows,moves);
