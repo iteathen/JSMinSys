@@ -92,6 +92,69 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize){
   return packed;
 }
 
+function searchCpcOnly(state,depth,alpha,beta){
+  const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis,alphaOrig=alpha,betaOrig=beta;
+  const words=state.words,basis=state.basis,n=state.basisSize[depth],meta=words[keyOffset+g.metaOffset];
+  const mover=(meta>>>2)&1;
+  state.nodes+=1;
+
+  const cache=state.cache,cacheSlot=mixSpan32Locator32(words,keyOffset,cache.keyWords)&cache.mask;
+  const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
+  if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
+
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
+  if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
+  state.cpcPrecursors+=state.cpc.precursorCount[0];
+  if(cpcKind===CPC_EXACT){
+    state.cpcExact+=1;const value=state.cpc.interval[0];
+    storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
+    return absToRelative(value,mover);
+  }
+  if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
+  else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
+  if(state.cpc.forcedColumn[0]>=0)state.cpcForced+=1;
+
+  let semanticLo,semanticHi;
+  if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
+  else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
+  if(semanticLo===semanticHi){
+    const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semanticLo;
+  }
+  if(semanticLo>=beta){state.cutoffs+=1;return semanticLo;}
+  if(semanticHi<=alpha){state.cutoffs+=1;return semanticHi;}
+  if(semanticLo>alpha)alpha=semanticLo;
+  if(semanticHi<beta)beta=semanticHi;
+
+  const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
+    usePreempt=preemptCount>1,childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
+    actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
+  let legal=0,best=-2,cut=0;
+  for(let oi=actionStart;oi<actionEnd;oi+=1){
+    const column=g.actionOrder[oi],height=words[keyOffset+column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    legal=1;
+    const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
+      words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
+    state.cofactors+=1;
+    let value;
+    if(term)value=absToRelative(term,mover);
+    else{
+      connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
+      value=-searchCpcOnly(state,childDepth,-beta,-alpha);
+    }
+    if(value>best)best=value;
+    if(value>alpha)alpha=value;
+    if(alpha>=beta){state.cutoffs+=1;cut=1;break;}
+    if(best===1)break;
+  }
+  if(!legal)return 0;
+  if(best===-2)best=semanticLo;
+  if(!cut&&alphaOrig===-2&&betaOrig===2){
+    const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
+  }
+  return best;
+}
+
 function search(state,depth,alpha,beta){
   const g=state.g,keyOffset=depth*g.keyWords,basisOffset=depth*g.maxBasis,alphaOrig=alpha,betaOrig=beta;
   const words=state.words,basis=state.basis,n=state.basisSize[depth],meta=words[keyOffset+g.metaOffset];
@@ -265,8 +328,12 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
         // the first action attaining that known value. For root win/draw the
         // corresponding child target is -1/0 respectively.
         const childAlpha=-rootExact;
-        value=-search(state,1,childAlpha,childAlpha+1);
-      }else value=-search(state,1,-beta,-alpha);
+        value=state.mode===RBA_AB_CPC_ONLY
+          ?-searchCpcOnly(state,1,childAlpha,childAlpha+1)
+          :-search(state,1,childAlpha,childAlpha+1);
+      }else value=state.mode===RBA_AB_CPC_ONLY
+        ?-searchCpcOnly(state,1,-beta,-alpha)
+        :-search(state,1,-beta,-alpha);
     }
     }
     if(value>best){best=value;bestMove=caller;}
