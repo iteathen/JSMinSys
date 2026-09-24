@@ -3,7 +3,7 @@ import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownLegal,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtHasPositionCode32,rbaTtPositionHi32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
-import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_EXACT_P1=1,RBA_EXACT_DRAW=2,RBA_EXACT_P0=3,RBA_BRANCH=4;
 export const RBA_QUERY_UNCOVERED=8,RBA_INTERRUPTED=9;
@@ -241,7 +241,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   const rank=meta>>>2,mover=rank&1;
 
   state.cpcCalls+=1;
-  const kind=evaluateConnect4Cpc32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
+  const kind=evaluateConnect4CpcNonterminal32(g,t.keys,base,t.basis,basisBase,n,state.cpc);
   state.lower=state.cpc.interval[0];state.upper=state.cpc.interval[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(state.cpc.projectedAdvisory)
@@ -301,7 +301,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
         state.childPositionLo,state.childPositionHi,count,
       );
       state.cpcCalls+=1;
-      const childKind=evaluateConnect4Cpc32(
+      const childKind=evaluateConnect4CpcNonterminal32(
         g,state.keys,childBase,state.childBasis,childBi,state.childBasisSize[count],state.cpc,
       );
       lo=state.cpc.interval[0];hi=state.cpc.interval[1];
