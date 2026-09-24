@@ -127,7 +127,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   const positionStride=rows+1,positionBits=columns*positionStride,
     positionMode=positionStride<32&&positionBits<=64?(columns===7&&rows===6?49:64):0,
-    positionBitBase=new Uint32Array(columns);
+    positionBitBase=new Uint32Array(columns),cpcTargetOwnerBase=((columns-1)*rows)&1;
   let positionEmptyLo=0,positionEmptyHi=0;
   if(positionMode)for(let c=0;c<columns;c+=1){
     const bit=c*positionStride;positionBitBase[c]=bit;
@@ -140,7 +140,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
-    positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0};
+    positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0,
+    cpcTargetOwnerBase};
 }
 
 export function prepareConnect4RbaCoordinateScratch(g){
