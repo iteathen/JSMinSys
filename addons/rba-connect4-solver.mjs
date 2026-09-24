@@ -82,7 +82,8 @@ export function prepareConnect4RbaEvaluator({geometry,boundaryDepth=2,boundaryCa
     transitions:0,actionClosures:0,actionsPruned:0};
 }
 export function assertConnect4RbaTtCompatibility(t,g){
-  if(t.keyWords!==g.keyWords||t.basisCapacity<g.maxBasis||t.edgeCapacity<g.columns)
+  if(t.keyWords!==g.keyWords||t.basisCapacity<g.maxBasis||
+     (t.basisElementBits===16&&g.shapeCount>0x10000)||t.edgeCapacity<g.columns)
     throw new RangeError('RBA TT/profile mismatch');
   return 1;
 }
