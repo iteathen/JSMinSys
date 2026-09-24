@@ -1828,34 +1828,15 @@
       "scope": "cold",
       "operations": [
         {
-          "op": "runtime.integer.check",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 4
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "runtime.typed_array.allocate",
-          "count": 3
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 8
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "RbaBranchManager"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+8*C(runtime.field.store)",
-        "note": "One-time manager scratch/state allocation."
+        "expression": "CALL(RbaBranchManager)",
+        "note": "Compatibility constructor wrapper; RbaBranchManager owns manager validation, scratch allocation, identity, and counters."
       },
       "status": "decomposed"
     },
@@ -4905,17 +4886,17 @@
         {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "runRbaBranchManagerLoop32"
+          "target": "RbaBranchManager.run"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareRbaBranchManager32)+CALL(RbaBranchManager.run)",
         "unboundedTerms": [
-          "CALL(runRbaBranchManagerLoop32)"
+          "CALL(RbaBranchManager.run)"
         ],
-        "note": "Top-level managed thread execution is explicitly ledgered; residual startup property/coercion/object assembly is nonzero symbolic module bookkeeping."
+        "note": "Top-level managed manager constructs the canonical RbaBranchManager during thread initialization and enters the specialized loop through manager.run(). Residual startup property/coercion/object assembly remains nonzero symbolic module bookkeeping."
       },
       "status": "decomposed"
     },
@@ -9804,11 +9785,132 @@
         "note": "Polymorphic RBA Worker implementation delegates to the existing shared-TT worker loop without changing loop semantics."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager.mjs#BranchManager",
+      "source": "addons/branch-manager.mjs",
+      "name": "BranchManager",
+      "scope": "branch-manager-base-construction",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.object.allocate)+C(runtime.field.store)",
+        "note": "Cold/control-plane construction of the canonical nominal BranchManager base. Instantiate before hot-loop entry, preferably during application initialization. Allocation and the owner-field write remain explicit runtime costs."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager.mjs#BranchManager.run",
+      "source": "addons/branch-manager.mjs",
+      "name": "BranchManager.run",
+      "scope": "branch-manager-base-contract",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.object.allocate)+C(runtime.error.throw)",
+        "note": "Fail-closed base implementation. Specialized managers override run(); TypeError allocation/throw cost remains explicit if the base path executes."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#RbaBranchManager",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "RbaBranchManager",
+      "scope": "cold-manager-construction",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 7
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 10
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "3*C(runtime.integer.check)+7*C(control.test.u32)+C(control.branch)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.constructor.dispatch)+10*C(runtime.field.store)",
+        "note": "Canonical RBA BranchManager construction. Includes owner/capacity/budget validation, one class-instance allocation, base-constructor dispatch, manager identity/configuration, scratch allocation, and manager counters. Cold/init-time only."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#RbaBranchManager.run",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "RbaBranchManager.run",
+      "scope": "manager-polymorphic-entry",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 5
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchManagerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "2*C(runtime.field.load)+C(runtime.object.allocate)+5*C(runtime.field.store)+CALL(runRbaBranchManagerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchManagerLoop32)"
+        ],
+        "note": "Polymorphic RBA BranchManager entry. Owner and budget are loaded once and one loop-options object is constructed before entering the specialized manager loop; no recurring class dispatch occurs inside the loop."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 187,
-    "decomposed": 187,
+    "units": 191,
+    "decomposed": 191,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -9908,10 +10010,10 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-branch-manager.mjs": "6772d2f4c9cbd345f71901f554fe68d1e2a5d7db",
+    "addons/rba-branch-manager.mjs": "f7d02f2dccdc372ecc447dbc594fc6cbc8c2b811",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-managed-host.mjs": "85aae8a395692d15a33dc04f7dfc4bd43109eb5e",
-    "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
+    "addons/rba-connect4-managed-manager.mjs": "cab37b1c3cb5b1427729edb2db7f832862319012",
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
@@ -9922,7 +10024,8 @@
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
-    "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5"
+    "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
+    "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

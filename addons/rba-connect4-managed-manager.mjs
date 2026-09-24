@@ -1,9 +1,6 @@
 import {workerData} from 'node:worker_threads';
 import {reconcileConnect4CpcRbaEvent32} from './rba-connect4-solver.mjs';
-import {
-  prepareRbaBranchManager32,
-  runRbaBranchManagerLoop32,
-} from './rba-branch-manager.mjs';
+import {prepareRbaBranchManager32} from './rba-branch-manager.mjs';
 
 const witness=new Int32Array(workerData.runtimeBuffer,0,1),
   resetTargets=new Int32Array(
@@ -18,6 +15,7 @@ const witness=new Int32Array(workerData.runtimeBuffer,0,1),
     mirrorColumn:workerData.mirrorColumn,
   },
   manager=prepareRbaBranchManager32({
+    owner:1,
     capacity:workerData.table.capacity,
     resetTargets,
     budget,
@@ -28,13 +26,8 @@ const reconcile=(table,q)=>
     table,q,g,rootReflected,witness,resetTargets,0,
   );
 
-runRbaBranchManagerLoop32(
+manager.run(
   workerData.table,
   reconcile,
-  {
-    owner:1,
-    budget,
-    manager,
-    waitMs:1,
-  },
+  {waitMs:1},
 );

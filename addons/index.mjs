@@ -1,4 +1,5 @@
 export * from './worker.mjs';
+export * from './branch-manager.mjs';
 export * from './branch-manager-host.mjs';
 export * from './rba-branch-manager.mjs';
 export * from './rba-tt32.mjs';
