@@ -444,6 +444,13 @@
         "name": "ERROR_THROW_COST(errorType,stackState,runtimeState)"
       },
       "note": "JavaScript exception throw/unwind cost, including runtime and stack-state effects."
+    },
+    "runtime.constructor.dispatch": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "CLASS_CONSTRUCTOR_DISPATCH_COST(classDepth,runtimeState)"
+      },
+      "note": "JavaScript class constructor/super dispatch; allocation and field stores are accounted separately."
     }
   },
   "units": [
@@ -1859,26 +1866,15 @@
       "scope": "cold",
       "operations": [
         {
-          "op": "control.test.u32",
-          "count": 8
-        },
-        {
-          "op": "control.branch",
-          "count": 4
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": 1
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "RbaBranchWorker"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "8*C(control.test.u32)+4*C(control.branch)+C(alu.sub.u32)+C(runtime.object.allocate)",
-        "note": "One-time worker preparation; reset-index range is proved here and removed from recurring steps."
+        "expression": "CALL(RbaBranchWorker)",
+        "note": "Compatibility constructor wrapper; all RBA worker validation, class construction, and field initialization are owned by RbaBranchWorker."
       },
       "status": "decomposed"
     },
@@ -4973,7 +4969,7 @@
         {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "runRbaBranchWorkerLoop32"
+          "target": "RbaBranchWorker.run"
         },
         {
           "op": "runtime.counter.load",
@@ -4987,11 +4983,11 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+C(runtime.object.allocate)+CALL(prepareRbaBranchWorker32)+CALL(runRbaBranchWorkerLoop32)+4*C(runtime.counter.load)+4*C(memory.store.f64)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+C(runtime.object.allocate)+CALL(prepareRbaBranchWorker32)+CALL(RbaBranchWorker.run)+4*C(runtime.counter.load)+4*C(memory.store.f64)",
         "unboundedTerms": [
-          "CALL(runRbaBranchWorkerLoop32)"
+          "CALL(RbaBranchWorker.run)"
         ],
-        "note": "Phase-1 managed worker prepares one local CPC-first Negamax state. Final loop-exit bookkeeping republishes only the four generic worker counters; exact Negamax metrics are written before exact publication inside evaluate."
+        "note": "Phase-1 managed worker constructs the canonical RbaBranchWorker and enters it through the polymorphic run() contract. Final loop-exit bookkeeping republishes only the four generic worker counters; exact Negamax metrics are written before exact publication inside evaluate."
       },
       "status": "decomposed",
       "optimizationDelta": {
@@ -9743,15 +9739,80 @@
         "note": "Fail-closed base implementation. Specialized workers override run(); if the base path executes, TypeError allocation/throw cost remains explicit rather than zero."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#RbaBranchWorker",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "RbaBranchWorker",
+      "scope": "cold-worker-construction",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 8
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 12
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "3*C(runtime.integer.check)+8*C(control.test.u32)+4*C(control.branch)+C(alu.sub.u32)+C(runtime.object.allocate)+C(runtime.constructor.dispatch)+12*C(runtime.field.store)",
+        "note": "Canonical RBA branch-worker construction. Includes validation, one class-instance allocation, base-constructor dispatch, owner initialization, and the eleven RBA worker state/counter fields."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-branch-manager.mjs#RbaBranchWorker.run",
+      "source": "addons/rba-branch-manager.mjs",
+      "name": "RbaBranchWorker.run",
+      "scope": "worker-polymorphic-entry",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runRbaBranchWorkerLoop32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "CALL(runRbaBranchWorkerLoop32)",
+        "unboundedTerms": [
+          "CALL(runRbaBranchWorkerLoop32)"
+        ],
+        "note": "Polymorphic RBA Worker implementation delegates to the existing shared-TT worker loop without changing loop semantics."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 185,
-    "decomposed": 185,
+    "units": 187,
+    "decomposed": 187,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 63
+    "localExtensionOperations": 64
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -9847,11 +9908,11 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-branch-manager.mjs": "7f0863343f18e950f1625656953a424241da070d",
+    "addons/rba-branch-manager.mjs": "6772d2f4c9cbd345f71901f554fe68d1e2a5d7db",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-managed-host.mjs": "85aae8a395692d15a33dc04f7dfc4bd43109eb5e",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
-    "addons/rba-connect4-managed-worker.mjs": "942c00c1be0a5b7deb8d56a669a0fe34ccda8134",
+    "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
     "addons/rba-connect4-alphabeta.mjs": "1cf4fc1881785067082146ac68d450e262addca6",

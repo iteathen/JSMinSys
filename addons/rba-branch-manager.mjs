@@ -1,3 +1,4 @@
+import {Worker} from './worker.mjs';
 import {
   rbaTtEnter32,
   rbaTtLeave32,
@@ -29,35 +30,43 @@ import {
 // caller owns the TT transaction. A successful publish must release execution
 // ownership of q and may directly retain at most one runnable child for owner.
 
-export function prepareRbaBranchWorker32({
-  owner,
-  workerCount=1,
-  readyTarget=workerCount*2,
-  state=null,
-  resetTargets=null,
-}={}){
-  if(!Number.isInteger(owner)||owner<2||owner>0x7fffffff||
-     !Number.isInteger(workerCount)||workerCount<1||
-     !Number.isInteger(readyTarget)||readyTarget<0)
-    throw new RangeError('invalid RBA branch worker configuration');
-  const resetIndex=owner-2;
-  if(resetTargets!==null&&
-     (!(resetTargets instanceof Int32Array)||resetIndex>=resetTargets.length))
-    throw new RangeError('invalid RBA branch worker reset target');
-  return {
+export class RbaBranchWorker extends Worker {
+  constructor({
     owner,
-    workerCount,
-    readyTarget,
-    state,
-    resetTargets,
-    resetIndex,
-    q:-1,
-    code:0,
-    claims:0,
-    branches:0,
-    evaluations:0,
-    idlePolls:0,
-  };
+    workerCount=1,
+    readyTarget=workerCount*2,
+    state=null,
+    resetTargets=null,
+  }={}){
+    if(!Number.isInteger(owner)||owner<2||owner>0x7fffffff||
+       !Number.isInteger(workerCount)||workerCount<1||
+       !Number.isInteger(readyTarget)||readyTarget<0)
+      throw new RangeError('invalid RBA branch worker configuration');
+    const resetIndex=owner-2;
+    if(resetTargets!==null&&
+       (!(resetTargets instanceof Int32Array)||resetIndex>=resetTargets.length))
+      throw new RangeError('invalid RBA branch worker reset target');
+    super(owner);
+    this.workerCount=workerCount;
+    this.readyTarget=readyTarget;
+    this.state=state;
+    this.resetTargets=resetTargets;
+    this.resetIndex=resetIndex;
+    this.q=-1;
+    this.code=0;
+    this.claims=0;
+    this.branches=0;
+    this.evaluations=0;
+    this.idlePolls=0;
+  }
+
+  run(t,evaluate,publish,options={}){
+    return runRbaBranchWorkerLoop32(t,this,evaluate,publish,options);
+  }
+}
+
+export function prepareRbaBranchWorker32(options={}){
+  return new RbaBranchWorker(options);
 }
 
 export function rbaBranchReadyCount32(t){
