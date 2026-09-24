@@ -56,7 +56,7 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
     // once from that ordering, so singleton scans require no shape-size load.
     if(id>=g.pairShapeStart)break;
     if(!coordHas(words,coord,i))continue;
-    const cell=g.shapeCells[id*4],word=cell>>>5,mask=1<<(cell&31);
+    const cell=id,word=cell>>>5,mask=1<<(cell&31);
     if(bits[word]&mask)continue;
     bits[word]|=mask;any=1;
     const column=g.cellColumn[cell];
@@ -232,7 +232,7 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
     for(let i=0;i<basisSize;i+=1){
       const id=basis[basisOffset+i];if(id>=g.pairShapeStart)break;
       if(!coordHas(words,coord,i))continue;
-      const cell=g.shapeCells[id*4];
+      const cell=id;
       if(connect4CpcTargetOwner32(g,words,offset,cell)!==player)continue;
       scratch.projectedCells[store+count]=cell;
       scratch.projectedOwner[store+count]=player;
