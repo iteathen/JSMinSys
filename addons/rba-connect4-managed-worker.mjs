@@ -1,5 +1,4 @@
 import {workerData} from 'node:worker_threads';
-import {prepareConnect4RbaGeometry} from './rba-connect4-geometry.mjs';
 import {
   prepareConnect4CpcRbaEvaluator,
   evaluateConnect4CpcRbaTt32,
@@ -12,7 +11,7 @@ import {
 import {RBA_TT_ROOT} from './rba-tt32.mjs';
 
 const table=workerData.table,
-  g=prepareConnect4RbaGeometry(workerData.geometryConfig),
+  g=workerData.geometry,
   witness=new Int32Array(workerData.runtimeBuffer,0,1),
   metrics=new Float64Array(workerData.runtimeBuffer,workerData.metricOffsetBytes,12),
   resetTargets=new Int32Array(
