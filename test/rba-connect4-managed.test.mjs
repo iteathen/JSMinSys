@@ -69,5 +69,8 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
     assert.equal(managed.workersExited,2);
     assert.equal(managed.workersUsed,1);
     assert.ok(managed.sharedBytes>0);
+    assert.ok(managed.metrics.claims>0);
+    assert.ok(managed.metrics.evaluations>0);
+    assert.ok(managed.metrics.transitions>0);
   }
 });
