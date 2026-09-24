@@ -251,13 +251,15 @@ export function runRbaBranchWorkerLoop32(
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
     if(!rbaBranchWorkerStepKnown32(t,worker,evaluate,publish,context))
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
-    telemetry+=1;
-    if(metrics&&(telemetry&1023)===0){
-      metrics[0]=worker.claims;
-      metrics[1]=worker.branches;
-      metrics[2]=worker.evaluations;
-      metrics[3]=worker.idlePolls;
-      if(publishMetrics)publishMetrics(worker,metrics);
+    if(metrics){
+      telemetry+=1;
+      if((telemetry&1023)===0){
+        metrics[0]=worker.claims;
+        metrics[1]=worker.branches;
+        metrics[2]=worker.evaluations;
+        metrics[3]=worker.idlePolls;
+        if(publishMetrics)publishMetrics(worker,metrics);
+      }
     }
   }
   if(metrics){
