@@ -38,7 +38,7 @@ const evaluate=(t,q,s)=>{
     n=worker.evaluations+1;
   if((n&1023)===1){
     metrics[0]=worker.claims;
-    metrics[1]=worker.branches;
+    metrics[1]=worker.branches+(code===4?1:0);
     metrics[2]=n;
     metrics[3]=worker.idlePolls;
     metrics[4]=state.cpcCalls;
