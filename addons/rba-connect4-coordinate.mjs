@@ -39,11 +39,10 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
   sizes[sizeIndex]=0;
 
-  const singleton=g.singletonByCell[cell];
-  if(singleton>=0){
-    // Basis ids are sorted. Singleton shape ids occupy the first shape-size
-    // class, so stop as soon as the target id has been passed instead of
-    // scanning the entire residual basis on every played cell.
+  // Every physical cell is a singleton residual whenever winning geometry
+  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
+  const singleton=cell;
+  if(g.lineCount){
     const coord=src+(player?g.p1Offset:g.p0Offset);
     let lo=0,hi=n;
     while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
