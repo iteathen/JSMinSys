@@ -9724,28 +9724,47 @@
       "operations": [
         {
           "op": "memory.load.u32",
-          "count": 6
+          "count": "3+P"
         },
         {
           "op": "alu.and.u32",
-          "count": 3
+          "count": "P"
         },
         {
           "op": "alu.add.u32",
+          "count": "P-1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
           "count": 2
         },
         {
           "op": "runtime.call.subledger",
-          "count": 3,
+          "count": "P",
           "target": "popcount32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+2*C(alu.add.u32)+3*CALL(popcount32)",
-        "note": "Standard-7x6 fast path. Caller supplies prepared three-word offsets, so there is no loop or offset multiplication inside the evaluator."
+        "expression": "(3+P)*C(memory.load.u32)+P*C(alu.and.u32)+(P-1)*C(alu.add.u32)+2*C(control.test.u32)+2*C(control.branch)+P*CALL(popcount32)",
+        "parameters": {
+          "P": "popcount calls actually required by nonzero prepared through-word masks; 1..3. Standard 7x6 static cell distribution is 5 cells with P=1, 28 with P=2, 9 with P=3."
+        },
+        "note": "Three-word exact scorer skips SWAR popcount for prepared incidence words that are identically zero for the candidate cell. The branch is on immutable geometry masks, not live search state; score semantics are unchanged."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "skip-zero-live-line-words",
+        "baseline": "2553020fabfb966480843b8bae8d561638f101df",
+        "removed": "fixed three SWAR popcount calls for every scored cell",
+        "added": "two immutable-mask tests/branches",
+        "standard7x6": "P distribution 5x1, 28x2, 9x3 across 42 cells",
+        "semantics": "exact popcount(live[player] & through[cell]) unchanged"
+      }
     },
     {
       "unit": "addons/worker.mjs#Worker",
@@ -10497,7 +10516,7 @@
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "4fb1b8d36e25badd0a036af0caba0204e4238cd8",
+    "addons/connect4-live-line-evaluator.mjs": "85c6bcb3496cde8594ed1ca9f6a2b17ef37deffa",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
   },
