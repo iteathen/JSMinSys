@@ -1,10 +1,6 @@
 import {performance} from 'node:perf_hooks';
 import {
   createManagedThreadSession32,
-  spawnManagedFileWorker32,
-  waitManagedThreadSession32,
-  closeManagedThreadSession32,
-  managedThreadSessionState32,
   sumMetricViews32,
   sharedViewBytes32,
 } from './branch-manager-host.mjs';
@@ -107,8 +103,7 @@ export async function runManagedConnect4CpcRba32(moves,{
 
   const started=performance.now();
   try{
-    spawnManagedFileWorker32(
-      session,
+    session.spawn(
       new URL('./rba-connect4-managed-manager.mjs',import.meta.url),
       {
         table,
@@ -123,8 +118,7 @@ export async function runManagedConnect4CpcRba32(moves,{
     );
 
     for(let i=0;i<workers;i+=1){
-      spawnManagedFileWorker32(
-        session,
+      session.spawn(
         new URL('./rba-connect4-managed-worker.mjs',import.meta.url),
         {
           table,
@@ -142,13 +136,13 @@ export async function runManagedConnect4CpcRba32(moves,{
       );
     }
 
-    await waitManagedThreadSession32(session,{timeoutMs,signal});
+    await session.wait({timeoutMs,signal});
   }finally{
-    await closeManagedThreadSession32(session);
+    await session.close();
   }
 
   const elapsedMs=performance.now()-started,
-    host=managedThreadSessionState32(session);
+    host=session.state();
   sumMetricViews32(runtime.metricViews,CONNECT4_CPC_RBA_METRIC_WIDTH,metricOut);
   const errorCode=host.errorCode,
     exact=!errorCode&&Atomics.load(table.control,RBA_TT_DONE)===1;

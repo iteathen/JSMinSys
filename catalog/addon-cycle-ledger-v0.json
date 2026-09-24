@@ -555,43 +555,22 @@
       "scope": "cold-host",
       "operations": [
         {
-          "op": "runtime.instanceof.check",
-          "count": 1
-        },
-        {
-          "op": "runtime.integer.check",
-          "count": 7
-        },
-        {
-          "op": "control.test.u32",
-          "count": 8
-        },
-        {
-          "op": "control.branch",
-          "count": 1
+          "op": "runtime.object.allocate",
+          "count": "D"
         },
         {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "filterFileWorkerExecArgv32"
-        },
-        {
-          "op": "runtime.array.allocate",
-          "count": 3
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 19
+          "target": "ManagedThreadSession"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(runtime.instanceof.check)+7*C(runtime.integer.check)+8*C(control.test.u32)+C(control.branch)+CALL(filterFileWorkerExecArgv32)+3*C(runtime.array.allocate)+C(runtime.object.allocate)+19*C(runtime.field.store)",
-        "note": "Valid managed-session construction path. Error-object construction is outside the valid path but validation cost is explicit."
+        "expression": "D*C(runtime.object.allocate)+CALL(ManagedThreadSession)",
+        "parameters": {
+          "D": "1 only when createManagedThreadSession32() is called without an options argument; valid production construction supplies options, so D=0"
+        },
+        "note": "Compatibility constructor wrapper; ManagedThreadSession owns validation and lifecycle-state initialization. Default-options allocation remains explicit."
       },
       "status": "decomposed"
     },
@@ -4813,23 +4792,6 @@
           "count": "W+1"
         },
         {
-          "op": "runtime.worker.spawn",
-          "count": "W+1"
-        },
-        {
-          "op": "runtime.managed_wait",
-          "count": 1
-        },
-        {
-          "op": "runtime.managed_close",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "managedThreadSessionState32"
-        },
-        {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "sumMetricViews32"
@@ -4847,20 +4809,41 @@
           "op": "runtime.call.subledger",
           "count": 2,
           "target": "sharedViewBytes32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "W+1",
+          "target": "ManagedThreadSession.spawn"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.wait"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.close"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.state"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+C(runtime.typed_array.allocate)+(W+1)*C(runtime.url.construct)+(W+1)*C(runtime.worker.spawn)+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+2*C(runtime.timer.read)+CALL(managedThreadSessionState32)+CALL(sumMetricViews32)+4*C(memory.load.u32)+C(runtime.array.copy)+2*CALL(sharedViewBytes32)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+C(runtime.typed_array.allocate)+(W+1)*C(runtime.url.construct)+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+(W+1)*CALL(ManagedThreadSession.spawn)+2*C(runtime.timer.read)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+CALL(sumMetricViews32)+4*C(memory.load.u32)+C(runtime.array.copy)+2*CALL(sharedViewBytes32)",
         "unboundedTerms": [
-          "runtime.managed_wait",
-          "runtime.managed_close"
+          "CALL(ManagedThreadSession.spawn)",
+          "CALL(ManagedThreadSession.wait)",
+          "CALL(ManagedThreadSession.close)"
         ],
         "parameters": {
           "W": "managed evaluator worker count"
         },
-        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Worker spawn remains symbolic in workerDataBytes and therefore includes structured cloning of the prepared root image added for Phase-1 local Negamax execution; residual host validation/property/result assembly remains nonzero symbolic bookkeeping."
+        "note": "Managed host now exercises the canonical ManagedThreadSession lifecycle surface. Session construction and polymorphic lifecycle dispatch remain cold/control-plane; worker startup, wait, and close retain their explicit symbolic/unbounded subledgers."
       },
       "status": "decomposed"
     },
@@ -9906,11 +9889,176 @@
         "note": "Polymorphic RBA BranchManager entry. Owner and budget are loaded once and one loop-options object is constructed before entering the specialized manager loop; no recurring class dispatch occurs inside the loop."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession",
+      "scope": "cold-host-session-construction",
+      "operations": [
+        {
+          "op": "runtime.instanceof.check",
+          "count": 1
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 7
+        },
+        {
+          "op": "control.test.u32",
+          "count": 8
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "filterFileWorkerExecArgv32"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 19
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.instanceof.check)+7*C(runtime.integer.check)+8*C(control.test.u32)+C(control.branch)+CALL(filterFileWorkerExecArgv32)+3*C(runtime.array.allocate)+C(runtime.object.allocate)+C(runtime.constructor.dispatch)+19*C(runtime.field.store)",
+        "note": "Canonical ManagedThreadSession construction. Cold/control-plane only: instantiate before worker/manager hot loops, preferably during application initialization. Validation, filtered argv, lifecycle arrays, class construction, and all state fields remain explicit."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession.fail",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession.fail",
+      "scope": "host-session-method",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "failManagedThreadSession32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "CALL(failManagedThreadSession32)",
+        "note": "Lifecycle method delegates to the existing fail-closed session primitive."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession.spawn",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession.spawn",
+      "scope": "cold-host-session-method",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "spawnManagedFileWorker32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "CALL(spawnManagedFileWorker32)",
+        "unboundedTerms": [
+          "CALL(spawnManagedFileWorker32)"
+        ],
+        "note": "Cold lifecycle method delegates worker construction/startup to the existing fully accounted primitive."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession.wait",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession.wait",
+      "scope": "cold-host-session-method",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": "D"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "waitManagedThreadSession32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "D*C(runtime.object.allocate)+CALL(waitManagedThreadSession32)",
+        "unboundedTerms": [
+          "CALL(waitManagedThreadSession32)"
+        ],
+        "parameters": {
+          "D": "1 only when wait() is called without an options argument; production managed Connect4 supplies options, so D=0"
+        },
+        "note": "Managed wait remains elapsed-time unbounded; optional default-options allocation is explicit."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession.close",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession.close",
+      "scope": "cold-host-session-method",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "closeManagedThreadSession32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "CALL(closeManagedThreadSession32)",
+        "unboundedTerms": [
+          "CALL(closeManagedThreadSession32)"
+        ],
+        "note": "Cold lifecycle method delegates termination/join cleanup to the existing fully accounted primitive."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/branch-manager-host.mjs#ManagedThreadSession.state",
+      "source": "addons/branch-manager-host.mjs",
+      "name": "ManagedThreadSession.state",
+      "scope": "cold-host-session-method",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "managedThreadSessionState32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "CALL(managedThreadSessionState32)",
+        "note": "Cold lifecycle snapshot delegates to the existing session-state primitive."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 191,
-    "decomposed": 191,
+    "units": 197,
+    "decomposed": 197,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10012,7 +10160,7 @@
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "f7d02f2dccdc372ecc447dbc594fc6cbc8c2b811",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-managed-host.mjs": "85aae8a395692d15a33dc04f7dfc4bd43109eb5e",
+    "addons/rba-connect4-managed-host.mjs": "916db327d207a40c777b0b87c974b10ef00b1d40",
     "addons/rba-connect4-managed-manager.mjs": "cab37b1c3cb5b1427729edb2db7f832862319012",
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
@@ -10020,7 +10168,7 @@
     "addons/rba-connect4-alphabeta.mjs": "1cf4fc1881785067082146ac68d450e262addca6",
     "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
-    "addons/branch-manager-host.mjs": "53399c9ae8a9d7d137f9e4723186f0400429cab3",
+    "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
