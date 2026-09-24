@@ -9435,14 +9435,271 @@
         "note": "Event-list removal."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#prepareConnect4LiveLineEvaluator32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "prepareConnect4LiveLineEvaluator32",
+      "scope": "cold-evaluator-prepare",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 4
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 10
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "13*L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "5*L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+14*L"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+9*L"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "5*L"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "1+L"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+L"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "11+6*L"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+6*L"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "4*C(runtime.integer.check)+2*C(runtime.instanceof.check)+10*C(runtime.field.load)+2*C(runtime.typed_array.allocate)+13*L*C(memory.load.u32)+5*L*C(memory.store.u32)+(2+14*L)*C(alu.add.u32)+(2+9*L)*C(alu.imul.u32)+L*C(alu.and.u32)+5*L*C(alu.or.u32)+(1+L)*C(alu.shl.u32)+(1+L)*C(alu.shr.u32)+(11+6*L)*C(control.test.u32)+(1+6*L)*C(control.branch)+C(runtime.object.allocate)",
+        "parameters": {
+          "L": "prepared geometric winning-line count"
+        },
+        "note": "Cold preparation only. Builds exact cell-to-line incidence and all-lines bitset once from prepared Connect4 geometry."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#resetConnect4LiveLineState32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "resetConnect4LiveLineState32",
+      "scope": "evaluator-root-reset",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "W"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2*W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+3*W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+W"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+W"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+W*C(memory.load.u32)+2*W*C(memory.store.u32)+(1+3*W)*C(alu.add.u32)+(1+W)*C(control.test.u32)+(1+W)*C(control.branch)",
+        "parameters": {
+          "W": "line-bitset word count; 3 for standard 7x6"
+        },
+        "note": "Initializes both players' live-line fields to the prepared all-lines mask in caller-owned storage."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#advanceConnect4LiveLineState32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "advanceConnect4LiveLineState32",
+      "scope": "evaluator-transition",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S+2*W"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S+W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+3*S+4*W"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.not.u32",
+          "count": "W"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+S+W"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+S+W"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "3*C(runtime.field.load)+(S+2*W)*C(memory.load.u32)+(S+W)*C(memory.store.u32)+(1+3*S+4*W)*C(alu.add.u32)+C(alu.sub.u32)+2*C(alu.imul.u32)+W*C(alu.not.u32)+W*C(alu.and.u32)+(2+S+W)*C(control.test.u32)+(2+S+W)*C(control.branch)",
+        "parameters": {
+          "W": "line-bitset word count; 3 for standard 7x6",
+          "S": "live-line state words copied; 2*W"
+        },
+        "note": "Copies the live-line frontier into caller-owned next-depth storage, then clears only the opponent's lines incident to the landing cell."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#evaluateConnect4LiveLineCell32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "evaluateConnect4LiveLineCell32",
+      "scope": "evaluator-hot-generic",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+4*W"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+W"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+W"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "W",
+          "target": "popcount32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+2*W*C(memory.load.u32)+(1+4*W)*C(alu.add.u32)+2*C(alu.imul.u32)+W*C(alu.and.u32)+(1+W)*C(control.test.u32)+(1+W)*C(control.branch)+W*CALL(popcount32)",
+        "parameters": {
+          "W": "line-bitset word count; 3 for standard 7x6"
+        },
+        "note": "Exact generic live-line contribution score. Counts only candidate-cell lines still live for the requested player."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#evaluateConnect4LiveLine3x32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "evaluateConnect4LiveLine3x32",
+      "scope": "evaluator-hot-7x6",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 3
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 3,
+          "target": "popcount32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+2*C(alu.add.u32)+3*CALL(popcount32)",
+        "note": "Standard-7x6 fast path. Caller supplies prepared three-word offsets, so there is no loop or offset multiplication inside the evaluator."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 178,
-    "decomposed": 178,
+    "units": 183,
+    "decomposed": 183,
     "legacySymbolicVisible": 0,
     "missing": 0,
-    "neesBoundOperations": 10,
+    "neesBoundOperations": 11,
     "localExtensionOperations": 62
   },
   "neesOperationBindings": {
@@ -9529,6 +9786,13 @@
         "cycles": 1
       },
       "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "alu.not.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
     }
   },
   "decomposedSourceBlobs": {
@@ -9544,7 +9808,8 @@
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "53399c9ae8a9d7d137f9e4723186f0400429cab3",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
-    "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704"
+    "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
+    "addons/connect4-live-line-evaluator.mjs": "c3fee0906a8329ee68219946a3771e54cdee5a2d"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
