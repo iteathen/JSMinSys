@@ -76,13 +76,14 @@
         "popcount32",
         "popcount2x32SparseHigh",
         "popcount2x32",
+        "popcount3x32",
         "fillPopcount10Table32",
         "popcount2x32High10Table",
         "popcount32Sparse",
         "popcount2x32SparseBits",
         "popcount2x32High10Sparse"
       ],
-      "note": "Exact popcount profiles now cover fixed fused SWAR, set-bit sparsity, high-lane emptiness, high<=10 table lookup, and their combined distribution/cache profile. Selection remains explicit from configured width, occupancy distribution, and cache evidence."
+      "note": "Exact popcount profiles now cover fixed fused SWAR across one, two, and three 32-bit lanes, plus set-bit sparsity, high-lane emptiness, high<=10 table lookup, and combined distribution/cache profiles. Selection remains explicit from configured width, occupancy distribution, and cache evidence."
     },
     {
       "id": 5,

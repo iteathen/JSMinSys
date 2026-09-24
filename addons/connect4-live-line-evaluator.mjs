@@ -1,5 +1,5 @@
 import {popcount32} from '../src/word32.mjs';
-import {popcount2x32} from '../src/word64x32.mjs';
+import {popcount3x32} from '../src/word64x32.mjs';
 
 // Exact advisory evaluator for potential winning-line contribution.
 //
@@ -95,8 +95,9 @@ export function evaluateConnect4LiveLine3x32(
   state,
   playerOffset,
 ){
-  return popcount2x32(
+  return popcount3x32(
     state[playerOffset]&through[throughOffset],
     state[playerOffset+1]&through[throughOffset+1],
-  )+popcount32(state[playerOffset+2]&through[throughOffset+2]);
+    state[playerOffset+2]&through[throughOffset+2],
+  );
 }

@@ -6627,6 +6627,27 @@
       }
     },
     {
+      "name": "popcount3x32",
+      "source": "src/word64x32.mjs",
+      "block": "popcount",
+      "primitives": [
+        ">>>",
+        "-",
+        "&",
+        "+",
+        "=",
+        "Math.imul"
+      ],
+      "status": "implemented",
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "fixed",
+        "cycles": 31,
+        "note": "Three lanes perform SWAR through exact 4-bit nibble counts (0..4 each); their sum is <=12 per nibble, so one shared byte-collapse and final IMUL/shift yields exact 0..96 cardinality without cross-nibble carry."
+      }
+    },
+    {
       "name": "playableColumn32",
       "source": "src/indexed32.mjs",
       "block": "legal-landing-cell",
@@ -8356,11 +8377,11 @@
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 296,
+    "functionsImplemented": 297,
     "catalogBlocks": 30,
     "blocksCompleteWithoutNewPrimitive": 29,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 296,
+    "functionsWithCycleCount": 297,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 30,
     "blocksCompletedWithAdmittedPrimitive": 1

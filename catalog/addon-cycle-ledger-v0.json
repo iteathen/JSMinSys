@@ -9731,33 +9731,24 @@
           "count": 3
         },
         {
-          "op": "alu.add.u32",
-          "count": 1
-        },
-        {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "popcount2x32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "popcount32"
+          "target": "popcount3x32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+C(alu.add.u32)+CALL(popcount2x32)+CALL(popcount32)",
-        "note": "Branchless three-word score: fuse the first two live-line words through the sealed 23-cycle popcount2x32, then add one 14-cycle popcount32. Static ledger removes one add and replaces two 14-cycle SWAR calls with one 23-cycle fused call."
+        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+CALL(popcount3x32)",
+        "note": "Branchless exact three-word score using the sealed 31-cycle popcount3x32 primitive. Relative to the retained 2+1 composition, removes one final add and replaces 23+14 count cycles with one 31-cycle triple-lane count."
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "candidate": "fused-two-word-live-line-popcount",
-        "baseline": "646bfab77e37a9c5923535c75dd843247222d896",
-        "prior": "3*CALL(popcount32)+2*C(alu.add.u32)",
-        "new": "CALL(popcount2x32)+CALL(popcount32)+C(alu.add.u32)",
-        "staticSerialDelta": "-6 cycles per scored three-word cell under the current sealed ledgers",
-        "semantics": "exact sum of three live-line word popcounts unchanged"
+        "candidate": "fused-three-word-live-line-popcount",
+        "baseline": "7428c014a542f7596e2b2e43dce84053a8c6473a",
+        "prior": "CALL(popcount2x32)+CALL(popcount32)+C(alu.add.u32)",
+        "new": "CALL(popcount3x32)",
+        "staticSerialDelta": "-7 cycles per scored three-word cell under current sealed ledgers",
+        "semantics": "exact sum of all three live-line word popcounts unchanged"
       }
     },
     {
@@ -10510,7 +10501,7 @@
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "dbf9fb7775670e6246470a31f7ffb2a1149b0508",
+    "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
   },
