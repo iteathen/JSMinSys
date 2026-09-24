@@ -117,7 +117,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   const g=state.g,base=q*t.keyWords,basisBase=q*t.basisCapacity,terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
-  const n=t.basisSize[q];if(!g.lineCount||!n)return RBA_EXACT_DRAW;
+  const n=t.basisSize[q];if(!n)return RBA_EXACT_DRAW;
   if(bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
 
   state.boundaryCalls+=1;
@@ -237,7 +237,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   if(terminal)return terminal;
 
   const n=t.basisSize[q];
-  if(!g.lineCount||!n)return RBA_EXACT_DRAW;
+  if(!n)return RBA_EXACT_DRAW;
   const rank=meta>>>2,mover=rank&1;
 
   state.cpcCalls+=1;
