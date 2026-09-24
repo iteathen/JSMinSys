@@ -234,6 +234,15 @@ test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>
 });
 
 
+test('multi-action preemption count implies <=32-column mask support',()=>{
+  const g=prepareConnect4RbaGeometry({columns:33,rows:4,specializationBudgetBytes:0}),
+    q=connect4RbaFromMoves([16],{geometry:g,canonical:false}),
+    s=prepareConnect4CpcScratch(g);
+  evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s);
+  assert.equal(s.forkTargets32,null);
+  assert.ok(s.preemptionCount[0]<=1);
+});
+
 test('CPC fork precursor restricts current defense without recursion',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6});
   // d1, b1, f1: e1 is an attacker enabler; c1/g1 are the two future singleton endpoints.
