@@ -37,6 +37,16 @@ test('live-line evaluator keeps only winning lines not blocked by the opponent',
 
   // P0 occupies bottom-center cell 3. Every P1 line through cell 3 dies.
   addons.advanceConnect4LiveLineState32(profile,stack,0,0,3,stack,profile.stateWords);
+
+  // The fused transition is also the root-replay path: same-frame in-place
+  // mutation must produce exactly the same live-line state as a disjoint frame.
+  const inPlace=new Uint32Array(profile.stateWords);
+  addons.resetConnect4LiveLineState32(profile,inPlace,0);
+  addons.advanceConnect4LiveLineState32(profile,inPlace,0,0,3,inPlace,0);
+  assert.deepEqual(
+    Array.from(inPlace),
+    Array.from(stack.slice(profile.stateWords,profile.stateWords*2)),
+  );
   const p1Expected=[2,2,2,0,2,2,2];
   for(let column=0;column<7;column+=1)
     assert.equal(

@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/isomax-search-opt-ab.yml'
       - 'addons/rba-connect4-alphabeta.mjs'
+      - 'addons/connect4-live-line-evaluator.mjs'
       - 'addons/cpc-connect4.mjs'
       - 'addons/rba-connect4-coordinate.mjs'
       - 'addons/rba-connect4-profile.mjs'
@@ -31,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          baseline=18785a39b8dec6e7d5da845ababb405448e8ec5c
+          baseline=f191c5f2885d9ae0a966096c1616d597f7fbc58c
           candidate="$GITHUB_SHA"
           run_phase() {
             local label="$1"
