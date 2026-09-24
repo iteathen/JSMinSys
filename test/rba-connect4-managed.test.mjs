@@ -72,6 +72,13 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
     assert.ok(managed.metrics.claims>0);
     assert.ok(managed.metrics.evaluations>0);
     assert.ok(managed.metrics.transitions>0);
+    assert.equal(managed.metrics.alphaBetaNodes,serial.metrics.nodes);
+    assert.equal(managed.metrics.cutoffs,serial.metrics.cutoffs);
+    assert.equal(managed.metrics.cacheHits,serial.metrics.cacheHits);
+    assert.equal(managed.metrics.cofactors,serial.metrics.cofactors);
+    assert.equal(managed.metrics.transitions,serial.metrics.cofactors);
+    assert.equal(managed.metrics.branches,0);
+    assert.equal(managed.metrics.ttLive,1);
   }
 });
 
