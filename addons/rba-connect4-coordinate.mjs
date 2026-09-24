@@ -30,26 +30,29 @@ export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cel
 }
 
 export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
-  const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
-  if(terminal||column<0||column>=g.columns)return -1;
+  const meta=source[src+g.metaOffset];
+  if((meta&3)||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
-  const cell=height*g.columns+column,player=rank&1;
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+}
+export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+}
+export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
   sizes[sizeIndex]=0;
 
-  const singleton=g.singletonByCell[cell];
-  if(singleton>=0){
-    // Basis ids are sorted. Singleton shape ids occupy the first shape-size
-    // class, so stop as soon as the target id has been passed instead of
-    // scanning the entire residual basis on every played cell.
-    const coord=src+(player?g.p1Offset:g.p0Offset);
-    let lo=0,hi=n;
-    while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
-    if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
-      const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
-    }
+  // Every physical cell is a singleton residual whenever winning geometry
+  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
+  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
@@ -104,6 +107,7 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   }
   return 0;
 }
+
 
 function compareReflectedSupport(g,words,offset){
   const half=g.columns>>>1;

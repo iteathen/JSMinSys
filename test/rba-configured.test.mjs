@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
+import {prepareConnect4RbaGeometry,prepareConnect4RbaCoordinateScratch} from '../addons/rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from '../addons/rba-connect4-profile.mjs';
+import {connect4RbaCofactor,connect4RbaCofactorKnownLegal} from '../addons/rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from '../addons/rba-connect4-front.mjs';
 import {connect4RbaFromMoves,prepareConnect4RbaEvaluator,evaluateConnect4RbaTt32,publishConnect4RbaEvaluation32,reconcileConnect4RbaEvent32,assertConnect4RbaTtCompatibility} from '../addons/rba-connect4-solver.mjs';
 import {createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,rbaTtTake32,rbaTtTakeEvent32,RBA_TT_DONE,RBA_TT_STOP} from '../addons/rba-tt32.mjs';
@@ -37,6 +38,42 @@ test('geometry derives different native carrier sizes for 4x4 and 10x10',()=>{
   const a=prepareConnect4RbaGeometry({columns:4,rows:4}),b=prepareConnect4RbaGeometry({columns:10,rows:10});
   assert.equal(a.lineCount,10);assert.equal(a.edgeCapacity,4);assert.equal(a.coordWords,1);assert.equal(a.keyWords,7);
   assert.equal(b.lineCount,238);assert.equal(b.edgeCapacity,10);assert.equal(b.coordWords,8);assert.equal(b.keyWords,27);assert.ok(b.shapeCount>625);
+});
+
+test('configured winning geometry implies singleton residual id equals physical cell',()=>{
+  for(const [columns,rows] of [[1,4],[4,1],[3,5],[7,6],[10,10]]){
+    const g=prepareConnect4RbaGeometry({columns,rows});
+    assert.ok(g.lineCount>0,columns+'x'+rows);
+    assert.equal(g.pairShapeStart,g.cellCount,columns+'x'+rows+' singleton prefix');
+    for(let cell=0;cell<g.cellCount;cell+=1){
+      assert.equal(g.shapeSize[cell],1,columns+'x'+rows+' cell '+cell+' size');
+      assert.equal(g.shapeCells[cell*4],cell,columns+'x'+rows+' cell '+cell+' id');
+    }
+    assert.equal('singletonByCell' in g,false,columns+'x'+rows+' redundant singleton map');
+  }
+  const none=prepareConnect4RbaGeometry({columns:3,rows:3});
+  assert.equal(none.lineCount,0);
+  assert.equal(none.shapeCount,0);
+});
+
+
+test('known-legal cofactor matches checked ingress after caller assertions',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),profile=prepareConnect4RbaExecutionProfile(g),
+    root=connect4RbaFromMoves([3,2,3,2],{geometry:g,canonical:false}),
+    aWords=new Uint32Array(g.keyWords),bWords=new Uint32Array(g.keyWords),
+    aBasis=new Uint32Array(g.maxBasis),bBasis=new Uint32Array(g.maxBasis),
+    aSize=new Uint32Array(1),bSize=new Uint32Array(1),
+    aScratch=prepareConnect4RbaCoordinateScratch(g),bScratch=prepareConnect4RbaCoordinateScratch(g),
+    column=3;
+  const a=connect4RbaCofactor(g,profile,root.words,0,root.basis,0,root.basis.length,column,
+    aWords,0,aBasis,0,aScratch.seen,aSize,0,aScratch.map,aScratch.inverse);
+  const b=connect4RbaCofactorKnownLegal(g,profile,root.words,0,root.basis,0,root.basis.length,column,
+    bWords,0,bBasis,0,bScratch.seen,bSize,0,bScratch.map,bScratch.inverse);
+  assert.equal(a,b);
+  assert.deepEqual(aWords,bWords);
+  assert.deepEqual([...aBasis.slice(0,aSize[0])],[...bBasis.slice(0,bSize[0])]);
+  assert.equal(connect4RbaCofactor(g,profile,root.words,0,root.basis,0,root.basis.length,-1,
+    aWords,0,aBasis,0,aScratch.seen,aSize,0,aScratch.map,aScratch.inverse),-1);
 });
 
 test('configured RBA coordinates match independent physical residuals on 4x4 and 10x10',()=>{

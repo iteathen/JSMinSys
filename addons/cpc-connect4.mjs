@@ -56,7 +56,7 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
     // once from that ordering, so singleton scans require no shape-size load.
     if(id>=g.pairShapeStart)break;
     if(!coordHas(words,coord,i))continue;
-    const cell=g.shapeCells[id*4],word=cell>>>5,mask=1<<(cell&31);
+    const cell=id,word=cell>>>5,mask=1<<(cell&31);
     if(bits[word]&mask)continue;
     bits[word]|=mask;any=1;
     const column=g.cellColumn[cell];
@@ -232,7 +232,7 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
     for(let i=0;i<basisSize;i+=1){
       const id=basis[basisOffset+i];if(id>=g.pairShapeStart)break;
       if(!coordHas(words,coord,i))continue;
-      const cell=g.shapeCells[id*4];
+      const cell=id;
       if(connect4CpcTargetOwner32(g,words,offset,cell)!==player)continue;
       scratch.projectedCells[store+count]=cell;
       scratch.projectedOwner[store+count]=player;
@@ -255,13 +255,23 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
 // Projected singleton/fork counts remain advisory until their temporal/response
 // guards close.
 export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize,scratch){
+  const terminal=words[offset+g.metaOffset]&3;
+  if(!terminal)return evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch);
+  scratch.interval[0]=terminal;scratch.interval[1]=terminal;scratch.forcedColumn[0]=-1;
+  scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
+  if(scratch.projectedAdvisory){
+    scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
+  }
+  return CPC_EXACT;
+}
+
+export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch){
   scratch.interval[0]=1;scratch.interval[1]=3;scratch.forcedColumn[0]=-1;
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   if(scratch.projectedAdvisory){
     scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
   }
-  const meta=words[offset+g.metaOffset],terminal=meta&3,rank=meta>>>2,mover=rank&1;
-  if(terminal){scratch.interval[0]=terminal;scratch.interval[1]=terminal;return CPC_EXACT;}
+  const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
 
   const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
   for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}

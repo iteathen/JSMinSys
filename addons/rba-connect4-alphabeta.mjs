@@ -1,9 +1,9 @@
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
-import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
@@ -105,7 +105,7 @@ function search(state,depth,alpha,beta){
   const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
-  const cpcKind=evaluateConnect4Cpc32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
   if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
@@ -138,7 +138,7 @@ function search(state,depth,alpha,beta){
   if(semanticHi<beta)beta=semanticHi;
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
+    usePreempt=preemptCount>1,useFront=state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth,row=depth*g.columns,
     childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
     actionStart=forced>=0?g.priorityByColumn[forced]:0,actionEnd=forced>=0?actionStart+1:g.columns;
   let legal=0;
@@ -161,18 +161,17 @@ function search(state,depth,alpha,beta){
 
   let best=-2,cut=0;
   for(let oi=actionStart;oi<actionEnd;oi+=1){
-    const column=g.actionOrder[oi];
-    if(words[keyOffset+column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    const column=g.actionOrder[oi],height=words[keyOffset+column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     if(!useFront)legal=1;
     let value;
     if(useFront&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];
     }else{
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
-      const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
+      const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
-      if(term<0)continue;
       if(term)value=absToRelative(term,mover);
       else{
         connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
@@ -204,7 +203,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   state.basisSize[0]=root.basis.length;
   const rootMeta=state.words[g.metaOffset],mover=(rootMeta>>>2)&1,terminal=rootMeta&3;
   if(terminal)return {value:terminal,relative:absToRelative(terminal,mover),move:-1,metrics:metrics(state)};
-  const cpcKind=evaluateConnect4Cpc32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
   let rootLo=state.cpc.interval[0],rootHi=state.cpc.interval[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT)state.cpcExact+=1;else if(cpcKind===CPC_BOUND)state.cpcBounds+=1;else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
@@ -229,7 +228,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }
   let best=-2,bestMove=-1;
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
-    usePreempt=preemptCount>1&&g.columns<=32,row=0,childKey=g.keyWords,childBasis=g.maxBasis,
+    usePreempt=preemptCount>1,row=0,childKey=g.keyWords,childBasis=g.maxBasis,
     forcedCaller=forced<0?-1:reflected?g.mirrorColumn[forced]:forced,
     actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,actionEnd=forcedCaller>=0?actionStart+1:g.columns;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.front&&state.front.depth){
@@ -244,8 +243,9 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }
   }
   for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
-    const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
-    if(state.words[column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller,
+      height=state.words[column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     // If the mover's exact root value is a loss, every surviving legal action
     // has that same value. The first initialization-ordered action is therefore
     // already the deterministic optimal witness.
@@ -254,9 +254,9 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];state.frontActionExact+=1;
     }else{
-    const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
+    const term=connect4RbaCofactorKnownHeight(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,height,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map,state.coord.inverse);
-    state.cofactors+=1;if(term<0)continue;
+    state.cofactors+=1;
     if(term)value=absToRelative(term,mover);
     else{
       connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
