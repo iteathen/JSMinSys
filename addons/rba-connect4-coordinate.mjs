@@ -1,4 +1,4 @@
-import {emitSortedSetBits32} from '../src/basis32.mjs';
+import {emitSortedSetBits32,emitSortedSetBitsAt32} from '../src/basis32.mjs';
 import {publishSpan32} from '../src/widekey32.mjs';
 import {connect4RbaShapeContains} from './rba-connect4-geometry.mjs';
 
@@ -18,27 +18,29 @@ export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffse
   }
   return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
-export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed=null){
-  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed=null,seenOffset=0){
+  for(let w=0;w<g.shapeWordCount;w+=1)seen[seenOffset+w]=0;
   const remove=profile.prepareRemove(g,cell);
   for(let i=0;i<count;i+=1){
     const id=profile.removePrepared(g,parent[parentOffset+i],remove);
     if(removed)removed[i]=id;
-    if(id>=0)seen[id>>>5]|=1<<(id&31);
+    if(id>=0)seen[seenOffset+(id>>>5)]|=1<<(id&31);
   }
-  return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
+  return seenOffset
+    ?emitSortedSetBitsAt32(seen,seenOffset,g.shapeWordCount,out,outOffset)
+    :emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 
-export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset];
   if((meta&3)||column<0||column>=g.columns)return -1;
   const height=source[src+column];if(height>=g.rows)return -1;
-  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
-export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
-  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
-export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
@@ -56,7 +58,7 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
+  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
   // One child-basis pass publishes the exact id->index map already owned by
   // coordinate scratch and discovers all cardinality boundaries.
   let childPair=cn,childTriple=cn,childQuad=cn;
@@ -117,7 +119,7 @@ function compareReflectedSupport(g,words,offset){
   }
   return 0;
 }
-export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratch){
+export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratch,selectedSet=null,selectedSetOffset=0){
   const primary=compareReflectedSupport(g,words,offset);
   if(primary<0)return 0;
 
@@ -143,5 +145,6 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
   scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
   publishSpan32(words,offset,scratch.mirror,0,g.keyWords);
   publishSpan32(basis,bi,scratch.mirrorBasis,0,n);
+  if(selectedSet)publishSpan32(selectedSet,selectedSetOffset,scratch.seen,0,g.shapeWordCount);
   return 1;
 }

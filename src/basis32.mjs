@@ -12,6 +12,20 @@ export function emitSortedSetBits32(seen, wordCount, out, outOffset) {
   return count;
 }
 
+export function emitSortedSetBitsAt32(seen, seenOffset, wordCount, out, outOffset) {
+  let count = 0;
+  for (let word = 0; word < wordCount; word += 1) {
+    let bits = seen[seenOffset + word];
+    while (bits) {
+      const bit = 31 - Math.clz32(bits & -bits);
+      out[outOffset + count] = word * 32 + bit;
+      count += 1;
+      bits &= bits - 1;
+    }
+  }
+  return count;
+}
+
 // table is action-major: table[actionBase + sourceId] -> mapped id or missingValue.
 // seen is caller-owned scratch spanning the mapped-id domain.
 export function transformDedupSortedActionMajor32(
