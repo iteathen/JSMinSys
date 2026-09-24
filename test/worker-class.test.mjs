@@ -9,9 +9,15 @@ test('Worker is the minimal canonical JSMinSys worker base', () => {
   assert.equal(worker.owner,7);
   assert.deepEqual(Object.keys(worker),['owner']);
   assert.equal(worker instanceof Worker,true);
+  assert.throws(()=>worker.run(),/Worker\.run must be implemented/);
 
-  class SpecializedWorker extends Worker {}
+  class SpecializedWorker extends Worker {
+    run(){
+      return this.owner;
+    }
+  }
   const specialized=new SpecializedWorker(9);
   assert.equal(specialized.owner,9);
   assert.equal(specialized instanceof Worker,true);
+  assert.equal(specialized.run(),9);
 });
