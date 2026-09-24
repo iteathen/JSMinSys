@@ -94,7 +94,12 @@ export function evaluateConnect4LiveLine3x32(
   state,
   playerOffset,
 ){
-  return popcount32(state[playerOffset]&through[throughOffset])+
-    popcount32(state[playerOffset+1]&through[throughOffset+1])+
-    popcount32(state[playerOffset+2]&through[throughOffset+2]);
+  const m0=through[throughOffset],m1=through[throughOffset+1],m2=through[throughOffset+2];
+  if(!m2){
+    const score0=popcount32(state[playerOffset]&m0);
+    return m1?score0+popcount32(state[playerOffset+1]&m1):score0;
+  }
+  const score2=popcount32(state[playerOffset+2]&m2);
+  if(!m0)return score2+popcount32(state[playerOffset+1]&m1);
+  return popcount32(state[playerOffset]&m0)+popcount32(state[playerOffset+1]&m1)+score2;
 }
