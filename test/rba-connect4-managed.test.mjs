@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry,shareConnect4RbaGeometry32} from '../addons/rba-connect4-geometry.mjs';
-import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4RbaFromMoves,prepareConnect4CpcRbaEvaluator} from '../addons/rba-connect4-solver.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
   solveConnect4RbaAlphaBeta,
@@ -23,6 +23,21 @@ test('managed workers share one immutable prepared geometry image',()=>{
     assert.deepEqual([...copy],[...value],key+' contents');
   }
   assert.equal(shareConnect4RbaGeometry32(shared).lineShape.buffer,shared.lineShape.buffer);
+});
+
+test('managed path can omit physical position-code capability without changing RBA q',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    moves=[3,2,3,2],
+    coded=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),
+    uncoded=connect4RbaFromMoves(moves,{geometry:g,canonical:false,positionCode:false}),
+    state=prepareConnect4CpcRbaEvaluator({geometry:g,positionCode:false});
+  assert.deepEqual(uncoded.words,coded.words);
+  assert.deepEqual(uncoded.basis,coded.basis);
+  assert.equal(uncoded.positionLo,0);
+  assert.equal(uncoded.positionHi,0);
+  assert.equal(state.childPositionLo,null);
+  assert.equal(state.childPositionHi,null);
+  assert.equal(state.positionCode,0);
 });
 
 test('managed Connect4 add-on owns host/worker/manager composition without changing solver semantics',async()=>{
