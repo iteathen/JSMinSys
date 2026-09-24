@@ -74,3 +74,18 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
     assert.ok(managed.metrics.transitions>0);
   }
 });
+
+
+test('exact managed completion publishes worker telemetry before host cleanup',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
+    managed=await runManagedConnect4CpcRba32(moves,{
+      geometry:g,
+      workers:2,
+      timeoutMs:5000,
+    });
+  assert.equal(managed.status,'EXACT',JSON.stringify(managed));
+  assert.ok(managed.metrics.evaluations>0,JSON.stringify(managed));
+  assert.ok(managed.metrics.claims>0,JSON.stringify(managed));
+  assert.ok(managed.metrics.transitions>0,JSON.stringify(managed));
+});
