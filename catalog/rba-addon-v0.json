@@ -86,7 +86,8 @@
     "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan",
     "worker publication can create equivalent surplus rows; only Branch Manager dedupe collapses them",
     "Branch Manager reset signal stops a worker from publishing work that became redundant after merge",
-    "worker-published surplus is visible before manager reconciliation; manager does not manufacture ready work"
+    "worker-published surplus is visible before manager reconciliation; manager does not manufacture ready work",
+    "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -182,5 +183,22 @@
     ],
     "lifetimePolicy": "Reference/pin updates are implementation bookkeeping beneath manager-owned topology cleanup; they are not a separate semantic responsibility.",
     "capacityPolicy": "Capacity recovery is a consequence of removing redundant/dead state while preserving live useful evidence; increasing TT size is not a substitute for manager maintenance."
+  },
+  "neutralTokenQuotient": {
+    "status": "qualified-subsumed-by-rba",
+    "meaning": "An occupied cell whose location belongs to no still-possible winning line has no player-ownership meaning; support still preserves its gravity/occupancy effect.",
+    "implementation": "Do not add a second neutral-token/live-line identity carrier. The existing support-local RBA residual coordinates already erase all such ownership distinctions and additionally merge states whose distinct geometric lines have identical remaining future requirements.",
+    "evidence": {
+      "geometry": "exhaustive reachable 4x4 legal state space",
+      "states": 161029,
+      "neutralTokenClasses": 42168,
+      "rbaQClasses": 34461,
+      "neutralClassesSplitAcrossRbaQ": 0,
+      "rbaQWithMultipleNeutralClasses": 15182,
+      "nonterminalRbaCollapses": 13259,
+      "maxNeutralClassesPerRbaQ": 84,
+      "maxPhysicalStatesPerRbaQ": 5336
+    },
+    "consequence": "Potential-winning structure should be consumed from the maintained residual requirement coordinates. Raw geometric live-line masks or explicit neutral-token ownership would be a finer, more expensive duplicate authority."
   }
 }
