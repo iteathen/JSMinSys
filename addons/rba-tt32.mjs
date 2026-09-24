@@ -265,7 +265,6 @@ function managerMergeKnownDuplicate32(t,duplicate,canonical,resetTargets){
   if(!t.execution[duplicate]&&!t.refs[duplicate])rbaTtRecycle32(t,duplicate);
   return 1;
 }
-}
 
 export function rbaTtManagerMergeDuplicate32(t,duplicate,canonical,resetTargets){
   if(duplicate<0||canonical<0||duplicate===canonical||!t.live[duplicate]||!t.live[canonical])return 0;
@@ -360,33 +359,44 @@ function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
   const keyWords=t.keyWords,primary=primaryWord32(keyWords);
   let groups=0,merged=0;
 
-  // Collapse equal fresh seeds first so each surviving seed owns exactly one
-  // equivalence group before the single live-table pass.
+  // Compact fresh seeds into distinct exact-q groups without mutating TT
+  // topology. Duplicate fresh seeds remain live until the bulk merge pass.
   for(let i=0;i<count;i+=1){
     const seed=scratch[i];
     if(!t.live[seed]||t.redirect[seed]>=0||t.inspectGeneration[seed]===t.generation[seed])continue;
     const seedBase=seed*keyWords;
-    let duplicate=0;
+    let known=0;
     for(let j=0;j<groups;j+=1){
-      const canonical=scratch[j];
-      if(!t.live[canonical]||t.redirect[canonical]>=0)continue;
-      if(equalKeyPrimaryFirst32(t.keys,seedBase,canonical*keyWords,keyWords,primary)){
-        t.inspectGeneration[seed]=t.generation[seed];
-        merged+=managerMergeKnownDuplicate32(t,seed,canonical,resetTargets);
-        duplicate=1;
-        break;
+      const representative=scratch[j];
+      if(!t.live[representative]||t.redirect[representative]>=0)continue;
+      if(equalKeyPrimaryFirst32(t.keys,seedBase,representative*keyWords,keyWords,primary)){
+        known=1;break;
       }
     }
-    if(!duplicate){
-      scratch[groups]=seed;
-      t.inspectGeneration[seed]=t.generation[seed];
-      groups+=1;
+    if(!known){scratch[groups]=seed;groups+=1;}
+  }
+  if(!groups)return 0;
+
+  // Pass 1: choose the same strongest/oldest canonical policy as the hashed
+  // path, amortized across every fresh equivalence group in this batch.
+  for(let scan=0;scan<t.capacity;scan+=1){
+    if(!t.live[scan]||t.redirect[scan]>=0)continue;
+    const scanBase=scan*keyWords,scanPrimary=t.keys[scanBase+primary];
+    for(let i=0;i<groups;i+=1){
+      const canonical=scratch[i];
+      if(!t.live[canonical]||t.redirect[canonical]>=0)continue;
+      const canonicalBase=canonical*keyWords;
+      if(scanPrimary!==t.keys[canonicalBase+primary])continue;
+      if(!equalKeyPrimaryFirst32(t.keys,scanBase,canonicalBase,keyWords,primary))continue;
+      if(t.exact[scan]>t.exact[canonical]||
+         (t.exact[scan]===t.exact[canonical]&&scan<canonical))scratch[i]=scan;
+      break;
     }
   }
-  if(!groups)return merged;
 
-  // One dense q-index pass normalizes every live duplicate for all fresh
-  // groups. Most rows die on one existing residual-word comparison.
+  // Pass 2: one more dense pass redirects every member directly to the final
+  // canonical. No hash, bucket lookup, locator check, or equality revalidation
+  // occurs inside the merge mutation itself.
   for(let scan=0;scan<t.capacity;scan+=1){
     if(!t.live[scan]||t.redirect[scan]>=0)continue;
     const scanBase=scan*keyWords,scanPrimary=t.keys[scanBase+primary];
@@ -401,7 +411,28 @@ function managerNormalizeLinearBatch32(t,resetTargets,scratch,count){
       break;
     }
   }
+  for(let i=0;i<groups;i+=1){
+    const canonical=scratch[i];
+    if(t.live[canonical]&&t.redirect[canonical]<0)
+      t.inspectGeneration[canonical]=t.generation[canonical];
+  }
   return merged;
+}
+
+function managerFindEquivalentLinear32(t,q){
+  if(!t.live[q]||t.redirect[q]>=0)return -1;
+  const keyWords=t.keyWords,primary=primaryWord32(keyWords),base=q*keyWords;
+  const primaryValue=t.keys[base+primary];
+  let best=q;
+  for(let scan=0;scan<t.capacity;scan+=1){
+    if(scan===q||!t.live[scan]||t.redirect[scan]>=0)continue;
+    const other=scan*keyWords;
+    if(t.keys[other+primary]!==primaryValue)continue;
+    if(!equalKeyPrimaryFirst32(t.keys,other,base,keyWords,primary))continue;
+    if(t.exact[scan]>t.exact[best]||
+       (t.exact[scan]===t.exact[best]&&scan<best))best=scan;
+  }
+  return best===q?-1:best;
 }
 
 export function rbaTtManagerInspectReady32(t,resetTargets,budget=64,scratch=null){
@@ -445,11 +476,16 @@ export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
   while(seen<budget){
     if(q>=t.capacity)q=0;
     if(t.live[q]){
-      if(t.bucket[q]!==RBA_TT_BUCKET_NONE&&t.redirect[q]<0&&
-         t.phase[q]===RBA_TT_PHASE_NEW&&t.inspectGeneration[q]!==t.generation[q]){
+      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW&&
+         t.inspectGeneration[q]!==t.generation[q]){
         t.inspectGeneration[q]=t.generation[q];
-        const equivalent=rbaTtFindEquivalent32(t,q);
-        if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+        if(t.bucket[q]===RBA_TT_BUCKET_NONE){
+          const equivalent=managerFindEquivalentLinear32(t,q);
+          if(equivalent>=0)managerMergeKnownDuplicate32(t,q,equivalent,resetTargets);
+        }else{
+          const equivalent=rbaTtFindEquivalent32(t,q);
+          if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
+        }
       }
       if(t.live[q]&&t.exact[q]&&q!==t.control[RBA_TT_ROOT]&&t.readyMember[q])rbaTtUnqueueReady32(t,q);
       if(t.live[q]&&t.redirect[q]>=0&&!t.execution[q]&&!t.refs[q]&&t.count[q])rbaTtDetachDependencies32(t,q);
