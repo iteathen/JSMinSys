@@ -27,7 +27,7 @@ import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 const HOST_WORKER_DIED=101;
 const HOST_DEADLINE=102;
 const HOST_CANCELLED=103;
-const CONNECT4_CPC_RBA_METRIC_WIDTH=12;
+const CONNECT4_CPC_RBA_METRIC_WIDTH=16;
 const WITNESS_OFFSET_BYTES=0;
 const RESET_OFFSET_BYTES=4;
 
@@ -134,6 +134,7 @@ export async function runManagedConnect4CpcRba32(moves,{
           resetCount:workers,
           metricOffsetBytes:runtime.metricBaseBytes+i*runtime.metricStrideBytes,
           owner:i+2,
+          root,
           rootReflected:root.reflected,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
@@ -174,6 +175,10 @@ export async function runManagedConnect4CpcRba32(moves,{
       cpcPrecursors:metricOut[9],
       transitions:metricOut[10],
       readyExposure:metricOut[11],
+      alphaBetaNodes:metricOut[12],
+      cutoffs:metricOut[13],
+      cacheHits:metricOut[14],
+      cofactors:metricOut[15],
       ttLive:table.control[RBA_TT_LIVE],
       readyCount:table.control[RBA_TT_READY_COUNT],
       eventCount:table.control[RBA_TT_EVENT_COUNT],

@@ -1974,7 +1974,7 @@
         {
           "op": "memory.allocate.shared.bytes",
           "count": 1,
-          "bytes": "ALIGN8(8 + 4*W) + 96*W"
+          "bytes": "ALIGN8(8 + 4*W) + 128*W"
         },
         {
           "op": "runtime.typed_view.construct",
@@ -1999,7 +1999,7 @@
         "parameters": {
           "W": "managed evaluator worker count"
         },
-        "note": "Cold setup. SharedArrayBuffer allocation and typed-view construction remain explicit symbolic runtime costs."
+        "note": "Cold setup. Per-worker metric slab is 16 Float64 values (128 bytes); SharedArrayBuffer allocation and typed-view construction remain explicit symbolic runtime costs."
       },
       "status": "decomposed"
     },
@@ -2113,7 +2113,7 @@
         "parameters": {
           "W": "managed evaluator worker count"
         },
-        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Residual cold host validation/property/result assembly is explicit as a nonzero symbolic local extension."
+        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Worker spawn remains symbolic in workerDataBytes and therefore includes structured cloning of the prepared root image added for Phase-1 local Negamax execution; residual host validation/property/result assembly remains nonzero symbolic bookkeeping."
       },
       "status": "decomposed"
     },
@@ -2189,7 +2189,16 @@
         {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "prepareConnect4CpcRbaEvaluator"
+          "target": "prepareConnect4RbaAlphaBeta"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareRbaBranchWorker32"
         },
         {
           "op": "runtime.call.subledger",
@@ -2198,23 +2207,30 @@
         },
         {
           "op": "runtime.counter.load",
-          "count": 11
+          "count": 4
         },
         {
           "op": "memory.store.f64",
-          "count": 12
+          "count": 4
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)+11*C(runtime.counter.load)+12*C(memory.store.f64)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+C(runtime.object.allocate)+CALL(prepareRbaBranchWorker32)+CALL(runRbaBranchWorkerLoop32)+4*C(runtime.counter.load)+4*C(memory.store.f64)",
         "unboundedTerms": [
           "CALL(runRbaBranchWorkerLoop32)"
         ],
-        "note": "Managed metrics are sampled before publish on evaluation 1 and every 1024 evaluations, then materialized once more after natural loop exit; numeric reads and Float64Array stores remain explicit symbolic costs."
+        "note": "Phase-1 managed worker prepares one local CPC-first Negamax state. Final loop-exit bookkeeping republishes only the four generic worker counters; exact Negamax metrics are written before exact publication inside evaluate."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "restore-local-negamax-authority",
+        "prior": "managed worker prepared the all-child CPC shared-q evaluator",
+        "removed": "CALL(prepareConnect4CpcRbaEvaluator) from the governing worker path",
+        "added": "CALL(prepareConnect4RbaAlphaBeta)+state object+CALL(prepareRbaBranchWorker32)",
+        "rationale": "shared TT remains claim/publication infrastructure while local Negamax regains search authority"
+      }
     },
     {
       "unit": "addons/rba-connect4-managed-worker.mjs#evaluate",
@@ -2223,68 +2239,52 @@
       "scope": "hot",
       "operations": [
         {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "evaluateConnect4CpcRbaTt32"
+          "target": "solveConnect4RbaAlphaBeta"
         },
         {
           "op": "runtime.counter.load",
+          "count": 15
+        },
+        {
+          "op": "runtime.metric.store",
           "count": 1
         },
         {
           "op": "alu.add.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.sub.u32",
           "count": 1
-        },
-        {
-          "op": "alu.and.u32",
-          "count": 1
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "runtime.counter.load",
-          "count": "10*S"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "S"
-        },
-        {
-          "op": "control.branch",
-          "count": "S"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "S"
         },
         {
           "op": "memory.store.f64",
-          "count": "12*S"
+          "count": 16
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(evaluateConnect4CpcRbaTt32)+C(runtime.counter.load)+C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)+S*(10*C(runtime.counter.load)+C(control.test.u32)+C(control.branch)+C(alu.add.u32)+12*C(memory.store.f64))",
-        "parameters": {
-          "S": "1 on evaluation numbers 1, 1025, 2049, ...; 0 otherwise"
-        },
-        "note": "Managed telemetry snapshots before publish on the first evaluation and every 1024 evaluations thereafter. On a sampled branch evaluation, the snapshot includes the pending branch increment from the already-known result code, so exact/cleanup races cannot leave completed branch work reported as zero."
+        "expression": "2*C(control.test.u32)+2*C(control.branch)+CALL(solveConnect4RbaAlphaBeta)+15*C(runtime.counter.load)+C(runtime.metric.store)+2*C(alu.add.u32)+C(alu.sub.u32)+16*C(memory.store.f64)",
+        "note": "A claimed Phase-1 q is solved exactly by the existing CPC-first Negamax kernel. Metrics are materialized before publish, so DONE/host teardown cannot erase completed search evidence. The q/root guard rejects accidental surplus until Phase 2."
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "candidate": "race-safe-sampled-managed-telemetry",
-        "prior": "exit-only telemetry could be terminated after DONE before its post-loop snapshot",
-        "addedPerEvaluation": "C(runtime.counter.load)+C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)",
-        "sampledCost": "S*(10*C(runtime.counter.load)+C(control.test.u32)+C(control.branch)+C(alu.add.u32)+12*C(memory.store.f64))",
-        "preserved": "post-loop final snapshot remains for natural worker exit",
-        "branchCorrection": "sampled branch count includes +1 when the current evaluation code is RBA_BRANCH before publish can trigger downstream completion",
-        "rationale": "restores mechanically visible telemetry reliability without reintroducing the generic per-loop telemetry counter or host-side grace/barrier machinery"
+        "candidate": "negamax-exact-q-evaluation",
+        "prior": "CALL(evaluateConnect4CpcRbaTt32) pre-materialized every unresolved child before retained descent",
+        "removed": "all-child cofactor/canonicalize/CPC expansion and sampled branch-telemetry machinery from the governing callback",
+        "added": "CALL(solveConnect4RbaAlphaBeta) plus one exact-result metric snapshot",
+        "invariant": "recursive children remain inside the qualified kernel with value=-search(child,-beta,-alpha)",
+        "rationale": "restore cutoff-before-sibling-materialization"
       }
     },
     {
@@ -4142,9 +4142,9 @@
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "7f0863343f18e950f1625656953a424241da070d",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-managed-host.mjs": "010e59d535f85dd07dfcdb63415859b1ff44e88b",
+    "addons/rba-connect4-managed-host.mjs": "85aae8a395692d15a33dc04f7dfc4bd43109eb5e",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
-    "addons/rba-connect4-managed-worker.mjs": "d15c57e0b6f95e971a59476a9ed32abdaa6f540b",
+    "addons/rba-connect4-managed-worker.mjs": "942c00c1be0a5b7deb8d56a669a0fe34ccda8134",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f"
   }
