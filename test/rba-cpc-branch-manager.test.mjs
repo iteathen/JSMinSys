@@ -23,11 +23,11 @@ import {
   prepareRbaBranchWorker32,prepareRbaBranchManager32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
 } from '../addons/rba-branch-manager.mjs';
 
-function solveDistributed(g,moves){
+function solveDistributed(g,moves,basisCapacity=g.maxBasis){
   const root=connect4RbaFromMoves(moves,{geometry:g});
   const t=createRbaTt32({
     capacity:16384,bucketCount:16384,
-    keyWords:g.keyWords,basisCapacity:g.maxBasis,edgeCapacity:g.columns,
+    keyWords:g.keyWords,basisCapacity,edgeCapacity:g.columns,
   });
   const rootQ=rbaTtIntern32(t,root.words,0,root.basis,0,root.basis.length);
   rbaTtSetPositionCode32(t,rootQ,root.positionLo,root.positionHi);
@@ -62,8 +62,26 @@ function solveDistributed(g,moves){
     claims:worker.claims,
     branches:worker.branches,
     evaluations:worker.evaluations,
+    basisBytes:t.basis.byteLength,
   };
 }
+
+test('support-derived TT basis closes a late standard 7x6 control exactly',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    serial=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+      reflected:root.reflected,
+    }),
+    stored=solveDistributed(g,moves,g.maxBasis),
+    derived=solveDistributed(g,moves,0);
+  assert.equal(stored.value,serial.value,JSON.stringify({serial,stored}));
+  assert.equal(stored.move,serial.move,JSON.stringify({serial,stored}));
+  assert.equal(derived.value,serial.value,JSON.stringify({serial,derived}));
+  assert.equal(derived.move,serial.move,JSON.stringify({serial,derived}));
+  assert.equal(derived.basisBytes,0);
+});
 
 test('CPC-first branch-manager traversal agrees with exact CPC alpha-beta on 4x4 controls',()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4});
@@ -80,9 +98,12 @@ test('CPC-first branch-manager traversal agrees with exact CPC alpha-beta on 4x4
       state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
       reflected:root.reflected,
     });
-    const distributed=solveDistributed(g,moves);
+    const distributed=solveDistributed(g,moves),derived=solveDistributed(g,moves,0);
     assert.equal(distributed.value,serial.value,JSON.stringify({moves,serial,distributed}));
     assert.equal(distributed.move,serial.move,JSON.stringify({moves,serial,distributed}));
-    assert.ok(distributed.claims>0);
+    assert.equal(derived.value,serial.value,JSON.stringify({moves,serial,derived}));
+    assert.equal(derived.move,serial.move,JSON.stringify({moves,serial,derived}));
+    assert.ok(distributed.claims>0);assert.ok(derived.claims>0);
+    assert.ok(distributed.basisBytes>0);assert.equal(derived.basisBytes,0);
   }
 });
