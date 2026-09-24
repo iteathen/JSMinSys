@@ -94,6 +94,13 @@
         "min": 0
       },
       "note": "Worker terminate/join may block with no finite elapsed upper bound."
+    },
+    "runtime.legacy.addon.body": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "LEGACY_ADDON_BODY(unit,scenario)"
+      },
+      "note": "Historical add-on body is explicitly unresolved/nonzero until decomposed; never treated as free."
     }
   },
   "units": [
@@ -3649,6 +3656,87 @@
     "units": 176,
     "decomposed": 21,
     "legacySymbolicVisible": 155,
-    "missing": 0
+    "missing": 0,
+    "neesBoundOperations": 9,
+    "localExtensionOperations": 14
+  },
+  "neesOperationBindings": {
+    "alu.add.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "alu.imul.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 3
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "alu.and.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "control.test.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "control.branch": {
+      "cost": {
+        "kind": "scenario",
+        "predicted": 1,
+        "mispredicted": [
+          16,
+          20
+        ],
+        "unknown": "BRANCH_COST"
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "memory.load.u32": {
+      "cost": {
+        "kind": "scenario",
+        "L1": 4,
+        "L2": 12,
+        "L3": 47,
+        "unknown": "MEMORY_LOAD_COST"
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "memory.store.u32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STORE_COST",
+        "minCycles": 0.5
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "atomic.rmw.u32": {
+      "cost": {
+        "kind": "scenario",
+        "uncontended": [
+          7.5,
+          12
+        ],
+        "unknown": "ATOMIC_RMW_COST",
+        "minCycles": 7.5
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "atomic.wait": {
+      "cost": {
+        "kind": "unbounded",
+        "minCycles": 0
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    }
   }
 }
