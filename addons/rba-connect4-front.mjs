@@ -22,16 +22,17 @@ export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=1000
     next:new Uint32Array(g.maxBasis+1),heights:new Uint32Array(g.columns),rootRank:0};
 }
 function spend(a,n=1){if(a.steps+n>a.budget){a.error=RBA_BOUNDARY_INCOMPLETE;return 0;}a.steps+=n;return 1;}
-function insert(a,slot){
+function insertFrom(a,slot,source,sourceOffset){
   if(!spend(a))return a.error;
-  const n=a.profile.insertFront(a.words,a.base[slot],a.count[slot],a.capacity,a.recordWords,a.temp,0);
+  const n=a.profile.insertFront(a.words,a.base[slot],a.count[slot],a.capacity,a.recordWords,source,sourceOffset);
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[slot]=n;return 0;
 }
+function insert(a,slot){return insertFrom(a,slot,a.temp,0);}
 function swap(a,left,right){const b=a.base[left],n=a.count[left];a.base[left]=a.base[right];a.count[left]=a.count[right];a.base[right]=b;a.count[right]=n;}
 function universal(a,slot){a.count[slot]=1;const b=a.base[slot];for(let w=0;w<a.recordWords;w+=1)a.words[b+w]=0;}
 function combine(a,left,right,out,intersect){
   a.count[out]=0;
-  if(!intersect){swap(a,left,out);for(let i=0;i<a.count[right];i+=1){const b=a.base[right]+i*a.recordWords;for(let w=0;w<a.recordWords;w+=1)a.temp[w]=a.words[b+w];if(insert(a,out))return a.error;}return 0;}
+  if(!intersect){swap(a,left,out);for(let i=0;i<a.count[right];i+=1){const b=a.base[right]+i*a.recordWords;if(insertFrom(a,out,a.words,b))return a.error;}return 0;}
   const pairs=a.count[left]*a.count[right];if(!spend(a,pairs||1))return a.error;
   const n=a.profile.productJoin(a.words,a.base[out],0,a.capacity,a.words,a.base[left],a.count[left],a.words,a.base[right],a.count[right],a.recordWords,a.temp,0);
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[out]=n;return 0;
