@@ -66,6 +66,7 @@ function unlinkBucketRow32(t,q){
   t.link[q]=-1;return 1;
 }
 function positionBucket32(t,q){const tag=t.bucket[q];return tag!==RBA_TT_BUCKET_NONE&&(tag&RBA_TT_BUCKET_POSITION)!==0?1:0;}
+export function rbaTtHasPositionCode32(t,q){return positionBucket32(t,q);}
 export function rbaTtSetPositionCode32(t,q,lo,hi){
   if(!t.live[q]||!(lo|hi))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
   if(!unlinkBucketRow32(t,q))return -1;
@@ -105,7 +106,7 @@ export function rbaTtAllocate32(t,words,offset,basis,basisOffset,basisSize,prior
   t.basisSize[q]=basisSize;t.generation[q]+=1;t.live[q]=1;t.refs[q]=1;t.execution[q]=0;
   t.exact[q]=0;t.lower[q]=1;t.upper[q]=3;t.phase[q]=0;t.priority[q]=priority;t.redirect[q]=-1;
   t.count[q]=0;t.parentHead[q]=-1;t.readyMember[q]=0;t.eventMember[q]=0;
-  t.locator[q]=0;t.positionHi[q]=0;
+  t.positionHi[q]=0;
   t.bucket[q]=bucket;t.link[q]=t.buckets[bucket];t.buckets[bucket]=q;t.control[RBA_TT_LIVE]+=1;return q;
 }
 export function rbaTtAllocateUnindexed32(t,words,offset,basis,basisOffset,basisSize,priority=0,positionLo=0,positionHi=0){
