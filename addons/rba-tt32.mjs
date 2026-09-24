@@ -19,19 +19,21 @@ export const RBA_TT_ERR_CAPACITY=1,RBA_TT_ERR_CONFLICT=2,RBA_TT_ERR_GENERATION=3
 const RBA_TT_BUCKET_NONE=0xffffffff;
 
 export function createRbaTt32({
-  capacity=4096,bucketCount=4096,keyWords,basisCapacity,edgeCapacity,
+  capacity=4096,bucketCount=4096,keyWords,basisCapacity,basisElementBits=32,edgeCapacity,
 }={}) {
   if(!Number.isSafeInteger(capacity)||capacity<1||capacity>0x1000000||
      !Number.isSafeInteger(bucketCount)||bucketCount<1||bucketCount>0x1000000||
      (bucketCount&(bucketCount-1))||
      !Number.isSafeInteger(keyWords)||keyWords<1||
      !Number.isSafeInteger(basisCapacity)||basisCapacity<0||
+     (basisElementBits!==16&&basisElementBits!==32)||
      !Number.isSafeInteger(edgeCapacity)||edgeCapacity<1) throw new RangeError('invalid RBA TT configuration');
+  const u16=n=>new Uint16Array(new SharedArrayBuffer(n*2));
   const u32=n=>new Uint32Array(new SharedArrayBuffer(n*4));
   const i32=n=>new Int32Array(new SharedArrayBuffer(n*4));
-  const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,edgeCapacity,
+  const t={capacity,bucketMask:bucketCount-1,keyWords,basisCapacity,basisElementBits,edgeCapacity,
     control:i32(RBA_TT_CONTROL_WORDS),fault:i32(4),buckets:i32(bucketCount),keys:u32(capacity*keyWords),locator:u32(capacity),
-    basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
+    basis:(basisElementBits===16?u16:u32)(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
     lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),priority:i32(capacity),redirect:i32(capacity),
     inspectGeneration:u32(capacity),
