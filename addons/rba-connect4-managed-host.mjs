@@ -77,7 +77,7 @@ export async function runManagedConnect4CpcRba32(moves,{
   if(!Number.isInteger(managerBudget)||managerBudget<1)
     throw new RangeError('invalid managed Connect4 manager budget');
 
-  const root=connect4RbaFromMoves(moves,{geometry}),
+  const root=connect4RbaFromMoves(moves,{geometry,positionCode:false}),
     table=createRbaTt32({
       capacity,
       bucketCount:buckets,
