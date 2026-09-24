@@ -31,12 +31,16 @@ export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cel
 
 export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
   const meta=source[src+g.metaOffset];
-  if((meta&3)||column<0||column>=g.columns||source[src+column]>=g.rows)return -1;
-  return connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+  if((meta&3)||column<0||column>=g.columns)return -1;
+  const height=source[src+column];if(height>=g.rows)return -1;
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
 }
-export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){  const meta=source[src+g.metaOffset],rank=meta>>>2,
-    height=source[src+column];
-  const cell=height*g.columns+column,player=rank&1;
+export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+  return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+}
+export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
