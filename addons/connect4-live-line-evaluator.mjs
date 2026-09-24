@@ -85,9 +85,9 @@ export function evaluateConnect4LiveLineCell32(
   return score;
 }
 
-// Standard 7x6 has 69 lines = exactly three u32 line words. Callers that
-// already own the two prepared offsets can use this path without loop,
-// player-offset multiplication, or cell-offset multiplication.
+// Three-word specialization for geometries whose prepared line field spans
+// exactly three u32 words. Callers that already own the two prepared offsets
+// avoid loop, player-offset multiplication, and cell-offset multiplication.
 export function evaluateConnect4LiveLine3x32(
   through,
   throughOffset,
