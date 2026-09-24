@@ -63,8 +63,10 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
       timeoutMs:5000,
     });
     assert.equal(managed.status,'EXACT',JSON.stringify(managed));
-    assert.equal(managed.absoluteValue,serial.value);
-    assert.equal(managed.witness,serial.move);
+    assert.equal(managed.rootWdl,serial.value-2);
+    assert.equal(managed.move,serial.move);
+    assert.equal('absoluteValue' in managed,false);
+    assert.equal('witness' in managed,false);
     assert.equal(managed.cleanup,true);
     assert.equal(managed.workersExited,2);
     assert.equal(managed.workersUsed,1);
