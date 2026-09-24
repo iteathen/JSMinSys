@@ -68,6 +68,8 @@ export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}
     scanCursor:0,
     resetTargets,
     readyScratch:new Int32Array(budget),
+    routeHeads:new Int32Array(256),
+    routeNext:new Int32Array(budget),
     events:0,
     dedupes:0,
     maintenancePasses:0,
@@ -113,7 +115,9 @@ export function rbaBranchManagerStep32(
       if(Atomics.load(t.control,RBA_TT_STOP))break;
     }
     if(manager){
-      merged=rbaTtManagerInspectReady32(t,manager.resetTargets,budget,manager.readyScratch);
+      merged=rbaTtManagerInspectReady32(
+        t,manager.resetTargets,budget,manager.readyScratch,manager.routeHeads,manager.routeNext,
+      );
       manager.dedupes+=merged;
       manager.scanCursor=rbaTtManagerClean32(t,manager.resetTargets,manager.scanCursor,budget);
       manager.maintenancePasses+=1;
