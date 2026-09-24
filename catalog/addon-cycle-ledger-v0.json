@@ -3657,7 +3657,7 @@
     "decomposed": 21,
     "legacySymbolicVisible": 155,
     "missing": 0,
-    "neesBoundOperations": 9,
+    "neesBoundOperations": 10,
     "localExtensionOperations": 14
   },
   "neesOperationBindings": {
@@ -3735,6 +3735,13 @@
       "cost": {
         "kind": "unbounded",
         "minCycles": 0
+      },
+      "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
+    },
+    "alu.sub.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
       },
       "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
     }
