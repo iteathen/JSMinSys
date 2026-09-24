@@ -25,6 +25,7 @@ const table=workerData.table,
     geometry:g,
     cpcFrontierResponse:!!workerData.cpcFrontierResponse,
     cpcProjectedAdvisory:!!workerData.cpcProjectedAdvisory,
+    positionCode:false,
   }),
   worker=prepareRbaBranchWorker32({
     owner:workerData.owner,
