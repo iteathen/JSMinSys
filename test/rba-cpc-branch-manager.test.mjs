@@ -16,7 +16,7 @@ import {
   RBA_AB_CPC_ONLY,
 } from '../addons/rba-connect4-alphabeta.mjs';
 import {
-  createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,
+  createRbaTt32,rbaTtIntern32,rbaTtSetPositionCode32,rbaTtSetRoot32,rbaTtEnqueue32,
   RBA_TT_DONE,
 } from '../addons/rba-tt32.mjs';
 import {
@@ -30,6 +30,7 @@ function solveDistributed(g,moves){
     keyWords:g.keyWords,basisCapacity:g.maxBasis,edgeCapacity:g.columns,
   });
   const rootQ=rbaTtIntern32(t,root.words,0,root.basis,0,root.basis.length);
+  rbaTtSetPositionCode32(t,rootQ,root.positionLo,root.positionHi);
   rbaTtSetRoot32(t,rootQ);
   rbaTtEnqueue32(t,rootQ);
   const witness=new Int32Array(1);witness[0]=-2;
