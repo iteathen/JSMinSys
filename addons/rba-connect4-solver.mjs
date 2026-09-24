@@ -1,6 +1,6 @@
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
-import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownLegal,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownLegal,connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtHasPositionCode32,rbaTtPositionHi32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
@@ -96,8 +96,8 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
   for(const column of moves){
     if(!Number.isInteger(column)||column<0||column>=g.columns)throw new RangeError('invalid column');
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
-    if(words[src+column]>=g.rows)throw new RangeError('column full');
-    connect4RbaCofactorKnownLegal(g,profile,words,src,basis,bi,n,column,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
+    const height=words[src+column];if(height>=g.rows)throw new RangeError('column full');
+    connect4RbaCofactorKnownHeight(g,profile,words,src,basis,bi,n,column,height,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
     const oldSrc=src;src=dst;dst=oldSrc;const oldBi=bi;bi=ci;ci=oldBi;n=scratch.size[0];
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
@@ -139,14 +139,15 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
   let count=0,childBase=0,childBi=0;
   for(let oi=0;oi<g.columns;oi+=1){
-    const column=q===rootQ?rootCanonicalColumn(g,oi,rootReflected):g.actionOrder[oi];
-    if(t.keys[base+column]>=g.rows)continue;
+    const column=q===rootQ?rootCanonicalColumn(g,oi,rootReflected):g.actionOrder[oi],
+      height=t.keys[base+column];
+    if(height>=g.rows)continue;
     const action=state.boundary.depth?queryConnect4RbaFourFront(g,state.boundary,state.boundary.actionBase+column*4,t.keys,base):13;
     let lo=action&3,hi=action>>>2;state.actions[count]=column;state.childPresent[count]=0;
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
-      const term=connect4RbaCofactorKnownLegal(g,state.profile,t.keys,base,t.basis,basisBase,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
+      const term=connect4RbaCofactorKnownHeight(g,state.profile,t.keys,base,t.basis,basisBase,n,column,height,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
       state.transitions+=1;
       if(term&&(term<lo||term>hi))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
@@ -270,17 +271,18 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
   for(let oi=actionStart;oi<actionEnd;oi+=1){
     const caller=g.actionOrder[oi],
-      column=q===rootQ&&rootReflected?g.mirrorColumn[caller]:caller;
-    if(t.keys[base+column]>=g.rows)continue;
+      column=q===rootQ&&rootReflected?g.mirrorColumn[caller]:caller,
+      height=t.keys[base+column];
+    if(height>=g.rows)continue;
     if(usePreempt&&!(preemptMask&((1<<column)>>>0)))continue;
 
     state.actions[count]=column;
     state.childPresent[count]=0;
     let lo=1,hi=3;
 
-    const term=connect4RbaCofactorKnownLegal(
+    const term=connect4RbaCofactorKnownHeight(
       g,state.profile,
-      t.keys,base,t.basis,basisBase,n,column,
+      t.keys,base,t.basis,basisBase,n,column,height,
       state.keys,childBase,state.childBasis,childBi,
       state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse,
     );
@@ -289,7 +291,6 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(term){
       lo=hi=term;
     }else{
-      const height=t.keys[base+column];
       if(coded)advancePositionCode64(g,parentLo,parentHi,column,height,mover,state.childPositionLo,state.childPositionHi,count);
       else {state.childPositionLo[count]=0;state.childPositionHi[count]=0;}
       const childReflected=connect4RbaCanonicalize(
