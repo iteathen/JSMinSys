@@ -290,20 +290,26 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
 function managerNormalizeEquivalentGroup32(t,seed,resetTargets){
   if(seed<0||seed>=t.capacity||!t.live[seed]||t.redirect[seed]>=0)return 0;
   const hash=t.locator[seed],keyWords=t.keyWords,base=seed*keyWords,bucket=t.bucket[seed];
-  let canonical=-1,merged=0;
+  let canonical=-1;
+  // Pass 1 selects the final canonical without mutating the bucket. This avoids
+  // redirect chains when a better canonical appears later in the traversal.
+  for(let scan=t.buckets[bucket];scan!==-1;scan=t.link[scan]){
+    if(!t.live[scan]||t.redirect[scan]>=0||t.locator[scan]!==hash||
+       !equalKeyXor32(t.keys,scan*keyWords,base,keyWords))continue;
+    if(canonical<0||t.exact[scan]>t.exact[canonical]||
+       (t.exact[scan]===t.exact[canonical]&&scan<canonical))canonical=scan;
+  }
+  if(canonical<0)return 0;
+
+  // Pass 2 stamps and redirects every equivalent row directly to that one
+  // canonical q. Two bucket walks replace one complete bucket walk per duplicate.
+  let merged=0;
   for(let scan=t.buckets[bucket];scan!==-1;){
     const next=t.link[scan];
     if(t.live[scan]&&t.redirect[scan]<0&&t.locator[scan]===hash&&
        equalKeyXor32(t.keys,scan*keyWords,base,keyWords)){
       t.inspectGeneration[scan]=t.generation[scan];
-      if(canonical<0)canonical=scan;
-      else if(t.exact[scan]>t.exact[canonical]||
-              (t.exact[scan]===t.exact[canonical]&&scan<canonical)){
-        merged+=rbaTtManagerMergeDuplicate32(t,canonical,scan,resetTargets);
-        canonical=scan;
-      }else{
-        merged+=rbaTtManagerMergeDuplicate32(t,scan,canonical,resetTargets);
-      }
+      if(scan!==canonical)merged+=rbaTtManagerMergeDuplicate32(t,scan,canonical,resetTargets);
     }
     scan=next;
   }
