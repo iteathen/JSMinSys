@@ -63,7 +63,7 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
   const moves=[];
   const visited=new Set();
   const neutralToQ=new Map(),qToNeutral=new Map(),qToPhysical=new Map();
-  let states=0,neutralMultiQ=0,qMultiNeutral=0,physicalCollapsedByQ=0,witness=null;
+  let states=0,neutralMultiQ=0,qMultiNeutral=0,physicalCollapsedByQ=0,nonterminalCollapsedByQ=0,witness=null,nonterminalWitness=null;
 
   function add(map,key,value){
     let set=map.get(key);
@@ -78,7 +78,8 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
     visited.add(physical);states+=1;
 
     const neutral=neutralKey(g,board,heights);
-    const q=qKey(connect4RbaFromMoves(moves,{geometry:g,canonical:false}));
+    const root=connect4RbaFromMoves(moves,{geometry:g,canonical:false});
+    const q=qKey(root),terminal=root.words[g.metaOffset]&3;
     const nq=add(neutralToQ,neutral,q);
     const qn=add(qToNeutral,q,neutral);
     const qp=add(qToPhysical,q,physical);
@@ -87,6 +88,10 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
     if(qp.size===2){
       physicalCollapsedByQ+=1;
       if(!witness)witness={q,neutral,physical:[...qp]};
+      if(!terminal){
+        nonterminalCollapsedByQ+=1;
+        if(!nonterminalWitness)nonterminalWitness={q,neutral,physical:[...qp]};
+      }
     }
 
     if(isTerminal)return;
@@ -116,13 +121,19 @@ test('audit neutral-token quotient against current RBA q on exhaustive 4x4 legal
     neutralMultiQ,
     qMultiNeutral,
     physicalCollapsedByQ,
+    nonterminalCollapsedByQ,
     maxQPerNeutral,
     maxNeutralPerQ,
     maxPhysicalPerQ,
     witness,
+    nonterminalWitness,
   };
   console.log('NEUTRAL_QUOTIENT_AUDIT '+JSON.stringify(result));
 
   assert.ok(states>1000);
-  assert.equal(qMultiNeutral,0,'one RBA q mapped to multiple neutral-token states');
+  assert.equal(neutralMultiQ,0,'neutral-token equivalent boards split across RBA q');
+  assert.equal(maxQPerNeutral,1,'neutral-token equivalent boards failed to collapse');
+  assert.ok(qToNeutral.size<neutralToQ.size,'RBA q did not improve on neutral-token quotient');
+  assert.ok(qMultiNeutral>0,'RBA q did not collapse beyond neutral-token board identity');
+  assert.ok(nonterminalCollapsedByQ>0,'RBA q collapse occurred only after terminal play');
 });
