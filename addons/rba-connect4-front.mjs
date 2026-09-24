@@ -17,7 +17,7 @@ export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=1000
     up:new Uint32Array((depth+1)*g.maxBasis*g.coordWords),
     seen:new Uint32Array(g.shapeWordCount),temp:new Uint32Array(recordWords),
     image0:new Uint32Array(g.maxBasis*g.coordWords),image1:new Uint32Array(g.maxBasis*g.coordWords),
-    top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
+    inverse:new Uint32Array(g.shapeCount),top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
     target:new Uint32Array((g.maxBasis+1)*g.coordWords),cover:new Uint32Array((g.maxBasis+1)*g.coordWords),
     next:new Uint32Array(g.maxBasis+1),heights:new Uint32Array(g.columns),rootRank:0};
 }
@@ -59,21 +59,47 @@ function prepareUpsets(g,a,d,basis,bi,n){
 function prepareImages(g,a,d,cell,mover,basis,bi){
   const n=a.size[d],cn=a.size[d+1],cw=g.coordWords,nextValid=(d+1)*cw,nextBasis=(d+1)*g.maxBasis,
     remove=a.profile.prepareRemove(g,cell);
-  let pair=0;while(pair<cn&&a.basis[nextBasis+pair]<g.pairShapeStart)pair+=1;
-  let triple=pair;while(triple<cn&&a.basis[nextBasis+triple]<g.tripleShapeStart)triple+=1;
-  let quad=triple;while(quad<cn&&a.basis[nextBasis+quad]<g.quadShapeStart)quad+=1;
-  for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.profile.removePrepared(g,id,remove);a.top1[i]=0;
-    const row=i*cw;for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
-    for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
-      if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
-      else{
-        const classStart=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad,
-          largerStart=image<g.pairShapeStart?pair:image<g.tripleShapeStart?triple:image<g.quadShapeStart?quad:cn;
-        for(let j=classStart;j<largerStart;j+=1)if(a.basis[nextBasis+j]===image){out[row+(j>>>5)]|=1<<(j&31);break;}
-        const subset=a.profile.prepareSubset(g,image);
-        for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+  let pair=cn,triple=cn,quad=cn;
+  for(let j=0;j<cn;j+=1){
+    const id=a.basis[nextBasis+j];a.inverse[id]=j;
+    if(pair===cn&&id>=g.pairShapeStart)pair=j;
+    if(triple===cn&&id>=g.tripleShapeStart)triple=j;
+    if(quad===cn&&id>=g.quadShapeStart)quad=j;
+  }
+  for(let i=0;i<n;i+=1){
+    const id=basis[bi+i],removed=a.profile.removePrepared(g,id,remove),row=i*cw;
+    a.top1[i]=0;
+    for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
+
+    // If the move leaves this residual unchanged, both player images are
+    // identical. Build the upset once and publish it to both coordinates.
+    if(removed===id){
+      const exact=a.inverse[id],word=exact>>>5,mask=1<<(exact&31);
+      a.image0[row+word]|=mask;a.image1[row+word]|=mask;
+      const largerStart=id<g.pairShapeStart?pair:id<g.tripleShapeStart?triple:id<g.quadShapeStart?quad:cn,
+        subset=a.profile.prepareSubset(g,id);
+      for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j])){
+        const w=j>>>5,m=1<<(j&31);a.image0[row+w]|=m;a.image1[row+w]|=m;
       }
+      continue;
     }
+
+    // Otherwise only the mover keeps the removal image; the opponent residual
+    // is destroyed by the move.
+    const out=mover===0?a.image0:a.image1;
+    if(removed<0){
+      if(mover===1)a.top1[i]=1;
+      for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];
+      continue;
+    }
+    const exact=a.inverse[removed];
+    out[row+(exact>>>5)]|=1<<(exact&31);
+    const largerStart=removed<g.pairShapeStart?pair:
+      removed<g.tripleShapeStart?triple:
+      removed<g.quadShapeStart?quad:cn,
+      subset=a.profile.prepareSubset(g,removed);
+    for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j]))
+      out[row+(j>>>5)]|=1<<(j&31);
   }
 }
 function covers(g,a,d,childBase,out){
