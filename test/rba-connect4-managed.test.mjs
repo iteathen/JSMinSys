@@ -9,6 +9,15 @@ import {
 } from '../addons/rba-connect4-alphabeta.mjs';
 import {runManagedConnect4CpcRba32} from '../addons/rba-connect4-managed-host.mjs';
 
+test('prepared geometry exposes the cheap stone eval as winning-line incidence',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const expected=new Uint32Array(g.cellCount);
+  for(let line=0;line<g.lineCount;line+=1)
+    for(let i=0;i<4;i+=1)expected[g.lineRow[line*4+i]*g.columns+g.lineColumn[line*4+i]]+=1;
+  assert.deepEqual([...g.cellLineCount],[...expected]);
+  assert.ok(g.cellLineCount[3]>g.cellLineCount[0]);
+});
+
 test('managed workers share one immutable prepared geometry image',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
     shared=shareConnect4RbaGeometry32(g);

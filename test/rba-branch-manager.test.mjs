@@ -77,6 +77,39 @@ function reconcile(t,q,context){
   }
 }
 
+test('surplus spike retains the highest local eval while exposing the remainder',()=>{
+  const t=table(),root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
+  rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);assert.equal(rbaTtTake32(t,7),root);
+  const state=makeState();
+  state.keys.set(key(2),0);state.keys.set(key(3),2);
+  state.sizes[0]=state.sizes[1]=0;
+  state.labels[0]=0;state.labels[1]=1;
+  state.lo[0]=state.lo[1]=1;state.hi[0]=state.hi[1]=3;
+  state.present[0]=state.present[1]=1;state.count=2;
+  state.priorities[0]=2;state.priorities[1]=7;
+  const next=rbaTtPublishSurplus32(
+    t,root,7,1,3,
+    state.keys,0,state.basis,0,1,
+    state.sizes,state.labels,state.lo,state.hi,state.present,state.priorities,state.count,
+    null,null,null,0,true,
+  );
+  const edge=root*t.edgeCapacity;
+  assert.equal(next,t.child[edge+1],'producer did not retain highest-eval child');
+  assert.equal(t.execution[t.child[edge+1]],7);
+  assert.equal(t.readyMember[t.child[edge]],1,'remaining child was not exposed as surplus');
+});
+
+test('surplus spike manager dedupes without globally reordering ready work',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const first=rbaTtIntern32(t,key(10),0,emptyBasis,0,0,1),
+    second=rbaTtIntern32(t,key(11),0,emptyBasis,0,0,99);
+  assert.equal(rbaTtEnqueue32(t,first),1);
+  assert.equal(rbaTtEnqueue32(t,second),1);
+  assert.equal(t.control[5],first);
+  rbaTtManagerInspectReady32(t,resetTargets,2,null,null,null,0);
+  assert.equal(t.control[5],first,'manager reordered worker contention by priority');
+});
+
 test('workers publish surplus directly; manager only inspects/reconciles it',()=>{
   const t=table(),root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
   rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
