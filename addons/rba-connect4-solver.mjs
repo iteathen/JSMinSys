@@ -119,9 +119,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
-  const carried=deriveBasis&&state.basisQ===q&&state.basisGeneration===t.generation[q],
-    n=deriveBasis?(carried?state.basisN:connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen)):t.basisSize[q];
-  if(carried)state.basisQ=-1;
+  const n=deriveBasis?connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen):t.basisSize[q];
   if(!n)return RBA_EXACT_DRAW;
   if(bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
 
@@ -244,7 +242,9 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
 
-  const n=deriveBasis?connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen):t.basisSize[q];
+  const carried=deriveBasis&&state.basisQ===q&&state.basisGeneration===t.generation[q],
+    n=deriveBasis?(carried?state.basisN:connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen)):t.basisSize[q];
+  if(carried)state.basisQ=-1;
   if(!n)return RBA_EXACT_DRAW;
   const rank=meta>>>2,mover=rank&1;
 
