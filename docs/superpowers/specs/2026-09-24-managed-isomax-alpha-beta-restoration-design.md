@@ -1,4 +1,4 @@
-# Managed IsoMax Alpha-Beta Restoration Design
+# Managed IsoMax Negamax Alpha-Beta Restoration Design
 
 **Date:** 2026-09-24  
 **Repository:** `iteathen/JSMinSys`  
@@ -8,7 +8,7 @@
 
 ## Problem
 
-The managed-runtime ownership refactor accidentally replaced IsoMax's governing CPC-first alpha-beta search loop with shared-q expansion.
+The managed-runtime ownership refactor accidentally replaced IsoMax's governing CPC-first **Negamax-style alpha-beta** search loop with shared-q expansion.
 
 The earlier worker path called `solveConnect4RbaAlphaBeta()`, whose hot recursion was:
 
@@ -36,7 +36,7 @@ These measurements are not directly portable across hardware or node definitions
 
 ## Goal
 
-Restore the tight CPC-first alpha-beta loop as the **governing search engine inside each managed worker** while preserving the decentralized Surplus/shared-TT/manager architecture.
+Restore the tight CPC-first **Negamax-style alpha-beta** loop as the **governing search engine inside each managed worker** while preserving the decentralized Surplus/shared-TT/manager architecture.
 
 The corrected architecture must be capable of becoming tighter than the historical worker by retaining the later RBA representation, initialization-prepared geometry, position-code subtraction, cycle accounting, manager separation, and cross-worker transposition knowledge.
 
@@ -55,7 +55,7 @@ The corrected architecture must be capable of becoming tighter than the historic
 
 ### Worker
 
-A worker owns a local CPC-first alpha-beta search loop.
+A worker owns a local CPC-first **Negamax-style alpha-beta** search loop. Each recursive child flips mover perspective and is searched with the negated window `(-beta, -alpha)`; the returned child score is negated before the parent updates its local best/alpha state.
 
 For a claimed q, the worker must:
 
@@ -66,8 +66,8 @@ For a claimed q, the worker must:
 5. cut immediately when CPC bounds close the current window;
 6. choose the initialization-prepared best/first action;
 7. construct only that child;
-8. recurse locally;
-9. update alpha/beta immediately on return;
+8. recurse locally as `value = -search(child, -beta, -alpha)` (or the equivalent tighter Negamax window when CPC/root exact information permits it);
+9. update local best/alpha immediately from the negated child value;
 10. stop before constructing later siblings when a cutoff occurs.
 
 The default local path therefore pays no shared work-publication cost for siblings that alpha-beta proves unnecessary.
@@ -130,8 +130,9 @@ The shared TT remains the authority for:
 
 Local search-control information remains local:
 
-- alpha;
-- beta;
+- Negamax `alpha`;
+- Negamax `beta`;
+- mover-relative score orientation;
 - fail-high/fail-low bounds whose validity depends on the caller window;
 - local recursion/continuation frame state.
 
@@ -139,11 +140,13 @@ Only evidence already qualified as globally sound may be published as q truth.
 
 ## Search kernel reuse
 
-The existing `addons/rba-connect4-alphabeta.mjs` kernel is the behavioral reference for restored pruning semantics. The restoration should reuse or structurally factor that qualified logic rather than re-derive a second alpha-beta implementation from scratch.
+The existing `addons/rba-connect4-alphabeta.mjs` kernel is the behavioral reference for restored **Negamax-style alpha-beta** pruning semantics. The restoration should reuse or structurally factor that qualified logic rather than re-derive a second alpha-beta implementation from scratch.
 
 The important authority is the behavior, not necessarily the current public function boundary. If distribution requires an incremental/resumable form, extract the minimum internal kernel necessary while preserving:
 
 - CPC-first interval tightening;
+- mover-relative Negamax score conversion (`absToRelative` / `relativeToAbs` semantics);
+- child recursion through the negated window `(-beta, -alpha)` and negated return value;
 - exact-cache qualification;
 - forced/preemption filtering;
 - initialization-prepared action order;
@@ -194,7 +197,7 @@ Those values are hardware-scoped evidence, not the desired restored-alpha-beta n
 
 ### Phase 1 — restore local alpha-beta authority
 
-Produce a managed worker that, after claiming a root/shared q, searches it with the qualified CPC-first alpha-beta kernel.
+Produce a managed worker that, after claiming a root/shared q, searches it with the qualified CPC-first **Negamax-style alpha-beta** kernel.
 
 For the first checkpoint, distributed Surplus exposure may be disabled or limited to the existing claimed root boundary. Correct local pruning is more important than immediate parallel scaling.
 
@@ -238,12 +241,12 @@ The restoration must add tests that fail on the current shared-q production path
 
 Required behavioral tests include:
 
-1. **Cutoff-before-sibling-materialization:** create a position/window where the first child causes a cutoff and assert no later sibling cofactor/publication occurs.
-2. **CPC-bound cutoff:** CPC closes a local alpha/beta window without constructing children.
+1. **Negamax cutoff-before-sibling-materialization:** create a position/window where the first child is searched with `(-beta, -alpha)`, its result is negated into the parent frame, causes a cutoff, and assert no later sibling cofactor/publication occurs.
+2. **CPC-bound cutoff:** CPC closes a mover-relative local Negamax alpha/beta window without constructing children.
 3. **Exact-cache hit:** exact cached q returns without child construction.
 4. **No-surplus single worker:** managed one-worker solve returns the same WDL/witness with no requirement to expose siblings.
 5. **Surplus only after open first child:** when the first child does not cut, later surviving work may be exposed; when it cuts, exposed count remains zero.
-6. **Local-window non-authority:** fail-high/fail-low local returns are not published as globally exact q values.
+6. **Local-window non-authority:** Negamax fail-high/fail-low local returns are not published as globally exact q values, and their sign/window orientation is not mistaken for absolute W/D/L truth.
 7. **Reflection witness:** caller-frame deterministic move ordering remains correct under root reflection.
 8. **Cancellation/deadline:** managed host still fails closed and cleans workers.
 9. **Cycle-ledger coverage:** every touched managed/alpha-beta execution unit remains decomposed and source-blob guarded.
@@ -292,17 +295,17 @@ Reject or revert a restoration candidate if any of these occurs:
 
 ## Success condition
 
-The managed runtime again behaves as a tight CPC-first alpha-beta solver whose workers can distribute surviving useful surplus without surrendering local pruning.
+The managed runtime again behaves as a tight CPC-first **Negamax-style alpha-beta** solver whose workers can distribute surviving useful surplus without surrendering local pruning.
 
 The target architecture is therefore:
 
 ```text
 managed host
     |
-    +-- worker 1: tight local CPC-alpha-beta
+    +-- worker 1: tight local CPC-Negamax-alpha-beta
     |       -- expose only surviving surplus
     |
-    +-- worker 2: tight local CPC-alpha-beta
+    +-- worker 2: tight local CPC-Negamax-alpha-beta
     |       -- expose only surviving surplus
     |
     +-- ...
