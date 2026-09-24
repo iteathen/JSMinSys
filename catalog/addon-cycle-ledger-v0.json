@@ -2694,7 +2694,7 @@
           "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
           "S": "exact-cache stores executed by this invocation (0 or 1)"
         },
-        "note": "Governing local Negamax node ledger. Counts expose scalar/control/memory work plus CPC, cofactor, canonicalization, cache and recursive subledgers. V8 object-field lowering remains symbolic rather than silently free.",
+        "note": "Four-Front-capable recursive Negamax path retained for RBA_AB_CPC_FOUR_FRONT qualification. Production RBA_AB_CPC_ONLY recursion uses searchCpcOnly so Four-Front dispatch is not paid per production node.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -2795,11 +2795,6 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "N*R",
-          "target": "search"
-        },
-        {
-          "op": "runtime.call.subledger",
           "count": "N",
           "target": "relativeToAbs"
         },
@@ -2807,11 +2802,21 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "metrics"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R*(1-F)",
+          "target": "searchCpcOnly"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R*F",
+          "target": "search"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(12+N*(14+8*A+4*Q))*C(runtime.field.load)+(14+N*(8+2*A))*C(runtime.field.store)+(4+N*(6+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(6+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+(5+N*(16+8*A+4*Q))*C(control.test.u32)+(5+N*(16+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)",
+        "expression": "(12+N*(14+8*A+4*Q))*C(runtime.field.load)+(14+N*(8+2*A))*C(runtime.field.store)+(4+N*(6+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(6+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+(5+N*(16+8*A+4*Q))*C(control.test.u32)+(5+N*(16+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)",
         "parameters": {
           "T": "1 for terminal root; otherwise 0",
           "N": "1-T for nonterminal root work",
@@ -2822,7 +2827,7 @@
           "C": "root children cofactored",
           "R": "nonterminal root children entering recursive search"
         },
-        "note": "Root solve ledger is separate from per-node budget; it composes the same operation subledgers and cold result materialization."
+        "note": "Root solve selects the recursive implementation by prepared mode. Production CPC-only roots enter searchCpcOnly; Four-Front roots retain search. The mode decision is therefore paid at root action dispatch rather than every recursive production node."
       },
       "status": "decomposed"
     },
@@ -10063,11 +10068,136 @@
         "note": "Cold lifecycle snapshot delegates to the existing session-state primitive."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#searchCpcOnly",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "searchCpcOnly",
+      "scope": "local-negamax-hot-production-cpc-only",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "8+N*(9+10*A)"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+N*(5+3*A+2*S)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+N*(5+3*A)"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2*N"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+N*(1+A)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+N*(7+5*A)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(4+2*A)"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2+N*(6+3*A)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N*A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2+3*N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+N*(11+7*A)"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+N*(11+7*A)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H+T",
+          "target": "absToRelative"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "relativeToAbs"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "storeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "searchCpcOnly"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(8+N*(9+10*A))*C(runtime.field.load)+(1+N*(5+3*A+2*S))*C(runtime.field.store)+(4+N*(5+3*A))*C(memory.load.u32)+2*N*C(memory.store.u32)+(3+N*(1+A))*C(alu.imul.u32)+(4+N*(7+5*A))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A))*C(alu.and.u32)+N*A*C(alu.shl.u32)+(2+3*N)*C(alu.shr.u32)+(3+N*(11+7*A))*C(control.test.u32)+(3+N*(11+7*A))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(searchCpcOnly))",
+        "parameters": {
+          "H": "1 on exact-cache hit; otherwise 0",
+          "N": "1-H, meaning the node continues beyond exact-cache probe",
+          "A": "action candidates examined in this invocation",
+          "C": "children actually cofactored",
+          "R": "nonterminal children recursively searched",
+          "T": "terminal cofactor children converted to mover-relative values",
+          "S": "exact-cache stores executed by this invocation (0 or 1)"
+        },
+        "note": "Production CPC-only Negamax recursion. Four-Front mode selection, parent-front evidence, action-bound prepass, and recurring useFront action checks are absent. Relative to the prior production path through search(F=Q=0), this removes three non-hit object-field loads, one non-hit row multiply, three non-hit control tests/branches, and three control tests/branches per examined action.",
+        "targetCyclesPerNode": 1000
+      },
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "cpc-only-recursion-specialization",
+        "priorUnit": "addons/rba-connect4-alphabeta.mjs#search with F=0,Q=0",
+        "removed": "Four-Front mode checks, reusable-front prepass gate, per-action useFront dispatch, and depth*columns row calculation from production recursion",
+        "recurringControlDelta": "-3 non-hit tests/branches - 3 tests/branches per examined action",
+        "recurringScalarDelta": "-3 non-hit field loads - 1 non-hit integer multiply",
+        "semantics": "CPC-only search order, cofactor/canonicalization, alpha-beta windows, cache qualification and WDL results unchanged"
+      }
     }
   ],
   "summary": {
-    "units": 197,
-    "decomposed": 197,
+    "units": 198,
+    "decomposed": 198,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10174,7 +10304,7 @@
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
-    "addons/rba-connect4-alphabeta.mjs": "1cf4fc1881785067082146ac68d450e262addca6",
+    "addons/rba-connect4-alphabeta.mjs": "c74637e7c5594c1df50f94863c9e60ed936bec55",
     "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -10189,7 +10319,7 @@
     "targetCyclesPerNode": 1000,
     "measuredPhase1CyclesPerNode": 3907,
     "nodeCounter": "alphaBetaNodes",
-    "governingUnit": "addons/rba-connect4-alphabeta.mjs#search",
+    "governingUnit": "addons/rba-connect4-alphabeta.mjs#searchCpcOnly",
     "requiredDetailedUnits": [
       "addons/rba-connect4-alphabeta.mjs#absToRelative",
       "addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32",
@@ -10208,7 +10338,8 @@
       "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis",
       "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight",
       "addons/rba-connect4-coordinate.mjs#compareReflectedSupport",
-      "addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize"
+      "addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize",
+      "addons/rba-connect4-alphabeta.mjs#searchCpcOnly"
     ],
     "accountingRule": "Every listed unit must be decomposed into bound operations. Unknown lowering/memory/runtime costs remain explicit symbolic terms; no local Negamax operation may fall back to runtime.legacy.addon.body.",
     "budgetBoundary": "Local CPC-first Negamax search only. Manager, worker startup, idle workers, shared-TT distribution and Surplus coordination remain separate ledgers."
