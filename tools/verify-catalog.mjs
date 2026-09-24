@@ -295,7 +295,7 @@ assert.equal(
 );
 assert.equal(
   isomaxLocalKernel?.governingUnit,
-  'addons/rba-connect4-alphabeta.mjs#search',
+  'addons/rba-connect4-alphabeta.mjs#searchCpcOnly',
   'unexpected IsoMax governing local cycle unit',
 );
 assert.ok(
