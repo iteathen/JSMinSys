@@ -45,11 +45,10 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
     // class, so stop as soon as the target id has been passed instead of
     // scanning the entire residual basis on every played cell.
     const coord=src+(player?g.p1Offset:g.p0Offset);
-    for(let i=0;i<n;i+=1){
-      const id=basis[bi+i];if(id>singleton)break;
-      if(id===singleton&&(source[coord+(i>>>5)]&(1<<(i&31)))){
-        const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
-      }
+    let lo=0,hi=n;
+    while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+    if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+      const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
     }
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
@@ -64,32 +63,38 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   while(childTriple<cn&&childBasis[ci+childTriple]<g.tripleShapeStart)childTriple+=1;
   let childQuad=childTriple;
   while(childQuad<cn&&childBasis[ci+childQuad]<g.quadShapeStart)childQuad+=1;
-  const remove=removed?0:profile.prepareRemove(g,cell);
-  for(let p=0;p<2;p+=1){
-    const sourceCoord=src+(p?g.p1Offset:g.p0Offset),targetCoord=dst+(p?g.p1Offset:g.p0Offset);
-    for(let i=0;i<n;i+=1){
-      if(!(source[sourceCoord+(i>>>5)]&(1<<(i&31))))continue;
-      const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
-        imageRemoved=raw===0xffffffff?-1:raw;
-      if(p!==player&&imageRemoved!==id)continue;
-      const image=p===player?imageRemoved:id;
-      if(image<0)continue;
+  const remove=removed?0:profile.prepareRemove(g,cell),
+    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,
+      active1=source[p1Source+sourceWord]&sourceMask;
+    if(!(active0|active1))continue;
+    const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
+      image=raw===0xffffffff?-1:raw;
+    if(image<0)continue;
+    const write0=active0&&(player===0||image===id),
+      write1=active1&&(player===1||image===id);
+    if(!write0&&!write1)continue;
 
-      // Equal-cardinality residuals satisfy subset iff they are identical.
-      // The exact image is guaranteed to be present in the child basis because
-      // that basis is the union of every parent removal image. Locate that one
-      // sorted id directly, then run subset tests only against strictly larger
-      // residual classes.
-      let lo=0,hi=cn;
-      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
-      target[targetCoord+(lo>>>5)]|=1<<(lo&31);
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo=0,hi=cn;
+    while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    if(write0)target[p0Target+targetWord]|=targetMask;
+    if(write1)target[p1Target+targetWord]|=targetMask;
 
-      let j=image<g.pairShapeStart?childPair:
-        image<g.tripleShapeStart?childTriple:
-        image<g.quadShapeStart?childQuad:cn;
-      const subset=profile.prepareSubset(g,image);
-      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j]))
-        target[targetCoord+(j>>>5)]|=1<<(j&31);
+    let j=image<g.pairShapeStart?childPair:
+      image<g.tripleShapeStart?childTriple:
+      image<g.quadShapeStart?childQuad:cn;
+    const subset=profile.prepareSubset(g,image);
+    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
+      targetWord=j>>>5;targetMask=1<<(j&31);
+      if(write0)target[p0Target+targetWord]|=targetMask;
+      if(write1)target[p1Target+targetWord]|=targetMask;
     }
   }
   return 0;
