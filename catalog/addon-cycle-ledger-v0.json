@@ -101,6 +101,48 @@
         "name": "LEGACY_ADDON_BODY(unit,scenario)"
       },
       "note": "Historical add-on body is explicitly unresolved/nonzero until decomposed; never treated as free."
+    },
+    "runtime.array.allocate": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ARRAY_ALLOC(length,gcState)"
+      },
+      "note": "JavaScript Array allocation; size and GC state dependent."
+    },
+    "runtime.typed_array.fill": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TYPED_ARRAY_FILL(length,cacheLevel)"
+      },
+      "note": "Bulk typed-array fill; byte count and locality dependent."
+    },
+    "runtime.timer.read": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TIMER_READ_COST(runtimeState)"
+      },
+      "note": "High-resolution runtime timer read; implementation and runtime-state dependent."
+    },
+    "runtime.url.construct": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "URL_CONSTRUCT_COST(specifier,runtimeState)"
+      },
+      "note": "URL object construction and parsing are cold runtime work, not zero."
+    },
+    "runtime.module.bookkeeping": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "MODULE_BOOKKEEPING(source,scenario)"
+      },
+      "note": "Residual module-startup property loads/coercions/object assembly remain explicitly nonzero until further decomposed."
+    },
+    "runtime.host.bookkeeping": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "HOST_BOOKKEEPING(source,scenario)"
+      },
+      "note": "Residual cold host validation/property/result assembly remains explicitly nonzero until further decomposed."
     }
   },
   "units": [
@@ -583,6 +625,11 @@
           "target": "rbaTtReleaseExecution32"
         },
         {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "rbaTtLeave32"
+        },
+        {
           "op": "atomic.store.u32",
           "count": "R"
         },
@@ -597,7 +644,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)+R*(C(control.test.u32)+C(control.branch)+CALL(rbaTtEnter32)+CALL(rbaTtReleaseExecution32)+C(atomic.store.u32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "expression": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)+R*(C(control.test.u32)+C(control.branch)+CALL(rbaTtEnter32)+CALL(rbaTtReleaseExecution32)+CALL(rbaTtLeave32)+C(atomic.store.u32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
         "parameters": {
           "R": "1 when a reset is pending; 0 on the ordinary no-reset path"
         },
@@ -712,6 +759,11 @@
           "target": "rbaTtManagerClean32"
         },
         {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "rbaTtLeave32"
+        },
+        {
           "op": "atomic.rmw.u32",
           "count": "N"
         },
@@ -722,8 +774,9 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(rbaTtEnter32)+E*(CALL(rbaTtTakeEvent32)+CALLBACK(reconcile))+M*(CALL(rbaTtManagerInspectReady32)+CALL(rbaTtManagerClean32))+N*(C(atomic.rmw.u32)+ATOMIC_NOTIFY)+CALL(rbaTtLeave32)",
+        "expression": "CALL(rbaTtEnter32)+T*(E*(CALL(rbaTtTakeEvent32)+CALLBACK(reconcile))+M*(CALL(rbaTtManagerInspectReady32)+CALL(rbaTtManagerClean32))+CALL(rbaTtLeave32)+N*(C(atomic.rmw.u32)+ATOMIC_NOTIFY))",
         "parameters": {
+          "T": "1 when the manager TT transaction is entered; 0 when entry fails",
           "E": "events processed in this manager turn",
           "M": "1 when manager maintenance state is supplied",
           "N": "1 when processed or merged work wakes waiters, else 0"
@@ -785,13 +838,23 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 2,
+          "count": "1+B",
           "target": "applyWorkerReset32"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "C",
+          "count": "Q+P",
+          "target": "rbaTtEnter32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q",
           "target": "rbaTtTake32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+P",
+          "target": "rbaTtLeave32"
         },
         {
           "op": "runtime.callback",
@@ -800,8 +863,13 @@
         },
         {
           "op": "runtime.callback",
-          "count": "P",
+          "count": "X",
           "target": "publish"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "rbaTtFail32"
         },
         {
           "op": "atomic.rmw.u32",
@@ -814,13 +882,16 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*CALL(applyWorkerReset32)+C*CALL(rbaTtTake32)+E*CALLBACK(evaluate)+P*(CALLBACK(publish)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)+TT_TRANSACTION_COST",
+        "expression": "(1+B)*CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
         "parameters": {
-          "C": "1 when claiming from the ready queue, else 0",
+          "B": "1 when execution reaches the post-evaluation reset poll; 0 on earlier return",
+          "Q": "1 when a ready-claim TT transaction is entered; 0 otherwise",
           "E": "1 when q requires evaluation, else 0",
-          "P": "1 when publishing evaluated q, else 0"
+          "P": "1 when the publish TT transaction is entered; 0 otherwise",
+          "X": "1 when the publish callback executes; 0 when a pre-publish contract failure bypasses it",
+          "F": "number of rbaTtFail32 contract-failure calls on the modeled path"
         },
-        "note": "Lifetime-known callbacks remove recurring typeof checks; expose is asserted constant zero."
+        "note": "TT enter/leave composition is explicit; lifetime-known callbacks remove recurring typeof checks and expose is asserted constant zero."
       },
       "status": "decomposed"
     },
@@ -1789,11 +1860,19 @@
         {
           "op": "memory.store.u32",
           "count": "W + 1"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(3*W+2)*C(alu.imul.u32) + (2*W+6)*C(alu.add.u32) + C(alu.and.u32) + SAB_ALLOC(ALIGN8(8+4*W)+96*W) + (W+2)*TYPED_VIEW_CONSTRUCT + (W+1)*C(memory.store.u32)",
+        "expression": "(3*W+2)*C(alu.imul.u32) + (2*W+6)*C(alu.add.u32) + C(alu.and.u32) + SAB_ALLOC(ALIGN8(8+4*W)+96*W) + (W+2)*TYPED_VIEW_CONSTRUCT + ARRAY_ALLOC(W) + TYPED_ARRAY_FILL(W) + (W+1)*C(memory.store.u32)",
         "parameters": {
           "W": "managed evaluator worker count"
         },
@@ -1807,6 +1886,10 @@
       "name": "runManagedConnect4CpcRba32",
       "scope": "cold-host",
       "operations": [
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
         {
           "op": "runtime.call.subledger",
           "count": 1,
@@ -1825,12 +1908,39 @@
         {
           "op": "runtime.call.subledger",
           "count": 1,
+          "target": "rbaTtSetRoot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "rbaTtEnqueue32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
           "target": "prepareManagedRuntimeSlab32"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 1
         },
         {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "shareConnect4RbaGeometry32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createManagedThreadSession32"
+        },
+        {
+          "op": "runtime.timer.read",
+          "count": 2
+        },
+        {
+          "op": "runtime.url.construct",
+          "count": "W+1"
         },
         {
           "op": "runtime.worker.spawn",
@@ -1845,19 +1955,34 @@
           "count": 1
         },
         {
-          "op": "memory.load.u32",
-          "count": 4
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "managedThreadSessionState32"
         },
         {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "sumMetricViews32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 4
+        },
+        {
+          "op": "runtime.array.copy",
+          "count": 1,
+          "bytes": "table.fault.byteLength"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "sharedViewBytes32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(prepareManagedRuntimeSlab32)+CALL(shareConnect4RbaGeometry32)+(W+1)*WORKER_SPAWN+CALL(sumMetricViews32)+4*C(memory.load.u32)+HOST_BOOKKEEPING",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+TYPED_ARRAY_ALLOC(Float64Array,12)+(W+1)*URL_CONSTRUCT+(W+1)*WORKER_SPAWN+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+2*TIMER_READ+CALL(managedThreadSessionState32)+CALL(sumMetricViews32)+4*C(memory.load.u32)+COPY_BYTES(table.fault.byteLength)+2*CALL(sharedViewBytes32)",
         "unboundedTerms": [
           "runtime.managed_wait",
           "runtime.managed_close"
@@ -1865,7 +1990,7 @@
         "parameters": {
           "W": "managed evaluator worker count"
         },
-        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Active CPU work remains explicitly composed."
+        "note": "Elapsed cost is unbounded because managed wait/worker teardown can block. Residual cold host validation/property/result assembly is explicit as a nonzero symbolic local extension."
       },
       "status": "decomposed"
     },
@@ -1875,6 +2000,10 @@
       "name": "<module-main>",
       "scope": "managed-module-main",
       "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
         {
           "op": "runtime.typed_view.construct",
           "count": 2
@@ -1893,11 +2022,11 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*TYPED_VIEW_CONSTRUCT+CALL(prepareRbaBranchManager32)+CALL(runRbaBranchManagerLoop32)",
         "unboundedTerms": [
           "CALL(runRbaBranchManagerLoop32)"
         ],
-        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
+        "note": "Top-level managed thread execution is explicitly ledgered; residual startup property/coercion/object assembly is nonzero symbolic module bookkeeping."
       },
       "status": "decomposed"
     },
@@ -1927,6 +2056,10 @@
       "scope": "managed-module-main",
       "operations": [
         {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
           "op": "runtime.typed_view.construct",
           "count": 3
         },
@@ -1944,11 +2077,11 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)",
         "unboundedTerms": [
           "CALL(runRbaBranchWorkerLoop32)"
         ],
-        "note": "Top-level managed thread execution is explicitly ledgered although it is not a named function."
+        "note": "Top-level managed thread execution is explicitly ledgered; residual startup property/coercion/object assembly is nonzero symbolic module bookkeeping."
       },
       "status": "decomposed"
     },
@@ -3712,7 +3845,7 @@
     "legacySymbolicVisible": 158,
     "missing": 0,
     "neesBoundOperations": 10,
-    "localExtensionOperations": 14
+    "localExtensionOperations": 20
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -3799,5 +3932,13 @@
       },
       "authority": "NEES node26-v8-14.6/x86_64-amd-zen3"
     }
+  },
+  "decomposedSourceBlobs": {
+    "addons/rba-branch-manager.mjs": "d185f3fe27d990ee74aecdf9438d0b61f8e26225",
+    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
+    "addons/rba-connect4-managed-host.mjs": "010e59d535f85dd07dfcdb63415859b1ff44e88b",
+    "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
+    "addons/rba-connect4-managed-worker.mjs": "d2d231a4e06d7d20aa7056e3947e58d2f73f86c5",
+    "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc"
   }
 }
