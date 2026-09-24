@@ -237,6 +237,56 @@ for (const unit of addonCycleLedger.units) {
 }
 
 
+const isomaxSystemGraph = addonCycleLedger.isomaxSystemCycleGraph;
+assert.ok(isomaxSystemGraph && Array.isArray(isomaxSystemGraph.roots), 'IsoMax system cycle graph missing');
+const addonUnitsByName = new Map();
+for (const unit of addonCycleLedger.units) {
+  const list = addonUnitsByName.get(unit.name) ?? [];
+  list.push(unit);
+  addonUnitsByName.set(unit.name, list);
+}
+const sealedFunctionNames = new Set(functions.functions.map((fn) => fn.name));
+const reachableIsoMaxUnits = new Set();
+const pendingIsoMaxUnits = [...isomaxSystemGraph.roots];
+while (pendingIsoMaxUnits.length) {
+  const id = pendingIsoMaxUnits.pop();
+  if (reachableIsoMaxUnits.has(id)) continue;
+  const unit = addonUnits.get(id);
+  assert.ok(unit, `IsoMax cycle-graph root/edge missing unit: ${id}`);
+  reachableIsoMaxUnits.add(id);
+  assert.equal(unit.status, 'decomposed', `${id}: reachable IsoMax unit must be decomposed`);
+  assert.ok(
+    !unit.operations.some((operation) => operation.op === 'runtime.legacy.addon.body'),
+    `${id}: reachable IsoMax unit may not hide work in a legacy body`,
+  );
+  for (const operation of unit.operations) {
+    if (operation.op === 'runtime.call.subledger') {
+      const target = operation.target;
+      if (sealedFunctionNames.has(target)) continue;
+      const candidates = addonUnitsByName.get(target) ?? [];
+      assert.equal(
+        candidates.length,
+        1,
+        `${id}: CALL(${target}) must resolve to exactly one add-on or sealed function`,
+      );
+      pendingIsoMaxUnits.push(candidates[0].unit);
+    } else if (operation.op === 'runtime.callback') {
+      const target = operation.target;
+      const concrete = isomaxSystemGraph.callbackTargets?.[target];
+      if (concrete) {
+        assert.ok(concrete.length > 0, `${id}: callback ${target} has empty concrete target set`);
+        for (const concreteId of concrete) pendingIsoMaxUnits.push(concreteId);
+      } else {
+        assert.ok(
+          isomaxSystemGraph.disabledCallbacks?.[target],
+          `${id}: unresolved IsoMax callback ${target}`,
+        );
+      }
+    }
+  }
+}
+assert.ok(reachableIsoMaxUnits.size > 0, 'IsoMax system cycle graph resolved no units');
+
 const isomaxLocalKernel = addonCycleLedger.isomaxLocalKernel;
 assert.equal(
   isomaxLocalKernel?.targetCyclesPerNode,

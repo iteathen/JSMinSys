@@ -5028,5 +5028,55 @@
     ],
     "accountingRule": "Every listed unit must be decomposed into bound operations. Unknown lowering/memory/runtime costs remain explicit symbolic terms; no local Negamax operation may fall back to runtime.legacy.addon.body.",
     "budgetBoundary": "Local CPC-first Negamax search only. Manager, worker startup, idle workers, shared-TT distribution and Surplus coordination remain separate ledgers."
+  },
+  "isomaxSystemCycleGraph": {
+    "roots": [
+      "addons/rba-connect4-managed-host.mjs#runManagedConnect4CpcRba32",
+      "addons/rba-connect4-managed-worker.mjs#<module-main>",
+      "addons/rba-connect4-managed-manager.mjs#<module-main>"
+    ],
+    "callbackTargets": {
+      "evaluate": [
+        "addons/rba-connect4-managed-worker.mjs#evaluate"
+      ],
+      "publish": [
+        "addons/rba-connect4-managed-worker.mjs#publish"
+      ],
+      "reconcile": [
+        "addons/rba-connect4-managed-manager.mjs#reconcile"
+      ],
+      "prepareRemove": [
+        "addons/rba-connect4-profile.mjs#prepareRemoveDense",
+        "addons/rba-connect4-profile.mjs#prepareRemoveSparse"
+      ],
+      "removePrepared": [
+        "addons/rba-connect4-profile.mjs#removeDensePrepared",
+        "addons/rba-connect4-profile.mjs#removeSparsePrepared"
+      ],
+      "prepareSubset": [
+        "addons/rba-connect4-profile.mjs#prepareSubsetDense",
+        "addons/rba-connect4-profile.mjs#prepareSubsetSparse"
+      ],
+      "shapeSubsetPrepared": [
+        "addons/rba-connect4-profile.mjs#subsetDensePrepared",
+        "addons/rba-connect4-profile.mjs#subsetSparsePrepared"
+      ],
+      "permuteCoordinates": [
+        "addons/rba-connect4-profile.mjs#permutePair3",
+        "addons/rba-connect4-profile.mjs#permutePairSpan"
+      ],
+      "insertFront": [
+        "addons/rba-connect4-profile.mjs#insert6",
+        "addons/rba-connect4-profile.mjs#insertSpan"
+      ],
+      "productJoin": [
+        "addons/rba-connect4-profile.mjs#product6",
+        "addons/rba-connect4-profile.mjs#productSpan"
+      ]
+    },
+    "disabledCallbacks": {
+      "publishMetrics": "Managed IsoMax passes publishMetrics=null to runRbaBranchWorkerLoop32; callback body is unreachable in this production composition."
+    },
+    "invariant": "Every add-on unit transitively reachable from the managed IsoMax roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled production callback."
   }
 }
