@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 import {
-  prepareConnect4CpcScratch,evaluateConnect4Cpc32,connect4CpcTargetOwner32,
+  prepareConnect4CpcScratch,evaluateConnect4Cpc32,evaluateConnect4CpcNonterminal32,connect4CpcTargetOwner32,
   CPC_NONE,CPC_EXACT,CPC_BOUND,CPC_RESTRICT,
 } from '../addons/cpc-connect4.mjs';
 import {
@@ -63,6 +63,22 @@ test('CPC per-column XOR parity equals literal future-event count on configured 
         assert.equal(connect4CpcTargetOwner32(g,words,0,cell),expected,`${columns}x${rows} c${c} r${r}`);
       }
     }
+  }
+});
+
+test('nonterminal CPC path matches checked evaluator after terminal assertion',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  for(const moves of [[3,2,3,2],[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3]]) {
+    const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),
+      checked=prepareConnect4CpcScratch(g),known=prepareConnect4CpcScratch(g);
+    assert.equal(q.words[g.metaOffset]&3,0);
+    const a=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,checked);
+    const b=evaluateConnect4CpcNonterminal32(g,q.words,0,q.basis,0,q.basis.length,known);
+    assert.equal(a,b);
+    assert.deepEqual([...checked.interval],[...known.interval]);
+    assert.equal(checked.forcedColumn[0],known.forcedColumn[0]);
+    assert.equal(checked.preemptionMask32[0],known.preemptionMask32[0]);
+    assert.equal(checked.preemptionCount[0],known.preemptionCount[0]);
   }
 });
 
