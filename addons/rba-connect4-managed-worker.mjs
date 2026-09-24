@@ -13,9 +13,13 @@ import {RBA_TT_ROOT} from './rba-tt32.mjs';
 
 const table=workerData.table,
   g=prepareConnect4RbaGeometry(workerData.geometryConfig),
-  witness=new Int32Array(workerData.witnessBuffer),
-  metrics=new Float64Array(workerData.metricsBuffer),
-  resetTargets=new Int32Array(workerData.resetBuffer),
+  witness=new Int32Array(workerData.runtimeBuffer,0,1),
+  metrics=new Float64Array(workerData.runtimeBuffer,workerData.metricOffsetBytes,12),
+  resetTargets=new Int32Array(
+    workerData.runtimeBuffer,
+    workerData.resetOffsetBytes,
+    workerData.resetCount,
+  ),
   rootQ=table.control[RBA_TT_ROOT],
   rootReflected=workerData.rootReflected?1:0,
   state=prepareConnect4CpcRbaEvaluator({
