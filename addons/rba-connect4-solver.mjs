@@ -97,7 +97,7 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true}={}){
     if(!Number.isInteger(column)||column<0||column>=g.columns)throw new RangeError('invalid column');
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
     if(words[src+column]>=g.rows)throw new RangeError('column full');
-    connect4RbaCofactor(g,profile,words,src,basis,bi,n,column,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map);
+    connect4RbaCofactor(g,profile,words,src,basis,bi,n,column,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
     const oldSrc=src;src=dst;dst=oldSrc;const oldBi=bi;bi=ci;ci=oldBi;n=scratch.size[0];
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
@@ -146,7 +146,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
-      const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,basisBase,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map);
+      const term=connect4RbaCofactor(g,state.profile,t.keys,base,t.basis,basisBase,n,column,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
       state.transitions+=1;
       if(term<0||(term&&(term<lo||term>hi)))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
@@ -282,7 +282,7 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
       g,state.profile,
       t.keys,base,t.basis,basisBase,n,column,
       state.keys,childBase,state.childBasis,childBi,
-      state.scratch.seen,state.childBasisSize,count,state.scratch.map,
+      state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse,
     );
     state.transitions+=1;
     if(term<0){childBase+=g.keyWords;childBi+=g.maxBasis;continue;}
