@@ -64,7 +64,7 @@ export function rbaBranchReadyCount32(t){
   return t.control[RBA_TT_READY_COUNT];
 }
 
-export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}={}){
+export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64,prioritizeReady=true}={}){
   if(!Number.isInteger(capacity)||capacity<1||!Number.isInteger(budget)||budget<1)
     throw new RangeError('invalid RBA branch manager capacity');
   return {
@@ -76,6 +76,7 @@ export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}
     events:0,
     dedupes:0,
     maintenancePasses:0,
+    prioritizeReady:prioritizeReady?1:0,
   };
 }
 
@@ -117,6 +118,7 @@ if(!rbaTtEnter32(t,owner))return 0;
     if(manager){
       merged=rbaTtManagerInspectReady32(
         t,manager.resetTargets,budget,manager.readyScratch,manager.routeHeads,manager.routeNext,
+        manager.prioritizeReady,
       );
       manager.dedupes+=merged;
       manager.scanCursor=rbaTtManagerClean32(t,manager.resetTargets,manager.scanCursor,budget);
@@ -147,7 +149,7 @@ export function rbaBranchManagerStep32(
 export function runRbaBranchManagerLoop32(
   t,
   reconcile,
-  {owner=1,budget=64,context=null,waitMs=1,manager=null}={},
+  {owner=1,budget=64,context=null,waitMs=1,manager=null,nonblocking=false}={},
 ){
   if(typeof reconcile!=='function')throw new TypeError('RBA reconcile callback required');
   if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
@@ -156,7 +158,7 @@ export function runRbaBranchManagerLoop32(
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA manager wait');
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchManagerStepKnown32(t,reconcile,owner,budget,context,manager))
+    if(!rbaBranchManagerStepKnown32(t,reconcile,owner,budget,context,manager)&&!nonblocking)
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
@@ -244,7 +246,7 @@ export function runRbaBranchWorkerLoop32(
   worker,
   evaluate,
   publish,
-  {context=null,waitMs=1,metrics=null,publishMetrics=null}={},
+  {context=null,waitMs=1,metrics=null,publishMetrics=null,nonblocking=false}={},
 ){
   if(typeof evaluate!=='function'||typeof publish!=='function')
     throw new TypeError('RBA worker callbacks required');
@@ -254,7 +256,7 @@ export function runRbaBranchWorkerLoop32(
   let telemetry=0;
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchWorkerStepKnown32(t,worker,evaluate,publish,context))
+    if(!rbaBranchWorkerStepKnown32(t,worker,evaluate,publish,context)&&!nonblocking)
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
     if(metrics){
       telemetry+=1;

@@ -62,6 +62,7 @@ export async function runManagedConnect4CpcRba32(moves,{
   managerBudget=64,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
+  surplusFightSpike=false,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<1||workers>64)
@@ -119,6 +120,7 @@ export async function runManagedConnect4CpcRba32(moves,{
         mirrorColumn:root.reflected?geometry.mirrorColumn:null,
         rootReflected:root.reflected,
         budget:managerBudget,
+        surplusFightSpike:!!surplusFightSpike,
       },
     );
 
@@ -138,6 +140,8 @@ export async function runManagedConnect4CpcRba32(moves,{
           rootReflected:root.reflected,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
+          surplusFightSpike:!!surplusFightSpike,
+          workerCount:workers,
         },
       );
     }
@@ -154,6 +158,7 @@ export async function runManagedConnect4CpcRba32(moves,{
     exact=!errorCode&&Atomics.load(table.control,RBA_TT_DONE)===1;
 
   return {
+    mode:surplusFightSpike?'SURPLUS_FIGHT_SPIKE':'NEGAMAX_PHASE1',
     status:exact?'EXACT':
       errorCode===HOST_DEADLINE?'TIMEOUT':
       errorCode===HOST_CANCELLED?'INTERRUPTED':'FAILED',

@@ -353,6 +353,103 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 }
 
 
+export function evaluateConnect4SurplusFightTt32(t,q,state,rootQ=-1,rootReflected=0){
+  if(Atomics.load(t.control,RBA_TT_STOP))return RBA_INTERRUPTED;
+  const g=state.g,base=q*t.keyWords,packedBasis=t.basisSetWords!==0,
+    basis=packedBasis?state.basis:t.basis,basisBase=packedBasis?0:q*t.basisCapacity,
+    meta=t.keys[base+g.metaOffset],terminal=meta&3;
+  state.count=0;state.witness=-1;
+  if(terminal)return terminal;
+
+  const storedN=packedBasis?0:t.basisSize[q];
+  if(!packedBasis&&!storedN)return RBA_EXACT_DRAW;
+  const n=packedBasis?emitSortedSetBitsAt32(t.basis,q*t.basisSetWords,t.basisSetWords,basis,0):storedN;
+  if(!n)return RBA_EXACT_DRAW;
+  const rank=meta>>>2;
+
+  state.cpcCalls+=1;
+  const kind=evaluateConnect4CpcNonterminal32(g,t.keys,base,basis,basisBase,n,state.cpc);
+  state.lower=state.cpc.interval[0];state.upper=state.cpc.interval[1];
+  state.cpcPrecursors+=state.cpc.precursorCount[0];
+  if(state.cpc.projectedAdvisory)
+    state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
+  if(kind===CPC_EXACT)state.cpcExact+=1;
+  else if(kind===CPC_BOUND)state.cpcBounds+=1;
+  else if(kind===CPC_RESTRICT)state.cpcRestrictions+=1;
+
+  const forced=state.cpc.forcedColumn[0],
+    preemptCount=state.cpc.preemptionCount[0],
+    preemptMask=state.cpc.preemptionMask32[0],
+    usePreempt=preemptCount>1;
+  if(forced>=0)state.cpcForced+=1;
+  if(kind===CPC_EXACT&&q!==rootQ)return state.lower;
+
+  let count=0,childBase=0,childBi=0;
+  const forcedCaller=forced<0?-1:
+    q===rootQ&&rootReflected?g.mirrorColumn[forced]:forced,
+    actionStart=forcedCaller>=0?g.priorityByColumn[forcedCaller]:0,
+    actionEnd=forcedCaller>=0?actionStart+1:g.columns;
+
+  for(let oi=actionStart;oi<actionEnd;oi+=1){
+    const caller=g.actionOrder[oi],
+      column=q===rootQ&&rootReflected?g.mirrorColumn[caller]:caller,
+      height=t.keys[base+column];
+    if(height>=g.rows)continue;
+    if(usePreempt&&!(preemptMask&((1<<column)>>>0)))continue;
+
+    const cell=height*g.columns+column,childSetOffset=count*g.shapeWordCount;
+    state.actions[count]=column;
+    state.actionPriority[count]=g.cellLineCount[cell];
+    state.childPresent[count]=0;
+    let lo=1,hi=3;
+
+    const term=connect4RbaCofactorKnownHeight(
+      g,state.profile,
+      t.keys,base,basis,basisBase,n,column,height,
+      state.keys,childBase,state.childBasis,childBi,
+      state.childBasisSet,state.childBasisSize,count,state.scratch.map,state.scratch.inverse,childSetOffset,
+    );
+    state.transitions+=1;
+    if(term)lo=hi=term;
+    else{
+      connect4RbaCanonicalize(
+        g,state.profile,state.keys,childBase,
+        state.childBasis,childBi,state.childBasisSize[count],state.scratch,
+        state.childBasisSet,childSetOffset,
+      );
+      state.childPresent[count]=1;
+    }
+    state.actionLower[count]=lo;
+    state.actionUpper[count]=hi;
+    count+=1;
+    childBase+=g.keyWords;
+    childBi+=g.maxBasis;
+  }
+
+  if(!count)return RBA_QUERY_UNCOVERED;
+  state.count=count;
+  state.positionCoded=0;
+  return RBA_BRANCH;
+}
+
+export function publishConnect4SurplusFightEvaluation32(t,q,owner,state,code,rootQ,rootWitnessOut,witnessIndex=0){
+  if(code>=1&&code<=3){
+    if(!rbaTtPublishExactOwned32(t,q,owner,code))return -1;
+    if(q===rootQ&&(connect4RbaTerminal(state.g,t.keys,q*t.keyWords)||state.witness>=0)){
+      rootWitnessOut[witnessIndex]=state.witness;rbaTtMarkDone32(t);
+    }
+    return -1;
+  }
+  if(code!==RBA_BRANCH)return -1;
+  return rbaTtPublishSurplus32(
+    t,q,owner,state.lower,state.upper,
+    state.keys,0,state.childBasis,0,state.g.maxBasis,
+    state.childBasisSize,state.actions,state.actionLower,state.actionUpper,
+    state.childPresent,state.actionPriority,state.count,
+    null,null,state.childBasisSet,state.g.shapeWordCount,1,
+  );
+}
+
 export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,rootWitnessOut,witnessIndex=0){
   if(code>=1&&code<=3){
     if(!rbaTtPublishExactOwned32(t,q,owner,code))return -1;

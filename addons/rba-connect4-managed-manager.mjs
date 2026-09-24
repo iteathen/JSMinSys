@@ -12,6 +12,7 @@ const witness=new Int32Array(workerData.runtimeBuffer,0,1),
     workerData.resetCount,
   ),
   budget=workerData.budget??64,
+  spike=workerData.surplusFightSpike?1:0,
   rootReflected=workerData.rootReflected?1:0,
   g={
     metaOffset:workerData.metaOffset,
@@ -21,6 +22,7 @@ const witness=new Int32Array(workerData.runtimeBuffer,0,1),
     capacity:workerData.table.capacity,
     resetTargets,
     budget,
+    prioritizeReady:!spike,
   });
 
 const reconcile=(table,q)=>
@@ -36,5 +38,6 @@ runRbaBranchManagerLoop32(
     budget,
     manager,
     waitMs:1,
+    nonblocking:!!spike,
   },
 );
