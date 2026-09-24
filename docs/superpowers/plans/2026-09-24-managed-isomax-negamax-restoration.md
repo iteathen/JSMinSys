@@ -21,6 +21,8 @@
 - Decomposed-source blob guards must match every modified decomposed source.
 - Unknown/thread/allocation/blocking/runtime costs remain symbolic or unbounded, never zero.
 - Do not touch BSFP.
+- Local CPC-first Negamax search has a **1,000 CPU cycles per local Negamax node target budget**; the current ~3.9k cycles/node Phase-1 measurement is the optimization baseline, not the target.
+- The 1,000-cycle budget excludes manager, worker startup, idle-worker, shared-TT distribution, and Surplus coordination overhead; those costs remain separately visible and accounted.
 - Do not merge PR #26 or PR #163 automatically.
 
 ## Review Focus
@@ -228,11 +230,14 @@ Acceptance for Phase 1:
 - `45461667` completes EXACT rather than filling the 65,536-row TT;
 - one-worker managed result matches oracle and direct Negamax witness;
 - `ttLive` remains 1 in no-surplus mode;
-- cycles/Negamax-node materially return toward the historical recursive regime relative to current ~81k cycles/transition shared-q traversal;
+- cycles/Negamax-node are measured explicitly against the restored local-kernel baseline;
+- the durable local optimization target is <=1,000 CPU cycles per local Negamax node;
 - no correctness, cleanup, or cycle-ledger regression.
 
 - [ ] **Step 5: Record the new Phase-1 cycle baseline**
 
 Add the exact runner/runtime/CPU, nodes/s, cycles/Negamax-node, wall time, and total cycles to PR #163 and summarize on JSMinSys PR #26.
+
+Record **1,000 cycles/local Negamax node** as the forward local-kernel target and keep distributed/manager overhead as separate budget lines. Future optimization passes must report both the measured local cycles/node and distance from the 1,000-cycle target.
 
 Do not begin Phase 2 Surplus splitting until this restored local kernel is qualified.

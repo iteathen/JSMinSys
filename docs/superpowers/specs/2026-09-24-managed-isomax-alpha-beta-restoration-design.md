@@ -186,12 +186,22 @@ For every restoration step:
 
 No thread, allocation, blocking, callback, or unknown runtime cost may be silently treated as zero.
 
-The current measured 4-worker managed reference is approximately:
+The obsolete pre-restoration shared-q reference was approximately:
 
 - 81k cycles/transition;
 - 195k cycles/q evaluation.
 
-Those values are hardware-scoped evidence, not the desired restored-alpha-beta node budget. A fresh alpha-beta-specific node/cycle baseline must be measured once the worker restoration checkpoint is functional.
+Phase 1 restored the local CPC-first Negamax kernel and established a current measured one-worker reference of approximately **3.9k CPU cycles per local Negamax node** on the maintained same-runner benchmark.
+
+### Local cycle budget target
+
+The optimization target is now **1,000 CPU cycles per local Negamax node**.
+
+This is the governing local-kernel budget for subsequent optimization passes. It applies to the worker's local CPC-first Negamax search work, measured as whole-process CPU cycles normalized by `alphaBetaNodes` on the controlled same-runner benchmark. It is intentionally separate from manager, worker-startup, shared-TT distribution, idle-worker, and Surplus coordination overhead.
+
+The current ~3.9k cycles/node Phase-1 measurement is a baseline, **not** an acceptable steady-state budget. Later local-kernel optimization work should explicitly report progress toward <=1,000 cycles/node and reject designs that hide local search cost inside a different node definition or move it into uncounted coordination work.
+
+The 1,000-cycle target is a performance objective, not a correctness relaxation: exact W/D/L, deterministic witness behavior, Negamax window semantics, cycle-ledger completeness, and fail-closed behavior remain mandatory.
 
 ## Restoration sequence
 
