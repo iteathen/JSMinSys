@@ -268,3 +268,42 @@ test('already-inspected surplus attaches without losing later duplicate converge
   assert.equal(t.redirect[duplicate],child);
   assert.equal(t.child[edge],child);
 });
+
+
+test('manager bulk-normalizes one exact duplicate group in one ready inspection',()=>{
+  const t=createRbaTt32({capacity:32,bucketCount:32,keyWords:2,basisCapacity:1,edgeCapacity:2});
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const ids=[];
+  for(let i=0;i<4;i+=1){
+    const q=rbaTtAllocate32(t,key(9),0,emptyBasis,0,0,10+i);
+    ids.push(q);rbaTtEnqueue32(t,q);
+  }
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets,budget:4});
+  const processed=rbaBranchManagerStep32(t,()=>{}, {budget:4,manager});
+  assert.equal(processed,3,'expected three duplicate merges in one manager turn');
+  assert.equal(manager.dedupes,3);
+  assert.equal(rbaBranchReadyCount32(t),1);
+  const canonical=ids.find(q=>t.live[q]&&t.redirect[q]<0&&t.readyMember[q]);
+  assert.ok(canonical>=0);
+  for(const q of ids){
+    if(q===canonical)continue;
+    assert.equal(t.redirect[q],canonical);
+  }
+});
+
+test('XOR equality rejects a forced locator collision at the last key word',()=>{
+  const t=createRbaTt32({capacity:8,bucketCount:1,keyWords:7,basisCapacity:0,edgeCapacity:1});
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const a=Uint32Array.from([1,2,3,4,5,6,7]);
+  const b=Uint32Array.from([1,2,3,4,5,6,8]);
+  const qa=rbaTtAllocate32(t,a,0,emptyBasis,0,0,1);
+  const qb=rbaTtAllocate32(t,b,0,emptyBasis,0,0,2);
+  t.locator[qb]=t.locator[qa];
+  rbaTtEnqueue32(t,qa);rbaTtEnqueue32(t,qb);
+  const manager=prepareRbaBranchManager32({capacity:t.capacity,resetTargets,budget:2});
+  rbaBranchManagerStep32(t,()=>{}, {budget:2,manager});
+  assert.equal(manager.dedupes,0);
+  assert.equal(rbaBranchReadyCount32(t),2);
+  assert.equal(t.redirect[qa],-1);
+  assert.equal(t.redirect[qb],-1);
+});
