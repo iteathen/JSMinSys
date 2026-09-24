@@ -52,8 +52,8 @@ function resetConnect4RbaExactCache32(cache){
   cache.epoch=epoch;
 }
 
-function absToRelative(value,mover){const mask=0-mover;return ((value-2)^mask)-mask;}
-function relativeToAbs(value,mover){const mask=0-mover;return 2+((value^mask)-mask);}
+function absToRelative(value,mover){return value===2?0:mover===0?value-2:2-value;}
+function relativeToAbs(value,mover){return value===0?2:mover===0?value+2:2-value;}
 export function prepareConnect4RbaAlphaBeta({
   geometry,
   mode=RBA_AB_CPC_ONLY,
@@ -76,7 +76,7 @@ export function prepareConnect4RbaAlphaBeta({
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
-    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,cpcPrecursors:0,cpcProjectedForks:0,
+    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcForced:0,cpcPrecursors:0,
     frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0};
 }
@@ -103,7 +103,6 @@ function searchCpcOnly(state,depth,alpha,beta){
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
-  if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
@@ -169,7 +168,6 @@ function search(state,depth,alpha,beta){
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
-  if(state.cpc.projectedAdvisory)state.cpcProjectedForks+=state.cpc.projectedForks[0]+state.cpc.projectedForks[1];
   state.cpcPrecursors+=state.cpc.precursorCount[0];
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
@@ -260,7 +258,8 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(!state)throw new TypeError('prepared alpha-beta state required');
   const g=state.g;
   resetConnect4RbaExactCache32(state.cache);
-  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=state.cpcForced=state.cpcPrecursors=state.cpcProjectedForks=0;
+  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=state.cpcForced=state.cpcPrecursors=0;
+  state.cpc.projectedForkTotal=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
   state.basisSize[0]=root.basis.length;
@@ -345,6 +344,6 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   return {value:relativeToAbs(relative,mover),relative,move:bestMove,metrics:metrics(state)};
 }
 function metrics(s){return {nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
-  cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpcForced,cpcPrecursors:s.cpcPrecursors,cpcProjectedForks:s.cpcProjectedForks,
+  cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpcForced,cpcPrecursors:s.cpcPrecursors,cpcProjectedForks:s.cpc.projectedForkTotal,
   frontCalls:s.frontCalls,frontExact:s.frontExact,
   frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}
