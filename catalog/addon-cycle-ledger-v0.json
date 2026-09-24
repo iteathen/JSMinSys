@@ -437,6 +437,13 @@
         "name": "STRING_FORMAT_COST(bytes,gcState)"
       },
       "note": "Error/string formatting."
+    },
+    "runtime.error.throw": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ERROR_THROW_COST(errorType,stackState,runtimeState)"
+      },
+      "note": "JavaScript exception throw/unwind cost, including runtime and stack-state effects."
     }
   },
   "units": [
@@ -9714,15 +9721,37 @@
         "note": "Cold/control-plane construction of the canonical nominal worker base. Allocation and the owner-field write remain explicit runtime costs; no scheduling or domain policy is hidden here."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker.mjs#Worker.run",
+      "source": "addons/worker.mjs",
+      "name": "Worker.run",
+      "scope": "worker-base-contract",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.object.allocate)+C(runtime.error.throw)",
+        "note": "Fail-closed base implementation. Specialized workers override run(); if the base path executes, TypeError allocation/throw cost remains explicit rather than zero."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 184,
-    "decomposed": 184,
+    "units": 185,
+    "decomposed": 185,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 62
+    "localExtensionOperations": 63
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -9832,7 +9861,7 @@
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "7505330dbe9fce815251685cee0bc81c2f3e6c8a",
-    "addons/worker.mjs": "b9d97fbc52e16959fcc57273491a6fe069196394"
+    "addons/worker.mjs": "3c108fd6940886c5ff5cb2a3c14647085b14712f"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
