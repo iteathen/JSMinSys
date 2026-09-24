@@ -1,7 +1,7 @@
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownLegal,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownLegal,connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
@@ -161,15 +161,15 @@ function search(state,depth,alpha,beta){
 
   let best=-2,cut=0;
   for(let oi=actionStart;oi<actionEnd;oi+=1){
-    const column=g.actionOrder[oi];
-    if(words[keyOffset+column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    const column=g.actionOrder[oi],height=words[keyOffset+column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     if(!useFront)legal=1;
     let value;
     if(useFront&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];
     }else{
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
-      const term=connect4RbaCofactorKnownLegal(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
+      const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
       if(term)value=absToRelative(term,mover);
@@ -243,8 +243,9 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }
   }
   for(let callerIndex=actionStart;callerIndex<actionEnd;callerIndex+=1){
-    const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller;
-    if(state.words[column]>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
+    const caller=g.actionOrder[callerIndex],column=reflected?g.mirrorColumn[caller]:caller,
+      height=state.words[column];
+    if(height>=g.rows||(usePreempt&&!(preemptMask&((1<<column)>>>0))))continue;
     // If the mover's exact root value is a loss, every surviving legal action
     // has that same value. The first initialization-ordered action is therefore
     // already the deterministic optimal witness.
@@ -253,7 +254,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];state.frontActionExact+=1;
     }else{
-    const term=connect4RbaCofactorKnownLegal(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
+    const term=connect4RbaCofactorKnownHeight(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,height,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map,state.coord.inverse);
     state.cofactors+=1;
     if(term)value=absToRelative(term,mover);
