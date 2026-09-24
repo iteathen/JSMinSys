@@ -1,10 +1,14 @@
 // Canonical nominal base for JSMinSys workers.
 //
-// This class intentionally owns only worker identity. Scheduling, queueing,
-// evaluation, synchronization, and domain policy stay in the existing numeric
-// worker substrate or in specialized add-ons.
+// The base owns identity plus the required execution surface. Scheduling,
+// queueing, synchronization, and domain policy stay in specialized workers or
+// the existing numeric worker substrate.
 export class Worker {
   constructor(owner){
     this.owner=owner;
+  }
+
+  run(){
+    throw new TypeError('Worker.run must be implemented');
   }
 }
