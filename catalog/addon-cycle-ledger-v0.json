@@ -143,6 +143,27 @@
         "name": "HOST_BOOKKEEPING(source,scenario)"
       },
       "note": "Residual cold host validation/property/result assembly remains explicitly nonzero until further decomposed."
+    },
+    "runtime.counter.load": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "COUNTER_FIELD_LOAD_COST(objectShape,valueRepresentation,cacheLevel)"
+      },
+      "note": "Load of a JavaScript numeric counter field; source-to-machine representation is runtime/profile-sensitive."
+    },
+    "runtime.metric.store": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "METRIC_STORE_COST(sinkType,cacheLevel)"
+      },
+      "note": "Generic metric-sink store; sink representation is caller-dependent."
+    },
+    "memory.store.f64": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STORE_F64_COST(cacheLevel,ownershipState)"
+      },
+      "note": "Float64Array store; locality/ownership and source lowering remain profile-sensitive."
     }
   },
   "units": [
@@ -966,7 +987,11 @@
           "count": "M*I"
         },
         {
-          "op": "memory.store.u32",
+          "op": "runtime.counter.load",
+          "count": "4*(S+M)"
+        },
+        {
+          "op": "runtime.metric.store",
           "count": "4*(S+M)"
         },
         {
@@ -978,7 +1003,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "I*(CALL(rbaBranchWorkerStepKnown32)+3*C(atomic.load.u32)+C(control.test.u32)+C(control.branch))+M*I*(C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch))+4*(S+M)*C(memory.store.u32)+K*CALLBACK(publishMetrics)+C(atomic.load.u32)",
+        "activeCycleExpression": "I*(CALL(rbaBranchWorkerStepKnown32)+3*C(atomic.load.u32)+C(control.test.u32)+C(control.branch))+M*I*(C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch))+4*(S+M)*(C(runtime.counter.load)+C(runtime.metric.store))+K*CALLBACK(publishMetrics)+C(atomic.load.u32)",
         "unboundedTerms": [
           "P*C(atomic.wait)"
         ],
@@ -989,15 +1014,20 @@
           "S": "periodic metric publications; 0 when M=0",
           "K": "metric callback executions including final callback when supplied; 0 for managed Connect4"
         },
-        "note": "Managed Connect4 now runs with M=0: recurring telemetry increment/AND/cadence work and periodic metric publication are absent. Generic callers retaining metrics keep the sampled path."
+        "note": "Managed Connect4 runs with M=0, so recurring telemetry increment/mask/cadence work and generic metric publication are absent. Generic callers retain explicit counter-load and sink-store costs."
       },
       "status": "decomposed",
       "optimizationDelta": {
         "candidate": "managed-exit-only-telemetry",
-        "oldManagedTelemetry": "I*(C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch))+S*(4*C(memory.store.u32)+CALLBACK(publishMetrics))",
-        "newManagedTelemetry": "I*(C(control.test.u32)+C(control.branch))",
-        "removed": "per-iteration telemetry increment and cadence mask/test; periodic generic/domain metric publication",
-        "transferred": "one final managed metric snapshot is charged in addons/rba-connect4-managed-worker.mjs#<module-main>"
+        "oldManagedTelemetry": "I*(C(alu.add.u32)+C(alu.and.u32)+2*C(control.test.u32)+2*C(control.branch))+(S+1)*(4*C(runtime.counter.load)+4*C(runtime.metric.store)+CALLBACK(publishMetrics))",
+        "newManagedTelemetry": "I*(C(control.test.u32)+C(control.branch)) + EXIT_SNAPSHOT",
+        "exitSnapshot": "11*C(runtime.counter.load)+12*C(memory.store.f64)",
+        "removed": "per-iteration telemetry increment, cadence mask/test, periodic worker-counter loads, metric stores, and domain metric callback",
+        "transferred": "one final managed metric snapshot in addons/rba-connect4-managed-worker.mjs#<module-main>",
+        "parameters": {
+          "I": "managed worker loop iterations",
+          "S": "old periodic 1024-turn publication count"
+        }
       }
     },
     {
@@ -2099,22 +2129,22 @@
           "target": "runRbaBranchWorkerLoop32"
         },
         {
-          "op": "memory.load.u32",
+          "op": "runtime.counter.load",
           "count": 11
         },
         {
-          "op": "memory.store.u32",
+          "op": "memory.store.f64",
           "count": 12
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)+11*C(memory.load.u32)+12*C(memory.store.u32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*TYPED_VIEW_CONSTRUCT+CALL(prepareConnect4CpcRbaEvaluator)+CALL(runRbaBranchWorkerLoop32)+11*C(runtime.counter.load)+12*C(memory.store.f64)",
         "unboundedTerms": [
           "CALL(runRbaBranchWorkerLoop32)"
         ],
-        "note": "Managed metrics are materialized once after the worker loop exits; no periodic metric callback remains in hot execution."
+        "note": "Managed metrics are materialized once after the worker loop exits; numeric object-field reads and Float64Array stores remain explicit symbolic costs."
       },
       "status": "decomposed"
     },
@@ -3856,7 +3886,7 @@
     "legacySymbolicVisible": 158,
     "missing": 0,
     "neesBoundOperations": 10,
-    "localExtensionOperations": 20
+    "localExtensionOperations": 23
   },
   "neesOperationBindings": {
     "alu.add.u32": {
