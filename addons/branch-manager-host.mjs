@@ -34,25 +34,13 @@ export function createMetricViews32(workerCount, metricWidth) {
   return views;
 }
 
-export function createManagedThreadSession32({
-  control,
-  stopIndex,
-  doneIndex,
-  errorIndex,
-  wakeIndex,
-  workerDiedCode,
-  deadlineCode,
-  cancelledCode,
-  execArgv = process.execArgv,
-} = {}) {
-  if (!(control instanceof Int32Array)
-      || !Number.isInteger(stopIndex) || !Number.isInteger(doneIndex)
-      || !Number.isInteger(errorIndex) || !Number.isInteger(wakeIndex)
-      || !Number.isInteger(workerDiedCode) || !Number.isInteger(deadlineCode)
-      || !Number.isInteger(cancelledCode)) {
-    throw new TypeError('invalid managed thread session');
-  }
-  return {
+// Canonical managed worker-thread lifecycle role.
+//
+// Construction is cold/control-plane work. Instantiate before entering hot
+// worker/manager loops, preferably during application initialization. Lifecycle
+// method dispatch therefore stays outside the numeric hot execution paths.
+export class ManagedThreadSession {
+  constructor({
     control,
     stopIndex,
     doneIndex,
@@ -61,17 +49,58 @@ export function createManagedThreadSession32({
     workerDiedCode,
     deadlineCode,
     cancelledCode,
-    execArgv: filterFileWorkerExecArgv32(execArgv),
-    threads: [],
-    exits: [],
-    errors: [],
-    exited: 0,
-    finished: false,
-    timer: null,
-    poll: null,
-    abortSignal: null,
-    abortHandler: null,
-  };
+    execArgv = process.execArgv,
+  } = {}) {
+    if (!(control instanceof Int32Array)
+        || !Number.isInteger(stopIndex) || !Number.isInteger(doneIndex)
+        || !Number.isInteger(errorIndex) || !Number.isInteger(wakeIndex)
+        || !Number.isInteger(workerDiedCode) || !Number.isInteger(deadlineCode)
+        || !Number.isInteger(cancelledCode)) {
+      throw new TypeError('invalid managed thread session');
+    }
+    this.control=control;
+    this.stopIndex=stopIndex;
+    this.doneIndex=doneIndex;
+    this.errorIndex=errorIndex;
+    this.wakeIndex=wakeIndex;
+    this.workerDiedCode=workerDiedCode;
+    this.deadlineCode=deadlineCode;
+    this.cancelledCode=cancelledCode;
+    this.execArgv=filterFileWorkerExecArgv32(execArgv);
+    this.threads=[];
+    this.exits=[];
+    this.errors=[];
+    this.exited=0;
+    this.finished=false;
+    this.timer=null;
+    this.poll=null;
+    this.abortSignal=null;
+    this.abortHandler=null;
+  }
+
+  fail(code){
+    return failManagedThreadSession32(this,code);
+  }
+
+  spawn(fileURL,workerData){
+    return spawnManagedFileWorker32(this,fileURL,workerData);
+  }
+
+  wait(options={}){
+    return waitManagedThreadSession32(this,options);
+  }
+
+  close(){
+    return closeManagedThreadSession32(this);
+  }
+
+  state(){
+    return managedThreadSessionState32(this);
+  }
+}
+
+export function createManagedThreadSession32(options={}) {
+  return new ManagedThreadSession(options);
 }
 
 export function failManagedThreadSession32(session, code) {
