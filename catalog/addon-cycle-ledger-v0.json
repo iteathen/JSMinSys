@@ -2177,7 +2177,7 @@
         "unboundedTerms": [
           "CALL(runRbaBranchWorkerLoop32)"
         ],
-        "note": "Managed metrics are materialized once after the worker loop exits; numeric object-field reads and Float64Array stores remain explicit symbolic costs."
+        "note": "Managed metrics are sampled before publish on evaluation 1 and every 1024 evaluations, then materialized once more after natural loop exit; numeric reads and Float64Array stores remain explicit symbolic costs."
       },
       "status": "decomposed"
     },
@@ -2191,14 +2191,53 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "evaluateConnect4CpcRbaTt32"
+        },
+        {
+          "op": "runtime.counter.load",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.counter.load",
+          "count": "10*S"
+        },
+        {
+          "op": "memory.store.f64",
+          "count": "12*S"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(evaluateConnect4CpcRbaTt32)",
-        "note": "Closure captures rootQ/rootReflected; no context-object loads remain."
+        "expression": "CALL(evaluateConnect4CpcRbaTt32)+C(runtime.counter.load)+C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)+S*(10*C(runtime.counter.load)+12*C(memory.store.f64))",
+        "parameters": {
+          "S": "1 on evaluation numbers 1, 1025, 2049, ...; 0 otherwise"
+        },
+        "note": "Managed telemetry snapshots before publish on the first evaluation and every 1024 evaluations thereafter. The first snapshot precedes any publish path that can set DONE, so abrupt host cleanup cannot erase all evidence of completed evaluation work."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "race-safe-sampled-managed-telemetry",
+        "prior": "exit-only telemetry could be terminated after DONE before its post-loop snapshot",
+        "addedPerEvaluation": "C(runtime.counter.load)+C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)",
+        "sampledCost": "S*(10*C(runtime.counter.load)+12*C(memory.store.f64))",
+        "preserved": "post-loop final snapshot remains for natural worker exit",
+        "rationale": "restores mechanically visible telemetry reliability without reintroducing the generic per-loop telemetry counter or host-side grace/barrier machinery"
+      }
     },
     {
       "unit": "addons/rba-connect4-managed-worker.mjs#publish",
@@ -4012,7 +4051,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-managed-host.mjs": "010e59d535f85dd07dfcdb63415859b1ff44e88b",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
-    "addons/rba-connect4-managed-worker.mjs": "d04010bd7357d540e92a1fc1cff900746a0da3e5",
+    "addons/rba-connect4-managed-worker.mjs": "3869827a5cae15b87be9c3bc1e6a738e08d6c94f",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc"
   }
 }
