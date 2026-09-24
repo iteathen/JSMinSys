@@ -30,9 +30,12 @@ export function connect4RbaCofactorBasis(g,profile,parent,parentOffset,count,cel
 }
 
 export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){
-  const meta=source[src+g.metaOffset],terminal=meta&3,rank=meta>>>2;
-  if(terminal||column<0||column>=g.columns)return -1;
-  const height=source[src+column];if(height>=g.rows)return -1;
+  const meta=source[src+g.metaOffset];
+  if((meta&3)||column<0||column>=g.columns||source[src+column]>=g.rows)return -1;
+  return connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex);
+}
+export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null){  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    height=source[src+column];
   const cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
@@ -103,6 +106,7 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
   }
   return 0;
 }
+
 
 function compareReflectedSupport(g,words,offset){
   const half=g.columns>>>1;
