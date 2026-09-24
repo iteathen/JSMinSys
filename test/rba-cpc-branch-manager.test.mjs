@@ -23,11 +23,11 @@ import {
   prepareRbaBranchWorker32,prepareRbaBranchManager32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
 } from '../addons/rba-branch-manager.mjs';
 
-function solveDistributed(g,moves){
+function solveDistributed(g,moves,basisElementBits=32){
   const root=connect4RbaFromMoves(moves,{geometry:g});
   const t=createRbaTt32({
     capacity:16384,bucketCount:16384,
-    keyWords:g.keyWords,basisCapacity:g.maxBasis,edgeCapacity:g.columns,
+    keyWords:g.keyWords,basisCapacity:g.maxBasis,basisElementBits,edgeCapacity:g.columns,
   });
   const rootQ=rbaTtIntern32(t,root.words,0,root.basis,0,root.basis.length);
   rbaTtSetPositionCode32(t,rootQ,root.positionLo,root.positionHi);
@@ -62,6 +62,7 @@ function solveDistributed(g,moves){
     claims:worker.claims,
     branches:worker.branches,
     evaluations:worker.evaluations,
+    basisBytes:t.basis.byteLength,
   };
 }
 
@@ -80,9 +81,12 @@ test('CPC-first branch-manager traversal agrees with exact CPC alpha-beta on 4x4
       state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
       reflected:root.reflected,
     });
-    const distributed=solveDistributed(g,moves);
+    const distributed=solveDistributed(g,moves),narrow=solveDistributed(g,moves,16);
     assert.equal(distributed.value,serial.value,JSON.stringify({moves,serial,distributed}));
     assert.equal(distributed.move,serial.move,JSON.stringify({moves,serial,distributed}));
-    assert.ok(distributed.claims>0);
+    assert.equal(narrow.value,serial.value,JSON.stringify({moves,serial,narrow}));
+    assert.equal(narrow.move,serial.move,JSON.stringify({moves,serial,narrow}));
+    assert.ok(distributed.claims>0);assert.ok(narrow.claims>0);
+    assert.equal(narrow.basisBytes*2,distributed.basisBytes);
   }
 });
