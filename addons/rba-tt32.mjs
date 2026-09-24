@@ -65,7 +65,7 @@ function unlinkBucketRow32(t,q){
   if(prev===-1)t.buckets[slot]=t.link[q];else t.link[prev]=t.link[q];
   t.link[q]=-1;return 1;
 }
-function positionBucket32(t,q){return (t.bucket[q]&RBA_TT_BUCKET_POSITION)!==0?1:0;}
+function positionBucket32(t,q){const tag=t.bucket[q];return tag!==RBA_TT_BUCKET_NONE&&(tag&RBA_TT_BUCKET_POSITION)!==0?1:0;}
 export function rbaTtSetPositionCode32(t,q,lo,hi){
   if(!t.live[q]||!(lo|hi))return rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
   if(!unlinkBucketRow32(t,q))return -1;
