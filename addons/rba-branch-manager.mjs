@@ -61,9 +61,17 @@ export function rbaBranchReadyCount32(t){
   return t.control[RBA_TT_READY_COUNT];
 }
 
-export function prepareRbaBranchManager32({capacity,resetTargets=null}={}){
-  if(!Number.isInteger(capacity)||capacity<1)throw new RangeError('invalid RBA branch manager capacity');
-  return {scanCursor:0,resetTargets,events:0,dedupes:0,maintenancePasses:0};
+export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}={}){
+  if(!Number.isInteger(capacity)||capacity<1||!Number.isInteger(budget)||budget<1)
+    throw new RangeError('invalid RBA branch manager capacity');
+  return {
+    scanCursor:0,
+    resetTargets,
+    readyScratch:new Int32Array(budget),
+    events:0,
+    dedupes:0,
+    maintenancePasses:0,
+  };
 }
 
 function applyWorkerReset32(t,worker){
@@ -105,7 +113,7 @@ export function rbaBranchManagerStep32(
       if(Atomics.load(t.control,RBA_TT_STOP))break;
     }
     if(manager){
-      merged=rbaTtManagerInspectReady32(t,manager.resetTargets,budget);
+      merged=rbaTtManagerInspectReady32(t,manager.resetTargets,budget,manager.readyScratch);
       manager.dedupes+=merged;
       manager.scanCursor=rbaTtManagerClean32(t,manager.resetTargets,manager.scanCursor,budget);
       manager.maintenancePasses+=1;
