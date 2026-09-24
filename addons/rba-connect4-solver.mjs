@@ -119,7 +119,9 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     terminal=connect4RbaTerminal(g,t.keys,base);
   state.count=0;state.witness=-1;
   if(terminal)return terminal;
-  const n=deriveBasis?connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen):t.basisSize[q];
+  const carried=deriveBasis&&state.basisQ===q&&state.basisGeneration===t.generation[q],
+    n=deriveBasis?(carried?state.basisN:connect4RbaBasisFromSupport(g,t.keys,base,basis,0,state.scratch.seen)):t.basisSize[q];
+  if(carried)state.basisQ=-1;
   if(!n)return RBA_EXACT_DRAW;
   if(bothCoordinatesEmpty(g,t.keys,base))return RBA_EXACT_DRAW;
 
@@ -218,7 +220,7 @@ export function prepareConnect4CpcRbaEvaluator({
     g,profile,
     scratch:prepareConnect4RbaCoordinateScratch(g),
     cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),
-    basis:new Uint32Array(g.maxBasis),
+    basis:new Uint32Array(g.maxBasis),basisQ:-1,basisGeneration:0,basisN:0,
     keys:new Uint32Array(g.columns*g.keyWords),
     childBasis:new Uint32Array(g.columns*g.maxBasis),
     childBasisSize:new Uint32Array(g.columns),
@@ -333,6 +335,15 @@ export function evaluateConnect4CpcRbaTt32(t,q,state,rootQ=-1,rootReflected=0){
 
   if(!count)return RBA_QUERY_UNCOVERED;
   state.count=count;
+  if(deriveBasis){
+    state.basisN=0;
+    for(let i=0;i<count;i+=1)if(state.childPresent[i]){
+      const childN=state.childBasisSize[i],source=i*g.maxBasis;
+      for(let j=0;j<childN;j+=1)state.basis[j]=state.childBasis[source+j];
+      state.basisN=childN;
+      break;
+    }
+  }
   return RBA_BRANCH;
 }
 
@@ -346,13 +357,17 @@ export function publishConnect4CpcRbaEvaluation32(t,q,owner,state,code,rootQ,roo
     return -1;
   }
   if(code!==RBA_BRANCH)return -1;
-  return rbaTtPublishSurplus32(
+  const next=rbaTtPublishSurplus32(
     t,q,owner,state.lower,state.upper,
     state.keys,0,state.childBasis,0,state.g.maxBasis,
     state.childBasisSize,state.actions,state.actionLower,state.actionUpper,
     state.childPresent,state.actionPriority,state.count,
     state.childPositionLo,state.childPositionHi,
   );
+  if(t.basisCapacity===0&&next>=0&&state.basisN){
+    state.basisQ=next;state.basisGeneration=t.generation[next];
+  }else state.basisQ=-1;
+  return next;
 }
 
 export function reconcileConnect4CpcRbaEvent32(
