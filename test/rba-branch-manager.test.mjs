@@ -5,7 +5,7 @@ import {
   rbaTtPublishSurplus32,rbaTtPublishExactOwned32,
   rbaTtManagerAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtMarkDone32,rbaTtSignal32,rbaTtRelease32,rbaTtRecycle32,
-  rbaTtManagerMergeDuplicate32,rbaTtManagerInspectReady32,
+  rbaTtManagerMergeDuplicate32,rbaTtManagerInspectReady32,rbaTtManagerClean32,
   RBA_TT_ROOT,RBA_TT_DONE,RBA_TT_EVENT_COUNT,RBA_TT_LIVE,
   RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,
 } from '../addons/rba-tt32.mjs';
@@ -216,4 +216,29 @@ test('manager inspects newest surplus before an old head window',()=>{
   assert.equal(t.readyMember[canonical],1);
   assert.equal(rbaBranchReadyCount32(t),5,
     'dedupe should replace redundant work with its unresolved canonical q');
+});
+
+test('manager duplicate inspection is generation-stamped and later duplicates find the stamped canonical',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const canonical=rbaTtIntern32(t,key(24),0,emptyBasis,0,0,10);
+  assert.equal(rbaTtEnqueue32(t,canonical),1);
+
+  assert.equal(t.inspectGeneration[canonical],0);
+  assert.equal(rbaTtManagerInspectReady32(t,resetTargets,1),0);
+  assert.equal(t.inspectGeneration[canonical],t.generation[canonical]);
+
+  const duplicate=rbaTtAllocate32(t,key(24),0,emptyBasis,0,0,20);
+  assert.equal(rbaTtEnqueue32(t,duplicate),1);
+  assert.equal(rbaTtManagerInspectReady32(t,resetTargets,1),1);
+  assert.equal(t.redirect[duplicate],canonical);
+  assert.equal(t.inspectGeneration[canonical],t.generation[canonical]);
+});
+
+test('TT sweep stamps retained q once for its generation',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const q=rbaTtAllocate32(t,key(25),0,emptyBasis,0,0,1);
+  assert.equal(t.readyMember[q],0);
+  assert.equal(t.inspectGeneration[q],0);
+  rbaTtManagerClean32(t,resetTargets,q,1);
+  assert.equal(t.inspectGeneration[q],t.generation[q]);
 });
