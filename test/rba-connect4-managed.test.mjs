@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
+import {prepareConnect4RbaGeometry,shareConnect4RbaGeometry32} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
@@ -8,6 +8,22 @@ import {
   RBA_AB_CPC_ONLY,
 } from '../addons/rba-connect4-alphabeta.mjs';
 import {runManagedConnect4CpcRba32} from '../addons/rba-connect4-managed-host.mjs';
+
+test('managed workers share one immutable prepared geometry image',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    shared=shareConnect4RbaGeometry32(g);
+  for(const key in g){
+    const value=g[key],copy=shared[key];
+    if(!ArrayBuffer.isView(value)){
+      assert.equal(copy,value,key);
+      continue;
+    }
+    assert.ok(copy.buffer instanceof SharedArrayBuffer,key+' buffer');
+    assert.equal(copy.constructor,value.constructor,key+' constructor');
+    assert.deepEqual([...copy],[...value],key+' contents');
+  }
+  assert.equal(shareConnect4RbaGeometry32(shared).lineShape.buffer,shared.lineShape.buffer);
+});
 
 test('managed Connect4 add-on owns host/worker/manager composition without changing solver semantics',async()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
