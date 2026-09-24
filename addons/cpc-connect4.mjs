@@ -28,6 +28,7 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     preemptionMask32:new Uint32Array(1),
     forcedColumn:new Int32Array(1),
     interval:new Uint32Array(2),
+    singletonEnd:0,
     frontierResponse:frontierResponse?1:0,
     projectedAdvisory:projectedAdvisory?1:0,
   };
@@ -46,29 +47,27 @@ function playableCell(g,words,offset,cell){
 // currently playable singleton terminals, capped at two. Keeping the mover and
 // opponent passes separate preserves the cheap early-terminal path while still
 // eliminating the duplicate singleton scans formerly done by fork derivation.
-function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,player,bits,scratch,storeThreats){
+function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,player,bits,scratch,storeThreats,singletonEnd=-1){
   bits.fill(0);
-  const coord=offset+(player?g.p1Offset:g.p0Offset);
-  let immediate=0,any=0;
-  for(let i=0;i<basisSize;i+=1){
+  const coord=offset+(player?g.p1Offset:g.p0Offset),findEnd=singletonEnd<0;
+  let immediate=0,any=0,end=findEnd?basisSize:singletonEnd,i=0;
+  for(;i<end;i+=1){
     const id=basis[basisOffset+i];
-    // Basis ids are sorted by residual cardinality. pairShapeStart is prepared
-    // once from that ordering, so singleton scans require no shape-size load.
-    if(id>=g.pairShapeStart)break;
+    // The first completed player scan discovers the singleton prefix boundary.
+    // The opponent scan and fork pass consume that assertion directly.
+    if(findEnd&&id>=g.pairShapeStart){end=i;break;}
     if(!coordHas(words,coord,i))continue;
     const cell=id,word=cell>>>5,mask=1<<(cell&31);
     if(bits[word]&mask)continue;
     bits[word]|=mask;any=1;
     const column=g.cellColumn[cell];
     if(words[offset+column]!==g.cellRow[cell])continue;
-    // Mover singleton: CPC is already exact, so the rest of the basis is
-    // irrelevant. Opponent: two distinct playable singletons are already an
-    // exact loss, so stop after recording the second witness.
-    if(!storeThreats)return 5; // immediate=1 | any=4
+    if(!storeThreats)return 5;
     scratch.threatCells[immediate]=cell;scratch.threatColumns[immediate]=column;
     immediate+=1;
-    if(immediate===2)return 6; // immediate=2 | any=4
+    if(immediate===2)return 6;
   }
+  if(findEnd)scratch.singletonEnd=end;
   return immediate|(any?4:0);
 }
 
@@ -78,7 +77,7 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
 // counter-terminal before the opponent's enabler/fork sequence.
 // For configured widths above 32 the proof optimization is simply skipped;
 // correctness then falls through to ordinary traversal.
-function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch){
+function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch,singletonEnd){
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   const targets=scratch.forkTargets32;if(!targets||moverHasSingleton)return 0;
 
@@ -90,7 +89,7 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   // A second basis pass handles both the mover minimal-pair guard and the
   // opponent's playable pair-to-fork precursor relation. Skip the singleton
   // prefix once, then stop at the triple boundary.
-  let i=0;while(i<basisSize&&basis[basisOffset+i]<g.pairShapeStart)i+=1;
+  let i=singletonEnd;
   for(;i<basisSize;i+=1){
     const id=basis[basisOffset+i];
     if(id>=g.tripleShapeStart)break;
@@ -291,8 +290,8 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     return CPC_EXACT;
   }
 
-  const opponent=mover^1;
-  const opponentProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,opponent,opponentBits,scratch,1);
+  const opponent=mover^1,singletonEnd=scratch.singletonEnd;
+  const opponentProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,opponent,opponentBits,scratch,1,singletonEnd);
   const threats=opponentProfile&3,moverHasSingleton=(ownProfile>>>2)&1,
     opponentHasSingleton=(opponentProfile>>>2)&1;
   if(threats>1){
@@ -327,7 +326,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
         return CPC_EXACT;
       }
     }
-    const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
+    const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch,singletonEnd);
     if(precursor<0){
       const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
       return CPC_EXACT;
