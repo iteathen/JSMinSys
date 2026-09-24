@@ -1,0 +1,43 @@
+name: CPC Basis Boundary A-B
+
+on:
+  push:
+    branches:
+      - experiment/assertion-cpc-basis-boundary-v1
+    paths:
+      - '.github/workflows/assertion-cpc-boundary-ab.yml'
+      - 'addons/cpc-connect4.mjs'
+      - 'tools/bench-rba-cpc-ab.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '26'
+      - name: Same-runner baseline-candidate-candidate-baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline=b3a79df0a17fccbb26265d695b4054f59a667842
+          candidate="$GITHUB_SHA"
+          run_phase() {
+            local label="$1"
+            local sha="$2"
+            echo "AB_PHASE $label $sha"
+            git checkout --detach "$sha"
+            node tools/bench-rba-cpc-ab.mjs
+          }
+          run_phase baseline-1 "$baseline"
+          run_phase candidate-1 "$candidate"
+          run_phase candidate-2 "$candidate"
+          run_phase baseline-2 "$baseline"
