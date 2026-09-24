@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
-import {connect4PositionCode49FromMoves,connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4PositionCode64FromMoves,connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 
@@ -29,8 +29,8 @@ function boardSignature(moves){
 test('49-bit position code matches independent board encoding and reflection',()=>{
   const samples=[[],[3],[3,2],[3,2,4,2,5],[0,6,1,5,2,4],[6,0,6,0,5,1]];
   for(const moves of samples){
-    const a=connect4PositionCode49FromMoves(moves,{geometry:g});
-    const b=connect4PositionCode49FromMoves(moves,{geometry:g,reflected:1});
+    const a=connect4PositionCode64FromMoves(moves,{geometry:g});
+    const b=connect4PositionCode64FromMoves(moves,{geometry:g,reflected:1});
     assert.equal(pairCode(a),referenceCode(moves,0));
     assert.equal(pairCode(b),referenceCode(moves,1));
     assert.ok(pairCode(a)<(1n<<49n));
@@ -42,7 +42,7 @@ test('49-bit position code is collision-free across all gravity-valid sequences 
   const codeToBoard=new Map(),boardToCode=new Map(),moves=[],heights=new Uint8Array(7);
   let visited=0;
   function walk(depth){
-    const code=pairCode(connect4PositionCode49FromMoves(moves,{geometry:g})).toString();
+    const code=pairCode(connect4PositionCode64FromMoves(moves,{geometry:g})).toString();
     const board=boardSignature(moves);
     const oldBoard=codeToBoard.get(code);
     if(oldBoard!==undefined)assert.equal(oldBoard,board,'position-code collision');
