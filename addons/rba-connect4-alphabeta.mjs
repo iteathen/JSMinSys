@@ -1,7 +1,7 @@
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactor,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownLegal,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 
@@ -169,10 +169,9 @@ function search(state,depth,alpha,beta){
       value=state.actionLo[row+column];
     }else{
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
-      const term=connect4RbaCofactor(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
+      const term=connect4RbaCofactorKnownLegal(g,state.profile,words,keyOffset,basis,basisOffset,n,column,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
-      if(term<0)continue;
       if(term)value=absToRelative(term,mover);
       else{
         connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,state.basisSize[childDepth],state.coord);
@@ -254,9 +253,9 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[row+column]&&state.actionLo[row+column]===state.actionHi[row+column]){
       value=state.actionLo[row+column];state.frontActionExact+=1;
     }else{
-    const term=connect4RbaCofactor(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
+    const term=connect4RbaCofactorKnownLegal(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,
       state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map,state.coord.inverse);
-    state.cofactors+=1;if(term<0)continue;
+    state.cofactors+=1;
     if(term)value=absToRelative(term,mover);
     else{
       connect4RbaCanonicalize(g,state.profile,state.words,childKey,state.basis,childBasis,state.basisSize[1],state.coord);
