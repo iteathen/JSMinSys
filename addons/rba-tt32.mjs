@@ -32,6 +32,7 @@ export function createRbaTt32({
     basis:u32(capacity*basisCapacity),basisSize:u32(capacity),generation:u32(capacity),
     live:u32(capacity),refs:u32(capacity),execution:u32(capacity),exact:u32(capacity),
     lower:u32(capacity),upper:u32(capacity),phase:u32(capacity),priority:i32(capacity),redirect:i32(capacity),
+    inspectGeneration:u32(capacity),
     link:i32(capacity),bucket:u32(capacity),
     readyNext:i32(capacity),readyPrev:i32(capacity),readyMember:u32(capacity),readyGeneration:u32(capacity),
     eventNext:i32(capacity),eventPrev:i32(capacity),eventMember:u32(capacity),eventGeneration:u32(capacity),
@@ -262,15 +263,20 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
 
 export function rbaTtManagerInspectReady32(t,resetTargets,budget=64){
   // Workers append new surplus at READY_TAIL. Inspect from the tail so the
-  // manager sees fresh surplus first instead of repeatedly rescanning the same
-  // old head window while the queue grows behind it.
+  // manager sees fresh surplus first. q identity is immutable within one
+  // generation, so duplicate probing is required only once per generation;
+  // later duplicates will find this already-inspected row as their canonical.
   let q=t.control[RBA_TT_READY_TAIL],seen=0,merged=0,best=-1,bestPriority=-2147483648;
   while(q!==-1&&seen<budget){
     const previous=t.readyPrev[q];
     if(!t.live[q]||!t.refs[q]||t.exact[q]||t.phase[q]!==RBA_TT_PHASE_NEW||t.redirect[q]>=0){
       rbaTtUnqueueReady32(t,q);
     }else{
-      const equivalent=rbaTtFindEquivalent32(t,q);
+      let equivalent=-1;
+      if(t.inspectGeneration[q]!==t.generation[q]){
+        t.inspectGeneration[q]=t.generation[q];
+        equivalent=rbaTtFindEquivalent32(t,q);
+      }
       if(equivalent>=0){merged+=rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);}
       else if(t.priority[q]>bestPriority){best=q;bestPriority=t.priority[q];}
     }
@@ -290,7 +296,9 @@ export function rbaTtManagerClean32(t,resetTargets,start=0,budget=64){
   while(seen<budget){
     if(q>=t.capacity)q=0;
     if(t.live[q]){
-      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW){
+      if(t.redirect[q]<0&&t.phase[q]===RBA_TT_PHASE_NEW&&
+         t.inspectGeneration[q]!==t.generation[q]){
+        t.inspectGeneration[q]=t.generation[q];
         const equivalent=rbaTtFindEquivalent32(t,q);
         if(equivalent>=0)rbaTtManagerMergeDuplicate32(t,q,equivalent,resetTargets);
       }
