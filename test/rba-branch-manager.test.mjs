@@ -242,3 +242,29 @@ test('TT sweep stamps retained q once for its generation',()=>{
   rbaTtManagerClean32(t,resetTargets,q,1);
   assert.equal(t.inspectGeneration[q],t.generation[q]);
 });
+
+test('already-inspected surplus attaches without losing later duplicate convergence',()=>{
+  const t=table(),root=rbaTtIntern32(t,key(1),0,emptyBasis,0,0);
+  rbaTtSetRoot32(t,root);rbaTtEnqueue32(t,root);
+  const resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const state=makeState(),worker=prepareRbaBranchWorker32({owner:2,workerCount:1,state,resetTargets});
+
+  assert.equal(rbaBranchWorkerStep32(t,worker,evaluate,publish),1);
+  assert.equal(t.phase[root],RBA_TT_PHASE_PENDING_ATTACH);
+  const edge=root*t.edgeCapacity+1,child=t.child[edge];
+  assert.ok(child>=0);
+  assert.equal(t.inspectGeneration[child],0);
+
+  rbaTtManagerInspectReady32(t,resetTargets,1);
+  assert.equal(t.inspectGeneration[child],t.generation[child]);
+
+  assert.equal(rbaTtManagerAttachDependencies32(t,root,resetTargets),1);
+  assert.equal(t.phase[root],RBA_TT_PHASE_ATTACHED);
+  assert.equal(t.child[edge],child);
+
+  const duplicate=rbaTtAllocate32(t,key(3),0,emptyBasis,0,0,99);
+  assert.equal(rbaTtEnqueue32(t,duplicate),1);
+  assert.equal(rbaTtManagerInspectReady32(t,resetTargets,1),1);
+  assert.equal(t.redirect[duplicate],child);
+  assert.equal(t.child[edge],child);
+});
