@@ -177,6 +177,25 @@ export function popcount2x32(lo, hi) {
   return Math.imul(bytes, 0x01010101) >>> 24;
 }
 
+export function popcount3x32(lo, mid, hi) {
+  let a = lo;
+  a = a - ((a >>> 1) & 0x55555555);
+  a = (a & 0x33333333) + ((a >>> 2) & 0x33333333);
+
+  let b = mid;
+  b = b - ((b >>> 1) & 0x55555555);
+  b = (b & 0x33333333) + ((b >>> 2) & 0x33333333);
+
+  let c = hi;
+  c = c - ((c >>> 1) & 0x55555555);
+  c = (c & 0x33333333) + ((c >>> 2) & 0x33333333);
+
+  const nibbles = a + b + c;
+  const bytes = (nibbles & 0x0f0f0f0f)
+    + ((nibbles >>> 4) & 0x0f0f0f0f);
+  return Math.imul(bytes, 0x01010101) >>> 24;
+}
+
 export function fillPopcount10Table32(table) {
   table[0] = 0;
   for (let value = 1; value < 1024; value += 1) {
