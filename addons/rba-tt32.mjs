@@ -314,7 +314,8 @@ export function rbaTtManagerAttachDependencies32(t,q,resetTargets){
     }
     if(equivalent>=0){
       const original=t.child[e],generation=t.childGeneration[e];
-      rbaTtManagerMergeDuplicate32(t,child,equivalent,resetTargets);
+      if(positionBucket32(t,child))managerMergeKnownDuplicate32(t,child,equivalent,resetTargets);
+      else rbaTtManagerMergeDuplicate32(t,child,equivalent,resetTargets);
       child=equivalent;
       if(t.child[e]===original){
         if(t.refs[child]===0xffffffff)return rbaTtFail32(t,RBA_TT_ERR_CAPACITY);
