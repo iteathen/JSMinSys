@@ -22,6 +22,7 @@ import {
   RBA_TT_LIVE,
 } from './rba-tt32.mjs';
 import {connect4RbaFromMoves} from './rba-connect4-solver.mjs';
+import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 
 const HOST_WORKER_DIED=101;
 const HOST_DEADLINE=102;
@@ -30,14 +31,6 @@ const CONNECT4_CPC_RBA_METRIC_WIDTH=12;
 const WITNESS_OFFSET_BYTES=0;
 const RESET_OFFSET_BYTES=4;
 
-function geometryConfig32(g){
-  return {
-    columns:g.columns,
-    rows:g.rows,
-    actionOrder:g.actionOrder,
-    specializationBudgetBytes:g.specializationBudgetBytes,
-  };
-}
 
 function prepareManagedRuntimeSlab32(workers){
   const resetBytes=workers*Int32Array.BYTES_PER_ELEMENT,
@@ -100,7 +93,7 @@ export async function runManagedConnect4CpcRba32(moves,{
 
   const runtime=prepareManagedRuntimeSlab32(workers),
     metricOut=new Float64Array(CONNECT4_CPC_RBA_METRIC_WIDTH),
-    geometryConfig=geometryConfig32(geometry),
+    workerGeometry=shareConnect4RbaGeometry32(geometry),
     session=createManagedThreadSession32({
       control:table.control,
       stopIndex:RBA_TT_STOP,
@@ -135,7 +128,7 @@ export async function runManagedConnect4CpcRba32(moves,{
         new URL('./rba-connect4-managed-worker.mjs',import.meta.url),
         {
           table,
-          geometryConfig,
+          geometry:workerGeometry,
           runtimeBuffer:runtime.buffer,
           resetOffsetBytes:RESET_OFFSET_BYTES,
           resetCount:workers,
@@ -189,7 +182,8 @@ export async function runManagedConnect4CpcRba32(moves,{
     elapsedMs,
     cleanup:host.cleanup,
     workersExited:host.workersExited,
-    sharedBytes:sharedViewBytes32(table)+runtime.buffer.byteLength,
+    sharedBytes:sharedViewBytes32(table)+runtime.buffer.byteLength+
+      sharedViewBytes32(workerGeometry),
     requestedWorkers:workers,
     workersUsed:workers,
     basisSetWords,
