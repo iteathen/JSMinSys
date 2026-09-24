@@ -188,15 +188,20 @@ const resetBefore=applyWorkerReset32(t,worker);
     worker.evaluations+=1;
   }
 
-  const resetAfter=applyWorkerReset32(t,worker);
-  if(resetAfter<0)return 0;
-  if(resetAfter>0)return 1;
-
   if(!rbaTtEnter32(t,worker.owner))return 0;
   const q=worker.q;
   let next=-1;
   try{
-    if(t.execution[q]!==worker.owner){
+    // A manager reset is created only by redirecting this execution-owned q.
+    // Once the publish TT transaction is owned, redirect is the authoritative
+    // reset assertion; no second shared atomic reset poll is required.
+    if(t.redirect[q]>=0){
+      if(t.execution[q]===worker.owner)
+        rbaTtReleaseExecution32(t,q,worker.owner);
+      if(worker.resetTargets)
+        Atomics.store(worker.resetTargets,worker.resetIndex,-2);
+      worker.code=0;
+    }else if(t.execution[q]!==worker.owner){
       t.fault[0]=4;t.fault[1]=q;t.fault[2]=worker.owner;t.fault[3]=t.execution[q];
       rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
     }else{

@@ -859,7 +859,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": "1+B",
+          "count": 1,
           "target": "applyWorkerReset32"
         },
         {
@@ -883,6 +883,27 @@
           "target": "evaluate"
         },
         {
+          "op": "memory.load.u32",
+          "count": "P"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "P"
+        },
+        {
+          "op": "control.branch",
+          "count": "P"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "L",
+          "target": "rbaTtReleaseExecution32"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "A"
+        },
+        {
           "op": "runtime.callback",
           "count": "X",
           "target": "publish"
@@ -903,18 +924,30 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1+B)*CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "expression": "CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+L*CALL(rbaTtReleaseExecution32)+A*C(atomic.store.u32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
         "parameters": {
-          "B": "1 when execution reaches the post-evaluation reset poll; 0 on earlier return",
           "Q": "1 when a ready-claim TT transaction is entered; 0 otherwise",
           "E": "1 when q requires evaluation, else 0",
-          "P": "1 when the publish TT transaction is entered; 0 otherwise",
-          "X": "1 when the publish callback executes; 0 when a pre-publish contract failure bypasses it",
+          "P": "1 when the publish/reset TT transaction is entered; 0 otherwise",
+          "L": "1 when redirected q still owns execution and is released; 0 otherwise",
+          "A": "1 when a redirect is acknowledged through resetTargets; 0 otherwise",
+          "X": "1 when the publish callback executes; 0 for redirected/pre-publish contract paths",
           "F": "number of rbaTtFail32 contract-failure calls on the modeled path"
         },
-        "note": "TT enter/leave composition is explicit; lifetime-known callbacks remove recurring typeof checks and expose is asserted constant zero."
+        "note": "The pre-evaluation reset poll remains atomic. Post-evaluation reset detection is fused into the already-required TT transaction through redirect[q], which is written by the manager before reset publication under the same TT authority."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "fuse-post-evaluation-reset-into-publish-transaction",
+        "oldCycleExpression": "(1+B)*CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "newCycleExpression": "CALL(applyWorkerReset32)+Q*(CALL(rbaTtEnter32)+CALL(rbaTtTake32)+CALL(rbaTtLeave32))+E*CALLBACK(evaluate)+P*(CALL(rbaTtEnter32)+C(memory.load.u32)+C(control.test.u32)+C(control.branch)+L*CALL(rbaTtReleaseExecution32)+A*C(atomic.store.u32)+X*CALLBACK(publish)+F*CALL(rbaTtFail32)+CALL(rbaTtLeave32)+C(atomic.rmw.u32)+ATOMIC_NOTIFY)",
+        "oldOrdinaryPostEvaluation": "C(atomic.load.u32)+2*C(control.test.u32)+2*C(control.branch)",
+        "newOrdinaryPostEvaluation": "C(memory.load.u32)+C(control.test.u32)+C(control.branch)",
+        "symbolicDelta": "C(memory.load.u32)-C(atomic.load.u32)-C(control.test.u32)-C(control.branch)",
+        "removed": "second applyWorkerReset32 call and its recurring shared atomic reset load/control path",
+        "added": "redirect[q] load/test under the publish TT transaction; direct reset acknowledgement on redirected path",
+        "expectedEffect": "scenario-dependent; no fixed speed claim because atomic-load and cache-load costs are locality/coherence dependent"
+      }
     },
     {
       "unit": "addons/rba-branch-manager.mjs#runRbaBranchManagerLoop32",
@@ -3975,7 +4008,7 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-branch-manager.mjs": "966580272b5ddfedcd9381bb55d3a11d2d012c28",
+    "addons/rba-branch-manager.mjs": "7f0863343f18e950f1625656953a424241da070d",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-managed-host.mjs": "010e59d535f85dd07dfcdb63415859b1ff44e88b",
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
