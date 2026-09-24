@@ -20,6 +20,7 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     projectedDistance:projectedAdvisory?new Uint32Array(g.maxBasis*2):null,
     projectedCount:new Uint32Array(2),
     projectedForks:new Uint32Array(2),
+    projectedForkTotal:0,
     activeSingletonCells:new Uint32Array(cellWords),
     activeSingletonCellsOther:new Uint32Array(cellWords),
     forkTargets32:g.columns<=32?new Uint32Array(g.columns):null,
@@ -353,7 +354,11 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
   }
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
-  if(scratch.projectedAdvisory)collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
+  if(scratch.projectedAdvisory){
+    collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
+    const forks=scratch.projectedForks;
+    scratch.projectedForkTotal+=forks[0]+forks[1];
+  }
   if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
   if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
