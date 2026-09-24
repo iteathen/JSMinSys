@@ -199,6 +199,69 @@
         "name": "PUBLISH_DISPATCH_COST(code,scenario)"
       },
       "note": "Result-code dispatch/control and argument selection before exact/surplus publication."
+    },
+    "runtime.integer.check": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "INTEGER_CHECK_COST(runtimeRepresentation)"
+      },
+      "note": "JavaScript integer validation/coercion; source-to-machine lowering remains V8-sensitive."
+    },
+    "runtime.field.load": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "FIELD_LOAD_COST(objectShape,property,cacheLevel)"
+      },
+      "note": "JavaScript object/property numeric load; hidden-class and cache-state dependent."
+    },
+    "runtime.field.store": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "FIELD_STORE_COST(objectShape,property,cacheLevel)"
+      },
+      "note": "JavaScript object/property numeric store; hidden-class and write-barrier state dependent."
+    },
+    "memory.load.u8": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "LOAD_U8_COST(cacheLevel)"
+      },
+      "note": "Uint8Array load; locality and V8 lowering dependent."
+    },
+    "memory.store.u8": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STORE_U8_COST(cacheLevel,ownershipState)"
+      },
+      "note": "Uint8Array store; locality and ownership state dependent."
+    },
+    "alu.xor.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "note": "Zen-family scalar 32-bit XOR seed cost; requalify if V8 lowering changes."
+    },
+    "alu.or.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "note": "Zen-family scalar 32-bit OR seed cost; requalify if V8 lowering changes."
+    },
+    "alu.shl.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "note": "Zen-family scalar 32-bit left-shift seed cost; requalify if V8 lowering changes."
+    },
+    "alu.shr.u32": {
+      "cost": {
+        "kind": "fixed",
+        "cycles": 1
+      },
+      "note": "Zen-family scalar 32-bit logical right-shift seed cost; requalify if V8 lowering changes."
     }
   },
   "units": [
@@ -548,19 +611,104 @@
       "unit": "addons/cpc-connect4.mjs#evaluateConnect4CpcNonterminal32",
       "source": "addons/cpc-connect4.mjs",
       "name": "evaluateConnect4CpcNonterminal32",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-cpc",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "24+8*C+4*R+3*P"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "10+6*C+4*R+4*P"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3+2*W+2*L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "7+4*P"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+4*L"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "6+3*L"
+        },
+        {
+          "op": "alu.xor.u32",
           "count": 1
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2+L"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "3"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "18+2*W+6*L"
+        },
+        {
+          "op": "control.branch",
+          "count": "18+2*W+6*L"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "collectPlayerSingletons"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "cellMarked"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "deriveForkPreemption32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "frontierResponseNoWin"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B",
+          "target": "pairedResponseNoWin"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "collectProjected"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/cpc-connect4.mjs#evaluateConnect4CpcNonterminal32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(24+8*C+4*R+3*P)*C(runtime.field.load)+(10+6*C+4*R+4*P)*C(runtime.field.store)+(3+2*W+2*L)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+3*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectPlayerSingletons)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "parameters": {
+          "W": "coordinate words scanned for any-live detection",
+          "L": "legal-column iterations executed by lift scan",
+          "C": "collectPlayerSingletons calls executed (0..2 on early exits, normally 2)",
+          "M": "cellMarked calls executed",
+          "D": "deriveForkPreemption32 calls executed (0 or 1)",
+          "F": "frontierResponseNoWin calls executed (0 or 1)",
+          "B": "pairedResponseNoWin calls executed (0 or 1)",
+          "P": "collectProjected calls executed (0 or 1)",
+          "R": "long-range response branches evaluated"
+        },
+        "note": "Production CPC node boundary. Tactical/response helper calls retain their own explicit nonzero subledgers; unresolved nested terms stay visible rather than being folded into zero."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/cpc-connect4.mjs#frontierResponseNoWin",
@@ -1102,253 +1250,751 @@
       "unit": "addons/rba-connect4-alphabeta.mjs#absToRelative",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "absToRelative",
-      "scope": "legacy-addon",
+      "scope": "hot-scalar",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "control.test.u32",
+          "count": "1+N"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+N"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#absToRelative,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*C(alu.sub.u32)",
+        "parameters": {
+          "N": "1 when value is non-draw and mover-relative arithmetic executes; 0 for absolute draw"
+        },
+        "note": "Valid-value Negamax conversion. Unknown branch prediction remains visible through control.branch."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "createConnect4RbaExactCache32",
-      "scope": "legacy-addon",
+      "scope": "cold",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 5
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.object.allocate",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#frontEvidence",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "frontEvidence",
-      "scope": "legacy-addon",
+      "scope": "experimental-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "3+E"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+E"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "buildConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-F",
+          "target": "queryConnect4RbaFourFront"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#frontEvidence,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+(3+E)*C(runtime.field.store)+(3+E)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+2*C(control.test.u32)+2*C(control.branch)+CALL(buildConnect4RbaFourFront)+(1-F)*CALL(queryConnect4RbaFourFront)",
+        "parameters": {
+          "F": "1 when Four-Front construction fails and query is skipped; otherwise 0",
+          "E": "1 when queried interval is exact and frontExact increments; otherwise 0"
+        },
+        "note": "Experimental Four-Front path remains separately visible from production CPC-only Negamax."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#metrics",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "metrics",
-      "scope": "legacy-addon",
+      "scope": "cold-result",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 14
+        },
+        {
+          "op": "runtime.object.allocate",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#metrics,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "14*C(runtime.field.load)+C(runtime.object.allocate)",
+        "note": "Cold result materialization of search counters."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#prepareConnect4RbaAlphaBeta",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "prepareConnect4RbaAlphaBeta",
-      "scope": "legacy-addon",
+      "scope": "cold",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "8+5*F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+3*F"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaCoordinateScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "prepareConnect4RbaFrontArena"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createConnect4RbaExactCache32"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "3+3*F"
+        },
+        {
+          "op": "runtime.object.allocate",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#prepareConnect4RbaAlphaBeta,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "expression": "4*C(control.test.u32)+2*C(control.branch)+(8+5*F)*C(runtime.field.load)+C(alu.add.u32)+(3+3*F)*C(alu.imul.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(3+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "parameters": {
+          "F": "1 in Four-Front mode; 0 in production CPC-only mode"
+        },
+        "note": "One-time worker Negamax state preparation; production local-node budget excludes this cold setup but it remains accounted."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCache32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "probeConnect4RbaExactCache32",
-      "scope": "legacy-addon",
+      "scope": "hot-cache-wrapper",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaExactCacheSlot32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCache32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32)",
+        "note": "Public exact-cache probe wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCacheSlot32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "probeConnect4RbaExactCacheSlot32",
-      "scope": "legacy-addon",
+      "scope": "hot-cache",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "2+3*H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*H*K"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "H*V"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*H*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "H*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "H*(K-1)*(1-G)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+H*(3+G*K)"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+H*(3+G*K)"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCacheSlot32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)",
+        "parameters": {
+          "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
+          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
+          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
+          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch"
+        },
+        "note": "Exact-cache probe exposes stamp, key-word equality, branch and value-load costs; no cache miss is treated as free."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#relativeToAbs",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "relativeToAbs",
-      "scope": "legacy-addon",
+      "scope": "hot-scalar",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "control.test.u32",
+          "count": "1+N"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "N*M"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(1-M)"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#relativeToAbs,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*M*C(alu.add.u32)+N*(1-M)*C(alu.sub.u32)",
+        "parameters": {
+          "N": "1 when relative value is non-draw; 0 for draw",
+          "M": "1 for mover 0 add path; 0 for mover 1 subtract path"
+        },
+        "note": "Mover-relative to absolute W/D/L conversion."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "resetConnect4RbaExactCache32",
-      "scope": "legacy-addon",
+      "scope": "cold-per-solve",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "1+W"
+        },
+        {
+          "op": "runtime.field.store",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "W"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(1+W)*C(runtime.field.load)+C(runtime.field.store)+C(alu.add.u32)+C(control.test.u32)+C(control.branch)+W*C(runtime.typed_array.fill)",
+        "parameters": {
+          "W": "1 only when epoch wraps and stamp array is cleared; otherwise 0"
+        },
+        "note": "Per-solve cache epoch reset; rare wrap clear remains visible."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#search",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "search",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-hot",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "8+N*(12+10*A+6*F+4*Q)"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+N*(5+3*A+2*S+F)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+N*(5+3*A+4*Q)"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "N*(2+3*Q)"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+N*(2+A+Q)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+N*(7+5*A+4*Q)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(4+2*A)"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2+N*(6+3*A+3*Q)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N*(A+Q)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2+N*(3+Q)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+N*(14+10*A+5*Q+4*F)"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+N*(14+10*A+5*Q+4*F)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H+T",
+          "target": "absToRelative"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*F",
+          "target": "frontEvidence"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*Q",
+          "target": "queryConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "relativeToAbs"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "storeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "search"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#search,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(8+N*(12+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(5+3*A+2*S+F))*C(runtime.field.store)+(4+N*(5+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(7+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(14+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(14+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))",
+        "parameters": {
+          "H": "1 on exact-cache hit; otherwise 0",
+          "N": "1-H, meaning the node continues beyond exact-cache probe",
+          "A": "action candidates examined in this invocation",
+          "C": "children actually cofactored",
+          "R": "nonterminal children recursively searched",
+          "T": "terminal cofactor children converted to mover-relative values",
+          "F": "1 when Four-Front parent evidence executes; 0 in production CPC-only mode",
+          "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
+          "S": "exact-cache stores executed by this invocation (0 or 1)"
+        },
+        "note": "Governing local Negamax node ledger. Counts expose scalar/control/memory work plus CPC, cofactor, canonicalization, cache and recursive subledgers. V8 object-field lowering remains symbolic rather than silently free.",
+        "targetCyclesPerNode": 1000
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#solveConnect4RbaAlphaBeta",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "solveConnect4RbaAlphaBeta",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-root",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "12+N*(14+8*A+4*Q)"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "14+N*(8+2*A)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+N*(6+3*A+3*Q)"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "3+N*(2+3*Q)"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "N*(2+A+Q)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "N*(6+4*A+3*Q)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(4+2*A)"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2+N*(5+2*A+2*Q)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N*(A+Q)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2+N*(2+Q)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+N*(16+8*A+4*Q)"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+N*(16+8*A+4*Q)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4RbaExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T+X",
+          "target": "absToRelative"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*F",
+          "target": "frontEvidence"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*Q",
+          "target": "queryConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "search"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "relativeToAbs"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "metrics"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#solveConnect4RbaAlphaBeta,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(12+N*(14+8*A+4*Q))*C(runtime.field.load)+(14+N*(8+2*A))*C(runtime.field.store)+(4+N*(6+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(6+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+(5+N*(16+8*A+4*Q))*C(control.test.u32)+(5+N*(16+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)",
+        "parameters": {
+          "T": "1 for terminal root; otherwise 0",
+          "N": "1-T for nonterminal root work",
+          "X": "1 when nonterminal root CPC interval is exact and absToRelative executes; otherwise 0",
+          "F": "1 when Four-Front root evidence executes; 0 in production CPC-only mode",
+          "Q": "Four-Front root action queries executed",
+          "A": "root actions examined",
+          "C": "root children cofactored",
+          "R": "nonterminal root children entering recursive search"
+        },
+        "note": "Root solve ledger is separate from per-node budget; it composes the same operation subledgers and cold result materialization."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "storeConnect4RbaExactCache32",
-      "scope": "legacy-addon",
+      "scope": "hot-cache-wrapper",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "alu.and.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeConnect4RbaExactCacheSlot32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(storeConnect4RbaExactCacheSlot32)",
+        "note": "Public exact-cache store wrapper."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCacheSlot32",
       "source": "addons/rba-connect4-alphabeta.mjs",
       "name": "storeConnect4RbaExactCacheSlot32",
-      "scope": "legacy-addon",
+      "scope": "hot-cache",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": 1
+        },
+        {
+          "op": "memory.store.u32",
           "count": 1
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCacheSlot32,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)",
+        "note": "Exact cache publication writes full key before value/stamp."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#compareReflectedSupport",
       "source": "addons/rba-connect4-coordinate.mjs",
       "name": "compareReflectedSupport",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-canonicalization",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
+          "op": "runtime.field.load",
+          "count": "2+C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*C"
+        },
+        {
+          "op": "alu.shr.u32",
           "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3*C"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+2*C"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+2*C"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#compareReflectedSupport,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(2+C)*C(runtime.field.load)+2*C*C(memory.load.u32)+C(alu.shr.u32)+3*C*C(alu.add.u32)+(2+2*C)*C(control.test.u32)+(2+2*C)*C(control.branch)",
+        "parameters": {
+          "C": "mirrored support column pairs compared before first difference or equality completion"
+        },
+        "note": "Primary reflection comparison short-circuits on first support difference."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaBasisFromSupport",
@@ -1372,19 +2018,83 @@
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize",
       "source": "addons/rba-connect4-coordinate.mjs",
       "name": "connect4RbaCanonicalize",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-canonicalization",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "12+5*N+3*C+2*P"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "5+3*N+C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3*N+2*C+2*P"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W+4*N+C+1"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+5*N+3*C+2*P"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "6+2*W+5*N+2*C+3*P"
+        },
+        {
+          "op": "control.branch",
+          "count": "6+2*W+5*N+2*C+3*P"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "compareReflectedSupport"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-E",
+          "target": "emitSortedSetBits32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "1-E",
+          "target": "permuteCoordinates"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-E)*(2+S)",
+          "target": "publishSpan32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(12+5*N+3*C+2*P)*C(runtime.field.load)+(5+3*N+C)*C(runtime.field.store)+(3*N+2*C+2*P)*C(memory.load.u32)+(W+4*N+C+1)*C(memory.store.u32)+(3+5*N+3*C+2*P)*C(alu.add.u32)+2*N*C(alu.and.u32)+N*C(alu.shl.u32)+N*C(alu.shr.u32)+(6+2*W+5*N+2*C+3*P)*C(control.test.u32)+(6+2*W+5*N+2*C+3*P)*C(control.branch)+CALL(compareReflectedSupport)+(1-E)*CALL(emitSortedSetBits32)+(1-E)*CALLBACK(permuteCoordinates)+(1-E)*(2+S)*CALL(publishSpan32)",
+        "parameters": {
+          "E": "1 when primary support comparison proves the current orientation strictly canonical and reflection work exits early; otherwise 0",
+          "W": "shapeWordCount words cleared in reflection scratch",
+          "N": "basis entries reflected/remapped",
+          "C": "configured support columns copied if reflected orientation wins",
+          "P": "coordinate words compared on symmetric-support secondary ordering",
+          "S": "1 when selectedSet is supplied and published; otherwise 0"
+        },
+        "note": "Canonicalization exposes primary short-circuit, reflected-basis construction, coordinate permutation, secondary compare and final publication."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactor",
@@ -1408,37 +2118,176 @@
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis",
       "source": "addons/rba-connect4-coordinate.mjs",
       "name": "connect4RbaCofactorBasis",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-cofactor",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "5+2*N"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "N"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W+2*N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "W+4*N"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+2*W+4*N"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+2*W+4*N"
+        },
+        {
+          "op": "runtime.callback",
+          "count": 1,
+          "target": "prepareRemove"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "N",
+          "target": "removePrepared"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "emitSortedSetBitsAt32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-A",
+          "target": "emitSortedSetBits32"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(5+2*N)*C(runtime.field.load)+N*C(memory.load.u32)+(W+2*N)*C(memory.store.u32)+(W+4*N)*C(alu.add.u32)+2*N*C(alu.and.u32)+N*C(alu.shl.u32)+N*C(alu.shr.u32)+(2+2*W+4*N)*C(control.test.u32)+(2+2*W+4*N)*C(control.branch)+CALLBACK(prepareRemove)+N*CALLBACK(removePrepared)+A*CALL(emitSortedSetBitsAt32)+(1-A)*CALL(emitSortedSetBits32)",
+        "parameters": {
+          "W": "shapeWordCount words zeroed",
+          "N": "parent basis entries transformed",
+          "A": "1 when seenOffset selects emitSortedSetBitsAt32; otherwise 0"
+        },
+        "note": "Basis cofactor explicitly counts zeroing, per-basis removal, bit publication and sorted-bit emission."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight",
       "source": "addons/rba-connect4-coordinate.mjs",
       "name": "connect4RbaCofactorKnownHeight",
-      "scope": "legacy-addon",
+      "scope": "local-negamax-cofactor",
       "operations": [
         {
-          "op": "runtime.legacy.addon.body",
-          "count": 1
+          "op": "runtime.field.load",
+          "count": "18+4*G+7*CN+9*N+4*U"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "8+CN+4*N+2*U"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+2*G+3*CN+5*N+2*U"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "G+2*Z+3+CN+2*N+2*U"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "8+3*G+5*CN+8*N+3*U"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "2+B+I"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "6+4*N+2*U"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2+3*N+U"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "3+B+CN+2*N+I+U"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+        },
+        {
+          "op": "control.branch",
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "connect4RbaCofactorBasis"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "K*PR",
+          "target": "prepareRemove"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "K*RM",
+          "target": "removePrepared"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "K*PS",
+          "target": "prepareSubset"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "K*U",
+          "target": "shapeSubsetPrepared"
         }
       ],
       "cycleCount": {
-        "kind": "symbolic",
-        "expression": "LEGACY_ADDON_LEDGER(addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight,scenario)",
-        "note": "Pre-existing add-on function is explicitly nonzero/symbolic until decomposed into NEES operation counts."
+        "kind": "expression",
+        "expression": "(18+4*G+7*CN+9*N+4*U)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "parameters": {
+          "G": "configured columns copied into child support",
+          "Z": "coordWords cleared per player coordinate",
+          "B": "singleton-basis binary-search iterations",
+          "CN": "child basis size scanned for cardinality boundaries",
+          "N": "active parent basis entries scanned",
+          "I": "total child-image binary-search iterations when childIndex is unavailable",
+          "U": "total upset subset-candidate tests across surviving residuals",
+          "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0",
+          "PR": "1 when removed[] is absent and prepareRemove executes; otherwise 0",
+          "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
+          "PS": "prepareSubset calls for surviving images"
+        },
+        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters."
       },
-      "status": "legacy-symbolic-visible"
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownLegal",
@@ -4047,11 +4896,11 @@
   ],
   "summary": {
     "units": 178,
-    "decomposed": 21,
-    "legacySymbolicVisible": 157,
+    "decomposed": 39,
+    "legacySymbolicVisible": 139,
     "missing": 0,
     "neesBoundOperations": 10,
-    "localExtensionOperations": 28
+    "localExtensionOperations": 37
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -4146,6 +4995,38 @@
     "addons/rba-connect4-managed-manager.mjs": "b0b92146205721b3befcf979db9d081c9c027437",
     "addons/rba-connect4-managed-worker.mjs": "942c00c1be0a5b7deb8d56a669a0fe34ccda8134",
     "addons/rba-connect4-solver.mjs": "13f4403dadc0e0d5ae1f044ecb523ab9fdb71fbc",
-    "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f"
+    "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
+    "addons/rba-connect4-alphabeta.mjs": "1cf4fc1881785067082146ac68d450e262addca6",
+    "addons/cpc-connect4.mjs": "9a6f76455e7c0b44df85e90d2818f497ced257ac",
+    "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af"
+  },
+  "isomaxLocalKernel": {
+    "profile": "node26-v8-14.6/x86_64-amd-zen3",
+    "targetCyclesPerNode": 1000,
+    "measuredPhase1CyclesPerNode": 3907,
+    "nodeCounter": "alphaBetaNodes",
+    "governingUnit": "addons/rba-connect4-alphabeta.mjs#search",
+    "requiredDetailedUnits": [
+      "addons/rba-connect4-alphabeta.mjs#absToRelative",
+      "addons/rba-connect4-alphabeta.mjs#createConnect4RbaExactCache32",
+      "addons/rba-connect4-alphabeta.mjs#frontEvidence",
+      "addons/rba-connect4-alphabeta.mjs#metrics",
+      "addons/rba-connect4-alphabeta.mjs#prepareConnect4RbaAlphaBeta",
+      "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCache32",
+      "addons/rba-connect4-alphabeta.mjs#probeConnect4RbaExactCacheSlot32",
+      "addons/rba-connect4-alphabeta.mjs#relativeToAbs",
+      "addons/rba-connect4-alphabeta.mjs#resetConnect4RbaExactCache32",
+      "addons/rba-connect4-alphabeta.mjs#search",
+      "addons/rba-connect4-alphabeta.mjs#solveConnect4RbaAlphaBeta",
+      "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32",
+      "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCacheSlot32",
+      "addons/cpc-connect4.mjs#evaluateConnect4CpcNonterminal32",
+      "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorBasis",
+      "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeight",
+      "addons/rba-connect4-coordinate.mjs#compareReflectedSupport",
+      "addons/rba-connect4-coordinate.mjs#connect4RbaCanonicalize"
+    ],
+    "accountingRule": "Every listed unit must be decomposed into bound operations. Unknown lowering/memory/runtime costs remain explicit symbolic terms; no local Negamax operation may fall back to runtime.legacy.addon.body.",
+    "budgetBoundary": "Local CPC-first Negamax search only. Manager, worker startup, idle workers, shared-TT distribution and Surplus coordination remain separate ledgers."
   }
 }
