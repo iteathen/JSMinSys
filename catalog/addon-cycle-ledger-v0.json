@@ -9732,20 +9732,33 @@
         },
         {
           "op": "alu.add.u32",
-          "count": 2
+          "count": 1
         },
         {
           "op": "runtime.call.subledger",
-          "count": 3,
+          "count": 1,
+          "target": "popcount2x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
           "target": "popcount32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+2*C(alu.add.u32)+3*CALL(popcount32)",
-        "note": "Standard-7x6 fast path. Caller supplies prepared three-word offsets, so there is no loop or offset multiplication inside the evaluator."
+        "expression": "6*C(memory.load.u32)+3*C(alu.and.u32)+C(alu.add.u32)+CALL(popcount2x32)+CALL(popcount32)",
+        "note": "Branchless three-word score: fuse the first two live-line words through the sealed 23-cycle popcount2x32, then add one 14-cycle popcount32. Static ledger removes one add and replaces two 14-cycle SWAR calls with one 23-cycle fused call."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "fused-two-word-live-line-popcount",
+        "baseline": "646bfab77e37a9c5923535c75dd843247222d896",
+        "prior": "3*CALL(popcount32)+2*C(alu.add.u32)",
+        "new": "CALL(popcount2x32)+CALL(popcount32)+C(alu.add.u32)",
+        "staticSerialDelta": "-6 cycles per scored three-word cell under the current sealed ledgers",
+        "semantics": "exact sum of three live-line word popcounts unchanged"
+      }
     },
     {
       "unit": "addons/worker.mjs#Worker",
@@ -10497,7 +10510,7 @@
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "4fb1b8d36e25badd0a036af0caba0204e4238cd8",
+    "addons/connect4-live-line-evaluator.mjs": "dbf9fb7775670e6246470a31f7ffb2a1149b0508",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
   },
