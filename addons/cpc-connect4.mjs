@@ -131,15 +131,7 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
 // currently remaining slots. XOR of the per-column parities is exactly the
 // parity of their sum. This is a projection, not unconditional W/D/L.
 export function connect4CpcTargetOwner32(g,words,offset,targetCell){
-  const targetColumn=g.cellColumn[targetCell],targetRow=g.cellRow[targetCell];
-  let parity=0;
-  for(let column=0;column<g.columns;column+=1)
-    parity^=(g.rows-words[offset+column])&1;
-  const height=words[offset+targetColumn];
-  parity^=(g.rows-height)&1;
-  parity^=(targetRow-height+1)&1;
-  const mover=(words[offset+g.metaOffset]>>>2)&1;
-  return mover^(parity^1);
+  return g.cpcTargetOwnerBase^(g.cellRow[targetCell]&1);
 }
 
 export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
