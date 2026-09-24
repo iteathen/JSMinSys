@@ -23,6 +23,16 @@ import {
   prepareRbaBranchWorker32,prepareRbaBranchManager32,rbaBranchWorkerStep32,rbaBranchManagerStep32,
 } from '../addons/rba-branch-manager.mjs';
 
+function assertOptimalWitness(g,moves,result,expectedValue){
+  assert.ok(result.move>=0&&result.move<g.columns,JSON.stringify({moves,result}));
+  const next=[...moves,result.move],root=connect4RbaFromMoves(next,{geometry:g}),
+    solved=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+      reflected:root.reflected,
+    });
+  assert.equal(solved.value,expectedValue,JSON.stringify({moves,result,solved}));
+}
+
 function solveDistributed(g,moves,basisSetWords=0){
   const root=connect4RbaFromMoves(moves,{geometry:g});
   const t=createRbaTt32({
@@ -83,9 +93,9 @@ test('CPC-first branch-manager traversal agrees with exact CPC alpha-beta on 4x4
     });
     const distributed=solveDistributed(g,moves),compact=solveDistributed(g,moves,g.shapeWordCount);
     assert.equal(distributed.value,serial.value,JSON.stringify({moves,serial,distributed}));
-    assert.equal(distributed.move,serial.move,JSON.stringify({moves,serial,distributed}));
+    assertOptimalWitness(g,moves,distributed,serial.value);
     assert.equal(compact.value,serial.value,JSON.stringify({moves,serial,compact}));
-    assert.equal(compact.move,serial.move,JSON.stringify({moves,serial,compact}));
+    assertOptimalWitness(g,moves,compact,serial.value);
     assert.ok(distributed.claims>0);assert.ok(compact.claims>0);
     assert.equal(compact.basisBytes/distributed.basisBytes,g.shapeWordCount/g.maxBasis);
   }
