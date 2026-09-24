@@ -92,6 +92,32 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
 });
 
 
+test('surplus fight spike expands exact shared work across competing workers',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    moves=[0,1,0,1],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    serial=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+      reflected:root.reflected,
+    }),
+    managed=await runManagedConnect4CpcRba32(moves,{
+      geometry:g,
+      workers:4,
+      capacity:16384,
+      buckets:16384,
+      timeoutMs:5000,
+      surplusFightSpike:true,
+    });
+  assert.equal(managed.status,'EXACT',JSON.stringify(managed));
+  assert.equal(managed.absoluteValue,serial.value);
+  assert.equal(managed.witness,serial.move);
+  assert.equal(managed.mode,'SURPLUS_FIGHT_SPIKE');
+  assert.ok(managed.metrics.branches>0,JSON.stringify(managed.metrics));
+  assert.ok(managed.metrics.claims>1,JSON.stringify(managed.metrics));
+  assert.ok(managed.metrics.transitions>0,JSON.stringify(managed.metrics));
+  assert.ok(managed.metrics.ttLive>1,JSON.stringify(managed.metrics));
+});
+
 test('exact managed completion publishes worker telemetry before host cleanup',async()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
     moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
