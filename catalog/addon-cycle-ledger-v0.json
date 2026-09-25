@@ -2566,7 +2566,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "M",
-          "target": "probeConnect4RbaSharedExactCache32"
+          "target": "probeConnect4RbaSharedExactCacheHash32"
         },
         {
           "op": "runtime.field.load",
@@ -2587,7 +2587,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCacheHash32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
           "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
@@ -2596,7 +2596,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses gate shared lookup by high hash bits, then forward the already-computed full hash to shared lookup. No second wide-key hash is performed on sampled shared probes."
       },
       "status": "decomposed"
     },
@@ -3053,7 +3053,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheHash32"
         },
         {
           "op": "runtime.field.load",
@@ -3074,8 +3074,8 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCacheHash32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "note": "Local exact publication remains unconditional. Sampled Lazy-SMP shared publication forwards the already-computed full hash, avoiding duplicate wide-key hashing.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -10009,16 +10009,39 @@
       "unit": "addons/rba-connect4-shared-exact-cache.mjs#probeConnect4RbaSharedExactCache32",
       "source": "addons/rba-connect4-shared-exact-cache.mjs",
       "name": "probeConnect4RbaSharedExactCache32",
-      "scope": "hot-lazy-smp-cache-probe",
+      "scope": "hot-lazy-smp-cache-probe-wrapper",
       "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
         {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "mixSpan32Locator32"
         },
         {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaSharedExactCacheHash32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "C(runtime.field.load)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaSharedExactCacheHash32)",
+        "note": "Compatibility wrapper for callers that do not already own the full exact-key hash."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#probeConnect4RbaSharedExactCacheHash32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "probeConnect4RbaSharedExactCacheHash32",
+      "scope": "hot-lazy-smp-cache-probe-known-hash",
+      "operations": [
+        {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "5+K"
         },
         {
           "op": "atomic.load.u32",
@@ -10055,12 +10078,12 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "(5+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
           "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Known-hash seqlock-style shared exact probe. The caller supplies the exact wide-key hash already computed for its private-cache slot, so this path performs no duplicate mixSpan32Locator32 call."
       },
       "status": "decomposed"
     },
@@ -10068,16 +10091,39 @@
       "unit": "addons/rba-connect4-shared-exact-cache.mjs#storeConnect4RbaSharedExactCache32",
       "source": "addons/rba-connect4-shared-exact-cache.mjs",
       "name": "storeConnect4RbaSharedExactCache32",
-      "scope": "hot-lazy-smp-cache-store",
+      "scope": "hot-lazy-smp-cache-store-wrapper",
       "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
         {
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "mixSpan32Locator32"
         },
         {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeConnect4RbaSharedExactCacheHash32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "C(runtime.field.load)+CALL(mixSpan32Locator32)+CALL(storeConnect4RbaSharedExactCacheHash32)",
+        "note": "Compatibility wrapper for callers that do not already own the full exact-key hash."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#storeConnect4RbaSharedExactCacheHash32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "storeConnect4RbaSharedExactCacheHash32",
+      "scope": "hot-lazy-smp-cache-store-known-hash",
+      "operations": [
+        {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "6+K"
         },
         {
           "op": "atomic.load.u32",
@@ -10118,12 +10164,12 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "(6+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
           "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Known-hash direct-mapped shared exact publication. The caller supplies the exact wide-key hash, eliminating the second mixSpan32Locator32 call without adding tags or metadata."
       },
       "status": "decomposed"
     },
@@ -10362,8 +10408,8 @@
     }
   ],
   "summary": {
-    "units": 192,
-    "decomposed": 192,
+    "units": 194,
+    "decomposed": 194,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10467,7 +10513,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+    "addons/rba-connect4-alphabeta.mjs": "45de0e77e86b7e079ff7765a9f9caf2374e426a5",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -10476,7 +10522,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "8921c3d50434ec8c36854a9533442f6b4097bb19",
     "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
   },
