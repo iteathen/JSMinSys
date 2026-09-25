@@ -10330,7 +10330,7 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.add.u32",
@@ -10352,11 +10352,11 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+3*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
+        "note": "Experimental standard-7x6 worker diversification keeps root witness ordering unchanged but spreads recursive action-order offsets by stride two: orderOffset=(workerIndex*2)%columns. This adds one cold multiply per worker and no recursive hot-loop policy branch."
       },
       "status": "decomposed"
     }
@@ -10478,7 +10478,7 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
     "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
+    "addons/rba-connect4-lazy-smp-worker.mjs": "5db7dcf5f44b9293af5370339601650322c362c9"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
