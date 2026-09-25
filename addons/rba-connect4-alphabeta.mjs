@@ -41,13 +41,30 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  if(cache.shared){
+    let share=!(hash&cache.sharedSampleBits);
+    if(!share){
+      let legal=0;
+      for(let c=0;c<cache.sharedColumns;c+=1)if(words[offset+c]<cache.sharedRows)legal+=1;
+      share=legal<=2;
+    }
+    if(share)return probeConnect4RbaSharedExactCache32(cache.shared,words,offset);
+  }
+  return 0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared){
+    let share=!(hash&cache.sharedSampleBits);
+    if(!share){
+      let legal=0;
+      for(let c=0;c<cache.sharedColumns;c+=1)if(words[offset+c]<cache.sharedRows)legal+=1;
+      share=legal<=2;
+    }
+    if(share)storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  }
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
@@ -95,6 +112,7 @@ export function prepareConnect4RbaAlphaBeta({
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
+  cache.sharedColumns=g.columns;cache.sharedRows=g.rows;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
