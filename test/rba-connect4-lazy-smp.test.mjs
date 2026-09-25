@@ -100,10 +100,3 @@ test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async
 });
 
 
-
-test('Lazy SMP worker-private root tie ordering preserves exact result',async()=>{
-  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),moves=[0,1,0,1],root=connect4RbaFromMoves(moves,{geometry:g});
-  const a=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096,orderOffset:0}),reflected:root.reflected});
-  const b=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096,orderOffset:1}),reflected:root.reflected});
-  assert.equal(a.value,b.value);
-});

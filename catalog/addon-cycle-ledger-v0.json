@@ -2951,15 +2951,9 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve reconstructs exact physical live-line state and uses the prepared worker-specific action order as the tie-break sequence for live-line-equal root moves, matching the already-diversified recursive tie order. Primary live-line scores and exact search semantics are unchanged."
+        "note": "Root solve reconstructs exact physical live-line state and retains the qualified geometry/live-line root ordering. Lazy-SMP worker diversification remains confined to recursive live-line ties."
       },
-      "status": "decomposed",
-      "optimizationDelta": {
-        "candidate": "lazy-smp-root-tie-diversification",
-        "prior": "all Lazy-SMP workers used identical root tie order and diverged only below the root",
-        "changed": "root live-line ties now follow each worker's initialization-prepared action order",
-        "hotAdded": "no new per-node arithmetic or scheduler operations"
-      }
+      "status": "decomposed"
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32",
@@ -11073,7 +11067,7 @@
     "addons/rba-connect4-managed-worker.mjs": "576fb889ca0b506da29f103f43d6becbd91a2ce5",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "a7208c868e4a20870c0da6ad86f034e823342aef",
+    "addons/rba-connect4-alphabeta.mjs": "be8d5927cdd6b04b1bfbbd8941d35b9a0da4a558",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
