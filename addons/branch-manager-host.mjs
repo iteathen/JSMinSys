@@ -152,19 +152,19 @@ export async function waitManagedThreadSession32(
   signal?.addEventListener('abort', abort, { once: true });
 
   try {
-    await new Promise((resolve) => {
-      session.timer = setTimeout(() => {
-        failManagedThreadSession32(session, session.deadlineCode);
-        resolve();
-      }, timeoutMs);
-      session.poll = setInterval(() => {
-        if (Atomics.load(session.control, session.stopIndex)
-            || Atomics.load(session.control, session.doneIndex)) resolve();
-      }, pollMs);
-    });
+    session.timer = setTimeout(() => {
+      failManagedThreadSession32(session, session.deadlineCode);
+    }, timeoutMs);
+    while (!Atomics.load(session.control, session.stopIndex)
+        && !Atomics.load(session.control, session.doneIndex)) {
+      const wake = Atomics.load(session.control, session.wakeIndex);
+      if (Atomics.load(session.control, session.stopIndex)
+          || Atomics.load(session.control, session.doneIndex)) break;
+      const waiter = Atomics.waitAsync(session.control, session.wakeIndex, wake);
+      if (waiter.async) await waiter.value;
+    }
   } finally {
     clearTimeout(session.timer);
-    clearInterval(session.poll);
     session.timer = null;
     session.poll = null;
     signal?.removeEventListener('abort', abort);

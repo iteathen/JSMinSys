@@ -903,7 +903,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+3*P"
+          "count": "18+5*W"
         },
         {
           "op": "runtime.field.store",
@@ -915,11 +915,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "7+2*P"
+          "count": "7+5*W"
         },
         {
           "op": "control.branch",
-          "count": "7+2*P"
+          "count": "7+5*W"
         },
         {
           "op": "runtime.call.subledger",
@@ -928,15 +928,11 @@
         },
         {
           "op": "runtime.event.listener",
-          "count": "2"
-        },
-        {
-          "op": "runtime.promise.construct",
-          "count": 1
+          "count": 2
         },
         {
           "op": "runtime.timer.set",
-          "count": 2
+          "count": 1
         },
         {
           "op": "runtime.call.subledger",
@@ -945,11 +941,15 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": "2*P+1"
+          "count": "5*W+1"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "W"
         },
         {
           "op": "runtime.timer.clear",
-          "count": 2
+          "count": 1
         },
         {
           "op": "runtime.field.store",
@@ -959,16 +959,16 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(18+3*P)*C(runtime.field.load)+12*C(runtime.field.store)+(7+2*P)*C(control.test.u32)+(7+2*P)*C(control.branch)+A*CALL(abort)+2*C(runtime.event.listener)+C(runtime.promise.construct)+2*C(runtime.timer.set)+T*CALL(failManagedThreadSession32)+(2*P+1)*C(atomic.load.u32)+2*C(runtime.timer.clear)",
+        "activeCycleExpression": "(18+5*W)*C(runtime.field.load)+12*C(runtime.field.store)+(7+5*W)*C(control.test.u32)+(7+5*W)*C(control.branch)+A*CALL(abort)+2*C(runtime.event.listener)+C(runtime.timer.set)+T*CALL(failManagedThreadSession32)+(5*W+1)*C(atomic.load.u32)+W*C(atomic.wait)+C(runtime.timer.clear)",
         "unboundedTerms": [
-          "C(runtime.promise.construct)"
+          "C(atomic.wait)"
         ],
         "parameters": {
           "A": "0/1 cancellation callback invocation before/during wait",
           "T": "0/1 deadline callback invocation",
-          "P": "poll interval callbacks executed before resolution"
+          "W": "Atomics.waitAsync wake iterations before STOP/DONE is observed"
         },
-        "note": "Managed wait is elapsed-time unbounded; active setup/poll/cancellation operations remain counted."
+        "note": "Experimental managed wait consumes the existing WAKE word via Atomics.waitAsync instead of 2ms polling. Deadline and abort use failManagedThreadSession32, which increments/notifies WAKE. pollMs remains accepted for interface compatibility but does not schedule a polling interval."
       },
       "status": "decomposed"
     },
@@ -10470,7 +10470,7 @@
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
-    "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
+    "addons/branch-manager-host.mjs": "8e87e5af26758819d54bb09d249ce06c28283158",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
