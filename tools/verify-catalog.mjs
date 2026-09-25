@@ -203,8 +203,6 @@ for (const name of readdirSync('addons').filter((name) => name.endsWith('.mjs'))
     declaredAddonUnits.add(`${path}#${match[1]}`);
   }
 }
-declaredAddonUnits.add('addons/rba-connect4-managed-worker.mjs#<module-main>');
-declaredAddonUnits.add('addons/rba-connect4-managed-manager.mjs#<module-main>');
 declaredAddonUnits.add('addons/rba-connect4-lazy-smp-worker.mjs#<module-main>');
 
 for (const unit of declaredAddonUnits) {
@@ -222,10 +220,9 @@ assert.equal(
 );
 
 const requiredDetailedSources = new Set([
-  'addons/rba-connect4-managed-host.mjs',
-  'addons/rba-connect4-managed-worker.mjs',
-  'addons/rba-connect4-managed-manager.mjs',
   'addons/rba-connect4-alphabeta.mjs',
+  'addons/rba-connect4-lazy-smp-host.mjs',
+  'addons/rba-connect4-lazy-smp-worker.mjs',
 ]);
 for (const unit of addonCycleLedger.units) {
   if (requiredDetailedSources.has(unit.source)) {
