@@ -150,6 +150,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     diagnosticOverlapTrace:overlapTrace,
     diagnosticProvenanceHits:sharedExactCache.provenanceHitStats?Array.from(sharedExactCache.provenanceHitStats):null,
     diagnosticProvenanceStores:sharedExactCache.provenanceStoreStats?Array.from(sharedExactCache.provenanceStoreStats):null,
+    diagnosticRouteReplacementStats:sharedExactCache.routeReplacementStats?Array.from(sharedExactCache.routeReplacementStats):null,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
