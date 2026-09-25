@@ -24,6 +24,20 @@ test('shared exact cache publishes only fully committed exact rows',()=>{
   assert.ok(cache.stats[1]>=2);
 });
 
+test('shared exact cache retains high-reuse CPC routes against lower-route collisions',()=>{
+  const a=Uint32Array.from([11,22]),b=Uint32Array.from([33,44]);
+  for(const protectedRoute of [6,8]){
+    const cache=createConnect4RbaSharedExactCache32({capacity:1,keyWords:2});
+    assert.equal(storeConnect4RbaSharedExactCache32(cache,a,0,3,protectedRoute),3);
+    assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
+    for(const incomingRoute of [3,4,5]){
+      assert.equal(storeConnect4RbaSharedExactCache32(cache,b,0,2,incomingRoute),2);
+      assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
+      assert.equal(probeConnect4RbaSharedExactCache32(cache,b,0),0);
+    }
+  }
+});
+
 test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
     moves=[0,1,0,1],
