@@ -15,7 +15,8 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords}={}
 }
 
 export function probeConnect4RbaSharedExactCache32(cache,words,offset){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask,
+  const hash=mixSpan32Locator32(words,offset,cache.keyWords),
+    slot=(hash>>>8)&cache.mask,
     before=Atomics.load(cache.sequence,slot);
   if(!before||(before&1))return 0;
   const base=slot*cache.keyWords;
@@ -29,7 +30,8 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset){
 }
 
 export function storeConnect4RbaSharedExactCache32(cache,words,offset,value){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask,
+  const hash=mixSpan32Locator32(words,offset,cache.keyWords),
+    slot=(hash>>>8)&cache.mask,
     current=Atomics.load(cache.sequence,slot);
   if(current&1){Atomics.add(cache.stats,2,1);return value;}
   const odd=(current+1)>>>0;

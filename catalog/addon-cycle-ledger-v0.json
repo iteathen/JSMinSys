@@ -10051,16 +10051,20 @@
         {
           "op": "atomic.rmw.u32",
           "count": "E"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)+C(alu.shr.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
           "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Experimental shared-slot placement uses bits 8.. instead of the local cache low-bit window, decorrelating local/shared direct-map collision classes at the cost of one logical shift per shared access."
       },
       "status": "decomposed"
     },
@@ -10114,16 +10118,20 @@
         {
           "op": "control.branch",
           "count": 2
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)+C(alu.shr.u32)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
           "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Experimental shared-slot placement uses bits 8.. instead of the local cache low-bit window, decorrelating local/shared direct-map collision classes at the cost of one logical shift per shared access."
       },
       "status": "decomposed"
     },
@@ -10476,7 +10484,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "b309bda1b79a31fe196cdb6fbab6b85f41af18e9",
     "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
   },
