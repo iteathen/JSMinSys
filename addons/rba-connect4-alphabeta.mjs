@@ -18,7 +18,7 @@ export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
   return {mask:capacity-1,keyWords,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
     keys:new Uint32Array(capacity*keyWords)};
 }
-function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot){
+function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
   if(cache.stamp[slot]===cache.epoch){
     const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
     if(keyWords===14){
@@ -41,22 +41,22 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
 }
-function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot){
+function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared)storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
-  return probeConnect4RbaExactCacheSlot32(cache,words,offset,slot);
+  const hash=mixSpan32Locator32(words,offset,cache.keyWords),slot=hash&cache.mask;
+  return probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash);
 }
 export function storeConnect4RbaExactCache32(cache,words,offset,value){
-  const slot=mixSpan32Locator32(words,offset,cache.keyWords)&cache.mask;
-  return storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot);
+  const hash=mixSpan32Locator32(words,offset,cache.keyWords),slot=hash&cache.mask;
+  return storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash);
 }
 function resetConnect4RbaExactCache32(cache){
   let epoch=(cache.epoch+1)>>>0;
@@ -74,6 +74,7 @@ export function prepareConnect4RbaAlphaBeta({
   boundaryBudget=100000,
   cacheCapacity=65536,
   sharedExactCache=null,
+  sharedSampleMask=0,
   orderOffset=0,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
@@ -87,10 +88,13 @@ export function prepareConnect4RbaAlphaBeta({
   if(sharedExactCache!==null&&
      (sharedExactCache.keyWords!==g.keyWords||!Number.isInteger(sharedExactCache.mask)))
     throw new RangeError('shared exact cache/profile mismatch');
+  if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
+     (sharedSampleMask&(sharedSampleMask+1)))
+    throw new RangeError('invalid shared sample mask');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
-  cache.shared=sharedExactCache;
+  cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
@@ -131,14 +135,14 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const alphaOrig=alpha,betaOrig=beta;
     state.nodes+=1;
 
-    const cacheSlot=mixSpan32Locator32(words,keyOffset,cache.keyWords)&cache.mask;
-    const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
+    const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
+    const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
     if(cached){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
       state.cpcExact+=1;const value=state.cpc.interval[0];
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
       return sign*absToRelative(value,mover);
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
@@ -149,7 +153,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
     if(semanticLo===semanticHi){
       const abs=relativeToAbs(semanticLo,mover);
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
       return sign*semanticLo;
     }
     if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
@@ -181,7 +185,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
         const value=absToRelative(term,mover);
         if(value>=beta){state.cutoffs+=1;return sign*value;}
         if(alphaOrig===-2&&betaOrig===2)
-          storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot);
+          storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash);
         return sign*value;
       }
 
@@ -241,7 +245,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if(best===-2)return 0;
     if(alphaOrig===-2&&betaOrig===2){
       const abs=relativeToAbs(best,mover);
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }
     return sign*best;
   }
@@ -255,14 +259,14 @@ function search(state,depth,alpha,beta){
   // search() is reached only after connect4RbaCofactor returned nonterminal;
   // terminal cofactors are consumed directly by the parent. Root terminal
   // handling remains in solveConnect4RbaAlphaBeta().
-  const cache=state.cache,cacheSlot=mixSpan32Locator32(words,keyOffset,cache.keyWords)&cache.mask;
-  const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot);
+  const cache=state.cache,cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
+  const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
   if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
   if(cpcKind===CPC_EXACT){
     state.cpcExact+=1;const value=state.cpc.interval[0];
-    storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot);
+    storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
     return absToRelative(value,mover);
   }
   if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
@@ -281,7 +285,7 @@ function search(state,depth,alpha,beta){
     }
   }
   if(semanticLo===semanticHi){
-    const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);return semanticLo;
+    const abs=relativeToAbs(semanticLo,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);return semanticLo;
   }
   if(semanticLo>=beta){state.cutoffs+=1;return semanticLo;}
   if(semanticHi<=alpha){state.cutoffs+=1;return semanticHi;}
@@ -339,7 +343,7 @@ function search(state,depth,alpha,beta){
   // Only full-window, non-cut nodes are cached as exact. Narrow-window returns
   // may be valid alpha/beta bounds but are not global q truth.
   if(!cut&&alphaOrig===-2&&betaOrig===2){
-    const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
+    const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
   }
   return best;
 }

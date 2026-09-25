@@ -97,3 +97,23 @@ test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async
   assert.ok(lazy.sharedCacheStores>0);
 });
 
+
+
+test('sharing-density masks preserve exact Lazy SMP results',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    moves=[0,1,0,1],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    serial=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096}),
+      reflected:root.reflected,
+    });
+  for(const sharedSampleMask of [0,1,3,7,15,31,63,127,255]){
+    const lazy=await runLazySmpConnect4Rba32(moves,{
+      geometry:g,workers:2,sharedCacheCapacity:4096,localCacheCapacity:4096,
+      sharedSampleMask,timeoutMs:5000,
+    });
+    assert.equal(lazy.status,'EXACT',JSON.stringify({sharedSampleMask,lazy}));
+    assert.equal(lazy.rootWdl,serial.value-2);
+    assert.equal(lazy.sharedSampleMask,sharedSampleMask);
+  }
+});

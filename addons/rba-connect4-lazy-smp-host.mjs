@@ -13,6 +13,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   workers=2,
   sharedCacheCapacity=65536,
   localCacheCapacity=65536,
+  sharedSampleMask=0,
   timeoutMs=120000,
   signal,
   cpcFrontierResponse=false,
@@ -27,6 +28,9 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isInteger(localCacheCapacity)||localCacheCapacity<1||
      (localCacheCapacity&(localCacheCapacity-1)))
     throw new RangeError('invalid Lazy SMP local cache capacity');
+  if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
+     (sharedSampleMask&(sharedSampleMask+1)))
+    throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
 
@@ -67,6 +71,7 @@ export async function runLazySmpConnect4Rba32(moves,{
           rootReflected:root.reflected,
           sharedExactCache,
           localCacheCapacity,
+          sharedSampleMask,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
         },
@@ -117,6 +122,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedCacheHits:Atomics.load(sharedExactCache.stats,0),
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
+    sharedSampleMask,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
