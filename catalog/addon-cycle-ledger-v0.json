@@ -2975,7 +2975,7 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve reconstructs exact physical live-line state from validated move history and now consumes the worker-private precomputed actionOrder, so existing cold orderOffset diversification reaches root tie ordering as well as recursive CPC-only search. Operation counts are unchanged."
       },
       "status": "decomposed"
     },
@@ -10467,7 +10467,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+    "addons/rba-connect4-alphabeta.mjs": "44d5231ba2b34e9b2f9d79c6b766cdd071b3943a",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",

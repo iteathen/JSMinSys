@@ -398,7 +398,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }else{
     const playerOffset=mover*live.wordCount;
     for(let oi=0;oi<g.columns;oi+=1){
-      const caller=g.actionOrder[oi],column=reflected?g.mirrorColumn[caller]:caller,height=state.words[column];
+      const caller=state.actionOrder[oi],column=reflected?g.mirrorColumn[caller]:caller,height=state.words[column];
       if(height>=g.rows||!(actionMask&(1<<column))){scores[oi]=MOVE_SCORE_NONE;continue;}
       const cell=height*g.columns+caller;
       scores[oi]=live.wordCount===3
@@ -408,7 +408,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }
     for(let out=0;out<actionCount;out+=1){
       const slot=g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns);
-      scores[slot]=MOVE_SCORE_NONE;ordered[out]=g.actionOrder[slot];
+      scores[slot]=MOVE_SCORE_NONE;ordered[out]=state.actionOrder[slot];
     }
   }
 
