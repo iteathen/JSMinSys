@@ -2377,7 +2377,7 @@
         },
         {
           "op": "runtime.field.store",
-          "count": "1+W"
+          "count": "2+W"
         },
         {
           "op": "alu.add.u32",
@@ -2468,12 +2468,12 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(2+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
           "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation stores mask sampling plus a preinitialized depth/rank priority offset for the rank-39 exact-sharing experiment."
       },
       "status": "decomposed"
     },
@@ -2517,7 +2517,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "2+3*H"
+          "count": "3+3*H+2*L"
         },
         {
           "op": "memory.load.u32",
@@ -2545,11 +2545,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(3+G*K)+2*L"
         },
         {
           "op": "control.branch",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(3+G*K)+2*L"
         },
         {
           "op": "runtime.field.load",
@@ -2587,16 +2587,16 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(3+3*H+2*L)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(2+H*(3+G*K)+2*L)*C(control.test.u32)+(2+H*(3+G*K)+2*L)*C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(alu.and.u32)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
           "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
           "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
-          "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+          "M": "1 when the private cache misses and the exact key is mask-selected or its recursion offset is at/after the precomputed rank-39 priority offset; otherwise 0",
+          "L": "1 when a shared Lazy-SMP exact cache is configured and both mask/priority predicates are available; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Experimental sharing gate reuses recursion offset as a rank/depth proxy. It avoids rereading/shifting key metadata; mask-selected keys and rank>=39 keys may consult the shared exact cache."
       },
       "status": "decomposed"
     },
@@ -2812,11 +2812,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "13+N*(12+8*A+4*Q)"
+          "count": "14+N*(12+8*A+4*Q)"
         },
         {
           "op": "runtime.field.store",
-          "count": "15+N*(6+2*A)"
+          "count": "16+N*(6+2*A)"
         },
         {
           "op": "memory.load.u32",
@@ -2828,7 +2828,7 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": "N*(2+A+Q)"
+          "count": "1+N*(2+A+Q)"
         },
         {
           "op": "alu.add.u32",
@@ -2836,7 +2836,7 @@
         },
         {
           "op": "alu.sub.u32",
-          "count": "N*(4+2*A)"
+          "count": "1+N*(4+2*A)"
         },
         {
           "op": "alu.and.u32",
@@ -2848,15 +2848,15 @@
         },
         {
           "op": "alu.shr.u32",
-          "count": "2+N*(2+Q)"
+          "count": "3+N*(2+Q)"
         },
         {
           "op": "control.test.u32",
-          "count": "5+N*(15+8*A+4*Q)"
+          "count": "6+N*(15+8*A+4*Q)"
         },
         {
           "op": "control.branch",
-          "count": "5+N*(15+8*A+4*Q)"
+          "count": "6+N*(15+8*A+4*Q)"
         },
         {
           "op": "runtime.call.subledger",
@@ -2959,7 +2959,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)",
+        "expression": "(14+N*(12+8*A+4*Q))*C(runtime.field.load)+(16+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+(1+N*(2+A+Q))*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+(1+N*(4+2*A))*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(3+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(6+N*(15+8*A+4*Q))*C(control.test.u32)+(6+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)",
         "parameters": {
           "T": "1 for terminal root; otherwise 0",
           "N": "1-T for nonterminal root work",
@@ -2975,7 +2975,7 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve now precomputes the recursion-key offset corresponding to absolute rank 39 from rootRank and keyWords once per solve; recursive sharing uses only offset comparison thereafter."
       },
       "status": "decomposed"
     },
@@ -3019,7 +3019,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 5
+          "count": "7+2*L"
         },
         {
           "op": "alu.imul.u32",
@@ -3044,11 +3044,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": 1
+          "count": "2+2*L"
         },
         {
           "op": "control.branch",
-          "count": 1
+          "count": "2+2*L"
         },
         {
           "op": "runtime.call.subledger",
@@ -3074,10 +3074,10 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "expression": "(7+2*L)*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+L*C(alu.and.u32)+(2+2*L)*C(control.test.u32)+(2+2*L)*C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "note": "Experimental exact publication keeps mask-7 sharing and additionally publishes exact states at rank>=39 using precomputed recursion-offset threshold. Private exact publication remains unconditional.",
         "parameters": {
-          "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
+          "S": "1 when the exact position is mask-selected or its recursion offset is at/after the precomputed rank-39 priority offset; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
         }
       },
@@ -10467,7 +10467,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+    "addons/rba-connect4-alphabeta.mjs": "47b21d0df5aae6e3fde46e7453ddf3652de39735",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",

@@ -41,13 +41,17 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  return cache.shared&&(
+    !(hash&cache.sharedSampleBits)||offset>=cache.sharedPriorityOffset
+  )?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared&&(
+     !(hash&cache.sharedSampleBits)||offset>=cache.sharedPriorityOffset
+  ))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
@@ -95,6 +99,7 @@ export function prepareConnect4RbaAlphaBeta({
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
+  cache.sharedPriorityOffset=0xffffffff;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
@@ -357,7 +362,8 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
   state.basisSize[0]=root.basis.length;
-  const rootMeta=state.words[g.metaOffset],mover=(rootMeta>>>2)&1,terminal=rootMeta&3;
+  const rootMeta=state.words[g.metaOffset],rootRank=rootMeta>>>2,mover=rootRank&1,terminal=rootMeta&3;
+  state.cache.sharedPriorityOffset=(rootRank>=39?0:39-rootRank)*g.keyWords;
   if(terminal)return {value:terminal,relative:absToRelative(terminal,mover),move:-1,metrics:metrics(state)};
   const moveHistory=root.moveHistory;
   if(!(moveHistory instanceof Uint32Array))throw new TypeError('Connect4 root move history required');
