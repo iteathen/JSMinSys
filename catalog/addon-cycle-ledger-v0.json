@@ -2361,23 +2361,39 @@
       "operations": [
         {
           "op": "control.test.u32",
-          "count": 4
+          "count": "10+3*F"
         },
         {
           "op": "control.branch",
+          "count": "4+F"
+        },
+        {
+          "op": "runtime.integer.check",
           "count": 2
         },
         {
           "op": "runtime.field.load",
-          "count": "12+5*F"
+          "count": "18+5*F+3*W"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+W"
         },
         {
           "op": "alu.add.u32",
-          "count": 1
+          "count": "1+2*W"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "W"
         },
         {
           "op": "alu.imul.u32",
           "count": "5+3*F"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "W"
         },
         {
           "op": "runtime.call.subledger",
@@ -2405,26 +2421,27 @@
           "target": "createConnect4RbaExactCache32"
         },
         {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineEvaluator32"
+        },
+        {
           "op": "runtime.typed_array.allocate",
-          "count": "7+3*F"
+          "count": "8+3*F"
         },
         {
           "op": "runtime.object.allocate",
           "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4LiveLineEvaluator32"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "4*C(control.test.u32)+2*C(control.branch)+(12+5*F)*C(runtime.field.load)+C(alu.add.u32)+(5+3*F)*C(alu.imul.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(7+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
         "parameters": {
-          "F": "1 in Four-Front mode; 0 in production CPC-only mode"
+          "F": "1 in Four-Front mode; 0 in production CPC-only mode",
+          "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker Negamax preparation now includes the existing exact live-line profile, per-depth live-line state, reusable score scratch, and per-depth ordered-action storage."
+        "note": "One-time Negamax preparation retains the private exact cache and may bind an exact-only shared Lazy-SMP cache. Worker-specific action-order rotation is precomputed during initialization, so no modulo/scheduler operation is added to recursive search."
       },
       "status": "decomposed"
     },
@@ -2501,18 +2518,36 @@
         {
           "op": "control.branch",
           "count": "1+H*(3+G*K)"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "probeConnect4RbaSharedExactCache32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)",
+        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
           "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
           "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
-          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch"
+          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
+          "M": "1 when the private exact-cache probe misses and a shared Lazy-SMP exact cache is configured; otherwise 0"
         },
-        "note": "Exact-cache probe exposes stamp, key-word equality, branch and value-load costs; no cache miss is treated as free."
+        "note": "Exact-cache probe exposes stamp, key-word equality, branch and value-load costs; no cache miss is treated as free. On a local miss, Lazy SMP may probe an optional exact-only shared cache; the ordinary Surplus runtime leaves this hook null."
       },
       "status": "decomposed"
     },
@@ -2953,12 +2988,32 @@
         {
           "op": "memory.store.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeConnect4RbaSharedExactCache32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)",
-        "note": "Exact cache publication writes full key before value/stamp."
+        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "note": "Exact cache publication writes full key before value/stamp. Lazy SMP mirrors locally proven exact values into the optional shared cache after the private key/value publication.",
+        "parameters": {
+          "S": "1 when a shared Lazy-SMP exact cache is configured; otherwise 0"
+        }
       },
       "status": "decomposed"
     },
@@ -10462,11 +10517,388 @@
           "semantics": "negamax window/sign carried through forced chain; ordinary branch ordering unchanged"
         }
       ]
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#createConnect4RbaSharedExactCache32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "createConnect4RbaSharedExactCache32",
+      "scope": "cold-lazy-smp-cache",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 4
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 4
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 4
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#probeConnect4RbaSharedExactCache32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "probeConnect4RbaSharedExactCache32",
+      "scope": "hot-lazy-smp-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "6+K"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K+2*E"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "K"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*K"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+K+3*E"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+K+E"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "parameters": {
+          "K": "shared exact-cache key words compared before mismatch or full equality",
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+        },
+        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#storeConnect4RbaSharedExactCache32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "storeConnect4RbaSharedExactCache32",
+      "scope": "hot-lazy-smp-cache-store",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "7+K"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "1+C"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "K+3"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "K"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*K"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "parameters": {
+          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
+          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+        },
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
+      "source": "addons/rba-connect4-lazy-smp-host.mjs",
+      "name": "runLazySmpConnect4Rba32",
+      "scope": "cold-host-lazy-smp",
+      "operations": [
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 12
+        },
+        {
+          "op": "control.branch",
+          "count": 5
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "connect4RbaFromMoves"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "shareConnect4RbaGeometry32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createManagedThreadSession32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "W",
+          "target": "ManagedThreadSession.spawn"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.wait"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.close"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.state"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "sharedViewBytes32"
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 3
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 3
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.url.construct",
+          "count": "W"
+        },
+        {
+          "op": "runtime.timer.read",
+          "count": 2
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "8+W"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "30*E"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "2+E"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "5+4*W+E"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+W"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)",
+        "unboundedTerms": [
+          "CALL(ManagedThreadSession.spawn)",
+          "CALL(ManagedThreadSession.wait)",
+          "CALL(ManagedThreadSession.close)"
+        ],
+        "parameters": {
+          "W": "Lazy-SMP search worker count, minimum 2",
+          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
+        },
+        "note": "Separate Lazy-SMP host option. It spawns only local-search workers, no Branch Manager and no shared surplus queue. Whole-session worker lifecycle remains explicitly unbounded."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaAlphaBeta"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "solveConnect4RbaAlphaBeta"
+        },
+        {
+          "op": "memory.store.f64",
+          "count": 15
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 6
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 17
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 24
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+24*C(runtime.field.load)",
+        "unboundedTerms": [
+          "CALL(solveConnect4RbaAlphaBeta)"
+        ],
+        "note": "Each Lazy-SMP worker owns a private recursive search and private local cache, sharing only exact cache evidence. First exact finisher atomically claims the winner slot and wakes the host."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 199,
-    "decomposed": 199,
+    "units": 204,
+    "decomposed": 204,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10573,7 +11005,7 @@
     "addons/rba-connect4-managed-worker.mjs": "576fb889ca0b506da29f103f43d6becbd91a2ce5",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "153f612f6ea874669da67fb298fc1794036da8ad",
+    "addons/rba-connect4-alphabeta.mjs": "3e208c12ad482e7b705fe2346ce92ef91bc3f980",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -10581,7 +11013,10 @@
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
-    "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc"
+    "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
+    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-lazy-smp-host.mjs": "90c83aebd9906f464d6d35700981651e7c539a40",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "9c41d2e45f6ffb000ca23c02bfd2f4307e3aee68"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -10681,7 +11116,9 @@
       "addons/rba-connect4-managed-host.mjs#runManagedConnect4CpcRba32",
       "addons/rba-connect4-managed-worker.mjs#<module-main>",
       "addons/rba-connect4-managed-manager.mjs#<module-main>",
-      "addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry"
+      "addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry",
+      "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
+      "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>"
     ],
     "callbackTargets": {
       "evaluate": [
@@ -10725,6 +11162,6 @@
     "disabledCallbacks": {
       "publishMetrics": "Managed IsoMax passes publishMetrics=null to runRbaBranchWorkerLoop32; callback body is unreachable in this production composition."
     },
-    "invariant": "Every add-on unit transitively reachable from the managed IsoMax roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled production callback."
+    "invariant": "Every add-on unit transitively reachable from the managed IsoMax roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled production callback. Lazy SMP is an additional root composition sharing exact cache evidence only; the existing Surplus/Branch-Manager composition remains independently rooted."
   }
 }

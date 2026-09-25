@@ -205,6 +205,7 @@ for (const name of readdirSync('addons').filter((name) => name.endsWith('.mjs'))
 }
 declaredAddonUnits.add('addons/rba-connect4-managed-worker.mjs#<module-main>');
 declaredAddonUnits.add('addons/rba-connect4-managed-manager.mjs#<module-main>');
+declaredAddonUnits.add('addons/rba-connect4-lazy-smp-worker.mjs#<module-main>');
 
 for (const unit of declaredAddonUnits) {
   assert.ok(addonUnits.has(unit), `add-on function/module missing cycle ledger: ${unit}`);
