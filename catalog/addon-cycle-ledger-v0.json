@@ -9963,23 +9963,23 @@
       "operations": [
         {
           "op": "runtime.integer.check",
-          "count": 2
+          "count": 3
         },
         {
           "op": "control.test.u32",
-          "count": 6
+          "count": 11
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": 4
         },
         {
           "op": "alu.and.u32",
-          "count": 1
+          "count": 3
         },
         {
           "op": "alu.sub.u32",
-          "count": 1
+          "count": 2
         },
         {
           "op": "alu.imul.u32",
@@ -10000,8 +10000,8 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+        "expression": "3*C(runtime.integer.check)+11*C(control.test.u32)+4*C(control.branch)+3*C(alu.and.u32)+2*C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Measurement-only Lazy-SMP cache allocation also stores a shadow Mersenne sample classifier and widens stats to nine counters."
       },
       "status": "decomposed"
     },
@@ -10018,7 +10018,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "8+K+D"
         },
         {
           "op": "atomic.load.u32",
@@ -10030,7 +10030,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+E*D"
         },
         {
           "op": "alu.imul.u32",
@@ -10042,25 +10042,26 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "3+K+3*E+E*D"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "2+K+E+E*D"
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "E"
+          "count": "E*(1+D)"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(8+K+D)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+(2+E*D)*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E+E*D)*C(control.test.u32)+(2+K+E+E*D)*C(control.branch)+E*(1+D)*C(atomic.rmw.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "D": "1 when diagnosticSampleMask is enabled; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Measurement branch additionally classifies each committed shared hit against a shadow deterministic sharing mask."
       },
       "status": "decomposed"
     },
@@ -10077,15 +10078,15 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "9+K+D+R*K"
         },
         {
           "op": "atomic.load.u32",
-          "count": 1
+          "count": "1+R*K"
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "1+C"
+          "count": "1+C+D*(1+R)"
         },
         {
           "op": "atomic.store.u32",
@@ -10093,11 +10094,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "K"
+          "count": "K+R*K"
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+D"
         },
         {
           "op": "alu.imul.u32",
@@ -10105,25 +10106,27 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2+2*K"
+          "count": "2+2*K+R*K"
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": "3+2*D+R*(1+K)"
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": "2+D+R*(1+K)"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "CALL(mixSpan32Locator32)+(9+K+D+R*K)*C(runtime.field.load)+(1+R*K)*C(atomic.load.u32)+(1+C+D*(1+R))*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K+R*K)*C(memory.load.u32)+(2+D)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K+R*K)*C(alu.add.u32)+(3+2*D+R*(1+K))*C(control.test.u32)+(2+D+R*(1+K))*C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
+          "D": "1 when diagnosticSampleMask is enabled on a successful store; 0 otherwise",
+          "R": "1 when diagnostics are enabled and the claimed slot already held a committed generation; 0 otherwise"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Measurement branch classifies shadow-mask store eligibility and, after writer ownership, compares the displaced committed key to distinguish same-key refresh from collision replacement."
       },
       "status": "decomposed"
     },
@@ -10139,19 +10142,19 @@
         },
         {
           "op": "runtime.integer.check",
-          "count": 3
-        },
-        {
-          "op": "control.test.u32",
-          "count": 12
-        },
-        {
-          "op": "control.branch",
           "count": 5
         },
         {
+          "op": "control.test.u32",
+          "count": 22
+        },
+        {
+          "op": "control.branch",
+          "count": 9
+        },
+        {
           "op": "alu.and.u32",
-          "count": 2
+          "count": 4
         },
         {
           "op": "runtime.call.subledger",
@@ -10200,11 +10203,11 @@
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.array.allocate",
@@ -10216,7 +10219,7 @@
         },
         {
           "op": "runtime.timer.read",
-          "count": 2
+          "count": 4
         },
         {
           "op": "atomic.store.u32",
@@ -10224,23 +10227,23 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": "8+W"
+          "count": "17+W"
         },
         {
           "op": "memory.load.u32",
-          "count": "30*E"
+          "count": "42*E"
         },
         {
           "op": "runtime.object.allocate",
-          "count": "2+E"
+          "count": "3+2*E"
         },
         {
           "op": "alu.imul.u32",
-          "count": "5+4*W+E"
+          "count": "7+5*W+3*E"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+W"
+          "count": "8+2*W+6*E"
         },
         {
           "op": "runtime.integer.check",
@@ -10264,17 +10267,17 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "W"
+          "count": "2+W"
         },
         {
           "op": "runtime.field.store",
-          "count": 1
+          "count": 3
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+5*C(runtime.integer.check)+22*C(control.test.u32)+9*C(control.branch)+4*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+4*C(runtime.timer.read)+C(atomic.store.u32)+(17+W)*C(atomic.load.u32)+42*E*C(memory.load.u32)+(3+2*E)*C(runtime.object.allocate)+(7+5*W+3*E)*C(alu.imul.u32)+(8+2*W+6*E)*C(alu.add.u32)+(2+W)*C(runtime.field.load)+3*C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10284,7 +10287,7 @@
           "W": "Lazy-SMP search worker count, minimum 2",
           "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Measurement-only host returns shadow-sharing diagnostics, completion multiplicity and winner/host/cleanup timestamps. Worker search semantics are unchanged."
       },
       "status": "decomposed"
     },
@@ -10300,7 +10303,7 @@
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 1
+          "count": 2
         },
         {
           "op": "runtime.call.subledger",
@@ -10314,7 +10317,7 @@
         },
         {
           "op": "memory.store.f64",
-          "count": 15
+          "count": 21
         },
         {
           "op": "atomic.store.u32",
@@ -10330,15 +10333,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.add.u32",
-          "count": 17
+          "count": 31
         },
         {
           "op": "control.test.u32",
-          "count": 1
+          "count": 2
         },
         {
           "op": "control.branch",
@@ -10346,17 +10349,21 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 25
+          "count": 31
+        },
+        {
+          "op": "runtime.timer.read",
+          "count": 5
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+21*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+3*C(alu.imul.u32)+31*C(alu.add.u32)+2*C(control.test.u32)+C(control.branch)+31*C(runtime.field.load)+5*C(runtime.timer.read)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
+        "note": "Measurement-only worker records solve/publication/CAS/signal timestamps after preserving the production result-publication and winner-arbitration order."
       },
       "status": "decomposed"
     }
@@ -10476,9 +10483,9 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
+    "addons/rba-connect4-shared-exact-cache.mjs": "024f6edf1028b2170fc551ebda541b4c0fa015d7",
+    "addons/rba-connect4-lazy-smp-host.mjs": "97fd05dc06384acadb34a403c12668e432a38dac",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "92e39eac8049485ef6fd2fbbd6a03357c7a4a6b3"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

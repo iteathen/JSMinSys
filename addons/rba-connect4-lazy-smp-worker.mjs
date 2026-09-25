@@ -1,3 +1,4 @@
+import {performance} from 'node:perf_hooks';
 import {workerData} from 'node:worker_threads';
 import {
   prepareConnect4RbaAlphaBeta,
@@ -6,13 +7,15 @@ import {
 } from './rba-connect4-alphabeta.mjs';
 
 const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  RESULT_STRIDE=4,METRIC_WIDTH=15,
+  RESULT_STRIDE=4,METRIC_WIDTH=15,TIMING_WIDTH=6,
   index=workerData.workerIndex,
   resultBase=index*RESULT_STRIDE,
   metricBase=index*METRIC_WIDTH,
+  timingBase=index*TIMING_WIDTH,
   control=workerData.control,
   resultWords=workerData.resultWords,
   metrics=new Float64Array(workerData.metricBuffer),
+  timings=new Float64Array(workerData.timingBuffer),
   state=prepareConnect4RbaAlphaBeta({
     geometry:workerData.geometry,
     mode:RBA_AB_CPC_ONLY,
@@ -23,10 +26,12 @@ const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
     cpcFrontierResponse:!!workerData.cpcFrontierResponse,
     cpcProjectedAdvisory:!!workerData.cpcProjectedAdvisory,
   }),
+  solveStart=performance.timeOrigin+performance.now(),
   result=solveConnect4RbaAlphaBeta(
     workerData.root,
     {state,reflected:workerData.rootReflected?1:0},
   ),
+  solveEnd=performance.timeOrigin+performance.now(),
   m=result.metrics;
 
 metrics[metricBase]=m.nodes;
@@ -49,9 +54,18 @@ Atomics.store(resultWords,resultBase,result.value);
 Atomics.store(resultWords,resultBase+1,result.relative);
 Atomics.store(resultWords,resultBase+2,result.move);
 Atomics.store(resultWords,resultBase+3,1);
-
-if(Atomics.compareExchange(control,CONTROL_WINNER,-1,index)===-1){
+const publishEnd=performance.timeOrigin+performance.now(),
+  won=Atomics.compareExchange(control,CONTROL_WINNER,-1,index)===-1,
+  casEnd=performance.timeOrigin+performance.now();
+if(won){
   Atomics.store(control,CONTROL_DONE,1);
   Atomics.add(control,CONTROL_WAKE,1);
   Atomics.notify(control,CONTROL_WAKE);
 }
+const signalEnd=performance.timeOrigin+performance.now();
+timings[timingBase]=solveStart;
+timings[timingBase+1]=solveEnd;
+timings[timingBase+2]=publishEnd;
+timings[timingBase+3]=casEnd;
+timings[timingBase+4]=signalEnd;
+timings[timingBase+5]=won?1:0;

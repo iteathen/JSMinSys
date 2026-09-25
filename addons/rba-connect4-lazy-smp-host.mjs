@@ -5,7 +5,7 @@ import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_ERROR=2,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,
+  CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,TIMING_WIDTH=6,
   HOST_WORKER_DIED=101,HOST_DEADLINE=102,HOST_CANCELLED=103;
 
 export async function runLazySmpConnect4Rba32(moves,{
@@ -14,6 +14,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   sharedCacheCapacity=65536,
   localCacheCapacity=65536,
   sharedSampleMask=0,
+  diagnosticSampleMask=-1,
   timeoutMs=120000,
   signal,
   cpcFrontierResponse=false,
@@ -31,6 +32,10 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid Lazy SMP shared sample mask');
+  if(!Number.isInteger(diagnosticSampleMask)||diagnosticSampleMask < -1||
+     diagnosticSampleMask>255||
+     (diagnosticSampleMask>=0&&(diagnosticSampleMask&(diagnosticSampleMask+1))))
+    throw new RangeError('invalid Lazy SMP diagnostic sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
 
@@ -39,11 +44,14 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedExactCache=createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
       keyWords:geometry.keyWords,
+      diagnosticSampleMask,
     }),
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
     metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
     metrics=new Float64Array(metricBuffer),
+    timingBuffer=new SharedArrayBuffer(workers*TIMING_WIDTH*Float64Array.BYTES_PER_ELEMENT),
+    timings=new Float64Array(timingBuffer),
     session=createManagedThreadSession32({
       control,
       stopIndex:CONTROL_STOP,
@@ -57,6 +65,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   control[CONTROL_WINNER]=-1;
 
   const started=performance.now();
+  let waitReturnedAt=0,closeCompletedAt=0;
   try{
     for(let i=0;i<workers;i+=1)
       session.spawn(
@@ -65,6 +74,7 @@ export async function runLazySmpConnect4Rba32(moves,{
           control,
           resultWords,
           metricBuffer,
+          timingBuffer,
           workerIndex:i,
           geometry:workerGeometry,
           root,
@@ -77,8 +87,10 @@ export async function runLazySmpConnect4Rba32(moves,{
         },
       );
     await session.wait({timeoutMs,signal});
+    waitReturnedAt=performance.timeOrigin+performance.now();
   }finally{
     await session.close();
+    closeCompletedAt=performance.timeOrigin+performance.now();
   }
 
   const elapsedMs=performance.now()-started,
@@ -87,11 +99,16 @@ export async function runLazySmpConnect4Rba32(moves,{
     errorCode=host.errorCode,
     exact=!errorCode&&Atomics.load(control,CONTROL_DONE)===1&&winner>=0,
     completedWorkers=new Array(workers);
-  for(let i=0;i<workers;i+=1)completedWorkers[i]=Atomics.load(resultWords,i*RESULT_STRIDE+3);
+  let completedCount=0;
+  for(let i=0;i<workers;i+=1){
+    const completed=Atomics.load(resultWords,i*RESULT_STRIDE+3);
+    completedWorkers[i]=completed;
+    completedCount+=completed?1:0;
+  }
 
-  let winnerMetrics=null;
+  let winnerMetrics=null,winnerTiming=null;
   if(exact){
-    const base=winner*METRIC_WIDTH;
+    const base=winner*METRIC_WIDTH,timingBase=winner*TIMING_WIDTH;
     winnerMetrics={
       nodes:metrics[base],
       cutoffs:metrics[base+1],
@@ -109,6 +126,14 @@ export async function runLazySmpConnect4Rba32(moves,{
       frontActionExact:metrics[base+13],
       cofactors:metrics[base+14],
     };
+    winnerTiming={
+      solveMs:timings[timingBase+1]-timings[timingBase],
+      solveToPublishMs:timings[timingBase+2]-timings[timingBase+1],
+      publishToCasMs:timings[timingBase+3]-timings[timingBase+2],
+      casToSignalMs:timings[timingBase+4]-timings[timingBase+3],
+      signalToHostObserveMs:waitReturnedAt-timings[timingBase+4],
+      hostObserveToCleanupMs:closeCompletedAt-waitReturnedAt,
+    };
   }
 
   return {
@@ -119,11 +144,20 @@ export async function runLazySmpConnect4Rba32(moves,{
     move:exact?Atomics.load(resultWords,winner*RESULT_STRIDE+2):-1,
     winner,
     winnerMetrics,
+    winnerTiming,
     sharedCacheHits:Atomics.load(sharedExactCache.stats,0),
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
+    diagnosticEligibleHits:Atomics.load(sharedExactCache.stats,3),
+    diagnosticExcludedHits:Atomics.load(sharedExactCache.stats,4),
+    diagnosticEligibleStores:Atomics.load(sharedExactCache.stats,5),
+    diagnosticExcludedStores:Atomics.load(sharedExactCache.stats,6),
+    diagnosticSameKeyReplacements:Atomics.load(sharedExactCache.stats,7),
+    diagnosticCollisionReplacements:Atomics.load(sharedExactCache.stats,8),
+    diagnosticSampleMask,
     sharedSampleMask,
     completedWorkers,
+    completedCount,
     reflected:root.reflected,
     elapsedMs,
     errorCode,
@@ -133,6 +167,6 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
-      control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
+      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+timingBuffer.byteLength,
   };
 }
