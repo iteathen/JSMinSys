@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
 import {
-  prepareConnect4CpcScratch,evaluateConnect4Cpc32,connect4CpcTargetOwner32,
+  prepareConnect4CpcScratch,evaluateConnect4Cpc32,evaluateConnect4CpcNonterminal32,connect4CpcTargetOwner32,
   CPC_NONE,CPC_EXACT,CPC_BOUND,CPC_RESTRICT,
 } from '../addons/cpc-connect4.mjs';
 import {
@@ -46,6 +46,11 @@ function exact(columns,rows,moves,memo=new Map()){
   const result={value:best,move};memo.set(key,result);return result;
 }
 
+function assertOptimalWitness(columns,rows,moves,result,memo){
+  assert.ok(result.move>=0&&result.move<columns,JSON.stringify({moves,result}));
+  assert.equal(exact(columns,rows,[...moves,result.move],memo).value,result.value,JSON.stringify({moves,result}));
+}
+
 test('CPC per-column XOR parity equals literal future-event count on configured geometries',()=>{
   for(const [columns,rows,heightSets] of [
     [4,4,[[0,0,0,0],[1,2,0,3],[4,1,2,0]]],
@@ -63,6 +68,22 @@ test('CPC per-column XOR parity equals literal future-event count on configured 
         assert.equal(connect4CpcTargetOwner32(g,words,0,cell),expected,`${columns}x${rows} c${c} r${r}`);
       }
     }
+  }
+});
+
+test('nonterminal CPC path matches checked evaluator after terminal assertion',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  for(const moves of [[3,2,3,2],[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3]]) {
+    const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),
+      checked=prepareConnect4CpcScratch(g),known=prepareConnect4CpcScratch(g);
+    assert.equal(q.words[g.metaOffset]&3,0);
+    const a=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,checked);
+    const b=evaluateConnect4CpcNonterminal32(g,q.words,0,q.basis,0,q.basis.length,known);
+    assert.equal(a,b);
+    assert.deepEqual([...checked.interval],[...known.interval]);
+    assert.equal(checked.forcedColumn[0],known.forcedColumn[0]);
+    assert.equal(checked.preemptionMask32[0],known.preemptionMask32[0]);
+    assert.equal(checked.preemptionCount[0],known.preemptionCount[0]);
   }
 });
 
@@ -161,6 +182,17 @@ test('CPC first-win ordering lets current immediate terminal supersede opponent 
   assert.deepEqual([...s.interval],[1,1]);
 });
 
+test('CPC alpha-beta uses live winning-line contribution for move ordering',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows}),moves=[],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    state=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+    result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
+  assert.equal(result.value,2);
+  // Empty 4x4: edge landing cells contribute to 3 live winning lines versus
+  // 2 for the two center cells. Static center-out would return column 1.
+  assert.equal(result.move,0);
+});
+
 test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle',()=>{
   const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
   const fixtures=[
@@ -183,9 +215,9 @@ test('CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle
     assert.equal(ra.value,oracle.value,JSON.stringify({moves,oracle,ra}));
     assert.equal(rx.value,oracle.value,JSON.stringify({moves,oracle,rx}));
     assert.equal(rb.value,oracle.value,JSON.stringify({moves,oracle,rb}));
-    assert.equal(ra.move,oracle.move,JSON.stringify({moves,oracle,ra}));
-    assert.equal(rx.move,oracle.move,JSON.stringify({moves,oracle,rx}));
-    assert.equal(rb.move,oracle.move,JSON.stringify({moves,oracle,rb}));
+    assertOptimalWitness(columns,rows,moves,ra,memo);
+    assertOptimalWitness(columns,rows,moves,rx,memo);
+    assertOptimalWitness(columns,rows,moves,rb,memo);
     assert.equal(ra.metrics.frontCalls,0);assert.equal(rx.metrics.frontCalls,0);
     assert.ok(rb.metrics.frontCalls>0);
   }
@@ -212,11 +244,20 @@ test('CPC alpha-beta modes agree with independent late standard-7x6 oracle',()=>
       const state=prepareConnect4RbaAlphaBeta({geometry:g,mode,cpcFrontierResponse,boundaryDepth:2,boundaryCapacity:4096,boundaryBudget:4000000,cacheCapacity:65536});
       const result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
       assert.equal(result.value,oracle.value,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
-      assert.equal(result.move,oracle.move,JSON.stringify({moves,mode,cpcFrontierResponse,oracle,result}));
+      assertOptimalWitness(columns,rows,moves,result,memo);
     }
   }
 });
 
+
+test('multi-action preemption count implies <=32-column mask support',()=>{
+  const g=prepareConnect4RbaGeometry({columns:33,rows:4,specializationBudgetBytes:0}),
+    q=connect4RbaFromMoves([16],{geometry:g,canonical:false}),
+    s=prepareConnect4CpcScratch(g);
+  evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s);
+  assert.equal(s.forkTargets32,null);
+  assert.ok(s.preemptionCount[0]<=1);
+});
 
 test('CPC fork precursor restricts current defense without recursion',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6});

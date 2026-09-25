@@ -307,3 +307,25 @@ test('XOR equality rejects a forced locator collision at the last key word',()=>
   assert.equal(t.redirect[qa],-1);
   assert.equal(t.redirect[qb],-1);
 });
+
+
+test('post-evaluation manager redirect is consumed by the publish transaction',()=>{
+  const t=table(),resetTargets=new Int32Array(new SharedArrayBuffer(4));resetTargets.fill(-2);
+  const canonical=rbaTtIntern32(t,key(2),0,emptyBasis,0,0);
+  const duplicate=rbaTtAllocate32(t,key(2),0,emptyBasis,0,0,9);
+  assert.equal(rbaTtEnqueue32(t,duplicate),1);
+  const worker=prepareRbaBranchWorker32({owner:2,workerCount:1,state:makeState(),resetTargets});
+  const evaluateAndRedirect=(table,q)=>{
+    assert.equal(q,duplicate);
+    assert.equal(rbaTtManagerMergeDuplicate32(table,q,canonical,resetTargets),1);
+    assert.equal(Atomics.load(resetTargets,0),-1);
+    return 2;
+  };
+  const publishNever=()=>{throw new Error('redirected q reached publication');};
+
+  assert.equal(rbaBranchWorkerStep32(t,worker,evaluateAndRedirect,publishNever),1);
+  assert.equal(worker.q,-1);
+  assert.equal(worker.code,0);
+  assert.equal(Atomics.load(resetTargets,0),-2);
+  assert.equal(t.exact[canonical],0,'redirect handling published stale exact evidence');
+});

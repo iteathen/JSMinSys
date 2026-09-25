@@ -2206,6 +2206,7 @@ import {
   popcount2x32SparseHigh,
   popcount2x32SparseBits,
   popcount2x32,
+  popcount3x32,
   fillPopcount10Table32,
   popcount2x32High10Table,
   popcount2x32High10Sparse,
@@ -2343,6 +2344,25 @@ test('two-lane popcount fused at nibble stage', () => {
   for (const [lo, hi, expected] of vectors) {
     assert.equal(popcount2x32(lo, hi), expected);
     assert.equal(popcount2x32SparseHigh(lo, hi), expected);
+  }
+});
+
+test('three-lane popcount fused at nibble stage', () => {
+  const vectors = [
+    [0, 0, 0, 0],
+    [0xffffffff, 0, 0, 32],
+    [0xffffffff, 0xffffffff, 0xffffffff, 96],
+    [0x55555555, 0xaaaaaaaa, 0xf0f0f0f0, 48],
+    [0x80000001, 0x80000001, 0x80000001, 6],
+    [
+      0x12345678,
+      0x9abcdef0,
+      0x0f0f0f0f,
+      popcount32(0x12345678) + popcount32(0x9abcdef0) + popcount32(0x0f0f0f0f),
+    ],
+  ];
+  for (const [lo, mid, hi, expected] of vectors) {
+    assert.equal(popcount3x32(lo, mid, hi), expected);
   }
 });
 
