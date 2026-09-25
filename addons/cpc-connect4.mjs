@@ -87,38 +87,26 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
 
   const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
   const moverBits=mover?p1Bits:p0Bits,attackerBits=mover?p0Bits:p1Bits;
-  const moverCoord=offset+(mover?g.p1Offset:g.p0Offset),attackerCoord=offset+(mover?g.p0Offset:g.p1Offset),
-    cw=g.coordWords;
-  let targetsReady=0,done=0;
+  const moverCoord=offset+(mover?g.p1Offset:g.p0Offset),attackerCoord=offset+(mover?g.p0Offset:g.p1Offset);
+  targets.fill(0);
 
-  // The coordinate lanes already are the active assertion set. Walk only bits
-  // active for either player instead of testing every pair-basis vocabulary
-  // entry with coordHas. Basis ids are cardinality-sorted, so the first active
-  // triple-or-larger entry closes the pair interval for all later active bits.
-  for(let word=0;word<cw&&!done;word+=1){
-    const moverWord=words[moverCoord+word]>>>0,attackerWord=words[attackerCoord+word]>>>0,
-      indexBase=word<<5;
-    let active=(moverWord|attackerWord)>>>0;
-    while(active){
-      const local=firstSetBitIndex32(active),bit=(1<<local)>>>0,i=indexBase+local;
-      if(i>=basisSize){done=1;break;}
-      const id=basis[basisOffset+i];
-      if(id>=g.tripleShapeStart){done=1;break;}
-      active=(active&(active-1))>>>0;
-      if(id<g.pairShapeStart)continue;
-      const base=id*4,a=g.shapeCells[base],b=g.shapeCells[base+1];
+  // A second basis pass handles both the mover minimal-pair guard and the
+  // opponent's playable pair-to-fork precursor relation. Skip the singleton
+  // prefix once, then stop at the triple boundary.
+  let i=0;while(i<basisSize&&basis[basisOffset+i]<g.pairShapeStart)i+=1;
+  for(;i<basisSize;i+=1){
+    const id=basis[basisOffset+i];
+    if(id>=g.tripleShapeStart)break;
+    const base=id*4,a=g.shapeCells[base],b=g.shapeCells[base+1];
 
-      if((moverWord&bit)!==0&&!cellMarked(moverBits,a)&&!cellMarked(moverBits,b))return 0;
-      if((attackerWord&bit)===0)continue;
-      if(cellMarked(attackerBits,a)||cellMarked(attackerBits,b))continue;
-      if(!playableCell(g,words,offset,a)||!playableCell(g,words,offset,b))continue;
-      const ca=g.cellColumn[a],cb=g.cellColumn[b];if(ca===cb)continue;
-      if(!targetsReady){targets.fill(0);targetsReady=1;}
-      targets[ca]=(targets[ca]|((1<<cb)>>>0))>>>0;
-      targets[cb]=(targets[cb]|((1<<ca)>>>0))>>>0;
-    }
+    if(coordHas(words,moverCoord,i)&&!cellMarked(moverBits,a)&&!cellMarked(moverBits,b))return 0;
+    if(!coordHas(words,attackerCoord,i))continue;
+    if(cellMarked(attackerBits,a)||cellMarked(attackerBits,b))continue;
+    if(!playableCell(g,words,offset,a)||!playableCell(g,words,offset,b))continue;
+    const ca=g.cellColumn[a],cb=g.cellColumn[b];if(ca===cb)continue;
+    targets[ca]=(targets[ca]|((1<<cb)>>>0))>>>0;
+    targets[cb]=(targets[cb]|((1<<ca)>>>0))>>>0;
   }
-  if(!targetsReady)return 0;
 
   let first=1,intersection=0;
   for(let column=0;column<g.columns;column+=1){
