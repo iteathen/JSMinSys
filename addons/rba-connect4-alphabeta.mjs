@@ -129,29 +129,52 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
 
   const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
     actionMask=preemptCount>1?preemptMask:-1,childDepth=depth+1,childKey=keyOffset+g.keyWords,childBasis=basisOffset+g.maxBasis,
-    live=state.live,liveWords=live.stateWords,childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,
-    scores=state.moveScores,ordered=state.moveOrder;
-  let actionCount=0;
+    live=state.live,liveWords=live.stateWords,childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns;
+
+  // CPC has already proved that exactly one defense survives. Follow it
+  // directly instead of materializing a one-element move order and entering
+  // the generic sibling loop.
   if(forced>=0){
     const height=words[keyOffset+forced];
-    if(height<g.rows&&(actionMask&(1<<forced))){ordered[orderRow]=forced;actionCount=1;}
-  }else{
-    const playerOffset=liveOffset+mover*live.wordCount;
-    for(let oi=0;oi<g.columns;oi+=1){
-      const column=g.actionOrder[oi],height=words[keyOffset+column];
-      if(height>=g.rows||!(actionMask&(1<<column)))continue;
-      const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
-        score=live.wordCount===3
-          ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
-          :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
-      let at=actionCount;
-      while(at>0){
-        const priorScore=scores[at-1];
-        if(priorScore>=score)break;
-        scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
-      }
-      scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
+    if(height>=g.rows||!(actionMask&(1<<forced)))return 0;
+    const physicalColumn=orientation?g.mirrorColumn[forced]:forced,
+      physicalCell=height*g.columns+physicalColumn,
+      term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,forced,height,
+        words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
+    state.cofactors+=1;
+    let best;
+    if(term)best=absToRelative(term,mover);
+    else{
+      const childN=state.basisSize[childDepth],
+        childReflected=connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,childN,state.coord);
+      advanceConnect4LiveLineState32(live,state.liveState,liveOffset,mover,physicalCell,state.liveState,childLiveOffset);
+      best=-searchCpcOnly(state,childDepth,childKey,childBasis,childN,mover^1,orientation^childReflected,
+        childLiveOffset,childOrderRow,-beta,-alpha);
     }
+    if(best>=beta){state.cutoffs+=1;return best;}
+    if(alphaOrig===-2&&betaOrig===2){
+      const abs=relativeToAbs(best,mover);storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot);
+    }
+    return best;
+  }
+
+  const scores=state.moveScores,ordered=state.moveOrder,
+    playerOffset=liveOffset+mover*live.wordCount;
+  let actionCount=0;
+  for(let oi=0;oi<g.columns;oi+=1){
+    const column=g.actionOrder[oi],height=words[keyOffset+column];
+    if(height>=g.rows||!(actionMask&(1<<column)))continue;
+    const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
+      score=live.wordCount===3
+        ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
+        :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
+    let at=actionCount;
+    while(at>0){
+      const priorScore=scores[at-1];
+      if(priorScore>=score)break;
+      scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
+    }
+    scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
   }
   if(!actionCount)return 0;
 
