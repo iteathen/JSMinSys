@@ -82,8 +82,7 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
 // For configured widths above 32 the proof optimization is simply skipped;
 // correctness then falls through to ordinary traversal.
 function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch){
-  // evaluateConnect4CpcNonterminal32 initializes precursor/preemption outputs
-  // before this private helper is reachable; do not rewrite them here.
+  scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   const targets=scratch.forkTargets32;if(!targets||moverHasSingleton)return 0;
 
   const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
