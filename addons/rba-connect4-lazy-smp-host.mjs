@@ -14,6 +14,8 @@ export async function runLazySmpConnect4Rba32(moves,{
   sharedCacheCapacity=65536,
   localCacheCapacity=65536,
   sharedSampleMask=0,
+  diagnosticOverlapSampleMask=-1,
+  diagnosticOverlapCapacity=16384,
   timeoutMs=120000,
   signal,
   cpcFrontierResponse=false,
@@ -31,6 +33,12 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid Lazy SMP shared sample mask');
+  if(!Number.isInteger(diagnosticOverlapSampleMask)||diagnosticOverlapSampleMask < -1||
+     diagnosticOverlapSampleMask>255||
+     (diagnosticOverlapSampleMask>=0&&(diagnosticOverlapSampleMask&(diagnosticOverlapSampleMask+1))))
+    throw new RangeError('invalid Lazy SMP overlap sample mask');
+  if(!Number.isInteger(diagnosticOverlapCapacity)||diagnosticOverlapCapacity<1)
+    throw new RangeError('invalid Lazy SMP overlap trace capacity');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
 
@@ -40,6 +48,15 @@ export async function runLazySmpConnect4Rba32(moves,{
       capacity:sharedCacheCapacity,
       keyWords:geometry.keyWords,
     }),
+    overlapTrace=diagnosticOverlapSampleMask<0?null:{
+      sampleBits:(diagnosticOverlapSampleMask<<24)>>>0,
+      capacityPerWorker:diagnosticOverlapCapacity,
+      keyWords:geometry.keyWords,
+      counts:new Uint32Array(new SharedArrayBuffer(workers*2*Uint32Array.BYTES_PER_ELEMENT)),
+      records:new Float64Array(new SharedArrayBuffer(workers*diagnosticOverlapCapacity*6*Float64Array.BYTES_PER_ELEMENT)),
+      meta:new Int32Array(new SharedArrayBuffer(workers*diagnosticOverlapCapacity*5*Int32Array.BYTES_PER_ELEMENT)),
+      keys:new Uint32Array(new SharedArrayBuffer(workers*diagnosticOverlapCapacity*geometry.keyWords*Uint32Array.BYTES_PER_ELEMENT)),
+    },
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
     metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
@@ -70,6 +87,7 @@ export async function runLazySmpConnect4Rba32(moves,{
           root,
           rootReflected:root.reflected,
           sharedExactCache,
+          overlapTrace,
           localCacheCapacity,
           sharedSampleMask,
           cpcFrontierResponse,
@@ -123,6 +141,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
     sharedSampleMask,
+    diagnosticOverlapSampleMask,
+    diagnosticOverlapCapacity,
+    diagnosticOverlapTrace:overlapTrace,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
@@ -133,6 +154,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
+      (overlapTrace?sharedViewBytes32(overlapTrace):0)+
       control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
   };
 }
