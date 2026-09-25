@@ -16,6 +16,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   sharedSampleMask=0,
   diagnosticOverlapSampleMask=-1,
   diagnosticOverlapCapacity=16384,
+  diagnosticProvenance=false,
   timeoutMs=120000,
   signal,
   cpcFrontierResponse=false,
@@ -39,6 +40,8 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new RangeError('invalid Lazy SMP overlap sample mask');
   if(!Number.isInteger(diagnosticOverlapCapacity)||diagnosticOverlapCapacity<1)
     throw new RangeError('invalid Lazy SMP overlap trace capacity');
+  if(typeof diagnosticProvenance!=='boolean')
+    throw new TypeError('invalid Lazy SMP provenance diagnostic flag');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
 
@@ -47,6 +50,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedExactCache=createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
       keyWords:geometry.keyWords,
+      diagnosticProvenance,
     }),
     overlapTrace=diagnosticOverlapSampleMask<0?null:{
       sampleBits:(diagnosticOverlapSampleMask<<24)>>>0,
@@ -144,6 +148,8 @@ export async function runLazySmpConnect4Rba32(moves,{
     diagnosticOverlapSampleMask,
     diagnosticOverlapCapacity,
     diagnosticOverlapTrace:overlapTrace,
+    diagnosticProvenanceHits:sharedExactCache.provenanceHitStats?Array.from(sharedExactCache.provenanceHitStats):null,
+    diagnosticProvenanceStores:sharedExactCache.provenanceStoreStats?Array.from(sharedExactCache.provenanceStoreStats):null,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
