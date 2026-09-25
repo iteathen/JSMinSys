@@ -17,21 +17,22 @@ export function prepareConnect4RbaFrontArena(g,{depth=2,capacity=256,budget=1000
     up:new Uint32Array((depth+1)*g.maxBasis*g.coordWords),
     seen:new Uint32Array(g.shapeWordCount),temp:new Uint32Array(recordWords),
     image0:new Uint32Array(g.maxBasis*g.coordWords),image1:new Uint32Array(g.maxBasis*g.coordWords),
-    top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
+    inverse:new Uint32Array(g.shapeCount),top1:new Uint32Array(g.maxBasis),adjoint:new Uint32Array(g.coordWords),
     target:new Uint32Array((g.maxBasis+1)*g.coordWords),cover:new Uint32Array((g.maxBasis+1)*g.coordWords),
     next:new Uint32Array(g.maxBasis+1),heights:new Uint32Array(g.columns),rootRank:0};
 }
 function spend(a,n=1){if(a.steps+n>a.budget){a.error=RBA_BOUNDARY_INCOMPLETE;return 0;}a.steps+=n;return 1;}
-function insert(a,slot){
+function insertFrom(a,slot,source,sourceOffset){
   if(!spend(a))return a.error;
-  const n=a.profile.insertFront(a.words,a.base[slot],a.count[slot],a.capacity,a.recordWords,a.temp,0);
+  const n=a.profile.insertFront(a.words,a.base[slot],a.count[slot],a.capacity,a.recordWords,source,sourceOffset);
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[slot]=n;return 0;
 }
+function insert(a,slot){return insertFrom(a,slot,a.temp,0);}
 function swap(a,left,right){const b=a.base[left],n=a.count[left];a.base[left]=a.base[right];a.count[left]=a.count[right];a.base[right]=b;a.count[right]=n;}
 function universal(a,slot){a.count[slot]=1;const b=a.base[slot];for(let w=0;w<a.recordWords;w+=1)a.words[b+w]=0;}
 function combine(a,left,right,out,intersect){
   a.count[out]=0;
-  if(!intersect){swap(a,left,out);for(let i=0;i<a.count[right];i+=1){const b=a.base[right]+i*a.recordWords;for(let w=0;w<a.recordWords;w+=1)a.temp[w]=a.words[b+w];if(insert(a,out))return a.error;}return 0;}
+  if(!intersect){swap(a,left,out);for(let i=0;i<a.count[right];i+=1){const b=a.base[right]+i*a.recordWords;if(insertFrom(a,out,a.words,b))return a.error;}return 0;}
   const pairs=a.count[left]*a.count[right];if(!spend(a,pairs||1))return a.error;
   const n=a.profile.productJoin(a.words,a.base[out],0,a.capacity,a.words,a.base[left],a.count[left],a.words,a.base[right],a.count[right],a.recordWords,a.temp,0);
   if(n<0){a.error=RBA_BOUNDARY_CAPACITY;return a.error;}a.count[out]=n;return 0;
@@ -58,21 +59,47 @@ function prepareUpsets(g,a,d,basis,bi,n){
 function prepareImages(g,a,d,cell,mover,basis,bi){
   const n=a.size[d],cn=a.size[d+1],cw=g.coordWords,nextValid=(d+1)*cw,nextBasis=(d+1)*g.maxBasis,
     remove=a.profile.prepareRemove(g,cell);
-  let pair=0;while(pair<cn&&a.basis[nextBasis+pair]<g.pairShapeStart)pair+=1;
-  let triple=pair;while(triple<cn&&a.basis[nextBasis+triple]<g.tripleShapeStart)triple+=1;
-  let quad=triple;while(quad<cn&&a.basis[nextBasis+quad]<g.quadShapeStart)quad+=1;
-  for(let i=0;i<n;i+=1){const id=basis[bi+i],removed=a.profile.removePrepared(g,id,remove);a.top1[i]=0;
-    const row=i*cw;for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
-    for(let p=0;p<2;p+=1){if(p!==mover&&removed!==id)continue;const image=p===mover?removed:id,out=p===0?a.image0:a.image1;
-      if(image<0){if(p===1)a.top1[i]=1;for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];}
-      else{
-        const classStart=image<g.pairShapeStart?0:image<g.tripleShapeStart?pair:image<g.quadShapeStart?triple:quad,
-          largerStart=image<g.pairShapeStart?pair:image<g.tripleShapeStart?triple:image<g.quadShapeStart?quad:cn;
-        for(let j=classStart;j<largerStart;j+=1)if(a.basis[nextBasis+j]===image){out[row+(j>>>5)]|=1<<(j&31);break;}
-        const subset=a.profile.prepareSubset(g,image);
-        for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j]))out[row+(j>>>5)]|=1<<(j&31);
+  let pair=cn,triple=cn,quad=cn;
+  for(let j=0;j<cn;j+=1){
+    const id=a.basis[nextBasis+j];a.inverse[id]=j;
+    if(pair===cn&&id>=g.pairShapeStart)pair=j;
+    if(triple===cn&&id>=g.tripleShapeStart)triple=j;
+    if(quad===cn&&id>=g.quadShapeStart)quad=j;
+  }
+  for(let i=0;i<n;i+=1){
+    const id=basis[bi+i],removed=a.profile.removePrepared(g,id,remove),row=i*cw;
+    a.top1[i]=0;
+    for(let w=0;w<cw;w+=1){a.image0[row+w]=0;a.image1[row+w]=0;}
+
+    // If the move leaves this residual unchanged, both player images are
+    // identical. Build the upset once and publish it to both coordinates.
+    if(removed===id){
+      const exact=a.inverse[id],word=exact>>>5,mask=1<<(exact&31);
+      a.image0[row+word]|=mask;a.image1[row+word]|=mask;
+      const largerStart=id<g.pairShapeStart?pair:id<g.tripleShapeStart?triple:id<g.quadShapeStart?quad:cn,
+        subset=a.profile.prepareSubset(g,id);
+      for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j])){
+        const w=j>>>5,m=1<<(j&31);a.image0[row+w]|=m;a.image1[row+w]|=m;
       }
+      continue;
     }
+
+    // Otherwise only the mover keeps the removal image; the opponent residual
+    // is destroyed by the move.
+    const out=mover===0?a.image0:a.image1;
+    if(removed<0){
+      if(mover===1)a.top1[i]=1;
+      for(let w=0;w<cw;w+=1)out[row+w]=a.valid[nextValid+w];
+      continue;
+    }
+    const exact=a.inverse[removed];
+    out[row+(exact>>>5)]|=1<<(exact&31);
+    const largerStart=removed<g.pairShapeStart?pair:
+      removed<g.tripleShapeStart?triple:
+      removed<g.quadShapeStart?quad:cn,
+      subset=a.profile.prepareSubset(g,removed);
+    for(let j=largerStart;j<cn;j+=1)if(a.profile.shapeSubsetPrepared(g,subset,a.basis[nextBasis+j]))
+      out[row+(j>>>5)]|=1<<(j&31);
   }
 }
 function covers(g,a,d,childBase,out){
@@ -96,7 +123,7 @@ function preimage(g,a,d,child,out,cell,mover,basis,bi){
     }
     if(covers(g,a,d,cb,out))return a.error;
   }
-  if(mover===0){const singleton=g.singletonByCell[cell];if(singleton>=0)for(let i=0;i<size;i+=1)if(basis[bi+i]===singleton){
+  if(mover===0&&g.lineCount){const singleton=cell;for(let i=0;i<size;i+=1)if(basis[bi+i]===singleton){
     const upRow=upBase+i*cw;for(let w=0;w<cw;w+=1){a.temp[w]=a.up[upRow+w];a.temp[cw+w]=0;}if(insert(a,out))return a.error;break;
   }}
   return 0;

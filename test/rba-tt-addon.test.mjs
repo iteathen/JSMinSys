@@ -5,7 +5,7 @@ import {
   rbaTtEnqueue32,rbaTtTake32,rbaTtPublishPrepared32,rbaTtAttachDependencies32,
   rbaTtSetExact32,rbaTtReconcile32,rbaTtTakeEvent32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtRelease32,rbaTtRecycle32,rbaTtMarkDone32,
-  RBA_TT_ROOT,RBA_TT_ROOT_GENERATION,RBA_TT_DONE,RBA_TT_PHASE_PENDING_ATTACH,
+  RBA_TT_ROOT,RBA_TT_ROOT_GENERATION,RBA_TT_DONE,RBA_TT_LOCK,RBA_TT_PHASE_PENDING_ATTACH,
   RBA_TT_PHASE_ATTACHED,RBA_TT_EXECUTION_FREE,
 } from '../addons/rba-tt32.mjs';
 
@@ -56,4 +56,22 @@ test('configured event coalescing, detach and recycle preserve pins',()=>{
 test('configured TT transaction and DONE controls remain geometry-neutral',()=>{
   const t=table();assert.equal(rbaTtEnter32(t,17),1);assert.equal(rbaTtEnter32(t,18),0);rbaTtLeave32(t);assert.equal(rbaTtEnter32(t,18),1);rbaTtLeave32(t);
   assert.equal(rbaTtMarkDone32(t),1);assert.equal(Atomics.load(t.control,RBA_TT_DONE),1);
+});
+
+
+test('contended TT enter avoids a locked RMW when the lock is visibly held',()=>{
+  const t=table(),originalCompareExchange=Atomics.compareExchange;
+  let rmwCalls=0;
+  Atomics.store(t.control,RBA_TT_LOCK,99);
+  Atomics.compareExchange=(...args)=>{
+    rmwCalls+=1;
+    return originalCompareExchange(...args);
+  };
+  try{
+    assert.equal(rbaTtEnter32(t,17),0);
+    assert.equal(rmwCalls,0);
+  }finally{
+    Atomics.compareExchange=originalCompareExchange;
+    Atomics.store(t.control,RBA_TT_LOCK,0);
+  }
 });

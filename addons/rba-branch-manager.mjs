@@ -1,3 +1,5 @@
+import {Worker} from './worker.mjs';
+import {BranchManager} from './branch-manager.mjs';
 import {
   rbaTtEnter32,
   rbaTtLeave32,
@@ -29,62 +31,90 @@ import {
 // caller owns the TT transaction. A successful publish must release execution
 // ownership of q and may directly retain at most one runnable child for owner.
 
-export function prepareRbaBranchWorker32({
-  owner,
-  workerCount=1,
-  readyTarget=workerCount*2,
-  state=null,
-  resetTargets=null,
-}={}){
-  if(!Number.isInteger(owner)||owner<2||owner>0x7fffffff||
-     !Number.isInteger(workerCount)||workerCount<1||
-     !Number.isInteger(readyTarget)||readyTarget<0)
-    throw new RangeError('invalid RBA branch worker configuration');
-  return {
+export class RbaBranchWorker extends Worker {
+  constructor({
     owner,
-    workerCount,
-    readyTarget,
-    state,
-    resetTargets,
-    resetIndex:owner-2,
-    q:-1,
-    code:0,
-    expose:0,
-    claims:0,
-    branches:0,
-    evaluations:0,
-    idlePolls:0,
-  };
+    workerCount=1,
+    readyTarget=workerCount*2,
+    state=null,
+    resetTargets=null,
+  }={}){
+    if(!Number.isInteger(owner)||owner<2||owner>0x7fffffff||
+       !Number.isInteger(workerCount)||workerCount<1||
+       !Number.isInteger(readyTarget)||readyTarget<0)
+      throw new RangeError('invalid RBA branch worker configuration');
+    const resetIndex=owner-2;
+    if(resetTargets!==null&&
+       (!(resetTargets instanceof Int32Array)||resetIndex>=resetTargets.length))
+      throw new RangeError('invalid RBA branch worker reset target');
+    super(owner);
+    this.workerCount=workerCount;
+    this.readyTarget=readyTarget;
+    this.state=state;
+    this.resetTargets=resetTargets;
+    this.resetIndex=resetIndex;
+    this.q=-1;
+    this.code=0;
+    this.claims=0;
+    this.branches=0;
+    this.evaluations=0;
+    this.idlePolls=0;
+  }
+
+  run(t,evaluate,publish,options={}){
+    return runRbaBranchWorkerLoop32(t,this,evaluate,publish,options);
+  }
+}
+
+export function prepareRbaBranchWorker32(options={}){
+  return new RbaBranchWorker(options);
 }
 
 export function rbaBranchReadyCount32(t){
   return t.control[RBA_TT_READY_COUNT];
 }
 
-export function prepareRbaBranchManager32({capacity,resetTargets=null,budget=64}={}){
-  if(!Number.isInteger(capacity)||capacity<1||!Number.isInteger(budget)||budget<1)
-    throw new RangeError('invalid RBA branch manager capacity');
-  return {
-    scanCursor:0,
-    resetTargets,
-    readyScratch:new Int32Array(budget),
-    routeHeads:new Int32Array(256),
-    routeNext:new Int32Array(budget),
-    events:0,
-    dedupes:0,
-    maintenancePasses:0,
-  };
+export class RbaBranchManager extends BranchManager {
+  constructor({owner=1,capacity,resetTargets=null,budget=64}={}){
+    if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
+       !Number.isInteger(capacity)||capacity<1||
+       !Number.isInteger(budget)||budget<1)
+      throw new RangeError('invalid RBA branch manager configuration');
+    super(owner);
+    this.budget=budget;
+    this.scanCursor=0;
+    this.resetTargets=resetTargets;
+    this.readyScratch=new Int32Array(budget);
+    this.routeHeads=new Int32Array(256);
+    this.routeNext=new Int32Array(budget);
+    this.events=0;
+    this.dedupes=0;
+    this.maintenancePasses=0;
+  }
+
+  run(t,reconcile,{context=null,waitMs=1}={}){
+    return runRbaBranchManagerLoop32(t,reconcile,{
+      owner:this.owner,
+      budget:this.budget,
+      context,
+      waitMs,
+      manager:this,
+    });
+  }
+}
+
+export function prepareRbaBranchManager32(options={}){
+  return new RbaBranchManager(options);
 }
 
 function applyWorkerReset32(t,worker){
   const reset=worker.resetTargets;
-  if(!reset||worker.resetIndex<0||worker.resetIndex>=reset.length||
-     Atomics.load(reset,worker.resetIndex)===-2)return 0;
+  if(!reset||Atomics.load(reset,worker.resetIndex)===-2)return 0;
   if(!rbaTtEnter32(t,worker.owner))return -1;
   try{
     if(worker.q>=0&&t.execution[worker.q]===worker.owner)
       rbaTtReleaseExecution32(t,worker.q,worker.owner);
-    worker.q=-1;worker.code=0;worker.expose=0;
+    worker.q=-1;worker.code=0;
     Atomics.store(reset,worker.resetIndex,-2);
   }finally{
     rbaTtLeave32(t);
@@ -94,16 +124,15 @@ function applyWorkerReset32(t,worker){
   return 1;
 }
 
-export function rbaBranchManagerStep32(
+function rbaBranchManagerStepKnown32(
   t,
   reconcile,
-  {owner=1,budget=64,context=null,manager=null}={},
+  owner,
+  budget,
+  context,
+  manager,
 ){
-  if(typeof reconcile!=='function')throw new TypeError('RBA reconcile callback required');
-  if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
-     !Number.isInteger(budget)||budget<1)
-    throw new RangeError('invalid RBA branch-manager configuration');
-  if(!rbaTtEnter32(t,owner))return 0;
+if(!rbaTtEnter32(t,owner))return 0;
   let processed=0,merged=0;
   try{
     while(processed<budget&&!Atomics.load(t.control,RBA_TT_STOP)){
@@ -112,7 +141,6 @@ export function rbaBranchManagerStep32(
       reconcile(t,q,context);
       processed+=1;
       if(manager)manager.events+=1;
-      if(Atomics.load(t.control,RBA_TT_STOP))break;
     }
     if(manager){
       merged=rbaTtManagerInspectReady32(
@@ -132,39 +160,51 @@ export function rbaBranchManagerStep32(
   return processed+merged;
 }
 
+export function rbaBranchManagerStep32(
+  t,
+  reconcile,
+  {owner=1,budget=64,context=null,manager=null}={},
+){
+  if(typeof reconcile!=='function')throw new TypeError('RBA reconcile callback required');
+  if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
+     !Number.isInteger(budget)||budget<1)
+    throw new RangeError('invalid RBA branch-manager configuration');
+  return rbaBranchManagerStepKnown32(t,reconcile,owner,budget,context,manager);
+}
+
 export function runRbaBranchManagerLoop32(
   t,
   reconcile,
   {owner=1,budget=64,context=null,waitMs=1,manager=null}={},
 ){
+  if(typeof reconcile!=='function')throw new TypeError('RBA reconcile callback required');
+  if(!Number.isInteger(owner)||owner<1||owner>0x7fffffff||
+     !Number.isInteger(budget)||budget<1)
+    throw new RangeError('invalid RBA branch-manager configuration');
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA manager wait');
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchManagerStep32(t,reconcile,{owner,budget,context,manager}))
+    if(!rbaBranchManagerStepKnown32(t,reconcile,owner,budget,context,manager))
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
 }
 
-export function rbaBranchWorkerStep32(
+function rbaBranchWorkerStepKnown32(
   t,
   worker,
   evaluate,
   publish,
   context=null,
 ){
-  if(typeof evaluate!=='function'||typeof publish!=='function')
-    throw new TypeError('RBA worker callbacks required');
-
-  const resetBefore=applyWorkerReset32(t,worker);
+const resetBefore=applyWorkerReset32(t,worker);
   if(resetBefore<0)return 0;
   if(resetBefore>0)return 1;
 
   if(worker.q===-1){
     if(!rbaTtEnter32(t,worker.owner))return 0;
     worker.q=rbaTtTake32(t,worker.owner);
-    worker.expose=worker.workerCount>1&&
-      t.control[RBA_TT_READY_COUNT]<worker.readyTarget?1:0;
+    // Surplus publication is unconditional; exposure is a lifetime constant 0.
     rbaTtLeave32(t);
     if(worker.q===-1){worker.idlePolls+=1;return 0;}
     worker.claims+=1;
@@ -172,19 +212,24 @@ export function rbaBranchWorkerStep32(
   }
 
   if(worker.code===0){
-    worker.code=evaluate(t,worker.q,worker.state,worker.expose,context);
+    worker.code=evaluate(t,worker.q,worker.state,0,context);
     worker.evaluations+=1;
   }
-
-  const resetAfter=applyWorkerReset32(t,worker);
-  if(resetAfter<0)return 0;
-  if(resetAfter>0)return 1;
 
   if(!rbaTtEnter32(t,worker.owner))return 0;
   const q=worker.q;
   let next=-1;
   try{
-    if(t.execution[q]!==worker.owner){
+    // A manager reset is created only by redirecting this execution-owned q.
+    // Once the publish TT transaction is owned, redirect is the authoritative
+    // reset assertion; no second shared atomic reset poll is required.
+    if(t.redirect[q]>=0){
+      if(t.execution[q]===worker.owner)
+        rbaTtReleaseExecution32(t,q,worker.owner);
+      if(worker.resetTargets)
+        Atomics.store(worker.resetTargets,worker.resetIndex,-2);
+      worker.code=0;
+    }else if(t.execution[q]!==worker.owner){
       t.fault[0]=4;t.fault[1]=q;t.fault[2]=worker.owner;t.fault[3]=t.execution[q];
       rbaTtFail32(t,RBA_TT_ERR_CONTRACT);
     }else{
@@ -210,24 +255,52 @@ export function rbaBranchWorkerStep32(
   return 1;
 }
 
+export function rbaBranchWorkerStep32(
+  t,
+  worker,
+  evaluate,
+  publish,
+  context=null,
+){
+  if(typeof evaluate!=='function'||typeof publish!=='function')
+    throw new TypeError('RBA worker callbacks required');
+  return rbaBranchWorkerStepKnown32(t,worker,evaluate,publish,context);
+}
+
 export function runRbaBranchWorkerLoop32(
   t,
   worker,
   evaluate,
   publish,
-  {context=null,waitMs=1,metrics=null}={},
+  {context=null,waitMs=1,metrics=null,publishMetrics=null}={},
 ){
+  if(typeof evaluate!=='function'||typeof publish!=='function')
+    throw new TypeError('RBA worker callbacks required');
+  if(publishMetrics!==null&&typeof publishMetrics!=='function')
+    throw new TypeError('RBA metric publisher must be a function');
   if(!Number.isFinite(waitMs)||waitMs<0)throw new RangeError('invalid RBA worker wait');
+  let telemetry=0;
   while(!Atomics.load(t.control,RBA_TT_STOP)&&!Atomics.load(t.control,RBA_TT_DONE)){
     const observed=Atomics.load(t.control,RBA_TT_WAKE);
-    if(!rbaBranchWorkerStep32(t,worker,evaluate,publish,context))
+    if(!rbaBranchWorkerStepKnown32(t,worker,evaluate,publish,context))
       Atomics.wait(t.control,RBA_TT_WAKE,observed,waitMs);
     if(metrics){
-      metrics[0]=worker.claims;
-      metrics[1]=worker.branches;
-      metrics[2]=worker.evaluations;
-      metrics[3]=worker.idlePolls;
+      telemetry+=1;
+      if((telemetry&1023)===0){
+        metrics[0]=worker.claims;
+        metrics[1]=worker.branches;
+        metrics[2]=worker.evaluations;
+        metrics[3]=worker.idlePolls;
+        if(publishMetrics)publishMetrics(worker,metrics);
+      }
     }
+  }
+  if(metrics){
+    metrics[0]=worker.claims;
+    metrics[1]=worker.branches;
+    metrics[2]=worker.evaluations;
+    metrics[3]=worker.idlePolls;
+    if(publishMetrics)publishMetrics(worker,metrics);
   }
   return Atomics.load(t.control,RBA_TT_DONE)?1:0;
 }

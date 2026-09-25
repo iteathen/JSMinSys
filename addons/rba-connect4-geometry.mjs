@@ -11,16 +11,13 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   const lines=[];
   for(let row=0;row<rows;row+=1)for(let column=0;column<columns;column+=1){
-    for(const [dc,dr] of [[1,0],[0,1],[1,1],[1,-1]]){
-      if(column+3*dc<columns&&row+3*dr>=0&&row+3*dr<rows){
-        lines.push([
-          row*columns+column,
-          (row+dr)*columns+column+dc,
-          (row+2*dr)*columns+column+2*dc,
-          (row+3*dr)*columns+column+3*dc,
-        ]);
-      }
-    }
+    const cell=row*columns+column;
+    if(column+3<columns)lines.push([cell,cell+1,cell+2,cell+3]);
+    if(row+3<rows)lines.push([cell,cell+columns,cell+2*columns,cell+3*columns]);
+    if(column+3<columns&&row+3<rows)
+      lines.push([cell,cell+columns+1,cell+2*columns+2,cell+3*columns+3]);
+    if(column+3<columns&&row>=3)
+      lines.push([cell,cell-columns+1,cell-2*columns+2,cell-3*columns+3]);
   }
 
   const shapeMap=new Map(),shapeList=[];
@@ -48,8 +45,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   for(let cell=0;cell<cellCount;cell+=1){cellColumn[cell]=cell%columns;cellRow[cell]=(cell/columns)|0;}
   const shapeSize=new Uint32Array(shapeCount),shapeCells=new Uint32Array(shapeCount*4),reflect=new Uint32Array(shapeCount),
     pairedResponseCover=new Uint8Array(shapeCount);
-  const removeAt=new Int32Array(shapeCount*4),singletonByCell=new Int32Array(cellCount);
-  shapeCells.fill(0xffffffff);removeAt.fill(-1);singletonByCell.fill(-1);
+  const removeAt=new Int32Array(shapeCount*4);
+  shapeCells.fill(0xffffffff);removeAt.fill(-1);
 
   for(let l=0;l<lineCount;l+=1){
     const line=lines[l];
@@ -69,7 +66,6 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
       const cell=cells[i];shapeCells[id*4+i]=cell;
       if((cellRow[cell]&1)===((rows-1)&1))pairedResponseCover[id]=1;
     }
-    if(size===1)singletonByCell[cells[0]]=id;
     const reflected=cells.map(cell=>((cell/columns)|0)*columns+(columns-1-(cell%columns))).sort((a,b)=>a-b);
     reflect[id]=shapeMap.get(keyOf(reflected));
     for(let pos=0;pos<size;pos+=1){
@@ -128,11 +124,44 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   const priorityByColumn=new Uint32Array(columns),mirrorColumn=new Uint32Array(columns);
   for(let i=0;i<columns;i+=1){priorityByColumn[order[i]]=i;mirrorColumn[i]=columns-1-i;}
 
+  const positionStride=rows+1,positionBits=columns*positionStride,
+    positionMode=positionStride<32&&positionBits<=64?(columns===7&&rows===6?49:64):0,
+    positionBitBase=new Uint32Array(columns),cpcTargetOwnerBase=((columns-1)*rows)&1;
+  let positionEmptyLo=0,positionEmptyHi=0;
+  if(positionMode)for(let c=0;c<columns;c+=1){
+    const bit=c*positionStride;positionBitBase[c]=bit;
+    if(bit<32)positionEmptyLo|=(1<<bit)>>>0;
+    else positionEmptyHi|=(1<<(bit-32))>>>0;
+  }
+
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
-    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,singletonByCell,pairedResponseCover,
+    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
-    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn};
+    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
+    positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0,
+    cpcTargetOwnerBase};
+}
+
+export function shareConnect4RbaGeometry32(g){
+  if(!g||!Number.isSafeInteger(g.columns)||!Number.isSafeInteger(g.rows))
+    throw new TypeError('prepared Connect4 RBA geometry required');
+  const shared={};
+  for(const key in g){
+    const value=g[key];
+    if(!ArrayBuffer.isView(value)){
+      shared[key]=value;
+      continue;
+    }
+    if(value.buffer instanceof SharedArrayBuffer){
+      shared[key]=value;
+      continue;
+    }
+    const copy=new value.constructor(new SharedArrayBuffer(value.byteLength));
+    copy.set(value);
+    shared[key]=copy;
+  }
+  return shared;
 }
 
 export function prepareConnect4RbaCoordinateScratch(g){
