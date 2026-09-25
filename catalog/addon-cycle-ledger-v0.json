@@ -9963,15 +9963,15 @@
       "operations": [
         {
           "op": "runtime.integer.check",
-          "count": 2
+          "count": 8
         },
         {
           "op": "control.test.u32",
-          "count": 6
+          "count": 20
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": 5
         },
         {
           "op": "alu.and.u32",
@@ -9983,15 +9983,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 4
+          "count": "4+3*D"
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 4
+          "count": "4+3*D"
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 4
+          "count": "4+3*D"
         },
         {
           "op": "runtime.object.allocate",
@@ -10000,8 +10000,11 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+        "expression": "8*C(runtime.integer.check)+20*C(control.test.u32)+5*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+(4+3*D)*C(alu.imul.u32)+(4+3*D)*C(memory.allocate.shared.bytes)+(4+3*D)*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "parameters": {
+          "D": "1 when leverage diagnostics are enabled; 0 otherwise"
+        },
+        "note": "Measurement-only branch optionally allocates per-slot feature metadata, global store histograms and per-worker cross-hit histograms."
       },
       "status": "decomposed"
     },
@@ -10018,11 +10021,11 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "8+K+8*D*X"
         },
         {
           "op": "atomic.load.u32",
-          "count": "1+K+2*E"
+          "count": "1+K+2*E+D*E"
         },
         {
           "op": "memory.load.u32",
@@ -10030,37 +10033,43 @@
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+5*D*X"
         },
         {
           "op": "alu.imul.u32",
-          "count": 1
+          "count": "1+D*X"
         },
         {
           "op": "alu.add.u32",
-          "count": "2*K"
+          "count": "2*K+4*D*X"
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "3+K+3*E+3*D*E"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "2+K+E+2*D*E"
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "E"
+          "count": "E+4*D*X"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "4*D*X"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(8+K+8*D*X)*C(runtime.field.load)+(1+K+2*E+D*E)*C(atomic.load.u32)+K*C(memory.load.u32)+(2+5*D*X)*C(alu.and.u32)+(1+D*X)*C(alu.imul.u32)+(2*K+4*D*X)*C(alu.add.u32)+4*D*X*C(alu.shr.u32)+(3+K+3*E+3*D*E)*C(control.test.u32)+(2+K+E+2*D*E)*C(control.branch)+(E+4*D*X)*C(atomic.rmw.u32)",
         "parameters": {
-          "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "K": "shared exact-cache key words compared",
+          "E": "1 on committed exact hit; 0 otherwise",
+          "D": "1 when leverage diagnostics are enabled; 0 otherwise",
+          "X": "1 when the hit is cross-worker under diagnostic owner metadata; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Measurement-only leverage mode attributes stable shared exact hits to consuming worker and state-feature bins."
       },
       "status": "decomposed"
     },
@@ -10077,7 +10086,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "9+K+D*(12+2*CW+C)"
         },
         {
           "op": "atomic.load.u32",
@@ -10085,45 +10094,65 @@
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "1+C"
+          "count": "1+C0+4*D"
         },
         {
           "op": "atomic.store.u32",
-          "count": "K+3"
+          "count": "K+3+D"
         },
         {
           "op": "memory.load.u32",
-          "count": "K"
+          "count": "K+D*(2*CW+C+1)"
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+D*(8+2*CW)"
         },
         {
           "op": "alu.imul.u32",
-          "count": 1
+          "count": "1+D"
         },
         {
           "op": "alu.add.u32",
-          "count": "2+2*K"
+          "count": "2+2*K+D*(9+2*CW+C)"
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": "3+D*(7+2*CW+C)"
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": "2+D*(5+2*CW+C)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "4*D"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "5*D"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "2*D*CW",
+          "target": "popcount32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "CALL(mixSpan32Locator32)+(9+K+D*(12+2*CW+C))*C(runtime.field.load)+C(atomic.load.u32)+(1+C0+4*D)*C(atomic.rmw.u32)+(K+3+D)*C(atomic.store.u32)+(K+D*(2*CW+C+1))*C(memory.load.u32)+(2+D*(8+2*CW))*C(alu.and.u32)+(1+D)*C(alu.imul.u32)+(2+2*K+D*(9+2*CW+C))*C(alu.add.u32)+D*C(alu.sub.u32)+4*D*C(alu.shl.u32)+5*D*C(alu.shr.u32)+(3+D*(7+2*CW+C))*C(control.test.u32)+(2+D*(5+2*CW+C))*C(control.branch)+2*D*CW*CALL(popcount32)",
         "parameters": {
-          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "K": "shared key words published",
+          "C0": "1 when contention accounting executes; 0 otherwise",
+          "D": "1 when leverage diagnostics are enabled on successful store; 0 otherwise",
+          "CW": "coordinate word count",
+          "C": "board columns"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Measurement-only leverage mode classifies successful shared exact publications by WDL, rank, residual density, legal-action count and publisher occurrence."
       },
       "status": "decomposed"
     },
@@ -10143,11 +10172,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": 12
+          "count": 13
         },
         {
           "op": "control.branch",
-          "count": 5
+          "count": 6
         },
         {
           "op": "alu.and.u32",
@@ -10208,7 +10237,7 @@
         },
         {
           "op": "runtime.array.allocate",
-          "count": 1
+          "count": "1+D*(8+4*E)"
         },
         {
           "op": "runtime.url.construct",
@@ -10228,19 +10257,19 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "30*E"
+          "count": "30*E+D*(59+59*W+59*E)"
         },
         {
           "op": "runtime.object.allocate",
-          "count": "2+E"
+          "count": "2+E+4*D"
         },
         {
           "op": "alu.imul.u32",
-          "count": "5+4*W+E"
+          "count": "5+4*W+E+D*(2+W)"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+W"
+          "count": "3+W+D*(59*W+236+177*E)"
         },
         {
           "op": "runtime.integer.check",
@@ -10264,17 +10293,17 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "W"
+          "count": "W+10*D"
         },
         {
           "op": "runtime.field.store",
-          "count": 1
+          "count": "1+D*(59+4*W)"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+13*C(control.test.u32)+6*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+(1+D*(8+4*E))*C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+(30*E+D*(59+59*W+59*E))*C(memory.load.u32)+(2+E+4*D)*C(runtime.object.allocate)+(5+4*W+E+D*(2+W))*C(alu.imul.u32)+(3+W+D*(59*W+236+177*E))*C(alu.add.u32)+(W+10*D)*C(runtime.field.load)+(1+D*(59+4*W))*C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10282,9 +10311,10 @@
         ],
         "parameters": {
           "W": "Lazy-SMP search worker count, minimum 2",
-          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
+          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure",
+          "D": "1 when leverage diagnostics are enabled; 0 otherwise"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Measurement-only host snapshots global store histograms and aggregate/winner cross-worker hit histograms after teardown; search behavior is unchanged."
       },
       "status": "decomposed"
     },
@@ -10346,17 +10376,21 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 25
+          "count": 27
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+27*C(runtime.field.load)+C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
+        "note": "Measurement branch sets a worker-local publisher/consumer occurrence id on the cloned shared-cache descriptor before preparing the unchanged private search."
       },
       "status": "decomposed"
     }
@@ -10476,9 +10510,9 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
+    "addons/rba-connect4-shared-exact-cache.mjs": "f375ab32efdcc14750c8a72bcb6538a827f7ccd2",
+    "addons/rba-connect4-lazy-smp-host.mjs": "1266c2c7ec6a071ba6ab9cf297c3e2b8b504f7c4",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "1c9a90daf8b4a25b42510f483d55a2b49236795c"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
