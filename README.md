@@ -86,6 +86,15 @@ domain result/status interpretation, and the external solve API. The cold add-on
 is cataloged separately in `catalog/addons-v0.json`; it does not enlarge the
 sealed hot vocabulary.
 
+### Connect4 parallel execution options
+
+JSMinSys exposes two independent exact Connect4 parallel compositions under `addons/`:
+
+- `runManagedConnect4CpcRba32`: the existing **Surplus + Branch Manager** model. Workers claim shared q, retain one continuation, publish unresolved siblings to the shared ready queue, and the Branch Manager dedupes/reconciles/cleans shared TT state.
+- `runLazySmpConnect4Rba32`: the optional **Lazy SMP** model. Each worker owns a private CPC/Negamax stack and private local exact cache; workers share only committed exact W/D/L cache entries through a concurrency-safe shared cache. It has no shared surplus queue and no Branch Manager.
+
+Both managed parallel options require at least two search workers. Lazy SMP does not replace or change the Surplus API; applications select the composition explicitly.
+
 ### Runtime-configured RBA + TT + solver add-ons
 
 The RBA add-on stack derives its carrier from application configuration at initialization. It does not assume a 7x6 board, 69-line basis, eight-word q, or seven actions.
