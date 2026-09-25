@@ -70,3 +70,30 @@ test('Lazy SMP rejects single-worker execution while Surplus runtime remains ava
   });
   assert.equal(managed.status,'EXACT',JSON.stringify(managed));
 });
+
+test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4],
+    root=connect4RbaFromMoves(moves,{geometry:g}),
+    serial=solveConnect4RbaAlphaBeta(root,{
+      state:prepareConnect4RbaAlphaBeta({
+        geometry:g,
+        mode:RBA_AB_CPC_ONLY,
+        cacheCapacity:65536,
+      }),
+      reflected:root.reflected,
+    }),
+    lazy=await runLazySmpConnect4Rba32(moves,{
+      geometry:g,
+      workers:2,
+      sharedCacheCapacity:65536,
+      localCacheCapacity:65536,
+      timeoutMs:5000,
+    });
+  assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
+  assert.equal(lazy.rootWdl,serial.value-2);
+  assert.equal(lazy.move,serial.move);
+  assert.equal(lazy.cleanup,true);
+  assert.ok(lazy.sharedCacheStores>0);
+});
+
