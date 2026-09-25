@@ -1,7 +1,7 @@
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeightIndexed,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeightDenseIndexed,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
@@ -176,7 +176,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       if(height>=g.rows||!(actionMask&(1<<forced)))return 0;
       const physicalColumn=orientation?g.mirrorColumn[forced]:forced,
         physicalCell=height*g.columns+physicalColumn,
-        term=connect4RbaCofactorKnownHeightIndexed(
+        term=connect4RbaCofactorKnownHeightDenseIndexed(
           g,state.profile,words,keyOffset,basis,basisOffset,n,forced,height,
           words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse,
         );
@@ -226,7 +226,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       const column=ordered[orderRow+ai],height=words[keyOffset+column],
         physicalColumn=orientation?g.mirrorColumn[column]:column,
         physicalCell=height*g.columns+physicalColumn;
-      const term=connect4RbaCofactorKnownHeightIndexed(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
+      const term=connect4RbaCofactorKnownHeightDenseIndexed(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
       let value;
@@ -324,7 +324,7 @@ function search(state,depth,alpha,beta){
       value=state.actionLo[row+column];
     }else{
       if(useFront&&state.actionKnown[row+column]&&state.actionHi[row+column]<=alpha){state.cutoffs+=1;continue;}
-      const term=connect4RbaCofactorKnownHeightIndexed(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
+      const term=connect4RbaCofactorKnownHeightDenseIndexed(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
       if(term)value=absToRelative(term,mover);
@@ -431,7 +431,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     if(state.mode===RBA_AB_CPC_FOUR_FRONT&&state.actionKnown[column]&&state.actionLo[column]===state.actionHi[column]){
       value=state.actionLo[column];state.frontActionExact+=1;
     }else{
-      const term=connect4RbaCofactorKnownHeightIndexed(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,height,
+      const term=connect4RbaCofactorKnownHeightDenseIndexed(g,state.profile,state.words,0,state.basis,0,state.basisSize[0],column,height,
         state.words,childKey,state.basis,childBasis,state.coord.seen,state.basisSize,1,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
       if(term)value=absToRelative(term,mover);

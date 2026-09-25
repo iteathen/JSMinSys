@@ -110,7 +110,10 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   return 0;
 }
 
-export function connect4RbaCofactorKnownHeightIndexed(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset=0){
+export function connect4RbaCofactorKnownHeightDenseIndexed(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset=0){
+  if(g.removeByCell===null||g.subsetTable===null||seenOffset)
+    return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
+
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
@@ -126,19 +129,33 @@ export function connect4RbaCofactorKnownHeightIndexed(g,profile,source,src,basis
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);
+  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  const remove=cell*g.shapeCount,removeByCell=g.removeByCell;
+  for(let i=0;i<n;i+=1){
+    const id=removeByCell[remove+basis[bi+i]];
+    removed[i]=id;
+    if(id>=0)seen[id>>>5]|=1<<(id&31);
+  }
+  const cn=emitSortedSetBits32(seen,g.shapeWordCount,childBasis,ci);
   sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+
+  let childPair=cn,childTriple=cn,childQuad=cn;
+  for(let j=0;j<cn;j+=1){
+    const id=childBasis[ci+j];childIndex[id]=j;
+    if(childPair===cn&&id>=g.pairShapeStart)childPair=j;
+    if(childTriple===cn&&id>=g.tripleShapeStart)childTriple=j;
+    if(childQuad===cn&&id>=g.quadShapeStart)childQuad=j;
+  }
 
   const p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
       active1=source[p1Source+sourceWord]&sourceMask;
     if(!(active0|active1))continue;
-    const id=basis[bi+i],raw=removed[i],
-      image=raw===0xffffffff?-1:raw;
+    const id=basis[bi+i],raw=removed[i],image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
     const write0=active0&&(player===0||image===id),
       write1=active1&&(player===1||image===id);
@@ -148,12 +165,12 @@ export function connect4RbaCofactorKnownHeightIndexed(g,profile,source,src,basis
     if(write0)target[p0Target+targetWord]|=targetMask;
     if(write1)target[p1Target+targetWord]|=targetMask;
 
-    const supersetStart=g.strictSupersetOffset[image],
-      supersetEnd=g.strictSupersetOffset[image+1];
-    for(let s=supersetStart;s<supersetEnd;s+=1){
-      const superset=g.strictSupersetIds[s],supersetMask=1<<(superset&31);
-      if(!(seen[seenOffset+(superset>>>5)]&supersetMask))continue;
-      j=childIndex[superset];targetWord=j>>>5;targetMask=1<<(j&31);
+    j=image<g.pairShapeStart?childPair:
+      image<g.tripleShapeStart?childTriple:
+      image<g.quadShapeStart?childQuad:cn;
+    const subset=image*shapeCount;
+    for(;j<cn;j+=1)if(subsetTable[subset+childBasis[ci+j]]){
+      targetWord=j>>>5;targetMask=1<<(j&31);
       if(write0)target[p0Target+targetWord]|=targetMask;
       if(write1)target[p1Target+targetWord]|=targetMask;
     }

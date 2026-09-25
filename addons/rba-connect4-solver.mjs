@@ -1,7 +1,7 @@
 import {emitSortedSetBitsAt32} from '../src/basis32.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
-import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownHeightIndexed,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownHeightDenseIndexed,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront,RBA_BOUNDARY_INCOMPLETE,RBA_BOUNDARY_CAPACITY} from './rba-connect4-front.mjs';
 import {rbaTtPublishPrepared32,rbaTtPublishExactOwned32,rbaTtAttachDependencies32,rbaTtReconcile32,rbaTtSignalParents32,rbaTtEnqueueDependencies32,rbaTtDetachDependencies32,rbaTtMarkDone32,RBA_TT_ROOT,RBA_TT_PHASE_PENDING_ATTACH,RBA_TT_PHASE_ATTACHED,RBA_TT_STOP} from './rba-tt32.mjs';
 
@@ -100,7 +100,7 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode
     moveHistory[moveIndex++]=column;
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
     const height=words[src+column];if(height>=g.rows)throw new RangeError('column full');
-    connect4RbaCofactorKnownHeightIndexed(g,profile,words,src,basis,bi,n,column,height,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
+    connect4RbaCofactorKnownHeightDenseIndexed(g,profile,words,src,basis,bi,n,column,height,words,dst,basis,ci,scratch.seen,scratch.size,0,scratch.map,scratch.inverse);
     const oldSrc=src;src=dst;dst=oldSrc;const oldBi=bi;bi=ci;ci=oldBi;n=scratch.size[0];
   }
   const result=words.slice(src,src+g.keyWords),rootBasis=basis.slice(bi,bi+n);
@@ -158,7 +158,7 @@ export function evaluateConnect4RbaTt32(t,q,state,rootQ=-1,rootReflected=0){
     if(lo===hi)state.actionClosures+=1;
     else if(mover?lo>state.upper:hi<state.lower)state.actionsPruned+=1;
     else{
-      const term=connect4RbaCofactorKnownHeightIndexed(g,state.profile,t.keys,base,basis,basisBase,n,column,height,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
+      const term=connect4RbaCofactorKnownHeightDenseIndexed(g,state.profile,t.keys,base,basis,basisBase,n,column,height,state.keys,childBase,state.childBasis,childBi,state.scratch.seen,state.childBasisSize,count,state.scratch.map,state.scratch.inverse);
       state.transitions+=1;
       if(term&&(term<lo||term>hi))return RBA_QUERY_UNCOVERED;
       if(term){lo=term;hi=term;state.actionClosures+=1;}
