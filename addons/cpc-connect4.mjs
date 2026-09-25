@@ -60,7 +60,7 @@ function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,play
     if(id>=g.pairShapeStart)break;
     if(!coordHas(words,coord,i))continue;
     const cell=id,word=cell>>>5,mask=1<<(cell&31);
-    if(bits[word]&mask)continue;
+    // Basis ids are unique and singleton id=cell, so this cell is new.
     bits[word]|=mask;any=1;
     const column=g.cellColumn[cell];
     if(words[offset+column]!==g.cellRow[cell])continue;

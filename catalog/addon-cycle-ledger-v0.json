@@ -1026,7 +1026,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "2+5*I"
+          "count": "2+5*I-U"
         },
         {
           "op": "memory.store.u32",
@@ -1038,7 +1038,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "3*I"
+          "count": "3*I-U"
         },
         {
           "op": "alu.shl.u32",
@@ -1050,11 +1050,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "2+7*I+4*T"
+          "count": "2+7*I+4*T-U"
         },
         {
           "op": "control.branch",
-          "count": "2+7*I+4*T"
+          "count": "2+7*I+4*T-U"
         },
         {
           "op": "runtime.call.subledger",
@@ -1064,15 +1064,22 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(runtime.typed_array.fill)+(6+5*I)*C(runtime.field.load)+(2+5*I)*C(memory.load.u32)+(2*U+2*T)*C(memory.store.u32)+(3+6*I+2*T)*C(alu.add.u32)+3*I*C(alu.and.u32)+I*C(alu.shl.u32)+I*C(alu.shr.u32)+(2+7*I+4*T)*C(control.test.u32)+(2+7*I+4*T)*C(control.branch)+I*CALL(coordHas)",
+        "expression": "C(runtime.typed_array.fill)+(6+5*I)*C(runtime.field.load)+(2+5*I-U)*C(memory.load.u32)+(2*U+2*T)*C(memory.store.u32)+(3+6*I+2*T)*C(alu.add.u32)+(3*I-U)*C(alu.and.u32)+I*C(alu.shl.u32)+I*C(alu.shr.u32)+(2+7*I+4*T-U)*C(control.test.u32)+(2+7*I+4*T-U)*C(control.branch)+I*CALL(coordHas)",
         "parameters": {
           "I": "basis singleton-prefix entries inspected",
-          "U": "new singleton cells inserted into the dedupe bitset",
+          "U": "active singleton entries inserted into the bitset; basis uniqueness and singleton id=cell prove each is new",
           "T": "playable threats recorded before early return"
         },
-        "note": "Player-local singleton collection including bitset dedupe and immediate threat detection."
+        "note": "Player-local singleton collection. Sorted basis IDs are unique and singleton id equals physical cell id, so the former duplicate-cell guard was impossible after coordHas succeeds. The bitset store remains for later CPC closure."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "remove-impossible-singleton-dedupe",
+        "baseline": "3329a3ac3faa5179b64ff12b50cc04c86ce4f8f2",
+        "removed": "U*(memory.load.u32 + alu.and.u32 + control.test.u32 + control.branch)",
+        "invariant": "RBA basis IDs are unique; singleton shape id equals cell id",
+        "semantics": "unchanged"
+      }
     },
     {
       "unit": "addons/cpc-connect4.mjs#collectProjected",
@@ -10496,7 +10503,7 @@
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
     "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
-    "addons/cpc-connect4.mjs": "ebaf699a4c326e8c89d68039acb0369e566f50af",
+    "addons/cpc-connect4.mjs": "844f69bf16f382bb17c8ca1113fba1ab49099fad",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
