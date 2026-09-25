@@ -1011,74 +1011,77 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/cpc-connect4.mjs#collectPlayerSingletons",
+      "unit": "addons/cpc-connect4.mjs#collectSingletonProfiles",
       "source": "addons/cpc-connect4.mjs",
-      "name": "collectPlayerSingletons",
+      "name": "collectSingletonProfiles",
       "scope": "cpc-hot",
       "operations": [
         {
           "op": "runtime.typed_array.fill",
-          "count": 1
+          "count": 2
         },
         {
           "op": "runtime.field.load",
-          "count": "6+5*I"
+          "count": "8+3*I+3*A+2*T"
         },
         {
           "op": "memory.load.u32",
-          "count": "2+5*I-U"
+          "count": "2*I+J+3*A+M+O"
         },
         {
           "op": "memory.store.u32",
-          "count": "2*U+2*T"
+          "count": "M+O+2*T"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+6*I+2*T"
+          "count": "4+4*I+4*A+T"
         },
         {
           "op": "alu.and.u32",
-          "count": "3*I-U"
+          "count": "3*I+2*A"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "I+M+O+3"
         },
         {
           "op": "alu.shl.u32",
-          "count": "I"
+          "count": "I+A+3"
         },
         {
           "op": "alu.shr.u32",
-          "count": "I"
+          "count": "I+A"
         },
         {
           "op": "control.test.u32",
-          "count": "2+7*I+4*T-U"
+          "count": "5+5*I+3*A+M+O"
         },
         {
           "op": "control.branch",
-          "count": "2+7*I+4*T-U"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "I",
-          "target": "coordHas"
+          "count": "5+5*I+3*A+M+O"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(runtime.typed_array.fill)+(6+5*I)*C(runtime.field.load)+(2+5*I-U)*C(memory.load.u32)+(2*U+2*T)*C(memory.store.u32)+(3+6*I+2*T)*C(alu.add.u32)+(3*I-U)*C(alu.and.u32)+I*C(alu.shl.u32)+I*C(alu.shr.u32)+(2+7*I+4*T-U)*C(control.test.u32)+(2+7*I+4*T-U)*C(control.branch)+I*CALL(coordHas)",
+        "expression": "2*C(runtime.typed_array.fill)+(8+3*I+3*A+2*T)*C(runtime.field.load)+(2*I+J+3*A+M+O)*C(memory.load.u32)+(M+O+2*T)*C(memory.store.u32)+(4+4*I+4*A+T)*C(alu.add.u32)+(3*I+2*A)*C(alu.and.u32)+(I+M+O+3)*C(alu.or.u32)+(I+A+3)*C(alu.shl.u32)+(I+A)*C(alu.shr.u32)+(5+5*I+3*A+M+O)*C(control.test.u32)+(5+5*I+3*A+M+O)*C(control.branch)",
         "parameters": {
-          "I": "basis singleton-prefix entries inspected",
-          "U": "active singleton entries inserted into the bitset; basis uniqueness and singleton id=cell prove each is new",
-          "T": "playable threats recorded before early return"
+          "I": "singleton-prefix basis entries inspected before boundary/early mover terminal",
+          "J": "entries where opponent coordinate membership is loaded; J<=I and stops once two playable opponent threats are known",
+          "A": "entries active for mover or opponent and therefore sharing cell/playability decoding",
+          "M": "mover-active singleton entries processed",
+          "O": "opponent-active singleton entries processed before the two-threat cap",
+          "T": "playable opponent threats recorded, 0..2"
         },
-        "note": "Player-local singleton collection. Sorted basis IDs are unique and singleton id equals physical cell id, so the former duplicate-cell guard was impossible after coordHas succeeds. The bitset store remains for later CPC closure."
+        "note": "Combined mover/opponent singleton closure. One basis/index pass shares coordinate decoding and playability. Current-player playable singleton still returns immediately and supersedes opponent obligations; opponent processing stops after two playable threats because the caller then has an exact loss unless that earlier-priority mover terminal is found."
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "candidate": "remove-impossible-singleton-dedupe",
-        "baseline": "3329a3ac3faa5179b64ff12b50cc04c86ce4f8f2",
-        "removed": "U*(memory.load.u32 + alu.and.u32 + control.test.u32 + control.branch)",
-        "invariant": "RBA basis IDs are unique; singleton shape id equals cell id",
-        "semantics": "unchanged"
+        "candidate": "combined-singleton-profile-pass",
+        "baseline": "ad366f2875bab5003ae313cb20bf7cb51f5c0a01",
+        "removed": "second singleton-prefix basis scan and two coordHas subledger calls per basis entry across the former two player-local passes",
+        "added": "direct paired coordinate membership loads and packed singleton profile",
+        "historicalBasis": "fixed-width minimax tactical bitboards compute both sides' active tactical facts from one position representation",
+        "semantics": "mover immediate terminal priority, opponent threat count, singleton bitsets and later CPC guards preserved"
       }
     },
     {
@@ -1428,7 +1431,7 @@
         },
         {
           "op": "alu.shr.u32",
-          "count": "3"
+          "count": "4"
         },
         {
           "op": "control.test.u32",
@@ -1441,7 +1444,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "C",
-          "target": "collectPlayerSingletons"
+          "target": "collectSingletonProfiles"
         },
         {
           "op": "runtime.call.subledger",
@@ -1471,11 +1474,11 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+3*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectPlayerSingletons)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
         "parameters": {
           "W": "coordinate words scanned for any-live detection",
           "L": "legal-column iterations executed by lift scan",
-          "C": "collectPlayerSingletons calls executed (0..2 on early exits, normally 2)",
+          "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
           "M": "cellMarked calls executed",
           "D": "deriveForkPreemption32 calls executed (0 or 1)",
           "F": "frontierResponseNoWin calls executed (0 or 1)",
@@ -1484,7 +1487,7 @@
           "R": "long-range response branches evaluated",
           "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
         },
-        "note": "CPC owns projected, precursor and forced telemetry. The single-threat forced counter update is inside the already-selected threat branch; fork-derived forced telemetry is charged in deriveForkPreemption32."
+        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
       },
       "status": "decomposed"
     },
@@ -10503,7 +10506,7 @@
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
     "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
-    "addons/cpc-connect4.mjs": "844f69bf16f382bb17c8ca1113fba1ab49099fad",
+    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
