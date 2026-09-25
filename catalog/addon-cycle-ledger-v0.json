@@ -1241,61 +1241,69 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "20+8*I+4*C+K+F"
+          "count": "22+4*W+6*A+4*C+K+F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "K+F"
         },
         {
           "op": "memory.load.u32",
-          "count": "5+6*I+2*C+K"
+          "count": "5+2*W+5*A+2*C+K"
         },
         {
           "op": "memory.store.u32",
-          "count": "5+2*I+3*C"
+          "count": "5+2*Q+3*C"
         },
         {
           "op": "runtime.typed_array.fill",
-          "count": 1
+          "count": "Z"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+8*I+5*C+K+F"
+          "count": "9+5*W+8*A+5*C+K+F"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "A"
         },
         {
           "op": "alu.and.u32",
-          "count": "8+6*I+4*C"
+          "count": "8+4*W+7*A+4*C"
         },
         {
           "op": "alu.or.u32",
-          "count": "2*I+2*C"
+          "count": "W+2*Q+2*C"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2*I+C"
+          "count": "W+A+2*Q+C"
         },
         {
           "op": "alu.shr.u32",
-          "count": "I"
+          "count": "A"
         },
         {
           "op": "control.test.u32",
-          "count": "12+12*I+6*C"
+          "count": "14+3*W+10*A+6*C+Z"
         },
         {
           "op": "control.branch",
-          "count": "12+12*I+6*C"
+          "count": "14+3*W+10*A+6*C+Z"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "3*I",
-          "target": "coordHas"
+          "count": "A",
+          "target": "firstSetBitIndex32"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "4*I",
+          "count": "CM",
           "target": "cellMarked"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "2*I",
+          "count": "PL",
           "target": "playableCell"
         },
         {
@@ -1307,24 +1315,33 @@
           "op": "runtime.call.subledger",
           "count": "F",
           "target": "firstSetBitIndex32"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "K+F"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(20+8*I+4*C+K+F)*C(runtime.field.load)+(K+F)*C(runtime.field.store)+(5+6*I+2*C+K)*C(memory.load.u32)+(5+2*I+3*C)*C(memory.store.u32)+C(runtime.typed_array.fill)+(8+8*I+5*C+K+F)*C(alu.add.u32)+(8+6*I+4*C)*C(alu.and.u32)+(2*I+2*C)*C(alu.or.u32)+(2*I+C)*C(alu.shl.u32)+I*C(alu.shr.u32)+(12+12*I+6*C)*C(control.test.u32)+(12+12*I+6*C)*C(control.branch)+3*I*CALL(coordHas)+4*I*CALL(cellMarked)+2*I*CALL(playableCell)+C*CALL(popcount32)+F*CALL(firstSetBitIndex32)",
+        "expression": "(22+4*W+6*A+4*C+K+F)*C(runtime.field.load)+(K+F)*C(runtime.field.store)+(5+2*W+5*A+2*C+K)*C(memory.load.u32)+(5+2*Q+3*C)*C(memory.store.u32)+Z*C(runtime.typed_array.fill)+(9+5*W+8*A+5*C+K+F)*C(alu.add.u32)+A*C(alu.sub.u32)+(8+4*W+7*A+4*C)*C(alu.and.u32)+(W+2*Q+2*C)*C(alu.or.u32)+(W+A+2*Q+C)*C(alu.shl.u32)+A*C(alu.shr.u32)+(14+3*W+10*A+6*C+Z)*C(control.test.u32)+(14+3*W+10*A+6*C+Z)*C(control.branch)+(A+F)*CALL(firstSetBitIndex32)+CM*CALL(cellMarked)+PL*CALL(playableCell)+C*CALL(popcount32)",
         "parameters": {
-          "I": "pair-basis entries inspected after singleton prefix",
+          "W": "coordinate words visited until basis end/triple boundary",
+          "A": "active coordinate bits visited from mover|attacker lanes before triple boundary",
+          "Q": "attacker pair entries surviving singleton/playability/distinct-column guards and updating fork target masks",
+          "CM": "cellMarked calls actually executed under short-circuit mover/attacker guards",
+          "PL": "playableCell calls actually executed under short-circuit attacker guards",
           "C": "configured columns scanned for fork target intersections",
+          "Z": "1 when the first qualifying attacker pair lazily clears forkTargets32; otherwise 0",
           "F": "1 when one forced column index is decoded; otherwise 0",
           "K": "1 when one or more fork precursors were found and precursorTotal is accumulated; otherwise 0"
         },
-        "note": "Fork-preemption derivation now owns cumulative precursor telemetry and forced-total updates on its already-existing forced-column branch."
+        "note": "Fork-preemption enumerates the packed active assertion union instead of testing every pair-basis vocabulary entry with coordHas. Coordinate words are loaded once per visited word; firstSetBitIndex32 enumerates active indices. forkTargets32 is cleared lazily only if a qualifying attacker precursor pair exists."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "active-pair-fork-preemption",
+        "baseline": "8fd2e878efc01be6a38310caed3ee28543dd4f62",
+        "removed": "linear pair-basis vocabulary scan + mover/attacker coordHas membership probes + unconditional forkTargets32 fill",
+        "added": "set-bit iteration over mover|attacker coordinate words + lazy forkTargets32 clear",
+        "historicalBasis": "Sep. 8 fixed-width minimax active tactical bitboards; Sep. 12 quotient active-bit residual traversal; current pairedResponseNoWin packed-coordinate iteration",
+        "semantics": "same mover minimal-pair guard, attacker precursor edges, preemption intersection, exact-loss/restriction/forced-column results"
+      }
     },
     {
       "unit": "addons/cpc-connect4.mjs#evaluateConnect4Cpc32",
@@ -10496,7 +10513,7 @@
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
     "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
-    "addons/cpc-connect4.mjs": "ebaf699a4c326e8c89d68039acb0369e566f50af",
+    "addons/cpc-connect4.mjs": "80d4d57a738b737ffabb9b257cb6f4bd175bd048",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
