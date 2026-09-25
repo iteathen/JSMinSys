@@ -1470,11 +1470,15 @@
           "op": "runtime.call.subledger",
           "count": "P",
           "target": "collectProjected"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+X"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)+(1+X)*C(runtime.field.store)",
         "parameters": {
           "W": "coordinate words scanned for any-live detection",
           "L": "legal-column iterations executed by lift scan",
@@ -1485,9 +1489,10 @@
           "B": "pairedResponseNoWin calls executed (0 or 1)",
           "P": "collectProjected calls executed (0 or 1)",
           "R": "long-range response branches evaluated",
-          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
+          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0",
+          "X": "1 when CPC returns CPC_EXACT and records its exact closure route; 0 otherwise"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged. Measurement-only exactRoute records which existing CPC_EXACT return path fired; it does not affect interval, restriction, or solver behavior."
       },
       "status": "decomposed"
     },
@@ -1672,16 +1677,20 @@
         {
           "op": "runtime.field.store",
           "count": 18
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+18*C(runtime.field.store)",
+        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+18*C(runtime.field.store)+C(runtime.field.store)",
         "parameters": {
           "P": "1 when projectedAdvisory allocations are enabled; otherwise 0",
           "F": "1 when <=32-column fork-target array is allocated; otherwise 0"
         },
-        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields."
+        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields. Measurement branch adds one scalar exactRoute field initialized to zero; no additional typed allocation is introduced."
       },
       "status": "decomposed"
     },
@@ -9961,11 +9970,15 @@
           "op": "runtime.call.subledger",
           "count": "N",
           "target": "endConnect4RbaOverlapTrace32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*E"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+N*CALL(beginConnect4RbaOverlapTrace32)+N*CALL(endConnect4RbaOverlapTrace32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+N*CALL(beginConnect4RbaOverlapTrace32)+N*CALL(endConnect4RbaOverlapTrace32)+2*E*C(runtime.field.load)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -9987,7 +10000,7 @@
           "J": "stable insertion score comparisons at the non-forced endpoint",
           "K": "successful stable insertion shifts at the non-forced endpoint"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. On the measurement branch every cache-miss q_r occurrence passes through bounded overlap-trace entry/exit helpers; disabled traces fail out immediately and do not affect exact search semantics. Exact shared publications are measurement-tagged by source transition: CPC exact, interval collapse, forced terminal, or recursively resolved full-window exact.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. On the measurement branch every cache-miss q_r occurrence passes through bounded overlap-trace entry/exit helpers; disabled traces fail out immediately and do not affect exact search semantics. Exact shared publications are measurement-tagged by source transition: CPC exact, interval collapse, forced terminal, or recursively resolved full-window exact. CPC_EXACT publication reads the measurement-only exactRoute scalar and forwards it to the diagnostic shared provenance sidecar.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -10161,7 +10174,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)+C(runtime.integer.check)+3*C(control.test.u32)+C(control.branch)+3*D*C(memory.allocate.shared.bytes)+3*D*C(runtime.typed_view.construct)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers. Measurement mode optionally allocates one per-slot provenance byte plus five-bin shared-hit and committed-store counters.",
+        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers. Measurement mode optionally allocates one per-slot provenance byte plus twelve-bin shared-hit and committed-store counters.",
         "parameters": {
           "D": "1 when provenance diagnostics are enabled; 0 otherwise"
         }
@@ -10330,7 +10343,7 @@
           "D": "1 when provenance diagnostics are enabled; 0 otherwise",
           "U": "1 when the store wins slot ownership and reaches committed publication; 0 on early contention return"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Measurement mode writes the producer provenance byte before the final even sequence publication and increments the corresponding committed-store counter after commit."
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Measurement mode writes the producer provenance byte before the final even sequence publication and increments the corresponding committed-store counter after commit. The measurement provenance domain is bounded to 0..11: eight CPC exact routes plus three non-CPC exact publication classes."
       },
       "status": "decomposed"
     },
@@ -10752,8 +10765,8 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "024ba76276ec38ef543f4b4f58051d4c7dd3c807",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/rba-connect4-alphabeta.mjs": "b00a5ffee453cfc2fea8d22c0400f7081c1e5687",
+    "addons/cpc-connect4.mjs": "134bfc716e912bda953d8b53c9e5617d412e1f17",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
@@ -10761,7 +10774,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "3a573b2482ead8f8205c56e8505dd5f9ffa269e1",
+    "addons/rba-connect4-shared-exact-cache.mjs": "e9feb8a9792e74a6f5424a71f9808aeeaf9af1bf",
     "addons/rba-connect4-lazy-smp-host.mjs": "ea948ae16139d6694935afa89145ed35b08cb8d7",
     "addons/rba-connect4-lazy-smp-worker.mjs": "9a53d32f5898116bdeb0b6f76492b5440790d6ff"
   },
