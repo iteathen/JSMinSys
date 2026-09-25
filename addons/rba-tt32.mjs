@@ -258,7 +258,11 @@ export function rbaTtPublishSurplus32(t,q,owner,stateLo,stateHi,keys,keyOffset,b
       child=rbaTtAllocateUnindexed32(t,keys,childKey,basis,childBasis,basisSizes[i],priority,
         coded?positionLo[i]:0,coded?positionHi[i]:0,basisSets,basisSets?i*basisSetStride:0);
       if(child<0)return -1;
-      if(!rbaTtTighten32(t,child,lo,hi))return -1;
+      // Fresh surplus rows have no attached parents and start at [1,3].
+      // The validated CPC interval is their initial evidence, so install it
+      // directly instead of generic tighten plus a pre-attachment event.
+      t.lower[child]=lo;t.upper[child]=hi;
+      if(lo===hi)t.exact[child]=lo;
     }
     const e=edgeBase+i;t.child[e]=child;t.childGeneration[e]=child<0?0:t.generation[child];
     t.edgeLabel[e]=labels[i];t.edgeLower[e]=lo;t.edgeUpper[e]=hi;t.edgeAttached[e]=0;

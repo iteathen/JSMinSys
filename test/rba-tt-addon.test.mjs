@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createRbaTt32,rbaTtEnter32,rbaTtLeave32,rbaTtIntern32,rbaTtSetRoot32,
-  rbaTtEnqueue32,rbaTtTake32,rbaTtPublishPrepared32,rbaTtAttachDependencies32,
+  rbaTtEnqueue32,rbaTtTake32,rbaTtPublishPrepared32,rbaTtPublishSurplus32,rbaTtAttachDependencies32,
   rbaTtSetExact32,rbaTtReconcile32,rbaTtTakeEvent32,rbaTtSignalParents32,
   rbaTtDetachDependencies32,rbaTtRelease32,rbaTtRecycle32,rbaTtMarkDone32,
-  RBA_TT_ROOT,RBA_TT_ROOT_GENERATION,RBA_TT_DONE,RBA_TT_LOCK,RBA_TT_PHASE_PENDING_ATTACH,
+  RBA_TT_ROOT,RBA_TT_ROOT_GENERATION,RBA_TT_DONE,RBA_TT_LOCK,RBA_TT_EVENT_COUNT,RBA_TT_PHASE_PENDING_ATTACH,
   RBA_TT_PHASE_ATTACHED,RBA_TT_EXECUTION_FREE,
 } from '../addons/rba-tt32.mjs';
 
@@ -33,6 +33,23 @@ test('configured branch publication supports ten dependency slots',()=>{
   const next=rbaTtPublishPrepared32(t,root,7,1,3,keys,0,bs,0,238,sizes,labels,lo,hi,present,count);
   assert.ok(next>=0);assert.equal(t.execution[root],RBA_TT_EXECUTION_FREE);assert.equal(t.phase[root],RBA_TT_PHASE_PENDING_ATTACH);assert.equal(t.count[root],10);
   assert.equal(rbaTtAttachDependencies32(t,root),1);assert.equal(t.phase[root],RBA_TT_PHASE_ATTACHED);
+});
+
+test('fresh surplus rows install validated bounds without child pre-attachment events',()=>{
+  const t=table(),root=rbaTtIntern32(t,key(0,1),0,basis(1),0,12);
+  rbaTtEnqueue32(t,root);rbaTtTake32(t,7);
+  const count=2,keys=new Uint32Array(count*27),bs=new Uint32Array(count*238),
+    sizes=Uint32Array.from([12,12]),labels=Uint32Array.from([0,1]),
+    lo=Uint32Array.from([2,1]),hi=Uint32Array.from([2,3]),
+    present=Uint32Array.from([1,1]),priorities=Int32Array.from([2,1]);
+  keys.set(key(1,2),0);keys.set(key(1,3),27);
+  bs.set(basis(10),0);bs.set(basis(30),238);
+  rbaTtPublishSurplus32(t,root,7,1,3,keys,0,bs,0,238,sizes,labels,lo,hi,present,priorities,count);
+  const c0=t.child[root*10],c1=t.child[root*10+1];
+  assert.ok(c0>=0&&c1>=0);
+  assert.equal(t.lower[c0],2);assert.equal(t.upper[c0],2);assert.equal(t.exact[c0],2);
+  assert.equal(t.lower[c1],1);assert.equal(t.upper[c1],3);assert.equal(t.exact[c1],0);
+  assert.equal(t.control[RBA_TT_EVENT_COUNT],1,'only the parent pending-attach event should be queued');
 });
 
 test('configured Bellman reconciliation propagates exact child evidence',()=>{
