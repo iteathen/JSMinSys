@@ -64,8 +64,8 @@ test('Lazy SMP rejects single-worker execution while Surplus runtime remains ava
   const managed=await runManagedConnect4CpcRba32([0,1,0,1],{
     geometry:g,
     workers:2,
-    capacity:4096,
-    buckets:4096,
+    capacity:16384,
+    buckets:16384,
     timeoutMs:5000,
   });
   assert.equal(managed.status,'EXACT',JSON.stringify(managed));
