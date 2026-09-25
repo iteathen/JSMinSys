@@ -1,8 +1,8 @@
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 
-export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,diagnosticProvenance=false}={}){
+export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,diagnosticProvenance=0}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
-     !Number.isInteger(keyWords)||keyWords<1||typeof diagnosticProvenance!=='boolean')
+     !Number.isInteger(keyWords)||keyWords<1||!Number.isInteger(diagnosticProvenance)||diagnosticProvenance<0||diagnosticProvenance>1)
     throw new RangeError('invalid shared exact cache');
   return {
     mask:capacity-1,
