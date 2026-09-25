@@ -1,10 +1,34 @@
 # Managed IsoMax Negamax Alpha-Beta Restoration Design
 
+> **SUPERSEDED IMPLEMENTATION CLAUSES — owner directive, 2026-09-24**
+>
+> This document is historical design evidence. Any clause below that permits or
+> recommends **single-worker IsoMax execution**, a root-only private Negamax solve,
+> disabling/delaying worker Surplus publication, or treating idle workers as an
+> acceptable production state is **non-authoritative and superseded**.
+>
+> Current managed IsoMax invariants:
+>
+> - at least **two search workers plus the Branch Manager**;
+> - a worker CPC/RBA-evaluates a claimed q, retains at most one continuation, and
+>   publishes every unresolved viable sibling as Surplus to the shared TT ready
+>   queue;
+> - an idle worker while useful unresolved Surplus exists is a defect;
+> - the Branch Manager organizes/dedupes/redirects/cleans asynchronously and does
+>   not manufacture worker work;
+> - optimization and qualification must preserve this topology; no single-worker
+>   benchmark or qualification may be used until the owner explicitly revokes the
+>   restriction.
+>
+> JSMinSys `main@51bd9bc09b2c50b84619bc7efa953ad9c1e0302a`
+> restored the required worker Surplus path. The later Phase-1 text below remains
+> only to explain the regression and must not be used to reintroduce it.
+
 **Date:** 2026-09-24  
 **Repository:** `iteathen/JSMinSys`  
 **Managed-runtime branch:** `experiment/connect4-managed-runtime-v1`  
 **Connect4 integration branch:** `work/isomax-jsminsys-boundary-cleanup`  
-**Status:** Design approved in conversation; written-spec review pending before implementation.
+**Status:** Historical restoration design; single-worker/zero-Surplus clauses superseded by the owner directive above.
 
 ## Problem
 
