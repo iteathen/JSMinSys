@@ -84,9 +84,6 @@
     "corrected rank-16+ standard-7x6 prefix A/B scan found zero interval/kind changes from the frontier-response extension",
     "forced-block and universal support-lift terminal-response closures match independent 4x4 exact oracles",
     "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan",
-    "worker publication can create equivalent surplus rows; only Branch Manager dedupe collapses them",
-    "Branch Manager reset signal stops a worker from publishing work that became redundant after merge",
-    "worker-published surplus is visible before manager reconciliation; manager does not manufacture ready work",
     "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states"
   ],
   "specializationContract": {
@@ -145,44 +142,6 @@
         "currentProductionNote": "After support-lift CPC closure, the maintained rank-28 control uses 49 alpha-beta nodes; the original Four-Front A/B comparison used 54 baseline nodes before that closure."
       }
     }
-  },
-  "branchManagerContract": {
-    "workAuthority": "Workers publish surplus directly into the shared ready-q work queue. The Branch Manager inspects but does not consume or generate surplus.",
-    "workerOwns": [
-      "claim ready work",
-      "evaluate/descend q outside the TT transaction",
-      "retain one runnable continuation",
-      "publish remaining unresolved branches directly as surplus",
-      "attach evaluation/bound priority metadata to published surplus",
-      "honor manager reset signals at control boundaries"
-    ],
-    "workerExcludes": [
-      "TT deduplication",
-      "transposition merging",
-      "queue deduplication",
-      "global queue prioritization",
-      "TT garbage collection",
-      "stale-work cleanup"
-    ],
-    "managerOwns": [
-      "inspect shared surplus without becoming its consumer",
-      "dedupe equivalent queued branches",
-      "merge duplicate/transposed q into authoritative shared TT state",
-      "reorder queued work by supplied usefulness priority",
-      "maintain dependency topology and evidence",
-      "clean dead/resolved/stale TT and queue state",
-      "reclaim storage made redundant by merge/cleanup",
-      "reset workers whose retained work becomes redundant"
-    ],
-    "managerExcludes": [
-      "game evaluation",
-      "branch generation",
-      "surplus generation",
-      "retiring worker threads",
-      "requiring workers to round-trip through manager before continuing retained work"
-    ],
-    "lifetimePolicy": "Reference/pin updates are implementation bookkeeping beneath manager-owned topology cleanup; they are not a separate semantic responsibility.",
-    "capacityPolicy": "Capacity recovery is a consequence of removing redundant/dead state while preserving live useful evidence; increasing TT size is not a substitute for manager maintenance."
   },
   "neutralTokenQuotient": {
     "status": "qualified-subsumed-by-rba",

@@ -4870,423 +4870,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-managed-host.mjs#prepareManagedRuntimeSlab32",
-      "source": "addons/rba-connect4-managed-host.mjs",
-      "name": "prepareManagedRuntimeSlab32",
-      "scope": "cold",
-      "operations": [
-        {
-          "op": "alu.imul.u32",
-          "count": "3*W + 2"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "2*W + 6"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": 1
-        },
-        {
-          "op": "memory.allocate.shared.bytes",
-          "count": 1,
-          "bytes": "ALIGN8(8 + 4*W) + 128*W"
-        },
-        {
-          "op": "runtime.typed_view.construct",
-          "count": "W + 2"
-        },
-        {
-          "op": "memory.store.u32",
-          "count": "W + 1"
-        },
-        {
-          "op": "runtime.array.allocate",
-          "count": 1
-        },
-        {
-          "op": "runtime.typed_array.fill",
-          "count": 1
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(3*W+2)*C(alu.imul.u32)+(2*W+6)*C(alu.add.u32)+C(alu.and.u32)+C(memory.allocate.shared.bytes)+(W+2)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+C(runtime.typed_array.fill)+(W+1)*C(memory.store.u32)",
-        "parameters": {
-          "W": "managed evaluator worker count"
-        },
-        "note": "Cold setup. Per-worker metric slab is 16 Float64 values (128 bytes); SharedArrayBuffer allocation and typed-view construction remain explicit symbolic runtime costs."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-host.mjs#runManagedConnect4CpcRba32",
-      "source": "addons/rba-connect4-managed-host.mjs",
-      "name": "runManagedConnect4CpcRba32",
-      "scope": "cold-host",
-      "operations": [
-        {
-          "op": "runtime.host.bookkeeping",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "connect4RbaFromMoves"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "createRbaTt32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "rbaTtIntern32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "rbaTtSetRoot32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "rbaTtEnqueue32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareManagedRuntimeSlab32"
-        },
-        {
-          "op": "runtime.typed_array.allocate",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "shareConnect4RbaGeometry32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "createManagedThreadSession32"
-        },
-        {
-          "op": "runtime.timer.read",
-          "count": 2
-        },
-        {
-          "op": "runtime.url.construct",
-          "count": "W+1"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "sumMetricViews32"
-        },
-        {
-          "op": "runtime.array.copy",
-          "count": 1,
-          "bytes": "table.fault.byteLength"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 2,
-          "target": "sharedViewBytes32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "W+1",
-          "target": "ManagedThreadSession.spawn"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "ManagedThreadSession.wait"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "ManagedThreadSession.close"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "ManagedThreadSession.state"
-        },
-        {
-          "op": "memory.load.u32",
-          "count": "3+E"
-        },
-        {
-          "op": "memory.load.u8",
-          "count": "E"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": "E"
-        },
-        {
-          "op": "runtime.array.allocate",
-          "count": 2
-        },
-        {
-          "op": "memory.load.u32",
-          "count": "2*W"
-        },
-        {
-          "op": "memory.store.u32",
-          "count": "2*W"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "W"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "1+W"
-        },
-        {
-          "op": "control.branch",
-          "count": "1+W"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+CALL(connect4RbaFromMoves)+CALL(createRbaTt32)+CALL(rbaTtIntern32)+CALL(rbaTtSetRoot32)+CALL(rbaTtEnqueue32)+CALL(prepareManagedRuntimeSlab32)+C(runtime.typed_array.allocate)+(W+1)*C(runtime.url.construct)+CALL(shareConnect4RbaGeometry32)+CALL(createManagedThreadSession32)+(W+1)*CALL(ManagedThreadSession.spawn)+2*C(runtime.timer.read)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+CALL(sumMetricViews32)+(3+E)*C(memory.load.u32)+E*C(memory.load.u8)+E*C(alu.sub.u32)+C(runtime.array.copy)+2*CALL(sharedViewBytes32)+2*C(runtime.array.allocate)+2*W*C(memory.load.u32)+2*W*C(memory.store.u32)+W*C(alu.add.u32)+(1+W)*C(control.test.u32)+(1+W)*C(control.branch)",
-        "unboundedTerms": [
-          "CALL(ManagedThreadSession.spawn)",
-          "CALL(ManagedThreadSession.wait)",
-          "CALL(ManagedThreadSession.close)"
-        ],
-        "parameters": {
-          "W": "managed search worker count (minimum 2)",
-          "E": "1 for exact completion; 0 otherwise. Exact completion loads the root exact byte and witness word and performs the absolute-value to root-WDL subtraction."
-        },
-        "note": "Managed host constructs the final Connect4 API fields directly: rootWdl = exactValue - 2 and move = witness. This removes the downstream destructure/rest/spread translation allocation. Session lifecycle remains cold/control-plane; worker startup, wait, and close retain explicit symbolic/unbounded subledgers. Per-worker claim/evaluation arrays are materialized after shutdown so multi-worker participation is directly observable. Per-worker Float64 metric reads are conservatively charged against the admitted memory.load.u32 locality model until a dedicated f64-load cost exists."
-      },
-      "status": "decomposed",
-      "optimizationDelta": {
-        "candidate": "enforce-multiworker-managed-topology",
-        "prior": "workers defaulted to 1 and root-only Negamax made additional workers idle",
-        "changed": "default/minimum workers=2; workerData carries workerCount; host returns per-worker claims/evaluations",
-        "rationale": "single-worker execution is forbidden by current IsoMax owner directive and multi-worker participation must be mechanically visible"
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-managed-manager.mjs#<module-main>",
-      "source": "addons/rba-connect4-managed-manager.mjs",
-      "name": "<module-main>",
-      "scope": "managed-module-main",
-      "operations": [
-        {
-          "op": "runtime.module.bookkeeping",
-          "count": 1
-        },
-        {
-          "op": "runtime.typed_view.construct",
-          "count": 2
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareRbaBranchManager32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "RbaBranchManager.run"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareRbaBranchManager32)+CALL(RbaBranchManager.run)",
-        "unboundedTerms": [
-          "CALL(RbaBranchManager.run)"
-        ],
-        "note": "Top-level managed manager constructs the canonical RbaBranchManager during thread initialization and enters the specialized loop through manager.run(). Residual startup property/coercion/object assembly remains nonzero symbolic module bookkeeping."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-manager.mjs#reconcile",
-      "source": "addons/rba-connect4-managed-manager.mjs",
-      "name": "reconcile",
-      "scope": "manager-hot",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "reconcileConnect4CpcRbaEvent32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "CALL(reconcileConnect4CpcRbaEvent32)",
-        "note": "Lifetime-captured manager state removes context-object transport."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-worker.mjs#<module-main>",
-      "source": "addons/rba-connect4-managed-worker.mjs",
-      "name": "<module-main>",
-      "scope": "managed-module-main",
-      "operations": [
-        {
-          "op": "runtime.module.bookkeeping",
-          "count": 1
-        },
-        {
-          "op": "runtime.typed_view.construct",
-          "count": 3
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4CpcRbaEvaluator"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareRbaBranchWorker32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "RbaBranchWorker.run"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "snapshot"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+3*C(runtime.typed_view.construct)+CALL(prepareConnect4CpcRbaEvaluator)+CALL(prepareRbaBranchWorker32)+CALL(RbaBranchWorker.run)+CALL(snapshot)",
-        "unboundedTerms": [
-          "CALL(RbaBranchWorker.run)"
-        ],
-        "note": "Managed worker restores distributed CPC/RBA q traversal: each claimed q may retain one continuation and publish remaining unresolved children as surplus. Final metrics snapshot remains explicit."
-      },
-      "status": "decomposed",
-      "optimizationDelta": {
-        "candidate": "restore-required-surplus-worker-semantics",
-        "prior": "Phase-1 root-only local Negamax consumed the entire branching tree inside one worker and could not publish surplus",
-        "removed": "CALL(prepareConnect4RbaAlphaBeta), root-only q guard, monolithic CALL(solveConnect4RbaAlphaBeta)",
-        "added": "CALL(prepareConnect4CpcRbaEvaluator) and shared-q surplus publication through the existing RbaBranchWorker loop",
-        "invariant": "worker retains at most one continuation; unresolved siblings are published to the shared TT ready queue; Branch Manager remains off the worker evaluation hot loop"
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-managed-worker.mjs#evaluate",
-      "source": "addons/rba-connect4-managed-worker.mjs",
-      "name": "evaluate",
-      "scope": "hot",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "evaluateConnect4CpcRbaTt32"
-        },
-        {
-          "op": "runtime.counter.load",
-          "count": 1
-        },
-        {
-          "op": "alu.add.u32",
-          "count": 1
-        },
-        {
-          "op": "alu.and.u32",
-          "count": 1
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "S",
-          "target": "snapshot"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "CALL(evaluateConnect4CpcRbaTt32)+C(runtime.counter.load)+C(alu.add.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)+S*CALL(snapshot)",
-        "parameters": {
-          "S": "1 on evaluation numbers 1, 1025, 2049, ...; 0 otherwise"
-        },
-        "note": "One claimed q is CPC/RBA-evaluated. Branch results flow to publishConnect4CpcRbaEvaluation32, which retains one continuation and publishes surplus siblings."
-      },
-      "status": "decomposed",
-      "optimizationDelta": {
-        "candidate": "distributed-q-evaluation",
-        "prior": "one worker solved the entire root locally before exact publication",
-        "restored": "CALL(evaluateConnect4CpcRbaTt32) one-q evaluation and branch publication",
-        "rationale": "make naturally surviving branches visible to other workers instead of serializing them inside one worker"
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-managed-worker.mjs#snapshot",
-      "source": "addons/rba-connect4-managed-worker.mjs",
-      "name": "snapshot",
-      "scope": "managed-telemetry",
-      "operations": [
-        {
-          "op": "runtime.counter.load",
-          "count": 11
-        },
-        {
-          "op": "alu.add.u32",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "memory.store.f64",
-          "count": 16
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "11*C(runtime.counter.load)+2*C(alu.add.u32)+C(control.test.u32)+16*C(memory.store.f64)",
-        "note": "Race-safe per-worker metrics snapshot. Pending evaluation/branch counts are included before publish can complete the root."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-managed-worker.mjs#publish",
-      "source": "addons/rba-connect4-managed-worker.mjs",
-      "name": "publish",
-      "scope": "hot",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "publishConnect4CpcRbaEvaluation32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "CALL(publishConnect4CpcRbaEvaluation32)",
-        "note": "Closure captures root/witness state; cost is the publication subledger."
-      },
-      "status": "decomposed"
-    },
-    {
       "unit": "addons/rba-connect4-profile.mjs#insert6",
       "source": "addons/rba-connect4-profile.mjs",
       "name": "insert6",
@@ -5942,58 +5525,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-solver.mjs#evaluateConnect4CpcRbaTt32",
-      "source": "addons/rba-connect4-solver.mjs",
-      "name": "evaluateConnect4CpcRbaTt32",
-      "scope": "hot",
-      "operations": [
-        {
-          "op": "runtime.evaluate.fixed",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "evaluateConnect4CpcNonterminal32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "A",
-          "target": "connect4RbaCofactorKnownHeight"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "U",
-          "target": "connect4RbaCanonicalize"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "U",
-          "target": "evaluateConnect4CpcNonterminal32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "PC",
-          "target": "rbaTtHasPositionCode32"
-        },
-        {
-          "op": "runtime.position_code.evaluate",
-          "count": "PC"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "C(runtime.evaluate.fixed)+CALL(evaluateConnect4CpcNonterminal32)+A*CALL(connect4RbaCofactorKnownHeight)+U*(CALL(connect4RbaCanonicalize)+CALL(evaluateConnect4CpcNonterminal32))+PC*(CALL(rbaTtHasPositionCode32)+C(runtime.position_code.evaluate))",
-        "parameters": {
-          "A": "legal actions examined",
-          "U": "nonterminal child actions requiring CPC",
-          "PC": "1 when evaluator position-code capability is enabled, else 0"
-        },
-        "note": "Managed runtime uses PC=0, so TT position-code probe, child code advancement/reflection, and child code stores are absent."
-      },
-      "status": "decomposed"
-    },
-    {
       "unit": "addons/rba-connect4-solver.mjs#evaluateConnect4RbaTt32",
       "source": "addons/rba-connect4-solver.mjs",
       "name": "evaluateConnect4RbaTt32",
@@ -6180,42 +5711,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-solver.mjs#prepareConnect4CpcRbaEvaluator",
-      "source": "addons/rba-connect4-solver.mjs",
-      "name": "prepareConnect4CpcRbaEvaluator",
-      "scope": "cold",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4RbaExecutionProfile"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4RbaCoordinateScratch"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4CpcScratch"
-        },
-        {
-          "op": "runtime.typed_array.allocate",
-          "count": "11 + 2*PC"
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcScratch)+(11+2*PC)*C(runtime.typed_array.allocate)",
-        "parameters": {
-          "PC": "1 when physical position-code capability is enabled, else 0"
-        },
-        "note": "Managed runtime selects PC=0, deleting two child position-code arrays."
-      },
-      "status": "decomposed"
-    },
-    {
       "unit": "addons/rba-connect4-solver.mjs#prepareConnect4RbaEvaluator",
       "source": "addons/rba-connect4-solver.mjs",
       "name": "prepareConnect4RbaEvaluator",
@@ -6261,37 +5756,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-solver.mjs#publishConnect4CpcRbaEvaluation32",
-      "source": "addons/rba-connect4-solver.mjs",
-      "name": "publishConnect4CpcRbaEvaluation32",
-      "scope": "hot",
-      "operations": [
-        {
-          "op": "runtime.publish.dispatch",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "X",
-          "target": "rbaTtPublishExactOwned32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "1-X",
-          "target": "rbaTtPublishSurplus32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "C(runtime.publish.dispatch)+X*CALL(rbaTtPublishExactOwned32)+(1-X)*CALL(rbaTtPublishSurplus32)",
-        "parameters": {
-          "X": "1 for exact result codes 1..3, 0 for branch publication"
-        },
-        "note": "Position-code child arrays are supplied only when state.positionCoded is asserted."
-      },
-      "status": "decomposed"
-    },
-    {
       "unit": "addons/rba-connect4-solver.mjs#publishConnect4RbaEvaluation32",
       "source": "addons/rba-connect4-solver.mjs",
       "name": "publishConnect4RbaEvaluation32",
@@ -6331,99 +5795,6 @@
           "M": "1 when exact root witness/terminal condition marks done"
         },
         "note": "Legacy exact/prepared publication."
-      },
-      "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-solver.mjs#reconcileConnect4CpcRbaEvent32",
-      "source": "addons/rba-connect4-solver.mjs",
-      "name": "reconcileConnect4CpcRbaEvent32",
-      "scope": "manager-hot",
-      "operations": [
-        {
-          "op": "runtime.field.load",
-          "count": 12
-        },
-        {
-          "op": "memory.load.u32",
-          "count": 7
-        },
-        {
-          "op": "memory.store.u32",
-          "count": "W"
-        },
-        {
-          "op": "alu.imul.u32",
-          "count": 1
-        },
-        {
-          "op": "alu.add.u32",
-          "count": 3
-        },
-        {
-          "op": "alu.and.u32",
-          "count": 1
-        },
-        {
-          "op": "control.test.u32",
-          "count": 10
-        },
-        {
-          "op": "control.branch",
-          "count": 10
-        },
-        {
-          "op": "atomic.load.u32",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "A",
-          "target": "rbaTtManagerAttachDependencies32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "R",
-          "target": "rbaTtReconcile32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "R",
-          "target": "connect4RbaRank"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "rbaTtSignalParents32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "S",
-          "target": "selectConnect4RbaRootWitness32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "D",
-          "target": "rbaTtDetachDependencies32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "M",
-          "target": "rbaTtMarkDone32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "12*C(runtime.field.load)+7*C(memory.load.u32)+W*C(memory.store.u32)+C(alu.imul.u32)+3*C(alu.add.u32)+C(alu.and.u32)+10*C(control.test.u32)+10*C(control.branch)+C(atomic.load.u32)+A*CALL(rbaTtManagerAttachDependencies32)+R*(CALL(rbaTtReconcile32)+CALL(connect4RbaRank))+CALL(rbaTtSignalParents32)+S*CALL(selectConnect4RbaRootWitness32)+D*CALL(rbaTtDetachDependencies32)+M*CALL(rbaTtMarkDone32)",
-        "parameters": {
-          "A": "pending-attach manager branch",
-          "R": "attached q reconciliation branch",
-          "S": "exact-root witness selection branch",
-          "W": "witness store count",
-          "D": "dependency detach calls",
-          "M": "mark-done call"
-        },
-        "note": "Managed CPC event reconciliation; Phase-1 exact root normally reaches completion without surplus dependencies."
       },
       "status": "decomposed"
     },
@@ -10991,8 +10362,8 @@
     }
   ],
   "summary": {
-    "units": 204,
-    "decomposed": 204,
+    "units": 192,
+    "decomposed": 192,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11094,10 +10465,7 @@
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "f7d02f2dccdc372ecc447dbc594fc6cbc8c2b811",
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-managed-host.mjs": "67f8b9df517455f9455abc8536e1ba04277c22e6",
-    "addons/rba-connect4-managed-manager.mjs": "cab37b1c3cb5b1427729edb2db7f832862319012",
-    "addons/rba-connect4-managed-worker.mjs": "576fb889ca0b506da29f103f43d6becbd91a2ce5",
-    "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
+    "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
@@ -11145,7 +10513,7 @@
       "addons/connect4-live-line-evaluator.mjs#evaluateConnect4LiveLine3x32"
     ],
     "accountingRule": "Every listed unit must be decomposed into bound operations. Unknown lowering/memory/runtime costs remain explicit symbolic terms; no local Negamax operation may fall back to runtime.legacy.addon.body.",
-    "budgetBoundary": "Local CPC-first Negamax search only. Manager, worker startup, idle workers, shared-TT distribution and Surplus coordination remain separate ledgers.",
+    "budgetBoundary": "Local CPC-first Negamax search only. Lazy SMP worker startup, teardown, and optional shared-exact-cache traffic remain separate ledgers.",
     "batchOptimization": {
       "baseline": "18785a39b8dec6e7d5da845ababb405448e8ec5c",
       "variations": [
@@ -11207,23 +10575,11 @@
   },
   "isomaxSystemCycleGraph": {
     "roots": [
-      "addons/rba-connect4-managed-host.mjs#runManagedConnect4CpcRba32",
-      "addons/rba-connect4-managed-worker.mjs#<module-main>",
-      "addons/rba-connect4-managed-manager.mjs#<module-main>",
       "addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry",
       "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
       "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>"
     ],
     "callbackTargets": {
-      "evaluate": [
-        "addons/rba-connect4-managed-worker.mjs#evaluate"
-      ],
-      "publish": [
-        "addons/rba-connect4-managed-worker.mjs#publish"
-      ],
-      "reconcile": [
-        "addons/rba-connect4-managed-manager.mjs#reconcile"
-      ],
       "prepareRemove": [
         "addons/rba-connect4-profile.mjs#prepareRemoveDense",
         "addons/rba-connect4-profile.mjs#prepareRemoveSparse"
@@ -11253,9 +10609,6 @@
         "addons/rba-connect4-profile.mjs#productSpan"
       ]
     },
-    "disabledCallbacks": {
-      "publishMetrics": "Managed IsoMax passes publishMetrics=null to runRbaBranchWorkerLoop32; callback body is unreachable in this production composition."
-    },
-    "invariant": "Every add-on unit transitively reachable from the managed IsoMax roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled production callback. Lazy SMP is an additional root composition sharing exact cache evidence only; the existing Surplus/Branch-Manager composition remains independently rooted."
+    "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback."
   }
 }
