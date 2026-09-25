@@ -12,3 +12,5 @@ export * from './cpc-connect4.mjs';
 export * from './connect4-live-line-evaluator.mjs';
 export * from './rba-connect4-alphabeta.mjs';
 export * from './rba-connect4-managed-host.mjs';
+export * from './rba-connect4-shared-exact-cache.mjs';
+export * from './rba-connect4-lazy-smp-host.mjs';
