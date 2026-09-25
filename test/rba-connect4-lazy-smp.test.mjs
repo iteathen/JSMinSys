@@ -13,7 +13,6 @@ import {
   storeConnect4RbaSharedExactCache32,
 } from '../addons/rba-connect4-shared-exact-cache.mjs';
 import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
-import {runManagedConnect4CpcRba32} from '../addons/rba-connect4-managed-host.mjs';
 
 test('shared exact cache publishes only fully committed exact rows',()=>{
   const cache=createConnect4RbaSharedExactCache32({capacity:8,keyWords:2}),
@@ -55,20 +54,14 @@ test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
   assert.ok(lazy.winnerMetrics.nodes>=0);
 });
 
-test('Lazy SMP rejects single-worker execution while Surplus runtime remains available',async()=>{
+test('Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition',async()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4});
   await assert.rejects(
     ()=>runLazySmpConnect4Rba32([0,1,0,1],{geometry:g,workers:1,timeoutMs:1000}),
     /at least two/,
   );
-  const managed=await runManagedConnect4CpcRba32([0,1,0,1],{
-    geometry:g,
-    workers:2,
-    capacity:16384,
-    buckets:16384,
-    timeoutMs:5000,
-  });
-  assert.equal(managed.status,'EXACT',JSON.stringify(managed));
+  const addons=await import('../addons/index.mjs');
+  assert.equal('runManagedConnect4CpcRba32' in addons,false);
 });
 
 test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async()=>{
