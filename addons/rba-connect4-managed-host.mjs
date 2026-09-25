@@ -49,7 +49,7 @@ function prepareManagedRuntimeSlab32(workers){
 
 export async function runManagedConnect4CpcRba32(moves,{
   geometry,
-  workers=1,
+  workers=2,
   capacity=65536,
   buckets=65536,
   basisSetWords=0,
@@ -60,8 +60,8 @@ export async function runManagedConnect4CpcRba32(moves,{
   cpcProjectedAdvisory=false,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  if(!Number.isInteger(workers)||workers<1||workers>64)
-    throw new RangeError('invalid managed Connect4 worker count');
+  if(!Number.isInteger(workers)||workers<2||workers>64)
+    throw new RangeError('managed Connect4 requires at least two search workers');
   if(!Number.isSafeInteger(capacity)||capacity<1||
      !Number.isSafeInteger(buckets)||buckets<1||(buckets&(buckets-1)))
     throw new RangeError('invalid managed Connect4 shared TT capacity');
@@ -128,7 +128,7 @@ export async function runManagedConnect4CpcRba32(moves,{
           resetCount:workers,
           metricOffsetBytes:runtime.metricBaseBytes+i*runtime.metricStrideBytes,
           owner:i+2,
-          root,
+          workerCount:workers,
           rootReflected:root.reflected,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
@@ -142,7 +142,13 @@ export async function runManagedConnect4CpcRba32(moves,{
   }
 
   const elapsedMs=performance.now()-started,
-    host=session.state();
+    host=session.state(),
+    workerClaims=new Array(workers),
+    workerEvaluations=new Array(workers);
+  for(let i=0;i<workers;i+=1){
+    workerClaims[i]=runtime.metricViews[i][0];
+    workerEvaluations[i]=runtime.metricViews[i][2];
+  }
   sumMetricViews32(runtime.metricViews,CONNECT4_CPC_RBA_METRIC_WIDTH,metricOut);
   const errorCode=host.errorCode,
     exact=!errorCode&&Atomics.load(table.control,RBA_TT_DONE)===1;
@@ -185,6 +191,8 @@ export async function runManagedConnect4CpcRba32(moves,{
       sharedViewBytes32(workerGeometry),
     requestedWorkers:workers,
     workersUsed:workers,
+    workerClaims,
+    workerEvaluations,
     basisSetWords,
   };
 }

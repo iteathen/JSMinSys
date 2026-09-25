@@ -56,7 +56,7 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
   for(const basisSetWords of [0,g.shapeWordCount]){
     const managed=await runManagedConnect4CpcRba32(moves,{
       geometry:g,
-      workers:1,
+      workers:2,
       capacity:16384,
       buckets:16384,
       basisSetWords,
@@ -68,19 +68,22 @@ test('managed Connect4 add-on owns host/worker/manager composition without chang
     assert.equal('absoluteValue' in managed,false);
     assert.equal('witness' in managed,false);
     assert.equal(managed.cleanup,true);
-    assert.equal(managed.workersExited,2);
-    assert.equal(managed.workersUsed,1);
+    assert.equal(managed.workersExited,3);
+    assert.equal(managed.workersUsed,2);
     assert.ok(managed.sharedBytes>0);
     assert.ok(managed.metrics.claims>0);
     assert.ok(managed.metrics.evaluations>0);
     assert.ok(managed.metrics.transitions>0);
-    assert.equal(managed.metrics.alphaBetaNodes,serial.metrics.nodes);
-    assert.equal(managed.metrics.cutoffs,serial.metrics.cutoffs);
-    assert.equal(managed.metrics.cacheHits,serial.metrics.cacheHits);
-    assert.equal(managed.metrics.cofactors,serial.metrics.cofactors);
-    assert.equal(managed.metrics.transitions,serial.metrics.cofactors);
-    assert.equal(managed.metrics.branches,0);
-    assert.equal(managed.metrics.ttLive,1);
+    assert.ok(managed.metrics.branches>0,JSON.stringify(managed));
+    assert.ok(managed.metrics.claims>1,JSON.stringify(managed));
+    assert.equal(managed.metrics.alphaBetaNodes,0);
+    assert.equal(managed.metrics.cutoffs,0);
+    assert.equal(managed.metrics.cacheHits,0);
+    assert.equal(managed.metrics.cofactors,0);
+    assert.equal(managed.workerClaims.length,2);
+    assert.equal(managed.workerEvaluations.length,2);
+    assert.ok(managed.workerClaims.every(v=>v>0),JSON.stringify(managed));
+    assert.ok(managed.workerEvaluations.every(v=>v>0),JSON.stringify(managed));
   }
 });
 
