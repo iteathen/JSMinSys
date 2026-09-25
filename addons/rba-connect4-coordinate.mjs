@@ -59,78 +59,103 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  // One child-basis pass publishes the exact id->index map already owned by
+  // coordinate scratch and discovers all cardinality boundaries.
+  let childPair=cn,childTriple=cn,childQuad=cn;
+  for(let j=0;j<cn;j+=1){
+    const id=childBasis[ci+j];
+    if(childIndex)childIndex[id]=j;
+    if(childPair===cn&&id>=g.pairShapeStart)childPair=j;
+    if(childTriple===cn&&id>=g.tripleShapeStart)childTriple=j;
+    if(childQuad===cn&&id>=g.quadShapeStart)childQuad=j;
+  }
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
-  if(childIndex){
-    // IsoMax supplies an id->child-index scratch map. Fill it once, then walk
-    // geometry's exact strict-superset lists instead of testing every
-    // same-or-larger child-basis entry for subset membership.
-    for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
-    for(let i=0;i<n;i+=1){
-      const sourceWord=i>>>5,sourceMask=1<<(i&31),
-        active0=source[p0Source+sourceWord]&sourceMask,
-        active1=source[p1Source+sourceWord]&sourceMask;
-      if(!(active0|active1))continue;
-      const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
-        image=raw===0xffffffff?-1:raw;
-      if(image<0)continue;
-      const write0=active0&&(player===0||image===id),
-        write1=active1&&(player===1||image===id);
-      if(!write0&&!write1)continue;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,
+      active1=source[p1Source+sourceWord]&sourceMask;
+    if(!(active0|active1))continue;
+    const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
+      image=raw===0xffffffff?-1:raw;
+    if(image<0)continue;
+    const write0=active0&&(player===0||image===id),
+      write1=active1&&(player===1||image===id);
+    if(!write0&&!write1)continue;
 
-      let j=childIndex[image],targetWord=j>>>5,targetMask=1<<(j&31);
-      if(write0)target[p0Target+targetWord]|=targetMask;
-      if(write1)target[p1Target+targetWord]|=targetMask;
-
-      const supersetStart=g.strictSupersetOffset[image],
-        supersetEnd=g.strictSupersetOffset[image+1];
-      for(let s=supersetStart;s<supersetEnd;s+=1){
-        const superset=g.strictSupersetIds[s],
-          supersetMask=1<<(superset&31);
-        if(!(seen[seenOffset+(superset>>>5)]&supersetMask))continue;
-        j=childIndex[superset];targetWord=j>>>5;targetMask=1<<(j&31);
-        if(write0)target[p0Target+targetWord]|=targetMask;
-        if(write1)target[p1Target+targetWord]|=targetMask;
-      }
-    }
-  }else{
-    // Generic callers without child-index scratch retain the exact historical
-    // path: cardinality cut points, binary image lookup and subset callbacks.
-    let childPair=cn,childTriple=cn,childQuad=cn;
-    for(let j=0;j<cn;j+=1){
-      const id=childBasis[ci+j];
-      if(childPair===cn&&id>=g.pairShapeStart)childPair=j;
-      if(childTriple===cn&&id>=g.tripleShapeStart)childTriple=j;
-      if(childQuad===cn&&id>=g.quadShapeStart)childQuad=j;
-    }
-    for(let i=0;i<n;i+=1){
-      const sourceWord=i>>>5,sourceMask=1<<(i&31),
-        active0=source[p0Source+sourceWord]&sourceMask,
-        active1=source[p1Source+sourceWord]&sourceMask;
-      if(!(active0|active1))continue;
-      const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
-        image=raw===0xffffffff?-1:raw;
-      if(image<0)continue;
-      const write0=active0&&(player===0||image===id),
-        write1=active1&&(player===1||image===id);
-      if(!write0&&!write1)continue;
-
-      let lo=0,hi=cn;
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    if(childIndex)lo=childIndex[image];
+    else{
+      lo=0;let hi=cn;
       while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
-      let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    }
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    if(write0)target[p0Target+targetWord]|=targetMask;
+    if(write1)target[p1Target+targetWord]|=targetMask;
+
+    let j=image<g.pairShapeStart?childPair:
+      image<g.tripleShapeStart?childTriple:
+      image<g.quadShapeStart?childQuad:cn;
+    const subset=profile.prepareSubset(g,image);
+    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
+      targetWord=j>>>5;targetMask=1<<(j&31);
       if(write0)target[p0Target+targetWord]|=targetMask;
       if(write1)target[p1Target+targetWord]|=targetMask;
+    }
+  }
+  return 0;
+}
 
-      let j=image<g.pairShapeStart?childPair:
-        image<g.tripleShapeStart?childTriple:
-        image<g.quadShapeStart?childQuad:cn;
-      const subset=profile.prepareSubset(g,image);
-      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
-        targetWord=j>>>5;targetMask=1<<(j&31);
-        if(write0)target[p0Target+targetWord]|=targetMask;
-        if(write1)target[p1Target+targetWord]|=targetMask;
-      }
+export function connect4RbaCofactorKnownHeightIndexed(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset=0){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    cell=height*g.columns+column,player=rank&1;
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
+  sizes[sizeIndex]=0;
+
+  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
+  }
+  if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
+
+  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);
+  sizes[sizeIndex]=cn;
+  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+
+  const p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,
+      active1=source[p1Source+sourceWord]&sourceMask;
+    if(!(active0|active1))continue;
+    const id=basis[bi+i],raw=removed[i],
+      image=raw===0xffffffff?-1:raw;
+    if(image<0)continue;
+    const write0=active0&&(player===0||image===id),
+      write1=active1&&(player===1||image===id);
+    if(!write0&&!write1)continue;
+
+    let j=childIndex[image],targetWord=j>>>5,targetMask=1<<(j&31);
+    if(write0)target[p0Target+targetWord]|=targetMask;
+    if(write1)target[p1Target+targetWord]|=targetMask;
+
+    const supersetStart=g.strictSupersetOffset[image],
+      supersetEnd=g.strictSupersetOffset[image+1];
+    for(let s=supersetStart;s<supersetEnd;s+=1){
+      const superset=g.strictSupersetIds[s],supersetMask=1<<(superset&31);
+      if(!(seen[seenOffset+(superset>>>5)]&supersetMask))continue;
+      j=childIndex[superset];targetWord=j>>>5;targetMask=1<<(j&31);
+      if(write0)target[p0Target+targetWord]|=targetMask;
+      if(write1)target[p1Target+targetWord]|=targetMask;
     }
   }
   return 0;

@@ -2772,7 +2772,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "N*C",
-          "target": "connect4RbaCofactorKnownHeight"
+          "target": "connect4RbaCofactorKnownHeightIndexed"
         },
         {
           "op": "runtime.call.subledger",
@@ -2787,7 +2787,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeightIndexed)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -2891,7 +2891,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "N*C",
-          "target": "connect4RbaCofactorKnownHeight"
+          "target": "connect4RbaCofactorKnownHeightIndexed"
         },
         {
           "op": "runtime.call.subledger",
@@ -2959,7 +2959,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)",
+        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeightIndexed)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)",
         "parameters": {
           "T": "1 for terminal root; otherwise 0",
           "N": "1-T for nonterminal root work",
@@ -3401,19 +3401,19 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "20+4*G+7*CN+9*N+4*U+5*Q+2*H"
+          "count": "18+4*G+7*CN+9*N+4*U"
         },
         {
           "op": "runtime.field.store",
-          "count": "8+CN+4*N+2*U+2*H"
+          "count": "8+CN+4*N+2*U"
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U+3*Q+H"
+          "count": "6+2*G+3*CN+5*N+2*U"
         },
         {
           "op": "memory.store.u32",
-          "count": "G+2*Z+3+CN+2*N+2*U+2*H"
+          "count": "G+2*Z+3+CN+2*N+2*U"
         },
         {
           "op": "alu.imul.u32",
@@ -3421,7 +3421,7 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U+3*Q+H"
+          "count": "8+3*G+5*CN+8*N+3*U"
         },
         {
           "op": "alu.sub.u32",
@@ -3429,23 +3429,23 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U+2*Q"
+          "count": "6+4*N+2*U"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+3*N+U+Q+H"
+          "count": "2+3*N+U"
         },
         {
           "op": "alu.shr.u32",
-          "count": "3+B+CN+2*N+I+U+Q+H"
+          "count": "3+B+CN+2*N+I+U"
         },
         {
           "op": "control.test.u32",
-          "count": "13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H"
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
         },
         {
           "op": "control.branch",
-          "count": "13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H"
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
         },
         {
           "op": "runtime.call.subledger",
@@ -3464,18 +3464,18 @@
         },
         {
           "op": "runtime.callback",
-          "count": "K*(1-X)*PS",
+          "count": "K*PS",
           "target": "prepareSubset"
         },
         {
           "op": "runtime.callback",
-          "count": "K*(1-X)*U",
+          "count": "K*U",
           "target": "shapeSubsetPrepared"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(20+4*G+7*CN+9*N+4*U+5*Q+2*H)*C(runtime.field.load)+(8+CN+4*N+2*U+2*H)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+3*Q+H)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U+2*H)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+3*Q+H)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+2*Q)*C(alu.and.u32)+(2+3*N+U+Q+H)*C(alu.shl.u32)+(3+B+CN+2*N+I+U+Q+H)*C(alu.shr.u32)+(13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H)*C(control.test.u32)+(13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*(1-X)*PS*CALLBACK(prepareSubset)+K*(1-X)*U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(18+4*G+7*CN+9*N+4*U)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3483,16 +3483,90 @@
           "CN": "child basis size scanned for cardinality boundaries",
           "N": "active parent basis entries scanned",
           "I": "total child-image binary-search iterations when childIndex is unavailable",
-          "U": "fallback subset-candidate tests only when X=0; active IsoMax childIndex path sets U=0",
+          "U": "total upset subset-candidate tests across surviving residuals",
           "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0",
           "PR": "1 when removed[] is absent and prepareRemove executes; otherwise 0",
           "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
-          "PS": "fallback prepareSubset calls for surviving images when X=0",
-          "X": "1 when caller supplies childIndex scratch (active IsoMax path); 0 for generic fallback",
-          "Q": "strict-superset ids visited from precomputed geometry when X=1; otherwise 0",
-          "H": "visited strict supersets that are present in the dynamic child basis and therefore published"
+          "PS": "prepareSubset calls for surviving images"
         },
-        "note": "Known-height cofactor now uses precomputed exact strict-superset adjacency on the active childIndex path, replacing broad subset candidate scans/callbacks. Generic callers without childIndex retain the historical exact fallback."
+        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaCofactorKnownHeightIndexed",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaCofactorKnownHeightIndexed",
+      "scope": "local-negamax-cofactor-indexed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "20+4*G+3*CN+9*N+5*Q+2*H"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "8+CN+4*N+2*H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+2*G+2*CN+5*N+3*Q+H"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "G+2*Z+3+CN+2*N+2*H"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "8+3*G+3*CN+8*N+3*Q+H"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "2+B"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "6+4*N+2*Q"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2+3*N+Q+H"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "3+B+CN+2*N+Q+H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "12+2*G+3*B+2*CN+10*N+2*Q+H"
+        },
+        {
+          "op": "control.branch",
+          "count": "12+2*G+3*B+2*CN+10*N+2*Q+H"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "connect4RbaCofactorBasis"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(20+4*G+3*CN+9*N+5*Q+2*H)*C(runtime.field.load)+(8+CN+4*N+2*H)*C(runtime.field.store)+(6+2*G+2*CN+5*N+3*Q+H)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*H)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+3*CN+8*N+3*Q+H)*C(alu.add.u32)+(2+B)*C(alu.sub.u32)+(6+4*N+2*Q)*C(alu.and.u32)+(2+3*N+Q+H)*C(alu.shl.u32)+(3+B+CN+2*N+Q+H)*C(alu.shr.u32)+(12+2*G+3*B+2*CN+10*N+2*Q+H)*C(control.test.u32)+(12+2*G+3*B+2*CN+10*N+2*Q+H)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)",
+        "parameters": {
+          "G": "configured columns copied into child support",
+          "Z": "coordWords cleared per player coordinate",
+          "B": "singleton-basis binary-search iterations",
+          "CN": "child basis entries indexed once",
+          "N": "active parent basis entries scanned",
+          "Q": "precomputed strict-superset ids visited",
+          "H": "visited strict supersets present in the dynamic child basis and published",
+          "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0"
+        },
+        "note": "Asserted IsoMax/solver cofactor path: caller supplies removed[] and childIndex scratch. Exact strict-superset adjacency replaces all hot subset callbacks, binary child-image lookup and generic dispatch."
       },
       "status": "decomposed"
     },
@@ -5494,7 +5568,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "M",
-          "target": "connect4RbaCofactorKnownHeight"
+          "target": "connect4RbaCofactorKnownHeightIndexed"
         },
         {
           "op": "runtime.call.subledger",
@@ -5521,7 +5595,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(runtime.root.storage.setup)+C(runtime.field.load)+C(runtime.typed_array.allocate)+M*(C(runtime.move.validation)+C(memory.store.u32))+CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeight)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)",
+        "expression": "C(runtime.root.storage.setup)+C(runtime.field.load)+C(runtime.typed_array.allocate)+M*(C(runtime.move.validation)+C(memory.store.u32))+CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeightIndexed)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)",
         "parameters": {
           "M": "ingress move count",
           "PC": "1 when positionCode capability enabled, else 0"
@@ -5614,7 +5688,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "C",
-          "target": "connect4RbaCofactorKnownHeight"
+          "target": "connect4RbaCofactorKnownHeightIndexed"
         },
         {
           "op": "runtime.call.subledger",
@@ -5624,7 +5698,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(atomic.load.u32)+(20+18*A)*C(runtime.field.load)+(8+12*A)*C(memory.load.u32)+(4+8*A)*C(memory.store.u32)+(4+3*A)*C(alu.imul.u32)+(8+9*A)*C(alu.add.u32)+(5+3*A)*C(alu.and.u32)+(3+2*A)*C(alu.shr.u32)+(10+14*A)*C(control.test.u32)+(10+14*A)*C(control.branch)+CALL(connect4RbaTerminal)+PB*CALL(emitSortedSetBitsAt32)+CALL(bothCoordinatesEmpty)+CALL(buildConnect4RbaFourFront)+(1+Q)*CALL(queryConnect4RbaFourFront)+CALL(connect4RbaRank)+RC*CALL(rootCanonicalColumn)+C*CALL(connect4RbaCofactorKnownHeight)+R*CALL(connect4RbaCanonicalize)",
+        "expression": "C(atomic.load.u32)+(20+18*A)*C(runtime.field.load)+(8+12*A)*C(memory.load.u32)+(4+8*A)*C(memory.store.u32)+(4+3*A)*C(alu.imul.u32)+(8+9*A)*C(alu.add.u32)+(5+3*A)*C(alu.and.u32)+(3+2*A)*C(alu.shr.u32)+(10+14*A)*C(control.test.u32)+(10+14*A)*C(control.branch)+CALL(connect4RbaTerminal)+PB*CALL(emitSortedSetBitsAt32)+CALL(bothCoordinatesEmpty)+CALL(buildConnect4RbaFourFront)+(1+Q)*CALL(queryConnect4RbaFourFront)+CALL(connect4RbaRank)+RC*CALL(rootCanonicalColumn)+C*CALL(connect4RbaCofactorKnownHeightIndexed)+R*CALL(connect4RbaCanonicalize)",
         "parameters": {
           "A": "legal actions examined",
           "PB": "1 when packed basis is decoded; 0 otherwise",
@@ -9801,7 +9875,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "Q+FT+C",
-          "target": "connect4RbaCofactorKnownHeight"
+          "target": "connect4RbaCofactorKnownHeightIndexed"
         },
         {
           "op": "runtime.call.subledger",
@@ -9831,7 +9905,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeightIndexed)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -10368,8 +10442,8 @@
     }
   ],
   "summary": {
-    "units": 192,
-    "decomposed": 192,
+    "units": 193,
+    "decomposed": 193,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10471,11 +10545,11 @@
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "f7d02f2dccdc372ecc447dbc594fc6cbc8c2b811",
     "addons/rba-connect4-geometry.mjs": "b65533d5d741ab6d708e2f57ccf8347bc5c75bf2",
-    "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
+    "addons/rba-connect4-solver.mjs": "c6ddd9018466b48c03a23b4f0236d2e9938e8dc2",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+    "addons/rba-connect4-alphabeta.mjs": "cdc2bceeee652f277223fa875146b24cee929633",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "43c35f18b0c6d6304e1e7bd64af1ea8f6e2ea096",
+    "addons/rba-connect4-coordinate.mjs": "44ca38515c2bdcb5fa09aa6f6f9e5fde1789414f",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
