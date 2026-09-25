@@ -10164,39 +10164,39 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+N*(6+10*A+4*O+8*F)"
+          "count": "4+N*(6+10*A+4*O)"
         },
         {
           "op": "runtime.field.store",
-          "count": "1+N*(3+3*A+2*S+2*F)"
+          "count": "1+N*(3+3*A+2*S)"
         },
         {
           "op": "memory.load.u32",
-          "count": "2+N*(3+3*A+3*O+A+J+K+3*F)"
+          "count": "2+N*(3+3*A+3*O+A+J+K)"
         },
         {
           "op": "memory.store.u32",
-          "count": "N*(2-F+2*L+2*K)"
+          "count": "2*N+N*(2*L+2*K)"
         },
         {
           "op": "alu.imul.u32",
-          "count": "1+N*(1+A+L+A+L3+2*F)"
+          "count": "1+N*(1+A+L+A+L3)"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+N*(5+5*A+3*O+5*L+A+4*K+2*J+4*F)"
+          "count": "3+N*(5+5*A+3*O+5*L+A+4*K+2*J)"
         },
         {
           "op": "alu.sub.u32",
-          "count": "N*(4+2*A+K+F)"
+          "count": "N*(4+2*A+K)"
         },
         {
           "op": "alu.and.u32",
-          "count": "1+N*(6+3*A+O+2*F)"
+          "count": "1+N*(6+3*A+O)"
         },
         {
           "op": "alu.shl.u32",
-          "count": "N*(A+O+F)"
+          "count": "N*(A+O)"
         },
         {
           "op": "alu.shr.u32",
@@ -10204,11 +10204,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+N*(7+5*A+U+4*O+4*L+2*J+3*F)"
+          "count": "3+N*(7+5*A+U+4*O+4*L+2*J)"
         },
         {
           "op": "control.branch",
-          "count": "3+N*(7+5*A+U+4*O+4*L+2*J+3*F)"
+          "count": "3+N*(7+5*A+U+4*O+4*L+2*J)"
         },
         {
           "op": "runtime.call.subledger",
@@ -10277,36 +10277,37 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+N*(6+10*A+4*O+8*F))*C(runtime.field.load)+(1+N*(3+3*A+2*S+2*F))*C(runtime.field.store)+(2+N*(3+3*A+3*O+A+J+K+3*F))*C(memory.load.u32)+N*(2-F+2*L+2*K)*C(memory.store.u32)+(1+N*(1+A+L+A+L3+2*F))*C(alu.imul.u32)+(3+N*(5+5*A+3*O+5*L+A+4*K+2*J+4*F))*C(alu.add.u32)+N*(4+2*A+K+F)*C(alu.sub.u32)+(1+N*(6+3*A+O+2*F))*C(alu.and.u32)+N*(A+O+F)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*N*R*C(alu.xor.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J+3*F))*C(control.test.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J+3*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32)+CALL(searchCpcOnly))",
+        "expression": "(4+N*(6+10*A+4*O))*C(runtime.field.load)+(1+N*(3+3*A+2*S))*C(runtime.field.store)+(2+N*(3+3*A+3*O+A+J+K))*C(memory.load.u32)+(2*N+N*(2*L+2*K))*C(memory.store.u32)+(1+N*(1+A+L+A+L3))*C(alu.imul.u32)+(3+N*(5+5*A+3*O+5*L+A+4*K+2*J))*C(alu.add.u32)+N*(4+2*A+K)*C(alu.sub.u32)+(1+N*(6+3*A+O))*C(alu.and.u32)+N*(A+O)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*N*R*C(alu.xor.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J))*C(control.test.u32)+(3+N*(7+5*A+U+4*O+4*L+2*J))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32)+CALL(searchCpcOnly))",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
-          "A": "non-forced child actions examined in the generic sibling loop; 0 on the forced fast path",
+          "A": "action candidates examined in this invocation",
           "C": "children actually cofactored",
           "R": "nonterminal children recursively searched",
           "T": "terminal cofactor children converted to mover-relative values",
           "S": "exact-cache stores executed by this invocation (0 or 1)",
-          "U": "non-forced examined actions that strictly improve best; 0 on the forced fast path",
+          "U": "number of examined actions that strictly improve best (0..A)",
           "O": "configured action slots scanned to score/order at an unresolved non-forced node; 0 for exact forced action",
           "L": "legal CPC-surviving moves scored and inserted into the ordered row",
           "L3": "legal moves scored by the three-word specialization; standard 7x6 has L3=L",
           "LG": "legal moves scored by the generic live-line evaluator; L3+LG=L",
           "Z7": "1 for configured width 7, selecting the exact seven-slot selector; otherwise 0",
           "J": "total insertion score comparisons across legal scored moves; 0..L*(L-1)/2 plus one terminating comparison per non-front insertion where applicable",
-          "K": "total successful insertion shifts across legal scored moves; 0..L*(L-1)/2",
-          "F": "1 when CPC supplies one forced defense and the direct forced-child fast path executes; otherwise 0"
+          "K": "total successful insertion shifts across legal scored moves; 0..L*(L-1)/2"
         },
-        "note": "Production CPC-only Negamax follows CPC-proved single defenses directly, bypassing one-element move-order storage and the generic sibling loop. Non-forced nodes retain stable live-line insertion ordering. F accounts the direct forced-child scalar envelope; child cofactor/canonicalization/live-state/recursion remain explicit through C/R/T.",
+        "note": "Production CPC-only Negamax computes the exact live-line score and stably insertion-orders each legal move immediately into the per-depth numeric row. Strict priorScore>=score termination preserves prepared center order on ties. This removes the separate repeated-argmax materialization pass. J/K expose data-dependent comparison/shift cost rather than hiding it.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
       "optimizationDelta": {
-        "pass": 15,
-        "candidate": "direct-cpc-forced-child",
-        "baseline": "c853a4c7fd3436089e45bc259c1461f601d866bb",
-        "historicalSource": "Sep. 8 exact minimax forced-candidate bitboard and Sep. 9 forced tactical closure",
-        "removed": "one-element move-order publication plus generic sibling-loop control on CPC single-defense nodes",
-        "semantics": "same forced child, alpha-beta window, exact-cache policy and return value"
+        "pass": 14,
+        "candidate": "single-pass-stable-live-line-insertion-order",
+        "historicalSource": "Connect4 Sep. 8 fixed-width exact-solver ordering lineage",
+        "baseline": "03d329882d1dede5d677c8d07ab07b363e021489",
+        "removed": "separate L-call repeated-argmax full-order materialization pass",
+        "added": "stable insertion comparisons/shifts J/K while each score is produced",
+        "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
+        "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
       },
       "optimizationHistory": [
         {
@@ -10391,14 +10392,6 @@
           "added": "stable insertion comparisons/shifts J/K while each score is produced",
           "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
           "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
-        },
-        {
-          "pass": 15,
-          "candidate": "direct-cpc-forced-child",
-          "baseline": "c853a4c7fd3436089e45bc259c1461f601d866bb",
-          "historicalSource": "Sep. 8 exact minimax forced-candidate bitboard and Sep. 9 forced tactical closure",
-          "removed": "one-element move-order publication plus generic sibling-loop control on CPC single-defense nodes",
-          "semantics": "same forced child, alpha-beta window, exact-cache policy and return value"
         }
       ]
     }
@@ -10512,7 +10505,7 @@
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
-    "addons/rba-connect4-alphabeta.mjs": "a0062adf83dfdab3dd6d83605596d82f840919cc",
+    "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
