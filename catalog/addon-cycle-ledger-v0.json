@@ -8531,7 +8531,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+15*N"
+          "count": "18+15*N+2*P+E"
         },
         {
           "op": "memory.load.u32",
@@ -8539,7 +8539,7 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "2+13*N"
+          "count": "2+13*N+2*P+E"
         },
         {
           "op": "runtime.integer.check",
@@ -8559,11 +8559,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "9+13*N"
+          "count": "9+13*N+P"
         },
         {
           "op": "control.branch",
-          "count": "9+13*N"
+          "count": "9+13*N+P"
         },
         {
           "op": "runtime.call.subledger",
@@ -8579,11 +8579,6 @@
           "op": "runtime.call.subledger",
           "count": "P",
           "target": "rbaTtAllocateUnindexed32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "P",
-          "target": "rbaTtTighten32"
         },
         {
           "op": "runtime.call.subledger",
@@ -8603,17 +8598,27 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+15*N)*C(runtime.field.load)+(5+11*N)*C(memory.load.u32)+(2+13*N)*C(memory.store.u32)+C(runtime.integer.check)+(2+S*N)*C(alu.imul.u32)+(4+7*N)*C(alu.add.u32)+C(alu.or.u32)+(9+13*N)*C(control.test.u32)+(9+13*N)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*(CALL(rbaTtAllocateUnindexed32)+CALL(rbaTtTighten32))+CALL(rbaTtSignal32)+Q*CALL(enqueueKnownNew32)+CALL(rbaTtReleaseExecution32)",
+        "expression": "(18+15*N+2*P+E)*C(runtime.field.load)+(5+11*N)*C(memory.load.u32)+(2+13*N+2*P+E)*C(memory.store.u32)+C(runtime.integer.check)+(2+S*N)*C(alu.imul.u32)+(4+7*N)*C(alu.add.u32)+C(alu.or.u32)+(9+13*N+P)*C(control.test.u32)+(9+13*N+P)*C(control.branch)+F*CALL(rbaTtFail32)+CALL(rbaTtTighten32)+P*CALL(rbaTtAllocateUnindexed32)+CALL(rbaTtSignal32)+Q*CALL(enqueueKnownNew32)+CALL(rbaTtReleaseExecution32)",
         "parameters": {
           "N": "action rows materialized",
           "P": "present children allocated",
           "Q": "surplus children enqueued after one local continuation is retained",
           "S": "1 when basisSets are present and set-stride address arithmetic executes; 0 otherwise",
-          "F": "contract/bounds/allocation failure taken (0 or 1)"
+          "F": "contract/bounds/allocation failure taken (0 or 1)",
+          "E": "present fresh children whose validated initial interval is exact (lo===hi), 0..P"
         },
-        "note": "Surplus publication path; Phase-1 exact Negamax does not execute this branch but it remains fully decomposed."
+        "note": "Surplus publication path. Fresh children are allocated under the same TT transaction with default [1,3], no attached parents and validated CPC intervals, so their initial lower/upper/exact payload is installed directly instead of calling generic rbaTtTighten32 and signaling a pre-attachment child event. Direct stores/tests remain explicitly charged. Phase-1 exact Negamax does not execute this branch."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "fresh-surplus-direct-initial-bounds",
+        "historicalCandidate": "1aadc93e5f23e788ae9110eeb8b28812d0ae4e05",
+        "baseline": "e8f174823a6e5cee95061adba087d6c156e5f3b8",
+        "removed": "P*CALL(rbaTtTighten32) and its pre-attachment child signaling",
+        "added": "2*P+E fresh-row interval/exact field+typed stores and P exactness tests/branches",
+        "invariant": "rbaTtAllocateUnindexed32 returns a fresh row under the same serialized TT transaction at [1,3] with no attached parents; action CPC interval has already passed lo/hi validation",
+        "semantics": "same initial child interval/exact evidence; parent pending-attach event remains propagation authority"
+      }
     },
     {
       "unit": "addons/rba-tt32.mjs#rbaTtReconcile32",
@@ -10516,7 +10521,7 @@
     "addons/rba-connect4-managed-manager.mjs": "cab37b1c3cb5b1427729edb2db7f832862319012",
     "addons/rba-connect4-managed-worker.mjs": "add60bfc22b1f4ab9dca7417501e6aa9d09d2611",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
-    "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
+    "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
     "addons/rba-connect4-alphabeta.mjs": "153f612f6ea874669da67fb298fc1794036da8ad",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
