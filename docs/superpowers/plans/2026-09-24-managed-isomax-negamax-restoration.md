@@ -1,8 +1,29 @@
 # Managed IsoMax Negamax Restoration Implementation Plan
 
+> **SUPERSEDED EXECUTION PLAN CLAUSES — owner directive, 2026-09-24**
+>
+> Do not execute any step below that creates or qualifies a single-worker,
+> root-only, zero-Surplus managed IsoMax path. Those steps caused a repeated
+> architecture regression and are retained only as historical evidence.
+>
+> Current execution authority requires:
+>
+> - **2+ search workers plus Branch Manager**;
+> - workers retain at most one continuation and publish unresolved viable
+>   siblings as Surplus to the shared ready queue;
+> - all performance/qualification runs use 2+ workers;
+> - per-worker claims/evaluations must remain visible so idle-worker regressions
+>   cannot pass unnoticed;
+> - Branch Manager remains asynchronous and does not manufacture work.
+>
+> The production correction is JSMinSys
+> `main@51bd9bc09b2c50b84619bc7efa953ad9c1e0302a`. The Phase-1 root-only
+> instructions below are **not executable authority** unless the owner explicitly
+> revokes the multi-worker restriction.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Restore CPC-first Negamax alpha-beta as the managed worker's governing search loop before reintroducing distributed Surplus splitting.
+**Historical goal (superseded where it disables Surplus):** Restore CPC-first Negamax alpha-beta before reintroducing distributed splitting.
 
 **Architecture:** Keep the current managed host, shared TT, claim/release loop, manager, and exact publication path. Replace the managed worker's all-child CPC evaluator with the existing qualified `solveConnect4RbaAlphaBeta()` kernel for each claimed q; Phase 1 exposes no new surplus, so only one worker claims the root while other workers remain idle. The worker publishes the exact result back through the existing shared-TT publication path after the Negamax solve completes.
 
