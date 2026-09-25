@@ -2572,7 +2572,7 @@
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
           "M": "1 when the private exact-cache probe misses and a shared Lazy-SMP exact cache is configured; otherwise 0"
         },
-        "note": "Exact-cache probe exposes stamp, key-word equality, branch and value-load costs; no cache miss is treated as free. On a local miss, Lazy SMP may probe an optional exact-only shared cache; the ordinary Surplus runtime leaves this hook null."
+        "note": "Private exact-cache probe now accepts the already-computed full hash alongside the masked local slot. On a local miss the same hash is forwarded to Lazy SMP shared-cache lookup, eliminating duplicate wide-key hashing."
       },
       "status": "decomposed"
     },
@@ -3035,7 +3035,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)",
-        "note": "Exact cache publication writes full key before value/stamp. Lazy SMP mirrors locally proven exact values into the optional shared cache after the private key/value publication.",
+        "note": "Private exact-cache publication mirrors exact evidence into Lazy SMP using the already-computed full hash, avoiding a second wide-key hash on every shared store.",
         "parameters": {
           "S": "1 when a shared Lazy-SMP exact cache is configured; otherwise 0"
         }
@@ -10571,15 +10571,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 3
+          "count": 4
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.object.allocate",
@@ -10588,8 +10588,8 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+3*C(alu.imul.u32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key arrays use separate SharedArrayBuffers. Hot telemetry is no longer a contended cache-global atomic array."
+        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/hash-tag/value/key arrays use separate SharedArrayBuffers. Hash tags reject almost all direct-map collisions before full exact-key comparison."
       },
       "status": "decomposed"
     },
@@ -10601,16 +10601,16 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "D",
           "target": "mixSpan32Locator32"
         },
         {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "7+K"
         },
         {
           "op": "atomic.load.u32",
-          "count": "1+K+2*E"
+          "count": "2+K+2*E"
         },
         {
           "op": "memory.load.u32",
@@ -10630,19 +10630,19 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "5+K+3*E+S+D"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "3+K+E+S+D"
         },
         {
           "op": "control.test.u32",
-          "count": "S"
+          "count": "5+K+3*E+S+D"
         },
         {
           "op": "control.branch",
-          "count": "S"
+          "count": "3+K+E+S+D"
         },
         {
           "op": "memory.load.u32",
@@ -10659,13 +10659,14 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2*K+S)*C(alu.add.u32)+(3+K+3*E+S)*C(control.test.u32)+(2+K+E+S)*C(control.branch)+S*C(memory.store.u32)",
+        "expression": "D*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+(2+K+2*E)*C(atomic.load.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2*K+S)*C(alu.add.u32)+(5+K+3*E+S+D)*C(control.test.u32)+(3+K+E+S+D)*C(control.branch)+S*C(memory.store.u32)",
         "parameters": {
-          "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "D": "1 for standalone shared-cache calls that must derive the 32-bit position hash; 0 when the local Negamax cache already supplies the hash",
+          "K": "exact key words compared only after the stored 32-bit hash tag matches",
+          "E": "1 when sequence/hash/key/value validation yields a committed exact hit; 0 otherwise",
           "S": "1 on a committed exact hit when caller supplies its private padded telemetry row; otherwise 0"
         },
-        "note": "Seqlock-style shared exact probe. Exact-hit telemetry is written to worker-private padded shared storage rather than a cache-global atomic counter, eliminating cross-worker statistic-line contention."
+        "note": "Known-hash Lazy-SMP probes reuse the local-cache hash and first compare one exact 32-bit tag. Only tag matches pay the full exact key comparison; sequence validation still fails closed on concurrent publication."
       },
       "status": "decomposed"
     },
@@ -10677,12 +10678,12 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "D",
           "target": "mixSpan32Locator32"
         },
         {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "8+K"
         },
         {
           "op": "atomic.load.u32",
@@ -10694,7 +10695,7 @@
         },
         {
           "op": "atomic.store.u32",
-          "count": "K+3"
+          "count": "K+4"
         },
         {
           "op": "memory.load.u32",
@@ -10714,19 +10715,19 @@
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": "4+S+D"
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": "3+S+D"
         },
         {
           "op": "control.test.u32",
-          "count": "S"
+          "count": "4+S+D"
         },
         {
           "op": "control.branch",
-          "count": "S"
+          "count": "3+S+D"
         },
         {
           "op": "memory.load.u32",
@@ -10743,12 +10744,13 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K+S)*C(alu.add.u32)+(3+S)*C(control.test.u32)+(2+S)*C(control.branch)+S*C(memory.store.u32)",
+        "expression": "D*CALL(mixSpan32Locator32)+(8+K)*C(runtime.field.load)+C(atomic.load.u32)+C(atomic.rmw.u32)+(K+4)*C(atomic.store.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K+S)*C(alu.add.u32)+(4+S+D)*C(control.test.u32)+(3+S+D)*C(control.branch)+S*C(memory.store.u32)",
         "parameters": {
-          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "S": "1 when caller supplies its private padded telemetry row; exactly one local store/contention counter is incremented"
+          "D": "1 for standalone shared-cache calls that must derive the hash; 0 when local Negamax supplies its already-computed hash",
+          "K": "exact key words published on an uncontended store; 0 on early contention return",
+          "S": "1 when caller supplies its private padded telemetry row"
         },
-        "note": "Direct-mapped shared exact publication retains per-slot sequence CAS. Cache-global atomic telemetry is removed; each worker updates only its own padded statistics row."
+        "note": "Shared exact publication reuses the local position hash in Lazy SMP and publishes that hash tag under the slot seqlock before the full key/value. Contended stores remain safely droppable cache writes."
       },
       "status": "decomposed"
     },
@@ -11067,7 +11069,7 @@
     "addons/rba-connect4-managed-worker.mjs": "576fb889ca0b506da29f103f43d6becbd91a2ce5",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "be8d5927cdd6b04b1bfbbd8941d35b9a0da4a558",
+    "addons/rba-connect4-alphabeta.mjs": "f5e56437e0e58d1608c2dceb2d7056b5f574eb7a",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -11076,7 +11078,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "05a4c7b57b7238ad12cfe4067577c90e87e38b36",
+    "addons/rba-connect4-shared-exact-cache.mjs": "47b9eeaf8e6022b7caeff1610a6ab700c42d55a3",
     "addons/rba-connect4-lazy-smp-host.mjs": "ba51b72de17a07f4b15f8db5494561fc83ac0ce0",
     "addons/rba-connect4-lazy-smp-worker.mjs": "9e141740778d980e9ea06c4f7ce9f6773311a973"
   },
