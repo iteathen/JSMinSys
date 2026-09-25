@@ -2432,16 +2432,41 @@
         {
           "op": "runtime.object.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": "S"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3*S"
+        },
+        {
+          "op": "control.branch",
+          "count": "S"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "2*S"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+S*C(runtime.instanceof.check)+S*C(runtime.integer.check)+S*C(memory.load.u32)+3*S*C(control.test.u32)+S*C(control.branch)+2*S*C(runtime.field.store)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "S": "1 when worker-private Lazy-SMP shared-cache telemetry storage is supplied; otherwise 0"
         },
-        "note": "One-time Negamax preparation retains the private exact cache and may bind an exact-only shared Lazy-SMP cache. Worker-specific action-order rotation is precomputed during initialization, so no modulo/scheduler operation is added to recursive search."
+        "note": "One-time Negamax preparation binds optional exact-only shared cache plus a worker-private padded telemetry row. Worker-specific action order is precomputed once and now governs both root tie ordering and recursive tie ordering; no recurring scheduler/modulo work is added."
       },
       "status": "decomposed"
     },
@@ -2926,9 +2951,15 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve reconstructs exact physical live-line state and uses the prepared worker-specific action order as the tie-break sequence for live-line-equal root moves, matching the already-diversified recursive tie order. Primary live-line scores and exact search semantics are unchanged."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "lazy-smp-root-tie-diversification",
+        "prior": "all Lazy-SMP workers used identical root tie order and diverged only below the root",
+        "changed": "root live-line ties now follow each worker's initialization-prepared action order",
+        "hotAdded": "no new per-node arithmetic or scheduler operations"
+      }
     },
     {
       "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaExactCache32",
@@ -10546,15 +10577,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 4
+          "count": 3
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 4
+          "count": 3
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 4
+          "count": 3
         },
         {
           "op": "runtime.object.allocate",
@@ -10563,8 +10594,8 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+3*C(alu.imul.u32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key arrays use separate SharedArrayBuffers. Hot telemetry is no longer a contended cache-global atomic array."
       },
       "status": "decomposed"
     },
@@ -10612,18 +10643,35 @@
           "count": "2+K+E"
         },
         {
-          "op": "atomic.rmw.u32",
-          "count": "E"
+          "op": "control.test.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.branch",
+          "count": "S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "S"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2*K+S)*C(alu.add.u32)+(3+K+3*E+S)*C(control.test.u32)+(2+K+E+S)*C(control.branch)+S*C(memory.store.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "S": "1 on a committed exact hit when caller supplies its private padded telemetry row; otherwise 0"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. Exact-hit telemetry is written to worker-private padded shared storage rather than a cache-global atomic counter, eliminating cross-worker statistic-line contention."
       },
       "status": "decomposed"
     },
@@ -10648,7 +10696,7 @@
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "1+C"
+          "count": 1
         },
         {
           "op": "atomic.store.u32",
@@ -10677,16 +10725,36 @@
         {
           "op": "control.branch",
           "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.branch",
+          "count": "S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "S"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K+S)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K+S)*C(alu.add.u32)+(3+S)*C(control.test.u32)+(2+S)*C(control.branch)+S*C(memory.store.u32)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "S": "1 when caller supplies its private padded telemetry row; exactly one local store/contention counter is incremented"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Direct-mapped shared exact publication retains per-slot sequence CAS. Cache-global atomic telemetry is removed; each worker updates only its own padded statistics row."
       },
       "status": "decomposed"
     },
@@ -10763,11 +10831,11 @@
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 3
+          "count": 4
         },
         {
           "op": "runtime.array.allocate",
@@ -10791,7 +10859,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "30*E"
+          "count": "30*E+3*W"
         },
         {
           "op": "runtime.object.allocate",
@@ -10799,17 +10867,17 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": "5+4*W+E"
+          "count": "6+6*W+E"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+W"
+          "count": "3+4*W"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+(30*E+3*W)*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(6+6*W+E)*C(alu.imul.u32)+(3+4*W)*C(alu.add.u32)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10819,7 +10887,7 @@
           "W": "Lazy-SMP search worker count, minimum 2",
           "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
         },
-        "note": "Separate Lazy-SMP host option. It spawns only local-search workers, no Branch Manager and no shared surplus queue. Whole-session worker lifecycle remains explicitly unbounded."
+        "note": "Separate Lazy-SMP host option. Shared-cache telemetry uses one 64-byte-stride row per worker and is summed after shutdown, removing cache-global hot atomic counters. No Branch Manager or surplus queue is introduced."
       },
       "status": "decomposed"
     },
@@ -10835,7 +10903,7 @@
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 1
+          "count": 2
         },
         {
           "op": "runtime.call.subledger",
@@ -10865,7 +10933,7 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.add.u32",
@@ -10881,17 +10949,17 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 24
+          "count": 28
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+24*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+2*C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+3*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+28*C(runtime.field.load)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker owns a private recursive search and private local cache, sharing only exact cache evidence. First exact finisher atomically claims the winner slot and wakes the host."
+        "note": "Each Lazy-SMP worker owns private recursive search/local cache and a cache-line-padded telemetry row. Shared exact-cache hit/store statistics no longer contend on cache-global atomic counters. First exact finisher still claims the winner atomically."
       },
       "status": "decomposed"
     }
@@ -11005,7 +11073,7 @@
     "addons/rba-connect4-managed-worker.mjs": "576fb889ca0b506da29f103f43d6becbd91a2ce5",
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "3e208c12ad482e7b705fe2346ce92ef91bc3f980",
+    "addons/rba-connect4-alphabeta.mjs": "a7208c868e4a20870c0da6ad86f034e823342aef",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -11014,9 +11082,9 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "90c83aebd9906f464d6d35700981651e7c539a40",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "9c41d2e45f6ffb000ca23c02bfd2f4307e3aee68"
+    "addons/rba-connect4-shared-exact-cache.mjs": "05a4c7b57b7238ad12cfe4067577c90e87e38b36",
+    "addons/rba-connect4-lazy-smp-host.mjs": "ba51b72de17a07f4b15f8db5494561fc83ac0ce0",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "9e141740778d980e9ea06c4f7ce9f6773311a973"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

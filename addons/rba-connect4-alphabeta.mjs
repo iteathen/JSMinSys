@@ -41,13 +41,13 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  return cache.shared?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,cache.sharedStats,cache.sharedStatsBase):0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared)storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared)storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,cache.sharedStats,cache.sharedStatsBase);
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
@@ -74,6 +74,8 @@ export function prepareConnect4RbaAlphaBeta({
   boundaryBudget=100000,
   cacheCapacity=65536,
   sharedExactCache=null,
+  sharedExactStats=null,
+  sharedExactStatsBase=0,
   orderOffset=0,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
@@ -87,10 +89,14 @@ export function prepareConnect4RbaAlphaBeta({
   if(sharedExactCache!==null&&
      (sharedExactCache.keyWords!==g.keyWords||!Number.isInteger(sharedExactCache.mask)))
     throw new RangeError('shared exact cache/profile mismatch');
+  if(sharedExactStats!==null&&
+     (!(sharedExactStats instanceof Uint32Array)||sharedExactStatsBase<0||
+      sharedExactStatsBase+2>=sharedExactStats.length))
+    throw new RangeError('shared exact stats/profile mismatch');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
-  cache.shared=sharedExactCache;
+  cache.shared=sharedExactCache;cache.sharedStats=sharedExactStats;cache.sharedStatsBase=sharedExactStatsBase;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
@@ -394,7 +400,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   }else{
     const playerOffset=mover*live.wordCount;
     for(let oi=0;oi<g.columns;oi+=1){
-      const caller=g.actionOrder[oi],column=reflected?g.mirrorColumn[caller]:caller,height=state.words[column];
+      const caller=state.actionOrder[oi],column=reflected?g.mirrorColumn[caller]:caller,height=state.words[column];
       if(height>=g.rows||!(actionMask&(1<<column))){scores[oi]=MOVE_SCORE_NONE;continue;}
       const cell=height*g.columns+caller;
       scores[oi]=live.wordCount===3
@@ -404,7 +410,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     }
     for(let out=0;out<actionCount;out+=1){
       const slot=g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns);
-      scores[slot]=MOVE_SCORE_NONE;ordered[out]=g.actionOrder[slot];
+      scores[slot]=MOVE_SCORE_NONE;ordered[out]=state.actionOrder[slot];
     }
   }
 

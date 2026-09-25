@@ -17,12 +17,14 @@ import {runManagedConnect4CpcRba32} from '../addons/rba-connect4-managed-host.mj
 
 test('shared exact cache publishes only fully committed exact rows',()=>{
   const cache=createConnect4RbaSharedExactCache32({capacity:8,keyWords:2}),
+    stats=new Uint32Array(new SharedArrayBuffer(16*Uint32Array.BYTES_PER_ELEMENT)),
     a=Uint32Array.from([11,22]),b=Uint32Array.from([33,44]);
-  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),0);
-  assert.equal(storeConnect4RbaSharedExactCache32(cache,a,0,3),3);
-  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
-  storeConnect4RbaSharedExactCache32(cache,b,0,2);
-  assert.ok(cache.stats[1]>=2);
+  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0,stats,0),0);
+  assert.equal(storeConnect4RbaSharedExactCache32(cache,a,0,3,stats,0),3);
+  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0,stats,0),3);
+  storeConnect4RbaSharedExactCache32(cache,b,0,2,stats,0);
+  assert.equal(stats[0],1);
+  assert.ok(stats[1]>=2);
 });
 
 test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
@@ -97,3 +99,11 @@ test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async
   assert.ok(lazy.sharedCacheStores>0);
 });
 
+
+
+test('Lazy SMP worker-private root tie ordering preserves exact result',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),moves=[0,1,0,1],root=connect4RbaFromMoves(moves,{geometry:g});
+  const a=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096,orderOffset:0}),reflected:root.reflected});
+  const b=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096,orderOffset:1}),reflected:root.reflected});
+  assert.equal(a.value,b.value);
+});

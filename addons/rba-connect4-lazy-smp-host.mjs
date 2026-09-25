@@ -5,7 +5,7 @@ import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_ERROR=2,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,
+  CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,SHARED_STATS_STRIDE=16,
   HOST_WORKER_DIED=101,HOST_DEADLINE=102,HOST_CANCELLED=103;
 
 export async function runLazySmpConnect4Rba32(moves,{
@@ -40,6 +40,8 @@ export async function runLazySmpConnect4Rba32(moves,{
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
     metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
     metrics=new Float64Array(metricBuffer),
+    sharedStatsBuffer=new SharedArrayBuffer(workers*SHARED_STATS_STRIDE*Uint32Array.BYTES_PER_ELEMENT),
+    sharedStats=new Uint32Array(sharedStatsBuffer),
     session=createManagedThreadSession32({
       control,
       stopIndex:CONTROL_STOP,
@@ -66,6 +68,8 @@ export async function runLazySmpConnect4Rba32(moves,{
           root,
           rootReflected:root.reflected,
           sharedExactCache,
+          sharedStatsBuffer,
+          sharedStatsStride:SHARED_STATS_STRIDE,
           localCacheCapacity,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
@@ -82,7 +86,14 @@ export async function runLazySmpConnect4Rba32(moves,{
     errorCode=host.errorCode,
     exact=!errorCode&&Atomics.load(control,CONTROL_DONE)===1&&winner>=0,
     completedWorkers=new Array(workers);
-  for(let i=0;i<workers;i+=1)completedWorkers[i]=Atomics.load(resultWords,i*RESULT_STRIDE+3);
+  let sharedCacheHits=0,sharedCacheStores=0,sharedCacheStoreContention=0;
+  for(let i=0;i<workers;i+=1){
+    completedWorkers[i]=Atomics.load(resultWords,i*RESULT_STRIDE+3);
+    const base=i*SHARED_STATS_STRIDE;
+    sharedCacheHits+=sharedStats[base];
+    sharedCacheStores+=sharedStats[base+1];
+    sharedCacheStoreContention+=sharedStats[base+2];
+  }
 
   let winnerMetrics=null;
   if(exact){
@@ -114,9 +125,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     move:exact?Atomics.load(resultWords,winner*RESULT_STRIDE+2):-1,
     winner,
     winnerMetrics,
-    sharedCacheHits:Atomics.load(sharedExactCache.stats,0),
-    sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
-    sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
+    sharedCacheHits,
+    sharedCacheStores,
+    sharedCacheStoreContention,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
@@ -127,6 +138,6 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
-      control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
+      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+sharedStatsBuffer.byteLength,
   };
 }
