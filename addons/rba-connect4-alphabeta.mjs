@@ -1,3 +1,4 @@
+import {performance} from 'node:perf_hooks';
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
@@ -76,6 +77,8 @@ export function prepareConnect4RbaAlphaBeta({
   sharedExactCache=null,
   sharedSampleMask=0,
   orderOffset=0,
+  overlapTrace=null,
+  workerIndex=-1,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
 }={}){
@@ -91,6 +94,11 @@ export function prepareConnect4RbaAlphaBeta({
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid shared sample mask');
+  if(overlapTrace!==null&&
+     (!Number.isInteger(workerIndex)||workerIndex<0||
+      overlapTrace.keyWords!==g.keyWords||
+      !Number.isInteger(overlapTrace.capacityPerWorker)||overlapTrace.capacityPerWorker<1))
+    throw new RangeError('invalid Lazy SMP overlap trace');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
@@ -100,7 +108,7 @@ export function prepareConnect4RbaAlphaBeta({
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
       :null,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
-    basisSize:new Uint32Array(levels),cache,actionOrder,
+    basisSize:new Uint32Array(levels),cache,actionOrder,overlapTrace,workerIndex,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
     moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
@@ -122,6 +130,48 @@ function frontEvidence(state,words,offset,basis,basisOffset,basisSize){
   return packed;
 }
 
+const OVERLAP_TRACE_RECORD_WIDTH=6,OVERLAP_TRACE_META_WIDTH=5;
+
+function beginConnect4RbaOverlapTrace32(state,words,offset,cacheHash,depth,alpha,beta){
+  const trace=state.overlapTrace;
+  if(!trace||(cacheHash&trace.sampleBits))return -1;
+  const countOffset=state.workerIndex*2,local=trace.counts[countOffset];
+  if(local>=trace.capacityPerWorker){
+    trace.counts[countOffset+1]+=1;
+    return -1;
+  }
+  trace.counts[countOffset]=local+1;
+  const event=state.workerIndex*trace.capacityPerWorker+local,
+    recordBase=event*OVERLAP_TRACE_RECORD_WIDTH,
+    metaBase=event*OVERLAP_TRACE_META_WIDTH,
+    keyBase=event*trace.keyWords;
+  trace.records[recordBase]=performance.timeOrigin+performance.now();
+  trace.records[recordBase+1]=0;
+  trace.records[recordBase+2]=state.nodes;
+  trace.records[recordBase+3]=0;
+  trace.records[recordBase+4]=state.cofactors;
+  trace.records[recordBase+5]=0;
+  trace.meta[metaBase]=depth;
+  trace.meta[metaBase+1]=alpha;
+  trace.meta[metaBase+2]=beta;
+  trace.meta[metaBase+3]=0;
+  trace.meta[metaBase+4]=0;
+  for(let w=0;w<trace.keyWords;w+=1)trace.keys[keyBase+w]=words[offset+w];
+  return event;
+}
+
+function endConnect4RbaOverlapTrace32(state,event,value,kind){
+  if(event<0)return value;
+  const trace=state.overlapTrace,recordBase=event*OVERLAP_TRACE_RECORD_WIDTH,
+    metaBase=event*OVERLAP_TRACE_META_WIDTH;
+  trace.records[recordBase+1]=performance.timeOrigin+performance.now();
+  trace.records[recordBase+3]=state.nodes;
+  trace.records[recordBase+5]=state.cofactors;
+  trace.meta[metaBase+3]=value;
+  trace.meta[metaBase+4]=kind;
+  return value;
+}
+
 function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liveOffset,orderRow,alpha,beta){
   const g=state.g,words=state.words,basis=state.basis,cache=state.cache,
     live=state.live,liveWords=live.stateWords;
@@ -138,12 +188,13 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
     const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
     if(cached){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
+    const traceEvent=beginConnect4RbaOverlapTrace32(state,words,keyOffset,cacheHash,depth,alpha,beta);
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
       state.cpcExact+=1;const value=state.cpc.interval[0];
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
-      return sign*absToRelative(value,mover);
+      return endConnect4RbaOverlapTrace32(state,traceEvent,sign*absToRelative(value,mover),1);
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
     else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
@@ -154,10 +205,10 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if(semanticLo===semanticHi){
       const abs=relativeToAbs(semanticLo,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
-      return sign*semanticLo;
+      return endConnect4RbaOverlapTrace32(state,traceEvent,sign*semanticLo,2);
     }
-    if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
-    if(semanticHi<=alpha){state.cutoffs+=1;return sign*semanticHi;}
+    if(semanticLo>=beta){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*semanticLo,3);}
+    if(semanticHi<=alpha){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*semanticHi,4);}
     if(semanticLo>alpha)alpha=semanticLo;
     if(semanticHi<beta)beta=semanticHi;
 
@@ -173,7 +224,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
 
     if(forced>=0){
       const height=words[keyOffset+forced];
-      if(height>=g.rows||!(actionMask&(1<<forced)))return 0;
+      if(height>=g.rows||!(actionMask&(1<<forced)))return endConnect4RbaOverlapTrace32(state,traceEvent,0,5);
       const physicalColumn=orientation?g.mirrorColumn[forced]:forced,
         physicalCell=height*g.columns+physicalColumn,
         term=connect4RbaCofactorKnownHeight(
@@ -183,10 +234,10 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       state.cofactors+=1;
       if(term){
         const value=absToRelative(term,mover);
-        if(value>=beta){state.cutoffs+=1;return sign*value;}
+        if(value>=beta){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*value,6);}
         if(alphaOrig===-2&&betaOrig===2)
           storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash);
-        return sign*value;
+        return endConnect4RbaOverlapTrace32(state,traceEvent,sign*value,7);
       }
 
       const childN=state.basisSize[childDepth],
@@ -198,6 +249,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       mover^=1;orientation^=childReflected;
       liveOffset=childLiveOffset;orderRow=childOrderRow;
       alpha=nextAlpha;beta=nextBeta;sign=-sign;
+      endConnect4RbaOverlapTrace32(state,traceEvent,0,8);
       continue;
     }
 
@@ -219,7 +271,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       }
       scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
     }
-    if(!actionCount)return 0;
+    if(!actionCount)return endConnect4RbaOverlapTrace32(state,traceEvent,0,9);
 
     let best=-2;
     for(let ai=0;ai<actionCount;ai+=1){
@@ -239,15 +291,15 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
           childLiveOffset,childOrderRow,-beta,-alpha);
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
-      if(alpha>=beta){state.cutoffs+=1;return sign*best;}
+      if(alpha>=beta){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*best,10);}
       if(best===1)break;
     }
-    if(best===-2)return 0;
+    if(best===-2)return endConnect4RbaOverlapTrace32(state,traceEvent,0,11);
     if(alphaOrig===-2&&betaOrig===2){
       const abs=relativeToAbs(best,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }
-    return sign*best;
+    return endConnect4RbaOverlapTrace32(state,traceEvent,sign*best,12);
   }
 }
 function search(state,depth,alpha,beta){
