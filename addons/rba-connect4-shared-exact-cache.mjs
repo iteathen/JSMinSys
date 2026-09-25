@@ -12,8 +12,8 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,dia
     keys:new Uint32Array(new SharedArrayBuffer(capacity*keyWords*Uint32Array.BYTES_PER_ELEMENT)),
     stats:new Uint32Array(new SharedArrayBuffer(3*Uint32Array.BYTES_PER_ELEMENT)),
     provenance:diagnosticProvenance?new Uint8Array(new SharedArrayBuffer(capacity*Uint8Array.BYTES_PER_ELEMENT)):null,
-    provenanceHitStats:diagnosticProvenance?new Uint32Array(new SharedArrayBuffer(5*Uint32Array.BYTES_PER_ELEMENT)):null,
-    provenanceStoreStats:diagnosticProvenance?new Uint32Array(new SharedArrayBuffer(5*Uint32Array.BYTES_PER_ELEMENT)):null,
+    provenanceHitStats:diagnosticProvenance?new Uint32Array(new SharedArrayBuffer(12*Uint32Array.BYTES_PER_ELEMENT)):null,
+    provenanceStoreStats:diagnosticProvenance?new Uint32Array(new SharedArrayBuffer(12*Uint32Array.BYTES_PER_ELEMENT)):null,
   };
 }
 
@@ -41,7 +41,7 @@ export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,prov
   if(Atomics.compareExchange(cache.sequence,slot,current,odd)!==current){
     Atomics.add(cache.stats,2,1);return value;
   }
-  const base=slot*cache.keyWords,p=provenance>=0&&provenance<5?provenance:0;
+  const base=slot*cache.keyWords,p=provenance>=0&&provenance<12?provenance:0;
   for(let w=0;w<cache.keyWords;w+=1)Atomics.store(cache.keys,base+w,words[offset+w]);
   Atomics.store(cache.value,slot,value);
   if(cache.provenance)Atomics.store(cache.provenance,slot,p);
