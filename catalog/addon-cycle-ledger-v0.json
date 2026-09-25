@@ -10164,17 +10164,17 @@
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": "3*D"
+          "count": "4*D"
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": "3*D"
+          "count": "4*D"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)+C(runtime.integer.check)+3*C(control.test.u32)+C(control.branch)+3*D*C(memory.allocate.shared.bytes)+3*D*C(runtime.typed_view.construct)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers. Measurement mode optionally allocates one per-slot provenance byte plus twelve-bin shared-hit and committed-store counters.",
+        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)+C(runtime.integer.check)+3*C(control.test.u32)+C(control.branch)+4*D*C(memory.allocate.shared.bytes)+4*D*C(runtime.typed_view.construct)",
+        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers. Measurement mode optionally allocates one per-slot provenance byte, twelve-bin shared-hit/store vectors, and a 12 x 12 x 2 route replacement matrix.",
         "parameters": {
           "D": "1 when provenance diagnostics are enabled; 0 otherwise"
         }
@@ -10332,18 +10332,63 @@
         {
           "op": "atomic.rmw.u32",
           "count": "D*U"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "R*(2*K+2)"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "R*(1+K)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R*K"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "R*(3*K+2)"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "R*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "R*K"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "R*(K+3)"
+        },
+        {
+          "op": "control.branch",
+          "count": "R*(K+3)"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "R"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)+(2*U+2*D*U)*C(control.test.u32)+(2*U+2*D*U)*C(control.branch)+2*D*U*C(runtime.field.load)+D*U*C(atomic.store.u32)+D*U*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)+(2*U+2*D*U)*C(control.test.u32)+(2*U+2*D*U)*C(control.branch)+2*D*U*C(runtime.field.load)+D*U*C(atomic.store.u32)+D*U*C(atomic.rmw.u32)+R*(2*K+2)*C(runtime.field.load)+R*(1+K)*C(atomic.load.u32)+R*K*C(memory.load.u32)+R*C(alu.imul.u32)+R*(3*K+2)*C(alu.add.u32)+R*K*C(alu.xor.u32)+R*K*C(alu.or.u32)+R*C(alu.shl.u32)+R*(K+3)*C(control.test.u32)+R*(K+3)*C(control.branch)+R*C(atomic.rmw.u32)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
           "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
           "D": "1 when provenance diagnostics are enabled; 0 otherwise",
-          "U": "1 when the store wins slot ownership and reaches committed publication; 0 on early contention return"
+          "U": "1 when the store wins slot ownership and reaches committed publication; 0 on early contention return",
+          "R": "1 when diagnostics are enabled, the store wins slot ownership, and the slot held a prior committed generation; 0 otherwise"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Measurement mode writes the producer provenance byte before the final even sequence publication and increments the corresponding committed-store counter after commit. The measurement provenance domain is bounded to 0..11: eight CPC exact routes plus three non-CPC exact publication classes."
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Measurement mode writes producer provenance before the final even sequence publication. While writer ownership is held, a pre-existing committed generation is compared by full qualified q_r key and attributed into a 12 x 12 incoming-route x displaced-route matrix split between same-key refresh and different-key collision. Hash/slot equality is never identity authority."
       },
       "status": "decomposed"
     },
@@ -10553,11 +10598,11 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "4+2*D"
+          "count": "4+3*D"
         },
         {
           "op": "runtime.array.from",
-          "count": "2*D"
+          "count": "3*D"
         },
         {
           "op": "runtime.object.allocate",
@@ -10567,7 +10612,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+3*C(runtime.integer.check)+(10+2*D)*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+D*C(alu.shl.u32)+6*D*C(alu.imul.u32)+4*D*C(memory.allocate.shared.bytes)+4*D*C(runtime.typed_view.construct)+D*C(runtime.object.allocate)+D*CALL(sharedViewBytes32)+(2+W*D)*C(runtime.field.load)+3*C(runtime.field.store)+C(runtime.integer.check)+3*C(control.test.u32)+C(control.branch)+(4+2*D)*C(runtime.field.load)+2*D*C(runtime.array.from)+2*D*C(runtime.object.allocate)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+3*C(runtime.integer.check)+(10+2*D)*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+D*C(alu.shl.u32)+6*D*C(alu.imul.u32)+4*D*C(memory.allocate.shared.bytes)+4*D*C(runtime.typed_view.construct)+D*C(runtime.object.allocate)+D*CALL(sharedViewBytes32)+(2+W*D)*C(runtime.field.load)+3*C(runtime.field.store)+C(runtime.integer.check)+3*C(control.test.u32)+C(control.branch)+(4+3*D)*C(runtime.field.load)+3*D*C(runtime.array.from)+2*D*C(runtime.object.allocate)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10578,7 +10623,7 @@
           "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure",
           "D": "1 when overlap/provenance measurement diagnostics are enabled as referenced by the corresponding expression terms; 0 otherwise"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced. Optional overlap tracing allocates four SharedArrayBuffer-backed views partitioned by worker and returns them to the benchmark harness after teardown. Provenance diagnostics return five-bin committed-store and consumed-shared-hit vectors after teardown; they are measurement-only."
+        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density while every worker continues complete private search. Optional overlap tracing is measurement-only. Provenance diagnostics return committed-store, consumed-hit, and 12 x 12 x 2 route replacement statistics after teardown."
       },
       "status": "decomposed"
     },
@@ -10774,8 +10819,8 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "e9feb8a9792e74a6f5424a71f9808aeeaf9af1bf",
-    "addons/rba-connect4-lazy-smp-host.mjs": "ea948ae16139d6694935afa89145ed35b08cb8d7",
+    "addons/rba-connect4-shared-exact-cache.mjs": "6b1aec455bbe4bee8800c5c7b5c7cba062db82a6",
+    "addons/rba-connect4-lazy-smp-host.mjs": "8753ac0f08be3fd63aadbbc6d7715d12a9827007",
     "addons/rba-connect4-lazy-smp-worker.mjs": "9a53d32f5898116bdeb0b6f76492b5440790d6ff"
   },
   "isomaxLocalKernel": {
