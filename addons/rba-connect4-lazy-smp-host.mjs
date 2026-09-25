@@ -12,6 +12,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   geometry,
   workers=2,
   sharedCacheCapacity=65536,
+  sharedExactCache=null,
   localCacheCapacity=65536,
   sharedSampleMask=0,
   timeoutMs=120000,
@@ -25,6 +26,9 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isInteger(sharedCacheCapacity)||sharedCacheCapacity<1||
      (sharedCacheCapacity&(sharedCacheCapacity-1)))
     throw new RangeError('invalid Lazy SMP shared cache capacity');
+  if(sharedExactCache!==null&&
+     (sharedExactCache.keyWords!==geometry.keyWords||!Number.isInteger(sharedExactCache.mask)))
+    throw new RangeError('invalid persistent Lazy SMP shared cache');
   if(!Number.isInteger(localCacheCapacity)||localCacheCapacity<1||
      (localCacheCapacity&(localCacheCapacity-1)))
     throw new RangeError('invalid Lazy SMP local cache capacity');
@@ -36,7 +40,7 @@ export async function runLazySmpConnect4Rba32(moves,{
 
   const root=connect4RbaFromMoves(moves,{geometry,positionCode:false}),
     workerGeometry=shareConnect4RbaGeometry32(geometry),
-    sharedExactCache=createConnect4RbaSharedExactCache32({
+    sharedCache=sharedExactCache??createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
       keyWords:geometry.keyWords,
     }),
@@ -69,7 +73,7 @@ export async function runLazySmpConnect4Rba32(moves,{
           geometry:workerGeometry,
           root,
           rootReflected:root.reflected,
-          sharedExactCache,
+          sharedExactCache:sharedCache,
           localCacheCapacity,
           sharedSampleMask,
           cpcFrontierResponse,
@@ -119,9 +123,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     move:exact?Atomics.load(resultWords,winner*RESULT_STRIDE+2):-1,
     winner,
     winnerMetrics,
-    sharedCacheHits:Atomics.load(sharedExactCache.stats,0),
-    sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
-    sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
+    sharedCacheHits:Atomics.load(sharedCache.stats,0),
+    sharedCacheStores:Atomics.load(sharedCache.stats,1),
+    sharedCacheStoreContention:Atomics.load(sharedCache.stats,2),
     sharedSampleMask,
     completedWorkers,
     reflected:root.reflected,
@@ -132,7 +136,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     workersExited:host.workersExited,
     requestedWorkers:workers,
     workersUsed:workers,
-    sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
+    sharedBytes:sharedViewBytes32(sharedCache)+sharedViewBytes32(workerGeometry)+
       control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
   };
 }

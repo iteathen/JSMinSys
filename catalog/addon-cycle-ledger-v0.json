@@ -10165,7 +10165,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "C",
           "target": "createConnect4RbaSharedExactCache32"
         },
         {
@@ -10269,12 +10269,24 @@
         {
           "op": "runtime.field.store",
           "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "4*P"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3*P"
+        },
+        {
+          "op": "control.branch",
+          "count": "P"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+C*CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+4*P*C(runtime.field.load)+3*P*C(control.test.u32)+P*C(control.branch)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10282,9 +10294,11 @@
         ],
         "parameters": {
           "W": "Lazy-SMP search worker count, minimum 2",
-          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
+          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure",
+          "C": "1 when the host allocates a fresh invocation-local shared exact cache; 0 when a caller supplies a validated persistent cache",
+          "P": "1 when a caller supplies a persistent shared exact cache and keyWords/mask validation executes; 0 otherwise"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Experimental host may reuse a caller-owned exact shared cache across solve invocations under the same prepared geometry/key profile. This changes cache lifetime only; every worker remains a complete private exact search."
       },
       "status": "decomposed"
     },
@@ -10477,7 +10491,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
+    "addons/rba-connect4-lazy-smp-host.mjs": "0a3389d75757607dcbbf93b493df0f4d9a4f7dbc",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
   },
   "isomaxLocalKernel": {
