@@ -9963,15 +9963,15 @@
       "operations": [
         {
           "op": "runtime.integer.check",
-          "count": 3
+          "count": 5
         },
         {
           "op": "control.test.u32",
-          "count": 11
+          "count": 15
         },
         {
           "op": "control.branch",
-          "count": 4
+          "count": 6
         },
         {
           "op": "alu.and.u32",
@@ -9983,15 +9983,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": 4
+          "count": 5
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 4
+          "count": "4+R"
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 4
+          "count": "4+R"
         },
         {
           "op": "runtime.object.allocate",
@@ -10000,8 +10000,11 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "3*C(runtime.integer.check)+11*C(control.test.u32)+4*C(control.branch)+3*C(alu.and.u32)+2*C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Measurement-only Lazy-SMP cache allocation also stores a shadow Mersenne sample classifier and widens stats to nine counters."
+        "expression": "5*C(runtime.integer.check)+15*C(control.test.u32)+6*C(control.branch)+3*C(alu.and.u32)+2*C(alu.sub.u32)+5*C(alu.imul.u32)+(4+R)*C(memory.allocate.shared.bytes)+(4+R)*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Measurement-only cache optionally allocates an interleaved eligible/excluded shared-hit counter by semantic rank.",
+        "parameters": {
+          "R": "1 when diagnostic per-rank hit counters are allocated; 0 otherwise"
+        }
       },
       "status": "decomposed"
     },
@@ -10051,17 +10054,34 @@
         {
           "op": "atomic.rmw.u32",
           "count": "E*(1+D)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "E*D*R"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "E*D*R"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "E*D*R"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "E*D*R"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(8+K+D)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+(2+E*D)*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E+E*D)*C(control.test.u32)+(2+K+E+E*D)*C(control.branch)+E*(1+D)*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(8+K+D)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+(2+E*D)*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E+E*D)*C(control.test.u32)+(2+K+E+E*D)*C(control.branch)+E*(1+D)*C(atomic.rmw.u32)+E*D*R*C(alu.shr.u32)+E*D*R*C(alu.imul.u32)+E*D*R*C(memory.load.u32)+E*D*R*C(atomic.rmw.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
           "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
-          "D": "1 when diagnosticSampleMask is enabled; 0 otherwise"
+          "D": "1 when diagnosticSampleMask is enabled; 0 otherwise",
+          "R": "1 when diagnostic rank counters are configured; 0 otherwise"
         },
-        "note": "Measurement branch additionally classifies each committed shared hit against a shadow deterministic sharing mask."
+        "note": "Measurement branch also attributes committed shared hits by semantic rank and shadow-mask eligibility."
       },
       "status": "decomposed"
     },
@@ -10272,12 +10292,20 @@
         {
           "op": "runtime.field.store",
           "count": 3
+        },
+        {
+          "op": "runtime.array.from",
+          "count": "E*R"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "3*R"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+5*C(runtime.integer.check)+22*C(control.test.u32)+9*C(control.branch)+4*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+4*C(runtime.timer.read)+C(atomic.store.u32)+(17+W)*C(atomic.load.u32)+42*E*C(memory.load.u32)+(3+2*E)*C(runtime.object.allocate)+(7+5*W+3*E)*C(alu.imul.u32)+(8+2*W+6*E)*C(alu.add.u32)+(2+W)*C(runtime.field.load)+3*C(runtime.field.store)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+5*C(runtime.integer.check)+22*C(control.test.u32)+9*C(control.branch)+4*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+4*C(runtime.timer.read)+C(atomic.store.u32)+(17+W)*C(atomic.load.u32)+42*E*C(memory.load.u32)+(3+2*E)*C(runtime.object.allocate)+(7+5*W+3*E)*C(alu.imul.u32)+(8+2*W+6*E)*C(alu.add.u32)+(2+W)*C(runtime.field.load)+3*C(runtime.field.store)+E*R*C(runtime.array.from)+3*R*C(runtime.field.load)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -10285,9 +10313,10 @@
         ],
         "parameters": {
           "W": "Lazy-SMP search worker count, minimum 2",
-          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
+          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure",
+          "R": "1 when diagnostic per-rank hit counters are present and returned; 0 otherwise"
         },
-        "note": "Measurement-only host returns shadow-sharing diagnostics, completion multiplicity and winner/host/cleanup timestamps. Worker search semantics are unchanged."
+        "note": "Measurement-only host additionally exports interleaved rank hit counts for shadow-mask leverage analysis."
       },
       "status": "decomposed"
     },
@@ -10483,8 +10512,8 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "024f6edf1028b2170fc551ebda541b4c0fa015d7",
-    "addons/rba-connect4-lazy-smp-host.mjs": "97fd05dc06384acadb34a403c12668e432a38dac",
+    "addons/rba-connect4-shared-exact-cache.mjs": "858822c3caa2f39119d6e29cfdc2db766f387613",
+    "addons/rba-connect4-lazy-smp-host.mjs": "92962729adf0d7268841865be8db53ce901438ca",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92e39eac8049485ef6fd2fbbd6a03357c7a4a6b3"
   },
   "isomaxLocalKernel": {
