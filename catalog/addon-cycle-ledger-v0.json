@@ -1249,7 +1249,7 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "5+2*I+3*C"
+          "count": "2+2*I+3*C"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -1315,16 +1315,23 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(20+8*I+4*C+K+F)*C(runtime.field.load)+(K+F)*C(runtime.field.store)+(5+6*I+2*C+K)*C(memory.load.u32)+(5+2*I+3*C)*C(memory.store.u32)+C(runtime.typed_array.fill)+(8+8*I+5*C+K+F)*C(alu.add.u32)+(8+6*I+4*C)*C(alu.and.u32)+(2*I+2*C)*C(alu.or.u32)+(2*I+C)*C(alu.shl.u32)+I*C(alu.shr.u32)+(12+12*I+6*C)*C(control.test.u32)+(12+12*I+6*C)*C(control.branch)+3*I*CALL(coordHas)+4*I*CALL(cellMarked)+2*I*CALL(playableCell)+C*CALL(popcount32)+F*CALL(firstSetBitIndex32)",
+        "expression": "(20+8*I+4*C+K+F)*C(runtime.field.load)+(K+F)*C(runtime.field.store)+(5+6*I+2*C+K)*C(memory.load.u32)+(2+2*I+3*C)*C(memory.store.u32)+C(runtime.typed_array.fill)+(8+8*I+5*C+K+F)*C(alu.add.u32)+(8+6*I+4*C)*C(alu.and.u32)+(2*I+2*C)*C(alu.or.u32)+(2*I+C)*C(alu.shl.u32)+I*C(alu.shr.u32)+(12+12*I+6*C)*C(control.test.u32)+(12+12*I+6*C)*C(control.branch)+3*I*CALL(coordHas)+4*I*CALL(cellMarked)+2*I*CALL(playableCell)+C*CALL(popcount32)+F*CALL(firstSetBitIndex32)",
         "parameters": {
           "I": "pair-basis entries inspected after singleton prefix",
           "C": "configured columns scanned for fork target intersections",
           "F": "1 when one forced column index is decoded; otherwise 0",
           "K": "1 when one or more fork precursors were found and precursorTotal is accumulated; otherwise 0"
         },
-        "note": "Fork-preemption derivation now owns cumulative precursor telemetry and forced-total updates on its already-existing forced-column branch."
+        "note": "Fork-preemption derivation consumes precursor/preemption outputs already zeroed by evaluateConnect4CpcNonterminal32. The private helper no longer repeats those three stores; all pair-scan and forced/precursor semantics are unchanged."
       },
-      "status": "decomposed"
+      "status": "decomposed",
+      "optimizationDelta": {
+        "candidate": "remove-duplicate-fork-output-reset",
+        "baseline": "937ac408d0fb334ad015f01b7932ddc5626dc79b",
+        "removed": "3*C(memory.store.u32) per deriveForkPreemption32 invocation",
+        "invariant": "deriveForkPreemption32 is private and reachable only after evaluateConnect4CpcNonterminal32 zeroes precursorCount, preemptionCount and preemptionMask32",
+        "semantics": "unchanged"
+      }
     },
     {
       "unit": "addons/cpc-connect4.mjs#evaluateConnect4Cpc32",
@@ -10496,7 +10503,7 @@
     "addons/rba-connect4-solver.mjs": "1643fc1ddf6cd9bbd67e9987d68ebc424fcf3ca8",
     "addons/rba-tt32.mjs": "756a42462d0be37ea18ef73a9bd567604673677f",
     "addons/rba-connect4-alphabeta.mjs": "db138b20da8fd0444f3a0569191a41ce2e166447",
-    "addons/cpc-connect4.mjs": "ebaf699a4c326e8c89d68039acb0369e566f50af",
+    "addons/cpc-connect4.mjs": "bc7e6c61f9126ef201552604aaf8233aac165603",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
