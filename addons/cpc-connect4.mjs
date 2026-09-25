@@ -23,6 +23,7 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     projectedForkTotal:0,
     precursorTotal:0,
     forcedTotal:0,
+    exactRoute:0,
     activeSingletonCells:new Uint32Array(cellWords),
     activeSingletonCellsOther:new Uint32Array(cellWords),
     forkTargets32:g.columns<=32?new Uint32Array(g.columns):null,
@@ -269,7 +270,7 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
 export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize,scratch){
   const terminal=words[offset+g.metaOffset]&3;
   if(!terminal)return evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch);
-  scratch.interval[0]=terminal;scratch.interval[1]=terminal;scratch.forcedColumn[0]=-1;
+  scratch.interval[0]=terminal;scratch.interval[1]=terminal;scratch.forcedColumn[0]=-1;scratch.exactRoute=0;
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   if(scratch.projectedAdvisory){
     scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
@@ -287,12 +288,12 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
 
   const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
   for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
-  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
+  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;scratch.exactRoute=1;return CPC_EXACT;}
 
   if(!p0Any)scratch.interval[1]=2;
   if(!p1Any)scratch.interval[0]=2;
 
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  if(scratch.interval[0]===scratch.interval[1]){scratch.exactRoute=2;return CPC_EXACT;}
 
   // Scan the singleton prefix once for both players. The packed profile keeps
   // mover-immediate priority while sharing basis/index/playability work.
@@ -300,7 +301,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther,
     singletonProfile=collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,opponentBits,scratch);
   if(singletonProfile&1){
-    const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+    const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;scratch.exactRoute=3;
     return CPC_EXACT;
   }
 
@@ -309,7 +310,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     moverHasSingleton=(singletonProfile>>>3)&1,
     opponentHasSingleton=(singletonProfile>>>4)&1;
   if(threats>1){
-    const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+    const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;scratch.exactRoute=4;
     return CPC_EXACT;
   }
   if(threats===1){
@@ -318,7 +319,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     // exposes another opponent singleton immediately above it, first-win order
     // makes the opponent's next move terminal.
     if(height+1<g.rows&&cellMarked(opponentBits,(height+1)*g.columns+column)){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;scratch.exactRoute=5;
       return CPC_EXACT;
     }
     scratch.forcedColumn[0]=column;
@@ -337,13 +338,13 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
         if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
       }
       if(legal&&allLift){
-        const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+        const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;scratch.exactRoute=6;
         return CPC_EXACT;
       }
     }
     const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
     if(precursor<0){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;scratch.exactRoute=7;
       return CPC_EXACT;
     }
   }
@@ -365,7 +366,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
       :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
     if(noWin)scratch.interval[0]=2;
   }
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  if(scratch.interval[0]===scratch.interval[1]){scratch.exactRoute=8;return CPC_EXACT;}
 
   if(scratch.projectedAdvisory){
     collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
