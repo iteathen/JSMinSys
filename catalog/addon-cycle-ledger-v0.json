@@ -2583,20 +2583,38 @@
         {
           "op": "control.branch",
           "count": "L"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "2*B"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "B"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "B"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+B*CALL(publishSpan32)+2*B*C(runtime.field.store)+B*C(memory.store.u8)+B*C(memory.store.u32)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
           "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
           "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise",
+          "B": "1 when the private cache misses, shared lookup returns an exact value, and that exact value is backfilled into the addressed local slot; otherwise 0"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Lazy-SMP shared exact hits are retained into the already-addressed private exact-cache slot after full shared-key validation. This changes only local reuse/replacement economics; exactness is unchanged."
       },
       "status": "decomposed"
     },
@@ -10467,7 +10485,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+    "addons/rba-connect4-alphabeta.mjs": "7b333fe2781a78fdf67f6ea85a42970172d30faa",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",

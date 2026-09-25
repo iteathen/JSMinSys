@@ -41,7 +41,16 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  if(cache.shared&&!(hash&cache.sharedSampleBits)){
+    const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,offset);
+    if(shared){
+      publishSpan32(cache.keys,slot*cache.keyWords,words,offset,cache.keyWords);
+      cache.value[slot]=shared;
+      cache.stamp[slot]=cache.epoch;
+      return shared;
+    }
+  }
+  return 0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
