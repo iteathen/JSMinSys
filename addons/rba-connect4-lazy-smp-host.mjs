@@ -16,7 +16,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   sharedSampleMask=0,
   diagnosticOverlapSampleMask=-1,
   diagnosticOverlapCapacity=16384,
-  diagnosticProvenance=false,
+  diagnosticProvenance=0,
   timeoutMs=120000,
   signal,
   cpcFrontierResponse=false,
@@ -40,8 +40,8 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new RangeError('invalid Lazy SMP overlap sample mask');
   if(!Number.isInteger(diagnosticOverlapCapacity)||diagnosticOverlapCapacity<1)
     throw new RangeError('invalid Lazy SMP overlap trace capacity');
-  if(typeof diagnosticProvenance!=='boolean')
-    throw new TypeError('invalid Lazy SMP provenance diagnostic flag');
+  if(!Number.isInteger(diagnosticProvenance)||diagnosticProvenance<0||diagnosticProvenance>1)
+    throw new RangeError('invalid Lazy SMP provenance diagnostic flag');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
 
