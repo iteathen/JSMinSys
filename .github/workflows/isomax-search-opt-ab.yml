@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          baseline=3329a3ac3faa5179b64ff12b50cc04c86ce4f8f2
+          baseline=ad366f2875bab5003ae313cb20bf7cb51f5c0a01
           candidate="$GITHUB_SHA"
           run_phase() {
             local label="$1"

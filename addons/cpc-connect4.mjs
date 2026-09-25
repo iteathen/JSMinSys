@@ -49,30 +49,38 @@ function playableCell(g,words,offset,cell){
 // currently playable singleton terminals, capped at two. Keeping the mover and
 // opponent passes separate preserves the cheap early-terminal path while still
 // eliminating the duplicate singleton scans formerly done by fork derivation.
-function collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,player,bits,scratch,storeThreats){
-  bits.fill(0);
-  const coord=offset+(player?g.p1Offset:g.p0Offset);
-  let immediate=0,any=0;
+function collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,opponentBits,scratch){
+  moverBits.fill(0);opponentBits.fill(0);
+  const moverCoord=offset+(mover?g.p1Offset:g.p0Offset),
+    opponentCoord=offset+(mover?g.p0Offset:g.p1Offset);
+  let moverAny=0,opponentAny=0,threats=0;
   for(let i=0;i<basisSize;i+=1){
     const id=basis[basisOffset+i];
-    // Basis ids are sorted by residual cardinality. pairShapeStart is prepared
-    // once from that ordering, so singleton scans require no shape-size load.
+    // Basis ids are cardinality-sorted; singleton id is the physical cell.
     if(id>=g.pairShapeStart)break;
-    if(!coordHas(words,coord,i))continue;
-    const cell=id,word=cell>>>5,mask=1<<(cell&31);
-    // Basis ids are unique and singleton id=cell, so this cell is new.
-    bits[word]|=mask;any=1;
-    const column=g.cellColumn[cell];
-    if(words[offset+column]!==g.cellRow[cell])continue;
-    // Mover singleton: CPC is already exact, so the rest of the basis is
-    // irrelevant. Opponent: two distinct playable singletons are already an
-    // exact loss, so stop after recording the second witness.
-    if(!storeThreats)return 5; // immediate=1 | any=4
-    scratch.threatCells[immediate]=cell;scratch.threatColumns[immediate]=column;
-    immediate+=1;
-    if(immediate===2)return 6; // immediate=2 | any=4
+    const coordWord=i>>>5,coordMask=1<<(i&31),
+      moverActive=words[moverCoord+coordWord]&coordMask,
+      opponentActive=threats<2?(words[opponentCoord+coordWord]&coordMask):0;
+    if(!(moverActive|opponentActive))continue;
+
+    const cell=id,cellWord=cell>>>5,cellMask=1<<(cell&31),
+      column=g.cellColumn[cell],
+      playable=words[offset+column]===g.cellRow[cell];
+
+    if(moverActive){
+      moverBits[cellWord]|=cellMask;moverAny=1;
+      // Current-player immediate terminal supersedes opponent obligations.
+      if(playable)return 1|(moverAny<<3)|(opponentAny<<4)|(threats<<1);
+    }
+    if(opponentActive){
+      opponentBits[cellWord]|=cellMask;opponentAny=1;
+      if(playable){
+        scratch.threatCells[threats]=cell;scratch.threatColumns[threats]=column;
+        threats+=1;
+      }
+    }
   }
-  return immediate|(any?4:0);
+  return (threats<<1)|(moverAny<<3)|(opponentAny<<4);
 }
 
 // Qualified one-step fork-precursor closure.
@@ -286,19 +294,20 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
 
   if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 
-  // Current-player immediate terminal supersedes every opponent obligation.
-  const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells;
-  const opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther;
-  const ownProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,scratch,0);
-  if(ownProfile&3){
+  // Scan the singleton prefix once for both players. The packed profile keeps
+  // mover-immediate priority while sharing basis/index/playability work.
+  const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells,
+    opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther,
+    singletonProfile=collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,opponentBits,scratch);
+  if(singletonProfile&1){
     const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
   }
 
-  const opponent=mover^1;
-  const opponentProfile=collectPlayerSingletons(g,words,offset,basis,basisOffset,basisSize,opponent,opponentBits,scratch,1);
-  const threats=opponentProfile&3,moverHasSingleton=(ownProfile>>>2)&1,
-    opponentHasSingleton=(opponentProfile>>>2)&1;
+  const opponent=mover^1,
+    threats=(singletonProfile>>>1)&3,
+    moverHasSingleton=(singletonProfile>>>3)&1,
+    opponentHasSingleton=(singletonProfile>>>4)&1;
   if(threats>1){
     const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
