@@ -110,6 +110,54 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     specializationBytes+=subsetBytes;
   }
 
+  // Upset propagation is a dominant cofactor cost. Precompute only actual
+  // strict-superset shape ids once so hot cofactors do not scan every
+  // same-or-larger child-basis candidate through subsetTable.
+  const strictSupersetOffset=new Uint32Array(shapeCount+1);
+  let strictSupersetCount=0;
+  for(let a=0;a<shapeCount;a+=1){
+    strictSupersetOffset[a]=strictSupersetCount;
+    const aSize=shapeSize[a],aBase=a*4;
+    for(let b=a+1;b<shapeCount;b+=1){
+      const bSize=shapeSize[b];if(bSize===aSize)continue;
+      let isSubset;
+      if(subsetTable)isSubset=subsetTable[a*shapeCount+b];
+      else{
+        const bBase=b*4;let i=0,j=0;
+        while(i<aSize&&j<bSize){
+          const av=shapeCells[aBase+i],bv=shapeCells[bBase+j];
+          if(av===bv){i+=1;j+=1;}
+          else if(bv<av)j+=1;
+          else break;
+        }
+        isSubset=i===aSize?1:0;
+      }
+      if(isSubset)strictSupersetCount+=1;
+    }
+  }
+  strictSupersetOffset[shapeCount]=strictSupersetCount;
+  const strictSupersetIds=new Uint32Array(strictSupersetCount);
+  let strictSupersetAt=0;
+  for(let a=0;a<shapeCount;a+=1){
+    const aSize=shapeSize[a],aBase=a*4;
+    for(let b=a+1;b<shapeCount;b+=1){
+      const bSize=shapeSize[b];if(bSize===aSize)continue;
+      let isSubset;
+      if(subsetTable)isSubset=subsetTable[a*shapeCount+b];
+      else{
+        const bBase=b*4;let i=0,j=0;
+        while(i<aSize&&j<bSize){
+          const av=shapeCells[aBase+i],bv=shapeCells[bBase+j];
+          if(av===bv){i+=1;j+=1;}
+          else if(bv<av)j+=1;
+          else break;
+        }
+        isSubset=i===aSize?1:0;
+      }
+      if(isSubset)strictSupersetIds[strictSupersetAt++]=b;
+    }
+  }
+
   let order;
   if(actionOrder!==undefined){
     if(!(actionOrder instanceof Uint32Array)&&!Array.isArray(actionOrder))throw new TypeError('actionOrder must be numeric');
@@ -136,7 +184,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
-    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
+    lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,strictSupersetOffset,strictSupersetIds,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
     positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0,

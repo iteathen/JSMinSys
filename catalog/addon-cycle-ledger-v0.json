@@ -3401,19 +3401,19 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*G+7*CN+9*N+4*U"
+          "count": "20+4*G+7*CN+9*N+4*U+5*Q+2*H"
         },
         {
           "op": "runtime.field.store",
-          "count": "8+CN+4*N+2*U"
+          "count": "8+CN+4*N+2*U+2*H"
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U"
+          "count": "6+2*G+3*CN+5*N+2*U+3*Q+H"
         },
         {
           "op": "memory.store.u32",
-          "count": "G+2*Z+3+CN+2*N+2*U"
+          "count": "G+2*Z+3+CN+2*N+2*U+2*H"
         },
         {
           "op": "alu.imul.u32",
@@ -3421,7 +3421,7 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U"
+          "count": "8+3*G+5*CN+8*N+3*U+3*Q+H"
         },
         {
           "op": "alu.sub.u32",
@@ -3429,23 +3429,23 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U"
+          "count": "6+4*N+2*U+2*Q"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+3*N+U"
+          "count": "2+3*N+U+Q+H"
         },
         {
           "op": "alu.shr.u32",
-          "count": "3+B+CN+2*N+I+U"
+          "count": "3+B+CN+2*N+I+U+Q+H"
         },
         {
           "op": "control.test.u32",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+          "count": "13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H"
         },
         {
           "op": "control.branch",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+          "count": "13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H"
         },
         {
           "op": "runtime.call.subledger",
@@ -3464,18 +3464,18 @@
         },
         {
           "op": "runtime.callback",
-          "count": "K*PS",
+          "count": "K*(1-X)*PS",
           "target": "prepareSubset"
         },
         {
           "op": "runtime.callback",
-          "count": "K*U",
+          "count": "K*(1-X)*U",
           "target": "shapeSubsetPrepared"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+4*G+7*CN+9*N+4*U)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(20+4*G+7*CN+9*N+4*U+5*Q+2*H)*C(runtime.field.load)+(8+CN+4*N+2*U+2*H)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+3*Q+H)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U+2*H)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+3*Q+H)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+2*Q)*C(alu.and.u32)+(2+3*N+U+Q+H)*C(alu.shl.u32)+(3+B+CN+2*N+I+U+Q+H)*C(alu.shr.u32)+(13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H)*C(control.test.u32)+(13+2*G+3*B+4*CN+10*N+3*I+4*U+2*Q+H)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*(1-X)*PS*CALLBACK(prepareSubset)+K*(1-X)*U*CALLBACK(shapeSubsetPrepared)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3483,13 +3483,16 @@
           "CN": "child basis size scanned for cardinality boundaries",
           "N": "active parent basis entries scanned",
           "I": "total child-image binary-search iterations when childIndex is unavailable",
-          "U": "total upset subset-candidate tests across surviving residuals",
+          "U": "fallback subset-candidate tests only when X=0; active IsoMax childIndex path sets U=0",
           "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0",
           "PR": "1 when removed[] is absent and prepareRemove executes; otherwise 0",
           "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
-          "PS": "prepareSubset calls for surviving images"
+          "PS": "fallback prepareSubset calls for surviving images when X=0",
+          "X": "1 when caller supplies childIndex scratch (active IsoMax path); 0 for generic fallback",
+          "Q": "strict-superset ids visited from precomputed geometry when X=1; otherwise 0",
+          "H": "visited strict supersets that are present in the dynamic child basis and therefore published"
         },
-        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters."
+        "note": "Known-height cofactor now uses precomputed exact strict-superset adjacency on the active childIndex path, replacing broad subset candidate scans/callbacks. Generic callers without childIndex retain the historical exact fallback."
       },
       "status": "decomposed"
     },
@@ -4714,11 +4717,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "20+8*CELL+10*LINE+8*SHAPE+5*SUB"
+          "count": "20+8*CELL+10*LINE+8*SHAPE+5*SUB+3*SP+2*SX"
         },
         {
           "op": "control.branch",
-          "count": "20+8*CELL+10*LINE+8*SHAPE+5*SUB"
+          "count": "20+8*CELL+10*LINE+8*SHAPE+5*SUB+3*SP+2*SX"
         },
         {
           "op": "runtime.array.allocate",
@@ -4762,7 +4765,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "18+DENSE_R+DENSE_S"
+          "count": "20+DENSE_R+DENSE_S"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -4770,19 +4773,19 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "20*CELL+24*LINE+24*SHAPE+8*SUB"
+          "count": "20*CELL+24*LINE+24*SHAPE+8*SUB+3*SP+2*SX"
         },
         {
           "op": "memory.store.u32",
-          "count": "8*CELL+24*LINE+20*SHAPE+4*SUB"
+          "count": "8*CELL+24*LINE+20*SHAPE+4*SUB+SHAPE+1+SR"
         },
         {
           "op": "alu.imul.u32",
-          "count": "10*CELL+20*LINE+18*SHAPE+6*SUB"
+          "count": "10*CELL+20*LINE+18*SHAPE+6*SUB+2*SP+2*SX"
         },
         {
           "op": "alu.add.u32",
-          "count": "20*CELL+35*LINE+30*SHAPE+12*SUB"
+          "count": "20*CELL+35*LINE+30*SHAPE+12*SUB+2*SP+2*SX+SR"
         },
         {
           "op": "alu.sub.u32",
@@ -4811,16 +4814,19 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "3*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+C(runtime.array.from)+C(runtime.map.construct)+15*LINE*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+C(runtime.map.clear)+(15*LINE+2*SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+2*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+C(runtime.object.allocate)",
+        "expression": "3*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB+3*SP+2*SX)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB+3*SP+2*SX)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+C(runtime.array.from)+C(runtime.map.construct)+15*LINE*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+C(runtime.map.clear)+(15*LINE+2*SHAPE)*C(runtime.array.join)+(20+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+2*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB+3*SP+2*SX)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB+SHAPE+1+SR)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB+2*SP+2*SX)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB+2*SP+2*SX+SR)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+C(runtime.object.allocate)",
         "parameters": {
           "CELL": "configured cell count iterations across geometry setup",
           "LINE": "winning-line records generated/scanned",
           "SHAPE": "unique residual shapes generated/scanned",
           "SUB": "shape-pair subset comparisons when specialization table is admitted",
           "DENSE_R": "1 when dense remove table allocation is admitted, else 0",
-          "DENSE_S": "1 when dense subset table allocation is admitted, else 0"
+          "DENSE_S": "1 when dense subset table allocation is admitted, else 0",
+          "SP": "shape-pair visits across the two cold strict-superset construction passes",
+          "SX": "shape-cell comparison steps used only when dense subsetTable is unavailable",
+          "SR": "strict-superset ids published into the compact geometry list"
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized."
+        "note": "Cold geometry initialization also materializes compact strict-superset adjacency for hot cofactor upset propagation. The extra two typed arrays and pair/cell scans are explicit symbolic cold costs."
       },
       "status": "decomposed"
     },
@@ -10464,12 +10470,12 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-branch-manager.mjs": "f7d02f2dccdc372ecc447dbc594fc6cbc8c2b811",
-    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
+    "addons/rba-connect4-geometry.mjs": "b65533d5d741ab6d708e2f57ccf8347bc5c75bf2",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
+    "addons/rba-connect4-coordinate.mjs": "43c35f18b0c6d6304e1e7bd64af1ea8f6e2ea096",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
