@@ -1374,16 +1374,20 @@
           "op": "runtime.call.subledger",
           "count": "1-T",
           "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "T"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "4*C(runtime.field.load)+C(memory.load.u32)+C(alu.add.u32)+C(alu.and.u32)+(2+P)*C(control.test.u32)+(2+P)*C(control.branch)+(7+4*P)*C(memory.store.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)",
+        "expression": "4*C(runtime.field.load)+C(memory.load.u32)+C(alu.add.u32)+C(alu.and.u32)+(2+P)*C(control.test.u32)+(2+P)*C(control.branch)+(7+4*P)*C(memory.store.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)+T*C(runtime.field.store)",
         "parameters": {
           "T": "1 for terminal input; 0 for nonterminal delegation",
           "P": "1 when projected advisory counters are reset on terminal input; otherwise 0"
         },
-        "note": "Checked CPC wrapper."
+        "note": "Checked CPC wrapper. Terminal input clears exactRoute; nonterminal route tagging is owned by evaluateConnect4CpcNonterminal32."
       },
       "status": "decomposed"
     },
@@ -1399,7 +1403,7 @@
         },
         {
           "op": "runtime.field.store",
-          "count": "10+6*C+4*R+5*P+G"
+          "count": "(10+6*C+4*R+5*P+G)+X"
         },
         {
           "op": "memory.load.u32",
@@ -1474,7 +1478,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G+X)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
         "parameters": {
           "W": "coordinate words scanned for any-live detection",
           "L": "legal-column iterations executed by lift scan",
@@ -1485,9 +1489,10 @@
           "B": "pairedResponseNoWin calls executed (0 or 1)",
           "P": "collectProjected calls executed (0 or 1)",
           "R": "long-range response branches evaluated",
-          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
+          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0",
+          "X": "1 when CPC returns CPC_EXACT and writes its exact closure route; 0 otherwise"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "CPC uses one combined singleton-profile pass. On CPC_EXACT only, it records the already-selected exact closure route (1..8) for optional Lazy-SMP shared-cache admission; non-exact calls pay no route reset/store."
       },
       "status": "decomposed"
     },
@@ -1671,17 +1676,17 @@
         },
         {
           "op": "runtime.field.store",
-          "count": 18
+          "count": 19
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+18*C(runtime.field.store)",
+        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+19*C(runtime.field.store)",
         "parameters": {
           "P": "1 when projectedAdvisory allocations are enabled; otherwise 0",
           "F": "1 when <=32-column fork-target array is allocated; otherwise 0"
         },
-        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields."
+        "note": "Cold CPC scratch allocation, including projected-fork, precursor/forced telemetry, and one exact-route field used only when CPC returns exact."
       },
       "status": "decomposed"
     },
@@ -3075,7 +3080,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits. The optional route argument is only forwarded on an eligible shared-store call and has no local-cache identity effect.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -9712,7 +9717,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+8*P+8*Q+10*A+4*O"
+          "count": "(4+8*P+8*Q+10*A+4*O)+E"
         },
         {
           "op": "runtime.field.store",
@@ -9825,7 +9830,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O+E)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -9847,7 +9852,7 @@
           "J": "stable insertion score comparisons at the non-forced endpoint",
           "K": "successful stable insertion shifts at the non-forced endpoint"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed.",
+        "note": "Forced-macro CPC-only Negamax. When CPC exact evidence terminates the invocation, one additional field load forwards the already-recorded exact route to the optional shared-cache store; private exact-cache semantics are unchanged.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -10030,7 +10035,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+E"
         },
         {
           "op": "alu.imul.u32",
@@ -10055,12 +10060,12 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+(2+E)*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
           "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. The existing atomic value word now packs the exact WDL in low two bits plus CPC route metadata in higher bits; committed hits mask the low two bits before returning the unchanged exact value."
       },
       "status": "decomposed"
     },
@@ -10081,7 +10086,7 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": 1
+          "count": "1+P"
         },
         {
           "op": "atomic.rmw.u32",
@@ -10089,7 +10094,7 @@
         },
         {
           "op": "atomic.store.u32",
-          "count": "K+3"
+          "count": "K+3*(U-D)+D"
         },
         {
           "op": "memory.load.u32",
@@ -10097,7 +10102,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": "2+(U-D)"
         },
         {
           "op": "alu.imul.u32",
@@ -10109,21 +10114,40 @@
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": "3+U+4*P"
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": "2+U+4*P"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "P"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "P+(U-D)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "U-D"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "U-D"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "CALL(mixSpan32Locator32)+(7+K+P)*C(runtime.field.load)+(1+P)*C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3*(U-D)+D)*C(atomic.store.u32)+K*C(memory.load.u32)+(2+(U-D))*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(P+(U-D))*C(alu.shr.u32)+(U-D)*C(alu.shl.u32)+(U-D)*C(alu.or.u32)+(3+U+4*P)*C(control.test.u32)+(2+U+4*P)*C(control.branch)",
         "parameters": {
-          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "K": "shared exact-cache key words atomically published on a normal committed store; 0 on contention or protected-drop return",
+          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
+          "U": "1 when the store wins slot writer ownership; 0 on pre-ownership contention return",
+          "P": "1 when writer ownership is held on an occupied slot and incoming CPC route is 3, 4, or 5, so the prior packed route is inspected; 0 otherwise",
+          "D": "1 when the inspected prior route is protected route 6 or 8 and the optional incoming shared store is dropped; 0 otherwise"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Direct-mapped shared exact publication remains optional cache acceleration. The existing value word packs WDL plus CPC route metadata. Only occupied-slot stores from routes 3/4/5 inspect the prior packed route; a prior route 6/8 is retained by ending the writer generation without modifying key/value. No extra shared route array is introduced."
       },
       "status": "decomposed"
     },
@@ -10467,8 +10491,8 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-solver.mjs": "6601a88212d9e4f8df89d1287f665c4a9cff0f0a",
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
-    "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/rba-connect4-alphabeta.mjs": "4f662ac855ff452dc61944105bf1d7e455a1227d",
+    "addons/cpc-connect4.mjs": "59b8db19cacb795118091482a79a6fa4c82ce7d7",
     "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
@@ -10476,7 +10500,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "a97542799c42b903060c1a7ba430960141bb9473",
     "addons/rba-connect4-lazy-smp-host.mjs": "38821b70e6d495b11abfc584be8a5a781dbe71fb",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f"
   },
