@@ -11,7 +11,9 @@ import {probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} f
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
-const MOVE_SCORE_NONE=-2147483648;
+const MOVE_SCORE_NONE=-2147483648,
+  EXACT_PROVENANCE_CPC=1,EXACT_PROVENANCE_INTERVAL=2,
+  EXACT_PROVENANCE_FORCED_TERMINAL=3,EXACT_PROVENANCE_RECURSIVE=4;
 
 export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
@@ -44,11 +46,12 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
   }
   return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
 }
-function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
+function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash,provenance=0){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))
+    storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,provenance);
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
@@ -193,7 +196,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
       state.cpcExact+=1;const value=state.cpc.interval[0];
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash,EXACT_PROVENANCE_CPC);
       return endConnect4RbaOverlapTrace32(state,traceEvent,sign*absToRelative(value,mover),1);
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
@@ -204,7 +207,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
     if(semanticLo===semanticHi){
       const abs=relativeToAbs(semanticLo,mover);
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash,EXACT_PROVENANCE_INTERVAL);
       return endConnect4RbaOverlapTrace32(state,traceEvent,sign*semanticLo,2);
     }
     if(semanticLo>=beta){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*semanticLo,3);}
@@ -236,7 +239,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
         const value=absToRelative(term,mover);
         if(value>=beta){state.cutoffs+=1;return endConnect4RbaOverlapTrace32(state,traceEvent,sign*value,6);}
         if(alphaOrig===-2&&betaOrig===2)
-          storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash);
+          storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash,EXACT_PROVENANCE_FORCED_TERMINAL);
         return endConnect4RbaOverlapTrace32(state,traceEvent,sign*value,7);
       }
 
@@ -297,7 +300,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if(best===-2)return endConnect4RbaOverlapTrace32(state,traceEvent,0,11);
     if(alphaOrig===-2&&betaOrig===2){
       const abs=relativeToAbs(best,mover);
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash,EXACT_PROVENANCE_RECURSIVE);
     }
     return endConnect4RbaOverlapTrace32(state,traceEvent,sign*best,12);
   }
