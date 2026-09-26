@@ -63,3 +63,47 @@ results as fast screens, not as standard Fhourstones scores or full NEES proof.
 The mirrored fixture tests orientation sensitivity, not an independent game.
 
 Results: [initial campaign](../../evidence/strategist-campaign-20260926/RESULTS.md).
+
+## Strategy-first pass 2
+
+The host, evaluator, generated solver, ordinary add-ons and TT are unchanged.
+`JSMINSYS_FLAG_DISPATCH=early` selects the provisional integer early-return
+handler for experiments; `integer` remains the default. `xor` and `masked` are
+comparison variants. All perform the required per-completion shared read.
+
+New strategist-only candidates, selected cold through
+`JSMINSYS_STRATEGIST_POLICY`, are:
+
+| Candidate | Hypothesis/behavior |
+| --- | --- |
+| anchor-private | Anchor shares fully, helpers sample 1/16 to reduce duplicate shared accesses |
+| wide-private | Same plus broader prepared tie offsets between workers |
+| harvest | Start asymmetric; enable full helper sharing once two sampled exact records have at least eight remaining cells |
+| wide-harvest | Combine harvest and broader tie offsets |
+| seed-retire | Share initially; STOP helpers once 256 stores and one sampled record with eight remaining cells are observed |
+| wide-seed | Combine seed retirement and broader tie offsets |
+| thin-sharing | Sample 1/256 shared accesses on all evaluators |
+
+The observer examines at most 256 committed shared rows without writing TT
+content or statistics. Store count and remaining cells are proxies, not proof
+that a helper contributed useful work. Retirement always leaves anchor 0 alive.
+Trace distinguishes threshold eligibility from actual helper STOP publication.
+Historical pass-2 traces used `retired`/`harvested` for eligibility; read them with
+the named policy. They do not alone establish retirement or harvesting.
+
+```powershell
+node --experimental-ffi experiments/strategist/explore-dispatch.mjs dispatch.jsonl
+node --experimental-ffi experiments/strategist/explore-strategies.mjs screen screen.jsonl
+$env:JSMINSYS_FLAG_DISPATCH='early'
+node --experimental-ffi experiments/strategist/explore-strategies.mjs strategies strategies.jsonl
+node --experimental-ffi experiments/strategist/explore-strategies.mjs confirmation confirmation.jsonl
+Remove-Item Env:JSMINSYS_FLAG_DISPATCH
+node experiments/strategist/analyze-pass2.mjs evidence/strategist-pass2-20260926
+```
+
+The strategy driver sets policy and geometry environment values per trial; the
+existing host interface is preserved. Run without externally supplied campaign
+environment overrides. Independent trials use fresh workers and storage.
+Pass 2 uses a fixed requested 5 ms observation interval, not cadence tuning.
+
+Results: [flag dispatch and strategy screening](../../evidence/strategist-pass2-20260926/RESULTS.md).

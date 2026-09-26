@@ -39,7 +39,7 @@ reported honestly. No full NEES or assembly-qualified claim.
   controls, fixed diversity, periodic diversity, sparse sharing, adaptive sharing,
   and combinations. Compare cadences and observe interaction rather than assuming
   additivity. Bound screening/trials; unresolved roots are not solve wins.
-- [ ] 4. Review, run full existing suite/checks, persist source identities and raw
+- [x] 4. Review, run full existing suite/checks, persist source identities and raw
   evidence, summarize conclusions/limits, commit and push an experimental PR.
 
 ## Review focus
@@ -78,7 +78,19 @@ paying for duplicate full searches. Prepared broad tie diversity is a candidate
 combination. Compare one-worker baseline, two-worker baseline and inert controls.
 No cadence tuning. Preserve actual instruction traces and inactive policies.
 
-- [ ] Pure policy/TT-observation tests, then strategist implementation.
-- [ ] Screen additional independent nontrivial 7x6 roots with short deadlines.
-- [ ] Interleaved quick comparisons, then confirm promising policies and mixtures.
-- [ ] Review, complete checks, record results and push the experimental checkpoint.
+- [x] Pure policy/TT-observation tests, then strategist implementation.
+- [x] Screen additional independent nontrivial 7x6 roots with short deadlines.
+- [x] Interleaved quick comparisons, then confirm promising policies and mixtures.
+- [x] Review, complete checks, record results and push the experimental checkpoint.
+
+Pass 2: 96 dispatch batches; 11 screens, 66 comparisons and 42 confirmation
+trials. All strategy trials exact with clean shutdown. Integer early return is
+the provisional experimental selection; tiny overlapping timing differences do
+not establish isolated instruction costs. Seed retirement reduces two-worker
+duplication but longer-root medians remain 5.9-11.3% above one worker. No policy
+promotion. Independent review caught a misleading retirement trace label; fixed
+eligibility versus actual STOP publication without changing worker execution.
+163 tests pass. Full source, limits, results and raw evidence are recorded in
+evidence/strategist-pass2-20260926/RESULTS.md. Existing host/evaluator, generated
+search, src and addons are unchanged. This closes the bounded pass, not the
+broader search for strategies that win across hard roots.
