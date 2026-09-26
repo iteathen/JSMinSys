@@ -14,6 +14,8 @@ test('prepared behavior worker reads every publication including extended unsign
   assert.equal(typeof behavior.createWorkerBehaviorMemory32,'function');
   const memory=behavior.createWorkerBehaviorMemory32(2),words=new Uint32Array(memory.buffer);
   const worker=new behavior.BehaviorWorker(0,words,1,memory);
+  behavior.publishWorkerBehavior32(words,1,17);
+  assert.equal(worker.loadPrimary(),17,'initialization must bind the worker address, not pass it at each node');
   for(const value of [1,7,0x7fffffff,0]){
     behavior.publishWorkerBehavior32(words,1,value);
     assert.equal(worker.readBehavior32(),value);

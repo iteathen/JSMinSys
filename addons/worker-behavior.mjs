@@ -15,23 +15,38 @@ export function createWorkerBehaviorMemory32(workerCount) {
   return new WebAssembly.Memory({initial:pages,maximum:pages,shared:true});
 }
 
-export function prepareWorkerBehaviorLoad32(memory) {
+export function prepareWorkerBehaviorLoad32(memory, byteOffset) {
   if (!(memory instanceof WebAssembly.Memory) || !(memory.buffer instanceof SharedArrayBuffer))
     throw new TypeError('shared WebAssembly behavior memory required');
+  if (!Number.isInteger(byteOffset) || byteOffset < 0 || byteOffset > 0xfffffffc ||
+      (byteOffset & 3) || byteOffset + 4 > memory.buffer.byteLength)
+    throw new RangeError('invalid prepared behavior byte offset');
+  // Encode the worker's address once as an i32.const. No per-node address
+  // field read, argument conversion, or dynamic alignment test is necessary.
+  const offsetBytes=[];
+  let offset=byteOffset|0;
+  while(true){
+    let byte=offset&127;offset>>=7;
+    const done=(offset===0&&!(byte&64))||(offset===-1&&(byte&64));
+    if(!done)byte|=128;
+    offsetBytes.push(byte);
+    if(done)break;
+  }
+  const body=[0,0x41,...offsetBytes,0xfe,0x10,2,0,0x0b];
   // (import "m" "m" (memory 1 65536 shared))
-  // (func (export "load") (param i32) (result i32)
-  //   local.get 0; i32.atomic.load align=4 offset=0)
+  // (func (export "load") (result i32)
+  //   i32.const PREPARED_BYTE_OFFSET; i32.atomic.load align=4 offset=0)
   const bytes = new Uint8Array([
     0,97,115,109,1,0,0,0,
-    1,6,1,0x60,1,0x7f,1,0x7f,
+    1,5,1,0x60,0,1,0x7f,
     2,11,1,1,109,1,109,2,3,1,0x80,0x80,4,
     3,2,1,0,
     7,8,1,4,108,111,97,100,0,0,
-    10,10,1,8,0,0x20,0,0xfe,0x10,2,0,0x0b,
+    10,body.length+2,1,body.length,...body,
   ]);
   const read = new WebAssembly.Instance(new WebAssembly.Module(bytes),{m:{m:memory}}).exports.load;
   // Compile/tier the tiny callable during preparation, before search.
-  for (let i=0;i<100000;i+=1) read(0);
+  for (let i=0;i<100000;i+=1) read();
   return read;
 }
 
@@ -94,13 +109,13 @@ export class BehaviorWorker extends Worker {
     this.behaviorExtensions = new Uint32Array(3);
     if (memory !== null && behaviorWords.buffer !== memory.buffer)
       throw new TypeError('behavior words and reader must share the same memory');
-    this.loadPrimary = memory === null ? null : prepareWorkerBehaviorLoad32(memory);
     this.behaviorByteOffset = behaviorWords.byteOffset + this.behaviorBase * 4;
+    this.loadPrimary = memory === null ? null : prepareWorkerBehaviorLoad32(memory,this.behaviorByteOffset);
   }
 
   readBehavior32() {
     if (this.loadPrimary !== null) {
-      const primary = this.loadPrimary(this.behaviorByteOffset) >>> 0;
+      const primary = this.loadPrimary() >>> 0;
       if (!(primary & 0x80000000)) return primary;
     }
     return readWorkerBehavior32(this.behaviorWords, this.behaviorBase, this.behaviorExtensions, 0);

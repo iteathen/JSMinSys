@@ -137,8 +137,10 @@ dispatch through the generic Worker method or test whether controls are enabled.
 
 Scope: `worker-behavior.mjs#prepareWorkerBehaviorLoad32` and
 `worker-behavior-search.mjs#completeBehaviorNode32`. The sole admitted Wasm
-operation for this opt-in profile is `i32.atomic.load`, taking a prepared byte
-offset, returning i32. It is a sequentially consistent atomic read; JS converts
+operation for this opt-in profile is `i32.atomic.load`, using a byte offset
+encoded as `i32.const` during initialization and returning i32. The exported
+reader takes no arguments: no worker-address lookup or conversion at each node.
+It is a sequentially consistent atomic read; JS converts
 to uint32 before applying the existing extension protocol. No game evaluation,
 TT operation, memory copying, or foreign general-purpose code is moved to Wasm.
 

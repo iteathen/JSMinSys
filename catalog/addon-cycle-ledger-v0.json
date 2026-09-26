@@ -7916,14 +7916,40 @@
         {
           "op": "runtime.error.throw",
           "count": "E"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+2*B"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "B-1"
+        },
+        {
+          "op": "runtime.array.push",
+          "count": "B"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*C(runtime.instanceof.check)+C(runtime.wasm.prepare)+C(runtime.typed_array.allocate)+2*C(runtime.object.allocate)+100000*(C(runtime.wasm.atomic.load32)+C(alu.add.u32)+C(control.branch))+PREP+E*C(runtime.error.throw)",
+        "expression": "2*C(runtime.instanceof.check)+C(runtime.wasm.prepare)+C(runtime.typed_array.allocate)+2*C(runtime.object.allocate)+100000*(C(runtime.wasm.atomic.load32)+C(alu.add.u32)+C(control.branch))+PREP+E*C(runtime.error.throw)+3*C(runtime.array.allocate)+C(runtime.integer.check)+(1+2*B)*C(alu.and.u32)+B*C(alu.shr.u32)+(B-1)*C(alu.or.u32)+B*C(runtime.array.push)+OFFSET_VALIDATION",
         "parameters": {
           "PREP": "Byte literal creation/copy, module/instance/export access, validation branches, loop setup/test/return; cold only",
-          "E": "Invalid setup only"
+          "E": "Invalid setup only",
+          "B": "1..5 signed-LEB bytes of validated i32 byte address",
+          "OFFSET_VALIDATION": "Cold alignment/inbounds tests, encoding-loop branches/sign tests, array spreads and address-bearing module materialization"
         },
         "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
       }
@@ -7941,11 +7967,11 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 6
+          "count": 5
         },
         {
           "op": "runtime.field.store",
-          "count": 5
+          "count": 4
         },
         {
           "op": "runtime.error.throw",
@@ -7954,7 +7980,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*C(control.branch)+6*C(runtime.field.load)+5*C(runtime.field.store)+CHECKS+E*C(runtime.error.throw)",
+        "expression": "2*C(control.branch)+5*C(runtime.field.load)+4*C(runtime.field.store)+CHECKS+E*C(runtime.error.throw)",
         "parameters": {
           "CHECKS": "Prepared callable type check and return",
           "E": "Missing/preparation-invalid behavior only"
@@ -7971,7 +7997,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "2+3*E"
+          "count": "1+3*E"
         },
         {
           "op": "runtime.wasm.atomic.load32",
@@ -8001,13 +8027,13 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*E)*C(runtime.field.load)+C(runtime.wasm.atomic.load32)+C(alu.shr.u32)+(1+S)*C(alu.and.u32)+(1+E+S)*(C(control.test.u32)+C(control.branch))+E*CALL(readWorkerBehavior32)+RETURN",
+        "expression": "(1+3*E)*C(runtime.field.load)+C(runtime.wasm.atomic.load32)+C(alu.shr.u32)+(1+S)*C(alu.and.u32)+(1+E+S)*(C(control.test.u32)+C(control.branch))+E*CALL(readWorkerBehavior32)+RETURN",
         "parameters": {
           "E": "1 if primary extension marker set; 0 otherwise",
           "S": "1 if consistent primary/snapshot accepted and STOP tested, 0 on deferred extension",
           "RETURN": "call/return/value preservation or selection unless compiler removes; no assumed zero"
         },
-        "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
+        "note": "Worker byte address is an i32.const encoded during initialization. One prepared zero-argument Wasm export call per node. No per-node byte-address field load/conversion. All other branch/cancellation costs retained."
       }
     }
   ],
@@ -8127,10 +8153,10 @@
     "addons/rba-connect4-lazy-smp-host.mjs": "421a0d50b3974f2652bec15f8d05a83f1eca5b0b",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
-    "addons/worker-behavior.mjs": "fdbb94ecb47bcbf12c6c8ff3e404803ef07957f6",
+    "addons/worker-behavior.mjs": "0c425fab6358f7088c3e964853d72ea55fc72c90",
     "addons/rba-connect4-alphabeta-behavior.mjs": "30c1dde32bf078d1c23b9ebeb94eee2a61289c19",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
-    "addons/worker-behavior-search.mjs": "f292a542520716b4cb8fbdda0dc1bcc7b43bba44"
+    "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
