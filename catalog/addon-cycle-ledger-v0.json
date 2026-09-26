@@ -3401,7 +3401,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*G+7*CN+9*N+4*U"
+          "count": "18+4*G+7*CN+9*N+4*U+A"
         },
         {
           "op": "runtime.field.store",
@@ -3409,7 +3409,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U"
+          "count": "6+2*G+3*CN+5*N+2*U+A"
         },
         {
           "op": "memory.store.u32",
@@ -3421,7 +3421,7 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U"
+          "count": "8+3*G+5*CN+8*N+3*U+A"
         },
         {
           "op": "alu.sub.u32",
@@ -3429,7 +3429,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U"
+          "count": "6+4*N+2*U+A"
         },
         {
           "op": "alu.shl.u32",
@@ -3441,11 +3441,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
         },
         {
           "op": "control.branch",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U"
+          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
         },
         {
           "op": "runtime.call.subledger",
@@ -3475,7 +3475,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+4*G+7*CN+9*N+4*U)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(18+4*G+7*CN+9*N+4*U+A)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+A)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+A)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+A)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3483,13 +3483,15 @@
           "CN": "child basis size scanned for cardinality boundaries",
           "N": "active parent basis entries scanned",
           "I": "total child-image binary-search iterations when childIndex is unavailable",
-          "U": "total upset subset-candidate tests across surviving residuals",
+          "U": "subset-candidate tests for images not already covered in every surviving target coordinate",
           "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0",
           "PR": "1 when removed[] is absent and prepareRemove executes; otherwise 0",
           "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
-          "PS": "prepareSubset calls for surviving images"
+          "PS": "prepareSubset calls for images requiring at least one new target closure",
+          "A": "surviving player-image membership checks actually executed (0..2 per J); short-circuited inactive players excluded",
+          "J": "surviving images reaching the per-player absorption guard"
         },
-        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters."
+        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters. C1 adds per-surviving-player load/address/AND and short-circuit tests. Control terms conservatively account Boolean selection/negation and the early exit; generated lowering, overlap and cache costs remain profile-dependent rather than claimed fixed Intel cycle values. PS/U now exclude absorbed work. Whole-operation measured cycles are the promotion evidence, not this inherited source-operation envelope."
       },
       "status": "decomposed"
     },
@@ -10469,7 +10471,7 @@
     "addons/rba-tt32.mjs": "989320faf58fb18092c3abc6fb746e1f700e200c",
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "66624c99dcdf885e6ca60523fa1a7d247e0fd6af",
+    "addons/rba-connect4-coordinate.mjs": "cd33a599c1b30340b94f6c0db7de48136c7aa69a",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",

@@ -80,7 +80,7 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
-    const write0=active0&&(player===0||image===id),
+    let write0=active0&&(player===0||image===id),
       write1=active1&&(player===1||image===id);
     if(!write0&&!write1)continue;
 
@@ -94,6 +94,14 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
       while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}
     }
     let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
     if(write0)target[p0Target+targetWord]|=targetMask;
     if(write1)target[p1Target+targetWord]|=targetMask;
 
