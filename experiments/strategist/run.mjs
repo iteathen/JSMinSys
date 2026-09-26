@@ -6,6 +6,7 @@ import {runTrial} from './host.mjs';
 const mode=process.argv[2]??'screen',output=process.argv[3]??'strategist-results.jsonl';
 if(existsSync(output))throw Error('refusing to overwrite campaign evidence');
 const moves=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4];
+const workingMoves=[2,0,5,3,6,3,5,2,3,3,3,5,0,5,0,0,1,6];
 const metadata={type:'metadata',mode,sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   dirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),node:process.version,v8:process.versions.v8,
   cpu:cpus()[0].model,date:new Date().toISOString(),
@@ -19,7 +20,7 @@ else if(mode==='screen2')cases=[
   [1,3,2,0,4,6,1,0,2,4,5,2,2,3,1,1,1,5,1,3,2,4,6,0,4,4,6,2,0,4,3,3],
 ].flatMap(sequence=>[26,22,18,14].map(n=>({fixture:{columns:7,rows:6,moves:sequence.slice(0,n)},policy:'poll-only',timeoutMs:500,warmups:20})));
 else if(mode==='campaign'){
-  const fixtures=[{columns:4,rows:4,moves:[]},{columns:7,rows:6,moves:moves.slice(0,20)}];
+  const fixtures=[{columns:4,rows:4,moves:[]},{columns:7,rows:6,moves:workingMoves}];
   const policies=['poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'];
   cases=[];
   for(let round=0;round<4;round++)for(const fixture of fixtures)
@@ -27,7 +28,7 @@ else if(mode==='campaign'){
 }else if(mode==='cadence'){
   cases=[];
   for(let round=0;round<3;round++)for(const cadenceMs of [1,5,25])for(const policy of ['inert','rotate','combined'])
-    cases.push({fixture:{columns:7,rows:6,moves:moves.slice(0,20)},policy,cadenceMs,round,timeoutMs:750,warmups:20});
+    cases.push({fixture:{columns:7,rows:6,moves:workingMoves},policy,cadenceMs,round,timeoutMs:750,warmups:20});
 }else throw Error('unknown mode');
 for(const c of cases){
   const result=await runTrial({...c,workers:2,measureCycles:true});
