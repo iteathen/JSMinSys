@@ -58,7 +58,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   return connect4RbaCofactorKnownNonwinningHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
 
-// HOT CONTRACT: caller has proved that no legal mover action wins now (CPC).
+// HOT CONTRACT: caller has proved the selected action cannot win now.
+// CPC recursion proves this for all legal actions; checked entry proves one.
 // Keep checked entry for ingress, root witness selection, and unproved callers.
 // No win test or mode branch belongs here; full-board exhaustion still applies.
 export function connect4RbaCofactorKnownNonwinningHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
