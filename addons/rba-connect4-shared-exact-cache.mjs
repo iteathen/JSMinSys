@@ -38,7 +38,7 @@ export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,rout
   }
   if(current&&route>=3&&route<=5){
     const displaced=Atomics.load(cache.value,slot)>>>2;
-    if(displaced===6||displaced===8){
+    if(displaced===8){
       Atomics.store(cache.sequence,slot,(odd+1)>>>0);
       return value;
     }
