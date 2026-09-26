@@ -41,6 +41,27 @@ export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,co
   return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
 export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,cell=height*g.columns+column,player=rank&1;
+  // Every physical cell is a singleton residual whenever winning geometry
+  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
+  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
+  sizes[sizeIndex]=0;
+
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
+  }
+  return connect4RbaCofactorKnownNonwinningHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
+}
+
+// HOT CONTRACT: caller has proved that no legal mover action wins now (CPC).
+// Keep checked entry for ingress, root witness selection, and unproved callers.
+// No win test or mode branch belongs here; full-board exhaustion still applies.
+export function connect4RbaCofactorKnownNonwinningHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
@@ -48,14 +69,6 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
   sizes[sizeIndex]=0;
 
-  // Every physical cell is a singleton residual whenever winning geometry
-  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
-  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
-  let lo=0,hi=n;
-  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
-  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
-    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
-  }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
