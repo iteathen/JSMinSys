@@ -6,13 +6,18 @@ Host: Windows, Intel Core i5-12600K, Node 26.7.0 / V8 14.6.202.34-node.28.
 
 ## Correctness and accounting
 
-- Full `node --test test/*.test.mjs`: 146 passed, 0 failed.
+- Full `node --test test/*.test.mjs`: 146 passed, 0 failed at the measured
+  implementation; 147 passed after adding the review regression below.
 - Catalog verification: 298 sealed functions, 118 add-on units cycle-ledgered,
   30/30 blocks complete, 0 deferred functions. This is not full NEES qualification.
 - Tests exercise a real concurrent reader, deterministic publication overlap,
   extension truncation, all 124 payload bits, version exhaustion, unchanged
   ordinary Worker, and exactly one shared load on the primary-only path.
 - Plain/direct/method primary checksums agree. Cycle partitions sum exactly.
+- Independent code review found no blocking findings. Its additional regression
+  is retained: publication after the initial primary load but before the version
+  bracket must observe the new primary and coherent extensions for all four
+  resulting chain lengths. Production code is unchanged after the cycle run.
 - Existing worker/search implementations are unchanged; IsoMax does not yet
   poll these flags. No PFIF strategy or behavior meanings are implemented.
 

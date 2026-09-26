@@ -69,6 +69,30 @@ test('a completed publication during extension reading cannot mix two flag sets'
   assert.deepEqual([...scratch],[0x80000009,0x8000000a,11]);
 });
 
+test('publication before the version bracket rereads primary for every new chain length',t=>{
+  const words=createWorkerBehavior32(1),scratch=new Uint32Array(3);
+  const load=Atomics.load;let armed=false,next;
+  t.mock.method(Atomics,'load',(array,index)=>{
+    const value=load(array,index);
+    if(array===words&&index===0&&armed){
+      armed=false;
+      publishWorkerBehavior32(words,0,...next);
+    }
+    return value;
+  });
+  for(const flags of [[8,0,0,0],[8,9,0,0],[8,9,10,0],[8,9,10,11]]){
+    publishWorkerBehavior32(words,0,1,2,3,4);
+    scratch.fill(77);next=flags;armed=true;
+    const extended=flags[1]!==0;
+    assert.equal(readWorkerBehavior32(words,0,scratch,0),extended?0x80000008:8);
+    assert.deepEqual([...scratch],[
+      (flags[1]|(flags[2]?0x80000000:0))>>>0,
+      (flags[2]|(flags[3]?0x80000000:0))>>>0,
+      flags[3],
+    ]);
+  }
+});
+
 test('one-word checkpoint performs exactly one shared read',t=>{
   const words=createWorkerBehavior32(1),load=Atomics.load;let reads=0;
   t.mock.method(Atomics,'load',(array,index)=>{reads++;assert.equal(index,0);return load(array,index);});
