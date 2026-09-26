@@ -1395,99 +1395,51 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "24+8*C+4*R+5*P+G"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "10+6*C+4*R+5*P+G"
+          "count": "10+I+2*A+2*K"
         },
         {
           "op": "memory.load.u32",
-          "count": "3+2*W+2*L+2*P"
+          "count": "1+I+S+3*A"
         },
         {
           "op": "memory.store.u32",
-          "count": "7+4*P"
+          "count": "6+2*K"
         },
         {
           "op": "alu.add.u32",
-          "count": "4+4*L+2*P+G"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": 2
+          "count": "2+2*I+S+A"
         },
         {
           "op": "alu.and.u32",
-          "count": "6+3*L"
-        },
-        {
-          "op": "alu.xor.u32",
-          "count": 1
+          "count": "1+2*S"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+L"
+          "count": "S"
         },
         {
           "op": "alu.shr.u32",
-          "count": "4"
+          "count": "1+S"
         },
         {
           "op": "control.test.u32",
-          "count": "18+2*W+6*L"
+          "count": "2+2*I+S+A+K"
         },
         {
           "op": "control.branch",
-          "count": "18+2*W+6*L"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "C",
-          "target": "collectSingletonProfiles"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "M",
-          "target": "cellMarked"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "D",
-          "target": "deriveForkPreemption32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "F",
-          "target": "frontierResponseNoWin"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "B",
-          "target": "pairedResponseNoWin"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "P",
-          "target": "collectProjected"
+          "count": "2+2*I+S+A+K"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(10+I+2*A+2*K)*C(runtime.field.load)+(1+I+S+3*A)*C(memory.load.u32)+(6+2*K)*C(memory.store.u32)+(2+2*I+S+A)*C(alu.add.u32)+(1+2*S)*C(alu.and.u32)+(S)*C(alu.shl.u32)+(1+S)*C(alu.shr.u32)+(2+2*I+S+A+K)*C(control.test.u32)+(2+2*I+S+A+K)*C(control.branch)",
         "parameters": {
-          "W": "coordinate words scanned for any-live detection",
-          "L": "legal-column iterations executed by lift scan",
-          "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
-          "M": "cellMarked calls executed",
-          "D": "deriveForkPreemption32 calls executed (0 or 1)",
-          "F": "frontierResponseNoWin calls executed (0 or 1)",
-          "B": "pairedResponseNoWin calls executed (0 or 1)",
-          "P": "collectProjected calls executed (0 or 1)",
-          "R": "long-range response branches evaluated",
-          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
+          "I": "basis entries visited, including optional first nonsingleton",
+          "S": "singleton entries checked for mover membership",
+          "A": "active mover singleton playability checks",
+          "K": "1 if a playable mover singleton returns exact, else 0"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "Experimental conservative source-operation envelope, not measured Intel instruction cycles. Includes six scratch reset stores. Caller setup, bounds/restriction consumers and other prepared storage remain charged by their existing ledgers. Total process cycles govern candidate screening; no final NEES qualification claimed."
       },
       "status": "decomposed"
     },
@@ -6446,7 +6398,7 @@
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/cpc-connect4.mjs": "772d2448ca48fd7c707a7d024ee57d9e85784d2f",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",

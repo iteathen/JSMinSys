@@ -277,102 +277,22 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   return CPC_EXACT;
 }
 
+// EXPERIMENT ONLY: win-only CPC. Unknown remains [P1 win,P0 win].
+// No predictive losses/draws or restrictions survive this replacement.
+// Preserve first-win priority, native residual identity and numeric hot storage.
 export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch){
   scratch.interval[0]=1;scratch.interval[1]=3;scratch.forcedColumn[0]=-1;
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
-  if(scratch.projectedAdvisory){
-    scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
-  }
-  const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
-
-  const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
-  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
-  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
-
-  if(!p0Any)scratch.interval[1]=2;
-  if(!p1Any)scratch.interval[0]=2;
-
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
-
-  // Scan the singleton prefix once for both players. The packed profile keeps
-  // mover-immediate priority while sharing basis/index/playability work.
-  const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells,
-    opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther,
-    singletonProfile=collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,opponentBits,scratch);
-  if(singletonProfile&1){
-    const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+  const mover=(words[offset+g.metaOffset]>>>2)&1,
+    coord=offset+(mover?g.p1Offset:g.p0Offset);
+  for(let i=0;i<basisSize;i+=1){
+    const cell=basis[basisOffset+i];
+    if(cell>=g.pairShapeStart)break;
+    if(!(words[coord+(i>>>5)]&(1<<(i&31))))continue;
+    if(words[offset+g.cellColumn[cell]]!==g.cellRow[cell])continue;
+    const value=mover?1:3;
+    scratch.interval[0]=value;scratch.interval[1]=value;
     return CPC_EXACT;
   }
-
-  const opponent=mover^1,
-    threats=(singletonProfile>>>1)&3,
-    moverHasSingleton=(singletonProfile>>>3)&1,
-    opponentHasSingleton=(singletonProfile>>>4)&1;
-  if(threats>1){
-    const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-    return CPC_EXACT;
-  }
-  if(threats===1){
-    const column=scratch.threatColumns[0],height=words[offset+column];
-    // The only current singleton must be blocked now. If that support event
-    // exposes another opponent singleton immediately above it, first-win order
-    // makes the opponent's next move terminal.
-    if(height+1<g.rows&&cellMarked(opponentBits,(height+1)*g.columns+column)){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-      return CPC_EXACT;
-    }
-    scratch.forcedColumn[0]=column;
-    scratch.preemptionMask32[0]=g.columns<=32?((1<<column)>>>0):0;
-    scratch.preemptionCount[0]=1;
-    scratch.forcedTotal+=1;
-  }else{
-    // With no current singleton threat, a move changes support in one column.
-    // If there are no opponent singleton targets at all this test cannot fire,
-    // so avoid even the short legal-column scan.
-    if(opponentHasSingleton){
-      let legal=0,allLift=1;
-      for(let column=0;column<g.columns;column+=1){
-        const height=words[offset+column];if(height>=g.rows)continue;
-        legal+=1;
-        if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
-      }
-      if(legal&&allLift){
-        const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-        return CPC_EXACT;
-      }
-    }
-    const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
-    if(precursor<0){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
-      return CPC_EXACT;
-    }
-  }
-
-  // Long-range response closure is intentionally after the cheap tactical
-  // exact/restriction checks so unresolved nodes alone pay its residual scan.
-  // The prior all-even theorem remains the production baseline. The pooled/
-  // synchronized frontier extension is selected once at initialization for A/B.
-  if(mover===0){
-    if(scratch.interval[1]===3){
-      const noWin=scratch.frontierResponse
-        ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
-        :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
-      if(noWin)scratch.interval[1]=2;
-    }
-  }else if(scratch.interval[0]===1){
-    const noWin=scratch.frontierResponse
-      ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch)
-      :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
-    if(noWin)scratch.interval[0]=2;
-  }
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
-
-  if(scratch.projectedAdvisory){
-    collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
-    const forks=scratch.projectedForks;
-    scratch.projectedForkTotal+=forks[0]+forks[1];
-  }
-  if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
-  if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
 }
