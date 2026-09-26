@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
-import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {
   prepareConnect4CpcScratch,evaluateConnect4Cpc32,evaluateConnect4CpcNonterminal32,connect4CpcTargetOwner32,
   CPC_NONE,CPC_EXACT,CPC_BOUND,CPC_RESTRICT,

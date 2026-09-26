@@ -98,15 +98,14 @@ Lazy SMP requires at least two search workers. Generic TT, worker, and
 BranchManager primitives remain reusable library/research building blocks, but
 they no longer constitute a supported Connect4 execution composition.
 
-### Runtime-configured RBA + TT + solver add-ons
+### Runtime-configured RBA and Lazy SMP add-ons
 
 The RBA add-on stack derives its carrier from application configuration at initialization. It does not assume a 7x6 board, 69-line basis, eight-word q, or seven actions.
 
-- `addons/rba-tt32.mjs` takes initialization-selected `keyWords`, `basisCapacity`, and `edgeCapacity`.
 - `addons/rba-connect4-geometry.mjs` derives winning lines, residual shapes, coordinate lanes, q layout, reflection, action order, and capacities from configured columns/rows.
 - `addons/rba-connect4-coordinate.mjs` supplies native cofactor/basis/reflection mechanics over that prepared profile.
 - `addons/rba-connect4-front.mjs` supplies the configured four-front algebra.
-- `addons/rba-connect4-solver.mjs` supplies RBA-native evaluation, publication, reconciliation, and cold ingress.
+- `addons/rba-connect4-ingress.mjs` supplies cold external-root conversion only.
 - `addons/cpc-connect4.mjs` supplies conservative CPC/NDC closure: per-column XOR event parity, exact exhaustion/paired-response bounds, immediate terminal/fork closure, forced-block restriction, and non-authoritative projected future forks.
 - `addons/rba-connect4-alphabeta.mjs` supplies the CPC-first exact negamax/alpha-beta control path. CPC-only mode iterates the immutable prepared action order directly and carries no per-depth action-order scratch.
 
@@ -117,3 +116,5 @@ Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general
 See `catalog/rba-addon-v0.json`.
 **Four-Front A/B status:** recursive Four-Front remains available as an experimental/reference refinement, not the primary unresolved fallback. On the qualified unresolved rank-28 standard-7x6 control it reduced alpha-beta nodes from 54 to 37 but increased measured runner time from about 0.27 ms to 6.74 ms while performing 3,703 front steps. This is directional single-run evidence; broader performance qualification remains required.
 
+
+Retired execution models and source recovery: [Lazy SMP cleanup history](history/2026-09-26-lazy-smp-only.md).

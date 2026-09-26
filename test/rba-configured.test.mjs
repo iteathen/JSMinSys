@@ -4,8 +4,7 @@ import {prepareConnect4RbaGeometry,prepareConnect4RbaCoordinateScratch} from '..
 import {prepareConnect4RbaExecutionProfile} from '../addons/rba-connect4-profile.mjs';
 import {connect4RbaCofactor,connect4RbaCofactorKnownLegal} from '../addons/rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from '../addons/rba-connect4-front.mjs';
-import {connect4RbaFromMoves,prepareConnect4RbaEvaluator,evaluateConnect4RbaTt32,publishConnect4RbaEvaluation32,reconcileConnect4RbaEvent32,assertConnect4RbaTtCompatibility} from '../addons/rba-connect4-solver.mjs';
-import {createRbaTt32,rbaTtIntern32,rbaTtSetRoot32,rbaTtEnqueue32,rbaTtTake32,rbaTtTakeEvent32,RBA_TT_DONE,RBA_TT_STOP} from '../addons/rba-tt32.mjs';
+import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 
 function lines(columns,rows){
   const out=[];for(let r=0;r<rows;r++)for(let c=0;c<columns;c++)for(const [dc,dr] of [[1,0],[0,1],[1,1],[1,-1]])
@@ -102,23 +101,6 @@ test('configured four-front bounds match independent physical propagation',()=>{
       const packed=queryConnect4RbaFourFront(g,a,0,q.words,0);assert.deepEqual([packed&3,packed>>>2],bounds(columns,rows,moves,depth));}
   }
 });
-
-test('4x4 depth-zero shared-q traversal solves without a physical-state fallback',()=>{
-  const columns=4,rows=4,moves=[0,1,0,1,2,3,2,3],g=prepareConnect4RbaGeometry({columns,rows}),root=connect4RbaFromMoves(moves,{geometry:g}),oracle=exact(columns,rows,moves);
-  const t=createRbaTt32({capacity:65536,bucketCount:65536,keyWords:g.keyWords,basisCapacity:g.maxBasis,edgeCapacity:g.columns});
-  assertConnect4RbaTtCompatibility(t,g);const rootQ=rbaTtIntern32(t,root.words,0,root.basis,0,root.basis.length);rbaTtSetRoot32(t,rootQ);rbaTtEnqueue32(t,rootQ);
-  const state=prepareConnect4RbaEvaluator({geometry:g,boundaryDepth:0,boundaryCapacity:512,boundaryBudget:100000}),witness=new Int32Array(1);witness[0]=-2;
-  let current=-1,steps=0;
-  while(!Atomics.load(t.control,RBA_TT_DONE)&&!Atomics.load(t.control,RBA_TT_STOP)&&steps++<200000){
-    if(current<0)current=rbaTtTake32(t,2);
-    if(current>=0){const q=current,code=evaluateConnect4RbaTt32(t,q,state,rootQ,root.reflected);current=publishConnect4RbaEvaluation32(t,q,2,state,code,rootQ,witness);}
-    let event;while((event=rbaTtTakeEvent32(t))>=0)reconcileConnect4RbaEvent32(t,event,g,root.reflected,witness);
-    if(current<0&&t.control[5]===-1&&t.control[8]===-1)break;
-  }
-  assert.equal(Atomics.load(t.control,RBA_TT_STOP),0);assert.equal(Atomics.load(t.control,RBA_TT_DONE),1);
-  assert.equal(t.exact[rootQ],oracle.value);assert.equal(witness[0],oracle.move);
-});
-
 
 test('init-time specialization profile selects fast paths without changing semantics',()=>{
   const fast=prepareConnect4RbaGeometry({columns:7,rows:6});

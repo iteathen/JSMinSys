@@ -2,15 +2,16 @@
   "version": "0.8.0",
   "status": "runtime-configured-hot-addon",
   "modules": [
-    "addons/rba-tt32.mjs",
-    "addons/rba-branch-manager.mjs",
     "addons/rba-connect4-geometry.mjs",
     "addons/rba-connect4-coordinate.mjs",
     "addons/rba-connect4-front.mjs",
-    "addons/rba-connect4-solver.mjs",
+    "addons/rba-connect4-ingress.mjs",
     "addons/rba-connect4-profile.mjs",
     "addons/cpc-connect4.mjs",
-    "addons/rba-connect4-alphabeta.mjs"
+    "addons/rba-connect4-alphabeta.mjs",
+    "addons/rba-connect4-shared-exact-cache.mjs",
+    "addons/rba-connect4-lazy-smp-host.mjs",
+    "addons/rba-connect4-lazy-smp-worker.mjs"
   ],
   "geometryContract": {
     "configurationTime": [
@@ -32,22 +33,6 @@
     "supportRepresentation": "one uint32 height per configured column in q identity; no 3-bit row limit",
     "limits": "Only explicit JS/TypedArray/uint32 profile limits validated during initialization; no proving-workload board dimensions are authoritative."
   },
-  "ttContract": {
-    "configured": [
-      "keyWords",
-      "basisCapacity",
-      "edgeCapacity"
-    ],
-    "owns": [
-      "exact q identity",
-      "immutable basis payload",
-      "generation/ref/execution lifetime",
-      "lower/upper exact evidence",
-      "dependency topology",
-      "ready/event membership",
-      "recycling"
-    ]
-  },
   "solverContract": {
     "owns": [
       "Connect4 residual cofactor semantics",
@@ -57,7 +42,7 @@
       "CPC-first exact negamax/alpha-beta traversal",
       "optional four-front construction/query reference refinement",
       "RBA-native child preparation",
-      "generic min/max reconciliation glue"
+      "Lazy SMP private worker searches sharing exact evidence only"
     ],
     "excludes": [
       "physical-board reconstruction after ingress",
@@ -159,5 +144,18 @@
       "maxPhysicalStatesPerRbaQ": 5336
     },
     "consequence": "Potential-winning structure should be consumed from the maintained residual requirement coordinates. Raw geometric live-line masks or explicit neutral-token ownership would be a finer, more expensive duplicate authority."
+  },
+  "sharedExactCacheContract": {
+    "owns": [
+      "committed globally exact W/D/L evidence",
+      "full canonical q equality",
+      "bounded replaceable cache slots"
+    ],
+    "excludes": [
+      "execution ownership",
+      "ready/event queues",
+      "dependency topology",
+      "refcounted work lifetime"
+    ]
   }
 }

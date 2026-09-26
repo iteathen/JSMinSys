@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
-import {connect4PositionCode64FromMoves,connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4PositionCode64FromMoves,connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 
