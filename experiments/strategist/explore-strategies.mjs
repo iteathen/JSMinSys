@@ -18,6 +18,13 @@ if(mode==='screen'){
   // Chosen before looking at policy results; add screened roots in a separate pass.
   for(let round=0;round<3;round++)for(const fixture of [{columns:4,rows:4,moves:[]},f(a.slice(0,18))])
     for(let i=0;i<labels.length;i++)cases.push({fixture,label:labels[(i+round*4)%labels.length],round});
+}else if(mode==='confirmation'){
+  // Independent B root plus longer A root, selected using baseline screening.
+  // Preserve one-worker control: retiring helpers must beat it to show a gain
+  // beyond simply reducing duplicated two-worker effort.
+  const labels=['one-worker','two-worker','inert','sparse','wide-private','seed-retire','wide-seed'];
+  for(let round=0;round<3;round++)for(const fixture of [f(a.slice(0,16)),f(b.slice(0,16))])
+    for(let i=0;i<labels.length;i++)cases.push({fixture,label:labels[(i+round*3)%labels.length],round});
 }else throw Error('mode');
 appendFileSync(output,JSON.stringify({type:'metadata',mode,sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   dirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),node:process.version,date:new Date().toISOString(),
