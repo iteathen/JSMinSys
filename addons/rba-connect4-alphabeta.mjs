@@ -91,6 +91,8 @@ export function prepareConnect4RbaAlphaBeta({
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid shared sample mask');
+  const recursiveScoreStorage=new Int32Array(levels*g.columns),recursiveScores=new Array(levels);
+  for(let i=0;i<levels;i+=1)recursiveScores[i]=new Int32Array(recursiveScoreStorage.buffer,i*g.columns*4,g.columns);
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
@@ -102,7 +104,7 @@ export function prepareConnect4RbaAlphaBeta({
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache,actionOrder,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
-    moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
+    recursiveScores,moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(g.columns),
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
@@ -201,31 +203,27 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       continue;
     }
 
-    const scores=state.moveScores,ordered=state.moveOrder,
+    const scores=state.recursiveScores[depth],
       playerOffset=liveOffset+mover*live.wordCount;
     let actionCount=0;
     for(let oi=0;oi<g.columns;oi+=1){
       const column=state.actionOrder[oi],height=words[keyOffset+column];
-      if(height>=g.rows||!(actionMask&(1<<column)))continue;
+      if(height>=g.rows||!(actionMask&(1<<column))){scores[oi]=MOVE_SCORE_NONE;continue;}
       const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
         score=live.wordCount===3
           ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
           :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
-      let at=actionCount;
-      while(at>0){
-        const priorScore=scores[at-1];
-        if(priorScore>=score)break;
-        scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
-      }
-      scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
+      scores[oi]=score;actionCount+=1;
     }
     if(!actionCount)return 0;
 
     let best=-2;
     for(let ai=0;ai<actionCount;ai+=1){
-      const column=ordered[orderRow+ai],height=words[keyOffset+column],
+      const slot=g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns),
+        column=state.actionOrder[slot],height=words[keyOffset+column],
         physicalColumn=orientation?g.mirrorColumn[column]:column,
         physicalCell=height*g.columns+physicalColumn;
+      scores[slot]=MOVE_SCORE_NONE;
       const term=connect4RbaCofactorKnownNonwinningHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
         words,childKey,basis,childBasis,state.coord.seen,state.basisSize,childDepth,state.coord.map,state.coord.inverse);
       state.cofactors+=1;
