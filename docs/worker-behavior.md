@@ -3,8 +3,33 @@
 `Worker` remains unchanged. Applications can explicitly select `BehaviorWorker`
 when preparing a worker implementation, or call `readWorkerBehavior32` directly
 at a chosen safe checkpoint. There is no per-node "enabled?" branch in existing
-workers. This is shared control infrastructure, not PFIF or an IsoMax search
-integration. The existing Lazy SMP worker does not consume these flags.
+workers. The ordinary Lazy SMP worker remains flag-free. Passing prepared
+`behaviorMemory` to `runLazySmpConnect4Rba32` selects the optional worker, which
+reads its primary word at every completed-node boundary during search. This is
+not a PFIF strategist; no scheduling/ordering policy is inferred from TT data.
+
+```js
+const behaviorMemory = createWorkerBehaviorMemory32(workerCount);
+const words = new Uint32Array(behaviorMemory.buffer);
+const solve = runLazySmpConnect4Rba32(moves, {geometry, workers:workerCount, behaviorMemory});
+// Strategist may publish while solve is running. Bit 0 means cooperative STOP.
+publishWorkerBehavior32(words, workerIndex, WORKER_BEHAVIOR_STOP);
+const result = await solve;
+```
+
+STOP retires that worker at its next completed-node/forced-transit boundary.
+Other workers continue. If all retire, the host returns INTERRUPTED with null
+rootWdl. A cancelled search never publishes an unfinished parent as exact.
+Previously completed exact rows remain valid. Clearing STOP permits a new solve;
+it does not resurrect a retired worker. Other payload bits are reserved for
+future explicit behaviors. Unknown bits alone do not change search semantics.
+
+Completion means a searched q return (cache/CPC/cutoff/ordinary), a terminal
+cofactor child, the root, or a completed forced-transit evaluation before
+continuing to its child. It is not each internal algebra operation. Front
+construction/action-front evidence is not interrupted internally. Lazy SMP
+uses CPC-only. For completed CPC solves, checkpoint count equals cofactors+1,
+including terminal children that the historical `nodes` counter excludes.
 
 ```js
 // Initialization/controller side:
@@ -97,5 +122,50 @@ performance and integration checkpoint cadence still need consumer qualification
 
 Tests cover all 124 payload bits, extension truncation, inactive slots, input
 validation, version exhaustion, overlapping updates, cross-thread consistency,
-one-load fast path, and the unchanged base Worker. Existing search workers,
-recursion, TT, move ordering and solver defaults are unchanged.
+one-load fast path, and the unchanged base Worker. Integration tests cover
+live post-start publication, every CPC completion, explicit cancellation,
+exact-cache reuse after cancellation, one-worker retirement and host cleanup.
+Ordinary search, TT, move ordering and solver defaults are unchanged.
+
+## Prepared per-node reader: scoped JSMinSys deviation
+
+The optional search uses `createWorkerBehaviorMemory32` and a prepared
+`BehaviorWorker(owner, words, index, memory)`. Memory allocation, view binding,
+module compilation, instance creation and a 100,000-load warmup happen before
+search. The hot search calls the prepared Wasm export directly; it does not
+dispatch through the generic Worker method or test whether controls are enabled.
+
+Scope: `worker-behavior.mjs#prepareWorkerBehaviorLoad32` and
+`worker-behavior-search.mjs#completeBehaviorNode32`. The sole admitted Wasm
+operation for this opt-in profile is `i32.atomic.load`, taking a prepared byte
+offset, returning i32. It is a sequentially consistent atomic read; JS converts
+to uint32 before applying the existing extension protocol. No game evaluation,
+TT operation, memory copying, or foreign general-purpose code is moved to Wasm.
+
+This explicitly recorded deviation under SPEC section 17 does not globally
+expand the sealed primitive catalog. A standard-library JS Atomics load remains
+the portable reader and owns the rare consistent-extension path. Ordinary
+unordered loads, initialization-only sampling, and less-than-per-node polling
+do not implement the owner's semantics. Equivalent signed/unsigned/cached JS
+Atomics call shapes did not remove the generic V8 builtin overhead in probes.
+
+Storage: fixed shared WebAssembly memory, 64 KiB page granularity, 128 bytes per
+worker region. Total reservation is ceil(workerCount*128/65536)*65536 bytes.
+All extension access uses views of the same memory. The byte offset includes
+the typed view's own byteOffset. No memory growth during a session.
+
+Cost: JS-to-Wasm guards/call/return, bounds/alignment checks, the actual atomic
+load, uint32 interpretation, extension test, STOP decision, recursive sentinel
+propagation and cold retirement must all be included. The isolated ~6-cycle
+loop result does not equal whole-search overhead. One reader is prepared per
+worker; swapping export identities inside an evaluator changes JIT feedback
+and requires its own qualification. Compilation/warmup cost and the extra
+64 KiB minimum are explicit, not free. Coherence under a changing strategist
+and other Node/CPU versions require requalification. No full NEES claim is made.
+
+The opt-in solver/worker files are generated at build time by
+`tools/build-behavior-search.mjs` from the ordinary solver/worker. CI checks exact
+regeneration. There is no runtime source rewriting or second manually maintained
+search algorithm. Falsifiers include any missed completed-node read, missed live
+update, altered zero-flag value/node count/move, invalid cache publication, or
+unaccounted whole-operation cycle regression.

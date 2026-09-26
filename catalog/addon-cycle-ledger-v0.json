@@ -451,6 +451,34 @@
         "name": "CLASS_CONSTRUCTOR_DISPATCH_COST(classDepth,runtimeState)"
       },
       "note": "JavaScript class constructor/super dispatch; allocation and field stores are accounted separately."
+    },
+    "runtime.wasm.prepare": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "WASM_MODULE_INSTANCE_COMPILE_ALLOCATION_COST"
+      },
+      "note": "Scoped optional worker profile; platform/compiler/coherence dependent. Includes guards and call costs, never assumed free."
+    },
+    "runtime.wasm.atomic.load32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "JS_TO_WASM_CALL_GUARDS_BOUNDS_SC_ATOMIC_I32_LOAD_RETURN_COST"
+      },
+      "note": "Scoped optional worker profile; platform/compiler/coherence dependent. Includes guards and call costs, never assumed free."
+    },
+    "runtime.wasm.memory.prepare": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "FIXED_SHARED_WASM_MEMORY_ALLOC_PAGES_VALIDATION_COST"
+      },
+      "note": "Scoped optional worker profile; platform/compiler/coherence dependent. Includes guards and call costs, never assumed free."
+    },
+    "atomic.wait": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_WAIT_SETUP_PARK_WAKE_COST"
+      },
+      "note": "Scoped optional worker profile; platform/compiler/coherence dependent. Includes guards and call costs, never assumed free."
     }
   },
   "units": [
@@ -6250,12 +6278,32 @@
         {
           "op": "runtime.field.store",
           "count": 1
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": "2*F"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*F"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+3*F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "2*W"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "X"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6263,7 +6311,10 @@
         ],
         "parameters": {
           "W": "Lazy-SMP search worker count, minimum 2",
-          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure"
+          "E": "1 when an exact winning worker result is materialized; 0 on timeout/interruption/failure",
+          "F": "1 when behavior memory supplied; 0 for ordinary worker",
+          "X": "Invalid memory only",
+          "HOST_SELECTION": "Memory length/index checks, cold URL selection and shared-byte accounting"
         },
         "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
       },
@@ -6492,12 +6543,44 @@
         {
           "op": "runtime.typed_array.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareWorkerBehaviorLoad32",
+          "count": "F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "E"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(Worker)+CALL(validateWorkerBehavior32)+3*C(runtime.field.store)+C(runtime.typed_array.allocate)",
-        "parameters": {},
+        "expression": "CALL(Worker)+CALL(validateWorkerBehavior32)+3*C(runtime.field.store)+C(runtime.typed_array.allocate)+F*CALL(prepareWorkerBehaviorLoad32)+2*C(runtime.field.store)+3*C(runtime.field.load)+3*C(control.branch)+C(alu.imul.u32)+C(alu.add.u32)+E*C(runtime.error.throw)",
+        "parameters": {
+          "F": "1 for prepared memory-backed worker; 0 for portable reader",
+          "E": "Invalid/mismatched memory only"
+        },
         "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
       }
     },
@@ -6510,31 +6593,1431 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 3
+          "count": "2+3*E"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+F"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "F"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "F"
+        },
+        {
+          "op": "runtime.wasm.atomic.load32",
+          "count": "F"
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "readWorkerBehavior32"
+          "target": "readWorkerBehavior32",
+          "count": "E"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "3*C(runtime.field.load)+CALL(readWorkerBehavior32)+METHOD_DISPATCH",
+        "expression": "(2+3*E)*C(runtime.field.load)+(1+F)*C(control.branch)+F*(C(alu.and.u32)+C(alu.shr.u32)+C(runtime.wasm.atomic.load32))+E*CALL(readWorkerBehavior32)+METHOD_DISPATCH",
         "parameters": {
-          "METHOD_DISPATCH": "receiver checks and call/return overhead unless inlined; not assumed free"
+          "F": "Prepared reader selected (1) or portable (0)",
+          "E": "1 on portable or extended path; 0 on prepared primary-only path",
+          "METHOD_DISPATCH": "call/return/receiver checks; not assumed free"
         },
-        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+        "note": "Actual search directly calls prepared reader through completeBehaviorNode32, without this optional method dispatch."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#absToRelativeBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "absToRelativeBehavior",
+      "scope": "hot-scalar",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": "1+N"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+N"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*C(alu.sub.u32)",
+        "parameters": {
+          "N": "1 when value is non-draw and mover-relative arithmetic executes; 0 for absolute draw"
+        },
+        "note": "Valid-value Negamax conversion. Unknown branch prediction remains visible through control.branch."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#createConnect4RbaExactCache32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "createConnect4RbaExactCache32Behavior",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 5
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#frontEvidenceBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "frontEvidenceBehavior",
+      "scope": "experimental-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "3+E"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+E"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "buildConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-F",
+          "target": "queryConnect4RbaFourFront"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+(3+E)*C(runtime.field.store)+(3+E)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+2*C(control.test.u32)+2*C(control.branch)+CALL(buildConnect4RbaFourFront)+(1-F)*CALL(queryConnect4RbaFourFront)",
+        "parameters": {
+          "F": "1 when Four-Front construction fails and query is skipped; otherwise 0",
+          "E": "1 when queried interval is exact and frontExact increments; otherwise 0"
+        },
+        "note": "Experimental Four-Front path remains separately visible from production CPC-only Negamax."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#metricsBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "metricsBehavior",
+      "scope": "cold-result",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 17
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "17*C(runtime.field.load)+C(runtime.object.allocate)",
+        "note": "Cold result materialization; projected-fork, precursor and forced totals are read from CPC-owned telemetry."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#prepareConnect4RbaAlphaBetaBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "prepareConnect4RbaAlphaBetaBehavior",
+      "scope": "cold",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": "10+3*F"
+        },
+        {
+          "op": "control.branch",
+          "count": "4+F"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "18+5*F+3*W"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+W"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+2*W"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "W"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "5+3*F"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "W"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaCoordinateScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "prepareConnect4RbaFrontArena"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createConnect4RbaExactCache32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineEvaluator32"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "8+3*F"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareSearchBehavior32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Behavior)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareSearchBehavior32)",
+        "parameters": {
+          "F": "1 in Four-Front mode; 0 in production CPC-only mode",
+          "W": "configured board width; one-time private action-order diversification materialized before search"
+        },
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#probeConnect4RbaExactCache32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "probeConnect4RbaExactCache32Behavior",
+      "scope": "hot-cache-wrapper",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaExactCacheSlot32Behavior"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)",
+        "note": "Public exact-cache probe wrapper."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#probeConnect4RbaExactCacheSlot32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "probeConnect4RbaExactCacheSlot32Behavior",
+      "scope": "hot-cache",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "2+3*H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*H*K"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "H*V"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*H*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "H*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "H*(K-1)*(1-G)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+H*(3+G*K)"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+H*(3+G*K)"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "probeConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "L"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "L"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "L"
+        },
+        {
+          "op": "control.branch",
+          "count": "L"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "parameters": {
+          "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
+          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
+          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
+          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
+          "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
+          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+        },
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#relativeToAbsBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "relativeToAbsBehavior",
+      "scope": "hot-scalar",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": "1+N"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "N*M"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(1-M)"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1+N)*C(control.test.u32)+(1+N)*C(control.branch)+N*M*C(alu.add.u32)+N*(1-M)*C(alu.sub.u32)",
+        "parameters": {
+          "N": "1 when relative value is non-draw; 0 for draw",
+          "M": "1 for mover 0 add path; 0 for mover 1 subtract path"
+        },
+        "note": "Mover-relative to absolute W/D/L conversion."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#resetConnect4RbaExactCache32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "resetConnect4RbaExactCache32Behavior",
+      "scope": "cold-per-solve",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "1+W"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "W"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1+W)*C(runtime.field.load)+C(runtime.field.store)+C(alu.add.u32)+C(control.test.u32)+C(control.branch)+W*C(runtime.typed_array.fill)",
+        "parameters": {
+          "W": "1 only when epoch wraps and stamp array is cleared; otherwise 0"
+        },
+        "note": "Per-solve cache epoch reset; rare wrap clear remains visible."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#searchBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "searchBehavior",
+      "scope": "local-negamax-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "8+N*(9+10*A+6*F+4*Q)"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+N*(3+3*A+2*S+F)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+N*(3+3*A+4*Q)"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "N*(2+3*Q)"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+N*(2+A+Q)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4+N*(5+5*A+4*Q)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(4+2*A)"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2+N*(6+3*A+3*Q)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N*(A+Q)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2+N*(3+Q)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+N*(12+10*A+5*Q+4*F)"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+N*(12+10*A+5*Q+4*F)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeConnect4RbaExactCacheSlot32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H+T",
+          "target": "absToRelativeBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*F",
+          "target": "frontEvidenceBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*Q",
+          "target": "queryConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "relativeToAbsBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*S",
+          "target": "storeConnect4RbaExactCacheSlot32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "searchBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "completeBehaviorNode32",
+          "count": "B"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "K"
+        },
+        {
+          "op": "control.branch",
+          "count": "K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+T)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidenceBehavior)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbsBehavior)+CALL(storeConnect4RbaExactCacheSlot32Behavior))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(searchBehavior))+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))",
+        "parameters": {
+          "H": "1 on exact-cache hit; otherwise 0",
+          "N": "1-H, meaning the node continues beyond exact-cache probe",
+          "A": "action candidates examined in this invocation",
+          "C": "children actually cofactored",
+          "R": "nonterminal children recursively searched",
+          "T": "terminal cofactor children converted to mover-relative values",
+          "F": "1 when Four-Front parent evidence executes; 0 in production CPC-only mode",
+          "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
+          "S": "exact-cache stores executed by this invocation (0 or 1)",
+          "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
+          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling."
+        },
+        "note": "Four-Front path now also consumes CPC-owned precursor/forced telemetry; its search semantics are otherwise unchanged.",
+        "targetCyclesPerNode": 1000
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#solveConnect4RbaAlphaBetaBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "solveConnect4RbaAlphaBetaBehavior",
+      "scope": "local-negamax-root",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "13+N*(12+8*A+4*Q)"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "15+N*(6+2*A)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4+N*(4+3*A+3*Q)"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "3+N*(2+3*Q)"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "N*(2+A+Q)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "N*(4+4*A+3*Q)"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "N*(4+2*A)"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2+N*(5+2*A+2*Q)"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N*(A+Q)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2+N*(2+Q)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "5+N*(15+8*A+4*Q)"
+        },
+        {
+          "op": "control.branch",
+          "count": "5+N*(15+8*A+4*Q)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4RbaExactCache32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T+X",
+          "target": "absToRelativeBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*F",
+          "target": "frontEvidenceBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*Q",
+          "target": "queryConnect4RbaFourFront"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "relativeToAbsBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "metricsBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R*(1-F)",
+          "target": "searchCpcOnlyBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*R*F",
+          "target": "searchBehavior"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "N*R"
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M+N*R*(1-F)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*L3",
+          "target": "evaluateConnect4LiveLine3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*LG",
+          "target": "evaluateConnect4LiveLineCell32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*L*Z7",
+          "target": "argMaxPlayableSlot7Nonempty32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*L*(1-Z7)",
+          "target": "argMaxPlayableSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "completeBehaviorNode32",
+          "count": "B"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "K"
+        },
+        {
+          "op": "control.branch",
+          "count": "K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32Behavior)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidenceBehavior)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnlyBehavior)+F*CALL(searchBehavior))+N*CALL(relativeToAbsBehavior)+CALL(metricsBehavior)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))",
+        "parameters": {
+          "T": "1 for terminal root; otherwise 0",
+          "N": "1-T for nonterminal root work",
+          "X": "1 when nonterminal root CPC interval is exact and absToRelative executes; otherwise 0",
+          "F": "1 when Four-Front root evidence executes; 0 in production CPC-only mode",
+          "Q": "Four-Front root action queries executed",
+          "A": "root actions examined",
+          "C": "root children cofactored",
+          "R": "nonterminal root children entering recursive search",
+          "M": "physical root move-history length replayed into live-line state",
+          "L": "legal CPC-surviving root moves scored/ordered",
+          "L3": "root moves using three-word live-line specialization",
+          "LG": "root moves using generic live-line scorer; L3+LG=L",
+          "Z7": "1 for configured width 7, otherwise 0",
+          "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
+          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling."
+        },
+        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#storeConnect4RbaExactCache32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "storeConnect4RbaExactCache32Behavior",
+      "scope": "hot-cache-wrapper",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeConnect4RbaExactCacheSlot32Behavior"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(storeConnect4RbaExactCacheSlot32Behavior)",
+        "note": "Public exact-cache store wrapper."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#storeConnect4RbaExactCacheSlot32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "storeConnect4RbaExactCacheSlot32Behavior",
+      "scope": "hot-cache",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 5
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": 1
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "L"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "L"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "L"
+        },
+        {
+          "op": "control.branch",
+          "count": "L"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "parameters": {
+          "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
+          "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#searchCpcOnlyBehavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "searchCpcOnlyBehavior",
+      "scope": "local-negamax-hot-production-cpc-only",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "4+8*P+8*Q+10*A+4*O"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+3*N+2*S+2*Q+3*A"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2+3*N+4*Q+4*A+3*O+J+K"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2*N+2*L+2*K"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+2*Q+2*A+L+L3"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "4*N+2*A+K+2*Q"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+6*N+3*A+O+2*Q"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A+O+Q"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+3*N"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "2*(Q+R)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "probeConnect4RbaExactCacheSlot32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H+E+FT+T",
+          "target": "absToRelativeBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "RA",
+          "target": "relativeToAbsBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeConnect4RbaExactCacheSlot32Behavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+FT+C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "searchCpcOnlyBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "L3",
+          "target": "evaluateConnect4LiveLine3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "LG",
+          "target": "evaluateConnect4LiveLineCell32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+R",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "completeBehaviorNode32",
+          "count": "B"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "K"
+        },
+        {
+          "op": "control.branch",
+          "count": "K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior))+(H+E+FT+T)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsBehavior)+S*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyBehavior)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))",
+        "parameters": {
+          "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
+          "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
+          "N": "P-H CPC-evaluated iterations",
+          "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
+          "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
+          "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
+          "RA": "relativeToAbs calls executed for semantic exactness or full-window endpoint publication, 0 or 1",
+          "S": "exact-cache stores executed by this invocation, 0 or 1",
+          "A": "non-forced endpoint actions examined",
+          "C": "non-forced endpoint children cofactored",
+          "R": "nonterminal non-forced children recursively searched",
+          "T": "terminal non-forced cofactor children converted to mover-relative values",
+          "U": "non-forced actions that strictly improve best",
+          "O": "configured action slots scanned for live-line scoring at the non-forced endpoint",
+          "L": "legal non-forced moves live-line scored and insertion-ordered",
+          "L3": "non-forced legal moves scored by the three-word live-line specialization",
+          "LG": "non-forced legal moves scored by the generic live-line evaluator",
+          "J": "stable insertion score comparisons at the non-forced endpoint",
+          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
+          "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint."
+        },
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed.",
+        "targetCyclesPerNode": 1000
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-behavior.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker-behavior.mjs",
+      "name": "<behavior-module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaAlphaBetaBehavior"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "solveConnect4RbaAlphaBetaBehavior"
+        },
+        {
+          "op": "memory.store.f64",
+          "count": 15
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 6
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 17
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 25
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "BehaviorWorker",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "R"
+        },
+        {
+          "op": "atomic.notify",
+          "count": "N"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "P"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBetaBehavior)+CALL(solveConnect4RbaAlphaBetaBehavior)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)",
+        "unboundedTerms": [
+          "CALL(solveConnect4RbaAlphaBetaBehavior)",
+          "PARK_DURATION"
+        ],
+        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search.",
+        "parameters": {
+          "L": "Executed retired-worker scan and wake checks",
+          "S": "Cancellation result/stop publications",
+          "R": "all-retired CAS and wake increment",
+          "N": "all-retired notify",
+          "P": "Retired waits until another result or host closes; unbounded duration",
+          "T": "Executed cancellation, scan and park tests",
+          "A": "Executed indexed addressing/increments",
+          "M": "Executed result-stride addressing"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#createWorkerBehaviorMemory32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "createWorkerBehaviorMemory32",
+      "scope": "cold",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 1
+        },
+        {
+          "op": "runtime.math.ceil",
+          "count": 1
+        },
+        {
+          "op": "runtime.wasm.memory.prepare",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "C(runtime.integer.check)+C(runtime.math.ceil)+C(runtime.wasm.memory.prepare)+2*C(alu.imul.u32)+3*C(control.branch)+SETUP+E*C(runtime.error.throw)",
+        "parameters": {
+          "SETUP": "Page division, number bounds, literal descriptor allocation, constructor dispatch, fixed memory view setup",
+          "E": "Invalid setup only"
+        },
+        "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#prepareWorkerBehaviorLoad32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "prepareWorkerBehaviorLoad32",
+      "scope": "cold",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.instanceof.check",
+          "count": 2
+        },
+        {
+          "op": "runtime.wasm.prepare",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 2
+        },
+        {
+          "op": "runtime.wasm.atomic.load32",
+          "count": 100000
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 100000
+        },
+        {
+          "op": "control.branch",
+          "count": 100002
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.instanceof.check)+C(runtime.wasm.prepare)+C(runtime.typed_array.allocate)+2*C(runtime.object.allocate)+100000*(C(runtime.wasm.atomic.load32)+C(alu.add.u32)+C(control.branch))+PREP+E*C(runtime.error.throw)",
+        "parameters": {
+          "PREP": "Byte literal creation/copy, module/instance/export access, validation branches, loop setup/test/return; cold only",
+          "E": "Invalid setup only"
+        },
+        "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior-search.mjs#prepareSearchBehavior32",
+      "source": "addons/worker-behavior-search.mjs",
+      "name": "prepareSearchBehavior32",
+      "scope": "cold",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 6
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 5
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(control.branch)+6*C(runtime.field.load)+5*C(runtime.field.store)+CHECKS+E*C(runtime.error.throw)",
+        "parameters": {
+          "CHECKS": "Prepared callable type check and return",
+          "E": "Missing/preparation-invalid behavior only"
+        },
+        "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior-search.mjs#completeBehaviorNode32",
+      "source": "addons/worker-behavior-search.mjs",
+      "name": "completeBehaviorNode32",
+      "scope": "per-completed-node-hot",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "2+3*E"
+        },
+        {
+          "op": "runtime.wasm.atomic.load32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+E+S"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+E+S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "readWorkerBehavior32",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(2+3*E)*C(runtime.field.load)+C(runtime.wasm.atomic.load32)+C(alu.shr.u32)+(1+S)*C(alu.and.u32)+(1+E+S)*(C(control.test.u32)+C(control.branch))+E*CALL(readWorkerBehavior32)+RETURN",
+        "parameters": {
+          "E": "1 if primary extension marker set; 0 otherwise",
+          "S": "1 if consistent primary/snapshot accepted and STOP tested, 0 on deferred extension",
+          "RETURN": "call/return/value preservation or selection unless compiler removes; no assumed zero"
+        },
+        "note": "Optional per-completed-node controls. Includes full caller/callee cost; no full NEES claim."
       }
     }
   ],
   "summary": {
-    "units": 118,
-    "decomposed": 118,
+    "units": 137,
+    "decomposed": 137,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 64
+    "localExtensionOperations": 68
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -6641,10 +8124,13 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "4d2bfa0dccf9c205f8507a5a0cebb9590ef2f0dd",
+    "addons/rba-connect4-lazy-smp-host.mjs": "421a0d50b3974f2652bec15f8d05a83f1eca5b0b",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
-    "addons/worker-behavior.mjs": "cf1b7e197f9d8e844ba076f7d15148ddd59f61eb"
+    "addons/worker-behavior.mjs": "fdbb94ecb47bcbf12c6c8ff3e404803ef07957f6",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "30c1dde32bf078d1c23b9ebeb94eee2a61289c19",
+    "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
+    "addons/worker-behavior-search.mjs": "f292a542520716b4cb8fbdda0dc1bcc7b43bba44"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -6743,7 +8229,8 @@
     "roots": [
       "addons/rba-connect4-geometry.mjs#prepareConnect4RbaGeometry",
       "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
-      "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>"
+      "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-behavior.mjs#<module-main>"
     ],
     "callbackTargets": {
       "prepareRemove": [
