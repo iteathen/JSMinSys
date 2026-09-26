@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry,prepareConnect4RbaCoordinateScratch,connect4RbaShapeSubset,connect4RbaShapeContains} from '../addons/rba-connect4-geometry.mjs';
 import {prepareConnect4RbaExecutionProfile} from '../addons/rba-connect4-profile.mjs';
 import {connect4RbaCofactorKnownLegal,connect4RbaBasisFromSupport} from '../addons/rba-connect4-coordinate.mjs';
-import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 
 test('completed principal upset absorbs later images without repeated expansion',()=>{
   for(const budget of [0,2097152])for(const player of [0,1]){

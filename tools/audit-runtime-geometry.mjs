@@ -33,8 +33,8 @@ for(const name of [
 
 const addons=readFileSync('addons/index.mjs','utf8');
 for(const name of [
-  'rba-tt32.mjs','rba-connect4-geometry.mjs','rba-connect4-coordinate.mjs',
-  'rba-connect4-front.mjs','rba-connect4-solver.mjs','rba-connect4-profile.mjs',
+  'rba-connect4-geometry.mjs','rba-connect4-coordinate.mjs',
+  'rba-connect4-front.mjs','rba-connect4-ingress.mjs','rba-connect4-profile.mjs',
   'cpc-connect4.mjs','rba-connect4-alphabeta.mjs'
 ])assert.ok(addons.includes(name),`missing configured RBA export ${name}`);
 
@@ -51,7 +51,7 @@ for(const name of [
   'publishDependencies32','retainFirstRunnableDependency32','applyMoveSpan32','undoMoveSpan32'
 ])assert.ok(names.has(name),`general runtime-sized catalog function missing: ${name}`);
 
-const geometry=readFileSync('addons/rba-connect4-solver.mjs','utf8');
+const geometry=readFileSync('addons/rba-connect4-ingress.mjs','utf8');
 assert.ok(!/columns\s*:\s*7|rows\s*:\s*6/.test(geometry),'RBA solver must require initialization geometry');
 
 console.log('Runtime geometry audit passed: general path present; RBA add-ons contain no 7x6 carrier constants.');

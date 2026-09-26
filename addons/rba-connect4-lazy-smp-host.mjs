@@ -1,6 +1,6 @@
 import {performance} from 'node:perf_hooks';
 import {createManagedThreadSession32,sharedViewBytes32} from './branch-manager-host.mjs';
-import {connect4RbaFromMoves} from './rba-connect4-solver.mjs';
+import {connect4RbaFromMoves} from './rba-connect4-ingress.mjs';
 import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 

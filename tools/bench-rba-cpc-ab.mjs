@@ -1,6 +1,6 @@
 import {performance} from 'node:perf_hooks';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
-import {connect4RbaFromMoves} from '../addons/rba-connect4-solver.mjs';
+import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4Cpc32} from '../addons/cpc-connect4.mjs';
 import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,RBA_AB_CPC_ONLY,RBA_AB_CPC_FOUR_FRONT} from '../addons/rba-connect4-alphabeta.mjs';
 
