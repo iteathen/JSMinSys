@@ -14,6 +14,10 @@ appendFileSync(output,JSON.stringify(metadata)+'\n');
 let cases;
 if(mode==='screen')cases=[{columns:4,rows:4,moves:[]},...[28,24,22,20,18].map(n=>({columns:7,rows:6,moves:moves.slice(0,n)}))]
   .map(fixture=>({fixture,policy:'poll-only',timeoutMs:500,warmups:20}));
+else if(mode==='screen2')cases=[
+  [2,0,5,3,6,3,5,2,3,3,3,5,0,5,0,0,1,6,1,4,3,4,2,6,6,0,6,4],
+  [1,3,2,0,4,6,1,0,2,4,5,2,2,3,1,1,1,5,1,3,2,4,6,0,4,4,6,2,0,4,3,3],
+].flatMap(sequence=>[26,22,18,14].map(n=>({fixture:{columns:7,rows:6,moves:sequence.slice(0,n)},policy:'poll-only',timeoutMs:500,warmups:20})));
 else if(mode==='campaign'){
   const fixtures=[{columns:4,rows:4,moves:[]},{columns:7,rows:6,moves:moves.slice(0,20)}];
   const policies=['poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'];
