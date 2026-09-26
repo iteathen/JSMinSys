@@ -6340,11 +6340,197 @@
         "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#createWorkerBehavior32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "createWorkerBehavior32",
+      "scope": "cold-control-storage",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "on invalid input"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.integer.check)+C(memory.allocate.shared.bytes)+C(runtime.typed_view.construct)+C(runtime.host.bookkeeping)+ERROR",
+        "parameters": {
+          "ERROR": "invalid argument construction and throw, zero on valid input; bytes=128*workers"
+        },
+        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#validateWorkerBehavior32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "validateWorkerBehavior32",
+      "scope": "cold-input-validation",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.instanceof.check",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "view metadata"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 1
+        },
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "on invalid input"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(runtime.instanceof.check)+C(runtime.integer.check)+C(runtime.host.bookkeeping)+FIELDS+ERROR",
+        "parameters": {
+          "FIELDS": "buffer/length reads and bounds/address arithmetic",
+          "ERROR": "invalid argument construction and throw; valid input zero"
+        },
+        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#publishWorkerBehavior32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "publishWorkerBehavior32",
+      "scope": "single-strategist-publication",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "validateWorkerBehavior32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "3+n"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "four flag checks plus version odd test"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "n extension markers"
+        },
+        {
+          "op": "control.branch",
+          "count": "validation and chain branches"
+        },
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "on invalid input"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(validateWorkerBehavior32)+C(atomic.load.u32)+(3+n)*C(atomic.store.u32)+CHECKS_AND_ADDRESSING+ERROR",
+        "parameters": {
+          "n": "0..3 active extension words",
+          "CHECKS_AND_ADDRESSING": "31-bit validation, version bounds, selected chain tests/marker ORs, argument defaults, scalar addressing/register updates",
+          "ERROR": "validation error allocation and throw; before shared mutation; otherwise zero"
+        },
+        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#BehaviorWorker",
+      "source": "addons/worker-behavior.mjs",
+      "name": "BehaviorWorker",
+      "scope": "cold-optional-worker-construction",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "Worker"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "validateWorkerBehavior32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 3
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(Worker)+CALL(validateWorkerBehavior32)+3*C(runtime.field.store)+C(runtime.typed_array.allocate)",
+        "parameters": {},
+        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+      }
+    },
+    {
+      "unit": "addons/worker-behavior.mjs#BehaviorWorker.readBehavior32",
+      "source": "addons/worker-behavior.mjs",
+      "name": "BehaviorWorker.readBehavior32",
+      "scope": "optional-method-checkpoint",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "readWorkerBehavior32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "3*C(runtime.field.load)+CALL(readWorkerBehavior32)+METHOD_DISPATCH",
+        "parameters": {
+          "METHOD_DISPATCH": "receiver checks and call/return overhead unless inlined; not assumed free"
+        },
+        "note": "Prepared optional worker controls. Unknown runtime/coherence costs stay symbolic; error paths include allocation and throw. Not an IsoMax speed or final NEES-conformance claim."
+      }
     }
   ],
   "summary": {
-    "units": 113,
-    "decomposed": 113,
+    "units": 118,
+    "decomposed": 118,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -6457,7 +6643,8 @@
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
     "addons/rba-connect4-lazy-smp-host.mjs": "4d2bfa0dccf9c205f8507a5a0cebb9590ef2f0dd",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
-    "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c"
+    "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
+    "addons/worker-behavior.mjs": "cf1b7e197f9d8e844ba076f7d15148ddd59f61eb"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

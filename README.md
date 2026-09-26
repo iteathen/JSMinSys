@@ -65,6 +65,11 @@ to verify catalog/admission consistency and behavior.
 
 ## Cold host add-ons
 
+Optional shared behavior controls: [worker behavior contract](docs/worker-behavior.md).
+Select `BehaviorWorker` during initialization to consume a strategist-owned,
+four-word extensible flag set. Ordinary `Worker` and current Lazy SMP execution
+remain unchanged. The flag transport does not define PFIF or domain behaviors.
+
 Host lifecycle that is intentionally outside JMS-RESTRICTED/JMS-SEALED hot
 execution lives under `addons/`. These modules may use Node host mechanisms
 such as worker threads, promises, timers, rich errors, and ordinary objects when
