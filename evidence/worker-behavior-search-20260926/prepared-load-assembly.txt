@@ -1,0 +1,118 @@
+--- WebAssembly code ---
+name: wasm-function[0]
+index: 0
+kind: wasm function
+compiler: Liftoff
+Body (size = 128 = 100 + 28 padding)
+Instructions (size = 84)
+00000062D0DC19C0     0  4531e4               xorl r12,r12
+00000062D0DC19C3     3  e8c8f7ffff           call 00000062D0DC1190  (jump table)
+00000062D0DC19C8     8  4881ec08000000       REX.W subq rsp,0x8
+00000062D0DC19CF     f  493b65a0             REX.W cmpq rsp,[r13-0x60]
+00000062D0DC19D3    13  0f861f000000         jna 00000062D0DC19F8  <+0x38>
+00000062D0DC19D9    19  488b461f             REX.W movq rax,[rsi+0x1f]
+00000062D0DC19DD    1d  8b8880000000         movl rcx,[rax+0x80]
+00000062D0DC19E3    23  4c8b5647             REX.W movq r10,[rsi+0x47]
+00000062D0DC19E7    27  41832a5f             subl [r10],0x5f
+00000062D0DC19EB    2b  0f8812000000         js 00000062D0DC1A03  <+0x43>
+00000062D0DC19F1    31  8bc1                 movl rax,rcx
+00000062D0DC19F3    33  488be5               REX.W movq rsp,rbp
+00000062D0DC19F6    36  5d                   pop rbp
+00000062D0DC19F7    37  c3                   retl
+00000062D0DC19F8    38  e843f9ffff           call 00000062D0DC1340  (jump table)
+00000062D0DC19FD    3d  488b75f0             REX.W movq rsi,[rbp-0x10]
+00000062D0DC1A01    41  ebd6                 jmp 00000062D0DC19D9  <+0x19>
+00000062D0DC1A03    43  50                   push rax
+00000062D0DC1A04    44  51                   push rcx
+00000062D0DC1A05    45  e876f7ffff           call 00000062D0DC1180  (jump table)
+00000062D0DC1A0A    4a  59                   pop rcx
+00000062D0DC1A0B    4b  58                   pop rax
+00000062D0DC1A0C    4c  488b75f0             REX.W movq rsi,[rbp-0x10]
+00000062D0DC1A10    50  ebdf                 jmp 00000062D0DC19F1  <+0x31>
+00000062D0DC1A12    52  6690                 nop
+
+Source positions:
+ pc offset  position
+        38         0  statement
+        45         8  statement
+
+Safepoints (stack slots = 8, entries = 1, byte size = 14)
+00000062D0DC19FD     3d  slots (sp->fp): 00000000
+
+RelocInfo (size = 0)
+
+--- End code ---
+kind = JS_TO_WASM_FUNCTION
+name = js-to-wasm::i
+compiler = turbofan
+address = 00000154191AE4D9
+
+Instructions (size = 72)
+0000024500046980     0  55                   push rbp
+0000024500046981     1  4889e5               REX.W movq rbp,rsp
+0000024500046984     4  56                   push rsi
+0000024500046985     5  57                   push rdi
+0000024500046986     6  50                   push rax
+0000024500046987     7  488b5f1f             REX.W movq rbx,[rdi+0x1f]
+000002450004698B     b  488b5b07             REX.W movq rbx,[rbx+0x7]
+000002450004698F     f  488b5b1f             REX.W movq rbx,[rbx+0x1f]
+0000024500046993    13  488b7307             REX.W movq rsi,[rbx+0x7]
+0000024500046997    17  8b5b1f               movl rbx,[rbx+0x1f]
+000002450004699A    1a  49ba0000626145020000 REX.W movq r10,0000024561620000    ;; external reference (GetProcessWideWasmCodePointerTable())
+00000245000469A4    24  41ff14da             call [r10+rbx*8]
+00000245000469A8    28  48c1e020             REX.W shlq rax,32
+00000245000469AC    2c  488b4de8             REX.W movq rcx,[rbp-0x18]
+00000245000469B0    30  488be5               REX.W movq rsp,rbp
+00000245000469B3    33  5d                   pop rbp
+00000245000469B4    34  4883f901             REX.W cmpq rcx,0x1
+00000245000469B8    38  7f03                 jg 00000245000469BD  <+0x3d>
+00000245000469BA    3a  c20800               ret 0x8
+00000245000469BD    3d  415a                 pop r10
+00000245000469BF    3f  488d24cc             REX.W leaq rsp,[rsp+rcx*8]
+00000245000469C3    43  4152                 push r10
+00000245000469C5    45  c3                   retl
+00000245000469C6    46  90                   nop
+00000245000469C7    47  90                   nop
+
+
+Safepoints (stack slots = 5, entries = 1, byte size = 14)
+00000245000469A8     28  slots (sp->fp): 00000
+
+RelocInfo (size = 2)
+000002450004699C  external reference (GetProcessWideWasmCodePointerTable())  (0000024561620000)
+
+--- WebAssembly code ---
+name: wasm-function[0]
+index: 0
+kind: wasm function
+compiler: TurboFan
+Body (size = 64 = 64 + 0 padding)
+Instructions (size = 48)
+00000062D0DC1A40     0  55                   push rbp
+00000062D0DC1A41     1  4889e5               REX.W movq rbp,rsp
+00000062D0DC1A44     4  6a30                 push 0x30
+00000062D0DC1A46     6  56                   push rsi
+00000062D0DC1A47     7  488b5e1f             REX.W movq rbx,[rsi+0x1f]
+00000062D0DC1A4B     b  488d9380000000       REX.W leaq rdx,[rbx+0x80]
+00000062D0DC1A52    12  83e203               andl rdx,0x3
+00000062D0DC1A55    15  8bd2                 movl rdx,rdx
+00000062D0DC1A57    17  85d2                 testl rdx,rdx
+00000062D0DC1A59    19  0f850b000000         jnz 00000062D0DC1A6A  <+0x2a>
+00000062D0DC1A5F    1f  8b8380000000         movl rax,[rbx+0x80]
+00000062D0DC1A65    25  488be5               REX.W movq rsp,rbp
+00000062D0DC1A68    28  5d                   pop rbp
+00000062D0DC1A69    29  c3                   retl
+00000062D0DC1A6A    2a  e8f1f5ffff           call 00000062D0DC1060  (jump table)
+00000062D0DC1A6F    2f  90                   nop
+
+Source positions:
+ pc offset  position
+        2a         4
+
+Safepoints (stack slots = 4, entries = 1, byte size = 14)
+00000062D0DC1A6F     2f  slots (sp->fp): 0000
+
+RelocInfo (size = 1)
+00000062D0DC1A6B  wasm stub call  (00000062D0DC1060)
+
+--- End code ---

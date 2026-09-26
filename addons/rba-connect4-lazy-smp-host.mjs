@@ -18,6 +18,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   signal,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
+  behaviorMemory=null,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<2||workers>64)
@@ -33,6 +34,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
+  if(behaviorMemory!==null&&(!(behaviorMemory instanceof WebAssembly.Memory)||
+     !(behaviorMemory.buffer instanceof SharedArrayBuffer)||behaviorMemory.buffer.byteLength<workers*128))
+    throw new TypeError('prepared shared behavior memory required');
 
   const root=connect4RbaFromMoves(moves,{geometry,positionCode:false}),
     workerGeometry=shareConnect4RbaGeometry32(geometry),
@@ -60,12 +64,15 @@ export async function runLazySmpConnect4Rba32(moves,{
   try{
     for(let i=0;i<workers;i+=1)
       session.spawn(
-        new URL('./rba-connect4-lazy-smp-worker.mjs',import.meta.url),
+        new URL(behaviorMemory===null?'./rba-connect4-lazy-smp-worker.mjs':
+          './rba-connect4-lazy-smp-worker-behavior.mjs',import.meta.url),
         {
           control,
           resultWords,
           metricBuffer,
           workerIndex:i,
+          workerCount:workers,
+          behaviorMemory,
           geometry:workerGeometry,
           root,
           rootReflected:root.reflected,
@@ -133,6 +140,6 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
-      control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
+      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength),
   };
 }
