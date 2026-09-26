@@ -4,11 +4,11 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
 import {createConnect4RbaSharedExactCache32} from '../../addons/rba-connect4-shared-exact-cache.mjs';
-import {createWorkerBehaviorMemory32} from '../../addons/worker-behavior.mjs';
+import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from '../../addons/worker-behavior.mjs';
 
 export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,holdMs=20,
   timeoutMs=1000,warmups=20,measureCycles=false,localCapacity=4096,sharedCapacity=16384}={}){
-  if(!['poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'].includes(policy))throw RangeError('policy');
+  if(!['host-only','poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'].includes(policy))throw RangeError('policy');
   if(!Number.isInteger(workers)||workers<1||workers>16)throw RangeError('workers');
   if(!(cadenceMs>=1&&cadenceMs<=1000)||!(timeoutMs>0&&timeoutMs<=5000)||!Number.isInteger(warmups)||warmups<0||warmups>100)throw RangeError('campaign bounds');
   const geometry=prepareConnect4RbaGeometry(fixture),root=connect4RbaFromMoves(fixture.moves,{geometry});
@@ -24,8 +24,9 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   };
   let started=null,finished=null;
   try{
-    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pollOnly:policy==='poll-only'});
-    launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles});
+    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pollOnly:policy==='poll-only'||policy==='host-only'});
+    if(policy==='host-only')Atomics.store(control,4,1);
+    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles});
     const preparationDeadline=performance.now()+10000;
     while((Atomics.load(control,1)!==workers||!Atomics.load(control,4))&&!errors.length&&performance.now()<preparationDeadline)await delay(1);
     if(errors.length||Atomics.load(control,1)!==workers||!Atomics.load(control,4))throw Error('campaign preparation failed');
@@ -33,6 +34,10 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
     while(!Atomics.load(control,2)&&!errors.length&&performance.now()-started<timeoutMs)await delay(1);
     timedOut=!Atomics.load(control,2)&&!errors.length;
     Atomics.store(control,0,2);Atomics.notify(control,0);
+    if(policy==='host-only'){
+      const words=new Uint32Array(memory.buffer);
+      for(let i=0;i<workers;i++)publishWorkerBehavior32(words,i,1);
+    }
     const joined=Promise.all(exits).then(()=>true);
     let graceTimer;
     const done=await Promise.race([joined,new Promise(resolve=>{graceTimer=setTimeout(()=>resolve(false),1500);})]);
@@ -44,6 +49,7 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
     forced++;await Promise.all(threads.map(w=>w.terminate()));await Promise.all(exits);
   }
   const winner=Atomics.load(control,2)-1,winning=evaluators.find(r=>r.index===winner);
+  if(winning&&winning.ended-started>timeoutMs)timedOut=true;
   const values=evaluators.filter(r=>r.result.status==='EXACT').map(r=>r.result.value);
   if(values.some(v=>v!==values[0]))errors.push('conflicting exact WDL');
   const cycles=measureCycles&&evaluators.length===workers?evaluators.reduce((sum,r)=>sum+BigInt(r.cycles),0n).toString():null;
@@ -56,5 +62,5 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
     cyclesPerNode:cycles&&nodes?Number(cycles)/nodes:null,
     evaluatorStartSkewMs:evaluators.length?Math.max(...evaluators.map(r=>r.started))-Math.min(...evaluators.map(r=>r.started)):null,
     evaluators:evaluators.sort((a,b)=>a.index-b.index),strategist,
-    cacheStats:[...cache.stats],errors,forcedTerminations:forced,cleanup:forced===0&&evaluators.length===workers&&strategist!==null};
+    cacheStats:[...cache.stats],errors,forcedTerminations:forced,cleanup:forced===0&&evaluators.length===workers&&(strategist!==null||policy==='host-only')};
 }

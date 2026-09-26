@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 
 test('asynchronous strategist and evaluators agree and join with live controls',{timeout:15000},async()=>{
   const {runTrial}=await import('./host.mjs');
-  for(const policy of ['inert','rotate','adaptive','combined']){
+  for(const policy of ['host-only','inert','rotate','adaptive','combined']){
     const r=await runTrial({fixture:{columns:4,rows:4,moves:[]},workers:2,policy,cadenceMs:1,timeoutMs:2000,warmups:2});
     assert.equal(r.status,'EXACT');assert.equal(r.value,2);assert.equal(r.cleanup,true);
-    assert.equal(r.evaluators.length,2);assert.equal(r.strategist.error,undefined);
+    assert.equal(r.evaluators.length,2);
+    if(policy==='host-only')assert.equal(r.strategist,null);
+    else assert.equal(r.strategist.error,undefined);
     assert.ok(r.evaluators.every(w=>w.result.value===2||w.result.status==='CANCELLED'));
-    if(policy!=='inert')assert.ok(r.evaluators.some(w=>w.changes>0));
+    if(policy!=='inert'&&policy!=='host-only')assert.ok(r.evaluators.some(w=>w.changes>0));
   }
 });
 

@@ -29,6 +29,14 @@ else if(mode==='campaign'){
   cases=[];
   for(let round=0;round<3;round++)for(const cadenceMs of [1,5,25])for(const policy of ['inert','rotate','combined'])
     cases.push({fixture:{columns:7,rows:6,moves:workingMoves},policy,cadenceMs,round,timeoutMs:750,warmups:20});
+}else if(mode==='confirmation'){
+  cases=[];
+  const policies=['host-only','poll-only','inert','fixed','sparse','fixed-sparse'];
+  for(let round=0;round<4;round++)for(const fixture of [
+    {columns:4,rows:4,moves:[]},
+    {columns:7,rows:6,moves:workingMoves},
+    {columns:7,rows:6,moves:workingMoves.map(c=>6-c)},
+  ])for(let i=0;i<policies.length;i++)cases.push({fixture,policy:policies[(i+round)%policies.length],round,cadenceMs:5,timeoutMs:750,warmups:20});
 }else throw Error('unknown mode');
 for(const c of cases){
   const result=await runTrial({...c,workers:2,measureCycles:true});
