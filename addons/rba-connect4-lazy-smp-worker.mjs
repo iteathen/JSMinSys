@@ -12,8 +12,11 @@ const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   metricBase=index*METRIC_WIDTH,
   control=workerData.control,
   resultWords=workerData.resultWords,
-  metrics=new Float64Array(workerData.metricBuffer),
-  state=prepareConnect4RbaAlphaBeta({
+  metrics=new Float64Array(workerData.metricBuffer);
+
+if(workerData.sharedExactCache)workerData.sharedExactCache.workerIndex=index;
+
+const state=prepareConnect4RbaAlphaBeta({
     geometry:workerData.geometry,
     mode:RBA_AB_CPC_ONLY,
     cacheCapacity:workerData.localCacheCapacity,
