@@ -28,14 +28,14 @@ reported honestly. No full NEES or assembly-qualified claim.
 
 ## Plan
 
-- [ ] 1. Tests first: zero settings preserve metrics; fixed and changing settings
+- [x] 1. Tests first: zero settings preserve metrics; fixed and changing settings
   preserve WDL; invalid controls fail cold; STOP works; generator stays exact.
   Implement prepared controls and generated experimental solver. Cost ledger
   covers load, extension path, change detection, bounded decode and assignments.
-- [ ] 2. Add evaluator/strategist/host with ready barrier, bounded deadlines,
+- [x] 2. Add evaluator/strategist/host with ready barrier, bounded deadlines,
   per-thread cycle records, cleanup, exact-value checks, and raw JSONL evidence.
   Test live updates, slow strategist, exceptions/deadlines, and fresh-trial isolation.
-- [ ] 3. Screen small fixtures, run interleaved short trials: poll-only, inert
+- [x] 3. Screen small fixtures, run interleaved short trials: poll-only, inert
   controls, fixed diversity, periodic diversity, sparse sharing, adaptive sharing,
   and combinations. Compare cadences and observe interaction rather than assuming
   additivity. Bound screening/trials; unresolved roots are not solve wins.
@@ -55,3 +55,14 @@ comparisons. Timing runs do not overlap tests or other campaign runs.
 Base 424d5c230f92e3394dc874eec4caa09c685f0bfb; main unchanged at 93aca17.
 Isolated existing worktree, separate experiment branch. User's explicit execution
 request supplies campaign authorization; no further design approval needed.
+
+Initial pass: 14 fixture screens, 163 comparison solves, all comparison results
+agreed with baseline and joined cleanly. 160 tests passed; independent review
+found no critical/important issues. Source/reproduction/raw evidence retained.
+No production policy selected. Sparse sharing is only a follow-up candidate.
+
+Owner steering: strategy value comes first. Cadence has no independent target;
+study delivery only for a strategy whose value depends on timely instructions.
+Cancelled the unimplemented atomic-wait follow-up. Existing cadence observations
+remain evidence, not a reason to add a timer mechanism. Future strategies should
+state the expected avoided search and observation needed before implementation.
