@@ -1332,7 +1332,7 @@
           "F": "1 when one forced column index is decoded; otherwise 0",
           "K": "1 when one or more fork precursors were found and precursorTotal is accumulated; otherwise 0"
         },
-        "note": "Fork-preemption derivation now owns cumulative precursor telemetry and forced-total updates on its already-existing forced-column branch. Live-line-only experiment: CPC exact result proofs remain, restriction production/consumption and root center-order selection are removed. Prior fixed envelope conservatively overcharges deleted work; root selectors execute lazily but at most once per action. Actual whole-operation cycle evidence is governing."
+        "note": "Live-line-only experiment: exact tactical proofs remain, restriction output production removed. Existing conservative source envelope may overcharge deleted work. No claim that forced-block outputs or restrictions remain unchanged. Measured all-thread process cycles govern screening."
       },
       "status": "decomposed"
     },
@@ -1473,7 +1473,7 @@
           "P": "collectProjected calls executed (0 or 1)",
           "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
         },
-        "note": "EXPERIMENT: predictive draw/exhaustion and response-bound scans removed. Retained tactical losses, forced blocks and fork restrictions unchanged. Source envelope conservatively retains preexisting fixed dispatch overhead; removed-loop and response-call costs are zero because unreachable. This is not an exact Intel instruction count. All actual costs including retained setup/caller work are measured by whole-process cycles; no final NEES promotion claim. Live-line-only experiment: CPC exact result proofs remain, restriction production/consumption and root center-order selection are removed. Prior fixed envelope conservatively overcharges deleted work; root selectors execute lazily but at most once per action. Actual whole-operation cycle evidence is governing."
+        "note": "Live-line-only experiment: exact tactical proofs remain, restriction output production removed. Existing conservative source envelope may overcharge deleted work. No claim that forced-block outputs or restrictions remain unchanged. Measured all-thread process cycles govern screening."
       },
       "status": "decomposed"
     },
@@ -5798,11 +5798,15 @@
         {
           "op": "memory.store.u32",
           "count": "S7+SG"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "O-L"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*0+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*0+3*A)*C(runtime.field.store)+(2+3*N+4*0+4*A+3*O+0+0)*C(memory.load.u32)+(2*N+2*L+2*0)*C(memory.store.u32)+(1+2*0+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*0+6*A+3*O+5*L+4*0+2*0)*C(alu.add.u32)+(4*N+2*A+0+2*0)*C(alu.sub.u32)+(1+6*N+3*A+O+2*0)*C(alu.and.u32)+(A+O+0)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(0+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+0+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(0+0+C)*CALL(connect4RbaCofactorKnownNonwinningHeight)+(0+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(0+R)*CALL(advanceConnect4LiveLineState32)+(S7)*CALL(argMaxPlayableSlot7Nonempty32)+(SG)*CALL(argMaxPlayableSlot32)+(N)*C(memory.load.u32)+(S7+SG)*C(memory.store.u32)",
+        "expression": "(4+8*P+8*0+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*0+3*A)*C(runtime.field.store)+(2+3*N+4*0+4*A+3*O+0+0)*C(memory.load.u32)+(2*N+2*L+2*0)*C(memory.store.u32)+(1+2*0+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*0+6*A+3*O+5*L+4*0+2*0)*C(alu.add.u32)+(4*N+2*A+0+2*0)*C(alu.sub.u32)+(1+6*N+3*A+O+2*0)*C(alu.and.u32)+(A+O+0)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(0+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+0+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(0+0+C)*CALL(connect4RbaCofactorKnownNonwinningHeight)+(0+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(0+R)*CALL(advanceConnect4LiveLineState32)+(S7)*CALL(argMaxPlayableSlot7Nonempty32)+(SG)*CALL(argMaxPlayableSlot32)+(N)*C(memory.load.u32)+(S7+SG)*C(memory.store.u32)+(O-L)*C(memory.store.u32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -5826,7 +5830,7 @@
           "S7": "lazy next-action selections in seven-column geometry",
           "SG": "lazy next-action selections in other geometry"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Experiment: native move loop uses only live-line scores, no CPC action filtering/forced transit, no center order/worker rotation, and lazy argmax selection. Added selector calls, consumed-slot writes and per-depth score access are charged. Existing fixed overhead is a conservative envelope, not exact hardware cycles.",
+        "note": "Experimental conservative source envelope for strict live-line selection. Forced transit, action filtering, center order and worker rotation removed. Lazy selector calls, consumed-slot writes, all full-column sentinel writes (O-L), and per-depth score access are charged. Existing fixed overhead may overcharge removed work. Whole-process measured cycles are independent of this source ledger; not an exact hardware instruction count.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
