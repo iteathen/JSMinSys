@@ -4,7 +4,7 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {
   prepareConnect4CpcScratch,evaluateConnect4Cpc32,evaluateConnect4CpcNonterminal32,connect4CpcTargetOwner32,
-  CPC_NONE,CPC_EXACT,CPC_BOUND,CPC_RESTRICT,
+  CPC_NONE,CPC_EXACT,CPC_RESTRICT,
 } from '../addons/cpc-connect4.mjs';
 import {
   prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,
@@ -107,36 +107,27 @@ test('projected CPC advisory collection is semantically inert and opt-in',()=>{
   assert.equal(sawProjected,1);
 });
 
-test('CPC pooled-frontier response extends all-even pairing without counting omitted frontiers',()=>{
+test('retired pooled-frontier bounds stay unresolved while native solving remains exact',()=>{
   const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
-
-  // Two odd-remainder columns form an even frontier pool. Every surviving P0
-  // requirement is covered by a true upper-response cell, so P0 gets an exact
-  // no-win upper bound even though the old all-even guard would reject this q.
-  const positive=[0,1,0,0],q=connect4RbaFromMoves(positive,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g,{frontierResponse:true});
-  let odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-q.words[c])&1;
-  assert.equal(odd,2);
-  assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_BOUND);
-  assert.deepEqual([...s.interval],[1,2]);
-  assert.equal(exact(columns,rows,positive).value,2);
-
-  // Fixing the two frontier cells as a synchronized response pair adds an
-  // exact pair blocker beyond pooled vertical-response coverage.
-  const paired=[0,2,0,0],pq=connect4RbaFromMoves(paired,{geometry:g,canonical:false}),ps=prepareConnect4CpcScratch(g,{frontierResponse:true});
-  odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-pq.words[c])&1;
-  assert.equal(odd,2);
-  assert.equal(evaluateConnect4Cpc32(g,pq.words,0,pq.basis,0,pq.basis.length,ps),CPC_BOUND);
-  assert.deepEqual([...ps.interval],[1,2]);
-  assert.equal(exact(columns,rows,paired).value,2);
-
-  // Omitted frontier parity alone is still not enough: if a residual contains
-  // only one endpoint of each fixed pair and no true upper-response cell, the
-  // certificate must remain conservative.
-  const negative=[0,0,0,2,2,2],nq=connect4RbaFromMoves(negative,{geometry:g,canonical:false}),ns=prepareConnect4CpcScratch(g,{frontierResponse:true});
-  odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-nq.words[c])&1;
-  assert.equal(odd,2);
-  assert.equal(evaluateConnect4Cpc32(g,nq.words,0,nq.basis,0,nq.basis.length,ns),CPC_NONE);
-  assert.deepEqual([...ns.interval],[1,3]);
+  // Retain the former pooled-positive, synchronized-pair-positive and negative
+  // controls. Owner-selected no-draw policy (14d6b8f) removed predictive no-win
+  // scans; a legacy frontierResponse option must not silently restore them.
+  for(const moves of [[0,1,0,0],[0,2,0,0],[0,0,0,2,2,2]]){
+    const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),memo=new Map(),
+      oracle=exact(columns,rows,moves,memo);
+    if(moves.length===4)assert.equal(oracle.value,2); // Original positive controls are draws.
+    let odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-q.words[c])&1;
+    assert.equal(odd,2);
+    for(const frontierResponse of [false,true]){
+      const scratch=prepareConnect4CpcScratch(g,{frontierResponse});
+      assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,scratch),CPC_NONE);
+      assert.deepEqual([...scratch.interval],[1,3]);
+      const state=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,
+        cpcFrontierResponse:frontierResponse}),result=solveConnect4RbaAlphaBeta(q,{state});
+      assert.equal(result.value,oracle.value);
+      assertOptimalWitness(columns,rows,moves,result,memo);
+    }
+  }
 });
 
 test('CPC closes a forced block that lifts another opponent terminal singleton',()=>{
