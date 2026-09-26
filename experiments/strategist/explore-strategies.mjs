@@ -38,6 +38,6 @@ for(const {fixture,label,round} of cases){
     cadenceMs:5,holdMs:20,warmups:20,timeoutMs:mode==='screen'?500:750});
   appendFileSync(output,JSON.stringify({type:'trial',label,round,...result})+'\n');
   console.log(label,fixture.columns,fixture.moves.join('')||'empty',result.status,result.value,result.evaluatorCycles,result.nodes,
-    result.strategist?.trace.some(t=>t.harvested),result.strategist?.trace.some(t=>t.retired));
+    result.strategist?.trace.some(t=>t.harvestEligible),result.strategist?.trace.some(t=>t.helperStopPublished));
   if(result.status==='FAILED')throw Error(JSON.stringify(result.errors));
 }

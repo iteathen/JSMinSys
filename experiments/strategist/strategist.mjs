@@ -44,8 +44,11 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
       d.policy==='fixed-sparse'?encodeControls({rotation:1,shareExponent:4}):0;
     if(flags!==last[i]){publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;}
   }
+  // Eligibility is an observation, not evidence that this policy issued STOP.
+  // Keep actual publication separate; this cold trace never runs in evaluators.
   if(trace.length<256)trace.push({ms:now-started,stores,contention,exponent,phase,writes,observation,
-    harvested:policyState.harvested,retired:policyState.retired});
+    harvestEligible:policyState.harvested,retirementEligible:policyState.retired,
+    helperStopPublished:last.subarray(1).some(flags=>flags&1)});
   previousStores=stores;previousContention=contention;ticks++;
   await delay(d.cadenceMs);
 }
