@@ -45,7 +45,7 @@ export function prepareWorkerBehaviorLoad32(memory, byteOffset) {
     10,body.length+2,1,body.length,...body,
   ]);
   const read = new WebAssembly.Instance(new WebAssembly.Module(bytes),{m:{m:memory}}).exports.load;
-  // Compile/tier the tiny callable during preparation, before search.
+  // Warm the callable during preparation; V8 owns final tier scheduling.
   for (let i=0;i<100000;i+=1) read();
   return read;
 }

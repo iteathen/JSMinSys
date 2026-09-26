@@ -134,6 +134,8 @@ The optional search uses `createWorkerBehaviorMemory32` and a prepared
 module compilation, instance creation and a 100,000-load warmup happen before
 search. The hot search calls the prepared Wasm export directly; it does not
 dispatch through the generic Worker method or test whether controls are enabled.
+V8 retains control over optimizing-tier scheduling. Preparation does not promise
+that no later JIT work occurs; whole-process measurements include that work.
 
 Scope: `worker-behavior.mjs#prepareWorkerBehaviorLoad32` and
 `worker-behavior-search.mjs#completeBehaviorNode32`. The sole admitted Wasm
