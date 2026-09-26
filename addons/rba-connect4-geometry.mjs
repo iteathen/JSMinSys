@@ -117,9 +117,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     const seen=new Uint8Array(columns);order=new Uint32Array(columns);
     for(let i=0;i<columns;i+=1){const c=actionOrder[i];if(!Number.isSafeInteger(c)||c<0||c>=columns||seen[c])throw new RangeError('invalid actionOrder');seen[c]=1;order[i]=c;}
   }else{
-    const temp=Array.from({length:columns},(_,c)=>c);
-    const center=(columns-1)/2;temp.sort((a,b)=>Math.abs(a-center)-Math.abs(b-center)||a-b);
-    order=Uint32Array.from(temp);
+    order=new Uint32Array(columns);
+    for(let c=0;c<columns;c+=1)order[c]=c;
   }
   const priorityByColumn=new Uint32Array(columns),mirrorColumn=new Uint32Array(columns);
   for(let i=0;i<columns;i+=1){priorityByColumn[order[i]]=i;mirrorColumn[i]=columns-1-i;}
