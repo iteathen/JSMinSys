@@ -1771,7 +1771,7 @@
         "parameters": {
           "N": "1 when value is non-draw and mover-relative arithmetic executes; 0 for absolute draw"
         },
-        "note": "Valid-value Negamax conversion. Unknown branch prediction remains visible through control.branch."
+        "note": "Valid-value Negamax conversion. Unknown branch prediction remains visible through control.branch. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -1817,7 +1817,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
-        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
+        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -1873,7 +1873,7 @@
           "F": "1 when Four-Front construction fails and query is skipped; otherwise 0",
           "E": "1 when queried interval is exact and frontExact increments; otherwise 0"
         },
-        "note": "Experimental Four-Front path remains separately visible from production CPC-only Negamax."
+        "note": "Experimental Four-Front path remains separately visible from production CPC-only Negamax. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -1895,7 +1895,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "17*C(runtime.field.load)+C(runtime.object.allocate)",
-        "note": "Cold result materialization; projected-fork, precursor and forced totals are read from CPC-owned telemetry."
+        "note": "Cold result materialization; projected-fork, precursor and forced totals are read from CPC-owned telemetry. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2019,7 +2019,7 @@
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
           "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2051,7 +2051,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32)",
-        "note": "Public exact-cache probe wrapper."
+        "note": "Public exact-cache probe wrapper. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2142,7 +2142,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2176,7 +2176,7 @@
           "N": "1 when relative value is non-draw; 0 for draw",
           "M": "1 for mover 0 add path; 0 for mover 1 subtract path"
         },
-        "note": "Mover-relative to absolute W/D/L conversion."
+        "note": "Mover-relative to absolute W/D/L conversion. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2217,7 +2217,7 @@
         "parameters": {
           "W": "1 only when epoch wraps and stamp array is cleared; otherwise 0"
         },
-        "note": "Per-solve cache epoch reset; rare wrap clear remains visible."
+        "note": "Per-solve cache epoch reset; rare wrap clear remains visible. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2345,7 +2345,7 @@
           "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
           "S": "exact-cache stores executed by this invocation (0 or 1)"
         },
-        "note": "Four-Front path now also consumes CPC-owned precursor/forced telemetry; its search semantics are otherwise unchanged.",
+        "note": "Four-Front path now also consumes CPC-owned precursor/forced telemetry; its search semantics are otherwise unchanged. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -2521,7 +2521,7 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2553,7 +2553,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(storeConnect4RbaExactCacheSlot32)",
-        "note": "Public exact-cache store wrapper."
+        "note": "Public exact-cache store wrapper. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -2621,7 +2621,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -5777,7 +5777,7 @@
           "J": "stable insertion score comparisons at the non-forced endpoint",
           "K": "successful stable insertion shifts at the non-forced endpoint"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Diagnostic control: ignore CPC action filters only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -6495,7 +6495,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "ea9473226d2a2954e31ad66e828d1e345c3117e3",
+    "addons/rba-connect4-alphabeta.mjs": "0b598045b60ec965547af6c237d8383b1a26650e",
     "addons/cpc-connect4.mjs": "4603dfea9030099e8a4cf95e39fd31deab23395b",
     "addons/rba-connect4-coordinate.mjs": "0078589c30a5c12884379b6083ac7e4c07daf8d6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",

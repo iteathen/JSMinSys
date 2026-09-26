@@ -161,9 +161,9 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if(semanticLo>alpha)alpha=semanticLo;
     if(semanticHi<beta)beta=semanticHi;
 
-    const forced=state.cpc.forcedColumn[0],
-      preemptCount=state.cpc.preemptionCount[0],
-      preemptMask=state.cpc.preemptionMask32[0],
+    const forced=-1,
+      preemptCount=0,
+      preemptMask=0,
       actionMask=preemptCount>1?preemptMask:-1,
       childDepth=depth+1,
       childKey=keyOffset+g.keyWords,
@@ -389,7 +389,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     alpha=rootSemanticLo;beta=rootSemanticHi;
   }
   let best=-2,bestMove=-1;
-  const forced=state.cpc.forcedColumn[0],preemptCount=state.cpc.preemptionCount[0],preemptMask=state.cpc.preemptionMask32[0],
+  const forced=-1,preemptCount=0,preemptMask=0,
     actionMask=preemptCount>1?preemptMask:-1,scores=state.moveScores,ordered=state.moveOrder,live=state.live;
   let actionCount=0;
   if(forced>=0){
