@@ -4078,7 +4078,7 @@
         "parameters": {
           "P": "1 when cell is absent and original id returns; 0 when removeAt is loaded"
         },
-        "note": "Sparse residual remove."
+        "note": "Sparse residual remove. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4119,7 +4119,7 @@
         "parameters": {
           "S": "shape cells scanned before hit/end"
         },
-        "note": "Sparse residual cell lookup."
+        "note": "Sparse residual cell lookup. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4161,7 +4161,7 @@
           "A": "subset cells scanned",
           "C": "superset cell comparisons across nested scans"
         },
-        "note": "Sparse shape-subset test."
+        "note": "Sparse shape-subset test. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4179,7 +4179,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "C(runtime.array.join)",
-        "note": "Cold shape-key string construction."
+        "note": "Cold shape-key string construction. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4209,7 +4209,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "6*C(runtime.field.load)+6*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+6*C(runtime.field.store)",
-        "note": "Per-worker coordinate scratch allocation."
+        "note": "Per-worker coordinate scratch allocation. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4331,7 +4331,7 @@
           "DENSE_R": "1 when dense remove table allocation is admitted, else 0",
           "DENSE_S": "1 when dense subset table allocation is admitted, else 0"
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized."
+        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -4376,7 +4376,7 @@
           "V": "typed-array property count not already shared",
           "B": "total bytes copied into shared backing stores"
         },
-        "note": "One cold shared image replaces W independent geometry rebuilds."
+        "note": "One cold shared image replaces W independent geometry rebuilds. Diagnostic control: natural ties only. Existing conservative source envelope retained for removed operations; this is not final NEES qualification. Measured whole-process cycles govern."
       },
       "status": "decomposed"
     },
@@ -6494,7 +6494,7 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
+    "addons/rba-connect4-geometry.mjs": "49dd221bd5ae1dec10a50c7447595144d169e057",
     "addons/rba-connect4-alphabeta.mjs": "ea9473226d2a2954e31ad66e828d1e345c3117e3",
     "addons/cpc-connect4.mjs": "4603dfea9030099e8a4cf95e39fd31deab23395b",
     "addons/rba-connect4-coordinate.mjs": "0078589c30a5c12884379b6083ac7e4c07daf8d6",
