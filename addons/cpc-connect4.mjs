@@ -285,15 +285,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
   }
   const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
 
-  const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
-  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
-  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
-
-  if(!p0Any)scratch.interval[1]=2;
-  if(!p1Any)scratch.interval[0]=2;
-
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
-
+  // EXPERIMENT: omit predictive draw/exhaustion and no-win bound scans.
   // Scan the singleton prefix once for both players. The packed profile keeps
   // mover-immediate priority while sharing basis/index/playability work.
   const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells,
@@ -348,31 +340,11 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     }
   }
 
-  // Long-range response closure is intentionally after the cheap tactical
-  // exact/restriction checks so unresolved nodes alone pay its residual scan.
-  // The prior all-even theorem remains the production baseline. The pooled/
-  // synchronized frontier extension is selected once at initialization for A/B.
-  if(mover===0){
-    if(scratch.interval[1]===3){
-      const noWin=scratch.frontierResponse
-        ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
-        :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
-      if(noWin)scratch.interval[1]=2;
-    }
-  }else if(scratch.interval[0]===1){
-    const noWin=scratch.frontierResponse
-      ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch)
-      :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
-    if(noWin)scratch.interval[0]=2;
-  }
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
-
   if(scratch.projectedAdvisory){
     collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
     const forks=scratch.projectedForks;
     scratch.projectedForkTotal+=forks[0]+forks[1];
   }
-  if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
   if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
 }

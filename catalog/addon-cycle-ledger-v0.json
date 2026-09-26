@@ -1395,15 +1395,15 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "24+8*C+4*R+5*P+G"
+          "count": "24+8*C+4*0+5*P+G"
         },
         {
           "op": "runtime.field.store",
-          "count": "10+6*C+4*R+5*P+G"
+          "count": "10+6*C+4*0+5*P+G"
         },
         {
           "op": "memory.load.u32",
-          "count": "3+2*W+2*L+2*P"
+          "count": "3+2*0+2*L+2*P"
         },
         {
           "op": "memory.store.u32",
@@ -1435,11 +1435,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "18+2*W+6*L"
+          "count": "18+2*0+6*L"
         },
         {
           "op": "control.branch",
-          "count": "18+2*W+6*L"
+          "count": "18+2*0+6*L"
         },
         {
           "op": "runtime.call.subledger",
@@ -1458,36 +1458,22 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "F",
-          "target": "frontierResponseNoWin"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "B",
-          "target": "pairedResponseNoWin"
-        },
-        {
-          "op": "runtime.call.subledger",
           "count": "P",
           "target": "collectProjected"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(24+8*C+4*0+5*P+G)*C(runtime.field.load)+(10+6*C+4*0+5*P+G)*C(runtime.field.store)+(3+2*0+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+(2)*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+(1)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+2*0+6*L)*C(control.test.u32)+(18+2*0+6*L)*C(control.branch)+(C)*CALL(collectSingletonProfiles)+(M)*CALL(cellMarked)+(D)*CALL(deriveForkPreemption32)+(P)*CALL(collectProjected)",
         "parameters": {
-          "W": "coordinate words scanned for any-live detection",
           "L": "legal-column iterations executed by lift scan",
-          "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
+          "C": "combined singleton-profile calls (always 1)",
           "M": "cellMarked calls executed",
           "D": "deriveForkPreemption32 calls executed (0 or 1)",
-          "F": "frontierResponseNoWin calls executed (0 or 1)",
-          "B": "pairedResponseNoWin calls executed (0 or 1)",
           "P": "collectProjected calls executed (0 or 1)",
-          "R": "long-range response branches evaluated",
           "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "EXPERIMENT: predictive draw/exhaustion and response-bound scans removed. Retained tactical losses, forced blocks and fork restrictions unchanged. Source envelope conservatively retains preexisting fixed dispatch overhead; removed-loop and response-call costs are zero because unreachable. This is not an exact Intel instruction count. All actual costs including retained setup/caller work are measured by whole-process cycles; no final NEES promotion claim."
       },
       "status": "decomposed"
     },
@@ -6446,7 +6432,7 @@
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/cpc-connect4.mjs": "4603dfea9030099e8a4cf95e39fd31deab23395b",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
