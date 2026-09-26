@@ -1332,7 +1332,7 @@
           "F": "1 when one forced column index is decoded; otherwise 0",
           "K": "1 when one or more fork precursors were found and precursorTotal is accumulated; otherwise 0"
         },
-        "note": "Fork-preemption derivation now owns cumulative precursor telemetry and forced-total updates on its already-existing forced-column branch."
+        "note": "Fork-preemption derivation now owns cumulative precursor telemetry and forced-total updates on its already-existing forced-column branch. Live-line-only experiment: CPC exact result proofs remain, restriction production/consumption and root center-order selection are removed. Prior fixed envelope conservatively overcharges deleted work; root selectors execute lazily but at most once per action. Actual whole-operation cycle evidence is governing."
       },
       "status": "decomposed"
     },
@@ -1473,7 +1473,7 @@
           "P": "collectProjected calls executed (0 or 1)",
           "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
         },
-        "note": "EXPERIMENT: predictive draw/exhaustion and response-bound scans removed. Retained tactical losses, forced blocks and fork restrictions unchanged. Source envelope conservatively retains preexisting fixed dispatch overhead; removed-loop and response-call costs are zero because unreachable. This is not an exact Intel instruction count. All actual costs including retained setup/caller work are measured by whole-process cycles; no final NEES promotion claim."
+        "note": "EXPERIMENT: predictive draw/exhaustion and response-bound scans removed. Retained tactical losses, forced blocks and fork restrictions unchanged. Source envelope conservatively retains preexisting fixed dispatch overhead; removed-loop and response-call costs are zero because unreachable. This is not an exact Intel instruction count. All actual costs including retained setup/caller work are measured by whole-process cycles; no final NEES promotion claim. Live-line-only experiment: CPC exact result proofs remain, restriction production/consumption and root center-order selection are removed. Prior fixed envelope conservatively overcharges deleted work; root selectors execute lazily but at most once per action. Actual whole-operation cycle evidence is governing."
       },
       "status": "decomposed"
     },
@@ -2010,16 +2010,45 @@
         {
           "op": "runtime.field.store",
           "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": "1"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "D"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "D"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "D"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2*D"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "D+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "D+1"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+(2)*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+(W)*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+(W)*C(alu.and.u32)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1)*CALL(prepareConnect4CpcScratch)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(F)*CALL(prepareConnect4RbaFrontArena)+(1)*CALL(createConnect4RbaExactCache32)+(1)*CALL(prepareConnect4LiveLineEvaluator32)+(8+3*F)*C(runtime.typed_array.allocate)+(1)*C(runtime.object.allocate)+(1)*C(runtime.integer.check)+(4)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(alu.and.u32)+(1)*C(alu.add.u32)+(1)*C(alu.shl.u32)+(1)*C(alu.shr.u32)+(1)*C(runtime.field.store)+(1)*C(runtime.array.allocate)+(D)*C(runtime.typed_view.construct)+(D)*C(runtime.field.load)+(D)*C(runtime.field.store)+(2*D)*C(alu.imul.u32)+(D+1)*C(control.test.u32)+(D+1)*C(control.branch)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "D": "cellCount+1 preallocated score views"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Experiment adds per-depth score views of one numeric backing store; existing moveOrder/order allocations are removed but prior allocation envelope is conservatively retained. No hot allocation."
       },
       "status": "decomposed"
     },
@@ -2521,7 +2550,7 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion. Live-line-only experiment: CPC exact result proofs remain, restriction production/consumption and root center-order selection are removed. Prior fixed envelope conservatively overcharges deleted work; root selectors execute lazily but at most once per action. Actual whole-operation cycle evidence is governing."
       },
       "status": "decomposed"
     },
@@ -5642,39 +5671,39 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+8*P+8*Q+10*A+4*O"
+          "count": "4+8*P+8*0+10*A+4*O"
         },
         {
           "op": "runtime.field.store",
-          "count": "1+3*N+2*S+2*Q+3*A"
+          "count": "1+3*N+2*S+2*0+3*A"
         },
         {
           "op": "memory.load.u32",
-          "count": "2+3*N+4*Q+4*A+3*O+J+K"
+          "count": "2+3*N+4*0+4*A+3*O+0+0"
         },
         {
           "op": "memory.store.u32",
-          "count": "2*N+2*L+2*K"
+          "count": "2*N+2*L+2*0"
         },
         {
           "op": "alu.imul.u32",
-          "count": "1+2*Q+2*A+L+L3"
+          "count": "1+2*0+2*A+L+L3"
         },
         {
           "op": "alu.add.u32",
-          "count": "3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J"
+          "count": "3+5*N+6*0+6*A+3*O+5*L+4*0+2*0"
         },
         {
           "op": "alu.sub.u32",
-          "count": "4*N+2*A+K+2*Q"
+          "count": "4*N+2*A+0+2*0"
         },
         {
           "op": "alu.and.u32",
-          "count": "1+6*N+3*A+O+2*Q"
+          "count": "1+6*N+3*A+O+2*0"
         },
         {
           "op": "alu.shl.u32",
-          "count": "A+O+Q"
+          "count": "A+O+0"
         },
         {
           "op": "alu.shr.u32",
@@ -5682,15 +5711,15 @@
         },
         {
           "op": "alu.xor.u32",
-          "count": "2*(Q+R)"
+          "count": "2*(0+R)"
         },
         {
           "op": "control.test.u32",
-          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q"
+          "count": "3+7*N+5*A+U+4*O+4*L+2*0+5*0"
         },
         {
           "op": "control.branch",
-          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q"
+          "count": "3+7*N+5*A+U+4*O+4*L+2*0+5*0"
         },
         {
           "op": "runtime.call.subledger",
@@ -5704,7 +5733,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "H+E+FT+T",
+          "count": "H+E+0+T",
           "target": "absToRelative"
         },
         {
@@ -5724,12 +5753,12 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "Q+FT+C",
+          "count": "0+0+C",
           "target": "connect4RbaCofactorKnownNonwinningHeight"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "Q+R",
+          "count": "0+R",
           "target": "connect4RbaCanonicalize"
         },
         {
@@ -5749,19 +5778,37 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "Q+R",
+          "count": "0+R",
           "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S7",
+          "target": "argMaxPlayableSlot7Nonempty32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SG",
+          "target": "argMaxPlayableSlot32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "N"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S7+SG"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownNonwinningHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)",
+        "expression": "(4+8*P+8*0+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*0+3*A)*C(runtime.field.store)+(2+3*N+4*0+4*A+3*O+0+0)*C(memory.load.u32)+(2*N+2*L+2*0)*C(memory.store.u32)+(1+2*0+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*0+6*A+3*O+5*L+4*0+2*0)*C(alu.add.u32)+(4*N+2*A+0+2*0)*C(alu.sub.u32)+(1+6*N+3*A+O+2*0)*C(alu.and.u32)+(A+O+0)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(0+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*0+5*0)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+0+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(0+0+C)*CALL(connect4RbaCofactorKnownNonwinningHeight)+(0+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(0+R)*CALL(advanceConnect4LiveLineState32)+(S7)*CALL(argMaxPlayableSlot7Nonempty32)+(SG)*CALL(argMaxPlayableSlot32)+(N)*C(memory.load.u32)+(S7+SG)*C(memory.store.u32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
           "N": "P-H CPC-evaluated iterations",
-          "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
-          "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
+          "Q": "0: removed forced-transit/sorted-order machinery in this experiment",
+          "FT": "0: removed forced-transit/sorted-order machinery in this experiment",
           "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
           "RA": "relativeToAbs calls executed for semantic exactness or full-window endpoint publication, 0 or 1",
           "S": "exact-cache stores executed by this invocation, 0 or 1",
@@ -5774,10 +5821,12 @@
           "L": "legal non-forced moves live-line scored and insertion-ordered",
           "L3": "non-forced legal moves scored by the three-word live-line specialization",
           "LG": "non-forced legal moves scored by the generic live-line evaluator",
-          "J": "stable insertion score comparisons at the non-forced endpoint",
-          "K": "successful stable insertion shifts at the non-forced endpoint"
+          "J": "0: removed forced-transit/sorted-order machinery in this experiment",
+          "K": "0: removed forced-transit/sorted-order machinery in this experiment",
+          "S7": "lazy next-action selections in seven-column geometry",
+          "SG": "lazy next-action selections in other geometry"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Experiment: native move loop uses only live-line scores, no CPC action filtering/forced transit, no center order/worker rotation, and lazy argmax selection. Added selector calls, consumed-slot writes and per-depth score access are charged. Existing fixed overhead is a conservative envelope, not exact hardware cycles.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -6495,8 +6544,8 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "ea9473226d2a2954e31ad66e828d1e345c3117e3",
-    "addons/cpc-connect4.mjs": "4603dfea9030099e8a4cf95e39fd31deab23395b",
+    "addons/rba-connect4-alphabeta.mjs": "cf1e99d1be52dbad15adfdc75e5e001db0404cef",
+    "addons/cpc-connect4.mjs": "f1fdff59e71a98d09cb01002c476e4a163d5ca85",
     "addons/rba-connect4-coordinate.mjs": "0078589c30a5c12884379b6083ac7e4c07daf8d6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
@@ -6506,7 +6555,7 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
     "addons/rba-connect4-lazy-smp-host.mjs": "4d2bfa0dccf9c205f8507a5a0cebb9590ef2f0dd",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "bfa5c7f178ba5a1e4b802045ff3ae54b3540a2f7",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c"
   },
   "isomaxLocalKernel": {

@@ -38,7 +38,7 @@ test('CPC-certified nonwinning cofactor matches checked transition exactly',()=>
 test('native CPC recursion uses the proved nonwinning transition; root retains checked witness path',()=>{
   const source=readFileSync(new URL('../addons/rba-connect4-alphabeta.mjs',import.meta.url),'utf8');
   const recursion=source.slice(source.indexOf('function searchCpcOnly('),source.indexOf('function search(state,'));
-  assert.equal((recursion.match(/connect4RbaCofactorKnownNonwinningHeight\(/g)||[]).length,2);
+  assert.equal((recursion.match(/connect4RbaCofactorKnownNonwinningHeight\(/g)||[]).length,1);
   assert.equal(recursion.includes('connect4RbaCofactorKnownHeight('),false);
   assert.ok(source.slice(source.indexOf('export function solveConnect4RbaAlphaBeta(')).includes('connect4RbaCofactorKnownHeight('));
 });

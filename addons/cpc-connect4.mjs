@@ -132,10 +132,8 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   if(first)return 0;
   scratch.precursorTotal+=scratch.precursorCount[0];
 
-  scratch.preemptionMask32[0]=intersection>>>0;
-  const count=popcount32(intersection);scratch.preemptionCount[0]=count;
-  if(count===1){scratch.forcedColumn[0]=firstSetBitIndex32(intersection);scratch.forcedTotal+=1;}
-  return count===0?-1:count;
+  // Exact fork-loss proof only; move ordering receives no restrictions.
+  return intersection===0?-1:0;
 }
 
 // Basic CPC event-reservoir parity for one future target. The target-column
@@ -313,10 +311,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
       const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
       return CPC_EXACT;
     }
-    scratch.forcedColumn[0]=column;
-    scratch.preemptionMask32[0]=g.columns<=32?((1<<column)>>>0):0;
-    scratch.preemptionCount[0]=1;
-    scratch.forcedTotal+=1;
+    // Loss proof retained above; all legal actions remain for live-line order.
   }else{
     // With no current singleton threat, a move changes support in one column.
     // If there are no opponent singleton targets at all this test cannot fire,
@@ -345,6 +340,5 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     const forks=scratch.projectedForks;
     scratch.projectedForkTotal+=forks[0]+forks[1];
   }
-  if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
 }
