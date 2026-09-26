@@ -66,3 +66,19 @@ study delivery only for a strategy whose value depends on timely instructions.
 Cancelled the unimplemented atomic-wait follow-up. Existing cadence observations
 remain evidence, not a reason to add a timer mechanism. Future strategies should
 state the expected avoided search and observation needed before implementation.
+
+## Pass 2: strategy discovery, authorized continuation
+
+Keep evaluator hot code unchanged. Add strategist-only policies and read-only
+sampling of committed TT records (sequence bracketing; rank from support).
+Hypotheses: asymmetric sharing lets one anchor exchange proofs while helpers
+explore mostly privately; harvest enables helper sharing after useful exact
+positions appear; seed-and-retire buys an initial proof contribution then avoids
+paying for duplicate full searches. Prepared broad tie diversity is a candidate
+combination. Compare one-worker baseline, two-worker baseline and inert controls.
+No cadence tuning. Preserve actual instruction traces and inactive policies.
+
+- [ ] Pure policy/TT-observation tests, then strategist implementation.
+- [ ] Screen additional independent nontrivial 7x6 roots with short deadlines.
+- [ ] Interleaved quick comparisons, then confirm promising policies and mixtures.
+- [ ] Review, complete checks, record results and push the experimental checkpoint.

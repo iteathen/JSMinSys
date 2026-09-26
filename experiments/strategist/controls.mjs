@@ -30,7 +30,7 @@ export function prepareSearchBehavior32(state,behavior){
 // frame's already-built move list or its alpha/beta/proof obligations.
 // Ledger: base reader + one comparison; on change, bounded masks/shifts/tests,
 // two prepared field assignments, last-word store and private change increment.
-export function completeBehaviorNode32(state,value){
+export function completeInteger32(state,value){
   let flags=state.behaviorLoad()>>>0;
   if(flags&0x80000000){
     flags=readWorkerBehavior32(state.behaviorWords,state.behaviorBase,state.behaviorExtensions,0);
@@ -45,3 +45,67 @@ export function completeBehaviorNode32(state,value){
   }
   return value;
 }
+
+// HOT CONTRACT inherited above. Equality before STOP removes its mask/test from
+// the unchanged primary path. STOP is never recorded as an applied setting.
+export function completeEarly32(state,value){
+  let flags=state.behaviorLoad()>>>0;
+  if(flags&0x80000000){
+    flags=readWorkerBehavior32(state.behaviorWords,state.behaviorBase,state.behaviorExtensions,0);
+    if(flags===-1)return value;
+  }
+  if(flags===state.campaignLast)return value;
+  if(flags&1)return 3;
+  const rotation=(flags>>>1)&31,exponent=(flags>>>6)&15;
+  state.actionOrder=state.campaignOrders[(flags&1024)&&rotation<state.g.columns?rotation:0];
+  state.cache.sharedSampleBits=(flags&2048)&&exponent<=8?(((1<<exponent)-1)<<24)>>>0:state.campaignDefaultSharing;
+  state.campaignLast=flags;state.campaignChanges+=1;
+  return value;
+}
+
+// HOT CONTRACT inherited above. Isolate XOR-versus-integer change detection.
+export function completeXor32(state,value){
+  let flags=state.behaviorLoad()>>>0;
+  if(flags&0x80000000){
+    flags=readWorkerBehavior32(state.behaviorWords,state.behaviorBase,state.behaviorExtensions,0);
+    if(flags===-1)return value;
+  }
+  const changed=flags^state.campaignLast;
+  if(!changed)return value;
+  if(flags&1)return 3;
+  const rotation=(flags>>>1)&31,exponent=(flags>>>6)&15;
+  state.actionOrder=state.campaignOrders[(flags&1024)&&rotation<state.g.columns?rotation:0];
+  state.cache.sharedSampleBits=(flags&2048)&&exponent<=8?(((1<<exponent)-1)<<24)>>>0:state.campaignDefaultSharing;
+  state.campaignLast=flags;state.campaignChanges+=1;
+  return value;
+}
+
+// HOT CONTRACT inherited above. Group masks avoid reapplying an unchanged
+// feature, at the price of two extra tests on the change path. Measure it.
+export function completeMasked32(state,value){
+  let flags=state.behaviorLoad()>>>0;
+  if(flags&0x80000000){
+    flags=readWorkerBehavior32(state.behaviorWords,state.behaviorBase,state.behaviorExtensions,0);
+    if(flags===-1)return value;
+  }
+  const changed=flags^state.campaignLast;
+  if(!changed)return value;
+  if(flags&1)return 3;
+  if(changed&1086){
+    const rotation=(flags>>>1)&31;
+    state.actionOrder=state.campaignOrders[(flags&1024)&&rotation<state.g.columns?rotation:0];
+  }
+  if(changed&3008){
+    const exponent=(flags>>>6)&15;
+    state.cache.sharedSampleBits=(flags&2048)&&exponent<=8?(((1<<exponent)-1)<<24)>>>0:state.campaignDefaultSharing;
+  }
+  state.campaignLast=flags;state.campaignChanges+=1;
+  return value;
+}
+
+// Experiment selection is cold, once per module/worker. No per-node variant
+// switch. Existing benchmark/evaluator interfaces are deliberately unchanged.
+const dispatch=process.env.JSMINSYS_FLAG_DISPATCH??'integer';
+if(!['integer','early','xor','masked'].includes(dispatch))throw RangeError('flag dispatch');
+export const completeBehaviorNode32=dispatch==='early'?completeEarly32:
+  dispatch==='xor'?completeXor32:dispatch==='masked'?completeMasked32:completeInteger32;
