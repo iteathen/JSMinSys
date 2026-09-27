@@ -91,6 +91,9 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
+  // Cached closures are immutable upward closures. Reapplying a closure is
+  // idempotent, so this experimental arm removes the C1 principal-bit probe
+  // and measures whether three fixed word ORs are cheaper than the guard.
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
@@ -98,13 +101,9 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
     if(!(active0|active1))continue;
     const encoded=cache.map[planBase+i];
     if(encoded===COFACTOR_PLAN_KILL)continue;
-    const imageIndex=encoded&127,unchanged=encoded&128;
-    let write0=active0&&(player===0||unchanged),
+    const imageIndex=encoded&127,unchanged=encoded&128,
+      write0=active0&&(player===0||unchanged),
       write1=active1&&(player===1||unchanged);
-    if(!write0&&!write1)continue;
-    const targetWord=imageIndex>>>5,targetMask=1<<(imageIndex&31);
-    write0=write0&&!(target[p0Target+targetWord]&targetMask);
-    write1=write1&&!(target[p1Target+targetWord]&targetMask);
     if(!write0&&!write1)continue;
     const cb=closureBase+imageIndex*words;
     for(let w=0;w<words;w+=1){
