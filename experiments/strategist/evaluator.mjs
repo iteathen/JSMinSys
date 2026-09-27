@@ -9,8 +9,9 @@ import {prepareCycleMeter} from './meter.mjs';
 // the ordinary worker keeps its original recursive path and cost.
 const frontier=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('frontier-');
 const recurring=process.env.JSMINSYS_STRATEGIST_POLICY?.includes('recurring');
+const modes=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-');
 const module=await import(d.pollOnly?'../../addons/rba-connect4-alphabeta-behavior.mjs':
-  recurring?'./recurring.generated.mjs':frontier?'./frontier.generated.mjs':'./search.generated.mjs');
+  modes?'./modes.generated.mjs':recurring?'./recurring.generated.mjs':frontier?'./frontier.generated.mjs':'./search.generated.mjs');
 const prepare=module.prepareConnect4RbaAlphaBetaBehavior,solve=module.solveConnect4RbaAlphaBetaBehavior;
 const behavior=new BehaviorWorker(d.index,new Uint32Array(d.memory.buffer),d.index,d.memory);
 const warmGeometry=prepareConnect4RbaGeometry({columns:4,rows:4});
