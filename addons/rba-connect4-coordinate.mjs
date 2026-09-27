@@ -97,28 +97,27 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
   if(words===3){
-    let p00=0,p01=0,p02=0,p10=0,p11=0,p12=0;
+    const moverSource=player?p1Source:p0Source,opponentSource=player?p0Source:p1Source,
+      moverTarget=player?p1Target:p0Target,opponentTarget=player?p0Target:p1Target;
+    let m0=0,m1=0,m2=0,o0=0,o1=0,o2=0;
     for(let sourceWord=0;sourceWord<3;sourceWord+=1){
-      let activeBits=(source[p0Source+sourceWord]|source[p1Source+sourceWord])&
-        cache.valid[planWordBase+sourceWord];
-      const unchangedBits=cache.unchanged[planWordBase+sourceWord];
-      while(activeBits){
-        const isolated=activeBits&-activeBits,bit=isolatedBitIndex32(isolated),
-          i=(sourceWord<<5)+bit;
-        activeBits^=isolated;
-        const active0=source[p0Source+sourceWord]&isolated,
-          active1=source[p1Source+sourceWord]&isolated,
-          unchanged=unchangedBits&isolated,
-          write0=active0&&(player===0||unchanged),
-          write1=active1&&(player===1||unchanged);
-        if(!write0&&!write1)continue;
-        const cb=closureBase+i*3,c0=cache.closure[cb],c1=cache.closure[cb+1],c2=cache.closure[cb+2];
-        if(write0){p00|=c0;p01|=c1;p02|=c2;}
-        if(write1){p10|=c0;p11|=c1;p12|=c2;}
+      let bits=source[moverSource+sourceWord]&cache.valid[planWordBase+sourceWord];
+      while(bits){
+        const isolated=bits&-bits,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+        bits^=isolated;
+        const cb=closureBase+i*3;
+        m0|=cache.closure[cb];m1|=cache.closure[cb+1];m2|=cache.closure[cb+2];
+      }
+      bits=source[opponentSource+sourceWord]&cache.unchanged[planWordBase+sourceWord];
+      while(bits){
+        const isolated=bits&-bits,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+        bits^=isolated;
+        const cb=closureBase+i*3;
+        o0|=cache.closure[cb];o1|=cache.closure[cb+1];o2|=cache.closure[cb+2];
       }
     }
-    target[p0Target]=p00;target[p0Target+1]=p01;target[p0Target+2]=p02;
-    target[p1Target]=p10;target[p1Target+1]=p11;target[p1Target+2]=p12;
+    target[moverTarget]=m0;target[moverTarget+1]=m1;target[moverTarget+2]=m2;
+    target[opponentTarget]=o0;target[opponentTarget+1]=o1;target[opponentTarget+2]=o2;
     return 0;
   }
 
