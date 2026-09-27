@@ -236,9 +236,21 @@ function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex
 export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1,
-    planCache=profile.cofactorPlanCache,
-    planKey=planCache?cofactorPlanKey(source,src,column,planCache):-1,
-    plan=planCache?planCache.planByKey[planKey]:-1;
+    planCache=profile.cofactorPlanCache;
+  let planKey=-1,plan=-1;
+  if(planCache){
+    if(planCache.columns===7&&planCache.radix===7){
+      let code=source[src+6];
+      code=Math.imul(code,7)+source[src+5];
+      code=Math.imul(code,7)+source[src+4];
+      code=Math.imul(code,7)+source[src+3];
+      code=Math.imul(code,7)+source[src+2];
+      code=Math.imul(code,7)+source[src+1];
+      code=Math.imul(code,7)+source[src];
+      planKey=Math.imul(code,7)+column;
+    }else planKey=cofactorPlanKey(source,src,column,planCache);
+    plan=planCache.planByKey[planKey];
+  }
   if(plan>=0)return applyConnect4RbaCofactorPlan32(planCache,plan,g,source,src,n,column,height,target,dst,childBasis,ci,sizes,sizeIndex);
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
