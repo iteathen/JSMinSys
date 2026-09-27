@@ -1,0 +1,39 @@
+name: IsoMax Stage10 confirmation
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-stage10-confirmation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirm:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/stage9-control" 10380f79af68dc1f57455d535814ac0a7eacea33
+          git worktree add "$env:RUNNER_TEMP/stage10-candidate" aaeeb87b4c0acbe72f2eb2f7fd2a5c84f6e12014
+      - name: Long 16-block ABBA
+        shell: pwsh
+        run: node experiments/isomax-cofactor-plan/run.mjs "$env:RUNNER_TEMP/isomax-stage10-confirmation/long" "$env:RUNNER_TEMP/stage9-control" "$env:RUNNER_TEMP/stage10-candidate" 353335714 16
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-stage10-confirmation
+          path: ${{ runner.temp }}/isomax-stage10-confirmation
+          if-no-files-found: error
+          retention-days: 30
