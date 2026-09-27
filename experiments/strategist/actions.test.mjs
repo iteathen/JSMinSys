@@ -24,6 +24,14 @@ test('action flags select prepared settings and restore defaults without TT muta
   publishWorkerBehavior32(words,0,0);controls.completeActions32(state,2);
   assert.equal(state.cache.shared,shared);assert.equal(state.cpc.frontierResponse,0);
   assert.deepEqual([...state.actionOrder],[1,2,0,3]);assert.deepEqual(shared,{sentinel:1});
+  publishWorkerBehavior32(words,0,flags,3,5,7);
+  controls.completeActions32(state,2);
+  assert.equal(state.cache.shared,null);assert.equal(state.cpc.frontierResponse,1);
+  const changes=state.campaignChanges;
+  Atomics.add(words,4,1);
+  assert.equal(controls.completeActions32(state,2),2);
+  assert.equal(state.campaignChanges,changes,'inconsistent extension snapshot deferred');
+  Atomics.add(words,4,1);
   publishWorkerBehavior32(words,0,flags|1);
   assert.equal(controls.completeActions32(state,2),3);assert.equal(controls.completeActions32(state,2),3);
 });
