@@ -58,3 +58,18 @@ test('live action changes preserve exact WDL, including toggled CPC proof and sh
     assert.ok(state.campaignChanges>1);
   }
 });
+
+test('live action strategy observes STOP and cleans up an unresolved deadline',{timeout:10000},async()=>{
+  const savedDispatch=process.env.JSMINSYS_FLAG_DISPATCH,savedPolicy=process.env.JSMINSYS_STRATEGIST_POLICY;
+  process.env.JSMINSYS_FLAG_DISPATCH='actions';process.env.JSMINSYS_STRATEGIST_POLICY='action-proof';
+  try{
+    const {runTrial}=await import('./host.mjs');
+    const r=await runTrial({fixture:{columns:7,rows:6,moves:[]},workers:2,policy:'inert',timeoutMs:10,warmups:0});
+    assert.equal(r.status,'TIMEOUT');assert.equal(r.value,null);assert.equal(r.cleanup,true);
+    assert.equal(r.forcedTerminations,0);assert.equal(r.solveWallMs,null);
+    assert.ok(r.evaluators.every(e=>e.result.status==='CANCELLED'));
+  }finally{
+    if(savedDispatch===undefined)delete process.env.JSMINSYS_FLAG_DISPATCH;else process.env.JSMINSYS_FLAG_DISPATCH=savedDispatch;
+    if(savedPolicy===undefined)delete process.env.JSMINSYS_STRATEGIST_POLICY;else process.env.JSMINSYS_STRATEGIST_POLICY=savedPolicy;
+  }
+});

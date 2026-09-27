@@ -95,3 +95,19 @@ Run `node --experimental-ffi experiments/strategist/action-campaign.mjs screen N
 Use `confirm NEW.jsonl action-POLICY ...` for selected follow-ups. Evidence records
 exact source SHA and any dirty state. No static render occurrence count is used
 as a cycle count or dynamic-frequency estimate.
+
+## Completed bounded pass
+
+60 screen trials at `0332ef4`; 72 action-isolation trials at `5f13889`; 56
+finalist confirmation trials at `6cb7303`. All completed EXACT with matching
+root moves and cleanup. The source-stamped raw JSONL and aggregate-cycle report
+are in `evidence/strategist-actions-20260926/`. Only the reporter/confirmation
+admission defects found in review changed after timing began; action semantics
+remained fixed. No failed timing run was retried or discarded.
+
+The optional proof action avoids 19,435 visited nodes on B16 and B15, but none
+on A16. Stronger proof plus 1/8 sharing is a workload-specific candidate; blanket
+enablement regresses A16. Private-only on one worker is another candidate.
+Helper specialization and observed-reuse policies did not establish a net
+cycle win. The next question is a cheap, defensible applicability signal;
+do not infer one from rank, hits or labels alone.

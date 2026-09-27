@@ -5,10 +5,10 @@ const dir=process.argv[2];
 if(!dir)throw Error('evidence directory required');
 const median=a=>{const s=a.toSorted((x,y)=>x-y),i=s.length>>>1;return s.length&1?s[i]:(s[i-1]+s[i])/2;};
 const summary=[];let count=0;
-for(const file of ['screen','isolated']){
+for(const file of ['screen','isolated','confirmation']){
   const groups=new Map(),witnesses=new Map();
   const rows=readFileSync(join(dir,file+'.jsonl'),'utf8').trim().split('\n').map(JSON.parse).filter(r=>r.type==='trial');
-  assert.equal(rows.length,file==='screen'?60:72);
+  assert.equal(rows.length,{screen:60,isolated:72,confirmation:56}[file]);
   for(const r of rows){
     assert.equal(r.status,'EXACT');assert.equal(r.value,1);assert.equal(r.cleanup,true);
     assert.equal(r.errors.length,0);assert.equal(r.forcedTerminations,0);
