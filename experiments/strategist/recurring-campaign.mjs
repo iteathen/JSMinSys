@@ -2,16 +2,19 @@ import {runTrial} from './host.mjs';
 import {appendFileSync,existsSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
-const [output]=process.argv.slice(2);
+const [output,mode='unbounded',roundText='3']=process.argv.slice(2);
 if(!output||existsSync(output))throw Error('new output path required');
+assert.ok(['unbounded','bounded'].includes(mode));
+const rounds=Number(roundText);assert.ok(Number.isInteger(rounds)&&rounds>=1&&rounds<=3);
 const roots=['2053635233350500','1320461024522311','132046102452231'];
-const labels=['baseline','frontier-2-narrow','frontier-recurring-off','frontier-2-recurring','frontier-4-recurring'];
+const labels=mode==='bounded'?['baseline','frontier-2-narrow','frontier-2-recurring-bounded','frontier-4-recurring-bounded']:
+  ['baseline','frontier-2-narrow','frontier-recurring-off','frontier-2-recurring','frontier-4-recurring'];
 appendFileSync(output,JSON.stringify({type:'metadata',sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   dirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),node:process.version,date:new Date().toISOString(),
-  roots,labels,rounds:3,workers:1,timeoutMs:750,warmups:20,
+  roots,labels,rounds,mode,workers:1,timeoutMs:750,warmups:20,
   scope:'Branch-local recurring PFIF; full solve-call evaluator cycles, all local passes charged. Third root is adjacent to B, not independent.'})+'\n');
 const oracle=new Map(),onewayNodes=new Map();
-for(let round=0;round<3;round++)for(const root of roots)for(let j=0;j<labels.length;j++){
+for(let round=0;round<rounds;round++)for(const root of roots)for(let j=0;j<labels.length;j++){
   const label=labels[(j+round*2)%labels.length];
   process.env.JSMINSYS_FLAG_DISPATCH='actions';
   if(label==='baseline')delete process.env.JSMINSYS_STRATEGIST_POLICY;

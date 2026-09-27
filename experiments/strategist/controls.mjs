@@ -18,10 +18,10 @@ export function encodeActions({rotation=null,shareExponent=null,privateOnly=fals
 // Cold PFIF commands: bits 16..21 stride, bit 22 release to full continuation,
 // bit 23 enables bounded passes. Bits 24..28 select a remaining-root-action
 // target (zero disables automatic release). This is an experimental action.
-export function encodeFrontier({stride=4,release=false,target=0,recurring=false,...actions}={}){
+export function encodeFrontier({stride=4,release=false,target=0,recurring=false,bounded=false,...actions}={}){
   if(!Number.isInteger(stride)||stride<1||stride>63)throw RangeError('frontier stride');
   if(!Number.isInteger(target)||target<0||target>31)throw RangeError('frontier target');
-  return encodeActions(actions)|(stride<<16)|8388608|(release?4194304:0)|(target<<24)|(recurring?0x20000000:0);
+  return encodeActions(actions)|(stride<<16)|8388608|(release?4194304:0)|(target<<24)|(recurring?0x20000000:0)|(bounded?0x40000000:0);
 }
 
 export function prepareSearchBehavior32(state,behavior){
@@ -48,7 +48,7 @@ export function prepareSearchBehavior32(state,behavior){
   }
   state.campaignLast=0;state.campaignChanges=0;
   state.frontierStride=0;state.frontierTarget=0;state.frontierLimit=state.g.cellCount??0;
-  state.frontierRecurring=0;state.recurringStride=0;
+  state.frontierRecurring=0;state.recurringStride=0;state.recurringBounded=0;
   return state;
 }
 
@@ -155,6 +155,7 @@ export function completeActions32(state,value){
   state.frontierTarget=(flags>>>24)&31;
   state.frontierRecurring=(flags&4194304)?0:(flags>>>29)&1;
   state.recurringStride=(flags>>>16)&63;
+  state.recurringBounded=(flags>>>30)&1;
   if(!state.frontierStride)state.frontierLimit=state.g.cellCount;
   state.campaignLast=flags;state.campaignChanges+=1;
   return value;

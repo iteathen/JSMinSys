@@ -7,6 +7,22 @@ import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta} from '../../addon
 process.env.JSMINSYS_FLAG_DISPATCH='actions';
 const controls=await import('./controls.mjs');
 
+test('bounded recurring action advances after an unproductive band and rearms after narrowing',async()=>{
+  const flags=controls.encodeFrontier({stride:2,target:1,recurring:true,bounded:true});
+  assert.ok(flags&0x40000000,'bounded exploration needs an explicit flag');
+  const mod=await import('./recurring.generated.mjs');
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),root=connect4RbaFromMoves([1],{geometry:g});
+  const reference=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g}),reflected:root.reflected});
+  const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
+  publishWorkerBehavior32(words,0,flags);
+  const state=mod.prepareConnect4RbaAlphaBetaBehavior({geometry:g,behavior:new BehaviorWorker(0,words,0,memory)});
+  const r=mod.solveConnect4RbaAlphaBetaBehavior(root,{state,reflected:root.reflected});
+  assert.equal(r.status,'EXACT');assert.equal(r.value,reference.value);assert.equal(r.move,reference.move);
+  assert.ok(r.metrics.recurringBudgetReleases>0);
+  assert.ok(r.metrics.recurringLocalReentries>0);
+  assert.ok(r.metrics.recurringRearms>0);
+});
+
 test('recurring flag enables local expansion after a prior local collapse',async()=>{
   const flags=controls.encodeFrontier({stride:2,target:1,recurring:true});
   assert.ok(flags&0x20000000,'worker needs an explicit recurring action');
@@ -55,11 +71,11 @@ test('recurring local queries agree with independent physical minimax and preser
       board[heights[c]++*4+c]=moves.length&1;moves.push(c);
     }
     const expected=exact(board,heights,moves.length);
-    for(const mirrored of [false,true]){
+    for(const mirrored of [false,true])for(const bounded of [false,true]){
       const root=connect4RbaFromMoves(mirrored?moves.map(c=>3-c):moves,{geometry:g});
       const reference=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g}),reflected:root.reflected});
       const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
-      publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:1+sample%3,target:1,recurring:true}));
+      publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:1+sample%3,target:1,recurring:true,bounded}));
       const state=mod.prepareConnect4RbaAlphaBetaBehavior({geometry:g,cacheCapacity:16,behavior:new BehaviorWorker(0,words,0,memory)});
       const r=mod.solveConnect4RbaAlphaBetaBehavior(root,{state,reflected:root.reflected});
       assert.equal(r.status,'EXACT');assert.equal(r.value,expected);assert.equal(r.move,reference.move);

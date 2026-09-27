@@ -61,3 +61,29 @@ boundaries for already-active probes; STOP remains observed at node completion.
 
 No production defaults or NEES claims are promoted by this screen. The outcome
 may reject this implementation even if the recurrence idea remains useful.
+
+## Bounded recurrence control
+
+The first live screen exhausted all 18 active recurring budgets. Local passes
+kept widening without completing child queries. Bit 30 selects a second,
+explicitly separate candidate: one probe band per expansion, then unconstrained
+native advancement until narrowing is observed again. A forced continuation,
+one remaining action, or completion of enough sibling queries re-arms probing.
+This uses a numeric phase in the existing lineage scalar, not TT metadata.
+It does not claim to preserve a globally materialized frontier.
+
+Extra cost is charged: forced-continuation phase comparison; region eligibility
+comparison; narrowing tests on advancing open branches; budget-release and
+re-arm counters. The unchanged behavior-word path remains read/compare/return.
+No five-cycle estimate is assumed for the complete action. Whole measured
+solve-call cycles, including repeated probes, decide whether it is worthwhile.
+
+Run a quick bounded screen with:
+
+```sh
+node experiments/strategist/recurring-campaign.mjs evidence/strategist-recurring-20260926/bounded-screen.jsonl bounded 1
+```
+
+The independent physical-minimax controls exercise both bounded and unbounded
+variants on the same seeded roots and mirrors. The first bounded-action test
+was observed failing for the missing action bit before implementation.

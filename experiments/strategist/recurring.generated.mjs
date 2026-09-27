@@ -112,6 +112,7 @@ export function prepareConnect4RbaAlphaBetaBehavior({
     frontierPending:0,frontierAutoReleases:0,
     recurringResolved:new Uint8Array(levels*g.columns),recurringRegions:0,recurringPasses:0,
     recurringReleases:0,recurringReentries:0,recurringLocalReentries:0,recurringRetainedSkips:0,recurringMaxDepth:0,
+    recurringBudgetReleases:0,recurringRearms:0,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache,actionOrder,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
@@ -178,6 +179,9 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
       childOrderRow=orderRow+g.columns;
 
     if(forced>=0){
+      // A forced continuation is observed narrowing. Re-arm only after that
+      // evidence, not at every wide node after an unproductive probe.
+      if(lineage===-2){lineage=depth;state.recurringRearms+=1;}
       const height=words[keyOffset+forced];
       if(height>=g.rows||!(actionMask&(1<<forced)))return completeBehaviorNode32(state, 0);
       const physicalColumn=orientation?g.mirrorColumn[forced]:forced,
@@ -233,9 +237,10 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
     // HOT recurring action. Reuse already-generated actions and this native
     // frame. Probe regions only during unconstrained advancement; a bounded
     // probe never recursively launches another probe region. DO NOT REMOVE.
-    const region=state.frontierRecurring&&state.recurringStride>0&&limit===g.cellCount&&actionCount>1;
+    const region=state.frontierRecurring&&lineage!==-2&&state.recurringStride>0&&limit===g.cellCount&&actionCount>1;
     const resolved=state.recurringResolved;
     let passLimit=limit,childLineage=lineage,pending=actionCount,best=-2;
+    if(lineage===-2&&pending<=state.frontierTarget){childLineage=depth;state.recurringRearms+=1;}
     if(region){
       state.recurringRegions+=1;state.recurringPasses+=1;
       if(lineage>=0)state.recurringReentries+=1;
@@ -277,9 +282,12 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
       // marker writes and narrowing decisions.
       if(region){
         resolved[orderRow+ai]=1;pending-=1;
-        if(pending<=state.frontierTarget&&passLimit<g.cellCount){
+        if(pending<=state.frontierTarget&&(passLimit<g.cellCount||childLineage===-2)){
           passLimit=g.cellCount;childLineage=depth;state.recurringReleases+=1;
         }
+      }else if(childLineage===-2){
+        pending-=1;
+        if(pending<=state.frontierTarget){childLineage=depth;state.recurringRearms+=1;}
       }
     }
     // A witnessed cutoff remains valid even with unfinished siblings; absence
@@ -290,7 +298,11 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
       // Advance from THIS branch, not the external root. Parent native state,
       // order, alpha, best and completed-query markers survive the next pass.
       state.recurringPasses+=1;
-      passLimit=state.frontierRecurring?Math.min(g.cellCount,passLimit+state.recurringStride):g.cellCount;
+      if(state.recurringBounded&&passLimit<g.cellCount&&pending>state.frontierTarget){
+        // One band per expansion. -2 suppresses more probes until native
+        // advancement observes narrowing. No new scheduler or TT metadata.
+        passLimit=g.cellCount;childLineage=-2;state.recurringBudgetReleases+=1;
+      }else passLimit=state.frontierRecurring?Math.min(g.cellCount,passLimit+state.recurringStride):g.cellCount;
       continue;
     }
     if(best===-2)return completeBehaviorNode32(state, 0);
@@ -310,6 +322,7 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
 
   state.recurringRegions=state.recurringPasses=state.recurringReleases=state.recurringReentries=0;
   state.recurringLocalReentries=state.recurringRetainedSkips=state.recurringMaxDepth=0;
+  state.recurringBudgetReleases=state.recurringRearms=0;
   state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=0;
   state.cpc.projectedForkTotal=state.cpc.precursorTotal=state.cpc.forcedTotal=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
@@ -419,7 +432,8 @@ function frontierResult(state,cancel,value,move){
 function metricsBehavior(s){return {
   recurringRegions:s.recurringRegions,recurringPasses:s.recurringPasses,recurringReleases:s.recurringReleases,
   recurringReentries:s.recurringReentries,recurringLocalReentries:s.recurringLocalReentries,
-  recurringRetainedSkips:s.recurringRetainedSkips,recurringMaxDepth:s.recurringMaxDepth,frontierPending:s.frontierPending,frontierAutoReleases:s.frontierAutoReleases,frontierPasses:s.frontierPasses,horizonStops:s.horizonStops,frontierLimit:s.frontierLimit,nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
+  recurringRetainedSkips:s.recurringRetainedSkips,recurringMaxDepth:s.recurringMaxDepth,
+  recurringBudgetReleases:s.recurringBudgetReleases,recurringRearms:s.recurringRearms,frontierPending:s.frontierPending,frontierAutoReleases:s.frontierAutoReleases,frontierPasses:s.frontierPasses,horizonStops:s.horizonStops,frontierLimit:s.frontierLimit,nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
   cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
   frontCalls:s.frontCalls,frontExact:s.frontExact,
   frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}
