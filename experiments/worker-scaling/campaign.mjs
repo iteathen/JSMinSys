@@ -17,7 +17,8 @@ const arms=hard?[...[1,2,3,4].map(workers=>({id:'full'+workers,workers,sharedSam
 const roots=hard?[['353335714',-1]]:[['45461667',1],['3164746344461611',-1],['2431572135633422',-1]];
 const files=['addons/rba-connect4-alphabeta.mjs','addons/rba-connect4-lazy-smp-host.mjs','addons/rba-connect4-lazy-smp-worker.mjs',
   'addons/rba-connect4-shared-exact-cache.mjs','experiments/cpc-factorial/isomax-node-counts.mjs',
-  'experiments/worker-scaling/loader.mjs','experiments/worker-scaling/sample.mjs','experiments/worker-scaling/campaign.mjs'];
+  'experiments/worker-scaling/loader.mjs','experiments/worker-scaling/sample.mjs','experiments/worker-scaling/campaign.mjs',
+  'experiments/worker-scaling/locked-profile.json'];
 writeFileSync(resolve(out,'manifest.json'),JSON.stringify({sha,node:process.version,arms,roots,rounds:3,workers:[1,2,3,4],
   shared:1048576,privatePerWorker:1048576,sharedSampleMask:hard?0:density?'per-arm':7,started:new Date().toISOString(),
   scope:'Completed-solve worker-scaling diagnostics. No memory selection. Test loader admits one native worker and cold timestamps; existing all-worker node loader.',
@@ -27,7 +28,9 @@ for(let round=0;round<3;round++)for(const [moves,expected] of roots)for(const ar
   assert.equal(git('rev-parse','HEAD'),sha);
   const env={...process.env};delete env.SCALE_NO_SHARE;delete env.SCALE_ORDER;
   if(arm.noShare)env.SCALE_NO_SHARE='1';if(arm.order!==undefined)env.SCALE_ORDER=String(arm.order);
-  const c={...arm,moves,timeoutMs:30000},p=spawnSync(process.execPath,['--experimental-ffi','--import',
+  // Preserve the historical campaign exactly when current defaults change.
+  const c={sharedCacheCapacity:1048576,localCacheCapacity:1048576,sharedSampleMask:7,
+    ...arm,moves,timeoutMs:30000},p=spawnSync(process.execPath,['--experimental-ffi','--import',
     pathToFileURL(resolve('experiments/worker-scaling/loader.mjs')).href,'experiments/worker-scaling/sample.mjs',JSON.stringify(c)],
     {env,encoding:'utf8',timeout:50000,maxBuffer:2*1024*1024});
   appendFileSync(resolve(out,'processes.jsonl'),JSON.stringify({round,config:c,exit:p.status,error:p.error?.message,stdout:p.stdout,stderr:p.stderr})+'\n');

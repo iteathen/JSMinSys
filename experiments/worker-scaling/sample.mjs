@@ -1,7 +1,10 @@
 import {performance} from 'node:perf_hooks';
 import {prepareConnect4RbaGeometry,runLazySmpConnect4Rba32} from '../../addons/index.mjs';
 import {processCycleCounter} from '../cpc-factorial/cycle-counter.mjs';
-const c={sharedCacheCapacity:1048576,localCacheCapacity:1048576,...JSON.parse(process.argv[2])},
+import lockedProfile from './locked-profile.json' with {type:'json'};
+// Cold, hardware-scoped campaign defaults. Explicit comparison arms override
+// these values; the portable library and recursive execution remain unchanged.
+const c={...lockedProfile.options,...JSON.parse(process.argv[2])},
   meter=await processCycleCounter(),bootstrap=meter.read();
 let peakRss=process.memoryUsage().rss;
 const rssTimer=setInterval(()=>{peakRss=Math.max(peakRss,process.memoryUsage().rss);},1000);

@@ -45,7 +45,7 @@ unchanged. Cache payload follows geometry key width (14 words on 7x6, 7 on 4x4).
 This cold accounting was generalized after the campaign; all captured 7x6
 byte totals remain unchanged. The 4x4 smoke test protects the alternate width.
 
-Provisional completed-workload profile:
+Owner-selected operating baseline (locked September 27, 2026):
 
 ```js
 {
@@ -56,6 +56,21 @@ Provisional completed-workload profile:
 }
 ```
 
-It uses 683 MiB of cache payload. It is an experiment recommendation, not a
-production default or proof of empty-board solve-time optimality. The three
-five-minute empty-board runs all timed out cleanly; retain that limitation.
+The machine-readable owner is [locked-profile.json](locked-profile.json).
+`sample.mjs` uses its options by default; explicit comparison settings override
+them. The historical `campaign.mjs` now explicitly supplies its original memory
+and sharing options so rerunning old experiments does not silently change them.
+Resource plans already specify their comparison settings explicitly.
+
+This baseline is scoped to native IsoMax RBA/CPC Lazy SMP with endpoint exact
+publication, current move order and full sharing, on the Windows i5-12600K /
+32 GiB / Node 26.7.0 host. It uses 683 MiB of cache payload. Generic library
+defaults remain portable; consumers of this hardware profile should pass the
+locked options to `runLazySmpConnect4Rba32` during initialization.
+
+Use this baseline for subsequent same-scope campaigns unless the experiment
+explicitly varies a pinned parameter. Changes of method (including enabling
+PFIF/strategist), solver semantics, runtime or hardware require fresh comparison.
+The owner has selected the operating point; historical experimental evidence is
+unchanged. The three five-minute empty-board runs all timed out cleanly, so the
+selection does not assert a proven empty-board solve-time optimum.

@@ -19,7 +19,8 @@ mkdirSync(out);
 const files=['addons/rba-connect4-alphabeta.mjs','addons/rba-connect4-lazy-smp-host.mjs',
   'addons/rba-connect4-lazy-smp-worker.mjs','addons/rba-connect4-shared-exact-cache.mjs',
   'experiments/cpc-factorial/isomax-node-counts.mjs','experiments/worker-scaling/loader.mjs',
-  'experiments/worker-scaling/sample.mjs','experiments/worker-scaling/resources.mjs'];
+  'experiments/worker-scaling/sample.mjs','experiments/worker-scaling/resources.mjs',
+  'experiments/worker-scaling/locked-profile.json'];
 writeFileSync(resolve(out,'manifest.json'),JSON.stringify({sha,node:process.version,plan,started:new Date().toISOString(),
   hashes:Object.fromEntries(files.map(f=>[f,createHash('sha256').update(readFileSync(f)).digest('hex')]))},null,2)+'\n');
 let n=0;

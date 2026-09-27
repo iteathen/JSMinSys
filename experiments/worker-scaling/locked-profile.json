@@ -1,0 +1,26 @@
+{
+  "id": "isomax-native-lazy-smp-i5-12600k-20260927",
+  "status": "owner-selected operating baseline",
+  "selectedOn": "2026-09-27",
+  "scope": {
+    "solver": "IsoMax native JSMinSys RBA CPC alpha-beta with exact endpoint publication",
+    "method": "Lazy SMP, full exact TT sharing, existing move order, no strategist",
+    "geometry": "7x6",
+    "cpu": "Intel Core i5-12600K",
+    "physicalCores": 10,
+    "logicalProcessors": 16,
+    "ramGiBApprox": 32,
+    "platform": "win32",
+    "node": "v26.7.0"
+  },
+  "options": {
+    "workers": 7,
+    "sharedCacheCapacity": 4194304,
+    "localCacheCapacity": 1048576,
+    "sharedSampleMask": 0
+  },
+  "cachePayloadBytes7x6": 716177420,
+  "evidenceRevision": "5b0a5f313d66d3929af8ea8fee14a39a16b031ed",
+  "evidence": "../../evidence/isomax-resource-sustained-20260927/REPORT.md",
+  "limits": "Selected operating baseline, not proof of global or empty-board solve-time optimality. Requalify materially different solver methods, revisions, runtimes or hardware. PFIF benefits are not included in this selection."
+}
