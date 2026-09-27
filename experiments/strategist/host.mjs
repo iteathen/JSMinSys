@@ -26,7 +26,8 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   try{
     for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pollOnly:policy==='poll-only'||policy==='host-only'});
     if(policy==='host-only')Atomics.store(control,4,1);
-    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles});
+    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,
+      ...(process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-width-')?{geometry,root}:{})});
     const preparationDeadline=performance.now()+10000;
     while((Atomics.load(control,1)!==workers||!Atomics.load(control,4))&&!errors.length&&performance.now()<preparationDeadline)await delay(1);
     if(errors.length||Atomics.load(control,1)!==workers||!Atomics.load(control,4))throw Error('campaign preparation failed');
