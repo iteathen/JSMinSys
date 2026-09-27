@@ -1,7 +1,7 @@
 import {workerData as d,parentPort} from 'node:worker_threads';
 import {setTimeout as delay} from 'node:timers/promises';
 import {performance} from 'node:perf_hooks';
-import {publishWorkerBehavior32} from '../../addons/worker-behavior.mjs';
+import {publishWorkerBehavior32,WORKER_BEHAVIOR_STRIDE32} from '../../addons/worker-behavior.mjs';
 import {encodeControls,encodeFrontier} from './controls.mjs';
 import {prepareCycleMeter} from './meter.mjs';
 import {STRATEGIES,observeProofCache,advancePolicy,policyFlags} from './policies.mjs';
@@ -11,13 +11,16 @@ import {WIDTH_POLICIES,createWidthPolicy,advanceWidthPolicy} from './width-polic
 import {prepareWidthObserver,stepWidthObserver} from './width-observer.mjs';
 import {preparePendingReaders,pollPendingReader} from './pending-reader.mjs';
 import {createPendingPolicy,advancePendingPolicy} from './pending-policy.mjs';
+import {createPoolPolicy,advancePoolPolicy} from './pool-policy.mjs';
 
 // Cold experiment selection through inherited environment keeps the existing
 // host, evaluator and benchmark interfaces unchanged. Every result names it.
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
 const pendingBand=strategy==='modes-pending-band';
 const pendingActive=strategy==='modes-pending-pfif'||pendingBand;
-const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive;
+const poolStrategy=strategy==='modes-pending-pool-fixed'||strategy==='modes-pending-pool-grow';
+const poolState=poolStrategy?createPoolPolicy(d.workers,d.initialActive):null;
+const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive||poolStrategy;
 const pendingReaders=pendingStrategy?preparePendingReaders(d.pendingObservation):null;
 const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy({oneBand:pendingBand})):null;
 const widthStrategy=WIDTH_POLICIES.includes(strategy);
@@ -44,6 +47,7 @@ if(observeProofs&&(!Number.isInteger(cellCount)||cellCount<d.columns||cellCount%
 const policyState={harvested:false,retired:false,tick:0,reuseSeen:false};
 
 const words=new Uint32Array(d.memory.buffer),last=new Uint32Array(d.workers),meter=await prepareCycleMeter(d.measureCycles);
+const gateWords=poolStrategy?new Int32Array(d.memory.buffer):null;
 let ticks=0,writes=0,previousStores=0,previousContention=0,exponent=0,phase=0,lastChange=-Infinity;
 const trace=[];
 // Publish the initial bounded action before opening the search barrier. A
@@ -55,7 +59,7 @@ if(frontierStrategy)for(let i=0;i<d.workers;i++){
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 if(modeStrategy)for(let i=0;i<d.workers;i++){
-  const flags=pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0);
+  const flags=poolStrategy?(i<poolState.active?1280:0):pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0);
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 Atomics.store(d.control,4,1);
@@ -65,6 +69,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   const now=performance.now(),stores=Atomics.load(d.cache.stats,1),contention=Atomics.load(d.cache.stats,2);
   const hits=actionStrategy?Atomics.load(d.cache.stats,0):0;
   const pendingSamples=pendingStrategy?pendingReaders.map((r,i)=>pollPendingReader(d.pendingObservation,i,r)):null;
+  if(poolStrategy&&strategy==='modes-pending-pool-grow')advancePoolPolicy(poolState,pendingSamples);
   if(widthStrategy){stepWidthObserver(widthObserver);advanceWidthPolicy(widthPolicy,widthObserver);}
   if(actionStrategy)advanceActionPolicy(policyState,{hits});
   const observation=observeProofs?observeProofCache(d.cache,d.columns,cellCount):null;
@@ -82,7 +87,8 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   for(let i=0;i<d.workers;i++){
     const acceptedPending=pendingStrategy&&strategy!=='modes-pending-off'&&pendingSamples[i]?.request===(last[i]&256);
     const pendingMode=pendingActive?advancePendingPolicy(pendingPolicies[i],acceptedPending?pendingSamples[i]:null):0;
-    const flags=pendingStrategy?((acceptedPending?(last[i]^256):last[i])&256)|pendingMode:
+    const flags=poolStrategy?(i<poolState.active?1024|((last[i]&1024)?((acceptedPending?(last[i]^256):last[i])&256):256):0):
+      pendingStrategy?((acceptedPending?(last[i]^256):last[i])&256)|pendingMode:
       widthStrategy?(strategy==='modes-width-observe'?0:widthPolicy.flags):
       modeStrategy?modePolicyFlags(strategy,now-started):frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,bounded,
       release:strategy==='frontier-full'||(strategy==='frontier-4-release'&&now-started>=32)}):
@@ -92,7 +98,11 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
       d.policy==='combined'?encodeControls({rotation:phase,shareExponent:exponent}):
       d.policy==='fixed'?encodeControls({rotation:1}):
       d.policy==='fixed-sparse'?encodeControls({rotation:1,shareExponent:4}):0;
-    if(flags!==last[i]){publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;}
+    if(flags!==last[i]){
+      publishWorkerBehavior32(words,i,flags);
+      if(poolStrategy&&(flags&1024)&&!(last[i]&1024))Atomics.notify(gateWords,i*WORKER_BEHAVIOR_STRIDE32);
+      last[i]=flags;writes++;
+    }
   }
   // Eligibility is an observation, not evidence that this policy issued STOP.
   // Keep actual publication separate; this cold trace never runs in evaluators.
@@ -107,11 +117,15 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   await delay(d.cadenceMs);
 }
 const stopAt=performance.now();
-for(let i=0;i<d.workers;i++){publishWorkerBehavior32(words,i,last[i]|1);writes++;}
+for(let i=0;i<d.workers;i++){
+  publishWorkerBehavior32(words,i,last[i]|1);writes++;
+  if(poolStrategy)Atomics.notify(gateWords,i*WORKER_BEHAVIOR_STRIDE32);
+}
 if(pendingStrategy)for(let i=0;i<d.workers;i++)pollPendingReader(d.pendingObservation,i,pendingReaders[i]);
 const end=meter.read();meter.close();
 parentPort.postMessage({strategy:strategy??d.policy,ticks,writes,cycles:start===null?null:(end-start).toString(),
   started,stopAt,wallMs:stopAt-started,trace,
+  ...(poolStrategy?{pool:{active:poolState.active,capacity:poolState.capacity,events:poolState.events}}:{}),
   ...(pendingActive?{pendingPolicies:pendingPolicies.map(p=>({triggers:p.triggers,releases:p.releases,
     lastBurstBands:p.lastBurstBands,maxBurstBands:p.maxBurstBands,finalMode:p.flags}))}:{}),
   ...(pendingStrategy?{pending:pendingReaders.map(r=>({samples:r.samples,minWidth:r.samples?r.minWidth:null,

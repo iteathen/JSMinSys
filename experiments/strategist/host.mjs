@@ -8,9 +8,11 @@ import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from '../../addons
 import {createPendingObservation} from './pending-observation.mjs';
 
 export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,holdMs=20,
-  timeoutMs=1000,warmups=20,measureCycles=false,localCapacity=4096,sharedCapacity=16384}={}){
+  timeoutMs=1000,warmups=20,measureCycles=false,localCapacity=4096,sharedCapacity=16384,initialActive=null}={}){
   if(!['host-only','poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'].includes(policy))throw RangeError('policy');
   if(!Number.isInteger(workers)||workers<1||workers>16)throw RangeError('workers');
+  if(initialActive!==null&&(!Number.isInteger(initialActive)||initialActive<1||initialActive>workers||
+    !['modes-pending-pool-fixed','modes-pending-pool-grow'].includes(process.env.JSMINSYS_STRATEGIST_POLICY)))throw RangeError('standby profile');
   if(!(cadenceMs>=1&&cadenceMs<=1000)||!(timeoutMs>0&&timeoutMs<=5000)||!Number.isInteger(warmups)||warmups<0||warmups>100)throw RangeError('campaign bounds');
   const geometry=prepareConnect4RbaGeometry(fixture),root=connect4RbaFromMoves(fixture.moves,{geometry});
   const cache=createConnect4RbaSharedExactCache32({capacity:sharedCapacity,keyWords:geometry.keyWords});
@@ -27,9 +29,9 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   };
   let started=null,finished=null;
   try{
-    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pendingObservation,pollOnly:policy==='poll-only'||policy==='host-only'});
+    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pendingObservation,initialActive,pollOnly:policy==='poll-only'||policy==='host-only'});
     if(policy==='host-only')Atomics.store(control,4,1);
-    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,pendingObservation,
+    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,pendingObservation,initialActive,
       ...(process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-width-')?{geometry,root}:{})});
     const preparationDeadline=performance.now()+10000;
     while((Atomics.load(control,1)!==workers||!Atomics.load(control,4))&&!errors.length&&performance.now()<preparationDeadline)await delay(1);
@@ -60,7 +62,9 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   const nodes=evaluators.reduce((sum,r)=>sum+r.result.metrics.nodes,0);
   return {status:errors.length||forced?'FAILED':timedOut?'TIMEOUT':winning?'EXACT':'FAILED',
     value:!errors.length&&!forced&&!timedOut&&winning?winning.result.value:null,
-    fixture,workers,policy,cadenceMs,holdMs,timeoutMs,warmups,localCapacity,sharedCapacity,
+    fixture,workers,policy,cadenceMs,holdMs,timeoutMs,warmups,localCapacity,sharedCapacity,initialActive,
+    cacheMemory:{keyWords:geometry.keyWords,privateCacheBytesPerWorker:localCapacity*(geometry.keyWords*4+5),
+      sharedCacheBytes:cache.sequence.byteLength+cache.value.byteLength+cache.keys.byteLength+cache.stats.byteLength},
     winner,wallMs:started!==null&&finished!==null?finished-started:null,
     solveWallMs:winning?winning.ended-started:null,evaluatorCycles:cycles,nodes,
     cyclesPerNode:cycles&&nodes?Number(cycles)/nodes:null,

@@ -2,7 +2,7 @@ import {workerData as d,parentPort} from 'node:worker_threads';
 import {performance} from 'node:perf_hooks';
 import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
-import {BehaviorWorker} from '../../addons/worker-behavior.mjs';
+import {BehaviorWorker,WORKER_BEHAVIOR_STRIDE32} from '../../addons/worker-behavior.mjs';
 import {prepareCycleMeter} from './meter.mjs';
 
 // Cold selection only. The PFIF worker owns the additional horizon actions;
@@ -27,13 +27,23 @@ if(pending){
   bindPendingObservation(state,d.pendingObservation,d.index);
 }
 const options={state,reflected:d.root.reflected},meter=await prepareCycleMeter(d.measureCycles);
+const gateWords=d.initialActive!==null?new Int32Array(d.memory.buffer):null,gateBase=d.index*WORKER_BEHAVIOR_STRIDE32;
 Atomics.add(d.control,1,1);Atomics.notify(d.control,1);
 while(Atomics.load(d.control,0)===0)Atomics.wait(d.control,0,0);
 const start=meter.read(),started=performance.now();
-const result=solve(d.root,options);
+let activated=true;
+if(gateWords){
+  // Before search only. Expected-value wait prevents lost activation/STOP wakes.
+  // No parking or activation check is added to recursive execution.
+  let flags=Atomics.load(gateWords,gateBase);
+  while(!(flags&1025)){Atomics.wait(gateWords,gateBase,flags);flags=Atomics.load(gateWords,gateBase);}
+  activated=(flags&1)===0;
+}
+const searchStarted=activated?performance.now():null;
+const result=activated?solve(d.root,options):{status:'NOT_STARTED',value:null,move:-1,metrics:{nodes:0}};
 const ended=performance.now(),end=meter.read();
 if(result.status==='EXACT')Atomics.compareExchange(d.control,2,0,d.index+1);
 Atomics.add(d.control,3,1);
 meter.close();
-parentPort.postMessage({index:d.index,result,changes:state.campaignChanges??0,
+parentPort.postMessage({index:d.index,result,activated,searchStarted,changes:state.campaignChanges??0,
   cycles:start===null?null:(end-start).toString(),started,ended,wallMs:ended-started});
