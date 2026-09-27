@@ -5,7 +5,7 @@ import {prepareSearchBehavior32,completeBehaviorNode32} from './worker-behavior-
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank,prepareConnect4RbaCofactorPlanCache32} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaFourFront} from './rba-connect4-front.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
@@ -88,6 +88,7 @@ export function prepareConnect4RbaAlphaBetaBehavior({
   boundaryCapacity=256,
   boundaryBudget=100000,
   cacheCapacity=65536,
+  cofactorPlanCapacity=0,
   sharedExactCache=null,
   sharedSampleMask=0,
   orderOffset=0,
@@ -99,6 +100,7 @@ export function prepareConnect4RbaAlphaBetaBehavior({
   if(mode!==RBA_AB_CPC_ONLY_BEHAVIOR&&mode!==RBA_AB_CPC_FOUR_FRONT_BEHAVIOR)throw new RangeError('invalid alpha-beta mode');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),levels=g.cellCount+1,
     live=prepareConnect4LiveLineEvaluator32(g);
+  if(cofactorPlanCapacity)profile.cofactorPlanCache=prepareConnect4RbaCofactorPlanCache32(g,{capacity:cofactorPlanCapacity});
   if(!Number.isInteger(orderOffset)||orderOffset<0||orderOffset>=g.columns)
     throw new RangeError('invalid alpha-beta order offset');
   if(sharedExactCache!==null&&
