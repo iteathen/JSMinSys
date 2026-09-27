@@ -24,5 +24,6 @@ for(const {column} of features.raw){
   values[column]=moves.length&1?2-result.value:result.value-2;
   parentPort.postMessage({type:'child',column,value:values[column],nodes:result.metrics.nodes});
 }
-const ranks=labelRanks(features,values);assert.equal(ranks.best,r.relative);
+// Negamax can return -0 for draw. WDL equality deliberately treats +/-0 alike.
+const ranks=labelRanks(features,values);assert.ok(ranks.best===r.relative,'all-action WDL differs from root');
 parentPort.postMessage({type:'complete',values,ranks});

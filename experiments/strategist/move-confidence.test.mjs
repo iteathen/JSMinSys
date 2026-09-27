@@ -4,6 +4,17 @@ import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs
 import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta} from '../../addons/rba-connect4-alphabeta.mjs';
 import {orderFeatures,labelRanks,makeCorpus} from './move-confidence.mjs';
+import {Worker} from 'node:worker_threads';
+
+test('offline worker accepts signed-zero draw while retaining losing alternatives',async()=>{
+  const messages=[];
+  await new Promise((resolve,reject)=>{
+    const w=new Worker(new URL('./move-confidence-label-worker.mjs',import.meta.url),{workerData:{moves:[1,2,2,2,6,2,0,1,6,5,6,6,4,0,3,0,5,0,6,6,1,5,0,0]}});
+    w.on('message',m=>messages.push(m));w.on('error',reject);w.on('exit',code=>code?reject(Error('worker exit '+code)):resolve());
+  });
+  const result=messages.find(m=>m.type==='complete');assert.ok(result);assert.equal(result.ranks.best,0);
+  assert.equal(result.ranks.firstOptimalRank,4);assert.equal(result.ranks.firstCorrect,false);
+});
 
 test('gap bins and optimal ties do not privilege one arbitrary winning witness',()=>{
   const f={ordered:[{column:2,score:5},{column:1,score:5},{column:0,score:3}],raw:[{column:2,score:5},{column:1,score:5},{column:0,score:3}]};
