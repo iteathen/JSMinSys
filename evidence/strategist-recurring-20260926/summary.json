@@ -1,0 +1,1718 @@
+[
+  {
+    "source": "screen.jsonl",
+    "metadata": {
+      "type": "metadata",
+      "sha": "a9e529f3be2a1aa24cc722acce3f6bf08eef53f2",
+      "dirty": "",
+      "node": "v26.7.0",
+      "date": "2026-09-27T01:28:08.249Z",
+      "roots": [
+        "2053635233350500",
+        "1320461024522311",
+        "132046102452231"
+      ],
+      "labels": [
+        "baseline",
+        "frontier-2-narrow",
+        "frontier-recurring-off",
+        "frontier-2-recurring",
+        "frontier-4-recurring"
+      ],
+      "rounds": 3,
+      "workers": 1,
+      "timeoutMs": 750,
+      "warmups": 20,
+      "scope": "Branch-local recurring PFIF; full solve-call evaluator cycles, all local passes charged. Third root is adjacent to B, not independent."
+    },
+    "trials": 45,
+    "groups": [
+      {
+        "root": "2053635233350500",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 516351836,
+        "medianNodes": 99114,
+        "medianCyclesPerNode": 5209.676090158807,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 11.482352128971574,
+        "medianSolveMs": 141.51770000000033,
+        "medianStrategistCycles": null,
+        "cycles": [
+          507638866,
+          523847689,
+          516351836
+        ],
+        "counters": {}
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 463169126,
+        "medianNodes": 89042,
+        "medianCyclesPerNode": 5201.692751735136,
+        "cycleVsBaselinePercent": -10.299703863162012,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 129.3663000000015,
+        "medianStrategistCycles": 4067502,
+        "cycles": [
+          489181960,
+          452689820,
+          463169126
+        ],
+        "counters": {
+          "horizonStops": [
+            5507,
+            5507,
+            5507
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-recurring-off",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 457199645,
+        "medianNodes": 89042,
+        "medianCyclesPerNode": 5134.651568922531,
+        "cycleVsBaselinePercent": -11.455791744294297,
+        "cycleVsOneWayPercent": -1.2888339625642509,
+        "medianSolveMs": 126.27830000000176,
+        "medianStrategistCycles": 4180292,
+        "cycles": [
+          494178344,
+          453718587,
+          457199645
+        ],
+        "counters": {
+          "recurringRegions": [
+            0,
+            0,
+            0
+          ],
+          "recurringPasses": [
+            0,
+            0,
+            0
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            0,
+            0,
+            0
+          ],
+          "horizonStops": [
+            5507,
+            5507,
+            5507
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2789356892,
+        "medianNodes": 360494,
+        "medianCyclesPerNode": 7671.120133034222,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 16525449,
+        "cycles": [
+          2720021397,
+          2841620702,
+          2789356892
+        ],
+        "counters": {
+          "recurringRegions": [
+            1,
+            1,
+            1
+          ],
+          "recurringPasses": [
+            4,
+            4,
+            4
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            1,
+            1,
+            1
+          ],
+          "horizonStops": [
+            230592,
+            239959,
+            233960
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-4-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2794239762,
+        "medianNodes": 361647,
+        "medianCyclesPerNode": 7696.587078261675,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 17532091,
+        "cycles": [
+          2827102669,
+          2794239762,
+          2779322510
+        ],
+        "counters": {
+          "recurringRegions": [
+            1,
+            1,
+            1
+          ],
+          "recurringPasses": [
+            2,
+            2,
+            2
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            1,
+            1,
+            1
+          ],
+          "horizonStops": [
+            233923,
+            230613,
+            230674
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 879164073,
+        "medianNodes": 238251,
+        "medianCyclesPerNode": 3690.0750594960778,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 1411.1916427274582,
+        "medianSolveMs": 242.77059999999983,
+        "medianStrategistCycles": null,
+        "cycles": [
+          879164073,
+          871051553,
+          906680437
+        ],
+        "counters": {}
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 58176875,
+        "medianNodes": 5838,
+        "medianCyclesPerNode": 9965.206406303529,
+        "cycleVsBaselinePercent": -93.38270559652408,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 16.562599999997474,
+        "medianStrategistCycles": 2129772,
+        "cycles": [
+          53083932,
+          58176875,
+          61481741
+        ],
+        "counters": {
+          "horizonStops": [
+            25,
+            25,
+            25
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-recurring-off",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 59428273,
+        "medianNodes": 5838,
+        "medianCyclesPerNode": 10179.560294621446,
+        "cycleVsBaselinePercent": -93.24036606759749,
+        "cycleVsOneWayPercent": 2.1510230654362195,
+        "medianSolveMs": 17.228699999999662,
+        "medianStrategistCycles": 1017705,
+        "cycles": [
+          59428273,
+          62145225,
+          44691645
+        ],
+        "counters": {
+          "recurringRegions": [
+            0,
+            0,
+            0
+          ],
+          "recurringPasses": [
+            0,
+            0,
+            0
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            0,
+            0,
+            0
+          ],
+          "horizonStops": [
+            25,
+            25,
+            25
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2800049610,
+        "medianNodes": 394319,
+        "medianCyclesPerNode": 7080.876599972677,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 15231653,
+        "cycles": [
+          2760173760,
+          2850654706,
+          2800049610
+        ],
+        "counters": {
+          "recurringRegions": [
+            1,
+            1,
+            1
+          ],
+          "recurringPasses": [
+            5,
+            5,
+            5
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            1,
+            1,
+            1
+          ],
+          "horizonStops": [
+            236779,
+            243065,
+            237981
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-4-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2775294078,
+        "medianNodes": 438238,
+        "medianCyclesPerNode": 6346.4595721910455,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 14947098,
+        "cycles": [
+          2775131905,
+          2775294078,
+          2801169800
+        ],
+        "counters": {
+          "recurringRegions": [
+            1,
+            1,
+            1
+          ],
+          "recurringPasses": [
+            3,
+            3,
+            3
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            1,
+            1,
+            1
+          ],
+          "horizonStops": [
+            247293,
+            246733,
+            247848
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 867552447,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3641.322830448433,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": -2.105182532956662,
+        "medianSolveMs": 241.27549999999974,
+        "medianStrategistCycles": null,
+        "cycles": [
+          919134316,
+          867370354,
+          867552447
+        ],
+        "counters": {}
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 886208759,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3719.627784866444,
+        "cycleVsBaselinePercent": 2.150453504513017,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 245.26770000000033,
+        "medianStrategistCycles": 6728424,
+        "cycles": [
+          894384309,
+          886208759,
+          883984630
+        ],
+        "counters": {
+          "horizonStops": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-recurring-off",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 904774030,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3797.550618672666,
+        "cycleVsBaselinePercent": 4.290413003699367,
+        "cycleVsOneWayPercent": 2.094909445597115,
+        "medianSolveMs": 247.1965999999993,
+        "medianStrategistCycles": 7778201,
+        "cycles": [
+          916059100,
+          904774030,
+          880280203
+        ],
+        "counters": {
+          "recurringRegions": [
+            0,
+            0,
+            0
+          ],
+          "recurringPasses": [
+            0,
+            0,
+            0
+          ],
+          "recurringReleases": [
+            0,
+            0,
+            0
+          ],
+          "recurringReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringLocalReentries": [
+            0,
+            0,
+            0
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            0,
+            0,
+            0
+          ],
+          "horizonStops": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2737317216,
+        "medianNodes": 386634,
+        "medianCyclesPerNode": 7129.035214561829,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 15714154,
+        "cycles": [
+          2737317216,
+          2773707989,
+          2715853248
+        ],
+        "counters": {
+          "recurringRegions": [
+            2,
+            2,
+            2
+          ],
+          "recurringPasses": [
+            6,
+            6,
+            6
+          ],
+          "recurringReleases": [
+            1,
+            1,
+            1
+          ],
+          "recurringReentries": [
+            2,
+            2,
+            2
+          ],
+          "recurringLocalReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            2,
+            2,
+            2
+          ],
+          "horizonStops": [
+            233183,
+            234673,
+            228283
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-4-recurring",
+        "exact": 0,
+        "timeouts": 3,
+        "medianCycles": 2749491354,
+        "medianNodes": 432066,
+        "medianCyclesPerNode": 6368.102387461272,
+        "cycleVsBaselinePercent": null,
+        "cycleVsOneWayPercent": null,
+        "medianSolveMs": null,
+        "medianStrategistCycles": 15966645,
+        "cycles": [
+          2749491354,
+          2736941266,
+          2795342224
+        ],
+        "counters": {
+          "recurringRegions": [
+            2,
+            2,
+            2
+          ],
+          "recurringPasses": [
+            4,
+            4,
+            4
+          ],
+          "recurringReleases": [
+            1,
+            1,
+            1
+          ],
+          "recurringReentries": [
+            2,
+            2,
+            2
+          ],
+          "recurringLocalReentries": [
+            1,
+            1,
+            1
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            2,
+            2,
+            2
+          ],
+          "horizonStops": [
+            243383,
+            238238,
+            247734
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": "bounded-screen.jsonl",
+    "metadata": {
+      "type": "metadata",
+      "sha": "f1aeecf3d92be4e871c9768453f337f0d21de257",
+      "dirty": "?? evidence/strategist-recurring-20260926/screen.jsonl",
+      "node": "v26.7.0",
+      "date": "2026-09-27T01:35:29.826Z",
+      "roots": [
+        "2053635233350500",
+        "1320461024522311",
+        "132046102452231"
+      ],
+      "labels": [
+        "baseline",
+        "frontier-2-narrow",
+        "frontier-2-recurring-bounded",
+        "frontier-4-recurring-bounded"
+      ],
+      "rounds": 1,
+      "mode": "bounded",
+      "workers": 1,
+      "timeoutMs": 750,
+      "warmups": 20,
+      "scope": "Branch-local recurring PFIF; full solve-call evaluator cycles, all local passes charged. Third root is adjacent to B, not independent."
+    },
+    "trials": 12,
+    "groups": [
+      {
+        "root": "2053635233350500",
+        "label": "baseline",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 517438100,
+        "medianNodes": 99114,
+        "medianCyclesPerNode": 5220.635833484675,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 9.447047642781058,
+        "medianSolveMs": 142.0962,
+        "medianStrategistCycles": null,
+        "cycles": [
+          517438100
+        ],
+        "counters": {}
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-narrow",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 472774836,
+        "medianNodes": 89042,
+        "medianCyclesPerNode": 5309.57116866198,
+        "cycleVsBaselinePercent": -8.631614873353932,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 131.2097,
+        "medianStrategistCycles": 5785546,
+        "cycles": [
+          472774836
+        ],
+        "counters": {
+          "horizonStops": [
+            5507
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 652997380,
+        "medianNodes": 122551,
+        "medianCyclesPerNode": 5328.372514300169,
+        "cycleVsBaselinePercent": 26.198163606429436,
+        "cycleVsOneWayPercent": 38.12016424664362,
+        "medianSolveMs": 181.40300000000002,
+        "medianStrategistCycles": 5431692,
+        "cycles": [
+          652997380
+        ],
+        "counters": {
+          "recurringRegions": [
+            13022
+          ],
+          "recurringPasses": [
+            16653
+          ],
+          "recurringReleases": [
+            9058
+          ],
+          "recurringReentries": [
+            13022
+          ],
+          "recurringLocalReentries": [
+            13021
+          ],
+          "recurringRetainedSkips": [
+            2898
+          ],
+          "recurringMaxDepth": [
+            20
+          ],
+          "recurringBudgetReleases": [
+            2902
+          ],
+          "recurringRearms": [
+            11314
+          ],
+          "horizonStops": [
+            28244
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 1893611356,
+        "medianNodes": 303119,
+        "medianCyclesPerNode": 6247.08895186379,
+        "cycleVsBaselinePercent": 265.95901152234444,
+        "cycleVsOneWayPercent": 300.5313336939109,
+        "medianSolveMs": 521.2347999999997,
+        "medianStrategistCycles": 12191075,
+        "cycles": [
+          1893611356
+        ],
+        "counters": {
+          "recurringRegions": [
+            8600
+          ],
+          "recurringPasses": [
+            9490
+          ],
+          "recurringReleases": [
+            5657
+          ],
+          "recurringReentries": [
+            8600
+          ],
+          "recurringLocalReentries": [
+            8599
+          ],
+          "recurringRetainedSkips": [
+            678
+          ],
+          "recurringMaxDepth": [
+            20
+          ],
+          "recurringBudgetReleases": [
+            875
+          ],
+          "recurringRearms": [
+            6724
+          ],
+          "horizonStops": [
+            131382
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "baseline",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 911660580,
+        "medianNodes": 238251,
+        "medianCyclesPerNode": 3826.4711585680648,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 1862.442897373769,
+        "medianSolveMs": 250.64809999999989,
+        "medianStrategistCycles": null,
+        "cycles": [
+          911660580
+        ],
+        "counters": {}
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-narrow",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 46455394,
+        "medianNodes": 5838,
+        "medianCyclesPerNode": 7957.415895854745,
+        "cycleVsBaselinePercent": -94.90431033005726,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 13.428899999999885,
+        "medianStrategistCycles": 833774,
+        "cycles": [
+          46455394
+        ],
+        "counters": {
+          "horizonStops": [
+            25
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 42691623,
+        "medianNodes": 4262,
+        "medianCyclesPerNode": 10016.805021116847,
+        "cycleVsBaselinePercent": -95.31715816866844,
+        "cycleVsOneWayPercent": -8.1019030857859,
+        "medianSolveMs": 12.65560000000005,
+        "medianStrategistCycles": 962045,
+        "cycles": [
+          42691623
+        ],
+        "counters": {
+          "recurringRegions": [
+            330
+          ],
+          "recurringPasses": [
+            464
+          ],
+          "recurringReleases": [
+            71
+          ],
+          "recurringReentries": [
+            330
+          ],
+          "recurringLocalReentries": [
+            329
+          ],
+          "recurringRetainedSkips": [
+            15
+          ],
+          "recurringMaxDepth": [
+            23
+          ],
+          "recurringBudgetReleases": [
+            134
+          ],
+          "recurringRearms": [
+            351
+          ],
+          "horizonStops": [
+            1220
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 96997459,
+        "medianNodes": 12898,
+        "medianCyclesPerNode": 7520.348813769577,
+        "cycleVsBaselinePercent": -89.36035393786578,
+        "cycleVsOneWayPercent": 108.79697845206091,
+        "medianSolveMs": 26.81880000000001,
+        "medianStrategistCycles": 1211956,
+        "cycles": [
+          96997459
+        ],
+        "counters": {
+          "recurringRegions": [
+            186
+          ],
+          "recurringPasses": [
+            226
+          ],
+          "recurringReleases": [
+            30
+          ],
+          "recurringReentries": [
+            186
+          ],
+          "recurringLocalReentries": [
+            185
+          ],
+          "recurringRetainedSkips": [
+            0
+          ],
+          "recurringMaxDepth": [
+            22
+          ],
+          "recurringBudgetReleases": [
+            40
+          ],
+          "recurringRearms": [
+            183
+          ],
+          "horizonStops": [
+            5525
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "baseline",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 868921799,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3647.070324698219,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": -0.8531973649168467,
+        "medianSolveMs": 239.6886000000004,
+        "medianStrategistCycles": null,
+        "cycles": [
+          868921799
+        ],
+        "counters": {}
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-narrow",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 876399214,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3678.4548041569433,
+        "cycleVsBaselinePercent": 0.8605394649559228,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 242.9979000000003,
+        "medianStrategistCycles": 7908684,
+        "cycles": [
+          876399214
+        ],
+        "counters": {
+          "horizonStops": [
+            0
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 48919487,
+        "medianNodes": 4263,
+        "medianCyclesPerNode": 11475.366408632419,
+        "cycleVsBaselinePercent": -94.37009325162529,
+        "cycleVsOneWayPercent": -94.4181274676497,
+        "medianSolveMs": 13.563400000000001,
+        "medianStrategistCycles": 668273,
+        "cycles": [
+          48919487
+        ],
+        "counters": {
+          "recurringRegions": [
+            331
+          ],
+          "recurringPasses": [
+            465
+          ],
+          "recurringReleases": [
+            72
+          ],
+          "recurringReentries": [
+            331
+          ],
+          "recurringLocalReentries": [
+            330
+          ],
+          "recurringRetainedSkips": [
+            15
+          ],
+          "recurringMaxDepth": [
+            24
+          ],
+          "recurringBudgetReleases": [
+            134
+          ],
+          "recurringRearms": [
+            351
+          ],
+          "horizonStops": [
+            1220
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 1,
+        "timeouts": 0,
+        "medianCycles": 111720818,
+        "medianNodes": 12899,
+        "medianCyclesPerNode": 8661.199937979689,
+        "cycleVsBaselinePercent": -87.14259233355935,
+        "cycleVsOneWayPercent": -87.25229139696604,
+        "medianSolveMs": 31.519900000000234,
+        "medianStrategistCycles": 1161090,
+        "cycles": [
+          111720818
+        ],
+        "counters": {
+          "recurringRegions": [
+            187
+          ],
+          "recurringPasses": [
+            227
+          ],
+          "recurringReleases": [
+            31
+          ],
+          "recurringReentries": [
+            187
+          ],
+          "recurringLocalReentries": [
+            186
+          ],
+          "recurringRetainedSkips": [
+            0
+          ],
+          "recurringMaxDepth": [
+            23
+          ],
+          "recurringBudgetReleases": [
+            40
+          ],
+          "recurringRearms": [
+            183
+          ],
+          "horizonStops": [
+            5525
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": "bounded-recheck.jsonl",
+    "metadata": {
+      "type": "metadata",
+      "sha": "f1aeecf3d92be4e871c9768453f337f0d21de257",
+      "dirty": "?? evidence/strategist-recurring-20260926/bounded-screen.jsonl\n?? evidence/strategist-recurring-20260926/screen.jsonl",
+      "node": "v26.7.0",
+      "date": "2026-09-27T01:35:43.860Z",
+      "roots": [
+        "2053635233350500",
+        "1320461024522311",
+        "132046102452231"
+      ],
+      "labels": [
+        "baseline",
+        "frontier-2-narrow",
+        "frontier-2-recurring-bounded",
+        "frontier-4-recurring-bounded"
+      ],
+      "rounds": 3,
+      "mode": "bounded",
+      "workers": 1,
+      "timeoutMs": 750,
+      "warmups": 20,
+      "scope": "Branch-local recurring PFIF; full solve-call evaluator cycles, all local passes charged. Third root is adjacent to B, not independent."
+    },
+    "trials": 36,
+    "groups": [
+      {
+        "root": "2053635233350500",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 507183278,
+        "medianNodes": 99114,
+        "medianCyclesPerNode": 5117.170914300705,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 10.180270793930912,
+        "medianSolveMs": 140.46949999999998,
+        "medianStrategistCycles": null,
+        "cycles": [
+          507183278,
+          500459272,
+          527354177
+        ],
+        "counters": {}
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 460321321,
+        "medianNodes": 89042,
+        "medianCyclesPerNode": 5169.710035713483,
+        "cycleVsBaselinePercent": -9.239649458632194,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 129.0029999999988,
+        "medianStrategistCycles": 4290134,
+        "cycles": [
+          508168548,
+          454839865,
+          460321321
+        ],
+        "counters": {
+          "horizonStops": [
+            5507,
+            5507,
+            5507
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 646521453,
+        "medianNodes": 122551,
+        "medianCyclesPerNode": 5275.529803918369,
+        "cycleVsBaselinePercent": 27.472943419873562,
+        "cycleVsOneWayPercent": 40.45003424901103,
+        "medianSolveMs": 177.01460000000043,
+        "medianStrategistCycles": 4999322,
+        "cycles": [
+          646521453,
+          640941945,
+          647466914
+        ],
+        "counters": {
+          "recurringRegions": [
+            13022,
+            13022,
+            13022
+          ],
+          "recurringPasses": [
+            16653,
+            16653,
+            16653
+          ],
+          "recurringReleases": [
+            9058,
+            9058,
+            9058
+          ],
+          "recurringReentries": [
+            13022,
+            13022,
+            13022
+          ],
+          "recurringLocalReentries": [
+            13021,
+            13021,
+            13021
+          ],
+          "recurringRetainedSkips": [
+            2898,
+            2898,
+            2898
+          ],
+          "recurringMaxDepth": [
+            20,
+            20,
+            20
+          ],
+          "recurringBudgetReleases": [
+            2902,
+            2902,
+            2902
+          ],
+          "recurringRearms": [
+            11314,
+            11314,
+            11314
+          ],
+          "horizonStops": [
+            28244,
+            28244,
+            28244
+          ]
+        }
+      },
+      {
+        "root": "2053635233350500",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 1881568090,
+        "medianNodes": 303119,
+        "medianCyclesPerNode": 6207.357803370954,
+        "cycleVsBaselinePercent": 270.9838576342022,
+        "cycleVsOneWayPercent": 308.75101894313514,
+        "medianSolveMs": 517.6706000000013,
+        "medianStrategistCycles": 12946335,
+        "cycles": [
+          1921500744,
+          1881568090,
+          1872873200
+        ],
+        "counters": {
+          "recurringRegions": [
+            8600,
+            8600,
+            8600
+          ],
+          "recurringPasses": [
+            9490,
+            9490,
+            9490
+          ],
+          "recurringReleases": [
+            5657,
+            5657,
+            5657
+          ],
+          "recurringReentries": [
+            8600,
+            8600,
+            8600
+          ],
+          "recurringLocalReentries": [
+            8599,
+            8599,
+            8599
+          ],
+          "recurringRetainedSkips": [
+            678,
+            678,
+            678
+          ],
+          "recurringMaxDepth": [
+            20,
+            20,
+            20
+          ],
+          "recurringBudgetReleases": [
+            875,
+            875,
+            875
+          ],
+          "recurringRearms": [
+            6724,
+            6724,
+            6724
+          ],
+          "horizonStops": [
+            131382,
+            131382,
+            131382
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 872425702,
+        "medianNodes": 238251,
+        "medianCyclesPerNode": 3661.792403809428,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": 1893.231761015902,
+        "medianSolveMs": 240.19510000000082,
+        "medianStrategistCycles": null,
+        "cycles": [
+          872425702,
+          869725708,
+          875583867
+        ],
+        "counters": {}
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 43769406,
+        "medianNodes": 5838,
+        "medianCyclesPerNode": 7497.3288797533405,
+        "cycleVsBaselinePercent": -94.9830219467789,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 12.382900000000518,
+        "medianStrategistCycles": 664955,
+        "cycles": [
+          49805232,
+          43769406,
+          42638173
+        ],
+        "counters": {
+          "horizonStops": [
+            25,
+            25,
+            25
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 46128079,
+        "medianNodes": 4262,
+        "medianCyclesPerNode": 10823.10628812764,
+        "cycleVsBaselinePercent": -94.7126639100323,
+        "cycleVsOneWayPercent": 5.388862256892413,
+        "medianSolveMs": 12.83010000000013,
+        "medianStrategistCycles": 848149,
+        "cycles": [
+          46128079,
+          43295757,
+          52559408
+        ],
+        "counters": {
+          "recurringRegions": [
+            330,
+            330,
+            330
+          ],
+          "recurringPasses": [
+            464,
+            464,
+            464
+          ],
+          "recurringReleases": [
+            71,
+            71,
+            71
+          ],
+          "recurringReentries": [
+            330,
+            330,
+            330
+          ],
+          "recurringLocalReentries": [
+            329,
+            329,
+            329
+          ],
+          "recurringRetainedSkips": [
+            15,
+            15,
+            15
+          ],
+          "recurringMaxDepth": [
+            23,
+            23,
+            23
+          ],
+          "recurringBudgetReleases": [
+            134,
+            134,
+            134
+          ],
+          "recurringRearms": [
+            351,
+            351,
+            351
+          ],
+          "horizonStops": [
+            1220,
+            1220,
+            1220
+          ]
+        }
+      },
+      {
+        "root": "1320461024522311",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 100043568,
+        "medianNodes": 12898,
+        "medianCyclesPerNode": 7756.51790975345,
+        "cycleVsBaselinePercent": -88.53271198101406,
+        "cycleVsOneWayPercent": 128.56962692159905,
+        "medianSolveMs": 27.874599999999646,
+        "medianStrategistCycles": 1143029,
+        "cycles": [
+          100043568,
+          112620201,
+          99840838
+        ],
+        "counters": {
+          "recurringRegions": [
+            186,
+            186,
+            186
+          ],
+          "recurringPasses": [
+            226,
+            226,
+            226
+          ],
+          "recurringReleases": [
+            30,
+            30,
+            30
+          ],
+          "recurringReentries": [
+            186,
+            186,
+            186
+          ],
+          "recurringLocalReentries": [
+            185,
+            185,
+            185
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            22,
+            22,
+            22
+          ],
+          "recurringBudgetReleases": [
+            40,
+            40,
+            40
+          ],
+          "recurringRearms": [
+            183,
+            183,
+            183
+          ],
+          "horizonStops": [
+            5525,
+            5525,
+            5525
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "baseline",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 883664324,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3708.948189312157,
+        "cycleVsBaselinePercent": 0,
+        "cycleVsOneWayPercent": -0.4586018045836915,
+        "medianSolveMs": 243.60680000000002,
+        "medianStrategistCycles": null,
+        "cycles": [
+          883664324,
+          907922248,
+          872246183
+        ],
+        "counters": {}
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-narrow",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 887735495,
+        "medianNodes": 238252,
+        "medianCyclesPerNode": 3726.0358569917566,
+        "cycleVsBaselinePercent": 0.4607146502838777,
+        "cycleVsOneWayPercent": 0,
+        "medianSolveMs": 242.3831,
+        "medianStrategistCycles": 6545598,
+        "cycles": [
+          887735495,
+          938701090,
+          875570225
+        ],
+        "counters": {
+          "horizonStops": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-2-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 43740657,
+        "medianNodes": 4263,
+        "medianCyclesPerNode": 10260.534130893737,
+        "cycleVsBaselinePercent": -95.05008227535957,
+        "cycleVsOneWayPercent": -95.07278268737018,
+        "medianSolveMs": 12.087999999999738,
+        "medianStrategistCycles": 639889,
+        "cycles": [
+          40101099,
+          43740657,
+          48178600
+        ],
+        "counters": {
+          "recurringRegions": [
+            331,
+            331,
+            331
+          ],
+          "recurringPasses": [
+            465,
+            465,
+            465
+          ],
+          "recurringReleases": [
+            72,
+            72,
+            72
+          ],
+          "recurringReentries": [
+            331,
+            331,
+            331
+          ],
+          "recurringLocalReentries": [
+            330,
+            330,
+            330
+          ],
+          "recurringRetainedSkips": [
+            15,
+            15,
+            15
+          ],
+          "recurringMaxDepth": [
+            24,
+            24,
+            24
+          ],
+          "recurringBudgetReleases": [
+            134,
+            134,
+            134
+          ],
+          "recurringRearms": [
+            351,
+            351,
+            351
+          ],
+          "horizonStops": [
+            1220,
+            1220,
+            1220
+          ]
+        }
+      },
+      {
+        "root": "132046102452231",
+        "label": "frontier-4-recurring-bounded",
+        "exact": 3,
+        "timeouts": 0,
+        "medianCycles": 113082423,
+        "medianNodes": 12899,
+        "medianCyclesPerNode": 8766.758896038453,
+        "cycleVsBaselinePercent": -87.20301137788154,
+        "cycleVsOneWayPercent": -87.26169859863495,
+        "medianSolveMs": 31.328199999999924,
+        "medianStrategistCycles": 1534851,
+        "cycles": [
+          105035519,
+          113082423,
+          113958222
+        ],
+        "counters": {
+          "recurringRegions": [
+            187,
+            187,
+            187
+          ],
+          "recurringPasses": [
+            227,
+            227,
+            227
+          ],
+          "recurringReleases": [
+            31,
+            31,
+            31
+          ],
+          "recurringReentries": [
+            187,
+            187,
+            187
+          ],
+          "recurringLocalReentries": [
+            186,
+            186,
+            186
+          ],
+          "recurringRetainedSkips": [
+            0,
+            0,
+            0
+          ],
+          "recurringMaxDepth": [
+            23,
+            23,
+            23
+          ],
+          "recurringBudgetReleases": [
+            40,
+            40,
+            40
+          ],
+          "recurringRearms": [
+            183,
+            183,
+            183
+          ],
+          "horizonStops": [
+            5525,
+            5525,
+            5525
+          ]
+        }
+      }
+    ]
+  }
+]
