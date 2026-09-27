@@ -1,0 +1,43 @@
+name: IsoMax Phase2 integrated zero-bound confirmation
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-integrated-confirm.yml"
+      - "experiments/isomax-phase2/integrated-confirm-*.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirm:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed sources
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/control" 10380f79af68dc1f57455d535814ac0a7eacea33
+          git worktree add "$env:RUNNER_TEMP/candidate" dbac3d430414a90b8e31da9e0c640a06dfef596d
+      - name: Long confirmation
+        shell: pwsh
+        run: node experiments/isomax-phase2/integrated-confirm-run.mjs "$env:RUNNER_TEMP/isomax-phase2-integrated/long" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 353335714 8
+      - name: Short confirmation
+        shell: pwsh
+        run: node experiments/isomax-phase2/integrated-confirm-run.mjs "$env:RUNNER_TEMP/isomax-phase2-integrated/short" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-integrated-confirm
+          path: ${{ runner.temp }}/isomax-phase2-integrated
+          if-no-files-found: error
+          retention-days: 30
