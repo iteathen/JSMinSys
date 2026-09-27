@@ -9495,7 +9495,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "S*(22+4*L+4*Q)+(1-S)*(20+4*L+4*Q+6*W)"
+          "count": "25+6*W+3*L+3*Q"
         },
         {
           "op": "runtime.field.store",
@@ -9503,7 +9503,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "S*(16+C+CN+2*L+3*E)+(1-S)*(4+C+CN+6*W+2*L+2*Q*W)"
+          "count": "6+C+CN+6*W+3*L"
         },
         {
           "op": "memory.load.u8",
@@ -9511,35 +9511,35 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "S*(9+C+CN)+(1-S)*(3+C+2*W+CN+Q*W)"
+          "count": "9+C+CN"
         },
         {
           "op": "alu.imul.u32",
-          "count": "S*(3+L)+(1-S)*(3+L)"
+          "count": "3+L"
         },
         {
           "op": "alu.add.u32",
-          "count": "S*(18+C+CN+5*L+3*E)+(1-S)*(12+C+CN+5*W+5*L+Q*W)"
+          "count": "18+C+CN+5*W+4*L"
         },
         {
           "op": "alu.sub.u32",
-          "count": "S*(1+L)+(1-S)*(1+L)"
+          "count": "1+L"
         },
         {
           "op": "alu.and.u32",
-          "count": "S*(17+5*L+3*Q)+(1-S)*(5+4*W+5*L+2*Q*W)"
+          "count": "8+5*W+L"
         },
         {
           "op": "alu.or.u32",
-          "count": "S*(3+3*Q)+(1-S)*(W+Q*W)"
+          "count": "3*W+6*B+3*M+3*O"
         },
         {
           "op": "alu.xor.u32",
-          "count": "L"
+          "count": "2*W+L"
         },
         {
           "op": "alu.shl.u32",
-          "count": "S*(2+L)+(1-S)*(2+L)"
+          "count": "2+L"
         },
         {
           "op": "alu.shr.u32",
@@ -9547,11 +9547,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "S*(16+C+6*L+3*E)+(1-S)*(10+C+4*W+6*L+Q*W)"
+          "count": "18+C+7*W+3*L"
         },
         {
           "op": "control.branch",
-          "count": "S*(16+C+6*L+3*E)+(1-S)*(10+C+4*W+6*L+Q*W)"
+          "count": "18+C+7*W+3*L"
         },
         {
           "op": "runtime.call.subledger",
@@ -9561,17 +9561,17 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(S*(22+4*L+4*Q)+(1-S)*(20+4*L+4*Q+6*W))*C(runtime.field.load)+(4)*C(runtime.field.store)+(S*(16+C+CN+2*L+3*E)+(1-S)*(4+C+CN+6*W+2*L+2*Q*W))*C(memory.load.u32)+(2)*C(memory.load.u8)+(S*(9+C+CN)+(1-S)*(3+C+2*W+CN+Q*W))*C(memory.store.u32)+(S*(3+L)+(1-S)*(3+L))*C(alu.imul.u32)+(S*(18+C+CN+5*L+3*E)+(1-S)*(12+C+CN+5*W+5*L+Q*W))*C(alu.add.u32)+(S*(1+L)+(1-S)*(1+L))*C(alu.sub.u32)+(S*(17+5*L+3*Q)+(1-S)*(5+4*W+5*L+2*Q*W))*C(alu.and.u32)+(S*(3+3*Q)+(1-S)*(W+Q*W))*C(alu.or.u32)+(L)*C(alu.xor.u32)+(S*(2+L)+(1-S)*(2+L))*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(S*(16+C+6*L+3*E)+(1-S)*(10+C+4*W+6*L+Q*W))*C(control.test.u32)+(S*(16+C+6*L+3*E)+(1-S)*(10+C+4*W+6*L+Q*W))*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
+        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
         "parameters": {
           "C": "prepared geometry column count",
-          "W": "prepared coordinate word count",
+          "W": "prepared coordinate word count; partitioned specialization is selected only at W=3",
           "CN": "cached child-basis entries copied",
-          "L": "valid live parent-coordinate indices visited",
-          "E": "visited entries with at least one surviving player coordinate",
-          "Q": "surviving player/parent closure applications",
-          "S": "1 when W=3 scalar-accumulator specialization executes; 0 for generic span fallback"
+          "B": "parent indices relevant to both output coordinates after valid/unchanged masking",
+          "M": "mover-only parent indices",
+          "O": "opponent-only parent indices",
+          "L": "B+M+O unique relevant parent indices visited"
         },
-        "note": "Plan-hit realization with a prepared three-word specialization. The W=3 arm accumulates six output coordinate words in scalar locals and publishes them once, so closure loads occur once per live entry and repeated target typed-array loads/stores are removed. Generic configurable geometry keeps the parent-aligned span loop. Terminal/draw paths remain conservatively covered by the fixed support/metadata/control envelope."
+        "note": "Experimental W=3 plan-hit realization partitions mover/opponent masks once per coordinate word, visits each relevant parent index once, and reuses the existing AoS closure payload. Both/mover-only/opponent-only accumulations remove per-entry P0/P1 membership reloads and write-branch tests. Generic configurable geometry keeps the prior fallback."
       },
       "status": "decomposed"
     },
@@ -9754,7 +9754,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "90fbcb28f0dc0a6d3e5210f64950aa022b4ee850",
+    "addons/rba-connect4-coordinate.mjs": "cf16bc114aa675da11d0eb32ff542673c90541ef",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
