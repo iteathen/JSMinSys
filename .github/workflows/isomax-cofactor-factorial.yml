@@ -1,0 +1,59 @@
+name: IsoMax cofactor factorial
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-cofactor-factorial.yml"
+      - "experiments/isomax-cofactor-factorial/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorial:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize exact arms
+        shell: pwsh
+        run: |
+          git fetch origin experiment/async-strategist-campaign-20260926
+          git fetch origin experiment/isomax-cofactor-dense-remove-c1-20260927
+          git fetch origin experiment/isomax-cofactor-dense-subset-c1-20260927
+          git fetch origin experiment/isomax-cofactor-dense-both-c1-20260927
+          $root="$env:RUNNER_TEMP/isomax-cofactor-factorial"
+          New-Item -ItemType Directory -Force $root | Out-Null
+          git worktree add --detach "$root/A" a3cf7f9ca5c90e5025542c3b27ab0b735a610e9a
+          git worktree add --detach "$root/B" 629b0e1430bfebdbb18a51927d8f66b91e863ee2
+          git worktree add --detach "$root/C" f997fc3af9eaaf5ef0005821f8ead5f48d5a7d3e
+          git worktree add --detach "$root/D" 390aed4888a0414afaf0d4c09c051d4ef4a5a13f
+          git -C "$root/A" status --porcelain
+          git -C "$root/B" status --porcelain
+          git -C "$root/C" status --porcelain
+          git -C "$root/D" status --porcelain
+      - name: Long local factorial
+        shell: pwsh
+        run: |
+          $root="$env:RUNNER_TEMP/isomax-cofactor-factorial"
+          node experiments/isomax-cofactor-factorial/run.mjs "$root/results-long-local" "$root/A" "$root/B" "$root/C" "$root/D" local 353335714 8
+      - name: Short local factorial
+        shell: pwsh
+        run: |
+          $root="$env:RUNNER_TEMP/isomax-cofactor-factorial"
+          node experiments/isomax-cofactor-factorial/run.mjs "$root/results-short-local" "$root/A" "$root/B" "$root/C" "$root/D" local 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-cofactor-factorial
+          path: ${{ runner.temp }}/isomax-cofactor-factorial/results-*
+          if-no-files-found: error
+          retention-days: 30
