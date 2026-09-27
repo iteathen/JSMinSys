@@ -6597,11 +6597,11 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(prepareConnect4RbaCofactorPlanCache32)+C(runtime.object.allocate)+2*C(runtime.field.load)+C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
+        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask. Qualification-only selected 7x6 worker wiring allocates one private 262144-plan support-derived cofactor arena during cold worker preparation and stores it on the prepared execution profile before search."
       },
       "status": "decomposed"
     },
@@ -8133,12 +8133,12 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBetaBehavior)+CALL(solveConnect4RbaAlphaBetaBehavior)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBetaBehavior)+CALL(solveConnect4RbaAlphaBetaBehavior)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)+CALL(prepareConnect4RbaCofactorPlanCache32)+C(runtime.object.allocate)+2*C(runtime.field.load)+C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBetaBehavior)",
           "PARK_DURATION"
         ],
-        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search.",
+        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search. Qualification-only selected 7x6 worker wiring allocates one private 262144-plan support-derived cofactor arena during cold worker preparation and stores it on the prepared execution profile before search.",
         "parameters": {
           "L": "Executed retired-worker scan and wake checks",
           "S": "Cancellation result/stop publications",
@@ -9652,12 +9652,12 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaFrontier)+CALL(solveConnect4RbaFrontier)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)+3*C(runtime.typed_view.construct)+2*C(runtime.timer.read)+6*C(memory.store.f64)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaFrontier)+CALL(solveConnect4RbaFrontier)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)+3*C(runtime.typed_view.construct)+2*C(runtime.timer.read)+6*C(memory.store.f64)+CALL(prepareConnect4RbaCofactorPlanCache32)+C(runtime.object.allocate)+2*C(runtime.field.load)+C(runtime.field.store)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaFrontier)",
           "PARK_DURATION"
         ],
-        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search.",
+        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search. Qualification-only selected 7x6 worker wiring allocates one private 262144-plan support-derived cofactor arena during cold worker preparation and stores it on the prepared execution profile before search.",
         "parameters": {
           "L": "Executed retired-worker scan and wake checks",
           "S": "Cancellation result/stop publications",
@@ -10079,15 +10079,15 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
     "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "65bd64a5ee5aab71ad7b839866092fec026ff61e",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
     "addons/rba-connect4-alphabeta-behavior.mjs": "e85c0e38d363b2c8603b0d84cc21c8d3bca720aa",
-    "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
+    "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "3601cbaf8ccafbc00cfaf096af12c41bc65b4fff",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
     "addons/rba-connect4-frontier.mjs": "994ebe7f5029ce834f94960de317a1591dd7cd00",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
-    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
+    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "e774942973e3b6b440de6661aaa12e2ba1a266d2"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
