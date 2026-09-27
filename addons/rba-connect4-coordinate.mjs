@@ -59,9 +59,15 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
   const keyCount=supportCount*g.columns;
   if(!Number.isSafeInteger(keyCount)||keyCount>maxKeyCount)
     throw new RangeError('cofactor plan key space exceeds configured bound');
-  const planByKey=new Int32Array(keyCount);planByKey.fill(-1);
+  const planByKey=new Int32Array(keyCount);planByKey.fill(-1),
+    subsetWords=g.shapeWordCount,subsetBits=new Uint32Array(g.shapeCount*subsetWords);
+  for(let a=0;a<g.shapeCount;a++){
+    const source=a*g.shapeCount,target=a*subsetWords;
+    for(let b=0;b<g.shapeCount;b++)if(g.subsetTable[source+b])
+      subsetBits[target+(b>>>5)]|=1<<(b&31);
+  }
   return {
-    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,
+    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,subsetWords,subsetBits,
     n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
     basis:new Uint16Array(capacity*g.maxBasis),
     valid:new Uint32Array(capacity*g.coordWords),
@@ -207,7 +213,8 @@ function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex
   if(cache.count>=cache.capacity)return;
   const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
     closureBase=planBase*words,planWordBase=plan*words,
-    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
+    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetBits=cache.subsetBits,
+    subsetWords=cache.subsetWords,shapeCount=g.shapeCount;
   cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
   for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
   for(let i=0;i<n;i+=1){
@@ -216,9 +223,12 @@ function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex
     const word=i>>>5,mask=1<<(i&31);
     cache.valid[planWordBase+word]|=mask;
     if(image===id)cache.unchanged[planWordBase+word]|=mask;
-    const subset=image*shapeCount,cb=closureBase+i*words;
-    for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]])
-      cache.closure[cb+(k>>>5)]|=1<<(k&31);
+    const subset=image*subsetWords,cb=closureBase+i*words;
+    for(let k=0;k<cn;k+=1){
+      const child=childBasis[ci+k];
+      if(subsetBits[subset+(child>>>5)]&(1<<(child&31)))
+        cache.closure[cb+(k>>>5)]|=1<<(k&31);
+    }
   }
   cache.planByKey[key]=plan;
 }
