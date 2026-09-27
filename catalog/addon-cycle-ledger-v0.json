@@ -9588,11 +9588,21 @@
           "op": "control.branch",
           "count": "2+L*(1+G2)",
           "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1",
+          "note": "select targetWords===1 fast path"
+        },
+        {
+          "op": "control.branch",
+          "count": "1",
+          "note": "select targetWords===1 fast path"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)",
+        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "C": "prepared geometry column count",
           "W": "prepared coordinate word count; partitioned specialization is selected only at W=3",
@@ -9603,9 +9613,10 @@
           "L": "B+M+O unique relevant parent indices visited",
           "SW": "1..3 source coordinate words actually visited; inherited W=3 loop envelope is intentionally retained conservatively in static accounting",
           "TW": "1..3 closure/output words implied by child basis size cn",
-          "G2": "1 when TW>1, else 0"
+          "G2": "1 when TW>1, else 0",
+          "T1": "1 when cn<=32 and the one-word closure fast path executes"
         },
-        "note": "Stage-7 combined dynamic-word-bound experiment. Source scanning stops after the last parent-basis coordinate word and closure loads stop after the last child-basis coordinate word. Static ledger deliberately retains the inherited W=3 memory/ALU envelope and adds all new selection/guard branches; measured process cycles are the authority for dynamic savings."
+        "note": "Stage-10 one-word closure experiment. The common cn<=32 path hoists target-width selection outside residual loops and loads only closure word 0. Static accounting deliberately retains the inherited Stage-7 per-residual three-word guard/memory envelope and adds the new outer selection branch; measured process cycles are the dynamic-performance authority."
       },
       "status": "decomposed"
     },
@@ -9788,7 +9799,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "d5fd7cfb8e1548a6d6c7d8ef1fee537da98063b6",
+    "addons/rba-connect4-coordinate.mjs": "1357f132b01e5ed0f9c428664df2602b22e83923",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
