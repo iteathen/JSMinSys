@@ -25,7 +25,8 @@ if(typeof api.prepareConnect4RbaCofactorPlanCache32==='function'){
   planCache=api.prepareConnect4RbaCofactorPlanCache32(g,{capacity:262144});
   state.profile.cofactorPlanCache=planCache;
   planBytes=planCache.planByKey.byteLength+planCache.n.byteLength+planCache.cn.byteLength+
-    planCache.landing.byteLength+planCache.basis.byteLength+planCache.map.byteLength+planCache.closure.byteLength;
+    planCache.landing.byteLength+planCache.basis.byteLength+(planCache.map?.byteLength??0)+
+    (planCache.valid?.byteLength??0)+(planCache.unchanged?.byteLength??0)+planCache.closure.byteLength;
 }
 const rssBefore=process.memoryUsage().rss,meter=await processCycleCounter();
 try{
