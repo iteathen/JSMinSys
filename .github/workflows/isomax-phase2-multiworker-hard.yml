@@ -1,0 +1,40 @@
+name: IsoMax Phase2 official hard seven-worker control
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-multiworker-hard.yml"
+      - "experiments/isomax-phase2/mw-hard-run.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hard:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed verified arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/mw-control" fb81d1502f3921894ae70916f31f93956555bfe9
+          git worktree add "$env:RUNNER_TEMP/mw-candidate" ad871518f320d9fdb6c0da8352a9704614bdf261
+      - name: Official 35333571 ABBA
+        shell: pwsh
+        run: node experiments/isomax-phase2/mw-hard-run.mjs "$env:RUNNER_TEMP/isomax-phase2-mw-hard" "$env:RUNNER_TEMP/mw-control" "$env:RUNNER_TEMP/mw-candidate" 2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-official-hard
+          path: ${{ runner.temp }}/isomax-phase2-mw-hard
+          if-no-files-found: error
+          retention-days: 30
