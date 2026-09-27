@@ -1,0 +1,44 @@
+name: IsoMax Stage9 microstructure factorial
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-stage9-micro-factorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorial:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" 81b698d2465d80aa3e9627ddcc9da61cc58bfa49
+          git worktree add "$env:RUNNER_TEMP/arm-b" 870bf442aa3bf92b59bc0823a3ba9e5d01720256
+          git worktree add "$env:RUNNER_TEMP/arm-c" 10380f79af68dc1f57455d535814ac0a7eacea33
+          git worktree add "$env:RUNNER_TEMP/arm-d" b4440269c1ac982cf84f0cee21ab3f97a5f76fe2
+      - name: Long factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage9-micro/long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 353335714 8
+      - name: Short factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage9-micro/short" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-stage9-micro-factorial
+          path: ${{ runner.temp }}/isomax-stage9-micro
+          if-no-files-found: error
+          retention-days: 30
