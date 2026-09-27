@@ -70,6 +70,16 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
   };
 }
 function cofactorPlanKey(source,src,column,cache){
+  if(cache.columns===7&&cache.radix===7){
+    let code=source[src+6];
+    code=Math.imul(code,7)+source[src+5];
+    code=Math.imul(code,7)+source[src+4];
+    code=Math.imul(code,7)+source[src+3];
+    code=Math.imul(code,7)+source[src+2];
+    code=Math.imul(code,7)+source[src+1];
+    code=Math.imul(code,7)+source[src];
+    return Math.imul(code,7)+column;
+  }
   let code=0;
   for(let c=cache.columns-1;c>=0;c-=1)code=Math.imul(code,cache.radix)+source[src+c];
   return Math.imul(code,cache.columns)+column;
