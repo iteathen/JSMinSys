@@ -101,7 +101,7 @@ record belongs to JSMinSys PR #52; this adds no competing production execution m
 ## Reproduction and disposition
 
 Create four clean worktrees from A at the paths in the manifest. Apply the named
-patches to B/C/D and commit; reconstructed commit IDs may differ, so the harness
+zero-context patches with `git apply --unidiff-zero` to B/C/D and commit; reconstructed commit IDs may differ, so the harness
 captures fresh identities. Normalize decomposed sources to committed LF bytes,
 verify catalogs, and refresh the index with `git add --renormalize addons`.
 Confirm no unrelated changes. Run with the pinned Node runtime:

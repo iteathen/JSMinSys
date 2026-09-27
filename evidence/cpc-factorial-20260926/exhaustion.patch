@@ -2,10 +2,7 @@ diff --git a/addons/cpc-connect4.mjs b/addons/cpc-connect4.mjs
 index cd8c062..1a0b98b 100644
 --- a/addons/cpc-connect4.mjs
 +++ b/addons/cpc-connect4.mjs
-@@ -285,15 +285,6 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
-   }
-   const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
- 
+@@ -288,9 +287,0 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
 -  const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
 -  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
 -  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
@@ -15,65 +12,30 @@ index cd8c062..1a0b98b 100644
 -
 -  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
 -
-   // Scan the singleton prefix once for both players. The packed profile keeps
-   // mover-immediate priority while sharing basis/index/playability work.
-   const moverBits=mover?scratch.activeSingletonCellsOther:scratch.activeSingletonCells,
 diff --git a/catalog/addon-cycle-ledger-v0.json b/catalog/addon-cycle-ledger-v0.json
 index 9b369c3..424f075 100644
 --- a/catalog/addon-cycle-ledger-v0.json
 +++ b/catalog/addon-cycle-ledger-v0.json
-@@ -1403,7 +1403,7 @@
-         },
-         {
-           "op": "memory.load.u32",
+@@ -1406 +1406 @@
 -          "count": "3+2*W+2*L+2*P"
 +          "count": "3+2*0+2*L+2*P"
-         },
-         {
-           "op": "memory.store.u32",
-@@ -1435,11 +1435,11 @@
-         },
-         {
-           "op": "control.test.u32",
+@@ -1438 +1438 @@
 -          "count": "18+2*W+6*L"
 +          "count": "18+2*0+6*L"
-         },
-         {
-           "op": "control.branch",
+@@ -1442 +1442 @@
 -          "count": "18+2*W+6*L"
 +          "count": "18+2*0+6*L"
-         },
-         {
-           "op": "runtime.call.subledger",
-@@ -1474,11 +1474,10 @@
-       ],
-       "cycleCount": {
-         "kind": "expression",
+@@ -1477 +1477 @@
 -        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
 +        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*0+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+(2)*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+(1)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+2*0+6*L)*C(control.test.u32)+(18+2*0+6*L)*C(control.branch)+(C)*CALL(collectSingletonProfiles)+(M)*CALL(cellMarked)+(D)*CALL(deriveForkPreemption32)+(F)*CALL(frontierResponseNoWin)+(B)*CALL(pairedResponseNoWin)+(P)*CALL(collectProjected)",
-         "parameters": {
+@@ -1479 +1478,0 @@
 -          "W": "coordinate words scanned for any-live detection",
-           "L": "legal-column iterations executed by lift scan",
+@@ -1481 +1480 @@
 -          "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
 +          "C": "combined singleton-profile calls (always 1)",
-           "M": "cellMarked calls executed",
-           "D": "deriveForkPreemption32 calls executed (0 or 1)",
-           "F": "frontierResponseNoWin calls executed (0 or 1)",
-@@ -1487,7 +1486,7 @@
-           "R": "long-range response branches evaluated",
-           "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
-         },
+@@ -1490 +1489 @@
 -        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
 +        "note": "Experimental factorial ablation. Removed loops/calls have zero executions; retained fixed dispatch terms remain a conservative source envelope, not exact Intel machine cycles. Actual all-thread process cycles measured separately. No final NEES promotion."
-       },
-       "status": "decomposed"
-     },
-@@ -6446,7 +6445,7 @@
-   "decomposedSourceBlobs": {
-     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-     "addons/rba-connect4-alphabeta.mjs": "218e44b58b3cac0001b323471659ce6f3a614d7f",
+@@ -6449 +6448 @@
 -    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
 +    "addons/cpc-connect4.mjs": "1a0b98b0b2c2eb35b6ebc4f687e59f58655b43c7",
-     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
-     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
-     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
