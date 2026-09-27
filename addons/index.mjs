@@ -14,3 +14,5 @@ export * from './rba-connect4-alphabeta.mjs';
 export * from './rba-connect4-alphabeta-behavior.mjs';
 export * from './rba-connect4-shared-exact-cache.mjs';
 export * from './rba-connect4-lazy-smp-host.mjs';
+export * from './rba-connect4-frontier.mjs';
+export * from './worker-root-frontier.mjs';

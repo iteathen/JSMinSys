@@ -99,6 +99,27 @@ search and private local exact cache; workers share only committed exact W/D/L
 cache evidence through the concurrency-safe shared exact cache. There is no
 shared surplus queue and no Branch Manager in the Connect4 execution path.
 
+The owner-selected hardware configuration is **six deep workers and one wide
+root-frontier worker**, using the same Lazy SMP shared exact TT. Set
+`rootFrontier:true` on `runLazySmpConnect4Rba32` to select this execution profile:
+worker 0 advances two-ply horizons and switches deep at one unresolved root
+action; peers stay deep. Preparation, behavior flags and worker routing are
+native add-ons, with no runtime source rewriting or experiment imports.
+
+On the pinned Windows i5-12600K / Node 26.7.0 host:
+
+```text
+node --experimental-ffi tools/run-isomax.mjs '{"moves":"2431572135633422"}'
+```
+
+The runner uses [the selected profile](profiles/isomax-i5-12600k.json), reports
+whole-operation and process cycles, total worker nodes and wall time, and keeps
+the 30-second default deadline. Use an empty move string for the empty board.
+An explicit `timeoutMs` controls a declared run. The profile has short-case
+worker-mix evidence; it is not a proven full-game optimum.
+See [scope and conformance](docs/isomax-root-frontier-nees.md) and
+[campaign cleanup history](history/2026-09-27-selected-frontier-cleanup.md).
+
 Lazy SMP requires at least two search workers. Generic TT, worker, and
 BranchManager primitives remain reusable library/research building blocks, but
 they no longer constitute a supported Connect4 execution composition.
