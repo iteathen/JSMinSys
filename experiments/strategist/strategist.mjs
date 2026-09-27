@@ -15,10 +15,11 @@ import {createPendingPolicy,advancePendingPolicy} from './pending-policy.mjs';
 // Cold experiment selection through inherited environment keeps the existing
 // host, evaluator and benchmark interfaces unchanged. Every result names it.
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
-const pendingActive=strategy==='modes-pending-pfif';
-const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||pendingActive;
+const pendingBand=strategy==='modes-pending-band';
+const pendingActive=strategy==='modes-pending-pfif'||pendingBand;
+const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive;
 const pendingReaders=pendingStrategy?preparePendingReaders(d.pendingObservation):null;
-const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy()):null;
+const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy({oneBand:pendingBand})):null;
 const widthStrategy=WIDTH_POLICIES.includes(strategy);
 const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy||pendingStrategy;
 const widthObserver=widthStrategy?prepareWidthObserver(d.geometry,d.root,d.cache):null;

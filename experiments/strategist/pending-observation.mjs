@@ -32,7 +32,8 @@ export function publishPendingObservation(state,top){
   Atomics.store(words,base+7,state.modePasses);
   Atomics.store(words,base+8,state.modeRegions);
   Atomics.store(words,base+9,state.modeRootPasses);
-  let copied=10;
+  Atomics.store(words,base+10,state.bandCompleted);
+  let copied=11;
   for(let depth=0;depth<=top;depth++){
     const count=state.observeCounts[depth],out=base+12+depth*rowWords;
     Atomics.store(words,out,count);copied++;
@@ -52,7 +53,7 @@ export function publishPendingObservation(state,top){
 export function readPendingObservation(memory,index,scratch){
   const base=index*memory.stride,words=memory.words,before=Atomics.load(words,base);
   if(!before||(before&1))return 0;
-  for(let i=1;i<10;i++)scratch[i]=Atomics.load(words,base+i);
+  for(let i=1;i<11;i++)scratch[i]=Atomics.load(words,base+i);
   const top=scratch[3];if(top>=memory.levels)return 0;
   for(let depth=0;depth<=top;depth++){
     const offset=12+depth*memory.rowWords,count=Atomics.load(words,base+offset);
@@ -84,5 +85,5 @@ export function measurePendingObservation(memory,snapshot){
   return {revision:snapshot[0],scope:snapshot[1],request:snapshot[2],depth:snapshot[3],mode:snapshot[4],
     horizonStops:snapshot[5],nodes:snapshot[6],width:pending-frames+1,frames,
     modePasses:snapshot[7],modeRegions:snapshot[8],modeRootPasses:snapshot[9],
-    completedBands:snapshot[7]-snapshot[8]+snapshot[9]-1};
+    completedBands:snapshot[7]-snapshot[8]+snapshot[9]-1,bandCompleted:snapshot[10]};
 }
