@@ -7,7 +7,12 @@ import assert from 'node:assert/strict';
 import profile from './locked-profile.json' with {type:'json'};
 const out=resolve(process.argv[2]),git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim(),sha=git('rev-parse','HEAD');
 assert.equal(git('status','--porcelain'),'');mkdirSync(out);
-const arms=['native','poll','mode','deep-ablation'],stages=[
+const active=process.argv.includes('--active');
+const arms=active?['probe-deep','probe','probe-split']:['native','poll','mode','deep-ablation'],stages=active?[
+  {id:'probe-A',workers:1,rounds:5,moves:'3164746344461611',expected:-1},
+  {id:'probe-B',workers:1,rounds:5,moves:'2431572135633422',expected:-1},
+  {id:'locked-probe-stress',workers:7,rounds:1,moves:'353335714',expected:-1,allowTimeout:true}
+]:[
   {id:'matched-single',workers:1,rounds:4,moves:'353335714',expected:-1},
   {id:'locked-seven',workers:7,rounds:5,moves:'353335714',expected:-1}
 ];
@@ -16,9 +21,11 @@ const files=['addons/rba-connect4-alphabeta.mjs','addons/rba-connect4-alphabeta-
   'addons/rba-connect4-lazy-smp-worker.mjs','experiments/strategist/modes.generated.mjs','experiments/strategist/mode-controls.mjs',
   'experiments/worker-scaling/locked-profile.json','experiments/worker-scaling/sample.mjs',
   'experiments/worker-scaling/loader.mjs','experiments/worker-scaling/wide-path-loader.mjs',
+  'experiments/strategist/frontier.generated.mjs','experiments/strategist/controls.mjs',
   'experiments/cpc-factorial/isomax-node-counts.mjs','experiments/worker-scaling/wide-path-campaign.mjs'];
 writeFileSync(resolve(out,'manifest.json'),JSON.stringify({sha,node:process.version,profile,arms,stages,started:new Date().toISOString(),
-  scope:'Dormant-path ablation; all flags zero, no strategist. Ablation cannot accept live shallow commands.',
+  scope:active?'Fixed two-ply root probe with narrowing release; worker 0 probes, peers deep. Split dispatch occurs only at root action boundaries, not arbitrary live-frame switching.':
+    'Dormant-path ablation; all flags zero, no strategist. Ablation cannot accept live shallow commands.',
   hashes:Object.fromEntries(files.map(f=>[f,createHash('sha256').update(readFileSync(f)).digest('hex')]))},null,2)+'\n');
 let count=0;
 for(const stage of stages)for(let round=0;round<stage.rounds;round++){
@@ -34,14 +41,22 @@ for(const stage of stages)for(let round=0;round<stage.rounds;round++){
     assert.equal(p.status,0,p.stderr);
     const r={...JSON.parse(p.stdout.trim()),stage:stage.id,round,arm,expected:stage.expected};
     appendFileSync(resolve(out,'samples.jsonl'),JSON.stringify(r)+'\n');current[arm]=r;
-    assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,stage.expected);assert.equal(r.cleanup,true);
+    if(r.status==='EXACT')assert.equal(r.rootWdl,stage.expected);
+    else {assert.equal(stage.allowTimeout,true);assert.equal(r.status,'TIMEOUT');assert.equal(r.rootWdl,null);}
+    assert.equal(r.cleanup,true);
     assert.equal(r.workersExited,stage.workers);assert.equal(r.errors.length,0);
-    count++;console.log(JSON.stringify({count,stage:stage.id,round,arm,ms:r.wallMs,nodes:r.totalNodes,cycles:r.solveCycles}));
+    count++;console.log(JSON.stringify({count,stage:stage.id,round,arm,status:r.status,ms:r.wallMs,nodes:r.totalNodes,cycles:r.solveCycles,probeMetrics:r.probeMetrics}));
   }
   if(stage.workers===1){
-    assert.equal(current.native.totalNodes,current.poll.totalNodes,'polling changed work');
-    assert.equal(current.mode.totalNodes,current['deep-ablation'].totalNodes,'ablation changed work');
-    assert.equal(current.mode.move,current['deep-ablation'].move);
+    if(active){
+      assert.equal(current.probe.totalNodes,current['probe-split'].totalNodes,'split handoff changed work');
+      assert.equal(current.probe.move,current['probe-split'].move);
+      assert.deepEqual(current.probe.probeMetrics,current['probe-split'].probeMetrics);
+    }else{
+      assert.equal(current.native.totalNodes,current.poll.totalNodes,'polling changed work');
+      assert.equal(current.mode.totalNodes,current['deep-ablation'].totalNodes,'ablation changed work');
+      assert.equal(current.mode.move,current['deep-ablation'].move);
+    }
   }
 }
 writeFileSync(resolve(out,'complete.json'),JSON.stringify({count,finished:new Date().toISOString()})+'\n');

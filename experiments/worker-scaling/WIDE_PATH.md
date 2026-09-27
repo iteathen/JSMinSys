@@ -42,3 +42,29 @@ This first stage can establish whether removing dormant machinery is worth
 pursuing. It cannot establish the cost or correctness of switching a retained
 native frame into a specialized shallow kernel. That requires a subsequent
 live-command test with no copying/replay/unwind assumptions hidden in the claim.
+
+## Fixed root-probe handoff test
+
+`--active` compares the historical repaired two-ply root probe against a split
+implementation of exactly that operation. Both use current endpoint publication
+and pinned memory. The split version keeps the bounded function for shallow work,
+but selects ordinary behavior recursion once the root narrowing guard releases.
+Selection happens at the root action call only; deep recursion calls itself
+directly. No frame copy, replay, cache reset, indirect recursive call, or new
+deep-node condition is introduced by this split. The action completion reader
+is the same in both. Generated input and in-memory substitution are retained.
+
+This is deliberately a ROOT-BOUNDARY prototype, not arbitrary mid-stack mode
+switching or an asynchronous width strategist. Worker 0 receives a fixed probe
+command, peers receive full release; no observer is added. `probe-deep` keeps
+the same root shell and action reader but starts fully released. Five complete
+single-worker repeats on each historical A/B fixture verify identical work,
+probe counters and witnesses between the two probe implementations. A single
+seven-worker longer-root stress comparison follows; TIMEOUT is preserved and
+never ranked as solve time. Final probe counters are available only from workers
+that completed before host shutdown, not from terminated peers.
+
+Costs still counted: shallow horizon and unfinished handling during actual
+probes; root action dispatch; prepared code/storage; per-node behavior polling;
+all repeated work; native host startup and cleanup. This is an experimental
+performance comparison, not final NEES machine-code qualification.
