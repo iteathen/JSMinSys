@@ -11,10 +11,13 @@ import {ACTION_POLICIES,advanceActionPolicy,actionPolicyFlags} from './action-po
 // host, evaluator and benchmark interfaces unchanged. Every result names it.
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
 const frontierStrategy=['frontier-2','frontier-4','frontier-8','frontier-4-release','frontier-full',
-  'frontier-2-narrow','frontier-4-narrow','frontier-8-narrow'].includes(strategy);
-const frontierStride=strategy==='frontier-2'||strategy==='frontier-2-narrow'?2:
+  'frontier-2-narrow','frontier-4-narrow','frontier-8-narrow',
+  'frontier-2-recurring','frontier-4-recurring','frontier-recurring-off'].includes(strategy);
+const recurring=frontierStrategy&&strategy.endsWith('-recurring');
+const frontierStride=strategy==='frontier-2'||strategy==='frontier-2-narrow'||
+  strategy==='frontier-2-recurring'||strategy==='frontier-recurring-off'?2:
   strategy==='frontier-8'||strategy==='frontier-8-narrow'?8:4;
-const frontierTarget=frontierStrategy&&strategy.endsWith('-narrow')?d.workers:0;
+const frontierTarget=frontierStrategy&&(strategy.endsWith('-narrow')||strategy.includes('recurring'))?d.workers:0;
 const actionStrategy=ACTION_POLICIES.includes(strategy);
 if(strategy!==null&&!STRATEGIES.includes(strategy)&&!actionStrategy&&!frontierStrategy)throw RangeError('strategist policy');
 if((actionStrategy||frontierStrategy)&&process.env.JSMINSYS_FLAG_DISPATCH!=='actions')throw RangeError('action strategy needs actions handler');
@@ -31,7 +34,7 @@ const trace=[];
 // Warmups must finish first; these words control the measured solve only.
 if(frontierStrategy)while(Atomics.load(d.control,1)<d.workers&&Atomics.load(d.control,0)===0)await delay(1);
 if(frontierStrategy)for(let i=0;i<d.workers;i++){
-  const flags=encodeFrontier({stride:frontierStride,target:frontierTarget,release:strategy==='frontier-full'});
+  const flags=encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,release:strategy==='frontier-full'});
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 Atomics.store(d.control,4,1);
@@ -54,7 +57,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   }
   if(d.policy==='rotate'||d.policy==='combined')phase=ticks%d.columns;
   for(let i=0;i<d.workers;i++){
-    const flags=frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,
+    const flags=frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,
       release:strategy==='frontier-full'||(strategy==='frontier-4-release'&&now-started>=32)}):
       actionStrategy?actionPolicyFlags(strategy,i,policyState):strategy?policyFlags(strategy,i,d,policyState):d.policy==='sparse'?encodeControls({shareExponent:4}):
       d.policy==='adaptive'?encodeControls({shareExponent:exponent}):
