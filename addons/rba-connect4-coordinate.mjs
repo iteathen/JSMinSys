@@ -1,5 +1,6 @@
 import {emitSortedSetBits32,emitSortedSetBitsAt32} from '../src/basis32.mjs';
 import {publishSpan32} from '../src/widekey32.mjs';
+import {isolatedBitIndex32} from '../src/word32.mjs';
 import {connect4RbaShapeContains} from './rba-connect4-geometry.mjs';
 
 export function connect4RbaTerminal(g,words,offset){return words[offset+g.metaOffset]&3;}
@@ -40,9 +41,266 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
 export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
+
+const COFACTOR_PLAN_KILL=255;
+
+export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyCount=8388608}={}){
+  if(!Number.isInteger(capacity)||capacity<1||capacity>262144||
+     !Number.isSafeInteger(maxKeyCount)||maxKeyCount<1)
+    throw new RangeError('invalid cofactor plan capacity');
+  if(g.maxBasis>=127||g.coordWords<1||g.coordWords>3||
+     g.removeByCell===null||g.subsetTable===null||g.shapeCount>65535)
+    throw new RangeError('geometry exceeds cofactor plan representation');
+  const radix=g.rows+1;let supportCount=1;
+  for(let c=0;c<g.columns;c+=1){
+    supportCount*=radix;
+    if(!Number.isSafeInteger(supportCount))throw new RangeError('cofactor plan support space overflow');
+  }
+  const keyCount=supportCount*g.columns;
+  if(!Number.isSafeInteger(keyCount)||keyCount>maxKeyCount)
+    throw new RangeError('cofactor plan key space exceeds configured bound');
+  const planByKey=new Int32Array(keyCount);planByKey.fill(-1);
+  return {
+    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,
+    n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
+    basis:new Uint16Array(capacity*g.maxBasis),
+    valid:new Uint32Array(capacity*g.coordWords),
+    unchanged:new Uint32Array(capacity*g.coordWords),
+    closure:new Uint32Array(capacity*g.maxBasis*g.coordWords),
+  };
+}
+function cofactorPlanKey(source,src,column,cache){
+  if(cache.columns===7&&cache.radix===7){
+    let code=source[src+6];
+    code=Math.imul(code,7)+source[src+5];
+    code=Math.imul(code,7)+source[src+4];
+    code=Math.imul(code,7)+source[src+3];
+    code=Math.imul(code,7)+source[src+2];
+    code=Math.imul(code,7)+source[src+1];
+    code=Math.imul(code,7)+source[src];
+    return Math.imul(code,7)+column;
+  }
+  let code=0;
+  for(let c=cache.columns-1;c>=0;c-=1)code=Math.imul(code,cache.radix)+source[src+c];
+  return Math.imul(code,cache.columns)+column;
+}
+function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,target,dst,childBasis,ci,sizes,sizeIndex){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,player=rank&1;
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  const p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,words=cache.words,
+    landing=cache.landing[plan],coord=src+(player?g.p1Offset:g.p0Offset);
+
+  if(landing!==COFACTOR_PLAN_KILL&&(source[coord+(landing>>>5)]&(1<<(landing&31)))){
+    for(let w=0;w<words;w+=1){target[p0Target+w]=0;target[p1Target+w]=0;}
+    sizes[sizeIndex]=0;
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
+  }
+  if(rank+1===g.cellCount){
+    for(let w=0;w<words;w+=1){target[p0Target+w]=0;target[p1Target+w]=0;}
+    sizes[sizeIndex]=0;target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;
+  }
+
+  const cn=cache.cn[plan],planBase=plan*cache.stride,closureBase=planBase*words,
+    planWordBase=plan*words,p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
+  sizes[sizeIndex]=cn;
+  for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
+
+  if(words===3){
+    const targetWords=cn<=32?1:cn<=64?2:3;
+    const sourceWords=n<=32?1:n<=64?2:3;
+    if(targetWords===1){
+      let p00=0,p10=0;
+      if(player===0){
+        for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+          const planWord=planWordBase+sourceWord,
+            validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+            source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+          let mover=source0&validBits,opponent=source1&unchangedBits,
+            both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+          while(both){
+            const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            both^=isolated;
+            const c0=cache.closure[closureBase+i*3];p00|=c0;p10|=c0;
+          }
+          while(moverOnly){
+            const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            moverOnly^=isolated;p00|=cache.closure[closureBase+i*3];
+          }
+          while(opponentOnly){
+            const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            opponentOnly^=isolated;p10|=cache.closure[closureBase+i*3];
+          }
+        }
+      }else{
+        for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+          const planWord=planWordBase+sourceWord,
+            validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+            source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+          let mover=source1&validBits,opponent=source0&unchangedBits,
+            both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+          while(both){
+            const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            both^=isolated;
+            const c0=cache.closure[closureBase+i*3];p00|=c0;p10|=c0;
+          }
+          while(moverOnly){
+            const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            moverOnly^=isolated;p10|=cache.closure[closureBase+i*3];
+          }
+          while(opponentOnly){
+            const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            opponentOnly^=isolated;p00|=cache.closure[closureBase+i*3];
+          }
+        }
+      }
+      target[p0Target]=p00;target[p0Target+1]=0;target[p0Target+2]=0;
+      target[p1Target]=p10;target[p1Target+1]=0;target[p1Target+2]=0;
+      return 0;
+    }
+    let p00=0,p01=0,p02=0,p10=0,p11=0,p12=0;
+    if(player===0){
+      for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+        const planWord=planWordBase+sourceWord,
+          validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+          source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+        let mover=source0&validBits,opponent=source1&unchangedBits,
+          both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+        while(both){
+          const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          both^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];
+          p00|=c0;p10|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p01|=c1;p11|=c1;
+            if(targetWords>2){const c2=cache.closure[cb+2];p02|=c2;p12|=c2;}
+          }
+        }
+        while(moverOnly){
+          const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          moverOnly^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];p00|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p01|=c1;
+            if(targetWords>2)p02|=cache.closure[cb+2];
+          }
+        }
+        while(opponentOnly){
+          const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          opponentOnly^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];p10|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p11|=c1;
+            if(targetWords>2)p12|=cache.closure[cb+2];
+          }
+        }
+      }
+    }else{
+      for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+        const planWord=planWordBase+sourceWord,
+          validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+          source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+        let mover=source1&validBits,opponent=source0&unchangedBits,
+          both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+        while(both){
+          const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          both^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];
+          p00|=c0;p10|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p01|=c1;p11|=c1;
+            if(targetWords>2){const c2=cache.closure[cb+2];p02|=c2;p12|=c2;}
+          }
+        }
+        while(moverOnly){
+          const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          moverOnly^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];p10|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p11|=c1;
+            if(targetWords>2)p12|=cache.closure[cb+2];
+          }
+        }
+        while(opponentOnly){
+          const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          opponentOnly^=isolated;
+          const cb=closureBase+i*3,c0=cache.closure[cb];p00|=c0;
+          if(targetWords>1){
+            const c1=cache.closure[cb+1];p01|=c1;
+            if(targetWords>2)p02|=cache.closure[cb+2];
+          }
+        }
+      }
+    }
+    target[p0Target]=p00;target[p0Target+1]=p01;target[p0Target+2]=p02;
+    target[p1Target]=p10;target[p1Target+1]=p11;target[p1Target+2]=p12;
+    return 0;
+  }
+
+  for(let w=0;w<words;w+=1){target[p0Target+w]=0;target[p1Target+w]=0;}
+  for(let sourceWord=0;sourceWord<words;sourceWord+=1){
+    let activeBits=(source[p0Source+sourceWord]|source[p1Source+sourceWord])&
+      cache.valid[planWordBase+sourceWord];
+    const unchangedBits=cache.unchanged[planWordBase+sourceWord];
+    while(activeBits){
+      const isolated=activeBits&-activeBits,bit=isolatedBitIndex32(isolated),
+        i=(sourceWord<<5)+bit;
+      activeBits^=isolated;
+      const active0=source[p0Source+sourceWord]&isolated,
+        active1=source[p1Source+sourceWord]&isolated,
+        unchanged=unchangedBits&isolated,
+        write0=active0&&(player===0||unchanged),
+        write1=active1&&(player===1||unchanged);
+      if(!write0&&!write1)continue;
+      const cb=closureBase+i*words;
+      for(let w=0;w<words;w+=1){
+        const closure=cache.closure[cb+w];
+        if(write0)target[p0Target+w]|=closure;
+        if(write1)target[p1Target+w]|=closure;
+      }
+    }
+  }
+  return 0;
+}
+function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex){
+  if(cache.count>=cache.capacity)return;
+  const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
+    closureBase=planBase*words,planWordBase=plan*words,
+    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
+  cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
+  for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
+  for(let i=0;i<n;i+=1){
+    const id=basis[bi+i],image=removeByCell[removeRow+id];
+    if(image<0)continue;
+    const word=i>>>5,mask=1<<(i&31);
+    cache.valid[planWordBase+word]|=mask;
+    if(image===id)cache.unchanged[planWordBase+word]|=mask;
+    const subset=image*shapeCount,cb=closureBase+i*words;
+    for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]])
+      cache.closure[cb+(k>>>5)]|=1<<(k&31);
+  }
+  cache.planByKey[key]=plan;
+}
+
 export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
-    cell=height*g.columns+column,player=rank&1;
+    cell=height*g.columns+column,player=rank&1,
+    planCache=profile.cofactorPlanCache;
+  let planKey=-1,plan=-1;
+  if(planCache){
+    if(planCache.columns===7&&planCache.radix===7){
+      let code=source[src+6];
+      code=Math.imul(code,7)+source[src+5];
+      code=Math.imul(code,7)+source[src+4];
+      code=Math.imul(code,7)+source[src+3];
+      code=Math.imul(code,7)+source[src+2];
+      code=Math.imul(code,7)+source[src+1];
+      code=Math.imul(code,7)+source[src];
+      planKey=Math.imul(code,7)+column;
+    }else planKey=cofactorPlanKey(source,src,column,planCache);
+    plan=planCache.planByKey[planKey];
+  }
+  if(plan>=0)return applyConnect4RbaCofactorPlan32(planCache,plan,g,source,src,n,column,height,target,dst,childBasis,ci,sizes,sizeIndex);
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
@@ -58,7 +316,19 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  let cn;
+  if(g.removeByCell!==null&&removed&&childIndex&&!seenOffset){
+    for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+    const removeRow=cell*g.shapeCount,removeByCell=g.removeByCell;
+    for(let i=0;i<n;i+=1){
+      const id=removeByCell[removeRow+basis[bi+i]];
+      removed[i]=id;
+      if(id>=0)seen[id>>>5]|=1<<(id&31);
+    }
+    cn=emitSortedSetBits32(seen,g.shapeWordCount,childBasis,ci);sizes[sizeIndex]=cn;
+  }else{
+    cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  }
   // One child-basis pass publishes the exact id->index map already owned by
   // coordinate scratch and discovers all cardinality boundaries.
   let childPair=cn,childTriple=cn,childQuad=cn;
@@ -71,7 +341,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
@@ -108,12 +379,25 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     let j=image<g.pairShapeStart?childPair:
       image<g.tripleShapeStart?childTriple:
       image<g.quadShapeStart?childQuad:cn;
-    const subset=profile.prepareSubset(g,image);
-    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
-      targetWord=j>>>5;targetMask=1<<(j&31);
-      if(write0)target[p0Target+targetWord]|=targetMask;
-      if(write1)target[p1Target+targetWord]|=targetMask;
+    if(subsetTable!==null){
+      const subset=image*shapeCount;
+      for(;j<cn;j+=1)if(subsetTable[subset+childBasis[ci+j]]){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
+    }else{
+      const subset=profile.prepareSubset(g,image);
+      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
     }
+  }
+  if(planCache&&plan<0&&removed&&childIndex&&!seenOffset){
+    const landingIndex=lo<n&&basis[bi+lo]===singleton?lo:COFACTOR_PLAN_KILL;
+    storeConnect4RbaCofactorPlan32(planCache,planKey,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex);
   }
   return 0;
 }
