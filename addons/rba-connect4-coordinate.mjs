@@ -64,7 +64,8 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
     capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,
     n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
     basis:new Uint16Array(capacity*g.maxBasis),
-    map:new Uint8Array(capacity*g.maxBasis),
+    valid:new Uint32Array(capacity*g.coordWords),
+    unchanged:new Uint32Array(capacity*g.coordWords),
     closure:new Uint32Array(capacity*g.maxBasis*g.coordWords),
   };
 }
@@ -88,28 +89,28 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=cache.cn[plan],planBase=plan*cache.stride,closureBase=planBase*words,
-    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
+    planWordBase=plan*words,p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
   sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
-  // Combined experimental arm: visit only live parent-coordinate indices
-  // and rely on idempotent immutable closure ORs instead of the C1 principal
-  // target-bit probe.
+  // Each parent basis slot owns its already-expanded child closure. The valid
+  // mask removes killed images before iteration; unchanged carries the only
+  // opponent-survival distinction. No child-image index lookup is required.
   for(let sourceWord=0;sourceWord<words;sourceWord+=1){
-    let activeBits=source[p0Source+sourceWord]|source[p1Source+sourceWord];
+    let activeBits=(source[p0Source+sourceWord]|source[p1Source+sourceWord])&
+      cache.valid[planWordBase+sourceWord];
+    const unchangedBits=cache.unchanged[planWordBase+sourceWord];
     while(activeBits){
       const isolated=activeBits&-activeBits,bit=isolatedBitIndex32(isolated),
         i=(sourceWord<<5)+bit;
       activeBits^=isolated;
       const active0=source[p0Source+sourceWord]&isolated,
         active1=source[p1Source+sourceWord]&isolated,
-        encoded=cache.map[planBase+i];
-      if(encoded===COFACTOR_PLAN_KILL)continue;
-      const imageIndex=encoded&127,unchanged=encoded&128,
+        unchanged=unchangedBits&isolated,
         write0=active0&&(player===0||unchanged),
         write1=active1&&(player===1||unchanged);
       if(!write0&&!write1)continue;
-      const cb=closureBase+imageIndex*words;
+      const cb=closureBase+i*words;
       for(let w=0;w<words;w+=1){
         const closure=cache.closure[cb+w];
         if(write0)target[p0Target+w]|=closure;
@@ -122,16 +123,17 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
 function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex){
   if(cache.count>=cache.capacity)return;
   const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
-    closureBase=planBase*words,
+    closureBase=planBase*words,planWordBase=plan*words,
     removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
   for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
   for(let i=0;i<n;i+=1){
     const id=basis[bi+i],image=removeByCell[removeRow+id];
-    cache.map[planBase+i]=image<0?COFACTOR_PLAN_KILL:(childIndex[image]|(image===id?128:0));
-  }
-  for(let j=0;j<cn;j+=1){
-    const image=childBasis[ci+j],subset=image*shapeCount,cb=closureBase+j*words;
+    if(image<0)continue;
+    const word=i>>>5,mask=1<<(i&31);
+    cache.valid[planWordBase+word]|=mask;
+    if(image===id)cache.unchanged[planWordBase+word]|=mask;
+    const subset=image*shapeCount,cb=closureBase+i*words;
     for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]])
       cache.closure[cb+(k>>>5)]|=1<<(k&31);
   }
