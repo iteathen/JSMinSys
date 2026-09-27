@@ -1,5 +1,10 @@
 # PFIF worker actions: first bounded screen
 
+**Subsequent implementation audit:** these fixed-pass policies omitted the
+narrowing stop condition. Their failures do not reject PFIF. See the
+[audit and corrected causal comparison](../strategist-frontier-audit-20260926/RESULTS.md).
+The historical measurements below remain unchanged.
+
 Tested JSMinSys `e10bb58c7ec32578798d438ea4944b658a7fcaec` on Windows,
 Intel i5-12600K, Node 26.7.0 with experimental FFI. This supplies actual worker
 actions for bounded native RBA frontier passes, stride changes, release into

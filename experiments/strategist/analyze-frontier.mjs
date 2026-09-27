@@ -3,9 +3,10 @@ import {join} from 'node:path';
 import assert from 'node:assert/strict';
 const directory=process.argv[2];
 if(!directory)throw Error('evidence directory required');
-const rows=readFileSync(join(directory,'screen.jsonl'),'utf8').trim().split('\n').map(JSON.parse);
+const input=process.argv[3]??'screen.jsonl';
+const rows=readFileSync(join(directory,input),'utf8').trim().split('\n').map(JSON.parse);
 const metadata=rows[0],trials=rows.filter(r=>r.type==='trial');
-assert.equal(trials.length,42);
+assert.equal(trials.length,metadata.roots.length*metadata.labels.length*metadata.rounds);
 const median=a=>a.sort((a,b)=>a-b)[a.length>>>1];
 const groups=[];
 for(const root of metadata.roots)for(const label of metadata.labels){
@@ -24,9 +25,10 @@ for(const root of metadata.roots)for(const label of metadata.labels){
     medianSolveMs:exact.length===3?median(exact.map(r=>r.solveWallMs)):null,
     medianStrategistCycles:runs[0].strategist?median(runs.map(r=>Number(r.strategist.cycles))):null,
     passCounts:metrics.map(m=>m.frontierPasses??null),horizonStops:metrics.map(m=>m.horizonStops??null),
+    autoReleases:metrics.map(m=>m.frontierAutoReleases??null),
     releasePublicationMs:releases,allCycles:runs.map(r=>Number(r.evaluatorCycles))});
 }
-const summary={testedSha:metadata.sha,node:metadata.node,trials:trials.length,exact:trials.filter(r=>r.status==='EXACT').length,
+const summary={source:input,testedSha:metadata.sha,node:metadata.node,trials:trials.length,exact:trials.filter(r=>r.status==='EXACT').length,
   timeouts:trials.filter(r=>r.status==='TIMEOUT').length,groups};
 writeFileSync(join(directory,'summary.json'),JSON.stringify(summary,null,2)+'\n');
 console.log(JSON.stringify(summary,null,2));

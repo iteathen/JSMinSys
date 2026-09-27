@@ -136,6 +136,11 @@ worker. The evaluator now selects that specialization cold for `frontier-*`
 policies. Ordinary solver, host and TT remain unchanged. Results and limitations:
 [42-trial screen](../../evidence/strategist-frontier-20260926/RESULTS.md).
 
+The [implementation audit and corrected test](../../evidence/strategist-frontier-audit-20260926/RESULTS.md)
+found the fixed-pass candidate omitted the narrowing stop condition. The new
+`frontier-*-narrow` policies release at a flag-selected remaining-root-action
+target. The original timeout screen is not a test of the complete PFIF strategy.
+
 ```text
 node experiments/strategist/build-frontier.mjs --check
 node --experimental-ffi experiments/strategist/frontier-campaign.mjs NEW-FRONTIER.jsonl

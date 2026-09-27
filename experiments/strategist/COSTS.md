@@ -96,3 +96,9 @@ evidence, unfinished-sibling propagation, root-action retention, and repeated
 passes. Root completion also polls STOP. Full-operation cycles include all of
 this work; the full-continuation control isolates the specialized path from
 bounded-pass behavior. See the [screen](../../evidence/strategist-frontier-20260926/RESULTS.md).
+
+The narrowing repair adds one target decode/store on a changed behavior word.
+Its pending-root count and target comparison run only on root entry and newly
+resolved root actions, never at ordinary recursive nodes. The matched corrected
+screen charges those costs; it does not infer instruction cycles from source
+operation counts. See the [audit](../../evidence/strategist-frontier-audit-20260926/RESULTS.md).

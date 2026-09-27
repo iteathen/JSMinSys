@@ -162,7 +162,7 @@ test('bounded passes agree with independent physical minimax on seeded late 4x4 
     }
     const expected=exact(board,heights,moves.length),root=connect4RbaFromMoves(moves,{geometry:g});
     const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
-    publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:1+sample%4}));
+    publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:1+sample%4,target:sample&1}));
     const state=prepare({geometry:g,cacheCapacity:16,behavior:new BehaviorWorker(0,words,0,memory)});
     const r=solve(root,{state,reflected:root.reflected});
     assert.equal(r.status,'EXACT');assert.equal(r.value,expected,JSON.stringify(moves));
