@@ -1,0 +1,40 @@
+name: IsoMax Stage6 winner profile
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-stage6-winner-profile.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  profile:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize Stage6 winner
+        shell: pwsh
+        run: git worktree add "$env:RUNNER_TEMP/stage6-winner" c628ffd559c35e08227a300dcdc9acf5df824378
+      - name: Profile long control
+        shell: pwsh
+        run: |
+          $out="$env:RUNNER_TEMP/isomax-stage6-winner-profile"
+          New-Item -ItemType Directory -Force $out | Out-Null
+          node --experimental-ffi --cpu-prof --cpu-prof-dir=$out experiments/isomax-cofactor-plan/sample.mjs "$env:RUNNER_TEMP/stage6-winner" 353335714 | Out-File -Encoding utf8 "$out/sample.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-stage6-winner-profile
+          path: ${{ runner.temp }}/isomax-stage6-winner-profile
+          if-no-files-found: error
+          retention-days: 30
