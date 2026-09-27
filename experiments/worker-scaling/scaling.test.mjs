@@ -7,11 +7,15 @@ test('diagnostic controls preserve WDL, count every worker, and disable sharing 
     const env={...process.env};delete env.SCALE_NO_SHARE;delete env.SCALE_ORDER;
     if(noShare)env.SCALE_NO_SHARE='1';if(order!==undefined)env.SCALE_ORDER=String(order);
     const p=spawnSync(process.execPath,['--experimental-ffi','--import',new URL('./loader.mjs',import.meta.url).href,
-      fileURLToPath(new URL('./sample.mjs',import.meta.url)),JSON.stringify({workers,moves:'1212',columns:4,rows:4})],
+      fileURLToPath(new URL('./sample.mjs',import.meta.url)),JSON.stringify({workers,moves:'1212',columns:4,rows:4,
+        sharedCacheCapacity:131072,localCacheCapacity:65536})],
       {env,encoding:'utf8',timeout:10000});
     assert.equal(p.status,0,p.stderr);const r=JSON.parse(p.stdout);
     assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,0);assert.equal(r.cleanup,true);
     assert.equal(r.workersExited,workers);assert.equal(r.benchmarkNodeCounts.length,workers);
+    assert.equal(r.config.sharedCacheCapacity,131072);assert.equal(r.config.localCacheCapacity,65536);
+    assert.equal(r.cachePayloadBytes,131072*64+12+workers*65536*61);
+    assert.ok(r.observedPeakRss>=r.rss);
     assert.ok(r.totalNodes>=r.winnerMetrics.nodes);assert.ok(r.firstSearchToResultMs>0);
     assert.ok(r.firstSearchToResultMs<r.wallMs);assert.ok(r.workerTiming.every(x=>x[0]>0));
     if(noShare){assert.equal(r.sharedCacheStores,0);assert.equal(r.sharedCacheHits,0);}

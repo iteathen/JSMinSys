@@ -1,12 +1,16 @@
 import {performance} from 'node:perf_hooks';
 import {prepareConnect4RbaGeometry,runLazySmpConnect4Rba32} from '../../addons/index.mjs';
 import {processCycleCounter} from '../cpc-factorial/cycle-counter.mjs';
-const c=JSON.parse(process.argv[2]),meter=await processCycleCounter(),bootstrap=meter.read();
+const c={sharedCacheCapacity:1048576,localCacheCapacity:1048576,...JSON.parse(process.argv[2])},
+  meter=await processCycleCounter(),bootstrap=meter.read();
+let peakRss=process.memoryUsage().rss;
+const rssTimer=setInterval(()=>{peakRss=Math.max(peakRss,process.memoryUsage().rss);},1000);
+rssTimer.unref();
 try{
   const geometry=prepareConnect4RbaGeometry({columns:c.columns??7,rows:c.rows??6}),
     moves=Array.from(c.moves,ch=>ch.charCodeAt(0)-49),before=meter.read(),start=performance.now(),cpu=process.cpuUsage();
-  const r=await runLazySmpConnect4Rba32(moves,{geometry,workers:c.workers,sharedCacheCapacity:1048576,
-    localCacheCapacity:1048576,sharedSampleMask:c.sharedSampleMask??7,timeoutMs:c.timeoutMs??30000});
+  const r=await runLazySmpConnect4Rba32(moves,{geometry,workers:c.workers,sharedCacheCapacity:c.sharedCacheCapacity,
+    localCacheCapacity:c.localCacheCapacity,sharedSampleMask:c.sharedSampleMask??7,timeoutMs:c.timeoutMs??30000});
   const after=meter.read(),wallMs=performance.now()-start,used=process.cpuUsage(cpu),
     totalNodes=r.benchmarkNodeCounts.reduce((a,b)=>a+b,0),starts=r.workerTiming.map(x=>x[0]),
     firstStart=Math.min(...starts),lastStart=Math.max(...starts),
@@ -18,5 +22,6 @@ try{
     firstSearchToResultMs:finish===null?null:finish-firstStart,
     winnerSearchMs:finish===null?null:finish-r.workerTiming[r.winner][0],
     afterResultMs:finish===null?null:performance.now()-finish,
-    rss:process.memoryUsage().rss}));
-}finally{meter.close();}
+    cachePayloadBytes:c.sharedCacheCapacity*64+12+c.workers*c.localCacheCapacity*61,
+    observedPeakRss:Math.max(peakRss,process.memoryUsage().rss),rss:process.memoryUsage().rss}));
+}finally{clearInterval(rssTimer);meter.close();}
