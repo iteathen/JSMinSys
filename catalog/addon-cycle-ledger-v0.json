@@ -9421,7 +9421,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "8"
+          "count": "9"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -9430,15 +9430,58 @@
         {
           "op": "runtime.object.allocate",
           "count": "1"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R+V"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*R+V"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*V"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "V"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "R+S+2"
+        },
+        {
+          "op": "control.branch",
+          "count": "R+S+2"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(8)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
+        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(9)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)+(R+V)*C(memory.load.u32)+(V)*C(memory.store.u32)+(S)*C(alu.imul.u32)+(2*R+V)*C(alu.add.u32)+(2*V)*C(alu.and.u32)+(V)*C(alu.or.u32)+(V)*C(alu.shl.u32)+(V)*C(alu.shr.u32)+(R+S+2)*C(control.test.u32)+(R+S+2)*C(control.branch)",
         "parameters": {
-          "C": "prepared geometry column count"
+          "C": "prepared geometry column count",
+          "S": "prepared shape count",
+          "R": "S*S subset relations copied/encoded during cold preparation",
+          "V": "true subset relations encoded as set bits during cold preparation; V<=R"
         },
-        "note": "Cold fixed-arena preparation. Parent-aligned plan layout replaces the Uint8 map arena with valid/unchanged Uint32 masks, so eight typed arrays are allocated. Allocation remains outside measured solve-call cycles."
+        "note": "Cold plan preparation bit-packs the prepared subset relation into Uint32 rows. The full R=S*S source scan, V true-bit stores and address/bit operations are charged explicitly outside measured solve cycles."
       },
       "status": "decomposed"
     },
@@ -9614,7 +9657,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "3*N+3*CN+T"
+          "count": "(3*N+3*CN+T)+T"
         },
         {
           "op": "memory.store.u32",
@@ -9630,11 +9673,11 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "8+6*N+5*CN+2*T"
+          "count": "(8+6*N+5*CN+2*T)+T"
         },
         {
           "op": "alu.and.u32",
-          "count": "2*N+2*T"
+          "count": "(2*N+2*T)+2*T"
         },
         {
           "op": "alu.or.u32",
@@ -9642,11 +9685,11 @@
         },
         {
           "op": "alu.shl.u32",
-          "count": "2*N+T"
+          "count": "(2*N+T)+T"
         },
         {
           "op": "alu.shr.u32",
-          "count": "N+T"
+          "count": "(N+T)+T"
         },
         {
           "op": "control.test.u32",
@@ -9659,7 +9702,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+(8+6*N+5*CN+2*T)*C(alu.add.u32)+(2*N+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+(2*N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)",
+        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+((3*N+3*CN+T)+T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+((8+6*N+5*CN+2*T)+T)*C(alu.add.u32)+((2*N+2*T)+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+((2*N+T)+T)*C(alu.shl.u32)+((N+T)+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)",
         "parameters": {
           "N": "parent basis entries examined",
           "CN": "child basis entries stored",
@@ -9667,7 +9710,7 @@
           "U": "non-killed parent images that are unchanged and publish an unchanged-mask bit",
           "T": "dense subset probes/conditional closure-bit publications while building parent-aligned closures"
         },
-        "note": "Miss-only parent-aligned plan materialization. Valid and unchanged masks are published by parent basis slot; each non-killed parent image receives its immutable child-basis closure directly at the parent slot. No q coordinate membership, W/D/L, CPC or best-move information is stored."
+        "note": "Miss-only plan materialization using a cold-prepared bit-packed subset relation. Each T probe retains the subset carrier load and explicitly charges child-id word/mask address arithmetic; the experiment relies only on improved cache locality, not hidden operation deletion."
       },
       "status": "decomposed"
     }
@@ -9777,7 +9820,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "3009c4abc710b591a56683b19330c27bc1475236",
+    "addons/rba-connect4-coordinate.mjs": "e0f3cc87c3178aa2b0c4298a8358ba382ba41579",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
