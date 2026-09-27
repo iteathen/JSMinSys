@@ -26,10 +26,13 @@ test('support-derived cofactor plans preserve exact search and deterministic wor
   assert.equal(planCache.count,count,'same deterministic search should need no new support plans');
 });
 
-test('cofactor plan cache rejects unsupported geometry and invalid capacity',()=>{
+test('cofactor plan cache derives carrier dimensions from configured geometry',()=>{
   const g4=prepareConnect4RbaGeometry({columns:4,rows:4});
-  assert.throws(()=>prepareConnect4RbaCofactorPlanCache32(g4),/standard 7x6/);
+  const c4=prepareConnect4RbaCofactorPlanCache32(g4,{capacity:8});
+  assert.equal(c4.planByKey.length,(g4.rows+1)**g4.columns*g4.columns);
+  assert.equal(c4.stride,g4.maxBasis);assert.equal(c4.words,g4.coordWords);
   const g=prepareConnect4RbaGeometry({columns:7,rows:6});
   assert.throws(()=>prepareConnect4RbaCofactorPlanCache32(g,{capacity:0}),/capacity/);
   assert.throws(()=>prepareConnect4RbaCofactorPlanCache32(g,{capacity:262145}),/capacity/);
+  assert.throws(()=>prepareConnect4RbaCofactorPlanCache32(g,{capacity:8,maxKeyCount:10}),/key space/);
 });
