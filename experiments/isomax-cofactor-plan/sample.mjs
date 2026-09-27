@@ -28,7 +28,8 @@ if(typeof api.prepareConnect4RbaCofactorPlanCache32==='function'){
     planCache.landing.byteLength+planCache.basis.byteLength+(planCache.map?.byteLength??0)+
     (planCache.valid?.byteLength??0)+(planCache.unchanged?.byteLength??0)+
     (planCache.closure?.byteLength??0)+(planCache.closure0?.byteLength??0)+
-    (planCache.closure1?.byteLength??0)+(planCache.closure2?.byteLength??0);
+    (planCache.closure1?.byteLength??0)+(planCache.closure2?.byteLength??0)+
+    (planCache.subset8?.byteLength??0)+(planCache.subsetBits?.byteLength??0);
 }
 const rssBefore=process.memoryUsage().rss,meter=await processCycleCounter();
 try{
