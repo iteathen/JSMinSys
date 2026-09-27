@@ -1,4 +1,5 @@
 import {workerData} from 'node:worker_threads';
+import {prepareConnect4RbaCofactorPlanCache32} from './rba-connect4-coordinate.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
   solveConnect4RbaAlphaBeta,
@@ -23,6 +24,8 @@ const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
     cpcFrontierResponse:!!workerData.cpcFrontierResponse,
     cpcProjectedAdvisory:!!workerData.cpcProjectedAdvisory,
   }),
+  planCache=prepareConnect4RbaCofactorPlanCache32(workerData.geometry,{capacity:262144}),
+  planEnabled=(state.profile.cofactorPlanCache=planCache),
   result=solveConnect4RbaAlphaBeta(
     workerData.root,
     {state,reflected:workerData.rootReflected?1:0},
