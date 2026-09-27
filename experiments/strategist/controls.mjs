@@ -130,8 +130,9 @@ export function completeMasked32(state,value){
 
 // HOT CONTRACT: same unconditional per-completion shared load and guarded
 // extension read as completeEarly32. DO NOT REMOVE. On unchanged flags only
-// compare and return. On change: bounded masks/shifts, four prepared field
-// assignments, last-word store and private counter increment. No allocation,
+// compare and return. On change: bounded masks/shifts, four prepared setting
+// assignments, frontier stride assignment and optional horizon release,
+// last-word store and private counter increment. No allocation,
 // strings, TT writes/clears, active-frame rewrites or clocks. Disabling a cache
 // drops optional reuse only; CPC toggling selects existing exact proof logic.
 export function completeActions32(state,value){

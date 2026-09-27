@@ -351,6 +351,7 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
 // Cold operation boundary only: string status and result allocation never run
 // at a recursive node or between frontier passes. Do not move them there.
 function frontierResult(state,cancel,value,move){
+  if(!cancel&&completeBehaviorNode32(state,0)===3){cancel=3;move=-1;}
   const mover=(state.words[state.g.metaOffset]>>>2)&1;
   return {status:cancel?'CANCELLED':'EXACT',value:cancel?null:value,
     relative:cancel?null:absToRelativeBehavior(value,mover),move,metrics:metricsBehavior(state)};

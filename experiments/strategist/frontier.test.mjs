@@ -7,6 +7,16 @@ import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta} from '../../addon
 process.env.JSMINSYS_FLAG_DISPATCH='actions';
 const controls=await import('./controls.mjs');
 
+test('root completion polls STOP after an immediate winning child',async()=>{
+  const {prepareConnect4RbaAlphaBetaBehavior:prepare,solveConnect4RbaAlphaBetaBehavior:solve}=await import('./frontier.generated.mjs');
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),root=connect4RbaFromMoves([0,1,0,1,0,2],{geometry:g});
+  const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
+  const state=prepare({geometry:g,behavior:new BehaviorWorker(0,words,0,memory)});
+  state.behaviorLoad=()=>state.frontierValues[0]===1?1:0;
+  const r=solve(root,{state,reflected:root.reflected});
+  assert.equal(r.status,'CANCELLED');assert.equal(r.value,null);
+});
+
 test('worker supplies bounded frontier, stride change, release and STOP actions',async()=>{
   assert.equal(typeof controls.encodeFrontier,'function','frontier worker actions must exist');
   const {prepareConnect4RbaAlphaBetaBehavior:prepare,solveConnect4RbaAlphaBetaBehavior:solve}=await import('./frontier.generated.mjs');
