@@ -2,7 +2,7 @@ import {workerData as d,parentPort} from 'node:worker_threads';
 import {setTimeout as delay} from 'node:timers/promises';
 import {performance} from 'node:perf_hooks';
 import {publishWorkerBehavior32} from '../../addons/worker-behavior.mjs';
-import {encodeControls} from './controls.mjs';
+import {encodeControls,encodeFrontier} from './controls.mjs';
 import {prepareCycleMeter} from './meter.mjs';
 import {STRATEGIES,observeProofCache,advancePolicy,policyFlags} from './policies.mjs';
 import {ACTION_POLICIES,advanceActionPolicy,actionPolicyFlags} from './action-policies.mjs';
@@ -10,9 +10,10 @@ import {ACTION_POLICIES,advanceActionPolicy,actionPolicyFlags} from './action-po
 // Cold experiment selection through inherited environment keeps the existing
 // host, evaluator and benchmark interfaces unchanged. Every result names it.
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
+const frontierStrategy=['frontier-2','frontier-4','frontier-8','frontier-4-release','frontier-full'].includes(strategy);
 const actionStrategy=ACTION_POLICIES.includes(strategy);
-if(strategy!==null&&!STRATEGIES.includes(strategy)&&!actionStrategy)throw RangeError('strategist policy');
-if(actionStrategy&&process.env.JSMINSYS_FLAG_DISPATCH!=='actions')throw RangeError('action strategy needs actions handler');
+if(strategy!==null&&!STRATEGIES.includes(strategy)&&!actionStrategy&&!frontierStrategy)throw RangeError('strategist policy');
+if((actionStrategy||frontierStrategy)&&process.env.JSMINSYS_FLAG_DISPATCH!=='actions')throw RangeError('action strategy needs actions handler');
 const observeProofs=['harvest','wide-harvest','seed-retire','wide-seed'].includes(strategy);
 const cellCount=Number(process.env.JSMINSYS_STRATEGIST_CELLS);
 if(observeProofs&&(!Number.isInteger(cellCount)||cellCount<d.columns||cellCount%d.columns))throw RangeError('strategist cell count');
@@ -21,6 +22,14 @@ const policyState={harvested:false,retired:false,tick:0,reuseSeen:false};
 const words=new Uint32Array(d.memory.buffer),last=new Uint32Array(d.workers),meter=await prepareCycleMeter(d.measureCycles);
 let ticks=0,writes=0,previousStores=0,previousContention=0,exponent=0,phase=0,lastChange=-Infinity;
 const trace=[];
+// Publish the initial bounded action before opening the search barrier. A
+// scheduler race must not silently turn a PFIF trial into an ordinary solve.
+// Warmups must finish first; these words control the measured solve only.
+if(frontierStrategy)while(Atomics.load(d.control,1)<d.workers&&Atomics.load(d.control,0)===0)await delay(1);
+if(frontierStrategy)for(let i=0;i<d.workers;i++){
+  const flags=encodeFrontier({stride:strategy==='frontier-2'?2:strategy==='frontier-8'?8:4,release:strategy==='frontier-full'});
+  publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
+}
 Atomics.store(d.control,4,1);
 while(Atomics.load(d.control,0)===0)Atomics.wait(d.control,0,0);
 const start=meter.read(),started=performance.now();
@@ -41,7 +50,9 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   }
   if(d.policy==='rotate'||d.policy==='combined')phase=ticks%d.columns;
   for(let i=0;i<d.workers;i++){
-    const flags=actionStrategy?actionPolicyFlags(strategy,i,policyState):strategy?policyFlags(strategy,i,d,policyState):d.policy==='sparse'?encodeControls({shareExponent:4}):
+    const flags=frontierStrategy?encodeFrontier({stride:strategy==='frontier-2'?2:strategy==='frontier-8'?8:4,
+      release:strategy==='frontier-full'||(strategy==='frontier-4-release'&&now-started>=32)}):
+      actionStrategy?actionPolicyFlags(strategy,i,policyState):strategy?policyFlags(strategy,i,d,policyState):d.policy==='sparse'?encodeControls({shareExponent:4}):
       d.policy==='adaptive'?encodeControls({shareExponent:exponent}):
       d.policy==='rotate'?encodeControls({rotation:phase}):
       d.policy==='combined'?encodeControls({rotation:phase,shareExponent:exponent}):
@@ -54,7 +65,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   if(trace.length<256)trace.push({ms:now-started,stores,contention,exponent,phase,writes,observation,
     harvestEligible:policyState.harvested,retirementEligible:policyState.retired,
     helperStopPublished:last.subarray(1).some(flags=>flags&1),
-    ...(actionStrategy?{hits,reuseSeen:policyState.reuseSeen,flags:[...last]}:{})});
+    ...(actionStrategy||frontierStrategy?{hits,reuseSeen:policyState.reuseSeen,flags:[...last]}:{})});
   previousStores=stores;previousContention=contention;ticks++;
   await delay(d.cadenceMs);
 }

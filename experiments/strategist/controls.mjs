@@ -15,6 +15,13 @@ export function encodeActions({rotation=null,shareExponent=null,privateOnly=fals
   return encodeControls({rotation,shareExponent})|(privateOnly?4096:0)|(frontierProof?8192:0)|(reverse?16384:0);
 }
 
+// Cold PFIF commands: bits 16..21 stride, bit 22 release to full continuation,
+// bit 23 enables bounded passes. This is an opt-in experimental worker action.
+export function encodeFrontier({stride=4,release=false,...actions}={}){
+  if(!Number.isInteger(stride)||stride<1||stride>63)throw RangeError('frontier stride');
+  return encodeActions(actions)|(stride<<16)|8388608|(release?4194304:0);
+}
+
 export function prepareSearchBehavior32(state,behavior){
   prepareBase(state,behavior);
   const columns=state.g.columns;
@@ -38,6 +45,7 @@ export function prepareSearchBehavior32(state,behavior){
     state.campaignActionOrders=[state.campaignOrders,reversed];
   }
   state.campaignLast=0;state.campaignChanges=0;
+  state.frontierStride=0;state.frontierLimit=state.g.cellCount??0;
   return state;
 }
 
@@ -139,6 +147,8 @@ export function completeActions32(state,value){
   state.cache.sharedSampleBits=(flags&2048)&&exponent<=8?(((1<<exponent)-1)<<24)>>>0:state.campaignDefaultSharing;
   state.cache.shared=(flags&4096)?null:state.campaignShared;
   state.cpc.frontierResponse=(flags&8192)?1:state.campaignDefaultFrontier;
+  state.frontierStride=(flags&8388608)&&!(flags&4194304)?(flags>>>16)&63:0;
+  if(!state.frontierStride)state.frontierLimit=state.g.cellCount;
   state.campaignLast=flags;state.campaignChanges+=1;
   return value;
 }
