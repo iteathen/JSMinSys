@@ -59,9 +59,11 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
   const keyCount=supportCount*g.columns;
   if(!Number.isSafeInteger(keyCount)||keyCount>maxKeyCount)
     throw new RangeError('cofactor plan key space exceeds configured bound');
-  const planByKey=new Int32Array(keyCount);planByKey.fill(-1);
+  const planByKey=new Int32Array(keyCount);planByKey.fill(-1),
+    subset8=new Uint8Array(g.subsetTable.length);
+  subset8.set(g.subsetTable);
   return {
-    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,
+    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,subset8,
     n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
     basis:new Uint16Array(capacity*g.maxBasis),
     valid:new Uint32Array(capacity*g.coordWords),
@@ -207,7 +209,7 @@ function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex
   if(cache.count>=cache.capacity)return;
   const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
     closureBase=planBase*words,planWordBase=plan*words,
-    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
+    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=cache.subset8,shapeCount=g.shapeCount;
   cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
   for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
   for(let i=0;i<n;i+=1){
