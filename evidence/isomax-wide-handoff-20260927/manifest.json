@@ -1,0 +1,79 @@
+{
+  "sha": "758fafbc43a29e6ac0302d9091034597f57cd9a6",
+  "node": "v26.7.0",
+  "profile": {
+    "id": "isomax-native-lazy-smp-i5-12600k-20260927",
+    "status": "owner-selected operating baseline",
+    "selectedOn": "2026-09-27",
+    "scope": {
+      "solver": "IsoMax native JSMinSys RBA CPC alpha-beta with exact endpoint publication",
+      "method": "Lazy SMP, full exact TT sharing, existing move order, no strategist",
+      "geometry": "7x6",
+      "cpu": "Intel Core i5-12600K",
+      "physicalCores": 10,
+      "logicalProcessors": 16,
+      "ramGiBApprox": 32,
+      "platform": "win32",
+      "node": "v26.7.0"
+    },
+    "options": {
+      "workers": 7,
+      "sharedCacheCapacity": 4194304,
+      "localCacheCapacity": 1048576,
+      "sharedSampleMask": 0
+    },
+    "cachePayloadBytes7x6": 716177420,
+    "evidenceRevision": "5b0a5f313d66d3929af8ea8fee14a39a16b031ed",
+    "evidence": "../../evidence/isomax-resource-sustained-20260927/REPORT.md",
+    "limits": "Selected operating baseline, not proof of global or empty-board solve-time optimality. Requalify materially different solver methods, revisions, runtimes or hardware. PFIF benefits are not included in this selection."
+  },
+  "arms": [
+    "probe-deep",
+    "probe",
+    "probe-split"
+  ],
+  "stages": [
+    {
+      "id": "probe-A",
+      "workers": 1,
+      "rounds": 5,
+      "moves": "3164746344461611",
+      "expected": -1
+    },
+    {
+      "id": "probe-B",
+      "workers": 1,
+      "rounds": 5,
+      "moves": "2431572135633422",
+      "expected": -1
+    },
+    {
+      "id": "locked-probe-stress",
+      "workers": 7,
+      "rounds": 1,
+      "moves": "353335714",
+      "expected": -1,
+      "allowTimeout": true
+    }
+  ],
+  "started": "2026-09-27T08:48:32.934Z",
+  "scope": "Fixed two-ply root probe with narrowing release; worker 0 probes, peers deep. Split dispatch occurs only at root action boundaries, not arbitrary live-frame switching.",
+  "hashes": {
+    "addons/rba-connect4-alphabeta.mjs": "a47155ebd40c15c5e57098e17fb910b70d4442c0c075e93144d2e6645115ac22",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "8699365386731f015ab7d22b782dbb523b2b54a254bfcf1e57e5911ddc41a354",
+    "addons/worker-behavior.mjs": "891231e5093cc60ad9d8197bd49883a7112efe45e2073760e353e625930fe8cd",
+    "addons/worker-behavior-search.mjs": "6aecc20929ef0e32b3f7a5d4b699ce0988da1151711535ed080220ef6b958b4c",
+    "addons/rba-connect4-lazy-smp-host.mjs": "0a43c6a43f01e4d866860f17547d823e79f33e6c6cf89a412494ae81f51a9c64",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "2a4711508b7d578fd0f69e389e9b95b5dbed401ab0fae2f79066f5f09b384a40",
+    "experiments/strategist/modes.generated.mjs": "f7575b35cb79fddaeb3fbe3999ef1bdeb1d157ae2c91be7a4572dd8db79d791a",
+    "experiments/strategist/mode-controls.mjs": "5fa1c030482303a9290cf82a71f5c7ba16762b1c5aaebab602abb5b9a076a569",
+    "experiments/worker-scaling/locked-profile.json": "dd5e792da61bb05cd7fc1d232bab29c07f505db76b9ca15390975a0f6058bd8d",
+    "experiments/worker-scaling/sample.mjs": "d0e8f65dcbfd2234089e07c2092da92399dece5fcb7f56a864866094854f4c11",
+    "experiments/worker-scaling/loader.mjs": "5dee047417e04fbe089f5adec8a8b56e1ff97179cde057b3090460685c1b48f7",
+    "experiments/worker-scaling/wide-path-loader.mjs": "4a2d520625e854eda1c83a36c9faaa30beafacf5505530f5987efd11bc402b14",
+    "experiments/strategist/frontier.generated.mjs": "bd979b8e04860c403593ada7141d7f8d515ed88c31606f5753ef54e4509f8c9d",
+    "experiments/strategist/controls.mjs": "8daf9b0b6f9786f481eca4d8968ac904a9857f13f01634c4fb2508101c4d1092",
+    "experiments/cpc-factorial/isomax-node-counts.mjs": "d8dcea3b86a2b23788facd302d6cae5f6db123f2f1ee237018f60cd6a88d73a0",
+    "experiments/worker-scaling/wide-path-campaign.mjs": "44a42b448398aa62848a450527930d30c35793c7be7ce140070f05b5d4ba693c"
+  }
+}

@@ -1,0 +1,642 @@
+{
+  "trials": 69,
+  "rows": [
+    {
+      "stage": "matched-single",
+      "arm": "native",
+      "n": 4,
+      "workers": 1,
+      "meanWallMs": 11336.1088,
+      "meanSearchMs": 11295.123674999999,
+      "meanSolveCycles": 41887962868,
+      "meanTotalCycles": 42142482461.75,
+      "meanNodes": 11057264,
+      "meanCyclesPerNode": 3788.2755506244584,
+      "meanNodesPerSecond": 975433.4712508346
+    },
+    {
+      "stage": "matched-single",
+      "arm": "poll",
+      "n": 4,
+      "workers": 1,
+      "meanWallMs": 11402.244325000001,
+      "meanSearchMs": 11357.553,
+      "meanSolveCycles": 42129380821.5,
+      "meanTotalCycles": 42390329536.75,
+      "meanNodes": 11057264,
+      "meanCyclesPerNode": 3810.1089764610847,
+      "meanNodesPerSecond": 969754.0960891979
+    },
+    {
+      "stage": "matched-single",
+      "arm": "mode",
+      "n": 4,
+      "workers": 1,
+      "meanWallMs": 11443.098875,
+      "meanSearchMs": 11398.832375,
+      "meanSolveCycles": 42183343084.5,
+      "meanTotalCycles": 42445758087.75,
+      "meanNodes": 11057264,
+      "meanCyclesPerNode": 3814.9892310159184,
+      "meanNodesPerSecond": 966287.9741052566
+    },
+    {
+      "stage": "matched-single",
+      "arm": "deep-ablation",
+      "n": 4,
+      "workers": 1,
+      "meanWallMs": 11467.2339,
+      "meanSearchMs": 11422.5054,
+      "meanSolveCycles": 42337893810,
+      "meanTotalCycles": 42593559836.25,
+      "meanNodes": 11057264,
+      "meanCyclesPerNode": 3828.9665336741527,
+      "meanNodesPerSecond": 964257.0192895207
+    },
+    {
+      "stage": "locked-seven",
+      "arm": "native",
+      "n": 5,
+      "workers": 7,
+      "meanWallMs": 5343.97358,
+      "meanSearchMs": 5284.839080000001,
+      "meanSolveCycles": 141050710521.8,
+      "meanTotalCycles": 141307881563.4,
+      "meanNodes": 30508854.4,
+      "meanCyclesPerNode": 4623.8269269914,
+      "meanNodesPerSecond": 5710367.5389419375
+    },
+    {
+      "stage": "locked-seven",
+      "arm": "poll",
+      "n": 5,
+      "workers": 7,
+      "meanWallMs": 5391.14416,
+      "meanSearchMs": 5331.464239999999,
+      "meanSolveCycles": 142373145588.8,
+      "meanTotalCycles": 142627337016.8,
+      "meanNodes": 30971934.2,
+      "meanCyclesPerNode": 4596.947108923394,
+      "meanNodesPerSecond": 5745439.967196746
+    },
+    {
+      "stage": "locked-seven",
+      "arm": "mode",
+      "n": 5,
+      "workers": 7,
+      "meanWallMs": 5404.86628,
+      "meanSearchMs": 5345.02164,
+      "meanSolveCycles": 142654474649,
+      "meanTotalCycles": 142911944330.6,
+      "meanNodes": 31041985.2,
+      "meanCyclesPerNode": 4595.806868612459,
+      "meanNodesPerSecond": 5743323.506129237
+    },
+    {
+      "stage": "locked-seven",
+      "arm": "deep-ablation",
+      "n": 5,
+      "workers": 7,
+      "meanWallMs": 5346.132179999999,
+      "meanSearchMs": 5285.43726,
+      "meanSolveCycles": 141184163218.6,
+      "meanTotalCycles": 141436499705.8,
+      "meanNodes": 30777295,
+      "meanCyclesPerNode": 4587.387215784327,
+      "meanNodesPerSecond": 5757154.268392088
+    },
+    {
+      "stage": "probe-A",
+      "arm": "probe-deep",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 96.82296000000001,
+      "meanSearchMs": 54.06264,
+      "meanSolveCycles": 513982691.8,
+      "meanTotalCycles": 773227105,
+      "meanNodes": 11406,
+      "meanCyclesPerNode": 45062.4839382781,
+      "meanNodesPerSecond": 117830.27881949961
+    },
+    {
+      "stage": "probe-A",
+      "arm": "probe",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 106.17926,
+      "meanSearchMs": 62.93466000000001,
+      "meanSolveCycles": 568334617.2,
+      "meanTotalCycles": 830190119.8,
+      "meanNodes": 15904,
+      "meanCyclesPerNode": 35735.32552816901,
+      "meanNodesPerSecond": 149812.49162903824
+    },
+    {
+      "stage": "probe-A",
+      "arm": "probe-split",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 107.60213999999999,
+      "meanSearchMs": 64.14772,
+      "meanSolveCycles": 586569179,
+      "meanTotalCycles": 844924092.2,
+      "meanNodes": 15904,
+      "meanCyclesPerNode": 36881.86487676056,
+      "meanNodesPerSecond": 147865.98703230103
+    },
+    {
+      "stage": "probe-B",
+      "arm": "probe-deep",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 133.75004,
+      "meanSearchMs": 89.68260000000001,
+      "meanSolveCycles": 795859080,
+      "meanTotalCycles": 1061412968.8,
+      "meanNodes": 40439,
+      "meanCyclesPerNode": 19680.48369148594,
+      "meanNodesPerSecond": 302587.7201918103
+    },
+    {
+      "stage": "probe-B",
+      "arm": "probe",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 59.407920000000004,
+      "meanSearchMs": 17.343580000000003,
+      "meanSolveCycles": 354034329.8,
+      "meanTotalCycles": 619466510,
+      "meanNodes": 2544,
+      "meanCyclesPerNode": 139164.4378144654,
+      "meanNodesPerSecond": 42841.36810363003
+    },
+    {
+      "stage": "probe-B",
+      "arm": "probe-split",
+      "n": 5,
+      "workers": 1,
+      "meanWallMs": 59.86898,
+      "meanSearchMs": 17.396760000000004,
+      "meanSolveCycles": 351313101,
+      "meanTotalCycles": 617069056,
+      "meanNodes": 2544,
+      "meanCyclesPerNode": 138094.7724056604,
+      "meanNodesPerSecond": 42499.50268107273
+    },
+    {
+      "stage": "locked-probe-stress",
+      "arm": "probe-deep",
+      "n": 1,
+      "workers": 7,
+      "meanWallMs": 5440.0079,
+      "meanSearchMs": 5377.6365000000005,
+      "meanSolveCycles": 143753930665,
+      "meanTotalCycles": 144010850757,
+      "meanNodes": 30908039,
+      "meanCyclesPerNode": 4651.020747870804,
+      "meanNodesPerSecond": 5681616.565299474
+    },
+    {
+      "stage": "locked-probe-stress",
+      "arm": "probe",
+      "n": 1,
+      "workers": 7,
+      "meanWallMs": 5670.4657,
+      "meanSearchMs": 5611.8353,
+      "meanSolveCycles": 149244497009,
+      "meanTotalCycles": 149507016147,
+      "meanNodes": 29047515,
+      "meanCyclesPerNode": 5137.943710813128,
+      "meanNodesPerSecond": 5122597.778873788
+    },
+    {
+      "stage": "locked-probe-stress",
+      "arm": "probe-split",
+      "n": 1,
+      "workers": 7,
+      "meanWallMs": 5979.666300000001,
+      "meanSearchMs": 5920.2242,
+      "meanSolveCycles": 157215138939,
+      "meanTotalCycles": 157468869165,
+      "meanNodes": 30835887,
+      "meanCyclesPerNode": 5098.447109337248,
+      "meanNodesPerSecond": 5156790.605522585
+    }
+  ],
+  "contrasts": [
+    {
+      "stage": "matched-single",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "wallMs",
+      "n": 4,
+      "meanPercent": 0.5854642816002481,
+      "descriptive95": [
+        -0.21058419065756417,
+        1.3815127538580603
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "solveCycles",
+      "n": 4,
+      "meanPercent": 0.5772606585789819,
+      "descriptive95": [
+        -0.017042192206682794,
+        1.1715635093646466
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "totalCycles",
+      "n": 4,
+      "meanPercent": 0.5889978094406334,
+      "descriptive95": [
+        0.023126479254792498,
+        1.1548691396264743
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "wallMs",
+      "n": 4,
+      "meanPercent": 0.3586213974216379,
+      "descriptive95": [
+        0.07647787017711499,
+        0.6407649246661609
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "solveCycles",
+      "n": 4,
+      "meanPercent": 0.12802489863577016,
+      "descriptive95": [
+        -0.12698518633535794,
+        0.38303498360689825
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "totalCycles",
+      "n": 4,
+      "meanPercent": 0.1307107334222707,
+      "descriptive95": [
+        -0.13951541940111323,
+        0.4009368862456546
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "wallMs",
+      "n": 4,
+      "meanPercent": 0.21121518599731548,
+      "descriptive95": [
+        -0.33787292433487903,
+        0.76030329632951
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "solveCycles",
+      "n": 4,
+      "meanPercent": 0.366956561376125,
+      "descriptive95": [
+        -0.3084893600155779,
+        1.042402482767828
+      ]
+    },
+    {
+      "stage": "matched-single",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "totalCycles",
+      "n": 4,
+      "meanPercent": 0.3487929344665991,
+      "descriptive95": [
+        -0.33657134241082953,
+        1.0341572113440276
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": 0.8931781678961004,
+      "descriptive95": [
+        -1.2200046426948608,
+        3.0063609784870615
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": 0.946552288182847,
+      "descriptive95": [
+        -1.0303489308505895,
+        2.9234535072162835
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "native",
+      "candidate": "poll",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": 0.9426542802604733,
+      "descriptive95": [
+        -1.0231615399072567,
+        2.908470100428203
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": 0.2945575685568901,
+      "descriptive95": [
+        -3.8560657129920464,
+        4.445180850105826
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": 0.2390644891583759,
+      "descriptive95": [
+        -3.9441135727530066,
+        4.4222425510697585
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "poll",
+      "candidate": "mode",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": 0.24083998690692673,
+      "descriptive95": [
+        -3.9331245415629197,
+        4.414804515376773
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": -1.07080195088038,
+      "descriptive95": [
+        -2.5175338430960172,
+        0.37592994133525726
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": -1.0146411761559393,
+      "descriptive95": [
+        -2.4000178680913304,
+        0.3707355157794521
+      ]
+    },
+    {
+      "stage": "locked-seven",
+      "base": "mode",
+      "candidate": "deep-ablation",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": -1.0165095248507217,
+      "descriptive95": [
+        -2.395447946200927,
+        0.3624288964994835
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": 9.678361741337888,
+      "descriptive95": [
+        7.3792623912299575,
+        11.977461091445818
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": 10.679647322824056,
+      "descriptive95": [
+        4.356952591811228,
+        17.002342053836884
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": 7.428796467963208,
+      "descriptive95": [
+        2.8536270157783816,
+        12.003965920148033
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": 1.3641465189751556,
+      "descriptive95": [
+        -2.3936774602134068,
+        5.1219704981637175
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": 3.2631403279520006,
+      "descriptive95": [
+        -2.0337801884081914,
+        8.560060844312193
+      ]
+    },
+    {
+      "stage": "probe-A",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": 1.80113488276717,
+      "descriptive95": [
+        -1.7789776280634937,
+        5.3812473935978336
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": -55.54457117631283,
+      "descriptive95": [
+        -57.81724841296807,
+        -53.27189393965759
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": -55.47888062235008,
+      "descriptive95": [
+        -57.85540681606639,
+        -53.102354428633774
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": -41.59881357466684,
+      "descriptive95": [
+        -43.89885338283802,
+        -39.298773766495664
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "wallMs",
+      "n": 5,
+      "meanPercent": 0.826806579197401,
+      "descriptive95": [
+        -2.9201626673994125,
+        4.573775825794215
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "solveCycles",
+      "n": 5,
+      "meanPercent": -0.7010404952011373,
+      "descriptive95": [
+        -4.517325001544938,
+        3.115244011142663
+      ]
+    },
+    {
+      "stage": "probe-B",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "totalCycles",
+      "n": 5,
+      "meanPercent": -0.3634532267628554,
+      "descriptive95": [
+        -4.546492449857569,
+        3.819585996331858
+      ]
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "wallMs",
+      "n": 1,
+      "meanPercent": 4.236350465593985,
+      "descriptive95": null
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "solveCycles",
+      "n": 1,
+      "meanPercent": 3.8194199759275183,
+      "descriptive95": null
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe-deep",
+      "candidate": "probe",
+      "metric": "totalCycles",
+      "n": 1,
+      "meanPercent": 3.8164939385533447,
+      "descriptive95": null
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "wallMs",
+      "n": 1,
+      "meanPercent": 5.452825506025039,
+      "descriptive95": null
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "solveCycles",
+      "n": 1,
+      "meanPercent": 5.340660519978391,
+      "descriptive95": null
+    },
+    {
+      "stage": "locked-probe-stress",
+      "base": "probe",
+      "candidate": "probe-split",
+      "metric": "totalCycles",
+      "n": 1,
+      "meanPercent": 5.325404267430267,
+      "descriptive95": null
+    }
+  ]
+}

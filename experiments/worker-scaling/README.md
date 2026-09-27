@@ -74,3 +74,12 @@ PFIF/strategist), solver semantics, runtime or hardware require fresh comparison
 The owner has selected the operating point; historical experimental evidence is
 unchanged. The three five-minute empty-board runs all timed out cleanly, so the
 selection does not assert a proven empty-board solve-time optimum.
+
+## Shallow-path cost experiment
+
+[WIDE_PATH.md](WIDE_PATH.md) defines matched dormant-path controls and a fixed
+root-probe handoff prototype. The [69-solve report](../../evidence/isomax-wide-handoff-20260927/REPORT.md)
+does not establish a repeatable gain from splitting the recursive paths. Actual
+probing still helps one fixture strongly and hurts another. The prototype is
+diagnostic only; it does not replace the selected native baseline or implement
+general in-flight strategist switching.

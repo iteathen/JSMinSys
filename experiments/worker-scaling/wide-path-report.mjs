@@ -1,0 +1,54 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const dirs=['isomax-wide-path-20260927','isomax-wide-handoff-20260927'];
+const sources=dirs.map(id=>{const path=`evidence/${id}`,samples=readFileSync(`${path}/samples.jsonl`,'utf8').trim().split('\n').map(JSON.parse),manifest=JSON.parse(readFileSync(`${path}/manifest.json`));
+  assert.equal(JSON.parse(readFileSync(`${path}/complete.json`)).count,samples.length);return {id,samples,manifest};});
+const all=sources.flatMap(s=>s.samples),mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+for(const r of all){assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,r.expected);assert.equal(r.cleanup,true);assert.equal(r.errors.length,0);
+  assert.equal(r.workersExited,r.config.workers);assert.equal(BigInt(r.totalCycles),BigInt(r.bootstrapCycles)+BigInt(r.setupCycles)+BigInt(r.solveCycles));}
+const rows=[];
+for(const stage of [...new Set(all.map(r=>r.stage))])for(const arm of [...new Set(all.filter(r=>r.stage===stage).map(r=>r.arm))]){
+  const r=all.filter(x=>x.stage===stage&&x.arm===arm);
+  rows.push({stage,arm,n:r.length,workers:r[0].config.workers,meanWallMs:mean(r.map(x=>x.wallMs)),meanSearchMs:mean(r.map(x=>x.firstSearchToResultMs)),
+    meanSolveCycles:mean(r.map(x=>Number(x.solveCycles))),meanTotalCycles:mean(r.map(x=>Number(x.totalCycles))),
+    meanNodes:mean(r.map(x=>x.totalNodes)),meanCyclesPerNode:mean(r.map(x=>x.cyclesPerNode)),meanNodesPerSecond:mean(r.map(x=>x.nodesPerSecond))});
+}
+const contrasts=[];
+for(const stage of [...new Set(all.map(r=>r.stage))])for(const [base,candidate] of stage.startsWith('probe')||stage==='locked-probe-stress'?
+  [['probe-deep','probe'],['probe','probe-split']]:[['native','poll'],['poll','mode'],['mode','deep-ablation']]){
+  const b=all.filter(r=>r.stage===stage&&r.arm===base);
+  for(const metric of ['wallMs','solveCycles','totalCycles']){
+    const d=b.map(r=>100*(Number(all.find(c=>c.stage===stage&&c.arm===candidate&&c.round===r.round)[metric])/Number(r[metric])-1)),m=mean(d),
+      sd=d.length>1?Math.sqrt(d.reduce((s,v)=>s+(v-m)**2,0)/(d.length-1)):null,
+      half=sd===null?null:(d.length===4?3.182:2.776)*sd/Math.sqrt(d.length);
+    contrasts.push({stage,base,candidate,metric,n:d.length,meanPercent:m,descriptive95:half===null?null:[m-half,m+half]});
+  }
+}
+const out='evidence/isomax-wide-handoff-20260927',f=(n,d=2)=>n.toFixed(d);
+writeFileSync(`${out}/summary.json`,JSON.stringify({trials:all.length,rows,contrasts},null,2)+'\n');
+let md='# IsoMax shallow-path cost and root handoff experiment\n\n';
+md+='69/69 completed solves returned the declared WDL and joined cleanly. Same Windows i5-12600K / Node 26.7.0 host; full sharing, 4M shared and 1M private entries per worker. One-worker controls deliberately isolate work; seven-worker tests use the locked pool. No production addon or pinned resource setting changed.\n\n';
+md+='## Result\n\nThe proposed split did not establish a repeatable performance improvement. Dormant shallow machinery had a small measured cost on the matched single-worker workload. Removing it was not faster there. The actual root-probe split preserved work/results but also failed to establish a consistent gain. Retain the selected native baseline; do not promote this prototype.\n\n';
+md+='Shallow exploration itself remains valuable selectively. On fixture B it reduced visits from 40,439 to 2,544 and mean wall time from 133.75 to 59.41 ms. On A it increased visits from 11,406 to 15,904 and wall time from 96.82 to 106.18 ms. The current configuration therefore reproduces a strong benefit on B, not the historical improvement on both fixtures. Endpoint publication, memory and measurement boundaries differ from historical evidence; do not attribute the change to one factor or compare old/new percentages directly.\n\n';
+md+='## Fairness repair before timing\n\nAt 6172113, `experiments/strategist/build.mjs --check` failed: generated experimental workers predated both exact endpoint cache-publication repairs. Commit 838586f regenerated all six experimental layers from the current behavior solver and updated one guarded cutoff seam in the one-band generator so it retains endpoint publication. Nine mode/one-band tests passed, including live switches and cancellation. Historical evidence was not rewritten.\n\n';
+md+='## Dormant capability\n\nAll flags remain DEEP; no strategist runs. Native is ordinary recursion; poll adds existing completion polling. Mode carries horizons, incomplete propagation and pass retention. Deep-ablation replaces only the recursive body, retaining MODE state preparation, root logic and completion reader. It is a diagnostic counterfactual, not live-switch-capable production code.\n\n';
+md+='Every single-worker run visited exactly 11,057,264 nodes. Mode versus ablation has matched witness and work. The root is `353335714`, a known-losing derived child of the standard Fhourstones input, not an official Fhourstones score.\n\n';
+md+='| Workers | Arm | Repeats | Wall s | Search s | Solve-call cycles B | Total process cycles B | Visits M |\n|---:|---|---:|---:|---:|---:|---:|---:|\n';
+for(const r of rows.filter(x=>['matched-single','locked-seven'].includes(x.stage)))md+=`| ${r.workers} | ${r.arm} | ${r.n} | ${f(r.meanWallMs/1000,3)} | ${f(r.meanSearchMs/1000,3)} | ${f(r.meanSolveCycles/1e9,3)} | ${f(r.meanTotalCycles/1e9,3)} | ${f(r.meanNodes/1e6,3)} |\n`;
+md+='\nPaired differences below are candidate/base minus one. Intervals are descriptive paired t intervals across rotated repetitions (4 or 5), unadjusted for multiple comparisons; they are not proof of equivalence or zero cost.\n\n| Stage | Comparison | Metric | Mean change | Descriptive 95% interval |\n|---|---|---|---:|---|\n';
+for(const r of contrasts.filter(x=>['matched-single','locked-seven'].includes(x.stage)&&x.metric!=='totalCycles'))md+=`| ${r.stage} | ${r.candidate} / ${r.base} | ${r.metric} | ${f(r.meanPercent)}% | ${f(r.descriptive95[0])}% to ${f(r.descriptive95[1])}% |\n`;
+md+='\nThe single-worker MODE versus polling cycle estimate is +0.13%; stripping shallow machinery is +0.37% versus MODE. At seven workers the ablation averages about 1.07% lower wall time, but its interval crosses zero and shared-TT races change work. These results do not demonstrate the large dormant-loop tax hypothesized from source inspection. They also do not prove all future live mode changes are free.\n\n';
+md+='## Actual probe followed by deep continuation\n\nThe existing root-concentration primitive issues a two-ply probe with narrowing target 1. It retains native state/exact results and releases when one root action remains. The split prototype keeps the bounded function for probing and dispatches to ordinary behavior recursion only at a root action boundary after release. Deep recursive calls are direct; no horizon or unfinished-probe handling is inserted into that body. Both versions use the same completion reader. All preparation, code/JIT effects, root dispatch and repeated work remain charged.\n\n';
+md+='A = `3164746344461611`, B = `2431572135633422`, both absolute WDL -1. Five repetitions per arm. Both probe versions have identical visits, witness and probe counters on each fixture. A performs four passes and 5,300 horizon stops; B one pass and 25 stops; each records one narrowing release.\n\n';
+md+='| Fixture | Arm | Repeats | Wall ms | Search ms | Solve-call cycles M | Total process cycles M | Visits |\n|---|---|---:|---:|---:|---:|---:|---:|\n';
+for(const r of rows.filter(x=>x.stage.startsWith('probe')||x.stage==='locked-probe-stress'))md+=`| ${r.stage} | ${r.arm} | ${r.n} | ${f(r.meanWallMs)} | ${f(r.meanSearchMs)} | ${f(r.meanSolveCycles/1e6)} | ${f(r.meanTotalCycles/1e6)} | ${f(r.meanNodes,0)} |\n`;
+md+='\nThe seven-worker stress case uses worker 0 probing and six fully released peers, on the longer derived root. Only one trial per arm: it is a smoke/stress observation, not a statistical ranking. Worker 0 did not finish before the host selected a deep peer; its final probe counters were unavailable. Zeros for those unfinished workers do not mean no probe work occurred. Aggregate visits include every worker.\n\n';
+md+='This prototype is ROOT-BOUNDARY ONLY. It does not implement arbitrary retained-frame switching, recurring frontier control, width sensing or asynchronous strategist policy. Fixed prepublished commands isolate the execution mechanism. No copies, root replay or extra unwinding are introduced by this split, but that does not establish a cheap general live-switch mechanism. The prototype remains opt-in through a diagnostic loader; no parallel production solver is installed.\n\n';
+md+='## Disposition and next seam\n\nKeep the seven-worker/4M-shared/1M-private native baseline. Do not justify a broad worker rewrite with this dormant-cost result. The next optimization question is whether a cheap selective trigger distinguishes B-like short refutations from A-like extra probing, and whether benefits survive shared-TT interaction. Count active probe work, repeated bands and control-delivery costs; source-level fewer branches is not a speed result. The split mechanism is preserved as measured experimental evidence, not promoted.\n\n';
+md+='## Evidence and limits\n\n';
+md+='The final targeted suite passed 35/35 tests, including independent physical-oracle cases, reflection, live mode changes, cancellation, root restoration and the matched handoff controls; see [test output](tests.txt). All six experimental generator freshness checks and patch hygiene passed.\n\n';
+for(const s of sources)md+=`- ${s.id}: tested \`${s.manifest.sha}\`; ${s.samples.length} solves; [manifest](../${s.id}/manifest.json), [samples](../${s.id}/samples.jsonl), [raw output](../${s.id}/processes.jsonl).\n`;
+md+='\nRun the targeted `wide-path.test.mjs`, then `wide-path-campaign.mjs NEW_DIRECTORY` or add `--active`, from a clean committed tree. The driver enables FFI and the source-guarded diagnostic loader. Source inputs/hashes and errors are retained; no retries. The ordinary production solver is unchanged.\n\n';
+md+='Cycles are Windows QueryProcessCycleTime summed over all process threads. Solve-call cycles include native host setup, worker preparation and joining; total process cycles also include earlier startup. Search timestamps isolate first worker entry to first exact result. Short A/B wall times contain substantial startup/JIT costs; search-only timings are reported alongside complete-operation costs. Node counting redirects the existing increment to padded per-worker storage. It adds no second per-node counter. Final probe telemetry is written cold after completed solves. These are scoped performance/semantic tests, not full NEES machine-code certification.\n';
+writeFileSync(`${out}/REPORT.md`,md);
+console.log(JSON.stringify({trials:all.length,report:`${out}/REPORT.md`}));
