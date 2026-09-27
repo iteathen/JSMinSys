@@ -5,7 +5,10 @@ Authority: NEES Draft 0.5, revision
 NODE_V8_METHODS and COST_ACCOUNTING; JSMinSys SPEC Draft 0.2.
 Scope: the selected six-deep/one-wide native Lazy-SMP composition. This is an
 implementation/conformance record, not a claim of universal speed or optimality.
-Qualification outcome is recorded in the linked evidence report when complete.
+Qualification completed: 164 repository tests, 20 deterministic old/new controls
+and 42 matched whole-solve trials passed. See the
+[evidence report](../evidence/isomax-native-frontier-cleanup-20260927/REPORT.md)
+for the noisy short-case cycle regression and runtime limitations.
 
 ## Execution contract
 
@@ -158,7 +161,7 @@ of all V8 internals, so **JMS-SEALED is not claimed**.
 | Live-line ordering, CPC reductions | COUPLED / TRADEOFF | Preserve tested work reduction; no new local policy variants in cleanup |
 | Node/closure counters and Wasm preparation | ENABLING / REQUIRED diagnostics, implementation debt | Costs are included; investigate cheaper equivalent accounting without losing timeout/peer work |
 | Worker startup/JIT, cloning root, cold object/materialization | COUPLED / UNVERIFIED-DEBT | Included in measured unit; no claim of zero transport or warm persistent pool |
-| GC, cache/TLB misses, branch misses, CPU migration, field boxing | UNKNOWN / UNVERIFIED-DEBT | Runtime traces/whole cycles observe some effects; no hardware-counter isolation or universal instruction mapping |
+| GC, cache/TLB misses, branch misses, CPU migration, field boxing | UNKNOWN / UNVERIFIED-DEBT | Trace contains Scavenge and feedback/overflow/minus-zero bailouts; no allocation-free-machine claim, hardware-counter isolation or universal instruction mapping |
 
 Mechanisms changed: ALLOCATION-LIFETIME/REPRESENTATION (unused cold tables and
 fields removed), JIT-ENGINE (smaller fixed dispatch), DIAGNOSTIC (direct prepared

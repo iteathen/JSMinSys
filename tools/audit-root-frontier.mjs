@@ -14,6 +14,12 @@ export function checkHotBody(body,site){
     [/(?:return|=)\s*[\[{]/,'object/array construction'],
     [/\b(?:fromMoves|connect4RbaFromMoves|registerHooks|eval)\b/,'cold ingress or source rewriting'],
   ])assert.ok(!pattern.test(code),`${site}: ${reason}`);
+  assert.ok(!/\]\s*\(/.test(code),`${site}: unbound indexed callable`);
+  for(const m of code.matchAll(/([\w.]+)\s*\(/g)){
+    const target=m[1];if(!target.includes('.'))continue;
+    assert.ok(/^(Math\.(imul|clz32|min|max)|Atomics\.(load|store|compareExchange|add)|state\.behaviorLoad|profile\.(prepareRemove|removePrepared|prepareSubset|shapeSubsetPrepared|permuteCoordinates))$/.test(target)||
+      /^[\w.]+\.fill$/.test(target),`${site}: unbound method ${target}`);
+  }
 }
 function bodyOf(source,name){
   const s=withoutComments(source),start=s.indexOf('function '+name+'(');

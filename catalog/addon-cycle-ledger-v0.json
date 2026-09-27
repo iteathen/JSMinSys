@@ -8543,7 +8543,7 @@
         },
         {
           "op": "runtime.field.store",
-          "count": "1+3*N+2*S+2*Q+3*A"
+          "count": "(1+3*N+2*S+2*Q+3*A)-P"
         },
         {
           "op": "memory.load.u32",
@@ -8672,7 +8672,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "P+HORIZON"
+          "count": "HORIZON"
         },
         {
           "op": "control.test.u32",
@@ -8685,7 +8685,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Frontier))+(H+E+FT+T)*CALL(absToRelativeFrontier)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsFrontier)+S*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyFrontier)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeRootFrontierNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(P+HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+INCOMPLETE_CONTROL",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Frontier))+(H+E+FT+T)*CALL(absToRelativeFrontier)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsFrontier)+S*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyFrontier)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeRootFrontierNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+HORIZON*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+INCOMPLETE_CONTROL",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -8713,7 +8713,7 @@
           "BRANCH": "Branch completions checking unfinished sentinel",
           "INCOMPLETE_CONTROL": "Executed horizon-stop counter increment, unfinished flag initialization/assignments, and sentinel propagation/returns; load/store/arithmetic/control/call costs are profile-sensitive, not zero"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; inherited field-store accounting is conservative until instruction-level lowering qualifies the replacement.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9567,5 +9567,21 @@
       ]
     },
     "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback."
+  },
+  "isomaxRootFrontierCostProfile": {
+    "id": "node26.7.0-v8-14.6.202.34/win32-x64-alder-lake-symbolic",
+    "authority": "NEES@7650bef0aecc0d2b226ecf253a1f8937ccf89d69 COST_ACCOUNTING.md",
+    "scope": "Selected root-frontier system including its inherited transitive operation inventory",
+    "binding": "All C(op) terms are SYMBOLIC for this Intel runtime. Historical Zen3 fixed cycle constants are not applied. CALL includes separately unresolved boundary/return cost and the callee inventory; waits remain unbounded.",
+    "measuredTotal": "Windows QueryProcessCycleTime after minus before, all process threads; setup and whole process retained separately",
+    "uncertainty": [
+      "cache/TLB/coherence locality",
+      "branch prediction",
+      "boxing and deoptimization",
+      "inlining/call boundaries",
+      "GC/JIT/background work",
+      "CPU migration/turbo",
+      "dynamic executed operation counts"
+    ]
   }
 }
