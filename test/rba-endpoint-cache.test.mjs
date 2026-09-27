@@ -32,6 +32,17 @@ test('a recursive fail-high win publishes exact current-q WDL',()=>{
   assert.equal(r.cached,3,'V>=1 is exact; recursive endpoint must survive the cutoff');
 });
 
+test('a completed fail-low loss publishes exact q without caching an interior bound',()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),moves=[2,0,0,1,2,0,1,0,2,2,1,1];
+  for(const history of [moves,moves.map(c=>3-c)]){
+    const r=search(g,history,-1,0);
+    assert.equal(r.value,-1);assert.ok(r.s.nodes>1);
+    assert.equal(r.cached,1,'all actions bounded <= -1 prove exact loss');
+  }
+  const draw=search(g,[0,1,0,1],-1,0);
+  assert.ok(draw.cached===0||draw.cached===2);
+});
+
 test('directed narrow windows and cached q values agree with an independent physical 4x4 oracle',()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4}),lines=[],memo=new Map();
   for(let r=0;r<4;r++)for(let c=0;c<4;c++)for(const [dc,dr] of [[1,0],[0,1],[1,1],[1,-1]]){

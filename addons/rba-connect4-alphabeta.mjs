@@ -251,7 +251,9 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       if(best===1)break;
     }
     if(best===-2)return 0;
-    if(alphaOrig===-2&&betaOrig===2){
+    // Reaching here examined every relevant action without a beta cutoff.
+    // An upper bound of -1 is exact; a narrow-window draw is still only a bound.
+    if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbs(best,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }
