@@ -86,3 +86,13 @@ tie reversal changes the recursive tree. Those effects are charged by the full
 solve-call meter across every evaluator. The strategist's three counter reads,
 policy decoding and numeric-word publication are off the evaluator path, but
 their interference is not assumed free. No raw per-handler-cycle claim is made.
+
+## PFIF extension
+
+The changed-word action path now also decodes/stores frontier stride and may
+release the prepared horizon. The unchanged-word path remains unchanged. Only
+the experimental frontier specialization adds a horizon comparison after CPC
+evidence, unfinished-sibling propagation, root-action retention, and repeated
+passes. Root completion also polls STOP. Full-operation cycles include all of
+this work; the full-continuation control isolates the specialized path from
+bounded-pass behavior. See the [screen](../../evidence/strategist-frontier-20260926/RESULTS.md).

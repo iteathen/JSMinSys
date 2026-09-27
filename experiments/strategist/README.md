@@ -127,3 +127,17 @@ The first mode screens 60 trials; the second isolates action costs and proof
 benefits in 72 interleaved trials including one-worker controls and a winning
 mover root. Fixed 750 ms case limits and requested 5 ms observation interval.
 Results: [action campaign evidence](../../evidence/strategist-actions-20260926/RESULTS.md).
+
+## PFIF worker actions
+
+The [frontier campaign](FRONTIER_CAMPAIGN.md) supplies native bounded traversal,
+stride changes and full-continuation release inside an opt-in experimental
+worker. The evaluator now selects that specialization cold for `frontier-*`
+policies. Ordinary solver, host and TT remain unchanged. Results and limitations:
+[42-trial screen](../../evidence/strategist-frontier-20260926/RESULTS.md).
+
+```text
+node experiments/strategist/build-frontier.mjs --check
+node --experimental-ffi experiments/strategist/frontier-campaign.mjs NEW-FRONTIER.jsonl
+node experiments/strategist/analyze-frontier.mjs evidence/strategist-frontier-20260926
+```
