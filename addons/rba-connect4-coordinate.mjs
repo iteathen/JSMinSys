@@ -71,14 +71,11 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
 }
 function cofactorPlanKey(source,src,column,cache){
   if(cache.columns===7&&cache.radix===7){
-    let code=source[src+6];
-    code=Math.imul(code,7)+source[src+5];
-    code=Math.imul(code,7)+source[src+4];
-    code=Math.imul(code,7)+source[src+3];
-    code=Math.imul(code,7)+source[src+2];
-    code=Math.imul(code,7)+source[src+1];
-    code=Math.imul(code,7)+source[src];
-    return Math.imul(code,7)+column;
+    const a=source[src]+Math.imul(source[src+1],7),
+      b=Math.imul(source[src+2],49)+Math.imul(source[src+3],343),
+      c=Math.imul(source[src+4],2401)+Math.imul(source[src+5],16807),
+      d=Math.imul(source[src+6],117649);
+    return Math.imul((a+b)+(c+d),7)+column;
   }
   let code=0;
   for(let c=cache.columns-1;c>=0;c-=1)code=Math.imul(code,cache.radix)+source[src+c];
