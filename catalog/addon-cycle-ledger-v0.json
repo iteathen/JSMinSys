@@ -2066,16 +2066,38 @@
         {
           "op": "runtime.field.store",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "CP"
+        },
+        {
+          "op": "control.branch",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "prepareConnect4RbaCofactorPlanCache32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "CP"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+(2)*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+(W)*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+(W)*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+(F)*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+CALL(prepareConnect4LiveLineEvaluator32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+(4)*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+(CP)*C(control.test.u32)+(CP)*C(control.branch)+(CP)*C(runtime.object.allocate)+(CP)*CALL(prepareConnect4RbaCofactorPlanCache32)+(CP)*C(runtime.field.store)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "CP": "1 when cold cofactorPlanCapacity is nonzero and a private support-plan arena is prepared; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Optional private cofactor-plan preparation is cold and fully charged through prepareConnect4RbaCofactorPlanCache32; recursive cofactor plan hits/misses remain owned by the coordinate ledger."
       },
       "status": "decomposed"
     },
@@ -3003,81 +3025,137 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*G+7*CN+9*N+4*U+A"
+          "count": "(1-H)*(((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2))"
         },
         {
           "op": "runtime.field.store",
-          "count": "8+CN+4*N+2*U"
+          "count": "(1-H)*(8+CN+4*N+2*U)"
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U+A"
+          "count": "(1-H)*(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U))"
         },
         {
           "op": "memory.store.u32",
-          "count": "G+2*Z+3+CN+2*N+2*U"
+          "count": "(1-H)*((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))"
         },
         {
           "op": "alu.imul.u32",
-          "count": "2+N"
+          "count": "(1-H)*(((2+N)+(K*D))+(K*S*PS))"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U+A"
+          "count": "(1-H)*(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U))"
         },
         {
           "op": "alu.sub.u32",
-          "count": "2+B+I"
+          "count": "(1-H)*(2+B+I)"
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U+A"
+          "count": "(1-H)*((6+4*N+2*U+A)+(K*D*(2*V)))"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+3*N+U"
+          "count": "(1-H)*((2+3*N+U)+(K*D*V))"
         },
         {
           "op": "alu.shr.u32",
-          "count": "3+B+CN+2*N+I+U"
+          "count": "(1-H)*((3+B+CN+2*N+I+U)+(K*D*V))"
         },
         {
           "op": "control.test.u32",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "(1-H)*(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))"
         },
         {
           "op": "control.branch",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "(1-H)*(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "K",
+          "count": "(1-H)*(K*(1-D))",
           "target": "connect4RbaCofactorBasis"
         },
         {
           "op": "runtime.callback",
-          "count": "K*PR",
+          "count": "(1-H)*(K*PR)",
           "target": "prepareRemove"
         },
         {
           "op": "runtime.callback",
-          "count": "K*RM",
+          "count": "(1-H)*(K*RM)",
           "target": "removePrepared"
         },
         {
           "op": "runtime.callback",
-          "count": "K*PS",
+          "count": "(1-H)*(K*PS*(1-S))",
           "target": "prepareSubset"
         },
         {
           "op": "runtime.callback",
-          "count": "K*U",
+          "count": "(1-H)*(K*U*(1-S))",
           "target": "shapeSubsetPrepared"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "(1-H)*(K*D*V)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-H)*(K*D)",
+          "target": "emitSortedSetBits32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "5+2*P"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+P*(8+H)"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2+P*7"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+P*7"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+3*P"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+3*P"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "cofactorPlanKey"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "applyConnect4RbaCofactorPlan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M",
+          "target": "storeConnect4RbaCofactorPlan32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+4*G+7*CN+9*N+4*U+A)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+A)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+A)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+A)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(1-H)*((((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2))*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U))*C(memory.load.u32)+((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))*C(memory.store.u32)+(((2+N)+(K*D))+(K*S*PS))*C(alu.imul.u32)+(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U))*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+((6+4*N+2*U+A)+(K*D*(2*V)))*C(alu.and.u32)+((2+3*N+U)+(K*D*V))*C(alu.shl.u32)+((3+B+CN+2*N+I+U)+(K*D*V))*C(alu.shr.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.test.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.branch)+(K*(1-D))*CALL(connect4RbaCofactorBasis)+(K*PR)*CALLBACK(prepareRemove)+(K*RM)*CALLBACK(removePrepared)+(K*PS*(1-S))*CALLBACK(prepareSubset)+(K*U*(1-S))*CALLBACK(shapeSubsetPrepared)+(K*D*V)*C(alu.or.u32)+(K*D)*CALL(emitSortedSetBits32))+(5+2*P)*C(runtime.field.load)+(1+P*(8+H))*C(memory.load.u32)+(2+P*7)*C(alu.imul.u32)+(2+P*7)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+(2+3*P)*C(control.test.u32)+(2+3*P)*C(control.branch)+P*CALL(cofactorPlanKey)+H*CALL(applyConnect4RbaCofactorPlan32)+M*CALL(storeConnect4RbaCofactorPlan32)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3091,9 +3169,16 @@
           "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
           "PS": "prepareSubset calls for images requiring at least one new target closure",
           "A": "surviving player-image membership checks actually executed (0..2 per J); short-circuited inactive players excluded",
-          "J": "surviving images reaching the per-player absorption guard"
+          "J": "surviving images reaching the per-player absorption guard",
+          "D": "1 when the dense removeByCell path is selected with caller-owned removed/childIndex scratch and zero seenOffset; otherwise 0",
+          "V": "nonnegative dense removed images whose seen bit is published; V<=N",
+          "W": "shapeWordCount words cleared by the dense child-basis path",
+          "S": "1 when g.subsetTable is present and direct dense subset lookup is selected; otherwise 0",
+          "P": "1 when a support-plan cache is attached to the prepared execution profile; otherwise 0",
+          "H": "1 when the exact base-7 support/column plan key hits; 0 otherwise",
+          "M": "1 when an enabled cache misses, the ordinary deep cofactor completes, and a new plan is stored; 0 otherwise"
         },
-        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters. C1 adds per-surviving-player load/address/AND and short-circuit tests. Control terms conservatively account Boolean selection/negation and the early exit; generated lowering, overlap and cache costs remain profile-dependent rather than claimed fixed Intel cycle values. PS/U now exclude absorbed work. Whole-operation measured cycles are the promotion evidence, not this inherited source-operation envelope."
+        "note": "Experimental support-plan wrapper. On a hit, support-derived child-basis and closure geometry replaces the ordinary dense cofactor body; current P0/P1 coordinate membership is still applied at runtime and C1 image absorption remains. On a miss the complete current C1+dense body executes and plan construction is charged separately. No W/D/L/CPC/best-move information enters the plan."
       },
       "status": "decomposed"
     },
@@ -6345,12 +6430,28 @@
         {
           "op": "runtime.field.store",
           "count": "3*W"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "W"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+C(runtime.integer.check)+3*C(control.test.u32)+3*C(control.branch)+W*C(runtime.field.store)+PLAN_ACCOUNTING",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6363,9 +6464,11 @@
           "X": "Invalid memory only",
           "HOST_SELECTION": "Memory length/index checks, cold URL selection and shared-byte accounting",
           "RF": "1 when rootFrontier selected; 0 otherwise",
-          "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive"
+          "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive",
+          "CP": "1 when cofactorPlanCapacity>0; 0 otherwise",
+          "PLAN_ACCOUNTING": "Cold plan-capacity validation and exact private-plan byte-estimate arithmetic reported to the caller; no recursive work"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced. cofactorPlanCapacity is a cold optional worker-preparation setting; reported plan bytes are private-worker memory and excluded from sharedBytes."
       },
       "status": "decomposed"
     },
@@ -6427,17 +6530,17 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 25
+          "count": 26
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+26*C(runtime.field.load)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBeta)"
         ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
+        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask. Worker preparation now forwards one cold cofactorPlanCapacity field into its prepared search state."
       },
       "status": "decomposed"
     },
@@ -6946,16 +7049,38 @@
           "op": "runtime.call.subledger",
           "target": "prepareSearchBehavior32",
           "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "CP"
+        },
+        {
+          "op": "control.branch",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "prepareConnect4RbaCofactorPlanCache32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "CP"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Behavior)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareSearchBehavior32)",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+(2)*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+(W)*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+(W)*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+(F)*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Behavior)+CALL(prepareConnect4LiveLineEvaluator32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+(4)*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareSearchBehavior32)+(CP)*C(control.test.u32)+(CP)*C(control.branch)+(CP)*C(runtime.object.allocate)+(CP)*CALL(prepareConnect4RbaCofactorPlanCache32)+(CP)*C(runtime.field.store)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "CP": "1 when cold cofactorPlanCapacity is nonzero and a private support-plan arena is prepared; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Optional private cofactor-plan preparation is cold and fully charged through prepareConnect4RbaCofactorPlanCache32; recursive cofactor plan hits/misses remain owned by the coordinate ledger."
       },
       "status": "decomposed"
     },
@@ -7817,7 +7942,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 25
+          "count": 26
         },
         {
           "op": "runtime.call.subledger",
@@ -7868,12 +7993,12 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBetaBehavior)+CALL(solveConnect4RbaAlphaBetaBehavior)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBetaBehavior)+CALL(solveConnect4RbaAlphaBetaBehavior)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+26*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaAlphaBetaBehavior)",
           "PARK_DURATION"
         ],
-        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search.",
+        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search. Worker preparation now forwards one cold cofactorPlanCapacity field into its prepared search state.",
         "parameters": {
           "L": "Executed retired-worker scan and wake checks",
           "S": "Cancellation result/stop publications",
@@ -8286,17 +8411,39 @@
         {
           "op": "runtime.field.store",
           "count": 8
+        },
+        {
+          "op": "control.test.u32",
+          "count": "CP"
+        },
+        {
+          "op": "control.branch",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "CP"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "prepareConnect4RbaCofactorPlanCache32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "CP"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Frontier)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareRootFrontierBehavior32)+2*C(runtime.typed_array.allocate)+8*C(runtime.field.store)+PREP_VALIDATION",
+        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+(2)*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+(W)*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+(W)*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+(F)*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Frontier)+CALL(prepareConnect4LiveLineEvaluator32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+(4)*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareRootFrontierBehavior32)+(2)*C(runtime.typed_array.allocate)+(8)*C(runtime.field.store)+(CP)*C(control.test.u32)+(CP)*C(control.branch)+(CP)*C(runtime.object.allocate)+(CP)*CALL(prepareConnect4RbaCofactorPlanCache32)+(CP)*C(runtime.field.store)",
         "parameters": {
           "F": "Always 0; four-front branch removed from this profile",
           "W": "configured board width; one-time private action-order diversification materialized before search",
-          "PREP_VALIDATION": "Cold prepared Float64 counter validation and remaining shape stores; measured setup includes them"
+          "PREP_VALIDATION": "Cold prepared Float64 counter validation and remaining shape stores; measured setup includes them",
+          "CP": "1 when cold cofactorPlanCapacity is nonzero and a private support-plan arena is prepared; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Optional private cofactor-plan preparation is cold and fully charged through prepareConnect4RbaCofactorPlanCache32; recursive cofactor plan hits/misses remain owned by the coordinate ledger."
       },
       "status": "decomposed"
     },
@@ -9244,7 +9391,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": 25
+          "count": 26
         },
         {
           "op": "runtime.call.subledger",
@@ -9307,12 +9454,12 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaFrontier)+CALL(solveConnect4RbaFrontier)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)+3*C(runtime.typed_view.construct)+2*C(runtime.timer.read)+6*C(memory.store.f64)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaFrontier)+CALL(solveConnect4RbaFrontier)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+26*C(runtime.field.load)+CALL(BehaviorWorker)+C(runtime.typed_view.construct)+L*C(atomic.load.u32)+S*C(atomic.store.u32)+R*C(atomic.rmw.u32)+N*C(atomic.notify)+P*C(atomic.wait)+T*(C(control.test.u32)+C(control.branch))+A*C(alu.add.u32)+M*C(alu.imul.u32)+3*C(runtime.typed_view.construct)+2*C(runtime.timer.read)+6*C(memory.store.f64)",
         "unboundedTerms": [
           "CALL(solveConnect4RbaFrontier)",
           "PARK_DURATION"
         ],
-        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search.",
+        "note": "Exact completion uses inherited worker publication ledger. Cancellation uses subset of inherited stores/RMW plus explicit retirement operations; inherited baseline is a conservative upper ledger on cancellation, not an exact path count. Park duration unbounded, outside search. Worker preparation now forwards one cold cofactorPlanCapacity field into its prepared search state.",
         "parameters": {
           "L": "Executed retired-worker scan and wake checks",
           "S": "Cancellation result/stop publications",
@@ -9325,11 +9472,304 @@
         }
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#prepareConnect4RbaCofactorPlanCache32",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "prepareConnect4RbaCofactorPlanCache32",
+      "scope": "cofactor-plan-cold",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "12+2*C"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "5"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "C"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "14+2*C"
+        },
+        {
+          "op": "control.branch",
+          "count": "14+2*C"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "8"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "1"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "1"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(8)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
+        "parameters": {
+          "C": "prepared geometry column count"
+        },
+        "note": "Cold fixed-arena preparation. Parent-aligned plan layout replaces the Uint8 map arena with valid/unchanged Uint32 masks, so eight typed arrays are allocated. Allocation remains outside measured solve-call cycles."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#cofactorPlanKey",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "cofactorPlanKey",
+      "scope": "cofactor-plan-hot-key",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "2+C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "C"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "C"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "C+1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2",
+          "note": "select exact 7-column/radix-7 key specialization"
+        },
+        {
+          "op": "control.branch",
+          "count": "2",
+          "note": "select exact 7-column/radix-7 key specialization"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(2+C)*C(runtime.field.load)+(C)*C(memory.load.u32)+(C+1)*C(alu.imul.u32)+(C+1)*C(alu.add.u32)+(C)*C(alu.sub.u32)+(C+1)*C(control.test.u32)+(C+1)*C(control.branch)+(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "parameters": {
+          "C": "prepared geometry column count",
+          "K7": "1 for the selected 7-column/radix-7 specialization; generic loop remains fallback"
+        },
+        "note": "Stage-9 exact 7x6 plan-key specialization. The ledger conservatively retains the full generic C-loop load/ALU/control envelope and adds the two specialization tests/branches, so measured savings from removed loop control are not pre-credited."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#applyConnect4RbaCofactorPlan32",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "applyConnect4RbaCofactorPlan32",
+      "scope": "local-negamax-cofactor-plan-hit",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "25+6*W+3*L+3*Q"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "4"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6+C+CN+6*W+3*L"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "2"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "9+C+CN"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "3+L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "18+C+CN+5*W+4*L"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "1+L"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "8+5*W+L"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "3*W+6*B+3*M+3*O"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "2*W+L"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2+L"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "4"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "18+C+7*W+3*L"
+        },
+        {
+          "op": "control.branch",
+          "count": "18+C+7*W+3*L"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "L",
+          "target": "isolatedBitIndex32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2",
+          "note": "derive sourceWords from parent basis size n"
+        },
+        {
+          "op": "control.branch",
+          "count": "2",
+          "note": "derive sourceWords from parent basis size n"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+L*(1+G2)",
+          "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+L*(1+G2)",
+          "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)",
+        "parameters": {
+          "C": "prepared geometry column count",
+          "W": "prepared coordinate word count; partitioned specialization is selected only at W=3",
+          "CN": "cached child-basis entries copied",
+          "B": "parent indices relevant to both output coordinates after valid/unchanged masking",
+          "M": "mover-only parent indices",
+          "O": "opponent-only parent indices",
+          "L": "B+M+O unique relevant parent indices visited",
+          "SW": "1..3 source coordinate words actually visited; inherited W=3 loop envelope is intentionally retained conservatively in static accounting",
+          "TW": "1..3 closure/output words implied by child basis size cn",
+          "G2": "1 when TW>1, else 0"
+        },
+        "note": "Stage-7 combined dynamic-word-bound experiment. Source scanning stops after the last parent-basis coordinate word and closure loads stop after the last child-basis coordinate word. Static ledger deliberately retains the inherited W=3 memory/ALU envelope and adds all new selection/guard branches; measured process cycles are the authority for dynamic savings."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#storeConnect4RbaCofactorPlan32",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "storeConnect4RbaCofactorPlan32",
+      "scope": "local-negamax-cofactor-plan-miss-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "18+5*N+4*CN+2*T+2*W"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "3"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3*N+3*CN+T"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2+CN+N+U+T"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "3"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "6+4*N+2*CN+T"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "8+6*N+5*CN+2*T"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N+2*T"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N+U+T"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2*N+T"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "N+T"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+5*N+3*CN+T"
+        },
+        {
+          "op": "control.branch",
+          "count": "4+5*N+3*CN+T"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+(8+6*N+5*CN+2*T)*C(alu.add.u32)+(2*N+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+(2*N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)",
+        "parameters": {
+          "N": "parent basis entries examined",
+          "CN": "child basis entries stored",
+          "W": "prepared coordinate word count",
+          "U": "non-killed parent images that are unchanged and publish an unchanged-mask bit",
+          "T": "dense subset probes/conditional closure-bit publications while building parent-aligned closures"
+        },
+        "note": "Miss-only parent-aligned plan materialization. Valid and unchanged masks are published by parent basis slot; each non-killed parent image receives its immutable child-basis closure directly at the parent slot. No q coordinate membership, W/D/L, CPC or best-move information is stored."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 153,
-    "decomposed": 137,
+    "units": 157,
+    "decomposed": 141,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -9430,9 +9870,9 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
+    "addons/rba-connect4-alphabeta.mjs": "e2d4ca2eccc9f81e84586c4a022c5af3d2912180",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
+    "addons/rba-connect4-coordinate.mjs": "d5fd7cfb8e1548a6d6c7d8ef1fee537da98063b6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
@@ -9440,16 +9880,16 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
-    "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
+    "addons/rba-connect4-lazy-smp-host.mjs": "580801cd7d39b81acf2a7218a7c20cb4ae6dce2d",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "42ce5a96e5966607126845f25fea75dec37d2687",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "15e174945df7b2909857b523ab0a89895de085dc",
-    "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "20c42bcd2694c10ba4c3400de76b9012ec4875a6",
+    "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "e1d0f4c24a0ac71d446ba41ceb1c351522a3d9c7",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "538bd7500b95dc7f0ba985b59bc1a79c90bb2f83",
+    "addons/rba-connect4-frontier.mjs": "80613e70717c7f0837b7a38c84f44dadf7f46faf",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
-    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
+    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "afbb6d5b35aa7b5c6e2bcf70a3b335eefa803648"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
