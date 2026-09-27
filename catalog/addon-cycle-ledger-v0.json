@@ -9475,15 +9475,26 @@
         {
           "op": "control.branch",
           "count": "C+1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2",
+          "note": "select exact 7-column/radix-7 key specialization"
+        },
+        {
+          "op": "control.branch",
+          "count": "2",
+          "note": "select exact 7-column/radix-7 key specialization"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+C)*C(runtime.field.load)+C*C(memory.load.u32)+(C+1)*C(alu.imul.u32)+(C+1)*C(alu.add.u32)+C*C(alu.sub.u32)+(C+1)*C(control.test.u32)+(C+1)*C(control.branch)",
+        "expression": "(2+C)*C(runtime.field.load)+(C)*C(memory.load.u32)+(C+1)*C(alu.imul.u32)+(C+1)*C(alu.add.u32)+(C)*C(alu.sub.u32)+(C+1)*C(control.test.u32)+(C+1)*C(control.branch)+(2)*C(control.test.u32)+(2)*C(control.branch)",
         "parameters": {
-          "C": "prepared geometry column count"
+          "C": "prepared geometry column count",
+          "K7": "1 for the selected 7-column/radix-7 specialization; generic loop remains fallback"
         },
-        "note": "Exact collision-free mixed-radix support encoding using radix rows+1, then column. Addressing only; geometry-derived at initialization."
+        "note": "Stage-9 exact 7x6 plan-key specialization. The ledger conservatively retains the full generic C-loop load/ALU/control envelope and adds the two specialization tests/branches, so measured savings from removed loop control are not pre-credited."
       },
       "status": "decomposed"
     },
@@ -9592,9 +9603,10 @@
           "L": "B+M+O unique relevant parent indices visited",
           "SW": "1..3 source coordinate words actually visited; inherited W=3 loop envelope is intentionally retained conservatively in static accounting",
           "TW": "1..3 closure/output words implied by child basis size cn",
-          "G2": "1 when TW>1, else 0"
+          "G2": "1 when TW>1, else 0",
+          "U4": "four-entry copy groups in the Stage-9 unrolled child-basis copy"
         },
-        "note": "Stage-7 combined dynamic-word-bound experiment. Source scanning stops after the last parent-basis coordinate word and closure loads stop after the last child-basis coordinate word. Static ledger deliberately retains the inherited W=3 memory/ALU envelope and adds all new selection/guard branches; measured process cycles are the authority for dynamic savings."
+        "note": "Stage-9 child-basis copy unroll experiment on top of Stage-7. The static ledger intentionally retains the original CN memory-load/store and control envelope, so any measured reduction from fewer loop branches is not hidden by accounting."
       },
       "status": "decomposed"
     },
@@ -9777,7 +9789,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "3009c4abc710b591a56683b19330c27bc1475236",
+    "addons/rba-connect4-coordinate.mjs": "f6c9aee42ad53107a0f0ff422e274871718f8b73",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
