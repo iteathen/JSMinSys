@@ -61,7 +61,7 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
     throw new RangeError('cofactor plan key space exceeds configured bound');
   const planByKey=new Int32Array(keyCount);planByKey.fill(-1),
     subset8=new Uint8Array(g.subsetTable.length);
-  subset8.set(g.subsetTable);
+  for(let s=0;s<g.subsetTable.length;s+=1)subset8[s]=g.subsetTable[s];
   return {
     capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,subset8,
     n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
