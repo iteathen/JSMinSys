@@ -1,0 +1,88 @@
+{
+  "sha": "6c0fecc66b5357b77c12588f410fe1c3fed8f6e6",
+  "node": "v26.7.0",
+  "arms": [
+    {
+      "id": "native1",
+      "workers": 1
+    },
+    {
+      "id": "native2",
+      "workers": 2
+    },
+    {
+      "id": "native3",
+      "workers": 3
+    },
+    {
+      "id": "native4",
+      "workers": 4
+    },
+    {
+      "id": "unshared1",
+      "workers": 1,
+      "noShare": true
+    },
+    {
+      "id": "unshared4",
+      "workers": 4,
+      "noShare": true
+    },
+    {
+      "id": "same-order4",
+      "workers": 4,
+      "order": 0
+    },
+    {
+      "id": "solo-offset1",
+      "workers": 1,
+      "order": 1
+    },
+    {
+      "id": "solo-offset2",
+      "workers": 1,
+      "order": 2
+    },
+    {
+      "id": "solo-offset3",
+      "workers": 1,
+      "order": 3
+    }
+  ],
+  "roots": [
+    [
+      "45461667",
+      1
+    ],
+    [
+      "3164746344461611",
+      -1
+    ],
+    [
+      "2431572135633422",
+      -1
+    ]
+  ],
+  "rounds": 3,
+  "workers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "shared": 1048576,
+  "privatePerWorker": 1048576,
+  "sharedSampleMask": 7,
+  "started": "2026-09-27T07:20:27.565Z",
+  "scope": "Completed-solve worker-scaling diagnostics. No memory selection. Test loader admits one native worker and cold timestamps; existing all-worker node loader.",
+  "hashes": {
+    "addons/rba-connect4-alphabeta.mjs": "016a5bc7274fb68ae1ae88d0e077d9f9cb1f4357c57fcfc155ae4ddce374e279",
+    "addons/rba-connect4-lazy-smp-host.mjs": "0a43c6a43f01e4d866860f17547d823e79f33e6c6cf89a412494ae81f51a9c64",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "2a4711508b7d578fd0f69e389e9b95b5dbed401ab0fae2f79066f5f09b384a40",
+    "addons/rba-connect4-shared-exact-cache.mjs": "f004484089b5b64d5df8668b5feedb2a9f7bceb4f5d5b90b742b2016c32dcf75",
+    "experiments/cpc-factorial/isomax-node-counts.mjs": "d8dcea3b86a2b23788facd302d6cae5f6db123f2f1ee237018f60cd6a88d73a0",
+    "experiments/worker-scaling/loader.mjs": "5dee047417e04fbe089f5adec8a8b56e1ff97179cde057b3090460685c1b48f7",
+    "experiments/worker-scaling/sample.mjs": "45dd26d9c5a9396f91901495b005a64c1c6a666a0ca784ecbc372c642a687a7c",
+    "experiments/worker-scaling/campaign.mjs": "9a999baa127b28d93b6c61d7116e3b619db7cb757d834b8d17fa0cfa25eeb904"
+  }
+}
