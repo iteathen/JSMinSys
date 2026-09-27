@@ -1,5 +1,6 @@
 import {emitSortedSetBits32,emitSortedSetBitsAt32} from '../src/basis32.mjs';
 import {publishSpan32} from '../src/widekey32.mjs';
+import {isolatedBitIndex32} from '../src/word32.mjs';
 import {connect4RbaShapeContains} from './rba-connect4-geometry.mjs';
 
 export function connect4RbaTerminal(g,words,offset){return words[offset+g.metaOffset]&3;}
@@ -97,7 +98,7 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   for(let sourceWord=0;sourceWord<words;sourceWord+=1){
     let activeBits=source[p0Source+sourceWord]|source[p1Source+sourceWord];
     while(activeBits){
-      const isolated=activeBits&-activeBits,bit=31-Math.clz32(isolated),
+      const isolated=activeBits&-activeBits,bit=isolatedBitIndex32(isolated),
         i=(sourceWord<<5)+bit;
       activeBits^=isolated;
       const active0=source[p0Source+sourceWord]&isolated,
