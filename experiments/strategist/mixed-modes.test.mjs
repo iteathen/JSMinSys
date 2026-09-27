@@ -12,6 +12,20 @@ test('fixed mixed policies assign exactly one shallow worker without timed switc
   }
 });
 
+test('paired profiles alternate wide/deep assignments for larger pools',()=>{
+  for(const workers of [2,4,8])for(const name of ['modes-wide-odd','modes-wide-even']){
+    assert.ok(MODE_POLICIES.includes(name));
+    let wide=0;
+    for(let i=0;i<workers;i++){
+      const expected=(i&1)===(name==='modes-wide-odd'?1:0);
+      assert.equal(modePolicyFlags(name,0,i),encodeSearchMode({shallow:expected,stride:2}));
+      assert.equal(modePolicyFlags(name,5000,i),modePolicyFlags(name,0,i));
+      wide+=expected;
+    }
+    assert.equal(wide,workers/2);
+  }
+});
+
 test('mixed shallow/deep workers receive distinct commands and stop cleanly',{timeout:15000},async()=>{
   const prior=process.env.JSMINSYS_STRATEGIST_POLICY;
   try{
