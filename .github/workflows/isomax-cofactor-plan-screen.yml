@@ -1,0 +1,51 @@
+name: IsoMax cofactor plan screen
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-cofactor-plan-screen.yml"
+      - "experiments/isomax-cofactor-plan/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize exact A/B
+        shell: pwsh
+        run: |
+          git fetch origin experiment/isomax-cofactor-dense-both-c1-20260927
+          git fetch origin experiment/isomax-cofactor-support-plan-v1-20260927
+          $root="$env:RUNNER_TEMP/isomax-cofactor-plan-screen"
+          New-Item -ItemType Directory -Force $root | Out-Null
+          git worktree add --detach "$root/A" 390aed4888a0414afaf0d4c09c051d4ef4a5a13f
+          git worktree add --detach "$root/B" 8d9b3dd2c353a8162addd1a4babbedd84d68f18b
+      - name: Long local A/B
+        shell: pwsh
+        run: |
+          $root="$env:RUNNER_TEMP/isomax-cofactor-plan-screen"
+          node experiments/isomax-cofactor-plan/run.mjs "$root/results-long" "$root/A" "$root/B" 353335714 8
+      - name: Short local A/B
+        shell: pwsh
+        run: |
+          $root="$env:RUNNER_TEMP/isomax-cofactor-plan-screen"
+          node experiments/isomax-cofactor-plan/run.mjs "$root/results-short" "$root/A" "$root/B" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-cofactor-plan-screen
+          path: ${{ runner.temp }}/isomax-cofactor-plan-screen/results-*
+          if-no-files-found: error
+          retention-days: 30

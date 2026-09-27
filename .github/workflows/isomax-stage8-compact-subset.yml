@@ -1,0 +1,44 @@
+name: IsoMax Stage8 compact-subset screen
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-stage8-compact-subset.yml"
+      - "experiments/isomax-cofactor-plan/sample.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" 81b698d2465d80aa3e9627ddcc9da61cc58bfa49
+          git worktree add "$env:RUNNER_TEMP/arm-b" 8c15b62a18fffd1ed5c3c348fcdff1497f905d63
+          git worktree add "$env:RUNNER_TEMP/arm-c" 5b0e1eaeb5cbf153337a2cf061df1935ab5f6f37
+      - name: Long screen
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage8-subset/long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-a" 353335714 8
+      - name: Short screen
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage8-subset/short" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-a" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-stage8-compact-subset
+          path: ${{ runner.temp }}/isomax-stage8-subset
+          if-no-files-found: error
+          retention-days: 30

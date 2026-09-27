@@ -1,0 +1,58 @@
+name: IsoMax hot-loop baseline
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-hotloop-baseline.yml"
+      - "experiments/isomax-hotloop-baseline/**"
+      - "addons/**"
+      - "src/**"
+      - "profiles/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Record runner
+        shell: pwsh
+        run: |
+          node --version
+          git rev-parse HEAD
+          Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors
+      - name: A/A short local
+        shell: pwsh
+        run: node experiments/isomax-hotloop-baseline/run.mjs "$env:RUNNER_TEMP/isomax-hotloop-baseline/short-local" . . local 45461667 6
+      - name: A/A short shared
+        shell: pwsh
+        run: node experiments/isomax-hotloop-baseline/run.mjs "$env:RUNNER_TEMP/isomax-hotloop-baseline/short-shared" . . shared 45461667 6
+      - name: A/A long local
+        shell: pwsh
+        run: node experiments/isomax-hotloop-baseline/run.mjs "$env:RUNNER_TEMP/isomax-hotloop-baseline/long-local" . . local 353335714 2
+      - name: A/A long shared
+        shell: pwsh
+        run: node experiments/isomax-hotloop-baseline/run.mjs "$env:RUNNER_TEMP/isomax-hotloop-baseline/long-shared" . . shared 353335714 2
+      - name: Separate CPU profile
+        shell: pwsh
+        run: |
+          $profileDir="$env:RUNNER_TEMP/isomax-hotloop-baseline/profile"
+          New-Item -ItemType Directory -Force $profileDir | Out-Null
+          node --experimental-ffi --cpu-prof --cpu-prof-dir=$profileDir experiments/isomax-hotloop-baseline/sample.mjs . local 353335714 | Out-File -Encoding utf8 "$profileDir/sample.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-hotloop-baseline
+          path: ${{ runner.temp }}/isomax-hotloop-baseline
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,42 @@
+name: IsoMax scalar plan screen
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-scalar-plan-screen.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/scalar-control" bc7380837f6ba65d513f31e5de89ac766f09df9f
+          git worktree add "$env:RUNNER_TEMP/scalar-candidate" d59569550feec2e1c2e5dd0691e50a9cd0fa904b
+      - name: Long ABBA
+        shell: pwsh
+        run: node experiments/isomax-cofactor-plan/run.mjs "$env:RUNNER_TEMP/isomax-scalar-plan/long" "$env:RUNNER_TEMP/scalar-control" "$env:RUNNER_TEMP/scalar-candidate" 353335714 8
+      - name: Short ABBA
+        shell: pwsh
+        run: node experiments/isomax-cofactor-plan/run.mjs "$env:RUNNER_TEMP/isomax-scalar-plan/short" "$env:RUNNER_TEMP/scalar-control" "$env:RUNNER_TEMP/scalar-candidate" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-scalar-plan-screen
+          path: ${{ runner.temp }}/isomax-scalar-plan
+          if-no-files-found: error
+          retention-days: 30
