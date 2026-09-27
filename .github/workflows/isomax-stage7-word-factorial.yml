@@ -1,0 +1,44 @@
+name: IsoMax Stage7 active-word factorial
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-stage7-word-factorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorial:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" c628ffd559c35e08227a300dcdc9acf5df824378
+          git worktree add "$env:RUNNER_TEMP/arm-b" e3eade0776d32f5a49230f77a467cda5cffc9ea7
+          git worktree add "$env:RUNNER_TEMP/arm-c" 368032d4a5469ae220c9c54786911325e97acd56
+          git worktree add "$env:RUNNER_TEMP/arm-d" 81b698d2465d80aa3e9627ddcc9da61cc58bfa49
+      - name: Long factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage7-word/long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 353335714 8
+      - name: Short factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-stage7-word/short" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-stage7-word-factorial
+          path: ${{ runner.temp }}/isomax-stage7-word
+          if-no-files-found: error
+          retention-days: 30
