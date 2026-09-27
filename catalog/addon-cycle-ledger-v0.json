@@ -486,6 +486,13 @@
         "name": "F64_LOAD(cacheState,coherenceState)"
       },
       "note": "Single-writer node counter read; no assumption of concurrent exact Float64 observation."
+    },
+    "runtime.to_int32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "TO_INT32_COST(valueRange,v8Tier,lowering)"
+      },
+      "note": "Explicit |0 normalization of bounded signed numeric values. Retains conversion/lowering cost until machine evidence resolves it; may fuse with the producing integer operation. Source count is not one added CPU instruction."
     }
   },
   "units": [
@@ -8681,11 +8688,15 @@
         {
           "op": "control.branch",
           "count": "HORIZON+R+BRANCH"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "POLARITY+2*Q+3*R"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Frontier))+(H+E+FT+T)*CALL(absToRelativeFrontier)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsFrontier)+S*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyFrontier)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeRootFrontierNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+HORIZON*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+INCOMPLETE_CONTROL",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Frontier))+(H+E+FT+T)*CALL(absToRelativeFrontier)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsFrontier)+S*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyFrontier)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeRootFrontierNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+HORIZON*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+INCOMPLETE_CONTROL+(POLARITY+2*Q+3*R)*C(runtime.to_int32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -8711,9 +8722,10 @@
           "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
           "HORIZON": "Executed bounded-horizon tests after cache/CPC closure",
           "BRANCH": "Branch completions checking unfinished sentinel",
-          "INCOMPLETE_CONTROL": "Executed horizon-stop counter increment, unfinished flag initialization/assignments, and sentinel propagation/returns; load/store/arithmetic/control/call costs are profile-sensitive, not zero"
+          "INCOMPLETE_CONTROL": "Executed horizon-stop counter increment, unfinished flag initialization/assignments, and sentinel propagation/returns; load/store/arithmetic/control/call costs are profile-sensitive, not zero",
+          "POLARITY": "Executed sign*WDL/bound completion transports in this invocation (0 or 1); 2*Q normalizes forced child bounds; 3*R normalizes recursive bounds and returned result, including STOP/incomplete sentinels."
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9135,11 +9147,15 @@
         {
           "op": "runtime.object.allocate",
           "count": "TERMINAL"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "CHILD"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1)*CALL(resetConnect4RbaExactCache32Frontier)+(2)*CALL(publishSpan32)+(1)*CALL(resetConnect4LiveLineState32)+(PLY+CHILD)*CALL(advanceConnect4LiveLineState32)+(1)*CALL(evaluateConnect4CpcNonterminal32)+(REL)*CALL(absToRelativeFrontier)+(RESULT)*CALL(relativeToAbsFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(O7)*CALL(argMaxPlayableSlot7Nonempty32)+(OG)*CALL(argMaxPlayableSlot32)+(CHECK)*CALL(completeRootFrontierNode32)+(ACTION)*CALL(connect4RbaCofactorKnownHeight)+(CHILD)*CALL(connect4RbaCanonicalize)+(CHILD)*CALL(searchCpcOnlyFrontier)+(1+EXACT_CHILD)*CALL(releaseNarrowFrontier)+(RESULT)*CALL(frontierResult)+(TERMINAL)*CALL(metricsFrontier)+(2)*C(runtime.typed_array.fill)+(PASS)*C(runtime.math.min)+(FL)*C(runtime.field.load)+(FS)*C(runtime.field.store)+(ML)*C(memory.load.u32)+(MS)*C(memory.store.u32)+(1)*C(memory.store.f64)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(ADD)*C(alu.add.u32)+(MUL)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHIFT)*C(alu.shl.u32)+(SHIFT)*C(alu.shr.u32)+(SUB)*C(alu.sub.u32)+(XOR)*C(alu.xor.u32)+(INVALID)*C(runtime.error.throw)+(TERMINAL)*C(runtime.object.allocate)",
+        "expression": "(1)*CALL(resetConnect4RbaExactCache32Frontier)+(2)*CALL(publishSpan32)+(1)*CALL(resetConnect4LiveLineState32)+(PLY+CHILD)*CALL(advanceConnect4LiveLineState32)+(1)*CALL(evaluateConnect4CpcNonterminal32)+(REL)*CALL(absToRelativeFrontier)+(RESULT)*CALL(relativeToAbsFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(O7)*CALL(argMaxPlayableSlot7Nonempty32)+(OG)*CALL(argMaxPlayableSlot32)+(CHECK)*CALL(completeRootFrontierNode32)+(ACTION)*CALL(connect4RbaCofactorKnownHeight)+(CHILD)*CALL(connect4RbaCanonicalize)+(CHILD)*CALL(searchCpcOnlyFrontier)+(1+EXACT_CHILD)*CALL(releaseNarrowFrontier)+(RESULT)*CALL(frontierResult)+(TERMINAL)*CALL(metricsFrontier)+(2)*C(runtime.typed_array.fill)+(PASS)*C(runtime.math.min)+(FL)*C(runtime.field.load)+(FS)*C(runtime.field.store)+(ML)*C(memory.load.u32)+(MS)*C(memory.store.u32)+(1)*C(memory.store.f64)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(ADD)*C(alu.add.u32)+(MUL)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHIFT)*C(alu.shl.u32)+(SHIFT)*C(alu.shr.u32)+(SUB)*C(alu.sub.u32)+(XOR)*C(alu.xor.u32)+(INVALID)*C(runtime.error.throw)+(TERMINAL)*C(runtime.object.allocate)+(CHILD)*C(runtime.to_int32)",
         "parameters": {
           "PLY": "Root history length, cold live-line initialization once",
           "CHILD": "Nonterminal child visits across all frontier passes",
@@ -9167,7 +9183,7 @@
           "XOR": "Executed mover/orientation XOR",
           "INVALID": "Invalid cold input errors, normally 0"
         },
-        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
+        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace."
       }
     },
     {
@@ -9317,7 +9333,7 @@
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 69
+    "localExtensionOperations": 70
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -9431,7 +9447,7 @@
     "addons/rba-connect4-alphabeta-behavior.mjs": "15e174945df7b2909857b523ab0a89895de085dc",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "c59713d1246dd1ac6af64b2c6af4cd39ebb7996c",
+    "addons/rba-connect4-frontier.mjs": "538bd7500b95dc7f0ba985b59bc1a79c90bb2f83",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },

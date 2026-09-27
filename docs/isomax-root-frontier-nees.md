@@ -10,6 +10,13 @@ and 42 matched whole-solve trials passed. See the
 [evidence report](../evidence/isomax-native-frontier-cleanup-20260927/REPORT.md)
 for the noisy short-case cycle regression and runtime limitations.
 
+Subsequent integer-polarity optimization: 164 tests, 40 deterministic controls
+including completed-node read counts, and 70 matched timing trials passed.
+WDL/bound polarity and recursive sentinel transport explicitly normalize to int32
+to avoid IEEE negative-zero handling. This changes neither the search algorithm
+nor polling cadence. Conversion cost remains explicit in the ledger; V8 lowering
+is not assumed free. See the [matched evidence and limits](../evidence/isomax-int32-polarity-20260927/REPORT.md).
+
 ## Execution contract
 
 - E0: `searchCpcOnlyFrontier`, completed-node flag reader and CPC closure.

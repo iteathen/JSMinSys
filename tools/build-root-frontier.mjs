@@ -29,6 +29,23 @@ search=replaceOnce(search,'    if(best===-2)return completeBehaviorNode32(state,
     // of such a cutoff cannot be promoted to an exact value or a cache entry.
     if(unfinished)return completeBehaviorNode32(state,4);
     if(best===-2)return completeBehaviorNode32(state, 0);`);
+// HOT numeric contract: WDL/bounds/sentinels fit signed int32. Normalize polarity
+// transport so draw zero never becomes IEEE -0 and forces floating-point/deopt
+// handling. No extra callback, branch or changed search/flag cadence. Preserve.
+const polaritySites=[['sign*absToRelativeBehavior(cached,mover)',1],
+  ['sign*absToRelativeBehavior(value,mover)',1],['sign*semanticLo',2],
+  ['sign*semanticHi',1],['sign*value',2],['sign*best',2]];
+for(const [expression,count] of polaritySites){
+  assert.equal(search.split(expression).length,count+1,expression);
+  search=search.replaceAll(expression,`((${expression})|0)`);
+}
+search=replaceOnce(search,'  let sign=1;',`  // HOT: signed integer polarity transport; zero is DRAW, never IEEE -0.
+  // Preserve |0 at sign/negation boundaries; all values and sentinels fit int32.
+  let sign=1;`);
+search=replaceOnce(search,'const nextAlpha=-beta,nextBeta=-alpha;',
+  'const nextAlpha=(-beta)|0,nextBeta=(-alpha)|0;');
+search=replaceOnce(search,'childLiveOffset,childOrderRow,-beta,-alpha);',
+  'childLiveOffset,childOrderRow,(-beta)|0,(-alpha)|0)|0;');
 source+=search;
 let root=base.slice(base.indexOf('export function solveConnect4RbaAlphaBetaBehavior'),base.indexOf('  const childKey=g.keyWords,childBasis=g.maxBasis;'));
 root=replaceOnce(root,'  resetConnect4RbaExactCache32Behavior(state.cache);',`  resetConnect4RbaExactCache32Behavior(state.cache);
@@ -72,7 +89,7 @@ source+=root+`
             g,state.profile,state.words,childKey,state.basis,childBasis,childN,state.coord);
           advanceConnect4LiveLineState32(live,state.liveState,0,mover,height*g.columns+caller,state.liveState,live.stateWords);
           value=-searchCpcOnlyBehavior(state,1,childKey,childBasis,childN,mover^1,(reflected?1:0)^childReflected,
-            live.stateWords,g.columns,-2,2);
+            live.stateWords,g.columns,-2,2)|0;
           if(value===-3)return frontierResult(state,3,0,-1);
           if(value===-4){unfinished=1;continue;}
         }

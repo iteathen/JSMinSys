@@ -107,6 +107,8 @@ export function prepareConnect4RbaFrontier({
 function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orientation,liveOffset,orderRow,alpha,beta){
   const g=state.g,words=state.words,basis=state.basis,cache=state.cache,
     live=state.live,liveWords=live.stateWords;
+  // HOT: signed integer polarity transport; zero is DRAW, never IEEE -0.
+  // Preserve |0 at sign/negation boundaries; all values and sentinels fit int32.
   let sign=1;
 
   // Deterministic CPC-forced transit states stay inside this invocation.
@@ -119,13 +121,13 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
 
     const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
     const cached=probeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,cacheSlot,cacheHash);
-    if(cached){state.cacheHits+=1;return completeBehaviorNode32(state, sign*absToRelativeFrontier(cached,mover));}
+    if(cached){state.cacheHits+=1;return completeBehaviorNode32(state, ((sign*absToRelativeFrontier(cached,mover))|0));}
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
       state.cpcExact+=1;const value=state.cpc.interval[0];
       storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,value,cacheSlot,cacheHash);
-      return completeBehaviorNode32(state, sign*absToRelativeFrontier(value,mover));
+      return completeBehaviorNode32(state, ((sign*absToRelativeFrontier(value,mover))|0));
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
     else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
@@ -136,10 +138,10 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
     if(semanticLo===semanticHi){
       const abs=relativeToAbsFrontier(semanticLo,mover);
       storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,abs,cacheSlot,cacheHash);
-      return completeBehaviorNode32(state, sign*semanticLo);
+      return completeBehaviorNode32(state, ((sign*semanticLo)|0));
     }
-    if(semanticLo>=beta){state.cutoffs+=1;return completeBehaviorNode32(state, sign*semanticLo);}
-    if(semanticHi<=alpha){state.cutoffs+=1;return completeBehaviorNode32(state, sign*semanticHi);}
+    if(semanticLo>=beta){state.cutoffs+=1;return completeBehaviorNode32(state, ((sign*semanticLo)|0));}
+    if(semanticHi<=alpha){state.cutoffs+=1;return completeBehaviorNode32(state, ((sign*semanticHi)|0));}
     if(semanticLo>alpha)alpha=semanticLo;
     if(semanticHi<beta)beta=semanticHi;
 
@@ -170,17 +172,17 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
       if(term){
         if(completeBehaviorNode32(state,0)===3)return 3;
         const value=absToRelativeFrontier(term,mover);
-        if(value>=beta){state.cutoffs+=1;return completeBehaviorNode32(state, sign*value);}
+        if(value>=beta){state.cutoffs+=1;return completeBehaviorNode32(state, ((sign*value)|0));}
         if(alphaOrig===-2&&betaOrig===2)
           storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,term,cacheSlot,cacheHash);
-        return completeBehaviorNode32(state, sign*value);
+        return completeBehaviorNode32(state, ((sign*value)|0));
       }
 
       const childN=state.basisSize[childDepth],
         childReflected=connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,childN,state.coord);
       advanceConnect4LiveLineState32(live,state.liveState,liveOffset,mover,physicalCell,state.liveState,childLiveOffset);
 
-      const nextAlpha=-beta,nextBeta=-alpha;
+      const nextAlpha=(-beta)|0,nextBeta=(-alpha)|0;
       depth=childDepth;keyOffset=childKey;basisOffset=childBasis;n=childN;
       mover^=1;orientation^=childReflected;
       liveOffset=childLiveOffset;orderRow=childOrderRow;
@@ -224,7 +226,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
           childReflected=connect4RbaCanonicalize(g,state.profile,words,childKey,basis,childBasis,childN,state.coord);
         advanceConnect4LiveLineState32(live,state.liveState,liveOffset,mover,physicalCell,state.liveState,childLiveOffset);
         value=-searchCpcOnlyFrontier(state,childDepth,childKey,childBasis,childN,mover^1,orientation^childReflected,
-          childLiveOffset,childOrderRow,-beta,-alpha);
+          childLiveOffset,childOrderRow,(-beta)|0,(-alpha)|0)|0;
         if (value === -3) return 3;
         if(value===-4){unfinished=1;continue;}
       }
@@ -236,7 +238,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
         // Interior cutoffs remain bounds and MUST NOT enter this exact cache.
         if(best===1)storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,
           relativeToAbsFrontier(best,mover),cacheSlot,cacheHash);
-        return completeBehaviorNode32(state, sign*best);
+        return completeBehaviorNode32(state, ((sign*best)|0));
       }
       if(best===1)break;
     }
@@ -250,7 +252,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
       const abs=relativeToAbsFrontier(best,mover);
       storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }
-    return completeBehaviorNode32(state, sign*best);
+    return completeBehaviorNode32(state, ((sign*best)|0));
   }
 }
 export function solveConnect4RbaFrontier(root,{state,reflected=0}={}){
@@ -331,7 +333,7 @@ export function solveConnect4RbaFrontier(root,{state,reflected=0}={}){
             g,state.profile,state.words,childKey,state.basis,childBasis,childN,state.coord);
           advanceConnect4LiveLineState32(live,state.liveState,0,mover,height*g.columns+caller,state.liveState,live.stateWords);
           value=-searchCpcOnlyFrontier(state,1,childKey,childBasis,childN,mover^1,(reflected?1:0)^childReflected,
-            live.stateWords,g.columns,-2,2);
+            live.stateWords,g.columns,-2,2)|0;
           if(value===-3)return frontierResult(state,3,0,-1);
           if(value===-4){unfinished=1;continue;}
         }
