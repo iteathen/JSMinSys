@@ -9495,7 +9495,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "20+4*N+7*E+4*Q+2*W"
+          "count": "20+4*L+5*E+4*Q+4*W"
         },
         {
           "op": "runtime.field.store",
@@ -9503,11 +9503,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "4+C+CN+4*N+Q*W"
+          "count": "4+C+CN+4*W+3*L+2*Q*W"
         },
         {
           "op": "memory.load.u8",
-          "count": "3+N"
+          "count": "3+L"
         },
         {
           "op": "memory.store.u32",
@@ -9519,49 +9519,58 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "12+C+CN+5*N+3*E+Q*W"
+          "count": "12+C+CN+4*W+6*L+2*E+Q*W"
         },
         {
           "op": "alu.sub.u32",
-          "count": "1"
+          "count": "1+L"
         },
         {
           "op": "alu.and.u32",
-          "count": "5+5*N+2*E+Q*W"
+          "count": "5+2*W+6*L+E+2*Q*W"
         },
         {
           "op": "alu.or.u32",
-          "count": "Q*W"
+          "count": "W+Q*W"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "L"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+N+E"
+          "count": "2+L"
         },
         {
           "op": "alu.shr.u32",
-          "count": "4+N+E"
+          "count": "4"
         },
         {
           "op": "control.test.u32",
-          "count": "10+C+2*W+7*N+5*E+Q*W"
+          "count": "10+C+4*W+7*L+3*E+Q*W"
         },
         {
           "op": "control.branch",
-          "count": "10+C+2*W+7*N+5*E+Q*W"
+          "count": "10+C+4*W+7*L+3*E+Q*W"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "L",
+          "target": "isolatedBitIndex32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(20+4*N+7*E+4*Q+2*W)*C(runtime.field.load)+4*C(runtime.field.store)+(4+C+CN+4*N+Q*W)*C(memory.load.u32)+(3+N)*C(memory.load.u8)+(3+C+2*W+CN+Q*W)*C(memory.store.u32)+(3+E)*C(alu.imul.u32)+(12+C+CN+5*N+3*E+Q*W)*C(alu.add.u32)+C(alu.sub.u32)+(5+5*N+2*E+Q*W)*C(alu.and.u32)+Q*W*C(alu.or.u32)+(2+N+E)*C(alu.shl.u32)+(4+N+E)*C(alu.shr.u32)+(10+C+2*W+7*N+5*E+Q*W)*C(control.test.u32)+(10+C+2*W+7*N+5*E+Q*W)*C(control.branch)",
+        "expression": "(20+4*L+5*E+4*Q+4*W)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4+C+CN+4*W+3*L+2*Q*W)*C(memory.load.u32)+(3+L)*C(memory.load.u8)+(3+C+2*W+CN+Q*W)*C(memory.store.u32)+(3+E)*C(alu.imul.u32)+(12+C+CN+4*W+6*L+2*E+Q*W)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(5+2*W+6*L+E+2*Q*W)*C(alu.and.u32)+(W+Q*W)*C(alu.or.u32)+(L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(10+C+4*W+7*L+3*E+Q*W)*C(control.test.u32)+(10+C+4*W+7*L+3*E+Q*W)*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
         "parameters": {
           "C": "prepared geometry column count",
           "W": "prepared coordinate word count",
-          "N": "parent basis entries scanned for current coordinate membership",
           "CN": "cached child-basis entries copied",
-          "E": "active mapped images reaching C1 absorption",
-          "Q": "surviving player/image closure applications"
+          "L": "parent coordinate indices live for at least one player and therefore visited by sparse bit iteration",
+          "E": "live mapped entries with at least one surviving player coordinate",
+          "Q": "player/image closure applications; may include closures that C1 would have absorbed"
         },
-        "note": "Geometry-derived plan hit. Current coordinate membership is still read from the q; C1 guards each player before W-word immutable closure OR."
+        "note": "Experimental combined plan-hit arm sparsely iterates only live parent-coordinate indices and removes the C1 principal target-bit probe. Caller bit isolation, isolatedBitIndex32, map/survival work and every idempotent closure OR remain explicitly charged."
       },
       "status": "decomposed"
     },
@@ -9743,7 +9752,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "ccfa627236630e720291467e62d95226079824dc",
+    "addons/rba-connect4-coordinate.mjs": "c03fb234806313dc88cbffd11f4de02e79de1a1a",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
