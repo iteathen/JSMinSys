@@ -9557,11 +9557,31 @@
           "op": "runtime.call.subledger",
           "count": "L",
           "target": "isolatedBitIndex32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2",
+          "note": "derive sourceWords from parent basis size n"
+        },
+        {
+          "op": "control.branch",
+          "count": "2",
+          "note": "derive sourceWords from parent basis size n"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+L*(1+G2)",
+          "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+L*(1+G2)",
+          "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
+        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)",
         "parameters": {
           "C": "prepared geometry column count",
           "W": "prepared coordinate word count; partitioned specialization is selected only at W=3",
@@ -9569,9 +9589,12 @@
           "B": "parent indices relevant to both output coordinates after valid/unchanged masking",
           "M": "mover-only parent indices",
           "O": "opponent-only parent indices",
-          "L": "B+M+O unique relevant parent indices visited"
+          "L": "B+M+O unique relevant parent indices visited",
+          "SW": "1..3 source coordinate words actually visited; inherited W=3 loop envelope is intentionally retained conservatively in static accounting",
+          "TW": "1..3 closure/output words implied by child basis size cn",
+          "G2": "1 when TW>1, else 0"
         },
-        "note": "Experimental W=3 plan-hit realization partitions mover/opponent masks once per coordinate word, visits each relevant parent index once, and reuses the existing AoS closure payload. Both/mover-only/opponent-only accumulations remove per-entry P0/P1 membership reloads and write-branch tests. Generic configurable geometry keeps the prior fallback."
+        "note": "Stage-7 combined dynamic-word-bound experiment. Source scanning stops after the last parent-basis coordinate word and closure loads stop after the last child-basis coordinate word. Static ledger deliberately retains the inherited W=3 memory/ALU envelope and adds all new selection/guard branches; measured process cycles are the authority for dynamic savings."
       },
       "status": "decomposed"
     },
@@ -9754,7 +9777,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "cf16bc114aa675da11d0eb32ff542673c90541ef",
+    "addons/rba-connect4-coordinate.mjs": "3009c4abc710b591a56683b19330c27bc1475236",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
