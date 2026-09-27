@@ -297,8 +297,8 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
     if(unfinished){
       if(!region)return completeBehaviorNode32(state,4);
       state.modePasses+=1;
-      // Mechanical iteration within the COMMANDED mode. Only a strategist
-      // write changes modes. At physical exhaustion no horizon is needed.
+      // The pre-authorized first band has ended. Retained obligations now
+      // continue DEEP; this invocation cannot start a second shallow band.
       passLimit=state.searchShallow?Math.min(g.cellCount,passLimit+state.modeStride):g.cellCount;
       continue;
     }
