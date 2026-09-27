@@ -58,7 +58,19 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  let cn;
+  if(g.removeByCell!==null&&removed&&childIndex&&!seenOffset){
+    for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+    const removeRow=cell*g.shapeCount,removeByCell=g.removeByCell;
+    for(let i=0;i<n;i+=1){
+      const id=removeByCell[removeRow+basis[bi+i]];
+      removed[i]=id;
+      if(id>=0)seen[id>>>5]|=1<<(id&31);
+    }
+    cn=emitSortedSetBits32(seen,g.shapeWordCount,childBasis,ci);sizes[sizeIndex]=cn;
+  }else{
+    cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  }
   // One child-basis pass publishes the exact id->index map already owned by
   // coordinate scratch and discovers all cardinality boundaries.
   let childPair=cn,childTriple=cn,childQuad=cn;
