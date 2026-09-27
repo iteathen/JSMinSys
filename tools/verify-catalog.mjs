@@ -168,6 +168,8 @@ for (const unit of addonCycleLedger.units.filter((entry) => entry.status === 'de
 }
 
 function gitBlobSha(source) {
+  // Ledger identities use canonical Git text, independent of Windows checkout EOLs.
+  source = source.replaceAll('\r\n', '\n');
   return createHash('sha1')
     .update(`blob ${Buffer.byteLength(source)}\0`)
     .update(source)
