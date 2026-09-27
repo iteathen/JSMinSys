@@ -1,0 +1,57 @@
+{
+  "sha": "9e5a334dc7388788f4b0e72dfa18ea79efedf6d8",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+  "started": "2026-09-27T06:58:01.393Z",
+  "workers": 4,
+  "sharedSampleMask": 7,
+  "stages": [
+    {
+      "name": "stress",
+      "configs": [
+        {
+          "id": "S1024K-P1024K",
+          "shared": 1048576,
+          "local": 1048576,
+          "timeoutMs": 300000
+        },
+        {
+          "id": "S512K-P512K",
+          "shared": 524288,
+          "local": 524288,
+          "timeoutMs": 300000
+        },
+        {
+          "id": "S2048K-P2048K",
+          "shared": 2097152,
+          "local": 2097152,
+          "timeoutMs": 300000
+        }
+      ],
+      "roots": [
+        [
+          "empty",
+          "",
+          1
+        ]
+      ]
+    }
+  ],
+  "repetitions": 1,
+  "maxTrials": 3,
+  "stressOnly": false,
+  "sustained": true,
+  "hashes": {
+    "memory-sample.mjs": "c729ad94d1bacd4e12e5ff997ccdfef26f04eccf25107a4536a58de57d68692b",
+    "memory-config.mjs": "401b906fdc8c30d2ee59479688cdf8be3c3bcaa5c201af34744d82f8f7b066b7",
+    "memory-campaign.mjs": "c4fc3a91108a5b5a1aa95099d1a464f47faf74891ce0fbe4c3243b10bdfc25c9",
+    "../cpc-factorial/isomax-node-counts.mjs": "d8dcea3b86a2b23788facd302d6cae5f6db123f2f1ee237018f60cd6a88d73a0",
+    "../../addons/rba-connect4-alphabeta.mjs": "016a5bc7274fb68ae1ae88d0e077d9f9cb1f4357c57fcfc155ae4ddce374e279",
+    "../../addons/rba-connect4-lazy-smp-host.mjs": "0a43c6a43f01e4d866860f17547d823e79f33e6c6cf89a412494ae81f51a9c64",
+    "../../addons/rba-connect4-lazy-smp-worker.mjs": "2a4711508b7d578fd0f69e389e9b95b5dbed401ab0fae2f79066f5f09b384a40",
+    "../../addons/rba-connect4-shared-exact-cache.mjs": "f004484089b5b64d5df8668b5feedb2a9f7bceb4f5d5b90b742b2016c32dcf75"
+  },
+  "historicalResearch": "Connect4@12b76d3b7f5fac7c7cd6a9c4ec31e3ee37e1078c",
+  "scope": "Five-minute empty-board memory knee bracket; one sample per size, no solve-time optimum claim."
+}

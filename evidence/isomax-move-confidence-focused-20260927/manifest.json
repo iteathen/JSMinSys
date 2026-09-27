@@ -1,0 +1,54 @@
+{
+  "sha": "1156cedfdc66acaeb33a2c3e5de8d93136804200",
+  "started": "2026-09-27T09:37:57.454Z",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+  "locked": {
+    "id": "isomax-native-lazy-smp-i5-12600k-20260927",
+    "status": "owner-selected operating baseline",
+    "selectedOn": "2026-09-27",
+    "scope": {
+      "solver": "IsoMax native JSMinSys RBA CPC alpha-beta with exact endpoint publication",
+      "method": "Lazy SMP, full exact TT sharing, existing move order, no strategist",
+      "geometry": "7x6",
+      "cpu": "Intel Core i5-12600K",
+      "physicalCores": 10,
+      "logicalProcessors": 16,
+      "ramGiBApprox": 32,
+      "platform": "win32",
+      "node": "v26.7.0"
+    },
+    "options": {
+      "workers": 7,
+      "sharedCacheCapacity": 4194304,
+      "localCacheCapacity": 1048576,
+      "sharedSampleMask": 0
+    },
+    "cachePayloadBytes7x6": 716177420,
+    "evidenceRevision": "5b0a5f313d66d3929af8ea8fee14a39a16b031ed",
+    "evidence": "../../evidence/isomax-resource-sustained-20260927/REPORT.md",
+    "limits": "Selected operating baseline, not proof of global or empty-board solve-time optimality. Requalify materially different solver methods, revisions, runtimes or hardware. PFIF benefits are not included in this selection."
+  },
+  "corpusSeed": 7509010,
+  "randomPositions": 48,
+  "diagnostics": 0,
+  "labelDeadlineMs": 5000,
+  "focused": true,
+  "acceptance": "CPC unresolved, at least 2 eligible moves, 8 per parity/gap bin; interleaved ply strata; no WDL/timing selection",
+  "thresholds": {
+    "tied": 0,
+    "near": 1,
+    "clear": ">=2"
+  },
+  "distribution": "Uniform legal-action walks rejected if a win occurs by target ply; physical boards deduplicated including mirrors. Not representative of solver visitation.",
+  "performanceSelection": "First two complete holdout positions per gap bin with >1 CPC-eligible choices, nonexact CPC interval, and 200..2000000 root label nodes; plus A/B diagnostics. Selection uses features/work magnitude, not optimality or probe timings.",
+  "performanceScope": "Matched existing root probe vs released root wrapper; fixed commands, no live strategist. Worker 0 probes, peers deep. No new trigger overhead measured or production promotion.",
+  "hashes": {
+    "move-confidence.mjs": "e025f59412e608ee736c54197e9683e8be319a108e11a4cd6ce558e0fc2d04a8",
+    "move-confidence-label-worker.mjs": "0254bbcde6e5254f34fca1fa22ae5f0248b829d631d9fa8ac3b3ed6fe44bc65b",
+    "move-confidence-campaign.mjs": "df19f19c01ea6ec6432ebc9b47307fa57af47f6c23c3a92b25d9ae6278a28c62",
+    "frontier.generated.mjs": "bd979b8e04860c403593ada7141d7f8d515ed88c31606f5753ef54e4509f8c9d",
+    "controls.mjs": "8daf9b0b6f9786f481eca4d8968ac904a9857f13f01634c4fb2508101c4d1092"
+  }
+}

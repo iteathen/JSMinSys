@@ -1,0 +1,19 @@
+✔ fixed mixed policies assign exactly one shallow worker without timed switching (0.6064ms)
+✔ paired profiles alternate wide/deep assignments for larger pools (0.1728ms)
+✔ mixed shallow/deep workers receive distinct commands and stop cleanly (368.4436ms)
+✔ mode worker contains execution only, without local probe selection or rearming (2.55ms)
+✔ strategist mode changes during native recursion preserve value, witness and restoration (2225.818ms)
+✔ mode STOP cannot publish incomplete work as WDL (2.6312ms)
+✔ mode policy is strategist-owned and delayed updates coalesce safely (0.8793ms)
+✔ real asynchronous strategist switches modes and stops evaluators cleanly (246.8012ms)
+✔ pool activation requires fresh sustained expansion and admits one standby at a time (1.3254ms)
+✔ prepared standby workers stay idle and stop without entering search (110.8767ms)
+✔ strategist activates preinitialized workers through flags and timeout wakes any remaining standby (583.8015ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2568.7346

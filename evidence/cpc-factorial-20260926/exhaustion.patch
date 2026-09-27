@@ -1,0 +1,41 @@
+diff --git a/addons/cpc-connect4.mjs b/addons/cpc-connect4.mjs
+index cd8c062..1a0b98b 100644
+--- a/addons/cpc-connect4.mjs
++++ b/addons/cpc-connect4.mjs
+@@ -288,9 +287,0 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
+-  const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
+-  for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
+-  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
+-
+-  if(!p0Any)scratch.interval[1]=2;
+-  if(!p1Any)scratch.interval[0]=2;
+-
+-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+-
+diff --git a/catalog/addon-cycle-ledger-v0.json b/catalog/addon-cycle-ledger-v0.json
+index 9b369c3..424f075 100644
+--- a/catalog/addon-cycle-ledger-v0.json
++++ b/catalog/addon-cycle-ledger-v0.json
+@@ -1406 +1406 @@
+-          "count": "3+2*W+2*L+2*P"
++          "count": "3+2*0+2*L+2*P"
+@@ -1438 +1438 @@
+-          "count": "18+2*W+6*L"
++          "count": "18+2*0+6*L"
+@@ -1442 +1442 @@
+-          "count": "18+2*W+6*L"
++          "count": "18+2*0+6*L"
+@@ -1477 +1477 @@
+-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
++        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*0+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+(2)*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+(1)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+2*0+6*L)*C(control.test.u32)+(18+2*0+6*L)*C(control.branch)+(C)*CALL(collectSingletonProfiles)+(M)*CALL(cellMarked)+(D)*CALL(deriveForkPreemption32)+(F)*CALL(frontierResponseNoWin)+(B)*CALL(pairedResponseNoWin)+(P)*CALL(collectProjected)",
+@@ -1479 +1478,0 @@
+-          "W": "coordinate words scanned for any-live detection",
+@@ -1481 +1480 @@
+-          "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
++          "C": "combined singleton-profile calls (always 1)",
+@@ -1490 +1489 @@
+-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
++        "note": "Experimental factorial ablation. Removed loops/calls have zero executions; retained fixed dispatch terms remain a conservative source envelope, not exact Intel machine cycles. Actual all-thread process cycles measured separately. No final NEES promotion."
+@@ -6449 +6448 @@
+-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
++    "addons/cpc-connect4.mjs": "1a0b98b0b2c2eb35b6ebc4f687e59f58655b43c7",

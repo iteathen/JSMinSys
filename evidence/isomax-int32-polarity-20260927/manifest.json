@@ -1,0 +1,40 @@
+{
+  "baseline": "a667bd1bad1c2cc4273a1ddd94f58592f558b18e",
+  "candidate": "working tree; exact patch retained",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "repeats": 5,
+  "cases": [
+    {
+      "id": "diagnostic-0",
+      "moves": "3164746344461611",
+      "wdl": -1
+    },
+    {
+      "id": "diagnostic-1",
+      "moves": "2431572135633422",
+      "wdl": -1
+    },
+    {
+      "id": "p16-5",
+      "moves": "2122466321377743",
+      "wdl": -1
+    },
+    {
+      "id": "p16-7",
+      "moves": "6577616172362266",
+      "wdl": 1
+    },
+    {
+      "id": "fhourstones-derived",
+      "moves": "353335714",
+      "wdl": -1
+    }
+  ],
+  "timeoutMs": 30000,
+  "workers": 7,
+  "policy": "six deep / one wide",
+  "sharedEntries": 4194304,
+  "privateEntries": 1048576,
+  "order": "alternating paired fresh processes; sequential; stop on invalid outcome"
+}

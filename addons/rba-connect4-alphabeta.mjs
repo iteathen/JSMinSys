@@ -239,11 +239,21 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
           childLiveOffset,childOrderRow,-beta,-alpha);
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
-      if(alpha>=beta){state.cutoffs+=1;return sign*best;}
+      if(alpha>=beta){
+        state.cutoffs+=1;
+        // A fail-high lower bound of +1 is exact in {-1,0,+1}. Publish the
+        // current q/mover, before forced-tail sign transports it to the caller.
+        // Interior cutoffs remain bounds and MUST NOT enter this exact cache.
+        if(best===1)storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,
+          relativeToAbs(best,mover),cacheSlot,cacheHash);
+        return sign*best;
+      }
       if(best===1)break;
     }
     if(best===-2)return 0;
-    if(alphaOrig===-2&&betaOrig===2){
+    // If best is -1 here, every relevant action finished without a beta cutoff.
+    // An upper bound of -1 is exact; a narrow-window draw is still only a bound.
+    if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbs(best,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }

@@ -1,0 +1,21 @@
+✔ nonterminal CPC path matches checked evaluator after terminal assertion (10.0023ms)
+✔ CPC closes a forced block that lifts another opponent terminal singleton (2.4968ms)
+✔ CPC closes when every legal move lifts an opponent terminal singleton (0.7219ms)
+✔ CPC recognizes exact fork loss after enabling move (0.8866ms)
+✔ CPC first-win ordering lets current immediate terminal supersede opponent fork (0.7661ms)
+✔ CPC alpha-beta uses live winning-line contribution for move ordering (18.8344ms)
+✔ CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle (136.3429ms)
+✔ CPC alpha-beta modes agree with independent late standard-7x6 oracle (57.6317ms)
+✔ shared exact cache publishes only fully committed exact rows (0.6517ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (51.6334ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (5.9305ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (44.4651ms)
+✔ sharing-density masks preserve exact Lazy SMP results (335.5077ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 581.8126

@@ -22,4 +22,5 @@ test('native worker execution cannot reenter cold ingress',()=>{
     for(const match of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g))visit(new URL(match[1],url));
   }
   visit(new URL('../addons/rba-connect4-lazy-smp-worker.mjs',import.meta.url));
+  visit(new URL('../addons/rba-connect4-lazy-smp-worker-frontier.mjs',import.meta.url));
 });

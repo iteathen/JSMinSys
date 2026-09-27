@@ -1,0 +1,64 @@
+{
+  "sha": "9e5a334dc7388788f4b0e72dfa18ea79efedf6d8",
+  "complete": {
+    "trials": 3,
+    "solved": 0,
+    "timeouts": 3
+  },
+  "workers": 4,
+  "durationMs": 300000,
+  "rows": [
+    {
+      "id": "S512K-P512K",
+      "cacheMiB": 154.0000114440918,
+      "status": "TIMEOUT",
+      "rootWdl": null,
+      "wallMs": 300017.42199999996,
+      "totalNodes": 1552581513,
+      "visitsPerSecond": 5174971.182173548,
+      "solveCycles": "4397699293414",
+      "totalProcessCycles": "4397949403632",
+      "cyclesPerVisit": 2832.507830726695,
+      "relativeRateTo1M": 0.9937358454783581,
+      "sampledPeakRssMiB": 274.88671875,
+      "sharedCacheHits": 36507406,
+      "sharedCacheStores": 212488,
+      "sharedCacheStoreContention": 0
+    },
+    {
+      "id": "S1024K-P1024K",
+      "cacheMiB": 308.0000114440918,
+      "status": "TIMEOUT",
+      "rootWdl": null,
+      "wallMs": 300034.6516,
+      "totalNodes": 1562458155,
+      "visitsPerSecond": 5207592.345310291,
+      "solveCycles": "4396528939871",
+      "totalProcessCycles": "4396773584852",
+      "cyclesPerVisit": 2813.853878775397,
+      "relativeRateTo1M": 1,
+      "sampledPeakRssMiB": 429.87890625,
+      "sharedCacheHits": 35595568,
+      "sharedCacheStores": 199666,
+      "sharedCacheStoreContention": 0
+    },
+    {
+      "id": "S2048K-P2048K",
+      "cacheMiB": 616.0000114440918,
+      "status": "TIMEOUT",
+      "rootWdl": null,
+      "wallMs": 300037.903,
+      "totalNodes": 1512325013,
+      "visitsPerSecond": 5040446.549848071,
+      "solveCycles": "4403156176222",
+      "totalProcessCycles": "4403405028767",
+      "cyclesPerVisit": 2911.514481591134,
+      "relativeRateTo1M": 0.9679034409034064,
+      "sampledPeakRssMiB": 738.03125,
+      "sharedCacheHits": 31108355,
+      "sharedCacheStores": 190203,
+      "sharedCacheStoreContention": 1
+    }
+  ],
+  "disposition": "Single sustained sample per size. Throughput bracket only; no statistical equivalence or solved-time optimum established. No production setting changed."
+}
