@@ -11,6 +11,13 @@ test('mode worker contains execution only, without local probe selection or rear
   const source=readFileSync(new URL('./modes.generated.mjs',import.meta.url),'utf8');
   for(const forbidden of ['releaseNarrowFrontier','frontierTarget','recurringBounded','recurringRearms','lineage','frontierPending'])
     assert.equal(source.includes(forbidden),false,forbidden);
+  // CPC-only mode specializations must not inherit unavailable front machinery.
+  for(const file of ['modes','observed-modes','one-band']){
+    const generated=readFileSync(new URL(`./${file}.generated.mjs`,import.meta.url),'utf8');
+    for(const dead of ['RBA_AB_CPC_FOUR_FRONT_BEHAVIOR','boundaryDepth','boundaryCapacity','boundaryBudget',
+      'actionLo','actionHi','actionKnown','frontCalls','frontExact','frontFailures','frontSteps','frontActionExact',
+      'connect4RbaTerminal','connect4RbaRank'])assert.equal(generated.includes(dead),false,`${file}: ${dead}`);
+  }
   assert.equal(encodeSearchMode({shallow:false}),0);
   assert.throws(()=>encodeSearchMode({stride:0}));
   let loads=0;

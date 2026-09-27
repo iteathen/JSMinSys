@@ -11,14 +11,13 @@ import {prepareSearchBehavior32,completeBehaviorNode32} from './mode-controls.mj
 import {mixSpan32Locator32,publishSpan32} from '../../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from '../../addons/rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from '../../addons/rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaTerminal,connect4RbaRank} from '../../addons/rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from '../../addons/rba-connect4-coordinate.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from '../../addons/cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from '../../addons/connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../../src/search32.mjs';
 import {probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from '../../addons/rba-connect4-shared-exact-cache.mjs';
 
 export const RBA_AB_CPC_ONLY_BEHAVIOR=0;
-export const RBA_AB_CPC_FOUR_FRONT_BEHAVIOR=1;
 const MOVE_SCORE_NONE=-2147483648;
 
 export function createConnect4RbaExactCache32Behavior({capacity=65536,keyWords}={}){
@@ -78,9 +77,6 @@ function relativeToAbsBehavior(value,mover){return value===0?2:mover===0?value+2
 export function prepareConnect4RbaAlphaBetaBehavior({
   geometry,
   mode=RBA_AB_CPC_ONLY_BEHAVIOR,
-  boundaryDepth=2,
-  boundaryCapacity=256,
-  boundaryBudget=100000,
   cacheCapacity=65536,
   sharedExactCache=null,
   sharedSampleMask=0,
@@ -90,7 +86,6 @@ export function prepareConnect4RbaAlphaBetaBehavior({
   behavior,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  if(mode!==RBA_AB_CPC_ONLY_BEHAVIOR&&mode!==RBA_AB_CPC_FOUR_FRONT_BEHAVIOR)throw new RangeError('invalid alpha-beta mode');
   if(mode!==RBA_AB_CPC_ONLY_BEHAVIOR)throw RangeError('PFIF requires CPC-only');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),levels=g.cellCount+1,
     live=prepareConnect4LiveLineEvaluator32(g);
@@ -106,18 +101,14 @@ export function prepareConnect4RbaAlphaBetaBehavior({
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32Behavior({capacity:cacheCapacity,keyWords:g.keyWords});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
-  return prepareSearchBehavior32({g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
-    front:null,modeRootValues:new Int8Array(g.columns),modeRootPasses:0,horizonStops:0,
+  return prepareSearchBehavior32({g,profile,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
+    modeRootValues:new Int8Array(g.columns),modeRootPasses:0,horizonStops:0,
     modeResolved:new Uint8Array(levels*g.columns),modeRegions:0,modePasses:0,modeRetainedSkips:0,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache,actionOrder,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
     moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
-    actionLo:mode===RBA_AB_CPC_FOUR_FRONT_BEHAVIOR?new Int8Array(levels*g.columns):null,
-    actionHi:mode===RBA_AB_CPC_FOUR_FRONT_BEHAVIOR?new Int8Array(levels*g.columns):null,
-    actionKnown:mode===RBA_AB_CPC_FOUR_FRONT_BEHAVIOR?new Uint8Array(levels*g.columns):null,
     nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,
-    frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0},behavior);
 }
 
@@ -293,7 +284,7 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
   state.modeRootValues.fill(-2);state.modeRootPasses=state.horizonStops=state.modeRegions=state.modePasses=state.modeRetainedSkips=0;
   state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=0;
   state.cpc.projectedForkTotal=state.cpc.precursorTotal=state.cpc.forcedTotal=0;
-  state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
+  state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
   state.basisSize[0]=root.basis.length;
   const rootMeta=state.words[g.metaOffset],mover=(rootMeta>>>2)&1,terminal=rootMeta&3;
@@ -387,5 +378,4 @@ function modeResult(state,cancel,value,move){
 }
 function metricsBehavior(s){return {modeRegions:s.modeRegions,modePasses:s.modePasses,modeRetainedSkips:s.modeRetainedSkips,modeChanges:s.campaignChanges,modeRootPasses:s.modeRootPasses,horizonStops:s.horizonStops,modeRootLimit:s.modeRootLimit,nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
   cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
-  frontCalls:s.frontCalls,frontExact:s.frontExact,
-  frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}
+  cofactors:s.cofactors};}
