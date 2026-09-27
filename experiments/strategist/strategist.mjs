@@ -23,7 +23,8 @@ const poolStrategy=strategy==='modes-pool-fixed'||poolObserved;
 const poolState=poolStrategy?createPoolPolicy(d.workers,d.initialActive):null;
 const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive||poolObserved;
 const pendingReaders=pendingStrategy?preparePendingReaders(d.pendingObservation):null;
-const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy({oneBand:pendingBand})):null;
+const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy({oneBand:pendingBand,
+  trigger:process.env.JSMINSYS_PENDING_TRIGGER??'sustained'})):null;
 const widthStrategy=WIDTH_POLICIES.includes(strategy);
 const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy||pendingStrategy||poolStrategy;
 const widthObserver=widthStrategy?prepareWidthObserver(d.geometry,d.root,d.cache):null;
