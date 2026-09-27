@@ -109,6 +109,55 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   if(words===3){
     const targetWords=cn<=32?1:cn<=64?2:3;
     const sourceWords=n<=32?1:n<=64?2:3;
+    if(targetWords===1){
+      let p00=0,p10=0;
+      if(player===0){
+        for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+          const planWord=planWordBase+sourceWord,
+            validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+            source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+          let mover=source0&validBits,opponent=source1&unchangedBits,
+            both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+          while(both){
+            const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            both^=isolated;
+            const c0=cache.closure[closureBase+i*3];p00|=c0;p10|=c0;
+          }
+          while(moverOnly){
+            const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            moverOnly^=isolated;p00|=cache.closure[closureBase+i*3];
+          }
+          while(opponentOnly){
+            const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            opponentOnly^=isolated;p10|=cache.closure[closureBase+i*3];
+          }
+        }
+      }else{
+        for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
+          const planWord=planWordBase+sourceWord,
+            validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+            source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+          let mover=source1&validBits,opponent=source0&unchangedBits,
+            both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+          while(both){
+            const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            both^=isolated;
+            const c0=cache.closure[closureBase+i*3];p00|=c0;p10|=c0;
+          }
+          while(moverOnly){
+            const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            moverOnly^=isolated;p10|=cache.closure[closureBase+i*3];
+          }
+          while(opponentOnly){
+            const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+            opponentOnly^=isolated;p00|=cache.closure[closureBase+i*3];
+          }
+        }
+      }
+      target[p0Target]=p00;target[p0Target+1]=0;target[p0Target+2]=0;
+      target[p1Target]=p10;target[p1Target+1]=0;target[p1Target+2]=0;
+      return 0;
+    }
     let p00=0,p01=0,p02=0,p10=0,p11=0,p12=0;
     if(player===0){
       for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
