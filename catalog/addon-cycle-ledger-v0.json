@@ -3117,7 +3117,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "P",
+          "count": "P*(1-K7)",
           "target": "cofactorPlanKey"
         },
         {
@@ -3129,11 +3129,21 @@
           "op": "runtime.call.subledger",
           "count": "M",
           "target": "storeConnect4RbaCofactorPlan32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2*P",
+          "note": "select inline exact 7-column/radix-7 plan key"
+        },
+        {
+          "op": "control.branch",
+          "count": "2*P",
+          "note": "select inline exact 7-column/radix-7 plan key"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-H)*((((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2))*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U))*C(memory.load.u32)+((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))*C(memory.store.u32)+(((2+N)+(K*D))+(K*S*PS))*C(alu.imul.u32)+(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U))*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+((6+4*N+2*U+A)+(K*D*(2*V)))*C(alu.and.u32)+((2+3*N+U)+(K*D*V))*C(alu.shl.u32)+((3+B+CN+2*N+I+U)+(K*D*V))*C(alu.shr.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.test.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.branch)+(K*(1-D))*CALL(connect4RbaCofactorBasis)+(K*PR)*CALLBACK(prepareRemove)+(K*RM)*CALLBACK(removePrepared)+(K*PS*(1-S))*CALLBACK(prepareSubset)+(K*U*(1-S))*CALLBACK(shapeSubsetPrepared)+(K*D*V)*C(alu.or.u32)+(K*D)*CALL(emitSortedSetBits32))+(5+2*P)*C(runtime.field.load)+(1+P*(8+H))*C(memory.load.u32)+(2+P*7)*C(alu.imul.u32)+(2+P*7)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+(2+3*P)*C(control.test.u32)+(2+3*P)*C(control.branch)+P*CALL(cofactorPlanKey)+H*CALL(applyConnect4RbaCofactorPlan32)+M*CALL(storeConnect4RbaCofactorPlan32)",
+        "expression": "((1-H)*(((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2)))*C(runtime.field.load)+((1-H)*(8+CN+4*N+2*U))*C(runtime.field.store)+((1-H)*(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U)))*C(memory.load.u32)+((1-H)*((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V))))*C(memory.store.u32)+((1-H)*(((2+N)+(K*D))+(K*S*PS)))*C(alu.imul.u32)+((1-H)*(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U)))*C(alu.add.u32)+((1-H)*(2+B+I))*C(alu.sub.u32)+((1-H)*((6+4*N+2*U+A)+(K*D*(2*V))))*C(alu.and.u32)+((1-H)*((2+3*N+U)+(K*D*V)))*C(alu.shl.u32)+((1-H)*((3+B+CN+2*N+I+U)+(K*D*V)))*C(alu.shr.u32)+((1-H)*(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS)))*C(control.test.u32)+((1-H)*(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS)))*C(control.branch)+((1-H)*(K*(1-D)))*CALL(connect4RbaCofactorBasis)+((1-H)*(K*PR))*CALLBACK(prepareRemove)+((1-H)*(K*RM))*CALLBACK(removePrepared)+((1-H)*(K*PS*(1-S)))*CALLBACK(prepareSubset)+((1-H)*(K*U*(1-S)))*CALLBACK(shapeSubsetPrepared)+((1-H)*(K*D*V))*C(alu.or.u32)+((1-H)*(K*D))*CALL(emitSortedSetBits32)+(5+2*P)*C(runtime.field.load)+(1+P*(8+H))*C(memory.load.u32)+(2+P*7)*C(alu.imul.u32)+(2+P*7)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+(2+3*P)*C(control.test.u32)+(2+3*P)*C(control.branch)+(P*(1-K7))*CALL(cofactorPlanKey)+(H)*CALL(applyConnect4RbaCofactorPlan32)+(M)*CALL(storeConnect4RbaCofactorPlan32)+(2*P)*C(control.test.u32)+(2*P)*C(control.branch)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3154,9 +3164,10 @@
           "S": "1 when g.subsetTable is present and direct dense subset lookup is selected; otherwise 0",
           "P": "1 when a support-plan cache is attached to the prepared execution profile; otherwise 0",
           "H": "1 when the exact base-7 support/column plan key hits; 0 otherwise",
-          "M": "1 when an enabled cache misses, the ordinary deep cofactor completes, and a new plan is stored; 0 otherwise"
+          "M": "1 when an enabled cache misses, the ordinary deep cofactor completes, and a new plan is stored; 0 otherwise",
+          "K7": "1 when the attached plan cache is the exact 7-column/radix-7 standard profile; otherwise 0"
         },
-        "note": "Experimental support-plan wrapper. On a hit, support-derived child-basis and closure geometry replaces the ordinary dense cofactor body; current P0/P1 coordinate membership is still applied at runtime and C1 image absorption remains. On a miss the complete current C1+dense body executes and plan construction is charged separately. No W/D/L/CPC/best-move information enters the plan."
+        "note": "Stage-10 inline-key experiment. Existing wrapper counts already conservatively include the seven support loads and seven imul/add steps. The helper subledger remains charged only for generic fallback; two specialization tests/branches are added explicitly."
       },
       "status": "decomposed"
     },
@@ -9588,11 +9599,21 @@
           "op": "control.branch",
           "count": "2+L*(1+G2)",
           "note": "derive targetWords once; guard word1 and conditionally word2 per visited closure"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1",
+          "note": "select targetWords===1 fast path"
+        },
+        {
+          "op": "control.branch",
+          "count": "1",
+          "note": "select targetWords===1 fast path"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)",
+        "expression": "(25+6*W+3*L+3*Q)*C(runtime.field.load)+(4)*C(runtime.field.store)+(6+C+CN+6*W+3*L)*C(memory.load.u32)+(2)*C(memory.load.u8)+(9+C+CN)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(18+C+CN+5*W+4*L)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(8+5*W+L)*C(alu.and.u32)+(3*W+6*B+3*M+3*O)*C(alu.or.u32)+(2*W+L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+C+7*W+3*L)*C(control.test.u32)+(18+C+7*W+3*L)*C(control.branch)+(L)*CALL(isolatedBitIndex32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2+L*(1+G2))*C(control.test.u32)+(2+L*(1+G2))*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "C": "prepared geometry column count",
           "W": "prepared coordinate word count; partitioned specialization is selected only at W=3",
@@ -9603,9 +9624,10 @@
           "L": "B+M+O unique relevant parent indices visited",
           "SW": "1..3 source coordinate words actually visited; inherited W=3 loop envelope is intentionally retained conservatively in static accounting",
           "TW": "1..3 closure/output words implied by child basis size cn",
-          "G2": "1 when TW>1, else 0"
+          "G2": "1 when TW>1, else 0",
+          "T1": "1 when cn<=32 and the one-word closure fast path executes"
         },
-        "note": "Stage-7 combined dynamic-word-bound experiment. Source scanning stops after the last parent-basis coordinate word and closure loads stop after the last child-basis coordinate word. Static ledger deliberately retains the inherited W=3 memory/ALU envelope and adds all new selection/guard branches; measured process cycles are the authority for dynamic savings."
+        "note": "Stage-10 one-word closure experiment. The common cn<=32 path hoists target-width selection outside residual loops and loads only closure word 0. Static accounting deliberately retains the inherited Stage-7 per-residual three-word guard/memory envelope and adds the new outer selection branch; measured process cycles are the dynamic-performance authority."
       },
       "status": "decomposed"
     },
@@ -9788,7 +9810,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "d5fd7cfb8e1548a6d6c7d8ef1fee537da98063b6",
+    "addons/rba-connect4-coordinate.mjs": "df125f7904eadeffd051d6a12c4891d8e01d65cf",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
