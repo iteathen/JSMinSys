@@ -1,0 +1,195 @@
+{
+  "sha": "04cc9bee348fd167eb114ac73e1ccc9e8ed1884b",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+  "started": "2026-09-27T06:51:42.317Z",
+  "workers": 4,
+  "sharedSampleMask": 7,
+  "stages": [
+    {
+      "name": "diagonal",
+      "configs": [
+        {
+          "id": "S64K-P64K",
+          "shared": 65536,
+          "local": 65536,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S256K-P256K",
+          "shared": 262144,
+          "local": 262144,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S512K-P512K",
+          "shared": 524288,
+          "local": 524288,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S1024K-P1024K",
+          "shared": 1048576,
+          "local": 1048576,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S2048K-P2048K",
+          "shared": 2097152,
+          "local": 2097152,
+          "timeoutMs": 5000
+        }
+      ],
+      "roots": [
+        [
+          "F45461667",
+          "34350556",
+          1
+        ],
+        [
+          "A",
+          "2053635233350500",
+          -1
+        ],
+        [
+          "B",
+          "1320461024522311",
+          -1
+        ]
+      ]
+    },
+    {
+      "name": "axes",
+      "configs": [
+        {
+          "id": "S1024K-P1024K",
+          "shared": 1048576,
+          "local": 1048576,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S256K-P1024K",
+          "shared": 262144,
+          "local": 1048576,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S1024K-P256K",
+          "shared": 1048576,
+          "local": 262144,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S512K-P1024K",
+          "shared": 524288,
+          "local": 1048576,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S1024K-P512K",
+          "shared": 1048576,
+          "local": 524288,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S2048K-P1024K",
+          "shared": 2097152,
+          "local": 1048576,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "S1024K-P2048K",
+          "shared": 1048576,
+          "local": 2097152,
+          "timeoutMs": 5000
+        }
+      ],
+      "roots": [
+        [
+          "F45461667",
+          "34350556",
+          1
+        ],
+        [
+          "A",
+          "2053635233350500",
+          -1
+        ],
+        [
+          "B",
+          "1320461024522311",
+          -1
+        ]
+      ]
+    },
+    {
+      "name": "stress",
+      "configs": [
+        {
+          "id": "S64K-P64K",
+          "shared": 65536,
+          "local": 65536,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S256K-P256K",
+          "shared": 262144,
+          "local": 262144,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S512K-P512K",
+          "shared": 524288,
+          "local": 524288,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S1024K-P1024K",
+          "shared": 1048576,
+          "local": 1048576,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S2048K-P2048K",
+          "shared": 2097152,
+          "local": 2097152,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S256K-P1024K",
+          "shared": 262144,
+          "local": 1048576,
+          "timeoutMs": 30000
+        },
+        {
+          "id": "S1024K-P256K",
+          "shared": 1048576,
+          "local": 262144,
+          "timeoutMs": 30000
+        }
+      ],
+      "roots": [
+        [
+          "empty",
+          "",
+          1
+        ]
+      ]
+    }
+  ],
+  "repetitions": 2,
+  "maxTrials": 86,
+  "hashes": {
+    "memory-sample.mjs": "c09ff6cb51d82f5b68a99ce75802e35d5d9591e2fbcd5b0ed043014789ef0db2",
+    "memory-config.mjs": "5fcbb0c34becdcc8d04655c196d95763297073f8c281c363f7c3e4840d560d0f",
+    "memory-campaign.mjs": "3c0f5bbd2e1cc58683d4ae79f8d9b24339cf24fd86e69ceeaa04d63b6e90cfa6",
+    "../cpc-factorial/isomax-node-counts.mjs": "d8dcea3b86a2b23788facd302d6cae5f6db123f2f1ee237018f60cd6a88d73a0",
+    "../../addons/rba-connect4-alphabeta.mjs": "016a5bc7274fb68ae1ae88d0e077d9f9cb1f4357c57fcfc155ae4ddce374e279",
+    "../../addons/rba-connect4-lazy-smp-host.mjs": "0a43c6a43f01e4d866860f17547d823e79f33e6c6cf89a412494ae81f51a9c64",
+    "../../addons/rba-connect4-lazy-smp-worker.mjs": "2a4711508b7d578fd0f69e389e9b95b5dbed401ab0fae2f79066f5f09b384a40",
+    "../../addons/rba-connect4-shared-exact-cache.mjs": "f004484089b5b64d5df8668b5feedb2a9f7bceb4f5d5b90b742b2016c32dcf75"
+  },
+  "historicalResearch": "Connect4@12b76d3b7f5fac7c7cd6a9c4ec31e3ee37e1078c",
+  "scope": "Completed-solve screen plus separate 30-second instrumented empty-board diagnostic. No timeout-based solve ranking."
+}
