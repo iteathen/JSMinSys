@@ -3118,7 +3118,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "P",
-          "target": "cofactorPlanKey7"
+          "target": "cofactorPlanKey"
         },
         {
           "op": "runtime.call.subledger",
@@ -3133,7 +3133,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-H)*((((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2))*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U))*C(memory.load.u32)+((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))*C(memory.store.u32)+(((2+N)+(K*D))+(K*S*PS))*C(alu.imul.u32)+(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U))*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+((6+4*N+2*U+A)+(K*D*(2*V)))*C(alu.and.u32)+((2+3*N+U)+(K*D*V))*C(alu.shl.u32)+((3+B+CN+2*N+I+U)+(K*D*V))*C(alu.shr.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.test.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.branch)+(K*(1-D))*CALL(connect4RbaCofactorBasis)+(K*PR)*CALLBACK(prepareRemove)+(K*RM)*CALLBACK(removePrepared)+(K*PS*(1-S))*CALLBACK(prepareSubset)+(K*U*(1-S))*CALLBACK(shapeSubsetPrepared)+(K*D*V)*C(alu.or.u32)+(K*D)*CALL(emitSortedSetBits32))+(5+2*P)*C(runtime.field.load)+(1+P*(8+H))*C(memory.load.u32)+(2+P*7)*C(alu.imul.u32)+(2+P*7)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+(2+3*P)*C(control.test.u32)+(2+3*P)*C(control.branch)+P*CALL(cofactorPlanKey7)+H*CALL(applyConnect4RbaCofactorPlan32)+M*CALL(storeConnect4RbaCofactorPlan32)",
+        "expression": "(1-H)*((((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))+(K*2))*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))+(K*S*U))*C(memory.load.u32)+((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))*C(memory.store.u32)+(((2+N)+(K*D))+(K*S*PS))*C(alu.imul.u32)+(((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))+(K*S*U))*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+((6+4*N+2*U+A)+(K*D*(2*V)))*C(alu.and.u32)+((2+3*N+U)+(K*D*V))*C(alu.shl.u32)+((3+B+CN+2*N+I+U)+(K*D*V))*C(alu.shr.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.test.u32)+(((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))+(K*S*PS))*C(control.branch)+(K*(1-D))*CALL(connect4RbaCofactorBasis)+(K*PR)*CALLBACK(prepareRemove)+(K*RM)*CALLBACK(removePrepared)+(K*PS*(1-S))*CALLBACK(prepareSubset)+(K*U*(1-S))*CALLBACK(shapeSubsetPrepared)+(K*D*V)*C(alu.or.u32)+(K*D)*CALL(emitSortedSetBits32))+(5+2*P)*C(runtime.field.load)+(1+P*(8+H))*C(memory.load.u32)+(2+P*7)*C(alu.imul.u32)+(2+P*7)*C(alu.add.u32)+C(alu.and.u32)+C(alu.shr.u32)+(2+3*P)*C(control.test.u32)+(2+3*P)*C(control.branch)+P*CALL(cofactorPlanKey)+H*CALL(applyConnect4RbaCofactorPlan32)+M*CALL(storeConnect4RbaCofactorPlan32)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -9397,19 +9397,27 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "8"
+          "count": "12+2*C"
         },
         {
           "op": "runtime.integer.check",
-          "count": "3"
+          "count": "5"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "C"
         },
         {
           "op": "control.test.u32",
-          "count": "10"
+          "count": "14+2*C"
         },
         {
           "op": "control.branch",
-          "count": "10"
+          "count": "14+2*C"
         },
         {
           "op": "runtime.typed_array.allocate",
@@ -9426,36 +9434,56 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "8*C(runtime.field.load)+3*C(runtime.integer.check)+10*C(control.test.u32)+10*C(control.branch)+7*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
-        "parameters": {},
-        "note": "Cold fixed-arena preparation only. Large backing-store allocation/fill cost is not hidden; it is outside the measured solve-call boundary in this experiment."
+        "expression": "(12+2*C)*C(runtime.field.load)+5*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+C*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+7*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
+        "parameters": {
+          "C": "prepared geometry column count"
+        },
+        "note": "Cold fixed-arena preparation. Mixed-radix support/key counts are derived from rows/columns; allocation/fill cost remains visible and outside measured solve-call cycles."
       },
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-coordinate.mjs#cofactorPlanKey7",
+      "unit": "addons/rba-connect4-coordinate.mjs#cofactorPlanKey",
       "source": "addons/rba-connect4-coordinate.mjs",
-      "name": "cofactorPlanKey7",
+      "name": "cofactorPlanKey",
       "scope": "cofactor-plan-hot-key",
       "operations": [
         {
+          "op": "runtime.field.load",
+          "count": "2+C"
+        },
+        {
           "op": "memory.load.u32",
-          "count": "7"
+          "count": "C"
         },
         {
           "op": "alu.imul.u32",
-          "count": "7"
+          "count": "C+1"
         },
         {
           "op": "alu.add.u32",
-          "count": "7"
+          "count": "C+1"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "C"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "C+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "C+1"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "7*C(memory.load.u32)+7*C(alu.imul.u32)+7*C(alu.add.u32)",
-        "parameters": {},
-        "note": "Exact collision-free base-7 support encoding plus column for standard 7x6; addressing identity only, not q identity."
+        "expression": "(2+C)*C(runtime.field.load)+C*C(memory.load.u32)+(C+1)*C(alu.imul.u32)+(C+1)*C(alu.add.u32)+C*C(alu.sub.u32)+(C+1)*C(control.test.u32)+(C+1)*C(control.branch)",
+        "parameters": {
+          "C": "prepared geometry column count"
+        },
+        "note": "Exact collision-free mixed-radix support encoding using radix rows+1, then column. Addressing only; geometry-derived at initialization."
       },
       "status": "decomposed"
     },
@@ -9467,7 +9495,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*N+8*E+6*Q"
+          "count": "20+4*N+7*E+4*Q+2*W"
         },
         {
           "op": "runtime.field.store",
@@ -9475,7 +9503,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "10+CN+4*N+3*E+3*Q"
+          "count": "4+C+CN+4*N+Q*W"
         },
         {
           "op": "memory.load.u8",
@@ -9483,15 +9511,15 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "15+CN+3*Q"
+          "count": "3+C+2*W+CN+Q*W"
         },
         {
           "op": "alu.imul.u32",
-          "count": "3"
+          "count": "3+E"
         },
         {
           "op": "alu.add.u32",
-          "count": "16+CN+5*N+3*E+3*Q"
+          "count": "12+C+CN+5*N+3*E+Q*W"
         },
         {
           "op": "alu.sub.u32",
@@ -9499,11 +9527,11 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "5+5*N+2*E+3*Q"
+          "count": "5+5*N+2*E+Q*W"
         },
         {
           "op": "alu.or.u32",
-          "count": "3*Q"
+          "count": "Q*W"
         },
         {
           "op": "alu.shl.u32",
@@ -9515,23 +9543,25 @@
         },
         {
           "op": "control.test.u32",
-          "count": "10+7*N+5*E+3*Q"
+          "count": "10+C+2*W+7*N+5*E+Q*W"
         },
         {
           "op": "control.branch",
-          "count": "10+7*N+5*E+3*Q"
+          "count": "10+C+2*W+7*N+5*E+Q*W"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+4*N+8*E+6*Q)*C(runtime.field.load)+4*C(runtime.field.store)+(10+CN+4*N+3*E+3*Q)*C(memory.load.u32)+(3+N)*C(memory.load.u8)+(15+CN+3*Q)*C(memory.store.u32)+3*C(alu.imul.u32)+(16+CN+5*N+3*E+3*Q)*C(alu.add.u32)+C(alu.sub.u32)+(5+5*N+2*E+3*Q)*C(alu.and.u32)+3*Q*C(alu.or.u32)+(2+N+E)*C(alu.shl.u32)+(4+N+E)*C(alu.shr.u32)+(10+7*N+5*E+3*Q)*C(control.test.u32)+(10+7*N+5*E+3*Q)*C(control.branch)",
+        "expression": "(20+4*N+7*E+4*Q+2*W)*C(runtime.field.load)+4*C(runtime.field.store)+(4+C+CN+4*N+Q*W)*C(memory.load.u32)+(3+N)*C(memory.load.u8)+(3+C+2*W+CN+Q*W)*C(memory.store.u32)+(3+E)*C(alu.imul.u32)+(12+C+CN+5*N+3*E+Q*W)*C(alu.add.u32)+C(alu.sub.u32)+(5+5*N+2*E+Q*W)*C(alu.and.u32)+Q*W*C(alu.or.u32)+(2+N+E)*C(alu.shl.u32)+(4+N+E)*C(alu.shr.u32)+(10+C+2*W+7*N+5*E+Q*W)*C(control.test.u32)+(10+C+2*W+7*N+5*E+Q*W)*C(control.branch)",
         "parameters": {
-          "N": "parent support-basis entries scanned for live coordinate membership",
+          "C": "prepared geometry column count",
+          "W": "prepared coordinate word count",
+          "N": "parent basis entries scanned for current coordinate membership",
           "CN": "cached child-basis entries copied",
-          "E": "active mapped images reaching the C1 per-player absorption guard",
-          "Q": "surviving player/image closures actually ORed; each closure is exactly three u32 words"
+          "E": "active mapped images reaching C1 absorption",
+          "Q": "surviving player/image closure applications"
         },
-        "note": "Plan hit applies only current coordinate membership. C1 remains before closure OR. Closure masks are support-derived exact upward closures, never solved values."
+        "note": "Geometry-derived plan hit. Current coordinate membership is still read from the q; C1 guards each player before W-word immutable closure OR."
       },
       "status": "decomposed"
     },
@@ -9543,7 +9573,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "14+5*N+4*CN+2*T"
+          "count": "16+5*N+4*CN+2*T+2*W"
         },
         {
           "op": "runtime.field.store",
@@ -9555,7 +9585,7 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "2+CN+3*CN+T"
+          "count": "2+CN+T"
         },
         {
           "op": "memory.store.u8",
@@ -9563,15 +9593,15 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": "4+2*N+3*CN"
+          "count": "5+2*N+3*CN+T"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+4*N+6*CN+T"
+          "count": "8+4*N+6*CN+2*T"
         },
         {
           "op": "alu.and.u32",
-          "count": "3*N+T"
+          "count": "3*N+2*T"
         },
         {
           "op": "alu.or.u32",
@@ -9596,13 +9626,14 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(14+5*N+4*CN+2*T)*C(runtime.field.load)+3*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+4*CN+T)*C(memory.store.u32)+(3+N)*C(memory.store.u8)+(4+2*N+3*CN)*C(alu.imul.u32)+(8+4*N+6*CN+T)*C(alu.add.u32)+(3*N+T)*C(alu.and.u32)+T*C(alu.or.u32)+(N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+4*CN+T)*C(control.test.u32)+(4+5*N+4*CN+T)*C(control.branch)",
+        "expression": "(16+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+3*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+T)*C(memory.store.u32)+(3+N)*C(memory.store.u8)+(5+2*N+3*CN+T)*C(alu.imul.u32)+(8+4*N+6*CN+2*T)*C(alu.add.u32)+(3*N+2*T)*C(alu.and.u32)+T*C(alu.or.u32)+(N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+4*CN+T)*C(control.test.u32)+(4+5*N+4*CN+T)*C(control.branch)",
         "parameters": {
-          "N": "parent basis entries encoded into the plan",
-          "CN": "child basis entries copied and closure rows built",
-          "T": "CN*CN dense subset-table probes while constructing immutable closure rows"
+          "N": "parent basis entries encoded",
+          "CN": "child basis entries stored",
+          "W": "prepared coordinate word count",
+          "T": "CN*CN dense subset probes/conditional closure-bit publications"
         },
-        "note": "Miss-only plan materialization. It intentionally pays CN^2 exact dense subset probes once so later hits replace repeated basis/subset reconstruction. Capacity exhaustion safely leaves the key uncached."
+        "note": "Miss-only immutable plan materialization. Geometry dimensions and closure word count come from the prepared profile; no standard-board constant or solved information is stored."
       },
       "status": "decomposed"
     }
@@ -9712,7 +9743,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "82a954b382760e8b823617b455a7f0bbb2208af3",
+    "addons/rba-connect4-coordinate.mjs": "ccfa627236630e720291467e62d95226079824dc",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
