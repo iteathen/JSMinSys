@@ -57,23 +57,47 @@ Owner-selected operating baseline (locked September 27, 2026):
 ```
 
 The machine-readable owner is [locked-profile.json](locked-profile.json).
-`sample.mjs` uses its options by default; explicit comparison settings override
-them. The historical `campaign.mjs` now explicitly supplies its original memory
+The selected worker mix is **six deep + one wide**: worker 0 iterates root
+frontiers in two-ply increments, switching to deep search when at most one
+unresolved root action remains. Workers 1-6 stay deep. The tested full-window
+root wrapper, existing move order and exact TT sharing remain intact. There is
+no asynchronous strategist or score-gap trigger in this selection.
+
+Run the selected configuration (one-based move sequence; empty string for empty board):
+
+```text
+node experiments/worker-scaling/run-selected.mjs '{"moves":"2431572135633422"}'
+```
+
+The launcher selects the tested `probe` loader arm, pins all resource settings,
+enables FFI for Windows cycle accounting, and retains the sample's 30-second
+default timeout. An explicit `timeoutMs` may be supplied for a declared test.
+Output includes the selected assignment, WDL, cleanup, nodes, timing and cycles.
+Cycle accounting covers the child benchmark process; the cold launcher itself
+is outside that measured operation. This locks the tested campaign configuration;
+it does not silently promote the experimental root wrapper into library defaults.
+
+`sample.mjs` alone uses only the profile's resource options, not its execution
+selection. Historical comparison loaders still select their own explicit arms.
+The historical `campaign.mjs` explicitly supplies its original memory
 and sharing options so rerunning old experiments does not silently change them.
 Resource plans already specify their comparison settings explicitly.
 
 This baseline is scoped to native IsoMax RBA/CPC Lazy SMP with endpoint exact
 publication, current move order and full sharing, on the Windows i5-12600K /
 32 GiB / Node 26.7.0 host. It uses 683 MiB of cache payload. Generic library
-defaults remain portable; consumers of this hardware profile should pass the
-locked options to `runLazySmpConnect4Rba32` during initialization.
+defaults remain portable. Passing resource options alone to
+`runLazySmpConnect4Rba32` does not enable the selected wide worker; use the launcher.
 
 Use this baseline for subsequent same-scope campaigns unless the experiment
-explicitly varies a pinned parameter. Changes of method (including enabling
-PFIF/strategist), solver semantics, runtime or hardware require fresh comparison.
-The owner has selected the operating point; historical experimental evidence is
-unchanged. The three five-minute empty-board runs all timed out cleanly, so the
-selection does not assert a proven empty-board solve-time optimum.
+explicitly varies a pinned parameter. Changes of method, solver semantics, runtime
+or hardware require fresh comparison. The owner selected the mixed worker plan
+after the [move-confidence screen](../../evidence/isomax-move-confidence-focused-20260927/REPORT.md).
+That report's recommendation preceded this owner decision and remains historical
+evidence. The worker mix has short-case qualification, including losing comparisons;
+it is not a proven global optimum. Sustained memory measurements and the three
+five-minute empty-board timeouts belong to the earlier all-deep method. They do
+not establish a sustained-memory optimum for the newly selected worker mix.
 
 ## Shallow-path cost experiment
 
@@ -81,5 +105,5 @@ selection does not assert a proven empty-board solve-time optimum.
 root-probe handoff prototype. The [69-solve report](../../evidence/isomax-wide-handoff-20260927/REPORT.md)
 does not establish a repeatable gain from splitting the recursive paths. Actual
 probing still helps one fixture strongly and hurts another. The prototype is
-diagnostic only; it does not replace the selected native baseline or implement
-general in-flight strategist switching.
+the source of the subsequently selected `probe` execution path. Other arms remain
+diagnostics. None implements general in-flight strategist switching.

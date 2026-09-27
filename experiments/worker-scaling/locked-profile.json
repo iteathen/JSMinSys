@@ -1,10 +1,10 @@
 {
-  "id": "isomax-native-lazy-smp-i5-12600k-20260927",
+  "id": "isomax-six-deep-one-wide-i5-12600k-20260927",
   "status": "owner-selected operating baseline",
   "selectedOn": "2026-09-27",
   "scope": {
     "solver": "IsoMax native JSMinSys RBA CPC alpha-beta with exact endpoint publication",
-    "method": "Lazy SMP, full exact TT sharing, existing move order, no strategist",
+    "method": "Lazy SMP, six deep workers and one iterative root-probing worker, full exact TT sharing, existing move order, no asynchronous strategist",
     "geometry": "7x6",
     "cpu": "Intel Core i5-12600K",
     "physicalCores": 10,
@@ -20,7 +20,18 @@
     "sharedSampleMask": 0
   },
   "cachePayloadBytes7x6": 716177420,
+  "execution": {
+    "launcher": "experiments/worker-scaling/run-selected.mjs",
+    "loader": "experiments/worker-scaling/wide-path-loader.mjs",
+    "arm": "probe",
+    "wideWorker": 0,
+    "deepWorkers": [1, 2, 3, 4, 5, 6],
+    "frontierStride": 2,
+    "releaseAtUnresolvedRootActions": 1
+  },
   "evidenceRevision": "5b0a5f313d66d3929af8ea8fee14a39a16b031ed",
   "evidence": "../../evidence/isomax-resource-sustained-20260927/REPORT.md",
-  "limits": "Selected operating baseline, not proof of global or empty-board solve-time optimality. Requalify materially different solver methods, revisions, runtimes or hardware. PFIF benefits are not included in this selection."
+  "configurationEvidenceRevision": "d238f1cf4a3370b47d91b9f63788ad8b9335e28e",
+  "configurationEvidence": "../../evidence/isomax-move-confidence-focused-20260927/REPORT.md",
+  "limits": "Owner-selected six-deep/one-wide configuration using the tested experimental root wrapper. Not a proven global or empty-board optimum; three-repeat short-case evidence only for this worker mix. Existing sustained memory evidence belongs to the earlier all-deep method. Requalify materially different solver methods, revisions, runtimes or hardware. Historical comparison arms remain explicit."
 }
