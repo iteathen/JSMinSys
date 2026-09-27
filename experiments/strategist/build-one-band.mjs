@@ -12,12 +12,12 @@ source=once(source,'    const region=state.searchShallow&&limit===g.cellCount;',
 source=once(source,'    if(region){\n      passLimit=',`    if(region){
       state.bandPending=0;state.searchShallow=1;state.bandStarted++;
       passLimit=`);
-source=once(source,'      if(alpha>=beta){state.cutoffs+=1;return completeBehaviorNode32(state, sign*best);}',
-  `      if(alpha>=beta){
-        state.cutoffs+=1;
-        if(bandActive){state.searchShallow=0;state.bandCompleted++;}
+// Preserve the current endpoint publication before returning from a cutoff.
+source=once(source,'        return completeBehaviorNode32(state, sign*best);\n      }\n      if(best===1)break;',
+  `        if(bandActive){state.searchShallow=0;state.bandCompleted++;}
         return completeBehaviorNode32(state, sign*best);
-      }`);
+      }
+      if(best===1)break;`);
 source=once(source,'    if(unfinished){\n      if(!region)',`    // Existing band-completion boundary; no added per-node progress counter.
     // Exact/cutoff completion may finish early. An incomplete first band keeps
     // native parent/alpha/child markers and continues DEEP in this same frame.
