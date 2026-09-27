@@ -9421,7 +9421,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "8"
+          "count": "9"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -9430,15 +9430,37 @@
         {
           "op": "runtime.object.allocate",
           "count": "1"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "R+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "R+1"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(8)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
+        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(9)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)+(R)*C(memory.load.u32)+(R)*C(memory.store.u8)+(R)*C(alu.add.u32)+(R+1)*C(control.test.u32)+(R+1)*C(control.branch)",
         "parameters": {
-          "C": "prepared geometry column count"
+          "C": "prepared geometry column count",
+          "S": "prepared shape count",
+          "R": "S*S subset relations copied/encoded during cold preparation"
         },
-        "note": "Cold fixed-arena preparation. Parent-aligned plan layout replaces the Uint8 map arena with valid/unchanged Uint32 masks, so eight typed arrays are allocated. Allocation remains outside measured solve-call cycles."
+        "note": "Cold plan preparation adds a byte subset table copied explicitly from the prepared geometry's 0/1 Uint32 subset table. R=S*S source loads and byte stores are visible in the ledger and remain outside measured solve-call cycles."
       },
       "status": "decomposed"
     },
@@ -9614,7 +9636,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "3*N+3*CN+T"
+          "count": "(3*N+3*CN+T)-T"
         },
         {
           "op": "memory.store.u32",
@@ -9655,11 +9677,15 @@
         {
           "op": "control.branch",
           "count": "4+5*N+3*CN+T"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "T"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+(8+6*N+5*CN+2*T)*C(alu.add.u32)+(2*N+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+(2*N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)",
+        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+((3*N+3*CN+T)-T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+(8+6*N+5*CN+2*T)*C(alu.add.u32)+(2*N+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+(2*N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)+(T)*C(memory.load.u8)",
         "parameters": {
           "N": "parent basis entries examined",
           "CN": "child basis entries stored",
@@ -9667,7 +9693,7 @@
           "U": "non-killed parent images that are unchanged and publish an unchanged-mask bit",
           "T": "dense subset probes/conditional closure-bit publications while building parent-aligned closures"
         },
-        "note": "Miss-only parent-aligned plan materialization. Valid and unchanged masks are published by parent basis slot; each non-killed parent image receives its immutable child-basis closure directly at the parent slot. No q coordinate membership, W/D/L, CPC or best-move information is stored."
+        "note": "Miss-only plan materialization using a cold-prepared Uint8 subset table. Each of T subset probes is charged as an 8-bit load instead of a 32-bit load; all parent/child indexing and closure publication work remains unchanged."
       },
       "status": "decomposed"
     }
@@ -9777,7 +9803,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "3009c4abc710b591a56683b19330c27bc1475236",
+    "addons/rba-connect4-coordinate.mjs": "b07e4c2c11b44bd5376cbbe005ae2ebca8e446f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
