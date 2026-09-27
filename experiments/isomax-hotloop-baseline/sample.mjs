@@ -5,6 +5,8 @@ import {cpus} from 'node:os';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {processCycleCounter} from '../../tools/process-cycle-counter.mjs';
 
 const [libraryArg='.', cacheMode='local', movesText='45461667'] = process.argv.slice(2);
@@ -24,6 +26,16 @@ const library=resolve(libraryArg);
 const git=(...args)=>execFileSync('git',['-C',library,...args],{encoding:'utf8'}).trim();
 const sourceSha=git('rev-parse','HEAD');
 if(git('status','--porcelain')) throw new Error('library checkout must be clean');
+const solverFiles=[
+  'addons/rba-connect4-alphabeta.mjs',
+  'addons/rba-connect4-coordinate.mjs',
+  'addons/cpc-connect4.mjs',
+  'addons/connect4-live-line-evaluator.mjs',
+  'addons/rba-connect4-shared-exact-cache.mjs',
+];
+const solverHashes=Object.fromEntries(solverFiles.map(file=>[
+  file,createHash('sha256').update(readFileSync(resolve(library,file))).digest('hex')
+]));
 
 const api=await import(pathToFileURL(resolve(library,'addons/index.mjs')).href);
 const {
@@ -64,6 +76,7 @@ try{
   console.log(JSON.stringify({
     kind:'isomax-hotloop-baseline-sample-v1',
     sourceSha,
+    solverHashes,
     cacheMode,
     moves:movesText,
     node:process.version,
