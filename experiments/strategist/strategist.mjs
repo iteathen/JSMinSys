@@ -59,7 +59,7 @@ if(frontierStrategy)for(let i=0;i<d.workers;i++){
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 if(modeStrategy)for(let i=0;i<d.workers;i++){
-  const flags=poolStrategy?(i<poolState.active?1280:0):pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0);
+  const flags=poolStrategy?(i<poolState.active?1280:0):pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0,i);
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 Atomics.store(d.control,4,1);
@@ -90,7 +90,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
     const flags=poolStrategy?(i<poolState.active?1024|((last[i]&1024)?((acceptedPending?(last[i]^256):last[i])&256):256):0):
       pendingStrategy?((acceptedPending?(last[i]^256):last[i])&256)|pendingMode:
       widthStrategy?(strategy==='modes-width-observe'?0:widthPolicy.flags):
-      modeStrategy?modePolicyFlags(strategy,now-started):frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,bounded,
+      modeStrategy?modePolicyFlags(strategy,now-started,i):frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,bounded,
       release:strategy==='frontier-full'||(strategy==='frontier-4-release'&&now-started>=32)}):
       actionStrategy?actionPolicyFlags(strategy,i,policyState):strategy?policyFlags(strategy,i,d,policyState):d.policy==='sparse'?encodeControls({shareExponent:4}):
       d.policy==='adaptive'?encodeControls({shareExponent:exponent}):
