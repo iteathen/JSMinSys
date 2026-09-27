@@ -5,6 +5,7 @@ import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs
 import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
 import {createConnect4RbaSharedExactCache32} from '../../addons/rba-connect4-shared-exact-cache.mjs';
 import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from '../../addons/worker-behavior.mjs';
+import {createPendingObservation} from './pending-observation.mjs';
 
 export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,holdMs=20,
   timeoutMs=1000,warmups=20,measureCycles=false,localCapacity=4096,sharedCapacity=16384}={}){
@@ -14,6 +15,8 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   const geometry=prepareConnect4RbaGeometry(fixture),root=connect4RbaFromMoves(fixture.moves,{geometry});
   const cache=createConnect4RbaSharedExactCache32({capacity:sharedCapacity,keyWords:geometry.keyWords});
   const memory=createWorkerBehaviorMemory32(workers),control=new Int32Array(new SharedArrayBuffer(128));
+  const pendingObservation=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-pending-')?
+    createPendingObservation(workers,geometry.columns,geometry.rows):null;
   const threads=[],exits=[],evaluators=[],errors=[];let strategist=null,forced=0,timedOut=false;
   const launch=(file,data)=>{
     const w=new Worker(new URL(file,import.meta.url),{workerData:data,execArgv:process.execArgv.filter(a=>a==='--experimental-ffi')});
@@ -24,9 +27,9 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   };
   let started=null,finished=null;
   try{
-    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pollOnly:policy==='poll-only'||policy==='host-only'});
+    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pendingObservation,pollOnly:policy==='poll-only'||policy==='host-only'});
     if(policy==='host-only')Atomics.store(control,4,1);
-    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,
+    else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,pendingObservation,
       ...(process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-width-')?{geometry,root}:{})});
     const preparationDeadline=performance.now()+10000;
     while((Atomics.load(control,1)!==workers||!Atomics.load(control,4))&&!errors.length&&performance.now()<preparationDeadline)await delay(1);

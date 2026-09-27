@@ -9,12 +9,15 @@ import {ACTION_POLICIES,advanceActionPolicy,actionPolicyFlags} from './action-po
 import {MODE_POLICIES,modePolicyFlags} from './mode-policy.mjs';
 import {WIDTH_POLICIES,createWidthPolicy,advanceWidthPolicy} from './width-policy.mjs';
 import {prepareWidthObserver,stepWidthObserver} from './width-observer.mjs';
+import {preparePendingReaders,pollPendingReader} from './pending-reader.mjs';
 
 // Cold experiment selection through inherited environment keeps the existing
 // host, evaluator and benchmark interfaces unchanged. Every result names it.
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
+const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read';
+const pendingReaders=pendingStrategy?preparePendingReaders(d.pendingObservation):null;
 const widthStrategy=WIDTH_POLICIES.includes(strategy);
-const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy;
+const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy||pendingStrategy;
 const widthObserver=widthStrategy?prepareWidthObserver(d.geometry,d.root,d.cache):null;
 const widthPolicy=widthStrategy?createWidthPolicy({growthPercent:strategy==='modes-width-relative'?25:0}):null;
 if(widthStrategy)advanceWidthPolicy(widthPolicy,widthObserver);
@@ -48,7 +51,7 @@ if(frontierStrategy)for(let i=0;i<d.workers;i++){
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 if(modeStrategy)for(let i=0;i<d.workers;i++){
-  const flags=widthStrategy?0:modePolicyFlags(strategy,0);
+  const flags=pendingStrategy?(strategy==='modes-pending-read'?256:0):widthStrategy?0:modePolicyFlags(strategy,0);
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 Atomics.store(d.control,4,1);
@@ -57,6 +60,7 @@ const start=meter.read(),started=performance.now();
 while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   const now=performance.now(),stores=Atomics.load(d.cache.stats,1),contention=Atomics.load(d.cache.stats,2);
   const hits=actionStrategy?Atomics.load(d.cache.stats,0):0;
+  const pendingSamples=pendingStrategy?pendingReaders.map((r,i)=>pollPendingReader(d.pendingObservation,i,r)):null;
   if(widthStrategy){stepWidthObserver(widthObserver);advanceWidthPolicy(widthPolicy,widthObserver);}
   if(actionStrategy)advanceActionPolicy(policyState,{hits});
   const observation=observeProofs?observeProofCache(d.cache,d.columns,cellCount):null;
@@ -72,7 +76,8 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   }
   if(d.policy==='rotate'||d.policy==='combined')phase=ticks%d.columns;
   for(let i=0;i<d.workers;i++){
-    const flags=widthStrategy?(strategy==='modes-width-observe'?0:widthPolicy.flags):
+    const flags=pendingStrategy?(strategy==='modes-pending-read'&&pendingSamples[i]?.request===(last[i]&256)?last[i]^256:last[i]):
+      widthStrategy?(strategy==='modes-width-observe'?0:widthPolicy.flags):
       modeStrategy?modePolicyFlags(strategy,now-started):frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,bounded,
       release:strategy==='frontier-full'||(strategy==='frontier-4-release'&&now-started>=32)}):
       actionStrategy?actionPolicyFlags(strategy,i,policyState):strategy?policyFlags(strategy,i,d,policyState):d.policy==='sparse'?encodeControls({shareExponent:4}):
@@ -89,6 +94,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
     harvestEligible:policyState.harvested,retirementEligible:policyState.retired,
     helperStopPublished:last.subarray(1).some(flags=>flags&1),
     ...(actionStrategy||frontierStrategy||modeStrategy?{hits,reuseSeen:policyState.reuseSeen,flags:[...last]}:{}),
+    ...(pendingStrategy?{pendingSamples}:{}),
     ...(widthStrategy?{width:{complete:widthObserver.complete,revision:widthObserver.revision,depth:widthObserver.depth,
       width:widthObserver.width,delta:widthPolicy.delta,capacityRejections:widthObserver.capacityRejections}}:{})});
   previousStores=stores;previousContention=contention;ticks++;
@@ -96,9 +102,12 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
 }
 const stopAt=performance.now();
 for(let i=0;i<d.workers;i++){publishWorkerBehavior32(words,i,last[i]|1);writes++;}
+if(pendingStrategy)for(let i=0;i<d.workers;i++)pollPendingReader(d.pendingObservation,i,pendingReaders[i]);
 const end=meter.read();meter.close();
 parentPort.postMessage({strategy:strategy??d.policy,ticks,writes,cycles:start===null?null:(end-start).toString(),
   started,stopAt,wallMs:stopAt-started,trace,
+  ...(pendingStrategy?{pending:pendingReaders.map(r=>({samples:r.samples,minWidth:r.samples?r.minWidth:null,
+    maxWidth:r.maxWidth,positive:r.positive,negative:r.negative,flat:r.flat,last:r.last}))}:{}),
   ...(widthStrategy?{widthObserver:{width:widthObserver.width,depth:widthObserver.depth,revision:widthObserver.revision,
     expanded:widthObserver.expanded,generated:widthObserver.generated,duplicates:widthObserver.duplicates,
     exactRemoved:widthObserver.exactRemoved,capacityRejections:widthObserver.capacityRejections,
