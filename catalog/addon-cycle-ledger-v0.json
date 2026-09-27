@@ -9421,7 +9421,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "7"
+          "count": "8"
         },
         {
           "op": "runtime.typed_array.fill",
@@ -9434,11 +9434,11 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(12+2*C)*C(runtime.field.load)+5*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+C*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+7*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
+        "expression": "(12+2*C)*C(runtime.field.load)+(5)*C(runtime.integer.check)+(C+1)*C(alu.imul.u32)+(C)*C(alu.add.u32)+(14+2*C)*C(control.test.u32)+(14+2*C)*C(control.branch)+(8)*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+C(runtime.object.allocate)",
         "parameters": {
           "C": "prepared geometry column count"
         },
-        "note": "Cold fixed-arena preparation. Mixed-radix support/key counts are derived from rows/columns; allocation/fill cost remains visible and outside measured solve-call cycles."
+        "note": "Cold fixed-arena preparation. Parent-aligned plan layout replaces the Uint8 map arena with valid/unchanged Uint32 masks, so eight typed arrays are allocated. Allocation remains outside measured solve-call cycles."
       },
       "status": "decomposed"
     },
@@ -9495,7 +9495,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "20+4*L+5*E+4*Q+4*W"
+          "count": "20+4*L+4*Q+6*W"
         },
         {
           "op": "runtime.field.store",
@@ -9503,11 +9503,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "4+C+CN+4*W+3*L+2*Q*W"
+          "count": "4+C+CN+6*W+2*L+2*Q*W"
         },
         {
           "op": "memory.load.u8",
-          "count": "3+L"
+          "count": "2"
         },
         {
           "op": "memory.store.u32",
@@ -9515,11 +9515,11 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": "3+E"
+          "count": "3+L"
         },
         {
           "op": "alu.add.u32",
-          "count": "12+C+CN+4*W+6*L+2*E+Q*W"
+          "count": "12+C+CN+5*W+5*L+Q*W"
         },
         {
           "op": "alu.sub.u32",
@@ -9527,7 +9527,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "5+2*W+6*L+E+2*Q*W"
+          "count": "5+4*W+5*L+2*Q*W"
         },
         {
           "op": "alu.or.u32",
@@ -9547,11 +9547,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "10+C+4*W+7*L+3*E+Q*W"
+          "count": "10+C+4*W+6*L+Q*W"
         },
         {
           "op": "control.branch",
-          "count": "10+C+4*W+7*L+3*E+Q*W"
+          "count": "10+C+4*W+6*L+Q*W"
         },
         {
           "op": "runtime.call.subledger",
@@ -9561,16 +9561,15 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(20+4*L+5*E+4*Q+4*W)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4+C+CN+4*W+3*L+2*Q*W)*C(memory.load.u32)+(3+L)*C(memory.load.u8)+(3+C+2*W+CN+Q*W)*C(memory.store.u32)+(3+E)*C(alu.imul.u32)+(12+C+CN+4*W+6*L+2*E+Q*W)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(5+2*W+6*L+E+2*Q*W)*C(alu.and.u32)+(W+Q*W)*C(alu.or.u32)+(L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(10+C+4*W+7*L+3*E+Q*W)*C(control.test.u32)+(10+C+4*W+7*L+3*E+Q*W)*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
+        "expression": "(20+4*L+4*Q+6*W)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4+C+CN+6*W+2*L+2*Q*W)*C(memory.load.u32)+(2)*C(memory.load.u8)+(3+C+2*W+CN+Q*W)*C(memory.store.u32)+(3+L)*C(alu.imul.u32)+(12+C+CN+5*W+5*L+Q*W)*C(alu.add.u32)+(1+L)*C(alu.sub.u32)+(5+4*W+5*L+2*Q*W)*C(alu.and.u32)+(W+Q*W)*C(alu.or.u32)+(L)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(10+C+4*W+6*L+Q*W)*C(control.test.u32)+(10+C+4*W+6*L+Q*W)*C(control.branch)+(L)*CALL(isolatedBitIndex32)",
         "parameters": {
           "C": "prepared geometry column count",
           "W": "prepared coordinate word count",
           "CN": "cached child-basis entries copied",
-          "L": "parent coordinate indices live for at least one player and therefore visited by sparse bit iteration",
-          "E": "live mapped entries with at least one surviving player coordinate",
-          "Q": "player/image closure applications; may include closures that C1 would have absorbed"
+          "L": "live parent-coordinate indices remaining after the cached valid-image mask",
+          "Q": "surviving player/parent closure applications"
         },
-        "note": "Experimental combined plan-hit arm sparsely iterates only live parent-coordinate indices and removes the C1 principal target-bit probe. Caller bit isolation, isolatedBitIndex32, map/survival work and every idempotent closure OR remain explicitly charged."
+        "note": "Parent-aligned plan hit. Sparse iteration masks killed parent images before entry, reads unchanged survival from one prepared bitset, and addresses immutable closure words directly by parent index. No map byte, child-image decode or child-index closure indirection remains; every source bit isolation and closure OR stays charged."
       },
       "status": "decomposed"
     },
@@ -9582,7 +9581,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "16+5*N+4*CN+2*T+2*W"
+          "count": "18+5*N+4*CN+2*T+2*W"
         },
         {
           "op": "runtime.field.store",
@@ -9594,31 +9593,31 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "2+CN+T"
+          "count": "2+CN+N+U+T"
         },
         {
           "op": "memory.store.u8",
-          "count": "3+N"
+          "count": "3"
         },
         {
           "op": "alu.imul.u32",
-          "count": "5+2*N+3*CN+T"
+          "count": "6+4*N+2*CN+T"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+4*N+6*CN+2*T"
+          "count": "8+6*N+5*CN+2*T"
         },
         {
           "op": "alu.and.u32",
-          "count": "3*N+2*T"
+          "count": "2*N+2*T"
         },
         {
           "op": "alu.or.u32",
-          "count": "T"
+          "count": "N+U+T"
         },
         {
           "op": "alu.shl.u32",
-          "count": "N+T"
+          "count": "2*N+T"
         },
         {
           "op": "alu.shr.u32",
@@ -9626,23 +9625,24 @@
         },
         {
           "op": "control.test.u32",
-          "count": "4+5*N+4*CN+T"
+          "count": "4+5*N+3*CN+T"
         },
         {
           "op": "control.branch",
-          "count": "4+5*N+4*CN+T"
+          "count": "4+5*N+3*CN+T"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(16+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+3*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+T)*C(memory.store.u32)+(3+N)*C(memory.store.u8)+(5+2*N+3*CN+T)*C(alu.imul.u32)+(8+4*N+6*CN+2*T)*C(alu.add.u32)+(3*N+2*T)*C(alu.and.u32)+T*C(alu.or.u32)+(N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+4*CN+T)*C(control.test.u32)+(4+5*N+4*CN+T)*C(control.branch)",
+        "expression": "(18+5*N+4*CN+2*T+2*W)*C(runtime.field.load)+(3)*C(runtime.field.store)+(3*N+3*CN+T)*C(memory.load.u32)+(2+CN+N+U+T)*C(memory.store.u32)+(3)*C(memory.store.u8)+(6+4*N+2*CN+T)*C(alu.imul.u32)+(8+6*N+5*CN+2*T)*C(alu.add.u32)+(2*N+2*T)*C(alu.and.u32)+(N+U+T)*C(alu.or.u32)+(2*N+T)*C(alu.shl.u32)+(N+T)*C(alu.shr.u32)+(4+5*N+3*CN+T)*C(control.test.u32)+(4+5*N+3*CN+T)*C(control.branch)",
         "parameters": {
-          "N": "parent basis entries encoded",
+          "N": "parent basis entries examined",
           "CN": "child basis entries stored",
           "W": "prepared coordinate word count",
-          "T": "CN*CN dense subset probes/conditional closure-bit publications"
+          "U": "non-killed parent images that are unchanged and publish an unchanged-mask bit",
+          "T": "dense subset probes/conditional closure-bit publications while building parent-aligned closures"
         },
-        "note": "Miss-only immutable plan materialization. Geometry dimensions and closure word count come from the prepared profile; no standard-board constant or solved information is stored."
+        "note": "Miss-only parent-aligned plan materialization. Valid and unchanged masks are published by parent basis slot; each non-killed parent image receives its immutable child-basis closure directly at the parent slot. No q coordinate membership, W/D/L, CPC or best-move information is stored."
       },
       "status": "decomposed"
     }
@@ -9752,7 +9752,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "c03fb234806313dc88cbffd11f4de02e79de1a1a",
+    "addons/rba-connect4-coordinate.mjs": "a9033f82188d2b35106114367f30c042667b2bd3",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
