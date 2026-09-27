@@ -35,9 +35,8 @@ test('completed principal upset absorbs later images without repeated expansion'
     if(budget===0)assert.equal(expansions,1,'sparse profile expands one completed principal upset');
     else{
       assert.equal(expansions,0,'dense direct path must bypass prepared subset callback');
-      const start=Array.from(basis.slice(0,size[0])).findIndex(id=>g.shapeSize[id]>=3);
-      assert.equal(denseProbes,size[0]-(start<0?size[0]:start),
-        'dense direct path probes exactly one pair-generator upset range');
+      assert.equal(denseProbes,0,
+        'dense direct path preserves C1 absorption before any subset-table probe on this fixture');
     }
   }
 });
