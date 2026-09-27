@@ -66,7 +66,9 @@ export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyC
     basis:new Uint16Array(capacity*g.maxBasis),
     valid:new Uint32Array(capacity*g.coordWords),
     unchanged:new Uint32Array(capacity*g.coordWords),
-    closure:new Uint32Array(capacity*g.maxBasis*g.coordWords),
+    closure0:new Uint32Array(capacity*g.maxBasis),
+    closure1:g.coordWords>1?new Uint32Array(capacity*g.maxBasis):null,
+    closure2:g.coordWords>2?new Uint32Array(capacity*g.maxBasis):null,
   };
 }
 function cofactorPlanKey(source,src,column,cache){
@@ -91,30 +93,64 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
     sizes[sizeIndex]=0;target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;
   }
 
-  const cn=cache.cn[plan],planBase=plan*cache.stride,closureBase=planBase*words,
+  const cn=cache.cn[plan],planBase=plan*cache.stride,
     planWordBase=plan*words,p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
   sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
   if(words===3){
     let p00=0,p01=0,p02=0,p10=0,p11=0,p12=0;
-    for(let sourceWord=0;sourceWord<3;sourceWord+=1){
-      let activeBits=(source[p0Source+sourceWord]|source[p1Source+sourceWord])&
-        cache.valid[planWordBase+sourceWord];
-      const unchangedBits=cache.unchanged[planWordBase+sourceWord];
-      while(activeBits){
-        const isolated=activeBits&-activeBits,bit=isolatedBitIndex32(isolated),
-          i=(sourceWord<<5)+bit;
-        activeBits^=isolated;
-        const active0=source[p0Source+sourceWord]&isolated,
-          active1=source[p1Source+sourceWord]&isolated,
-          unchanged=unchangedBits&isolated,
-          write0=active0&&(player===0||unchanged),
-          write1=active1&&(player===1||unchanged);
-        if(!write0&&!write1)continue;
-        const cb=closureBase+i*3,c0=cache.closure[cb],c1=cache.closure[cb+1],c2=cache.closure[cb+2];
-        if(write0){p00|=c0;p01|=c1;p02|=c2;}
-        if(write1){p10|=c0;p11|=c1;p12|=c2;}
+    if(player===0){
+      for(let sourceWord=0;sourceWord<3;sourceWord+=1){
+        const planWord=planWordBase+sourceWord,
+          validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+          source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+        let mover=source0&validBits,opponent=source1&unchangedBits,
+          both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+        while(both){
+          const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          both^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p00|=c0;p01|=c1;p02|=c2;p10|=c0;p11|=c1;p12|=c2;
+        }
+        while(moverOnly){
+          const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          moverOnly^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p00|=c0;p01|=c1;p02|=c2;
+        }
+        while(opponentOnly){
+          const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          opponentOnly^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p10|=c0;p11|=c1;p12|=c2;
+        }
+      }
+    }else{
+      for(let sourceWord=0;sourceWord<3;sourceWord+=1){
+        const planWord=planWordBase+sourceWord,
+          validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
+          source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
+        let mover=source1&validBits,opponent=source0&unchangedBits,
+          both=mover&opponent,moverOnly=mover^both,opponentOnly=opponent^both;
+        while(both){
+          const isolated=both&-both,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          both^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p00|=c0;p01|=c1;p02|=c2;p10|=c0;p11|=c1;p12|=c2;
+        }
+        while(moverOnly){
+          const isolated=moverOnly&-moverOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          moverOnly^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p10|=c0;p11|=c1;p12|=c2;
+        }
+        while(opponentOnly){
+          const isolated=opponentOnly&-opponentOnly,bit=isolatedBitIndex32(isolated),i=(sourceWord<<5)+bit;
+          opponentOnly^=isolated;
+          const pi=planBase+i,c0=cache.closure0[pi],c1=cache.closure1[pi],c2=cache.closure2[pi];
+          p00|=c0;p01|=c1;p02|=c2;
+        }
       }
     }
     target[p0Target]=p00;target[p0Target+1]=p01;target[p0Target+2]=p02;
@@ -137,11 +173,19 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
         write0=active0&&(player===0||unchanged),
         write1=active1&&(player===1||unchanged);
       if(!write0&&!write1)continue;
-      const cb=closureBase+i*words;
-      for(let w=0;w<words;w+=1){
-        const closure=cache.closure[cb+w];
-        if(write0)target[p0Target+w]|=closure;
-        if(write1)target[p1Target+w]|=closure;
+      const pi=planBase+i;
+      const c0=cache.closure0[pi];
+      if(write0)target[p0Target]|=c0;
+      if(write1)target[p1Target]|=c0;
+      if(words>1){
+        const c1=cache.closure1[pi];
+        if(write0)target[p0Target+1]|=c1;
+        if(write1)target[p1Target+1]|=c1;
+      }
+      if(words>2){
+        const c2=cache.closure2[pi];
+        if(write0)target[p0Target+2]|=c2;
+        if(write1)target[p1Target+2]|=c2;
       }
     }
   }
@@ -150,7 +194,7 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
 function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex){
   if(cache.count>=cache.capacity)return;
   const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
-    closureBase=planBase*words,planWordBase=plan*words,
+    planWordBase=plan*words,
     removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
   for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
@@ -160,9 +204,13 @@ function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex
     const word=i>>>5,mask=1<<(i&31);
     cache.valid[planWordBase+word]|=mask;
     if(image===id)cache.unchanged[planWordBase+word]|=mask;
-    const subset=image*shapeCount,cb=closureBase+i*words;
-    for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]])
-      cache.closure[cb+(k>>>5)]|=1<<(k&31);
+    const subset=image*shapeCount,pi=planBase+i;
+    for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]]){
+      const mask=1<<(k&31),word=k>>>5;
+      if(word===0)cache.closure0[pi]|=mask;
+      else if(word===1)cache.closure1[pi]|=mask;
+      else cache.closure2[pi]|=mask;
+    }
   }
   cache.planByKey[key]=plan;
 }
