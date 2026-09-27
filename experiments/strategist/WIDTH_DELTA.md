@@ -1,5 +1,12 @@
 # Width-delta strategist candidate
 
+Screening disposition: **reject this observer as a usable active-width signal**.
+All six active controls timed out after projection capacity blocked new width
+measurements; all six fixed/observation-only controls solved. Preserve this
+experiment for reproduction, not as a production policy. See
+`evidence/strategist-width-20260926/RESULTS.md`. This does not reject an actual
+active-frontier delta trigger, which the current exact-only TT cannot expose.
+
 Owner-approved question: use change in unresolved search width to select
 SHALLOW/DEEP, with all decisions and new observation work in the strategist.
 No evaluator source, flag decoder or generated worker changes in this pass.
