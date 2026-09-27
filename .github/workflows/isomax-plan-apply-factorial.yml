@@ -1,0 +1,45 @@
+name: IsoMax plan-apply factorial
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-plan-apply-factorial.yml"
+      - "experiments/isomax-plan-apply-factorial/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorial:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" 8d9b3dd2c353a8162addd1a4babbedd84d68f18b
+          git worktree add "$env:RUNNER_TEMP/arm-b" 6df3bfb64026006eac184e2abdc900c28e67a103
+          git worktree add "$env:RUNNER_TEMP/arm-c" b1b3b9198cb963afad07cf18a1ab9dc68c1bd561
+          git worktree add "$env:RUNNER_TEMP/arm-d" b6a87d308bcb75323c15404ed8fd5a166c9feecf
+      - name: Long factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-plan-apply-factorial/long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 353335714 8
+      - name: Short factorial
+        shell: pwsh
+        run: node experiments/isomax-plan-apply-factorial/run.mjs "$env:RUNNER_TEMP/isomax-plan-apply-factorial/short" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 45461667 4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-plan-apply-factorial
+          path: ${{ runner.temp }}/isomax-plan-apply-factorial
+          if-no-files-found: error
+          retention-days: 30
