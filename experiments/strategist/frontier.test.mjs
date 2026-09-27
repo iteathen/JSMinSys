@@ -4,8 +4,53 @@ import {BehaviorWorker,createWorkerBehaviorMemory32,publishWorkerBehavior32} fro
 import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta} from '../../addons/rba-connect4-alphabeta.mjs';
+import {createConnect4RbaSharedExactCache32} from '../../addons/rba-connect4-shared-exact-cache.mjs';
 process.env.JSMINSYS_FLAG_DISPATCH='actions';
 const controls=await import('./controls.mjs');
+
+test('narrow-frontier action stops bounded passes once one root obligation remains',async()=>{
+  const {prepareConnect4RbaAlphaBetaBehavior:prepare,solveConnect4RbaAlphaBetaBehavior:solve}=await import('./frontier.generated.mjs');
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const root=connect4RbaFromMoves([...'1320461024522311'].map(Number),{geometry:g});
+  const expected=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:4096}),reflected:root.reflected});
+  const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
+  publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:2,target:1}));
+  const state=prepare({geometry:g,cacheCapacity:4096,
+    sharedExactCache:createConnect4RbaSharedExactCache32({capacity:16384,keyWords:g.keyWords}),
+    behavior:new BehaviorWorker(0,words,0,memory)});
+  const load=state.behaviorLoad;state.behaviorLoad=()=>state.nodes>=300000?1:load();
+  const r=solve(root,{state,reflected:root.reflected});
+  assert.equal(r.status,'EXACT','bounded exploration must end when its narrowing objective is met');
+  assert.equal(r.value,expected.value);assert.equal(r.move,expected.move);
+  assert.equal(r.metrics.frontierAutoReleases,1);assert.equal(state.frontierLimit,g.cellCount);
+});
+
+test('target already met releases before exploration; target encodes without extension collision',async()=>{
+  const {prepareConnect4RbaAlphaBetaBehavior:prepare,solveConnect4RbaAlphaBetaBehavior:solve}=await import('./frontier.generated.mjs');
+  for(const target of [-1,32,1.5])assert.throws(()=>controls.encodeFrontier({target}),RangeError);
+  assert.equal(controls.encodeFrontier({target:31})>>>31,0);
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),root=connect4RbaFromMoves([],{geometry:g});
+  const expected=solveConnect4RbaAlphaBeta(root,{state:prepareConnect4RbaAlphaBeta({geometry:g}),reflected:root.reflected});
+  const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
+  publishWorkerBehavior32(words,0,controls.encodeFrontier({stride:2,target:4}));
+  const state=prepare({geometry:g,behavior:new BehaviorWorker(0,words,0,memory)});
+  const r=solve(root,{state,reflected:root.reflected});
+  assert.equal(r.status,'EXACT');assert.equal(r.value,expected.value);assert.equal(r.move,expected.move);
+  assert.equal(r.metrics.frontierAutoReleases,1);assert.equal(r.metrics.horizonStops,0);
+  assert.equal(r.metrics.frontierPasses,1);
+});
+
+test('real strategist supplies narrow-frontier action to evaluator',{timeout:15000},async()=>{
+  process.env.JSMINSYS_STRATEGIST_POLICY='frontier-2-narrow';
+  try{
+    const {runTrial}=await import('./host.mjs');
+    const r=await runTrial({fixture:{columns:7,rows:6,moves:[...'1320461024522311'].map(Number)},
+      workers:1,policy:'inert',timeoutMs:750,warmups:0});
+    assert.equal(r.status,'EXACT');assert.equal(r.value,1);assert.equal(r.cleanup,true);
+    assert.equal(r.evaluators[0].result.metrics.frontierAutoReleases,1);
+    assert.ok(r.strategist.trace.every(t=>((t.flags[0]>>>24)&31)===1));
+  }finally{delete process.env.JSMINSYS_STRATEGIST_POLICY;}
+});
 
 test('root completion polls STOP after an immediate winning child',async()=>{
   const {prepareConnect4RbaAlphaBetaBehavior:prepare,solveConnect4RbaAlphaBetaBehavior:solve}=await import('./frontier.generated.mjs');

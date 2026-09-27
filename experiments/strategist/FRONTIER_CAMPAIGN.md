@@ -9,6 +9,8 @@ adds that missing capability without changing the ordinary solver or TT.
 - Primary word bits 16..21: stride, 1..63 plies relative to the solve root.
 - Bit 23: enable successive bounded passes.
 - Bit 22: release into full continuation. Clearing enable also releases.
+- Bits 24..28: remaining-root-action target, 0..31. Zero disables this guard;
+  otherwise release as soon as unresolved root actions are at most the target.
 - Bit 0: existing STOP. Bit 31: existing extension protocol.
 
 The existing per-completed-node reader applies changed words. Stride changes
@@ -16,6 +18,15 @@ take effect on the next pass. Release increases the current horizon immediately
 at that control boundary; it does not abandon or restart the active frame.
 The strategist publishes the initial command after warmup and before the run
 barrier. It never writes TT contents or search frames.
+
+Audit correction: the original fixed-pass policies omitted the narrowing stop
+condition entirely. The `frontier-2-narrow`, `frontier-4-narrow` and
+`frontier-8-narrow` policies encode worker count as the target. The worker tests
+the target only at root-action boundaries (once on entry, then on newly solved
+root actions). It switches to full continuation immediately when reached, not
+after completing another broad pass. This is a root-concentration safeguard;
+unresolved root actions are NOT a count of all frontier leaves, and this does
+not implement worker partitioning or a TT-observing global frontier strategist.
 
 `build-frontier.mjs` produces an opt-in specialization of the existing native
 CPC/RBA search. The evaluator selects it cold for `frontier-*` policies. The
@@ -33,6 +44,10 @@ witness. This first candidate uses full-window probes for unresolved root
 actions; that loses some baseline root pruning and is a deliberate, measured
 limitation. It retains exact values, not a complete set of partial action
 intervals or a materialized frontier. No new queue/manager/TT authority exists.
+
+The pre-repair timeout screen must not be used to reject the owner's PFIF
+strategy: it lacked this stopping condition and the broader retained-frontier
+and routing behavior. Its raw timings remain valid for that limited worker.
 
 This is the first PFIF worker-action candidate, not the complete original
 multiworker routing strategy. It does not yet expose surviving branch counts or

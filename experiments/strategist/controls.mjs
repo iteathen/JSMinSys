@@ -16,10 +16,12 @@ export function encodeActions({rotation=null,shareExponent=null,privateOnly=fals
 }
 
 // Cold PFIF commands: bits 16..21 stride, bit 22 release to full continuation,
-// bit 23 enables bounded passes. This is an opt-in experimental worker action.
-export function encodeFrontier({stride=4,release=false,...actions}={}){
+// bit 23 enables bounded passes. Bits 24..28 select a remaining-root-action
+// target (zero disables automatic release). This is an experimental action.
+export function encodeFrontier({stride=4,release=false,target=0,...actions}={}){
   if(!Number.isInteger(stride)||stride<1||stride>63)throw RangeError('frontier stride');
-  return encodeActions(actions)|(stride<<16)|8388608|(release?4194304:0);
+  if(!Number.isInteger(target)||target<0||target>31)throw RangeError('frontier target');
+  return encodeActions(actions)|(stride<<16)|8388608|(release?4194304:0)|(target<<24);
 }
 
 export function prepareSearchBehavior32(state,behavior){
@@ -45,7 +47,7 @@ export function prepareSearchBehavior32(state,behavior){
     state.campaignActionOrders=[state.campaignOrders,reversed];
   }
   state.campaignLast=0;state.campaignChanges=0;
-  state.frontierStride=0;state.frontierLimit=state.g.cellCount??0;
+  state.frontierStride=0;state.frontierTarget=0;state.frontierLimit=state.g.cellCount??0;
   return state;
 }
 
@@ -131,7 +133,7 @@ export function completeMasked32(state,value){
 // HOT CONTRACT: same unconditional per-completion shared load and guarded
 // extension read as completeEarly32. DO NOT REMOVE. On unchanged flags only
 // compare and return. On change: bounded masks/shifts, four prepared setting
-// assignments, frontier stride assignment and optional horizon release,
+// assignments, frontier stride/target assignments and optional horizon release,
 // last-word store and private counter increment. No allocation,
 // strings, TT writes/clears, active-frame rewrites or clocks. Disabling a cache
 // drops optional reuse only; CPC toggling selects existing exact proof logic.
@@ -149,6 +151,7 @@ export function completeActions32(state,value){
   state.cache.shared=(flags&4096)?null:state.campaignShared;
   state.cpc.frontierResponse=(flags&8192)?1:state.campaignDefaultFrontier;
   state.frontierStride=(flags&8388608)&&!(flags&4194304)?(flags>>>16)&63:0;
+  state.frontierTarget=(flags>>>24)&31;
   if(!state.frontierStride)state.frontierLimit=state.g.cellCount;
   state.campaignLast=flags;state.campaignChanges+=1;
   return value;

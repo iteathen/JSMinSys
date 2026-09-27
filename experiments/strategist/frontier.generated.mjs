@@ -107,6 +107,7 @@ export function prepareConnect4RbaAlphaBetaBehavior({
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return prepareSearchBehavior32({g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:null,frontierValues:new Int8Array(g.columns),frontierPasses:0,horizonStops:0,
+    frontierPending:0,frontierAutoReleases:0,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache,actionOrder,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
@@ -262,7 +263,7 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
   if(!state)throw new TypeError('prepared alpha-beta state required');
   const g=state.g;
   resetConnect4RbaExactCache32Behavior(state.cache);
-  state.frontierValues.fill(-2);state.frontierPasses=state.horizonStops=0;
+  state.frontierValues.fill(-2);state.frontierPasses=state.horizonStops=state.frontierAutoReleases=state.frontierPending=0;
   state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=0;
   state.cpc.projectedForkTotal=state.cpc.precursorTotal=state.cpc.forcedTotal=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
@@ -314,6 +315,8 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
   // that cost and every repeated pass; do not imply equivalence to baseline AB.
   if(completeBehaviorNode32(state,0)===3)return frontierResult(state,3,0,-1);
   state.frontierLimit=state.frontierStride||g.cellCount;
+  state.frontierPending=actionCount;
+  releaseNarrowFrontier(state);
   const childKey=g.keyWords,childBasis=g.maxBasis,values=state.frontierValues;
   while(true){
     state.frontierPasses+=1;
@@ -338,6 +341,8 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
           if(value===-4){unfinished=1;continue;}
         }
         values[ai]=value;
+        state.frontierPending-=1;
+        releaseNarrowFrontier(state);
       }
       if(value>best){best=value;bestMove=caller;}
       // Earlier unresolved actions may tie this witness. Keep deterministic
@@ -348,6 +353,15 @@ export function solveConnect4RbaAlphaBetaBehavior(root,{state,reflected=0}={}){
     state.frontierLimit=state.frontierStride?Math.min(g.cellCount,state.frontierLimit+state.frontierStride):g.cellCount;
   }
 }
+// Root-boundary action only; never called at an ordinary recursive node.
+// Release as soon as the flag's narrowing target is met, not after another
+// broad pass. This counts unresolved ROOT actions, not all frontier leaves.
+// Keep exact values/cache and current frames. No copy, queue or TT mutation.
+function releaseNarrowFrontier(state){
+  if(state.frontierTarget&&state.frontierPending<=state.frontierTarget&&state.frontierStride){
+    state.frontierLimit=state.g.cellCount;state.frontierStride=0;state.frontierAutoReleases+=1;
+  }
+}
 // Cold operation boundary only: string status and result allocation never run
 // at a recursive node or between frontier passes. Do not move them there.
 function frontierResult(state,cancel,value,move){
@@ -356,7 +370,7 @@ function frontierResult(state,cancel,value,move){
   return {status:cancel?'CANCELLED':'EXACT',value:cancel?null:value,
     relative:cancel?null:absToRelativeBehavior(value,mover),move,metrics:metricsBehavior(state)};
 }
-function metricsBehavior(s){return {frontierPasses:s.frontierPasses,horizonStops:s.horizonStops,frontierLimit:s.frontierLimit,nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
+function metricsBehavior(s){return {frontierPending:s.frontierPending,frontierAutoReleases:s.frontierAutoReleases,frontierPasses:s.frontierPasses,horizonStops:s.horizonStops,frontierLimit:s.frontierLimit,nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
   cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
   frontCalls:s.frontCalls,frontExact:s.frontExact,
   frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}
