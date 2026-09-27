@@ -13,6 +13,7 @@ test('strategy decisions use persistent flag actions without stopping the anchor
   assert.equal(actionPolicyFlags('action-proof-helper',1,state)&8192,8192);
   assert.equal(actionPolicyFlags('action-proof-private',1,state)&12288,12288);
   assert.equal(actionPolicyFlags('action-reverse-proof',1,state)&24576,24576);
+  assert.equal(actionPolicyFlags('action-proof-sample8',0,state),8192|2048|(3<<6));
   for(const name of ACTION_POLICIES)for(let worker=0;worker<4;worker++)assert.equal(actionPolicyFlags(name,worker,state)&1,0);
   assert.throws(()=>actionPolicyFlags('invalid',0,state),/policy/);
 });
