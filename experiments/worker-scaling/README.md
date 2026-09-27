@@ -34,3 +34,28 @@ on 353335714 (a legal one-move continuation of the known P0-losing Fhourstones
 diagnostic completed it in ~12 seconds; that probe is not a campaign replicate.
 This longer completed task distinguishes steady search from cold overhead.
 No memory or worker-count default is changed by either diagnostic mode.
+
+## Joint resource campaign
+
+See RESOURCE_CAMPAIGN.md and resource-{screen,axes,refine,sustained}.json.
+`resources.mjs PLAN NEW_DIRECTORY` runs one declared stage sequentially.
+`resource-report.mjs` checks the four captured stages and generates their
+combined report. The host samples RSS once per second; recursive code is
+unchanged. Cache payload follows geometry key width (14 words on 7x6, 7 on 4x4).
+This cold accounting was generalized after the campaign; all captured 7x6
+byte totals remain unchanged. The 4x4 smoke test protects the alternate width.
+
+Provisional completed-workload profile:
+
+```js
+{
+  workers: 7,
+  sharedCacheCapacity: 4194304,
+  localCacheCapacity: 1048576, // per worker
+  sharedSampleMask: 0
+}
+```
+
+It uses 683 MiB of cache payload. It is an experiment recommendation, not a
+production default or proof of empty-board solve-time optimality. The three
+five-minute empty-board runs all timed out cleanly; retain that limitation.

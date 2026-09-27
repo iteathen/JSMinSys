@@ -14,7 +14,8 @@ test('diagnostic controls preserve WDL, count every worker, and disable sharing 
     assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,0);assert.equal(r.cleanup,true);
     assert.equal(r.workersExited,workers);assert.equal(r.benchmarkNodeCounts.length,workers);
     assert.equal(r.config.sharedCacheCapacity,131072);assert.equal(r.config.localCacheCapacity,65536);
-    assert.equal(r.cachePayloadBytes,131072*64+12+workers*65536*61);
+    // This 4x4 smoke fixture has seven key words, versus fourteen for 7x6.
+    assert.equal(r.cachePayloadBytes,131072*36+12+workers*65536*33);
     assert.ok(r.observedPeakRss>=r.rss);
     assert.ok(r.totalNodes>=r.winnerMetrics.nodes);assert.ok(r.firstSearchToResultMs>0);
     assert.ok(r.firstSearchToResultMs<r.wallMs);assert.ok(r.workerTiming.every(x=>x[0]>0));

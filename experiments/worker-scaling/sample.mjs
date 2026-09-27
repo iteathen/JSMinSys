@@ -22,6 +22,7 @@ try{
     firstSearchToResultMs:finish===null?null:finish-firstStart,
     winnerSearchMs:finish===null?null:finish-r.workerTiming[r.winner][0],
     afterResultMs:finish===null?null:performance.now()-finish,
-    cachePayloadBytes:c.sharedCacheCapacity*64+12+c.workers*c.localCacheCapacity*61,
+    cachePayloadBytes:c.sharedCacheCapacity*(geometry.keyWords*4+8)+12+
+      c.workers*c.localCacheCapacity*(geometry.keyWords*4+5),
     observedPeakRss:Math.max(peakRss,process.memoryUsage().rss),rss:process.memoryUsage().rss}));
 }finally{clearInterval(rssTimer);meter.close();}
