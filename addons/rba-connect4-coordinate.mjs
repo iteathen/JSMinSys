@@ -91,26 +91,32 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
-  for(let i=0;i<n;i+=1){
-    const sourceWord=i>>>5,sourceMask=1<<(i&31),
-      active0=source[p0Source+sourceWord]&sourceMask,
-      active1=source[p1Source+sourceWord]&sourceMask;
-    if(!(active0|active1))continue;
-    const encoded=cache.map[planBase+i];
-    if(encoded===COFACTOR_PLAN_KILL)continue;
-    const imageIndex=encoded&127,unchanged=encoded&128;
-    let write0=active0&&(player===0||unchanged),
-      write1=active1&&(player===1||unchanged);
-    if(!write0&&!write1)continue;
-    const targetWord=imageIndex>>>5,targetMask=1<<(imageIndex&31);
-    write0=write0&&!(target[p0Target+targetWord]&targetMask);
-    write1=write1&&!(target[p1Target+targetWord]&targetMask);
-    if(!write0&&!write1)continue;
-    const cb=closureBase+imageIndex*words;
-    for(let w=0;w<words;w+=1){
-      const closure=cache.closure[cb+w];
-      if(write0)target[p0Target+w]|=closure;
-      if(write1)target[p1Target+w]|=closure;
+  for(let sourceWord=0;sourceWord<words;sourceWord+=1){
+    const p0=source[p0Source+sourceWord]|0,p1=source[p1Source+sourceWord]|0;
+    let active=p0|p1;
+    while(active){
+      // Preserve the isolated bit as signed int32 before clz32. This is the
+      // previously qualified high-bit realization; no unsigned boxing carrier.
+      const sourceMask=active&-active,
+        i=(sourceWord<<5)+(31-Math.clz32(sourceMask));
+      active^=sourceMask;
+      const active0=p0&sourceMask,active1=p1&sourceMask,
+        encoded=cache.map[planBase+i];
+      if(encoded===COFACTOR_PLAN_KILL)continue;
+      const imageIndex=encoded&127,unchanged=encoded&128;
+      let write0=active0&&(player===0||unchanged),
+        write1=active1&&(player===1||unchanged);
+      if(!write0&&!write1)continue;
+      const targetWord=imageIndex>>>5,targetMask=1<<(imageIndex&31);
+      write0=write0&&!(target[p0Target+targetWord]&targetMask);
+      write1=write1&&!(target[p1Target+targetWord]&targetMask);
+      if(!write0&&!write1)continue;
+      const cb=closureBase+imageIndex*words;
+      for(let w=0;w<words;w+=1){
+        const closure=cache.closure[cb+w];
+        if(write0)target[p0Target+w]|=closure;
+        if(write1)target[p1Target+w]|=closure;
+      }
     }
   }
   return 0;
