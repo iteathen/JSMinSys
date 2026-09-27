@@ -9,6 +9,12 @@ export function encodeControls({rotation=null,shareExponent=null}={}){
   return (rotation===null?0:1024|(rotation<<1))|(shareExponent===null?0:2048|(shareExponent<<6));
 }
 
+// Cold action word: bit 12 bypasses shared cache, bit 13 enables the existing
+// exact CPC frontier-response option, bit 14 reverses prepared tie precedence.
+export function encodeActions({rotation=null,shareExponent=null,privateOnly=false,frontierProof=false,reverse=false}={}){
+  return encodeControls({rotation,shareExponent})|(privateOnly?4096:0)|(frontierProof?8192:0)|(reverse?16384:0);
+}
+
 export function prepareSearchBehavior32(state,behavior){
   prepareBase(state,behavior);
   const columns=state.g.columns;
@@ -20,6 +26,17 @@ export function prepareSearchBehavior32(state,behavior){
     state.campaignOrders[rotation]=order;
   }
   state.campaignDefaultSharing=state.cache.sharedSampleBits;
+  state.campaignShared=state.cache.shared;
+  state.campaignDefaultFrontier=state.cpc?.frontierResponse??0;
+  if(dispatch==='actions'){
+    const reversed=new Array(columns);
+    for(let rotation=0;rotation<columns;rotation++){
+      const order=new Uint32Array(columns);
+      for(let i=0;i<columns;i++)order[i]=state.campaignOrders[rotation][columns-1-i];
+      reversed[rotation]=order;
+    }
+    state.campaignActionOrders=[state.campaignOrders,reversed];
+  }
   state.campaignLast=0;state.campaignChanges=0;
   return state;
 }
@@ -103,9 +120,32 @@ export function completeMasked32(state,value){
   return value;
 }
 
+// HOT CONTRACT: same unconditional per-completion shared load and guarded
+// extension read as completeEarly32. DO NOT REMOVE. On unchanged flags only
+// compare and return. On change: bounded masks/shifts, four prepared field
+// assignments, last-word store and private counter increment. No allocation,
+// strings, TT writes/clears, active-frame rewrites or clocks. Disabling a cache
+// drops optional reuse only; CPC toggling selects existing exact proof logic.
+export function completeActions32(state,value){
+  let flags=state.behaviorLoad()>>>0;
+  if(flags&0x80000000){
+    flags=readWorkerBehavior32(state.behaviorWords,state.behaviorBase,state.behaviorExtensions,0);
+    if(flags===-1)return value;
+  }
+  if(flags===state.campaignLast)return value;
+  if(flags&1)return 3;
+  const rotation=(flags>>>1)&31,exponent=(flags>>>6)&15;
+  state.actionOrder=state.campaignActionOrders[(flags>>>14)&1][(flags&1024)&&rotation<state.g.columns?rotation:0];
+  state.cache.sharedSampleBits=(flags&2048)&&exponent<=8?(((1<<exponent)-1)<<24)>>>0:state.campaignDefaultSharing;
+  state.cache.shared=(flags&4096)?null:state.campaignShared;
+  state.cpc.frontierResponse=(flags&8192)?1:state.campaignDefaultFrontier;
+  state.campaignLast=flags;state.campaignChanges+=1;
+  return value;
+}
+
 // Experiment selection is cold, once per module/worker. No per-node variant
 // switch. Existing benchmark/evaluator interfaces are deliberately unchanged.
 const dispatch=process.env.JSMINSYS_FLAG_DISPATCH??'integer';
-if(!['integer','early','xor','masked'].includes(dispatch))throw RangeError('flag dispatch');
-export const completeBehaviorNode32=dispatch==='early'?completeEarly32:
+if(!['integer','early','xor','masked','actions'].includes(dispatch))throw RangeError('flag dispatch');
+export const completeBehaviorNode32=dispatch==='actions'?completeActions32:dispatch==='early'?completeEarly32:
   dispatch==='xor'?completeXor32:dispatch==='masked'?completeMasked32:completeInteger32;
