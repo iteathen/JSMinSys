@@ -1,3 +1,5 @@
+SUPERSEDED for memory selection: see MEMORY_SUSTAINED.md. Short results are diagnostics only.
+
 # Locate the cache-sizing knee
 
 Recover prior evidence first: Connect4 research/semantic-quotient, memory-sizing

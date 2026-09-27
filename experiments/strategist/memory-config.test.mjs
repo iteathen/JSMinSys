@@ -16,5 +16,6 @@ test('memory campaign capacities route to exact public allocator payloads',()=>{
 test('memory campaign bounds fail closed',()=>{
   const c={shared:1048576,local:1048576,timeoutMs:30000};assert.equal(validateMemoryArm(c),c);
   for(const n of [0,4096,65537,4194304,NaN])for(const key of ['shared','local'])assert.throws(()=>validateMemoryArm({...c,[key]:n}));
-  assert.throws(()=>validateMemoryArm({...c,timeoutMs:300000}));
+  assert.equal(validateMemoryArm({...c,timeoutMs:300000}).timeoutMs,300000);
+  assert.throws(()=>validateMemoryArm({...c,timeoutMs:300001}));
 });

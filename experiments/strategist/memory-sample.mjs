@@ -11,7 +11,7 @@ const moves=[...root].map(Number),before=meter.read(),started=performance.now();
 let peakRss=process.memoryUsage().rss,timer;
 try{
   // Diagnostics only: separate host event loop, never evaluator recursion.
-  if(config.timeoutMs===30000)timer=setInterval(()=>{
+  if(config.timeoutMs>=30000)timer=setInterval(()=>{
     const rss=process.memoryUsage().rss;peakRss=Math.max(peakRss,rss);
     console.error(JSON.stringify({elapsedMs:performance.now()-started,rss,cycles:String(meter.read())}));
   },1000);
@@ -26,6 +26,6 @@ try{
     bootstrapCycles:String(bootstrap),setupCycles:String(before-bootstrap),solveCycles:String(after-before),totalProcessCycles:String(after),
     totalNodes,visitsPerSecond:totalNodes===null?null:totalNodes/(wallMs/1000),
     cyclesPerVisit:totalNodes?Number(after-before)/totalNodes:null,
-    sampledPeakRssBytes:config.timeoutMs===30000?peakRss:null,finalRssBytes:process.memoryUsage().rss,
+    sampledPeakRssBytes:config.timeoutMs>=30000?peakRss:null,finalRssBytes:process.memoryUsage().rss,
     measurement:totalNodes===null?'production':'existing-all-worker-node-loader'}));
 }finally{if(timer)clearInterval(timer);meter.close();}
