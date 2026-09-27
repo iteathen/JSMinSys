@@ -97,9 +97,10 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
   if(words===3){
+    const sourceWords=n<=32?1:n<=64?2:3;
     let p00=0,p01=0,p02=0,p10=0,p11=0,p12=0;
     if(player===0){
-      for(let sourceWord=0;sourceWord<3;sourceWord+=1){
+      for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
         const planWord=planWordBase+sourceWord,
           validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
           source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
@@ -125,7 +126,7 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
         }
       }
     }else{
-      for(let sourceWord=0;sourceWord<3;sourceWord+=1){
+      for(let sourceWord=0;sourceWord<sourceWords;sourceWord+=1){
         const planWord=planWordBase+sourceWord,
           validBits=cache.valid[planWord],unchangedBits=cache.unchanged[planWord],
           source0=source[p0Source+sourceWord],source1=source[p1Source+sourceWord];
