@@ -16,8 +16,15 @@ test('completed principal upset absorbs later images without repeated expansion'
     q.words.fill(0,g.p0Offset);
     const coord=player?g.p1Offset:g.p0Offset;
     for(let i=0;i<q.basis.length;i++)if(connect4RbaShapeSubset(g,seed,q.basis[i]))q.words[coord+(i>>>5)]|=1<<(i&31);
-    const base=prepareConnect4RbaExecutionProfile(g);let expansions=0;
+    const base=prepareConnect4RbaExecutionProfile(g);let expansions=0,denseProbes=0;
     const profile={...base,prepareSubset(g,id){expansions++;return base.prepareSubset(g,id);}};
+    if(g.subsetTable!==null){
+      const table=g.subsetTable;
+      g.subsetTable=new Proxy(table,{get(target,key){
+        if(typeof key==='string'&&/^(?:0|[1-9]\\d*)$/.test(key))denseProbes++;
+        return Reflect.get(target,key,target);
+      }});
+    }
     const scratch=prepareConnect4RbaCoordinateScratch(g),words=new Uint32Array(g.keyWords),basis=new Uint32Array(g.maxBasis),size=new Uint32Array(1);
     assert.equal(connect4RbaCofactorKnownLegal(g,profile,q.words,0,q.basis,0,q.basis.length,column,
       words,0,basis,0,scratch.seen,size,0,scratch.map,scratch.inverse),0);
@@ -25,7 +32,12 @@ test('completed principal upset absorbs later images without repeated expansion'
       assert.equal(!!(words[coord+(i>>>5)]&(1<<(i&31))),!!connect4RbaShapeSubset(g,seed,basis[i]));
       assert.equal(words[(player?g.p0Offset:g.p1Offset)+(i>>>5)],0,'other player must remain separate');
     }
-    assert.equal(expansions,1,'one generator requires only one completed subset expansion');
+    if(budget===0)assert.equal(expansions,1,'sparse profile expands one completed principal upset');
+    else{
+      assert.equal(expansions,0,'dense direct path must bypass prepared subset callback');
+      assert.equal(denseProbes,0,
+        'dense direct path preserves C1 absorption before any subset-table probe on this fixture');
+    }
   }
 });
 
