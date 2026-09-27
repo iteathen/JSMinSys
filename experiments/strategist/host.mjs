@@ -9,10 +9,12 @@ import {createPendingObservation} from './pending-observation.mjs';
 
 export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,holdMs=20,
   timeoutMs=1000,warmups=20,measureCycles=false,localCapacity=4096,sharedCapacity=16384,initialActive=null}={}){
-  if(!['host-only','poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'].includes(policy))throw RangeError('policy');
+  if(!['bare','host-only','poll-only','inert','fixed','rotate','sparse','adaptive','combined','fixed-sparse'].includes(policy))throw RangeError('policy');
+  if(policy==='bare'&&workers!==1)throw RangeError('bare control requires one worker');
+  const hostOnly=policy==='bare'||policy==='host-only';
   if(!Number.isInteger(workers)||workers<1||workers>16)throw RangeError('workers');
   if(initialActive!==null&&(!Number.isInteger(initialActive)||initialActive<1||initialActive>workers||
-    !['modes-pending-pool-fixed','modes-pending-pool-grow'].includes(process.env.JSMINSYS_STRATEGIST_POLICY)))throw RangeError('standby profile');
+    !['modes-pool-fixed','modes-pending-pool-fixed','modes-pending-pool-grow'].includes(process.env.JSMINSYS_STRATEGIST_POLICY)))throw RangeError('standby profile');
   if(!(cadenceMs>=1&&cadenceMs<=1000)||!(timeoutMs>0&&timeoutMs<=5000)||!Number.isInteger(warmups)||warmups<0||warmups>100)throw RangeError('campaign bounds');
   const geometry=prepareConnect4RbaGeometry(fixture),root=connect4RbaFromMoves(fixture.moves,{geometry});
   const cache=createConnect4RbaSharedExactCache32({capacity:sharedCapacity,keyWords:geometry.keyWords});
@@ -29,8 +31,8 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
   };
   let started=null,finished=null;
   try{
-    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pendingObservation,initialActive,pollOnly:policy==='poll-only'||policy==='host-only'});
-    if(policy==='host-only')Atomics.store(control,4,1);
+    for(let index=0;index<workers;index++)launch('./evaluator.mjs',{index,geometry,root,cache,memory,control,localCapacity,warmups,measureCycles,pendingObservation,initialActive,bare:policy==='bare',pollOnly:policy==='poll-only'||policy==='host-only'});
+    if(hostOnly)Atomics.store(control,4,1);
     else launch('./strategist.mjs',{workers,columns:geometry.columns,cache,memory,control,policy,cadenceMs,holdMs,measureCycles,pendingObservation,initialActive,
       ...(process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-width-')?{geometry,root}:{})});
     const preparationDeadline=performance.now()+10000;
@@ -40,7 +42,7 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
     while(!Atomics.load(control,2)&&!errors.length&&performance.now()-started<timeoutMs)await delay(1);
     timedOut=!Atomics.load(control,2)&&!errors.length;
     Atomics.store(control,0,2);Atomics.notify(control,0);
-    if(policy==='host-only'){
+    if(hostOnly){
       const words=new Uint32Array(memory.buffer);
       for(let i=0;i<workers;i++)publishWorkerBehavior32(words,i,1);
     }
@@ -70,5 +72,5 @@ export async function runTrial({fixture,workers=2,policy='inert',cadenceMs=5,hol
     cyclesPerNode:cycles&&nodes?Number(cycles)/nodes:null,
     evaluatorStartSkewMs:evaluators.length?Math.max(...evaluators.map(r=>r.started))-Math.min(...evaluators.map(r=>r.started)):null,
     evaluators:evaluators.sort((a,b)=>a.index-b.index),strategist,
-    cacheStats:[...cache.stats],errors,forcedTerminations:forced,cleanup:forced===0&&evaluators.length===workers&&(strategist!==null||policy==='host-only')};
+    cacheStats:[...cache.stats],errors,forcedTerminations:forced,cleanup:forced===0&&evaluators.length===workers&&(strategist!==null||hostOnly)};
 }

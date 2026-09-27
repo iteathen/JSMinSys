@@ -12,10 +12,11 @@ const recurring=process.env.JSMINSYS_STRATEGIST_POLICY?.includes('recurring');
 const modes=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-');
 const pending=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-pending-');
 const oneBand=process.env.JSMINSYS_STRATEGIST_POLICY?.startsWith('modes-pending-band');
-const module=await import(d.pollOnly?'../../addons/rba-connect4-alphabeta-behavior.mjs':
+const module=await import(d.bare?'../../addons/rba-connect4-alphabeta.mjs':d.pollOnly?'../../addons/rba-connect4-alphabeta-behavior.mjs':
   oneBand?'./one-band.generated.mjs':pending?'./observed-modes.generated.mjs':modes?'./modes.generated.mjs':recurring?'./recurring.generated.mjs':frontier?'./frontier.generated.mjs':'./search.generated.mjs');
-const prepare=module.prepareConnect4RbaAlphaBetaBehavior,solve=module.solveConnect4RbaAlphaBetaBehavior;
-const behavior=new BehaviorWorker(d.index,new Uint32Array(d.memory.buffer),d.index,d.memory);
+const prepare=d.bare?module.prepareConnect4RbaAlphaBeta:module.prepareConnect4RbaAlphaBetaBehavior,
+  solve=d.bare?module.solveConnect4RbaAlphaBeta:module.solveConnect4RbaAlphaBetaBehavior;
+const behavior=d.bare?undefined:new BehaviorWorker(d.index,new Uint32Array(d.memory.buffer),d.index,d.memory);
 const warmGeometry=prepareConnect4RbaGeometry({columns:4,rows:4});
 const warmRoot=connect4RbaFromMoves([],{geometry:warmGeometry});
 const warmState=prepare({geometry:warmGeometry,behavior,cacheCapacity:4096});
@@ -42,6 +43,12 @@ if(gateWords){
 const searchStarted=activated?performance.now():null;
 const result=activated?solve(d.root,options):{status:'NOT_STARTED',value:null,move:-1,metrics:{nodes:0}};
 const ended=performance.now(),end=meter.read();
+// Cold result adaptation only: the ordinary synchronous solver returns an
+// exact value directly and has no cancellation/status protocol.
+if(d.bare){
+  if(!Number.isInteger(result.value)||result.value<1||result.value>3)throw Error('invalid bare result');
+  result.status='EXACT';
+}
 if(result.status==='EXACT')Atomics.compareExchange(d.control,2,0,d.index+1);
 Atomics.add(d.control,3,1);
 meter.close();

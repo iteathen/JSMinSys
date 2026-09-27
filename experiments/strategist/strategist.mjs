@@ -18,13 +18,14 @@ import {createPoolPolicy,advancePoolPolicy} from './pool-policy.mjs';
 const strategy=process.env.JSMINSYS_STRATEGIST_POLICY??null;
 const pendingBand=strategy==='modes-pending-band';
 const pendingActive=strategy==='modes-pending-pfif'||pendingBand;
-const poolStrategy=strategy==='modes-pending-pool-fixed'||strategy==='modes-pending-pool-grow';
+const poolObserved=strategy==='modes-pending-pool-fixed'||strategy==='modes-pending-pool-grow';
+const poolStrategy=strategy==='modes-pool-fixed'||poolObserved;
 const poolState=poolStrategy?createPoolPolicy(d.workers,d.initialActive):null;
-const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive||poolStrategy;
+const pendingStrategy=strategy==='modes-pending-off'||strategy==='modes-pending-read'||strategy==='modes-pending-band-read'||pendingActive||poolObserved;
 const pendingReaders=pendingStrategy?preparePendingReaders(d.pendingObservation):null;
 const pendingPolicies=pendingActive?Array.from({length:d.workers},()=>createPendingPolicy({oneBand:pendingBand})):null;
 const widthStrategy=WIDTH_POLICIES.includes(strategy);
-const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy||pendingStrategy;
+const modeStrategy=MODE_POLICIES.includes(strategy)||widthStrategy||pendingStrategy||poolStrategy;
 const widthObserver=widthStrategy?prepareWidthObserver(d.geometry,d.root,d.cache):null;
 const widthPolicy=widthStrategy?createWidthPolicy({growthPercent:strategy==='modes-width-relative'?25:0}):null;
 if(widthStrategy)advanceWidthPolicy(widthPolicy,widthObserver);
@@ -59,7 +60,7 @@ if(frontierStrategy)for(let i=0;i<d.workers;i++){
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 if(modeStrategy)for(let i=0;i<d.workers;i++){
-  const flags=poolStrategy?(i<poolState.active?1280:0):pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0,i);
+  const flags=poolStrategy?(i<poolState.active?(poolObserved?1280:1024):0):pendingStrategy?(strategy!=='modes-pending-off'?256:0):widthStrategy?0:modePolicyFlags(strategy,0,i);
   publishWorkerBehavior32(words,i,flags);last[i]=flags;writes++;
 }
 Atomics.store(d.control,4,1);
@@ -87,7 +88,7 @@ while(Atomics.load(d.control,0)===1&&!Atomics.load(d.control,2)){
   for(let i=0;i<d.workers;i++){
     const acceptedPending=pendingStrategy&&strategy!=='modes-pending-off'&&pendingSamples[i]?.request===(last[i]&256);
     const pendingMode=pendingActive?advancePendingPolicy(pendingPolicies[i],acceptedPending?pendingSamples[i]:null):0;
-    const flags=poolStrategy?(i<poolState.active?1024|((last[i]&1024)?((acceptedPending?(last[i]^256):last[i])&256):256):0):
+    const flags=poolStrategy?(i<poolState.active?1024|(poolObserved?((last[i]&1024)?((acceptedPending?(last[i]^256):last[i])&256):256):0):0):
       pendingStrategy?((acceptedPending?(last[i]^256):last[i])&256)|pendingMode:
       widthStrategy?(strategy==='modes-width-observe'?0:widthPolicy.flags):
       modeStrategy?modePolicyFlags(strategy,now-started,i):frontierStrategy?encodeFrontier({stride:frontierStride,target:frontierTarget,recurring,bounded,
