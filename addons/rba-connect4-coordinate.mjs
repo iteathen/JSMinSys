@@ -71,7 +71,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
@@ -108,11 +109,20 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     let j=image<g.pairShapeStart?childPair:
       image<g.tripleShapeStart?childTriple:
       image<g.quadShapeStart?childQuad:cn;
-    const subset=profile.prepareSubset(g,image);
-    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
-      targetWord=j>>>5;targetMask=1<<(j&31);
-      if(write0)target[p0Target+targetWord]|=targetMask;
-      if(write1)target[p1Target+targetWord]|=targetMask;
+    if(subsetTable!==null){
+      const subset=image*shapeCount;
+      for(;j<cn;j+=1)if(subsetTable[subset+childBasis[ci+j]]){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
+    }else{
+      const subset=profile.prepareSubset(g,image);
+      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
     }
   }
   return 0;
