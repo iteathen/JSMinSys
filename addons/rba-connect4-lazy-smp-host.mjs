@@ -15,6 +15,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   workers=2,
   sharedCacheCapacity=65536,
   localCacheCapacity=65536,
+  cofactorPlanCapacity=0,
   sharedSampleMask=0,
   timeoutMs=120000,
   signal,
@@ -32,6 +33,8 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isInteger(localCacheCapacity)||localCacheCapacity<1||
      (localCacheCapacity&(localCacheCapacity-1)))
     throw new RangeError('invalid Lazy SMP local cache capacity');
+  if(!Number.isInteger(cofactorPlanCapacity)||cofactorPlanCapacity<0||cofactorPlanCapacity>262144)
+    throw new RangeError('invalid Lazy SMP cofactor plan capacity');
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid Lazy SMP shared sample mask');
@@ -94,6 +97,7 @@ export async function runLazySmpConnect4Rba32(moves,{
           rootReflected:root.reflected,
           sharedExactCache,
           localCacheCapacity,
+          cofactorPlanCapacity,
           sharedSampleMask,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
@@ -149,6 +153,17 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
     sharedSampleMask,
+    cofactorPlanCapacity,
+    cofactorPlanBytesPerWorker:cofactorPlanCapacity
+      ?((geometry.rows+1)**geometry.columns*geometry.columns*4+
+        cofactorPlanCapacity*(3+geometry.maxBasis*2+geometry.coordWords*8+
+          geometry.maxBasis*geometry.coordWords*4))
+      :0,
+    cofactorPlanBytesAllWorkers:cofactorPlanCapacity
+      ?workers*((geometry.rows+1)**geometry.columns*geometry.columns*4+
+        cofactorPlanCapacity*(3+geometry.maxBasis*2+geometry.coordWords*8+
+          geometry.maxBasis*geometry.coordWords*4))
+      :0,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
