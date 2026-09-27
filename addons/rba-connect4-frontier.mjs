@@ -7,7 +7,7 @@ import {prepareRootFrontierBehavior32 as prepareSearchBehavior32,completeRootFro
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,prepareConnect4RbaCofactorPlanCache32} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../src/search32.mjs';
@@ -77,6 +77,7 @@ export function prepareConnect4RbaFrontier({
   geometry,
   mode=RBA_FRONTIER_CPC_ONLY,
   cacheCapacity=65536,
+  cofactorPlanCapacity=0,
   sharedExactCache=null,
   sharedSampleMask=0,
   orderOffset=0,
@@ -91,6 +92,7 @@ export function prepareConnect4RbaFrontier({
   if(!(nodeCounts instanceof Float64Array)||nodeCounts.length!==1)throw TypeError('prepared node counter required');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),levels=g.cellCount+1,
     live=prepareConnect4LiveLineEvaluator32(g);
+  if(cofactorPlanCapacity)profile.cofactorPlanCache=prepareConnect4RbaCofactorPlanCache32(g,{capacity:cofactorPlanCapacity});
   if(!Number.isInteger(orderOffset)||orderOffset<0||orderOffset>=g.columns)
     throw new RangeError('invalid alpha-beta order offset');
   if(sharedExactCache!==null&&
