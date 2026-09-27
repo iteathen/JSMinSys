@@ -9,7 +9,7 @@ test('raw snapshot publication is coherent; only strategist calculates pending w
   const memory=createPendingObservation(2,4,4),g={columns:4,cellCount:16};
   const state={g,observeCounts:new Uint32Array(17),modeRootValues:new Int8Array([-2,-2,0,-2]),
     modeResolved:new Uint8Array(68),observeEpoch:1,observeRequest:256,observePending:1,
-    searchShallow:0,horizonStops:0,nodes:20};
+    searchShallow:0,horizonStops:0,nodes:20,modePasses:9,modeRegions:3,modeRootPasses:2};
   state.observeCounts[0]=3;state.observeCounts[2]=2;state.modeResolved[9]=1;
   bindPendingObservation(state,memory,1);publishPendingObservation(state,2);
   const scratch=new Uint32Array(memory.stride);
@@ -17,6 +17,7 @@ test('raw snapshot publication is coherent; only strategist calculates pending w
   assert.equal(readPendingObservation(memory,1,scratch),1);
   const m=measurePendingObservation(memory,scratch);
   assert.equal(m.width,2);assert.equal(m.depth,2);assert.equal(m.scope,1);assert.equal(m.request,256);
+  assert.equal(m.completedBands,7,'six local incomplete bands and one root band completed');
   assert.equal(state.observePending,0);assert.equal(state.observePublications,1);
   assert.throws(()=>bindPendingObservation(state,memory,1),/slot must be fresh/);
   const base=memory.stride;Atomics.store(memory.words,base,3);

@@ -2,7 +2,10 @@
 
 Experimental only. Production solver, TT semantics, ordering, pruning, memory
 limits and deadlines are unchanged. This is observation qualification, not a
-width-driven strategy or final NEES qualification. All measured workers stay DEEP.
+width-driven strategy or final NEES qualification. Its observation-cost screen
+keeps all workers DEEP. The separately selected subsequent
+[width-triggered policy experiment](PENDING_POLICY.md) uses the same observation
+path to control the existing worker modes.
 
 The worker retains numeric branch counts and child-completion markers that its
 traversal produces. The strategist requests a snapshot by toggling bit 8 of the
@@ -42,6 +45,11 @@ header and only active-depth rows/count-selected markers. This is requested copy
 of raw scalar metadata, not zero-copy observation. The strategist owns interpretation,
 allocation of report objects and delta calculation. No hot strings, allocation,
 clocks, messages, waiting or new evaluation occur in the worker observation path.
+
+The current 12-word header includes raw local-pass, region and root-pass counters
+for strategist-side band-progress interpretation. Three additional words are
+published per request compared with the original fixed-DEEP observation screen;
+there is no new per-node progress counter.
 
 For 7x6: 1,408 shared bytes and 172 private count bytes per evaluator. Existing
 completion storage is reused. Standalone preparation also creates a cold default
