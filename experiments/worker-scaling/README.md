@@ -26,3 +26,11 @@ Run scaling.test.mjs first. Commit checkpoint, then run campaign.mjs with a new
 evidence directory. Exact source hashes, subprocess failures, raw results and
 cycle partitions are retained. No automatic retries. No claim about empty-board
 completion or general scalability follows solely from these completed fixtures.
+
+After endpoint retention, --density compares masks7/0/1/3 at workers1/4.
+--hard compares full sharing at workers1/2/3/4 and unshared1/4, three repeats,
+on 353335714 (a legal one-move continuation of the known P0-losing Fhourstones
+35333571). The derived child's expected absolute WDL is -1. A separate first
+diagnostic completed it in ~12 seconds; that probe is not a campaign replicate.
+This longer completed task distinguishes steady search from cold overhead.
+No memory or worker-count default is changed by either diagnostic mode.
