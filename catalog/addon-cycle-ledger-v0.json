@@ -3003,7 +3003,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*G+7*CN+9*N+4*U+A"
+          "count": "(18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N))"
         },
         {
           "op": "runtime.field.store",
@@ -3011,19 +3011,19 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U+A"
+          "count": "(6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V))"
         },
         {
           "op": "memory.store.u32",
-          "count": "G+2*Z+3+CN+2*N+2*U"
+          "count": "(G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V))"
         },
         {
           "op": "alu.imul.u32",
-          "count": "2+N"
+          "count": "(2+N)+(K*D)"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U+A"
+          "count": "(8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V))"
         },
         {
           "op": "alu.sub.u32",
@@ -3031,27 +3031,27 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U+A"
+          "count": "(6+4*N+2*U+A)+(K*D*(2*V))"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+3*N+U"
+          "count": "(2+3*N+U)+(K*D*V)"
         },
         {
           "op": "alu.shr.u32",
-          "count": "3+B+CN+2*N+I+U"
+          "count": "(3+B+CN+2*N+I+U)+(K*D*V)"
         },
         {
           "op": "control.test.u32",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V))"
         },
         {
           "op": "control.branch",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V))"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "K",
+          "count": "K*(1-D)",
           "target": "connect4RbaCofactorBasis"
         },
         {
@@ -3073,11 +3073,20 @@
           "op": "runtime.callback",
           "count": "K*U",
           "target": "shapeSubsetPrepared"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "K*D*V"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K*D",
+          "target": "emitSortedSetBits32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+4*G+7*CN+9*N+4*U+A)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+A)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+A)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+A)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "((18+4*G+7*CN+9*N+4*U+A)+(K*D*(3+N)))*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+((6+2*G+3*CN+5*N+2*U+A)+(K*D*(2*N+V)))*C(memory.load.u32)+((G+2*Z+3+CN+2*N+2*U)+(K*D*(W+N+V)))*C(memory.store.u32)+((2+N)+(K*D))*C(alu.imul.u32)+((8+3*G+5*CN+8*N+3*U+A)+(K*D*(W+3*N+V)))*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+((6+4*N+2*U+A)+(K*D*(2*V)))*C(alu.and.u32)+((2+3*N+U)+(K*D*V))*C(alu.shl.u32)+((3+B+CN+2*N+I+U)+(K*D*V))*C(alu.shr.u32)+((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))*C(control.test.u32)+((12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)+(K*D*(4+2*W+4*N+2*V)))*C(control.branch)+(K*(1-D))*CALL(connect4RbaCofactorBasis)+(K*PR)*CALLBACK(prepareRemove)+(K*RM)*CALLBACK(removePrepared)+(K*PS)*CALLBACK(prepareSubset)+(K*U)*CALLBACK(shapeSubsetPrepared)+(K*D*V)*C(alu.or.u32)+(K*D)*CALL(emitSortedSetBits32)",
         "parameters": {
           "G": "configured columns copied into child support",
           "Z": "coordWords cleared per player coordinate",
@@ -3091,9 +3100,12 @@
           "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
           "PS": "prepareSubset calls for images requiring at least one new target closure",
           "A": "surviving player-image membership checks actually executed (0..2 per J); short-circuited inactive players excluded",
-          "J": "surviving images reaching the per-player absorption guard"
+          "J": "surviving images reaching the per-player absorption guard",
+          "D": "1 when the dense removeByCell path is selected with caller-owned removed/childIndex scratch and zero seenOffset; otherwise 0",
+          "V": "nonnegative dense removed images whose seen bit is published; V<=N",
+          "W": "shapeWordCount words cleared by the dense child-basis path"
         },
-        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters. C1 adds per-surviving-player load/address/AND and short-circuit tests. Control terms conservatively account Boolean selection/negation and the early exit; generated lowering, overlap and cache costs remain profile-dependent rather than claimed fixed Intel cycle values. PS/U now exclude absorbed work. Whole-operation measured cycles are the promotion evidence, not this inherited source-operation envelope."
+        "note": "C1 retained. Experimental dense-remove arm inlines the existing removeByCell child-basis transform only when dense geometry and caller-owned scratch are present; generic fallback remains. Direct operations are charged explicitly and the generic cofactor-basis subledger is disabled only on D=1."
       },
       "status": "decomposed"
     },
@@ -9432,7 +9444,7 @@
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
     "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
+    "addons/rba-connect4-coordinate.mjs": "dbe787cbabdfc7ed324d9bb59aa99e96c2b2f8cf",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
