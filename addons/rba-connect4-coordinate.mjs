@@ -94,7 +94,14 @@ function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,
   const cn=cache.cn[plan],planBase=plan*cache.stride,closureBase=planBase*words,
     planWordBase=plan*words,p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
   sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
+  let j=0;
+  for(;j+3<cn;j+=4){
+    childBasis[ci+j]=cache.basis[planBase+j];
+    childBasis[ci+j+1]=cache.basis[planBase+j+1];
+    childBasis[ci+j+2]=cache.basis[planBase+j+2];
+    childBasis[ci+j+3]=cache.basis[planBase+j+3];
+  }
+  for(;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
 
   if(words===3){
     const targetWords=cn<=32?1:cn<=64?2:3;
