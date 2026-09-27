@@ -40,9 +40,106 @@ export function connect4RbaCofactor(g,profile,source,src,basis,bi,n,column,targe
 export function connect4RbaCofactorKnownLegal(g,profile,source,src,basis,bi,n,column,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   return connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,source[src+column],target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex,seenOffset);
 }
+
+const COFACTOR_PLAN_KILL=255;
+
+export function prepareConnect4RbaCofactorPlanCache32(g,{capacity=262144,maxKeyCount=8388608}={}){
+  if(!Number.isInteger(capacity)||capacity<1||capacity>262144||
+     !Number.isSafeInteger(maxKeyCount)||maxKeyCount<1)
+    throw new RangeError('invalid cofactor plan capacity');
+  if(g.maxBasis>=127||g.coordWords<1||g.coordWords>3||
+     g.removeByCell===null||g.subsetTable===null||g.shapeCount>65535)
+    throw new RangeError('geometry exceeds cofactor plan representation');
+  const radix=g.rows+1;let supportCount=1;
+  for(let c=0;c<g.columns;c+=1){
+    supportCount*=radix;
+    if(!Number.isSafeInteger(supportCount))throw new RangeError('cofactor plan support space overflow');
+  }
+  const keyCount=supportCount*g.columns;
+  if(!Number.isSafeInteger(keyCount)||keyCount>maxKeyCount)
+    throw new RangeError('cofactor plan key space exceeds configured bound');
+  const planByKey=new Int32Array(keyCount);planByKey.fill(-1);
+  return {
+    capacity,count:0,columns:g.columns,radix,stride:g.maxBasis,words:g.coordWords,planByKey,
+    n:new Uint8Array(capacity),cn:new Uint8Array(capacity),landing:new Uint8Array(capacity),
+    basis:new Uint16Array(capacity*g.maxBasis),
+    map:new Uint8Array(capacity*g.maxBasis),
+    closure:new Uint32Array(capacity*g.maxBasis*g.coordWords),
+  };
+}
+function cofactorPlanKey(source,src,column,cache){
+  let code=0;
+  for(let c=cache.columns-1;c>=0;c-=1)code=Math.imul(code,cache.radix)+source[src+c];
+  return Math.imul(code,cache.columns)+column;
+}
+function applyConnect4RbaCofactorPlan32(cache,plan,g,source,src,n,column,height,target,dst,childBasis,ci,sizes,sizeIndex){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,player=rank&1;
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  const p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,words=cache.words;
+  for(let w=0;w<words;w+=1){target[p0Target+w]=0;target[p1Target+w]=0;}
+  sizes[sizeIndex]=0;
+
+  const landing=cache.landing[plan],coord=src+(player?g.p1Offset:g.p0Offset);
+  if(landing!==COFACTOR_PLAN_KILL&&(source[coord+(landing>>>5)]&(1<<(landing&31)))){
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
+  }
+  if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
+
+  const cn=cache.cn[plan],planBase=plan*cache.stride,closureBase=planBase*words,
+    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset;
+  sizes[sizeIndex]=cn;
+  for(let j=0;j<cn;j+=1)childBasis[ci+j]=cache.basis[planBase+j];
+
+  // Cached closures are immutable upward closures. Reapplying a closure is
+  // idempotent, so this experimental arm removes the C1 principal-bit probe
+  // and measures whether three fixed word ORs are cheaper than the guard.
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,
+      active1=source[p1Source+sourceWord]&sourceMask;
+    if(!(active0|active1))continue;
+    const encoded=cache.map[planBase+i];
+    if(encoded===COFACTOR_PLAN_KILL)continue;
+    const imageIndex=encoded&127,unchanged=encoded&128,
+      write0=active0&&(player===0||unchanged),
+      write1=active1&&(player===1||unchanged);
+    if(!write0&&!write1)continue;
+    const cb=closureBase+imageIndex*words;
+    for(let w=0;w<words;w+=1){
+      const closure=cache.closure[cb+w];
+      if(write0)target[p0Target+w]|=closure;
+      if(write1)target[p1Target+w]|=closure;
+    }
+  }
+  return 0;
+}
+function storeConnect4RbaCofactorPlan32(cache,key,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex){
+  if(cache.count>=cache.capacity)return;
+  const plan=cache.count++,planBase=plan*cache.stride,words=cache.words,
+    closureBase=planBase*words,
+    removeRow=cell*g.shapeCount,removeByCell=g.removeByCell,subsetTable=g.subsetTable,shapeCount=g.shapeCount;
+  cache.n[plan]=n;cache.cn[plan]=cn;cache.landing[plan]=landingIndex;
+  for(let j=0;j<cn;j+=1)cache.basis[planBase+j]=childBasis[ci+j];
+  for(let i=0;i<n;i+=1){
+    const id=basis[bi+i],image=removeByCell[removeRow+id];
+    cache.map[planBase+i]=image<0?COFACTOR_PLAN_KILL:(childIndex[image]|(image===id?128:0));
+  }
+  for(let j=0;j<cn;j+=1){
+    const image=childBasis[ci+j],subset=image*shapeCount,cb=closureBase+j*words;
+    for(let k=0;k<cn;k+=1)if(subsetTable[subset+childBasis[ci+k]])
+      cache.closure[cb+(k>>>5)]|=1<<(k&31);
+  }
+  cache.planByKey[key]=plan;
+}
+
 export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed=null,childIndex=null,seenOffset=0){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
-    cell=height*g.columns+column,player=rank&1;
+    cell=height*g.columns+column,player=rank&1,
+    planCache=profile.cofactorPlanCache,
+    planKey=planCache?cofactorPlanKey(source,src,column,planCache):-1,
+    plan=planCache?planCache.planByKey[planKey]:-1;
+  if(plan>=0)return applyConnect4RbaCofactorPlan32(planCache,plan,g,source,src,n,column,height,target,dst,childBasis,ci,sizes,sizeIndex);
   for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
   target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
   for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
@@ -58,7 +155,19 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  let cn;
+  if(g.removeByCell!==null&&removed&&childIndex&&!seenOffset){
+    for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+    const removeRow=cell*g.shapeCount,removeByCell=g.removeByCell;
+    for(let i=0;i<n;i+=1){
+      const id=removeByCell[removeRow+basis[bi+i]];
+      removed[i]=id;
+      if(id>=0)seen[id>>>5]|=1<<(id&31);
+    }
+    cn=emitSortedSetBits32(seen,g.shapeWordCount,childBasis,ci);sizes[sizeIndex]=cn;
+  }else{
+    cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
+  }
   // One child-basis pass publishes the exact id->index map already owned by
   // coordinate scratch and discovers all cardinality boundaries.
   let childPair=cn,childTriple=cn,childQuad=cn;
@@ -71,7 +180,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   }
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    subsetTable=g.subsetTable,shapeCount=g.shapeCount;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
@@ -108,12 +218,25 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     let j=image<g.pairShapeStart?childPair:
       image<g.tripleShapeStart?childTriple:
       image<g.quadShapeStart?childQuad:cn;
-    const subset=profile.prepareSubset(g,image);
-    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
-      targetWord=j>>>5;targetMask=1<<(j&31);
-      if(write0)target[p0Target+targetWord]|=targetMask;
-      if(write1)target[p1Target+targetWord]|=targetMask;
+    if(subsetTable!==null){
+      const subset=image*shapeCount;
+      for(;j<cn;j+=1)if(subsetTable[subset+childBasis[ci+j]]){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
+    }else{
+      const subset=profile.prepareSubset(g,image);
+      for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+      }
     }
+  }
+  if(planCache&&plan<0&&removed&&childIndex&&!seenOffset){
+    const landingIndex=lo<n&&basis[bi+lo]===singleton?lo:COFACTOR_PLAN_KILL;
+    storeConnect4RbaCofactorPlan32(planCache,planKey,g,basis,bi,n,cell,landingIndex,childBasis,ci,cn,childIndex);
   }
   return 0;
 }
