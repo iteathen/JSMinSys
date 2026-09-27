@@ -1,0 +1,41 @@
+name: IsoMax Phase2 bound shadow
+
+on:
+  push:
+    branches:
+      - experiment/isomax-phase2-bound-shadow-20260927
+
+permissions:
+  contents: read
+
+jobs:
+  shadow:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize frozen Phase2 denominator
+        shell: pwsh
+        run: git worktree add "$env:RUNNER_TEMP/phase2-denominator" 10380f79af68dc1f57455d535814ac0a7eacea33
+      - name: Long shadow census
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:RUNNER_TEMP/isomax-phase2-bound-shadow" | Out-Null
+          node --import ./experiments/isomax-phase2/bound-shadow-hook.mjs ./experiments/isomax-phase2/bound-shadow-run.mjs "$env:RUNNER_TEMP/phase2-denominator" 353335714 | Out-File -Encoding utf8 "$env:RUNNER_TEMP/isomax-phase2-bound-shadow/long.json"
+      - name: Short shadow census
+        shell: pwsh
+        run: |
+          node --import ./experiments/isomax-phase2/bound-shadow-hook.mjs ./experiments/isomax-phase2/bound-shadow-run.mjs "$env:RUNNER_TEMP/phase2-denominator" 45461667 | Out-File -Encoding utf8 "$env:RUNNER_TEMP/isomax-phase2-bound-shadow/short.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-bound-shadow
+          path: ${{ runner.temp }}/isomax-phase2-bound-shadow
+          if-no-files-found: error
+          retention-days: 30
