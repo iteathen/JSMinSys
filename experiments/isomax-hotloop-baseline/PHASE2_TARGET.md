@@ -26,15 +26,20 @@ Do not optimize to a single local metric when total solve cost gets worse.
 
 ## Baseline
 
-The Phase-2 baseline is the **qualified Phase-1 winner**, not an intermediate
-screen candidate. Phase-1 confirmation is still active at the time of this
-directive; freeze the exact winner SHA and its qualified measurements here as
-soon as confirmation closes.
+The Phase-2 experimental denominator is now frozen after the Stage-10
+confirmation falsifier:
 
-Until then:
-- preserve all Phase-1 evidence;
-- do not reset or weaken the Phase-1 qualification;
-- do not use an unconfirmed point estimate as the permanent Phase-2 denominator.
+- SHA: `10380f79af68dc1f57455d535814ac0a7eacea33`
+- retained Stage-9 exact 7-column/radix-7 plan-key specialization;
+- cumulative retained Phase-1 chain: approximately 0.50339 of the original C1
+  worker cost (~49.66% reduction).
+
+The owner directed Phase 2 to begin from the best retained/current line even
+though Phase 1 finished just short of its nominal 50% threshold. Stage-10
+point-estimate wins are excluded because higher-power confirmation did not
+retain them.
+
+This is an experimental/research denominator, not a production-promotion claim.
 
 ## Acceptance metric
 
