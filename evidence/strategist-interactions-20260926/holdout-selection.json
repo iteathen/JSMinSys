@@ -1,0 +1,52 @@
+[
+  {
+    "family": "resources",
+    "candidate": {
+      "id": "w4-shared2",
+      "workers": 4,
+      "localCapacity": 4096,
+      "sharedCapacity": 32768,
+      "strategy": "modes-deep",
+      "initialActive": null
+    },
+    "control": {
+      "id": "w4-base",
+      "workers": 4,
+      "localCapacity": 4096,
+      "sharedCapacity": 16384,
+      "strategy": "modes-deep",
+      "initialActive": null
+    },
+    "ratio": 0.9742691085198234,
+    "rootRatios": [
+      0.9846700226002577,
+      0.9700391529556702,
+      0.9680542543555397
+    ]
+  },
+  {
+    "family": "profiles",
+    "candidate": {
+      "id": "w4-modes-wide-anchor",
+      "workers": 4,
+      "localCapacity": 4096,
+      "sharedCapacity": 32768,
+      "strategy": "modes-wide-anchor",
+      "initialActive": null
+    },
+    "control": {
+      "id": "w4-modes-deep",
+      "workers": 4,
+      "localCapacity": 4096,
+      "sharedCapacity": 32768,
+      "strategy": "modes-deep",
+      "initialActive": null
+    },
+    "ratio": 0.9741922924802039,
+    "rootRatios": [
+      0.894104112277434,
+      1.0296107227580225,
+      1.0030812438868124
+    ]
+  }
+]
