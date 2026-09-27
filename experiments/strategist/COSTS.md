@@ -68,3 +68,21 @@ cost of changing flags at every node, isolated load latency, or a five-cycle
 checkpoint. Static operation ledgers are not measured hardware cycle counts.
 The 7x6 strategy campaign then charges actual sharing, ordering, and cancellation
 effects across every evaluator, including helpers that do not produce the answer.
+
+## Action campaign
+
+`actions` retains the early-handler unchanged-word path. Changed words add two
+private field assignments (saved shared-cache reference/null and existing CPC
+frontier selector) and select one of two prepared permutation families with an
+extra shift/mask/index. The total change path has four setting assignments plus
+last-word store and the existing private change increment. There is no new
+per-cache-access test: disabling shared access uses its existing nullable field.
+The optional CPC implementation already tests its prepared selector; no extra
+worker branch is inserted into ordinary recursion.
+
+Setting costs alone do not price the actions: private-only can repeat proof
+work; stronger CPC adds proof instructions and may remove many later nodes;
+tie reversal changes the recursive tree. Those effects are charged by the full
+solve-call meter across every evaluator. The strategist's three counter reads,
+policy decoding and numeric-word publication are off the evaluator path, but
+their interference is not assumed free. No raw per-handler-cycle claim is made.

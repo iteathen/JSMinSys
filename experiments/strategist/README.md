@@ -107,3 +107,23 @@ environment overrides. Independent trials use fresh workers and storage.
 Pass 2 uses a fixed requested 5 ms observation interval, not cadence tuning.
 
 Results: [flag dispatch and strategy screening](../../evidence/strategist-pass2-20260926/RESULTS.md).
+
+## Research-guided worker actions
+
+The [action campaign](ACTION_CAMPAIGN.md) records the consulted IsoGraph/DP
+research, primary external sources, action semantics, hypotheses and scope.
+It adds an opt-in `actions` handler and policies for shared-cache bypass,
+existing optional CPC proof effort, reversed prepared tie precedence, and their
+combinations. Exact values and deterministic root moves remain required.
+No production solver, TT, existing host/evaluator or default handler changes.
+
+```text
+node --experimental-ffi experiments/strategist/action-campaign.mjs screen NEW-SCREEN.jsonl
+node --experimental-ffi experiments/strategist/action-campaign.mjs actions NEW-ISOLATED.jsonl
+node experiments/strategist/analyze-actions.mjs evidence/strategist-actions-20260926
+```
+
+The first mode screens 60 trials; the second isolates action costs and proof
+benefits in 72 interleaved trials including one-worker controls and a winning
+mover root. Fixed 750 ms case limits and requested 5 ms observation interval.
+Results: [action campaign evidence](../../evidence/strategist-actions-20260926/RESULTS.md).
