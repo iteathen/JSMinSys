@@ -1,0 +1,181 @@
+{
+  "sha": "db5773ffd96be48c154543d8a9464bd690dfdf7e",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+  "started": "2026-09-27T06:29:33.568Z",
+  "stages": [
+    {
+      "name": "overhead",
+      "rounds": 4,
+      "roots": [
+        [
+          "A",
+          "2053635233350500",
+          1
+        ],
+        [
+          "B",
+          "1320461024522311",
+          1
+        ]
+      ],
+      "configs": [
+        {
+          "id": "bare",
+          "policy": "bare",
+          "strategy": null,
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        },
+        {
+          "id": "stop-host",
+          "policy": "host-only",
+          "strategy": null,
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        },
+        {
+          "id": "stop-strategist",
+          "policy": "poll-only",
+          "strategy": null,
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        },
+        {
+          "id": "mode-deep",
+          "policy": "inert",
+          "strategy": "modes-deep",
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        },
+        {
+          "id": "observed-off",
+          "policy": "inert",
+          "strategy": "modes-pending-off",
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        },
+        {
+          "id": "observed-read",
+          "policy": "inert",
+          "strategy": "modes-pending-read",
+          "workers": 1,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 16384,
+          "timeoutMs": 750
+        }
+      ]
+    },
+    {
+      "name": "hard",
+      "rounds": 3,
+      "roots": [
+        [
+          "F45461667",
+          "34350556",
+          3
+        ],
+        [
+          "empty",
+          "",
+          3
+        ]
+      ],
+      "configs": [
+        {
+          "id": "deep4",
+          "policy": "inert",
+          "strategy": "modes-deep",
+          "workers": 4,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "wide0-deep3",
+          "policy": "inert",
+          "strategy": "modes-wide-anchor",
+          "workers": 4,
+          "initialActive": null,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "minimal-fixed1",
+          "policy": "inert",
+          "strategy": "modes-pool-fixed",
+          "workers": 4,
+          "initialActive": 1,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "minimal-fixed4",
+          "policy": "inert",
+          "strategy": "modes-pool-fixed",
+          "workers": 4,
+          "initialActive": 4,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "observed-fixed1",
+          "policy": "inert",
+          "strategy": "modes-pending-pool-fixed",
+          "workers": 4,
+          "initialActive": 1,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        },
+        {
+          "id": "observed-grow1",
+          "policy": "inert",
+          "strategy": "modes-pending-pool-grow",
+          "workers": 4,
+          "initialActive": 1,
+          "localCapacity": 4096,
+          "sharedCapacity": 32768,
+          "timeoutMs": 5000
+        }
+      ]
+    }
+  ],
+  "warmups": 20,
+  "cadenceMs": 5,
+  "maxTrials": 84,
+  "qualification": "EXPERIMENTAL_DIAGNOSTIC",
+  "hashes": {
+    "host.mjs": "8f31c563965369137a179ad9624327a4f8daad1bdfa4798b94e3aa221f4be8d7",
+    "evaluator.mjs": "895611b5ebaf77af7355dcb0477b00359713690216322aeeebbb8c52079b50d0",
+    "strategist.mjs": "fbebe0ee4ab0a9d1502813d5b9a40e3df419ff9c4fd3c0558b028f4ecd05422d",
+    "modes.generated.mjs": "08b62165cd50d99e010cf5872e7d1f70ba8ff196cde491cf2c87066afea4895f",
+    "observed-modes.generated.mjs": "9e65948ef43d141577b4a487665bfcc6186739be47980a69ab03b3e4d5c8490a",
+    "mode-controls.mjs": "5fa1c030482303a9290cf82a71f5c7ba16762b1c5aaebab602abb5b9a076a569",
+    "observed-mode-controls.mjs": "126e0c8097b1ccfc646269e9b55aaeab639dbfe35ef11af5322fb9631cd818fd",
+    "pending-observation.mjs": "640b522343be224d84b8b0d4129f334794f466e1aa005691e99635ee25f71e5f",
+    "overhead-sample.mjs": "f2253d346bc1d945ba5ad73b39bfb3e2e56bd5abd11838c6a6193d3167eafe7e",
+    "overhead-campaign.mjs": "e4f15e0abaf2cbc7af41c10a7636f63c2397b82a32dd6e1ee85041b06d3fb045"
+  }
+}
