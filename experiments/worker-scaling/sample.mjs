@@ -6,7 +6,7 @@ try{
   const geometry=prepareConnect4RbaGeometry({columns:c.columns??7,rows:c.rows??6}),
     moves=Array.from(c.moves,ch=>ch.charCodeAt(0)-49),before=meter.read(),start=performance.now(),cpu=process.cpuUsage();
   const r=await runLazySmpConnect4Rba32(moves,{geometry,workers:c.workers,sharedCacheCapacity:1048576,
-    localCacheCapacity:1048576,sharedSampleMask:7,timeoutMs:c.timeoutMs??30000});
+    localCacheCapacity:1048576,sharedSampleMask:c.sharedSampleMask??7,timeoutMs:c.timeoutMs??30000});
   const after=meter.read(),wallMs=performance.now()-start,used=process.cpuUsage(cpu),
     totalNodes=r.benchmarkNodeCounts.reduce((a,b)=>a+b,0),starts=r.workerTiming.map(x=>x[0]),
     firstStart=Math.min(...starts),lastStart=Math.max(...starts),

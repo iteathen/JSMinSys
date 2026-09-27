@@ -6,7 +6,8 @@ import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 const out=resolve(process.argv[2]),git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
 assert.equal(git('status','--porcelain'),'');const sha=git('rev-parse','HEAD');mkdirSync(out);
-const arms=[...[1,2,3,4].map(workers=>({id:'native'+workers,workers})),
+const density=process.argv.includes('--density');
+const arms=density?[7,0,1,3].flatMap(sharedSampleMask=>[1,4].map(workers=>({id:`mask${sharedSampleMask}-w${workers}`,workers,sharedSampleMask}))):[...[1,2,3,4].map(workers=>({id:'native'+workers,workers})),
   {id:'unshared1',workers:1,noShare:true},{id:'unshared4',workers:4,noShare:true},
   {id:'same-order4',workers:4,order:0},...[1,2,3].map(order=>({id:'solo-offset'+order,workers:1,order}))];
 const roots=[['45461667',1],['3164746344461611',-1],['2431572135633422',-1]];
@@ -14,7 +15,7 @@ const files=['addons/rba-connect4-alphabeta.mjs','addons/rba-connect4-lazy-smp-h
   'addons/rba-connect4-shared-exact-cache.mjs','experiments/cpc-factorial/isomax-node-counts.mjs',
   'experiments/worker-scaling/loader.mjs','experiments/worker-scaling/sample.mjs','experiments/worker-scaling/campaign.mjs'];
 writeFileSync(resolve(out,'manifest.json'),JSON.stringify({sha,node:process.version,arms,roots,rounds:3,workers:[1,2,3,4],
-  shared:1048576,privatePerWorker:1048576,sharedSampleMask:7,started:new Date().toISOString(),
+  shared:1048576,privatePerWorker:1048576,sharedSampleMask:density?'per-arm':7,started:new Date().toISOString(),
   scope:'Completed-solve worker-scaling diagnostics. No memory selection. Test loader admits one native worker and cold timestamps; existing all-worker node loader.',
   hashes:Object.fromEntries(files.map(f=>[f,createHash('sha256').update(readFileSync(f)).digest('hex')]))},null,2)+'\n');
 let n=0;
