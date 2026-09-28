@@ -54,7 +54,7 @@ registerHooks({load(url,context,nextLoad){
     source=rep(source,'RESULT_STRIDE=4,METRIC_WIDTH=15,','RESULT_STRIDE=4,METRIC_WIDTH=22,');
     source=rep(source,
       'metrics[metricBase+14]=m.cofactors;',
-      'metrics[metricBase+14]=m.cofactors;\nfor(let i=0;i<7;i+=1)metrics[metricBase+15+i]=C[i];');
+      'metrics[metricBase+14]=m.cofactors;\nfor(let i=0;i<7;i+=1)metrics[metricBase+15+i]=globalThis.__ISOMAX_BOUND_COALESCE_CENSUS[i];');
     return {...result,source};
   }
 
