@@ -30,3 +30,9 @@ Nearest supported power-of-two size is288MiB/worker (8388608entries);256MiB itse
 Nearest supported capacity33554432entries=1152MiB(1.125GiB)/worker. One candidate-only run; no baseline rerun. Same fixed source,nightly,4pinned workers,10GiB shared,35333571,300000ms. EXACT,-1,move4;all4workers active/exited,cleanup=true. Wall33.0614747s,483474833037cycles,59077579nodes. Compared with recorded288MiB: slightly higher cycles/wall and fewer nodes. This suggests diminishing returns on THIS fixture; no precise saturation point or empty-board optimum established. No default changed.
 
 Updated curve:18MiB66.546s;36MiB historical mean56.255s;72MiB40.683s;288MiB32.935s;1152MiB33.061s. All new points singleton screens. Complete raw evidence and exact comparison deltas in private-curve-1152 files.
+
+## Intermediate point: owner requested200MiB
+
+Nearest supported native capacity4194304entries=144MiB/worker. One candidate-only run,unchanged fixed source/nightly/pinning/four-worker profile/10GiB shared/35333571/300000ms. EXACT,-1,move4,all4workers active/exited,cleanup=true.34.0948028s,499079947062cycles,65526864nodes. No baseline rerun.200MiB itself was not tested.
+
+Curve in ascending private capacity:18MiB66.546s;36MiB historical mean56.255s;72MiB40.683s;144MiB34.095s;288MiB32.935s;1152MiB33.061s.144MiB is close to288MiB on this fixture,with half the private allocation; singleton comparisons do not resolve noise or establish global/empty-board optimum. Raw evidence and manifest retained in private-curve-144 files. No global default change.
