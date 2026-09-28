@@ -1,0 +1,39 @@
+name: IsoMax regenerate frontier once
+
+on:
+  push:
+    branches:
+      - experiment/isomax-phase2-lazy-live-order-20260928
+    paths:
+      - ".github/workflows/isomax-regenerate-frontier-once.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: experiment/isomax-phase2-lazy-live-order-20260928
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26"
+      - name: Generate authoritative mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/build-behavior-search.mjs
+          node tools/build-root-frontier.mjs
+          git status --short
+          if git diff --quiet -- addons/rba-connect4-alphabeta-behavior.mjs addons/rba-connect4-frontier.mjs addons/rba-connect4-lazy-smp-worker-behavior.mjs addons/rba-connect4-lazy-smp-worker-frontier.mjs; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add addons/rba-connect4-alphabeta-behavior.mjs addons/rba-connect4-frontier.mjs addons/rba-connect4-lazy-smp-worker-behavior.mjs addons/rba-connect4-lazy-smp-worker-frontier.mjs
+          git commit -m "build(isomax): regenerate lazy-order frontier"
+          git push origin HEAD:experiment/isomax-phase2-lazy-live-order-20260928
