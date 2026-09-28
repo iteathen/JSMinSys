@@ -1,0 +1,46 @@
+{
+  "kind": "isomax-phase2-packed-move-order-source-ab-v1",
+  "startedAt": "2026-09-28T17:26:21.059Z",
+  "moves": "353335714",
+  "blocks": 8,
+  "timeoutMs": 90000,
+  "orders": [
+    "AB",
+    "BA"
+  ],
+  "sources": {
+    "A": {
+      "label": "packed-tag-control-f2d56",
+      "path": "C:\\r\\isomax-p2-packed-tag-control",
+      "sha": "f2d56c2788ef3a4c49fc4bef9d447c5be3184059",
+      "dirty": false
+    },
+    "B": {
+      "label": "packed-move-order-c496f",
+      "path": "C:\\r\\isomax-p2-packed-order-source",
+      "sha": "c496f57f3d1463805528cf1d904a3ee52a44e57f",
+      "dirty": false
+    }
+  },
+  "environment": {
+    "node": "v26.7.0",
+    "platform": "win32",
+    "arch": "x64",
+    "release": "10.0.26200",
+    "availableParallelism": 16
+  },
+  "topology": {
+    "workers": 4,
+    "wideWorker": 0,
+    "deepWorkers": [
+      1,
+      2,
+      3
+    ],
+    "rootFrontier": true,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 4194304,
+    "localCacheCapacity": 1048576,
+    "minimumAvailableParallelism": 4
+  }
+}
