@@ -43,7 +43,7 @@ test('standard 7x6 shared exact cache uses lossless compact identity',()=>{
     hashA=mixSpan32Locator32(a.words,0,g.keyWords),hashB=mixSpan32Locator32(b.words,0,g.keyWords);
   assert.equal(cache.keyWords,14);
   assert.equal(cache.storedKeyWords,8);
-  assert.equal(cache.compact7x6,1);
+  assert.equal(cache.compact8,1);
   assert.equal(cache.keys.length,8);
   assert.equal(storeConnect4RbaSharedExactCache32(cache,a.words,0,3,hashA),3);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a.words,0,hashA),3);
@@ -56,7 +56,7 @@ test('non-7x6 shared exact cache retains full-key identity',()=>{
     a=connect4RbaFromMoves([0,1,0,1],{geometry:g}),
     b=connect4RbaFromMoves([0,1,0,2],{geometry:g}),
     cache=createConnect4RbaSharedExactCache32({capacity:1,keyWords:g.keyWords,geometry:g});
-  assert.equal(cache.compact7x6,0);
+  assert.equal(cache.compact8,0);
   assert.equal(cache.storedKeyWords,g.keyWords);
   assert.equal(cache.keys.length,g.keyWords);
   storeConnect4RbaSharedExactCache32(cache,a.words,0,3);
