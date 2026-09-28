@@ -2102,12 +2102,22 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "probeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "public exact-only filter rejects private LOWER0/UPPER0 codes"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "public exact-only filter rejects private LOWER0/UPPER0 codes"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32)",
-        "note": "Public exact-cache probe wrapper."
+        "expression": "(2)*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32)+C(control.test.u32)+C(control.branch)",
+        "note": "Public exact-cache probe wrapper. Private LOWER0/UPPER0 codes remain invisible to exact-only consumers."
       },
       "status": "decomposed"
     },
@@ -2198,7 +2208,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -2385,11 +2395,21 @@
           "op": "runtime.call.subledger",
           "count": "N*R",
           "target": "search"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "B",
+          "note": "generic/Four-Front lane rejects a nonzero private bound code as non-exact"
+        },
+        {
+          "op": "control.branch",
+          "count": "B",
+          "note": "generic/Four-Front lane rejects a nonzero private bound code as non-exact"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbs)+CALL(storeConnect4RbaExactCacheSlot32))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(search))",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidence)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbs)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(search)+(B)*C(control.test.u32)+(B)*C(control.branch)",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -2399,9 +2419,10 @@
           "T": "terminal cofactor children converted to mover-relative values",
           "F": "1 when Four-Front parent evidence executes; 0 in production CPC-only mode",
           "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
-          "S": "exact-cache stores executed by this invocation (0 or 1)"
+          "S": "exact-cache stores executed by this invocation (0 or 1)",
+          "B": "1 when the private slot returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise"
         },
-        "note": "Four-Front path now also consumes CPC-owned precursor/forced telemetry; its search semantics are otherwise unchanged.",
+        "note": "Four-Front/generic path remains exact-only. A private zero-bound code is treated as a local-cache miss and cannot terminate this lane.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -2677,13 +2698,374 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
         }
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#storeConnect4RbaBoundCacheSlot32",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "storeConnect4RbaBoundCacheSlot32",
+      "scope": "hot-cache-local-zero-bound",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "4+2*B+O+5*F+3*X"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*B*K"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "B+F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*B*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "B*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "B*(K-1)*(1-G)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "X"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "F+O"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "storeConnect4RbaSharedExactCache32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "parameters": {
+          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
+          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
+          "K": "cache key words compared when B=1",
+          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
+          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
+          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
+          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+        },
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta.mjs#searchCpcOnly",
+      "source": "addons/rba-connect4-alphabeta.mjs",
+      "name": "searchCpcOnly",
+      "scope": "local-negamax-hot-production-cpc-only",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "4+8*P+8*Q+10*A+4*O"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "1+3*N+2*S+2*Q+3*A"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2+3*N+4*Q+4*A+3*O+J+K"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2*N+2*L+2*K"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "1+2*Q+2*A+L+L3"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "4*N+2*A+K+2*Q"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+6*N+3*A+O+2*Q"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A+O+Q"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+3*N"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "2*(Q+R)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "probeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H+E+FT+T",
+          "target": "absToRelative"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "evaluateConnect4CpcNonterminal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "RA",
+          "target": "relativeToAbs"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeConnect4RbaExactCacheSlot32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+FT+C",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+R",
+          "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "searchCpcOnly"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "L3",
+          "target": "evaluateConnect4LiveLine3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "LG",
+          "target": "evaluateConnect4LiveLineCell32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q+R",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "BC",
+          "note": "cutoff counter update on immediate zero-bound hit"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, and search-derived store predicates"
+        },
+        {
+          "op": "control.branch",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, and search-derived store predicates"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SB",
+          "target": "storeConnect4RbaBoundCacheSlot32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+FT+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32)",
+        "parameters": {
+          "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
+          "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
+          "N": "P-H-BC CPC-evaluated iterations; immediate exact or zero-bound cutoffs do not reach CPC",
+          "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
+          "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
+          "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
+          "RA": "relativeToAbs calls for semantic exactness, full-window publication, or directed winning/losing endpoint publication, 0 or 1",
+          "S": "exact-cache stores including directed winning/losing endpoints, 0 or 1; nested local/shared publication costs remain in the store subledger",
+          "A": "non-forced endpoint actions examined",
+          "C": "non-forced endpoint children cofactored",
+          "R": "nonterminal non-forced children recursively searched",
+          "T": "terminal non-forced cofactor children converted to mover-relative values",
+          "U": "non-forced actions that strictly improve best",
+          "O": "configured action slots scanned for live-line scoring at the non-forced endpoint",
+          "L": "legal non-forced moves live-line scored and insertion-ordered",
+          "L3": "non-forced legal moves scored by the three-word live-line specialization",
+          "LG": "non-forced legal moves scored by the generic live-line evaluator",
+          "J": "stable insertion score comparisons at the non-forced endpoint",
+          "K": "successful stable insertion shifts at the non-forced endpoint",
+          "EC": "1 when a non-forced alpha>=beta cutoff executes the endpoint test; otherwise 0",
+          "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
+          "BH": "private LOWER0/UPPER0 hits consumed across the P search-state iterations",
+          "BC": "zero-bound hits that immediately close the current alpha/beta window",
+          "ZC": "search cutoff/forced-terminal seams that test a returned value for zero-bound publication (0 or 1 before return)",
+          "ZF": "completed non-exact fail-low seam testing best===0 (0 or 1)",
+          "ZA": "second alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
+          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+        },
+        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only.",
+        "targetCyclesPerNode": 1000
+      },
+      "status": "decomposed",
+      "optimizationDelta": {
+        "pass": 15,
+        "candidate": "cpc-forced-macro-transit",
+        "baseline": "70ada3430dc733abe518b64143422ecd03dd3384",
+        "historicalSource": "Connect4 Sep. 9 forced-macro experiment and Sep. 12 quotient-native Negamax forced-loop implementation",
+        "removed": "recursive searchCpcOnly call/return and ordinary exact-cache publication for each nonterminal forced parent",
+        "retained": "cache probe, CPC evaluation, cofactor, canonicalization and live-line transition on each forced state",
+        "semantics": "negamax window/sign carried through forced chain; ordinary branch ordering unchanged"
+      },
+      "optimizationHistory": [
+        {
+          "pass": 1,
+          "candidate": "cpc-only-recursion-specialization",
+          "baseline": "67ecf83c1e0789a230afe1261464c23d217e9757",
+          "recurringControlDelta": "-3 non-hit tests/branches - 3 tests/branches per examined action",
+          "recurringScalarDelta": "-3 non-hit field loads - 1 non-hit integer multiply"
+        },
+        {
+          "pass": 2,
+          "candidate": "move-projected-telemetry-into-cpc",
+          "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
+          "productionDelta": "-1*C(runtime.field.load)-1*C(control.test.u32)-1*C(control.branch) per cache-miss search node",
+          "transferred": "advisory-on projected fork total update into CPC's existing projectedAdvisory branch",
+          "semantics": "projected advisory remains semantically inert; result values, action order, alpha-beta windows and exact-cache behavior unchanged"
+        },
+        {
+          "pass": 3,
+          "candidate": "remove-redundant-legal-flag",
+          "delta": "-1 test -1 branch per completed cache-miss node"
+        },
+        {
+          "pass": 4,
+          "candidate": "direct-alpha-beta-cutoff-return",
+          "delta": "-1 post-loop test/branch plus cut bookkeeping"
+        },
+        {
+          "pass": 5,
+          "candidate": "guard-alpha-update-by-best-improvement",
+          "delta": "-(A-U) tests/branches"
+        },
+        {
+          "pass": 6,
+          "candidate": "single-forced-action-setup-branch",
+          "delta": "-1 setup test/branch"
+        },
+        {
+          "pass": 7,
+          "candidate": "prepared-action-mask",
+          "delta": "+1 setup test/branch -1 test/branch per action"
+        },
+        {
+          "pass": 8,
+          "candidate": "carry-key-and-basis-offsets",
+          "delta": "-2 integer multiplies and -2 geometry field loads per recursive node"
+        },
+        {
+          "pass": 9,
+          "candidate": "carry-mover",
+          "delta": "removes meta word load/add/shift/and; adds XOR on recursive edges"
+        },
+        {
+          "pass": 10,
+          "candidate": "carry-basis-size",
+          "delta": "-1 state field load and -1 typed load per recursive node"
+        },
+        {
+          "pass": 11,
+          "candidate": "cpc-owned-precursor-total",
+          "delta": "removes search-side precursor load/update; accumulation moves to derivation event"
+        },
+        {
+          "pass": 12,
+          "candidate": "cpc-owned-forced-total",
+          "delta": "removes search-side forced reload/test; accumulation moves to existing forced branches"
+        },
+        {
+          "pass": 13,
+          "candidate": "restore-live-line-move-order-wiring",
+          "type": "correctness-of-intended-wiring",
+          "added": "existing exact live-line scorer + existing selector + per-depth live state/order",
+          "removed": "static center-out as primary branch ranking",
+          "tieBreak": "prepared geometry order only when live-line contribution scores are equal"
+        },
+        {
+          "pass": 14,
+          "candidate": "single-pass-stable-live-line-insertion-order",
+          "historicalSource": "Connect4 Sep. 8 fixed-width exact-solver ordering lineage",
+          "baseline": "03d329882d1dede5d677c8d07ab07b363e021489",
+          "removed": "separate L-call repeated-argmax full-order materialization pass",
+          "added": "stable insertion comparisons/shifts J/K while each score is produced",
+          "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
+          "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
+        },
+        {
+          "pass": 15,
+          "candidate": "cpc-forced-macro-transit",
+          "baseline": "70ada3430dc733abe518b64143422ecd03dd3384",
+          "historicalSource": "Connect4 Sep. 9 forced-macro experiment and Sep. 12 quotient-native Negamax forced-loop implementation",
+          "removed": "recursive searchCpcOnly call/return and ordinary exact-cache publication for each nonterminal forced parent",
+          "retained": "cache probe, CPC evaluation, cofactor, canonicalization and live-line transition on each forced state",
+          "semantics": "negamax window/sign carried through forced chain; ordinary branch ordering unchanged"
+        }
+      ]
     },
     {
       "unit": "addons/rba-connect4-coordinate.mjs#compareReflectedSupport",
@@ -5728,259 +6110,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-alphabeta.mjs#searchCpcOnly",
-      "source": "addons/rba-connect4-alphabeta.mjs",
-      "name": "searchCpcOnly",
-      "scope": "local-negamax-hot-production-cpc-only",
-      "operations": [
-        {
-          "op": "runtime.field.load",
-          "count": "4+8*P+8*Q+10*A+4*O"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "1+3*N+2*S+2*Q+3*A"
-        },
-        {
-          "op": "memory.load.u32",
-          "count": "2+3*N+4*Q+4*A+3*O+J+K"
-        },
-        {
-          "op": "memory.store.u32",
-          "count": "2*N+2*L+2*K"
-        },
-        {
-          "op": "alu.imul.u32",
-          "count": "1+2*Q+2*A+L+L3"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": "4*N+2*A+K+2*Q"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "1+6*N+3*A+O+2*Q"
-        },
-        {
-          "op": "alu.shl.u32",
-          "count": "A+O+Q"
-        },
-        {
-          "op": "alu.shr.u32",
-          "count": "1+3*N"
-        },
-        {
-          "op": "alu.xor.u32",
-          "count": "2*(Q+R)"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL"
-        },
-        {
-          "op": "control.branch",
-          "count": "3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "P",
-          "target": "mixSpan32Locator32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "P",
-          "target": "probeConnect4RbaExactCacheSlot32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "H+E+FT+T",
-          "target": "absToRelative"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "N",
-          "target": "evaluateConnect4CpcNonterminal32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "RA",
-          "target": "relativeToAbs"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "S",
-          "target": "storeConnect4RbaExactCacheSlot32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "Q+FT+C",
-          "target": "connect4RbaCofactorKnownHeight"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "Q+R",
-          "target": "connect4RbaCanonicalize"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "R",
-          "target": "searchCpcOnly"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "L3",
-          "target": "evaluateConnect4LiveLine3x32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "LG",
-          "target": "evaluateConnect4LiveLineCell32"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "Q+R",
-          "target": "advanceConnect4LiveLineState32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32))+(H+E+FT+T)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbs)+S*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnly)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))",
-        "parameters": {
-          "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
-          "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
-          "N": "P-H CPC-evaluated iterations",
-          "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
-          "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
-          "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
-          "RA": "relativeToAbs calls for semantic exactness, full-window publication, or directed winning/losing endpoint publication, 0 or 1",
-          "S": "exact-cache stores including directed winning/losing endpoints, 0 or 1; nested local/shared publication costs remain in the store subledger",
-          "A": "non-forced endpoint actions examined",
-          "C": "non-forced endpoint children cofactored",
-          "R": "nonterminal non-forced children recursively searched",
-          "T": "terminal non-forced cofactor children converted to mover-relative values",
-          "U": "non-forced actions that strictly improve best",
-          "O": "configured action slots scanned for live-line scoring at the non-forced endpoint",
-          "L": "legal non-forced moves live-line scored and insertion-ordered",
-          "L3": "non-forced legal moves scored by the three-word live-line specialization",
-          "LG": "non-forced legal moves scored by the generic live-line evaluator",
-          "J": "stable insertion score comparisons at the non-forced endpoint",
-          "K": "successful stable insertion shifts at the non-forced endpoint",
-          "EC": "1 when a non-forced alpha>=beta cutoff executes the endpoint test; otherwise 0",
-          "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0"
-        },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained.",
-        "targetCyclesPerNode": 1000
-      },
-      "status": "decomposed",
-      "optimizationDelta": {
-        "pass": 15,
-        "candidate": "cpc-forced-macro-transit",
-        "baseline": "70ada3430dc733abe518b64143422ecd03dd3384",
-        "historicalSource": "Connect4 Sep. 9 forced-macro experiment and Sep. 12 quotient-native Negamax forced-loop implementation",
-        "removed": "recursive searchCpcOnly call/return and ordinary exact-cache publication for each nonterminal forced parent",
-        "retained": "cache probe, CPC evaluation, cofactor, canonicalization and live-line transition on each forced state",
-        "semantics": "negamax window/sign carried through forced chain; ordinary branch ordering unchanged"
-      },
-      "optimizationHistory": [
-        {
-          "pass": 1,
-          "candidate": "cpc-only-recursion-specialization",
-          "baseline": "67ecf83c1e0789a230afe1261464c23d217e9757",
-          "recurringControlDelta": "-3 non-hit tests/branches - 3 tests/branches per examined action",
-          "recurringScalarDelta": "-3 non-hit field loads - 1 non-hit integer multiply"
-        },
-        {
-          "pass": 2,
-          "candidate": "move-projected-telemetry-into-cpc",
-          "baseline": "d3f02ef91026df0332fe41be77fdd9e81dc18e2f",
-          "productionDelta": "-1*C(runtime.field.load)-1*C(control.test.u32)-1*C(control.branch) per cache-miss search node",
-          "transferred": "advisory-on projected fork total update into CPC's existing projectedAdvisory branch",
-          "semantics": "projected advisory remains semantically inert; result values, action order, alpha-beta windows and exact-cache behavior unchanged"
-        },
-        {
-          "pass": 3,
-          "candidate": "remove-redundant-legal-flag",
-          "delta": "-1 test -1 branch per completed cache-miss node"
-        },
-        {
-          "pass": 4,
-          "candidate": "direct-alpha-beta-cutoff-return",
-          "delta": "-1 post-loop test/branch plus cut bookkeeping"
-        },
-        {
-          "pass": 5,
-          "candidate": "guard-alpha-update-by-best-improvement",
-          "delta": "-(A-U) tests/branches"
-        },
-        {
-          "pass": 6,
-          "candidate": "single-forced-action-setup-branch",
-          "delta": "-1 setup test/branch"
-        },
-        {
-          "pass": 7,
-          "candidate": "prepared-action-mask",
-          "delta": "+1 setup test/branch -1 test/branch per action"
-        },
-        {
-          "pass": 8,
-          "candidate": "carry-key-and-basis-offsets",
-          "delta": "-2 integer multiplies and -2 geometry field loads per recursive node"
-        },
-        {
-          "pass": 9,
-          "candidate": "carry-mover",
-          "delta": "removes meta word load/add/shift/and; adds XOR on recursive edges"
-        },
-        {
-          "pass": 10,
-          "candidate": "carry-basis-size",
-          "delta": "-1 state field load and -1 typed load per recursive node"
-        },
-        {
-          "pass": 11,
-          "candidate": "cpc-owned-precursor-total",
-          "delta": "removes search-side precursor load/update; accumulation moves to derivation event"
-        },
-        {
-          "pass": 12,
-          "candidate": "cpc-owned-forced-total",
-          "delta": "removes search-side forced reload/test; accumulation moves to existing forced branches"
-        },
-        {
-          "pass": 13,
-          "candidate": "restore-live-line-move-order-wiring",
-          "type": "correctness-of-intended-wiring",
-          "added": "existing exact live-line scorer + existing selector + per-depth live state/order",
-          "removed": "static center-out as primary branch ranking",
-          "tieBreak": "prepared geometry order only when live-line contribution scores are equal"
-        },
-        {
-          "pass": 14,
-          "candidate": "single-pass-stable-live-line-insertion-order",
-          "historicalSource": "Connect4 Sep. 8 fixed-width exact-solver ordering lineage",
-          "baseline": "03d329882d1dede5d677c8d07ab07b363e021489",
-          "removed": "separate L-call repeated-argmax full-order materialization pass",
-          "added": "stable insertion comparisons/shifts J/K while each score is produced",
-          "tieBreak": "strict greater-score movement preserves prepared center order for equal live-line scores",
-          "semantics": "same full live-line score ordering, CPC restrictions, cofactor/canonicalization, cache behavior and alpha-beta windows"
-        },
-        {
-          "pass": 15,
-          "candidate": "cpc-forced-macro-transit",
-          "baseline": "70ada3430dc733abe518b64143422ecd03dd3384",
-          "historicalSource": "Connect4 Sep. 9 forced-macro experiment and Sep. 12 quotient-native Negamax forced-loop implementation",
-          "removed": "recursive searchCpcOnly call/return and ordinary exact-cache publication for each nonterminal forced parent",
-          "retained": "cache probe, CPC evaluation, cofactor, canonicalization and live-line transition on each forced state",
-          "semantics": "negamax window/sign carried through forced chain; ordinary branch ordering unchanged"
-        }
-      ]
-    },
-    {
       "unit": "addons/rba-connect4-shared-exact-cache.mjs#createConnect4RbaSharedExactCache32",
       "source": "addons/rba-connect4-shared-exact-cache.mjs",
       "name": "createConnect4RbaSharedExactCache32",
@@ -6038,7 +6167,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-KH",
           "target": "mixSpan32Locator32"
         },
         {
@@ -6076,16 +6205,27 @@
         {
           "op": "atomic.rmw.u32",
           "count": "E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
       },
       "status": "decomposed"
     },
@@ -6097,7 +6237,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-KH",
           "target": "mixSpan32Locator32"
         },
         {
@@ -6139,16 +6279,27 @@
         {
           "op": "control.branch",
           "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(3)*C(control.test.u32)+(2)*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Known-hash callers skip duplicate locator mixing; sequence CAS/key/value publication is unchanged."
       },
       "status": "decomposed"
     },
@@ -6982,12 +7133,22 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "probeConnect4RbaExactCacheSlot32Behavior"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "public behavior exact-only filter rejects private LOWER0/UPPER0 codes"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "public behavior exact-only filter rejects private LOWER0/UPPER0 codes"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)",
-        "note": "Public exact-cache probe wrapper."
+        "expression": "(2)*C(runtime.field.load)+CALL(mixSpan32Locator32)+C(alu.and.u32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+C(control.test.u32)+C(control.branch)",
+        "note": "Public behavior exact-cache probe wrapper. Private LOWER0/UPPER0 codes remain invisible to exact-only consumers."
       },
       "status": "decomposed"
     },
@@ -7078,7 +7239,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -7278,11 +7439,21 @@
         {
           "op": "control.branch",
           "count": "K"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "BND",
+          "note": "behavior generic/Four-Front lane rejects private bound code as non-exact"
+        },
+        {
+          "op": "control.branch",
+          "count": "BND",
+          "note": "behavior generic/Four-Front lane rejects private bound code as non-exact"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+N*(2+3*Q)*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+T)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidenceBehavior)+N*Q*CALL(queryConnect4RbaFourFront)+N*S*(CALL(relativeToAbsBehavior)+CALL(storeConnect4RbaExactCacheSlot32Behavior))+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*(CALL(connect4RbaCanonicalize)+CALL(searchBehavior))+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidenceBehavior)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbsBehavior)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(searchBehavior)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BND)*C(control.test.u32)+(BND)*C(control.branch)",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -7294,9 +7465,10 @@
           "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
           "S": "exact-cache stores executed by this invocation (0 or 1)",
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
-          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling."
+          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
+          "BND": "1 when private cache returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise"
         },
-        "note": "Four-Front path now also consumes CPC-owned precursor/forced telemetry; its search semantics are otherwise unchanged.",
+        "note": "Behavior Four-Front/generic path remains exact-only; private zero-bound codes continue search and never become exact results.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -7587,11 +7759,93 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
         }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-alphabeta-behavior.mjs#storeConnect4RbaBoundCacheSlot32Behavior",
+      "source": "addons/rba-connect4-alphabeta-behavior.mjs",
+      "name": "storeConnect4RbaBoundCacheSlot32Behavior",
+      "scope": "hot-cache-local-zero-bound-behavior",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "4+2*B+O+5*F+3*X"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*B*K"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "B+F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*B*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "B*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "B*(K-1)*(1-G)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "X"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "F+O"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "storeConnect4RbaSharedExactCache32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "parameters": {
+          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
+          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
+          "K": "cache key words compared when B=1",
+          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
+          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
+          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
+          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+        },
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
       },
       "status": "decomposed"
     },
@@ -7725,15 +7979,35 @@
         {
           "op": "control.branch",
           "count": "K"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "BC",
+          "note": "cutoff counter update on immediate zero-bound hit"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
+        },
+        {
+          "op": "control.branch",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SB",
+          "target": "storeConnect4RbaBoundCacheSlot32Behavior"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior))+(H+E+FT+T)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsBehavior)+S*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyBehavior)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
-          "N": "P-H CPC-evaluated iterations",
+          "N": "P-H-BC CPC-evaluated iterations; immediate exact or zero-bound cutoffs do not reach CPC",
           "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
           "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
           "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
@@ -7752,9 +8026,15 @@
           "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
           "EC": "1 when a non-forced alpha>=beta cutoff executes the endpoint test; otherwise 0",
-          "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0"
+          "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
+          "BH": "private LOWER0/UPPER0 hits consumed across the P behavior search-state iterations",
+          "BC": "zero-bound hits that immediately close the current alpha/beta window",
+          "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
+          "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
+          "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
+          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained.",
+        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -8387,7 +8667,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -8530,11 +8810,93 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
         }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-frontier.mjs#storeConnect4RbaBoundCacheSlot32Frontier",
+      "source": "addons/rba-connect4-frontier.mjs",
+      "name": "storeConnect4RbaBoundCacheSlot32Frontier",
+      "scope": "hot-cache-local-zero-bound-frontier",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "4+2*B+O+5*F+3*X"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*B*K"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "B+F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*B*K"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "B*K"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "B*(K-1)*(1-G)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+B*(5+G*K)+2*X"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "X"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "F+O"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "storeConnect4RbaSharedExactCache32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "parameters": {
+          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
+          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
+          "K": "cache key words compared when B=1",
+          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
+          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
+          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
+          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+        },
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
       },
       "status": "decomposed"
     },
@@ -8692,15 +9054,35 @@
         {
           "op": "runtime.to_int32",
           "count": "POLARITY+2*Q+3*R"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "BC",
+          "note": "cutoff counter update on immediate zero-bound hit"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
+        },
+        {
+          "op": "control.branch",
+          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SB",
+          "target": "storeConnect4RbaBoundCacheSlot32Frontier"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+2*(Q+R)*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q)*C(control.branch)+P*(CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Frontier))+(H+E+FT+T)*CALL(absToRelativeFrontier)+N*CALL(evaluateConnect4CpcNonterminal32)+RA*CALL(relativeToAbsFrontier)+S*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*(CALL(connect4RbaCanonicalize)+CALL(advanceConnect4LiveLineState32))+R*CALL(searchCpcOnlyFrontier)+L3*CALL(evaluateConnect4LiveLine3x32)+LG*CALL(evaluateConnect4LiveLineCell32)+B*CALL(completeRootFrontierNode32)+K*(C(control.test.u32)+C(control.branch))+EC*(C(control.test.u32)+C(control.branch))+EL*(C(control.test.u32)+C(control.branch))+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+HORIZON*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+INCOMPLETE_CONTROL+(POLARITY+2*Q+3*R)*C(runtime.to_int32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
-          "N": "P-H CPC-evaluated iterations",
+          "N": "P-H-BC CPC-evaluated iterations; immediate exact or zero-bound cutoffs do not reach CPC",
           "Q": "nonterminal CPC-forced transitions advanced in-loop without recursive search/cache publication of the forced parent",
           "FT": "1 when a CPC-forced transition terminates immediately by cofactor; otherwise 0",
           "E": "1 when CPC exact evidence terminates the invocation; otherwise 0",
@@ -8723,135 +9105,18 @@
           "HORIZON": "Executed bounded-horizon tests after cache/CPC closure",
           "BRANCH": "Branch completions checking unfinished sentinel",
           "INCOMPLETE_CONTROL": "Executed horizon-stop counter increment, unfinished flag initialization/assignments, and sentinel propagation/returns; load/store/arithmetic/control/call costs are profile-sensitive, not zero",
-          "POLARITY": "Executed sign*WDL/bound completion transports in this invocation (0 or 1); 2*Q normalizes forced child bounds; 3*R normalizes recursive bounds and returned result, including STOP/incomplete sentinels."
+          "POLARITY": "Executed sign*WDL/bound completion transports in this invocation (0 or 1); 2*Q normalizes forced child bounds; 3*R normalizes recursive bounds and returned result, including STOP/incomplete sentinels.",
+          "BH": "private LOWER0/UPPER0 hits consumed across the P frontier search-state iterations",
+          "BC": "zero-bound hits that immediately close the current alpha/beta window",
+          "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
+          "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
+          "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
+          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
-    },
-    {
-      "unit": "addons/worker-root-frontier.mjs#encodeRootFrontier32",
-      "source": "addons/worker-root-frontier.mjs",
-      "name": "encodeRootFrontier32",
-      "scope": "COLD",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.integer.check",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 6
-        },
-        {
-          "op": "control.branch",
-          "count": 7
-        },
-        {
-          "op": "alu.shl.u32",
-          "count": 2
-        },
-        {
-          "op": "alu.or.u32",
-          "count": 3
-        },
-        {
-          "op": "runtime.error.throw",
-          "count": "INVALID"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "(2)*C(runtime.integer.check)+(6)*C(control.test.u32)+(7)*C(control.branch)+(2)*C(alu.shl.u32)+(3)*C(alu.or.u32)+(INVALID)*C(runtime.error.throw)",
-        "parameters": {
-          "INVALID": "0 for valid cold config; 1 for rejected input"
-        },
-        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
-      }
-    },
-    {
-      "unit": "addons/worker-root-frontier.mjs#prepareRootFrontierBehavior32",
-      "source": "addons/worker-root-frontier.mjs",
-      "name": "prepareRootFrontierBehavior32",
-      "scope": "COLD",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "target": "prepareSearchBehavior32",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 4
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 2
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "(1)*CALL(prepareSearchBehavior32)+(4)*C(runtime.field.store)+(2)*C(runtime.field.load)",
-        "parameters": {},
-        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
-      }
-    },
-    {
-      "unit": "addons/worker-root-frontier.mjs#completeRootFrontierNode32",
-      "source": "addons/worker-root-frontier.mjs",
-      "name": "completeRootFrontierNode32",
-      "scope": "E0 completion",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.wasm.atomic.load32",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "2+3*E+2*D"
-        },
-        {
-          "op": "alu.shr.u32",
-          "count": "1+2*D"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "1+S+4*D"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "2+E+S+3*D"
-        },
-        {
-          "op": "control.branch",
-          "count": "2+E+S+3*D"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "3*D+L"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "readWorkerBehavior32",
-          "count": "E"
-        }
-      ],
-      "cycleCount": {
-        "kind": "expression",
-        "expression": "(1)*C(runtime.wasm.atomic.load32)+(2+3*E+2*D)*C(runtime.field.load)+(1+2*D)*C(alu.shr.u32)+(1+S+4*D)*C(alu.and.u32)+(2+E+S+3*D)*C(control.test.u32)+(2+E+S+3*D)*C(control.branch)+(3*D+L)*C(runtime.field.store)+(E)*CALL(readWorkerBehavior32)+RETURN",
-        "parameters": {
-          "E": "Extension marker set, 0/1",
-          "S": "Accepted changed word reaches STOP test, 0/1",
-          "D": "Accepted non-STOP changed word decoded, 0/1",
-          "L": "Changed word releases horizon, 0/1",
-          "RETURN": "Call/return/value preservation unless removed by qualified inlining"
-        },
-        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
-      }
     },
     {
       "unit": "addons/rba-connect4-frontier.mjs#releaseNarrowFrontier",
@@ -9187,6 +9452,129 @@
       }
     },
     {
+      "unit": "addons/worker-root-frontier.mjs#encodeRootFrontier32",
+      "source": "addons/worker-root-frontier.mjs",
+      "name": "encodeRootFrontier32",
+      "scope": "COLD",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 7
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 3
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "INVALID"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(2)*C(runtime.integer.check)+(6)*C(control.test.u32)+(7)*C(control.branch)+(2)*C(alu.shl.u32)+(3)*C(alu.or.u32)+(INVALID)*C(runtime.error.throw)",
+        "parameters": {
+          "INVALID": "0 for valid cold config; 1 for rejected input"
+        },
+        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
+      }
+    },
+    {
+      "unit": "addons/worker-root-frontier.mjs#prepareRootFrontierBehavior32",
+      "source": "addons/worker-root-frontier.mjs",
+      "name": "prepareRootFrontierBehavior32",
+      "scope": "COLD",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareSearchBehavior32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 4
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1)*CALL(prepareSearchBehavior32)+(4)*C(runtime.field.store)+(2)*C(runtime.field.load)",
+        "parameters": {},
+        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
+      }
+    },
+    {
+      "unit": "addons/worker-root-frontier.mjs#completeRootFrontierNode32",
+      "source": "addons/worker-root-frontier.mjs",
+      "name": "completeRootFrontierNode32",
+      "scope": "E0 completion",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.wasm.atomic.load32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2+3*E+2*D"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+2*D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+S+4*D"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+E+S+3*D"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+E+S+3*D"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "3*D+L"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "readWorkerBehavior32",
+          "count": "E"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1)*C(runtime.wasm.atomic.load32)+(2+3*E+2*D)*C(runtime.field.load)+(1+2*D)*C(alu.shr.u32)+(1+S+4*D)*C(alu.and.u32)+(2+E+S+3*D)*C(control.test.u32)+(2+E+S+3*D)*C(control.branch)+(3*D+L)*C(runtime.field.store)+(E)*CALL(readWorkerBehavior32)+RETURN",
+        "parameters": {
+          "E": "Extension marker set, 0/1",
+          "S": "Accepted changed word reaches STOP test, 0/1",
+          "D": "Accepted non-STOP changed word decoded, 0/1",
+          "L": "Changed word releases horizon, 0/1",
+          "RETURN": "Call/return/value preservation unless removed by qualified inlining"
+        },
+        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit."
+      }
+    },
+    {
       "unit": "addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>",
       "source": "addons/rba-connect4-lazy-smp-worker-frontier.mjs",
       "name": "<frontier-module-main>",
@@ -9328,8 +9716,8 @@
     }
   ],
   "summary": {
-    "units": 153,
-    "decomposed": 137,
+    "units": 156,
+    "decomposed": 156,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -9430,7 +9818,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "e2011568b34bbc1416cff48154865367cabb6515",
+    "addons/rba-connect4-alphabeta.mjs": "2db14d8949e7b158c40d0c38afd17c61ba962a83",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -9439,15 +9827,15 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
     "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "15e174945df7b2909857b523ab0a89895de085dc",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "d54358ccf9556b4fcdc7a97e75c6d2ca90b690fb",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "538bd7500b95dc7f0ba985b59bc1a79c90bb2f83",
+    "addons/rba-connect4-frontier.mjs": "73b5a467168c24f24197075a9c1097a74dc2dac5",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
