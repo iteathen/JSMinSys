@@ -14,11 +14,12 @@ const rawPath=dir+'/'+mode+'-raw.jsonl';
 assert.equal(existsSync(rawPath),false,'Do not silently rerun/resume an existing experiment');
 writeFileSync(dir+'/'+mode+'-manifest.json',JSON.stringify({mode,fixture,timeoutMs,order,sha,library,runtime,startedAt:new Date().toISOString(),environment:{os:release(),cpu:cpus()[0].model,logical:cpus().length,ram:totalmem(),freeRam:freemem()},cycleCounter:'Windows QueryProcessCycleTime user+kernel all threads',shared:{A:4194304,B:67108864},private:1048576,workers:4,wide:0,deep:[1,2,3],affinity:'off'},null,2)+'\n');
 const rows=[];
+const childEnv={...process.env};delete childEnv.NODE_OPTIONS;delete childEnv.JMS_WORKER_AFFINITY_FILE;delete childEnv.JMS_WORKER_AFFINITY_REPORT;
 for(const [index,arm] of [...order].entries()){
  assert.equal(git('rev-parse','HEAD'),sha);assert.equal(git('status','--porcelain'),'');
  const shared=arm==='A'?4194304:67108864,startedAt=new Date().toISOString();
  console.log(JSON.stringify({mode,index,arm,shared,startedAt}));
- const r=spawnSync(runtime.nodeExe,['--experimental-ffi',dir+'/sample.mjs',library,fixture,String(timeoutMs),String(shared),'1048576'],{encoding:'utf8',windowsHide:true,timeout:timeoutMs+30000,maxBuffer:8*1024*1024});
+ const r=spawnSync(runtime.nodeExe,['--experimental-ffi',dir+'/sample.mjs',library,fixture,String(timeoutMs),String(shared),'1048576'],{encoding:'utf8',env:childEnv,windowsHide:true,timeout:timeoutMs+30000,maxBuffer:8*1024*1024});
  const raw={index,arm,startedAt,endedAt:new Date().toISOString(),status:r.status,signal:r.signal,error:r.error?.message??null,stdout:r.stdout,stderr:r.stderr};
  appendFileSync(rawPath,JSON.stringify(raw)+'\n');
  assert.equal(raw.status,0);assert.equal(raw.error,null);
