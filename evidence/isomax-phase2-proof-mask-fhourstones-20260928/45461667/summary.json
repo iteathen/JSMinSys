@@ -1,0 +1,171 @@
+{
+  "kind": "isomax-phase2-cpc-proof-mask-source-ab-summary-v1",
+  "moves": "45461667",
+  "blocks": 1,
+  "timeoutMs": 120000,
+  "samples": 2,
+  "exactResult": {
+    "rootWdl": 1,
+    "move": 3
+  },
+  "arms": {
+    "A": {
+      "label": "packed-move-control-be7c2",
+      "sha": "be7c2887defcefb37080fa61de7ce1dc38dc2990",
+      "exact": 1,
+      "timeouts": 0,
+      "meanCycles": 3362638284,
+      "meanWall": 170.09679999999997,
+      "meanCpu": 969,
+      "meanNodes": 121210,
+      "meanWinnerNodes": 31695,
+      "meanPerWorkerNodes": [
+        28824,
+        31695,
+        31364,
+        29327
+      ],
+      "meanSharedHits": 8898,
+      "meanSharedStores": 57668,
+      "meanContention": 2838,
+      "meanCyclesPerNode": 27742.25133239832,
+      "meanSharedBytes": 169539109,
+      "meanRss": 238084096,
+      "meanPeakRss": 380141568,
+      "winners": [
+        1
+      ],
+      "parallelism": [
+        16
+      ]
+    },
+    "B": {
+      "label": "cpc-proof-mask-7f74e",
+      "sha": "7f74e324457c4237590bc6b0f924852f6d728e4c",
+      "exact": 1,
+      "timeouts": 0,
+      "meanCycles": 3367351194,
+      "meanWall": 168.50509999999997,
+      "meanCpu": 938,
+      "meanNodes": 119404,
+      "meanWinnerNodes": 33270,
+      "meanPerWorkerNodes": [
+        26733,
+        33195,
+        33270,
+        26206
+      ],
+      "meanSharedHits": 9236,
+      "meanSharedStores": 57219,
+      "meanContention": 3213,
+      "meanCyclesPerNode": 28201.326538474423,
+      "meanSharedBytes": 169539109,
+      "meanRss": 237424640,
+      "meanPeakRss": 377245696,
+      "winners": [
+        2
+      ],
+      "parallelism": [
+        16
+      ]
+    }
+  },
+  "paired": {
+    "solveCycles": {
+      "ratios": [
+        1.0014015512826415
+      ],
+      "meanDeltaPct": 0.14015512826415222,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "wallMs": {
+      "ratios": [
+        0.9906423871583709
+      ],
+      "meanDeltaPct": -0.9357612841629059,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "cpuMs": {
+      "ratios": [
+        0.9680082559339526
+      ],
+      "meanDeltaPct": -3.1991744066047434,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "totalNodes": {
+      "ratios": [
+        0.985100239254187
+      ],
+      "meanDeltaPct": -1.4899760745813007,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "winnerNodes": {
+      "ratios": [
+        1.0496923805016565
+      ],
+      "meanDeltaPct": 4.9692380501656475,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "sharedCacheHits": {
+      "ratios": [
+        1.0379860642841088
+      ],
+      "meanDeltaPct": 3.798606428410878,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "sharedCacheStores": {
+      "ratios": [
+        0.9922140528542692
+      ],
+      "meanDeltaPct": -0.7785947145730776,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "sharedCacheStoreContention": {
+      "ratios": [
+        1.1321353065539113
+      ],
+      "meanDeltaPct": 13.213530655391125,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "cyclesPerNode": {
+      "ratios": [
+        1.0165478713524587
+      ],
+      "meanDeltaPct": 1.654787135245872,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "sharedBytes": {
+      "ratios": [
+        1
+      ],
+      "meanDeltaPct": 0,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "rss": {
+      "ratios": [
+        0.9972301551801259
+      ],
+      "meanDeltaPct": -0.2769844819874079,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    },
+    "processPeakRssBytes": {
+      "ratios": [
+        0.9923821222308422
+      ],
+      "meanDeltaPct": -0.7617877769157788,
+      "interval95Pct": null,
+      "exactSolveRatioAdmissible": true
+    }
+  }
+}

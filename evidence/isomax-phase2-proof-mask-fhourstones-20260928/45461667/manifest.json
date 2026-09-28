@@ -1,0 +1,46 @@
+{
+  "kind": "isomax-phase2-cpc-proof-mask-source-ab-v1",
+  "startedAt": "2026-09-28T18:40:11.505Z",
+  "moves": "45461667",
+  "blocks": 1,
+  "timeoutMs": 120000,
+  "orders": [
+    "AB",
+    "BA"
+  ],
+  "sources": {
+    "A": {
+      "label": "packed-move-control-be7c2",
+      "path": "C:\\r\\isomax-p2-proof-mask-A",
+      "sha": "be7c2887defcefb37080fa61de7ce1dc38dc2990",
+      "dirty": false
+    },
+    "B": {
+      "label": "cpc-proof-mask-7f74e",
+      "path": "C:\\r\\isomax-p2-proof-mask-B",
+      "sha": "7f74e324457c4237590bc6b0f924852f6d728e4c",
+      "dirty": false
+    }
+  },
+  "environment": {
+    "node": "v26.7.0",
+    "platform": "win32",
+    "arch": "x64",
+    "release": "10.0.26200",
+    "availableParallelism": 16
+  },
+  "topology": {
+    "workers": 4,
+    "wideWorker": 0,
+    "deepWorkers": [
+      1,
+      2,
+      3
+    ],
+    "rootFrontier": true,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 4194304,
+    "localCacheCapacity": 1048576,
+    "minimumAvailableParallelism": 4
+  }
+}
