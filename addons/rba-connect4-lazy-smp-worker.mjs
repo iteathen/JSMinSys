@@ -1,9 +1,13 @@
 import {workerData} from 'node:worker_threads';
+import {attachConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
   solveConnect4RbaAlphaBeta,
   RBA_AB_CPC_ONLY,
 } from './rba-connect4-alphabeta.mjs';
+
+// Once before private state/search preparation; no table allocation or hot check.
+attachConnect4RbaSharedExactCache32(workerData.sharedExactCache);
 
 const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,METRIC_WIDTH=15,

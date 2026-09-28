@@ -35,6 +35,18 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,geo
   };
 }
 
+// COLD worker initialization only. Some Node/V8 structured-clone versions truncate
+// a >=4GiB typed-array view length while preserving its SharedArrayBuffer. Restore
+// only the view header over the existing full-span backing; never copy/grow data.
+export function attachConnect4RbaSharedExactCache32(cache){
+  const keys=cache.keys,expected=(cache.mask+1)*cache.storedKeyWords;
+  if(!(keys instanceof Uint32Array)||!(keys.buffer instanceof SharedArrayBuffer)||
+     keys.byteOffset!==0||keys.buffer.byteLength!==expected*4)
+    throw new RangeError('invalid shared exact key backing');
+  if(keys.length!==expected)cache.keys=new Uint32Array(keys.buffer);
+  return cache;
+}
+
 export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash){
   const hash=knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash,
     slot=hash&cache.mask,

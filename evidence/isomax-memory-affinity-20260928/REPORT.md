@@ -23,3 +23,5 @@ malformed-topology API absent,and inherited CPC array/store accounting errors.
 These are cold/accounting repairs; selected measured solver remains unchanged.
 
 Owner stopped original8-run series after5 exact samples; index5 cancelled,6/7notrun. No complete8-run CI claimed. Next authorized test is one matchedAB hard pair:2.5GiB versus10GiB shared,5min ceiling,private unchanged. Budget is80% startup-available RAM less144MiB private and1GiB runtime headroom,rounded down to supported power-of-two capacity. No hot-path allocation/growth. Affinity/private stages deferred.
+
+10GiB attempt failed before solving: Invalid atomic access index,138nodes,cleanup=true. Standalone transfer reproducer shows4GiB/8GiB Uint32Array views arrive in worker as length0 while SAB byte length survives;2GiB works. Checked one-time worker attachment restores only the view header,not backing allocation/copy/growth. Canonical worker and generated mirrors updated together with cold ledger;180/180tests and catalog/generated/audits pass. Rerun both capacities on identical repaired source; preserve failed pair separately.
