@@ -33,6 +33,7 @@ search=replaceOnce(search,'    if(best===-2)return completeBehaviorNode32(state,
 // transport so draw zero never becomes IEEE -0 and forces floating-point/deopt
 // handling. No extra callback, branch or changed search/flag cadence. Preserve.
 const polaritySites=[['sign*absToRelativeBehavior(cached,mover)',1],
+  ['sign*absToRelativeBehavior(sharedExact,mover)',2],
   ['sign*absToRelativeBehavior(value,mover)',1],['sign*semanticLo',2],
   ['sign*semanticHi',1],['sign*value',2],['sign*best',2]];
 for(const [expression,count] of polaritySites){
