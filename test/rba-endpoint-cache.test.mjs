@@ -9,7 +9,7 @@ import {resetConnect4LiveLineState32,advanceConnect4LiveLineState32} from '../ad
 // a public production entry point or altering its body.
 const url=new URL('../addons/rba-connect4-alphabeta.mjs',import.meta.url);
 const source=readFileSync(url,'utf8').replace(/from '([^']+)'/g,(_,p)=>`from '${new URL(p,url).href}'`);
-const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly};').toString('base64'));
+const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly,probeConnect4RbaExactCacheSlot32,mixSpan32Locator32};').toString('base64'));
 function prepared(g,moves){
   const root=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=api.prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:65536});
   s.words.set(root.words);s.basis.set(root.basis);s.basisSize[0]=root.basis.length;
@@ -22,8 +22,10 @@ function prepared(g,moves){
 }
 const search=(g,moves,a,b)=>{
   const {root,s}=prepared(g,moves);
-  const value=api.searchCpcOnly(s,0,0,0,root.basis.length,moves.length&1,0,0,0,a,b);
-  return {value,cached:api.probeConnect4RbaExactCache32(s.cache,root.words,0),s};
+  const value=api.searchCpcOnly(s,0,0,0,root.basis.length,moves.length&1,0,0,0,a,b),
+    hash=api.mixSpan32Locator32(root.words,0,s.cache.keyWords),slot=hash&s.cache.mask,
+    privateCached=api.probeConnect4RbaExactCacheSlot32(s.cache,root.words,0,slot,hash);
+  return {value,cached:api.probeConnect4RbaExactCache32(s.cache,root.words,0),privateCached,s};
 };
 test('a recursive fail-high win publishes exact current-q WDL',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),moves=[3,4,3,5,0,5,5,6];
@@ -60,7 +62,7 @@ test('directed narrow windows and cached q values agree with an independent phys
     }
     memo.set(key,best);return best;
   }
-  let seed=55129,checked=0,forced=0,endpointHits=0;const values=new Set();
+  let seed=55129,checked=0,forced=0,endpointHits=0,boundRows=0;const values=new Set();
   const random=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return seed>>>0;};
   for(let game=0;game<40;game++){
     let p0=0,p1=0;const heights=[0,0,0,0],moves=[];
@@ -75,9 +77,13 @@ test('directed narrow windows and cached q values agree with an independent phys
       if(r.value<=a)assert.ok(expected<=r.value);
       else if(r.value>=b)assert.ok(expected>=r.value);
       else assert.equal(r.value+0,expected+0);
-      if(r.cached){assert.equal(r.cached,absolute);if(r.cached!==2)endpointHits++;}
+      if(r.privateCached>3){
+        assert.ok(r.privateCached===4||r.privateCached===5,'private non-exact carrier must be LOWER0/UPPER0');
+        assert.equal(r.cached,0,'public exact-cache probe must hide private zero bounds');
+        boundRows++;
+      }else if(r.cached){assert.equal(r.cached,absolute);if(r.cached!==2)endpointHits++;}
       if(r.s.cpc.forcedTotal)forced++;checked++;
     }
   }
-  assert.ok(checked>=200);assert.ok(forced>0);assert.ok(endpointHits>0);assert.equal(values.size,3);
+  assert.ok(checked>=200);assert.ok(forced>0);assert.ok(endpointHits>0);assert.ok(boundRows>0);assert.equal(values.size,3);
 });
