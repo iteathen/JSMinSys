@@ -11,7 +11,7 @@ import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './rba-conn
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../src/search32.mjs';
-import {probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {probeConnect4RbaSharedExactCacheKnownHash32,storeConnect4RbaSharedExactCacheKnownHash32} from './rba-connect4-shared-exact-cache.mjs';
 
 export const RBA_FRONTIER_CPC_ONLY=0;
 
@@ -47,13 +47,13 @@ function probeConnect4RbaExactCacheSlot32Frontier(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0;
+  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,hash):0;
 }
 function storeConnect4RbaExactCacheSlot32Frontier(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,hash);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,value,hash);
   return value;
 }
 function storeConnect4RbaBoundCacheSlot32Frontier(cache,words,offset,value,slot,hash){
@@ -85,7 +85,7 @@ function storeConnect4RbaBoundCacheSlot32Frontier(cache,words,offset,value,slot,
         if(prior===value)return prior;
         // Same q has both >=0 and <=0, therefore exact draw.
         cache.value[slot]=2;
-        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,2,hash);
+        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,2,hash);
         return 2;
       }
     }
@@ -167,7 +167,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
         if(beta<=0){state.cutoffs+=1;return completeBehaviorNode32(state, 0);}
       }else if(alpha>=0){state.cutoffs+=1;return completeBehaviorNode32(state, 0);}
       if(cache.shared&&!(cacheHash&cache.sharedSampleBits)){
-        const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset,cacheHash);
+        const shared=probeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,keyOffset,cacheHash);
         if(shared){state.cacheHits+=1;return completeBehaviorNode32(state, ((sign*absToRelativeFrontier(shared,mover))|0));}
       }
       if(cached===RBA_CACHE_LOWER0){if(alpha<0)alpha=0;}
