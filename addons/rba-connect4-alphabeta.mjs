@@ -234,18 +234,22 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       }
     }
 
-    const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
+    // Packed constant is six interval nibbles (hi<<2)|lo, indexed by proof mask.
+    // Decode once; the exact path needs only lo. Cache codes remain 1..3.
+    const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc),
+    cpcProof=0xd905eaf0>>>(state.cpc.proofMask[0]<<2),cpcLo=cpcProof&3;
     if(cpcKind===CPC_EXACT){
-      state.cpcExact+=1;const value=state.cpc.interval[0];
+      state.cpcExact+=1;const value=cpcLo;
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
       return sign*absToRelative(value,mover);
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
     else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
 
+    const cpcHi=(cpcProof>>>2)&3;
     let semanticLo,semanticHi;
-    if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
-    else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
+    if(mover===0){semanticLo=cpcLo-2;semanticHi=cpcHi-2;}
+    else{semanticLo=2-cpcHi;semanticHi=2-cpcLo;}
     if(semanticLo===semanticHi){
       const abs=relativeToAbs(semanticLo,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
@@ -393,18 +397,20 @@ function search(state,depth,alpha,beta){
   const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
   if(cached&&cached<=3){state.cacheHits+=1;return absToRelative(cached,mover);}
 
-  const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
+  const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc),
+    cpcProof=0xd905eaf0>>>(state.cpc.proofMask[0]<<2),cpcLo=cpcProof&3;
   if(cpcKind===CPC_EXACT){
-    state.cpcExact+=1;const value=state.cpc.interval[0];
+    state.cpcExact+=1;const value=cpcLo;
     storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
     return absToRelative(value,mover);
   }
   if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
   else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
 
-  let semanticLo,semanticHi;
-  if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
-  else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
+  const cpcHi=(cpcProof>>>2)&3;
+    let semanticLo,semanticHi;
+  if(mover===0){semanticLo=cpcLo-2;semanticHi=cpcHi-2;}
+  else{semanticLo=2-cpcHi;semanticHi=2-cpcLo;}
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const packed=frontEvidence(state,words,keyOffset,basis,basisOffset,n);
     if(packed>=0){
@@ -498,7 +504,8 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
     state.liveHeights[column]=height+1;
   }
   const cpcKind=evaluateConnect4CpcNonterminal32(g,state.words,0,state.basis,0,state.basisSize[0],state.cpc);
-  let rootLo=state.cpc.interval[0],rootHi=state.cpc.interval[1];
+  const cpcProof=0xd905eaf0>>>(state.cpc.proofMask[0]<<2);
+  let rootLo=cpcProof&3,rootHi=(cpcProof>>>2)&3;
   if(cpcKind===CPC_EXACT)state.cpcExact+=1;else if(cpcKind===CPC_BOUND)state.cpcBounds+=1;else if(cpcKind===CPC_RESTRICT)state.cpcRestrictions+=1;
   if(state.mode===RBA_AB_CPC_FOUR_FRONT){
     const packed=frontEvidence(state,state.words,0,state.basis,0,state.basisSize[0]);

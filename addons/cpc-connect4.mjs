@@ -30,7 +30,7 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     preemptionCount:new Uint32Array(1),
     preemptionMask32:new Uint32Array(1),
     forcedColumn:new Int32Array(1),
-    interval:new Uint32Array(2),
+    proofMask:new Uint8Array(1),
     frontierResponse:frontierResponse?1:0,
     projectedAdvisory:projectedAdvisory?1:0,
   };
@@ -260,7 +260,10 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
 }
 
 // Returns CPC_EXACT/CPC_BOUND/CPC_RESTRICT/CPC_NONE.
-// interval[0..1] is an absolute P0-oriented WDL interval using 1..3.
+// proofMask[0] is the absolute P0 possibility set: LOSS=100, DRAW=010, WIN=001.
+// Only 001/010/011/100/110/111 are sound convex proof states; zero is invalid.
+// Keep refinement local and publish one byte on return. Do not restore endpoint
+// arrays or add allocation/helper dispatch to this hot path.
 // forcedColumn[0] is exact when >=0.
 // preemptionMask32/preemptionCount are exact current-action restrictions when
 // available for a <=32-column profile.
@@ -269,7 +272,7 @@ function collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch){
 export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize,scratch){
   const terminal=words[offset+g.metaOffset]&3;
   if(!terminal)return evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch);
-  scratch.interval[0]=terminal;scratch.interval[1]=terminal;scratch.forcedColumn[0]=-1;
+  scratch.proofMask[0]=1<<(3-terminal);scratch.forcedColumn[0]=-1;
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   if(scratch.projectedAdvisory){
     scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
@@ -278,7 +281,8 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
 }
 
 export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch){
-  scratch.interval[0]=1;scratch.interval[1]=3;scratch.forcedColumn[0]=-1;
+  let proofMask=7;
+  scratch.forcedColumn[0]=-1;
   scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   if(scratch.projectedAdvisory){
     scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
@@ -287,12 +291,12 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
 
   const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
   for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
-  if(!p0Any&&!p1Any){scratch.interval[0]=2;scratch.interval[1]=2;return CPC_EXACT;}
+  if(!p0Any&&!p1Any){scratch.proofMask[0]=2;return CPC_EXACT;}
 
-  if(!p0Any)scratch.interval[1]=2;
-  if(!p1Any)scratch.interval[0]=2;
+  if(!p0Any)proofMask&=6;
+  if(!p1Any)proofMask&=3;
 
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  if((proofMask&(proofMask-1))===0){scratch.proofMask[0]=proofMask;return CPC_EXACT;}
 
   // Scan the singleton prefix once for both players. The packed profile keeps
   // mover-immediate priority while sharing basis/index/playability work.
@@ -300,7 +304,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     opponentBits=mover?scratch.activeSingletonCells:scratch.activeSingletonCellsOther,
     singletonProfile=collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mover,moverBits,opponentBits,scratch);
   if(singletonProfile&1){
-    const value=mover?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+    scratch.proofMask[0]=1<<(mover<<1);
     return CPC_EXACT;
   }
 
@@ -309,7 +313,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     moverHasSingleton=(singletonProfile>>>3)&1,
     opponentHasSingleton=(singletonProfile>>>4)&1;
   if(threats>1){
-    const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+    scratch.proofMask[0]=1<<(opponent<<1);
     return CPC_EXACT;
   }
   if(threats===1){
@@ -318,7 +322,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     // exposes another opponent singleton immediately above it, first-win order
     // makes the opponent's next move terminal.
     if(height+1<g.rows&&cellMarked(opponentBits,(height+1)*g.columns+column)){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      scratch.proofMask[0]=1<<(opponent<<1);
       return CPC_EXACT;
     }
     scratch.forcedColumn[0]=column;
@@ -337,13 +341,13 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
         if(height+1>=g.rows||!cellMarked(opponentBits,(height+1)*g.columns+column)){allLift=0;break;}
       }
       if(legal&&allLift){
-        const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+        scratch.proofMask[0]=1<<(opponent<<1);
         return CPC_EXACT;
       }
     }
     const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
     if(precursor<0){
-      const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
+      scratch.proofMask[0]=1<<(opponent<<1);
       return CPC_EXACT;
     }
   }
@@ -353,26 +357,27 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
   // The prior all-even theorem remains the production baseline. The pooled/
   // synchronized frontier extension is selected once at initialization for A/B.
   if(mover===0){
-    if(scratch.interval[1]===3){
+    if(proofMask&1){
       const noWin=scratch.frontierResponse
         ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0,scratch)
         :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,0);
-      if(noWin)scratch.interval[1]=2;
+      if(noWin)proofMask&=6;
     }
-  }else if(scratch.interval[0]===1){
+  }else if(proofMask&4){
     const noWin=scratch.frontierResponse
       ?frontierResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1,scratch)
       :pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,1);
-    if(noWin)scratch.interval[0]=2;
+    if(noWin)proofMask&=3;
   }
-  if(scratch.interval[0]===scratch.interval[1])return CPC_EXACT;
+  scratch.proofMask[0]=proofMask;
+  if((proofMask&(proofMask-1))===0)return CPC_EXACT;
 
   if(scratch.projectedAdvisory){
     collectProjected(g,words,offset,basis,basisOffset,basisSize,scratch);
     const forks=scratch.projectedForks;
     scratch.projectedForkTotal+=forks[0]+forks[1];
   }
-  if(scratch.interval[0]!==1||scratch.interval[1]!==3)return CPC_BOUND;
+  if(proofMask!==7)return CPC_BOUND;
   if(scratch.preemptionCount[0])return CPC_RESTRICT;
   return CPC_NONE;
 }

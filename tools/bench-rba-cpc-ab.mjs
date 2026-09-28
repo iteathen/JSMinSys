@@ -21,10 +21,10 @@ const frontierResponseScan=[];
   const on=prepareConnect4CpcScratch(g,{frontierResponse:true}),off=prepareConnect4CpcScratch(g,{frontierResponse:false});
   for(const moves of group.fixtures)for(let rank=16;rank<=moves.length;rank+=1){
     const prefix=moves.slice(0,rank),q=connect4RbaFromMoves(prefix,{geometry:g,canonical:false});
-    const onKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,on),onLo=on.interval[0],onHi=on.interval[1];
-    const offKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,off),offLo=off.interval[0],offHi=off.interval[1];
-    if(onLo!==offLo||onHi!==offHi||onKind!==offKind)
-      frontierResponseScan.push({rank,moves:prefix.join(''),onKind,on:[onLo,onHi],offKind,off:[offLo,offHi]});
+    const onKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,on),onMask=on.proofMask[0];
+    const offKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,off),offMask=off.proofMask[0];
+    if(onMask!==offMask||onKind!==offKind)
+      frontierResponseScan.push({rank,moves:prefix.join(''),onKind,onMask,offKind,offMask});
   }
 }
 const modes=[

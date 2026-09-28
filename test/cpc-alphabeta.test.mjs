@@ -80,7 +80,7 @@ test('nonterminal CPC path matches checked evaluator after terminal assertion',(
     const a=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,checked);
     const b=evaluateConnect4CpcNonterminal32(g,q.words,0,q.basis,0,q.basis.length,known);
     assert.equal(a,b);
-    assert.deepEqual([...checked.interval],[...known.interval]);
+    assert.deepEqual(proofInterval(checked),proofInterval(known));
     assert.equal(checked.forcedColumn[0],known.forcedColumn[0]);
     assert.equal(checked.preemptionMask32[0],known.preemptionMask32[0]);
     assert.equal(checked.preemptionCount[0],known.preemptionCount[0]);
@@ -95,10 +95,10 @@ test('projected CPC advisory collection is semantically inert and opt-in',()=>{
   for(let rank=16;rank<=moves.length;rank+=1){
     const q=connect4RbaFromMoves(moves.slice(0,rank),{geometry:g,canonical:false});
     const offKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,off);
-    const offInterval=[...off.interval],offMask=off.preemptionMask32[0],offCount=off.preemptionCount[0];
+    const offInterval=proofInterval(off),offMask=off.preemptionMask32[0],offCount=off.preemptionCount[0];
     const onKind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,on);
     assert.equal(onKind,offKind);
-    assert.deepEqual([...on.interval],offInterval);
+    assert.deepEqual(proofInterval(on),offInterval);
     assert.equal(on.preemptionMask32[0],offMask);
     assert.equal(on.preemptionCount[0],offCount);
     assert.equal(off.projectedForks[0]+off.projectedForks[1],0);
@@ -117,7 +117,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   let odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-q.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_BOUND);
-  assert.deepEqual([...s.interval],[1,2]);
+  assert.deepEqual(proofInterval(s),[1,2]);
   assert.equal(exact(columns,rows,positive).value,2);
 
   // Fixing the two frontier cells as a synchronized response pair adds an
@@ -126,7 +126,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-pq.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,pq.words,0,pq.basis,0,pq.basis.length,ps),CPC_BOUND);
-  assert.deepEqual([...ps.interval],[1,2]);
+  assert.deepEqual(proofInterval(ps),[1,2]);
   assert.equal(exact(columns,rows,paired).value,2);
 
   // Omitted frontier parity alone is still not enough: if a residual contains
@@ -136,7 +136,7 @@ test('CPC pooled-frontier response extends all-even pairing without counting omi
   odd=0;for(let c=0;c<columns;c+=1)odd+=(rows-nq.words[c])&1;
   assert.equal(odd,2);
   assert.equal(evaluateConnect4Cpc32(g,nq.words,0,nq.basis,0,nq.basis.length,ns),CPC_NONE);
-  assert.deepEqual([...ns.interval],[1,3]);
+  assert.deepEqual(proofInterval(ns),[1,3]);
 });
 
 test('CPC closes a forced block that lifts another opponent terminal singleton',()=>{
@@ -148,7 +148,7 @@ test('CPC closes a forced block that lifts another opponent terminal singleton',
   const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
   assert.equal(exact(columns,rows,moves).value,3);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
-  assert.deepEqual([...s.interval],[3,3]);
+  assert.deepEqual(proofInterval(s),[3,3]);
 });
 
 test('CPC closes when every legal move lifts an opponent terminal singleton',()=>{
@@ -159,7 +159,7 @@ test('CPC closes when every legal move lifts an opponent terminal singleton',()=
   const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=prepareConnect4CpcScratch(g);
   assert.equal(exact(columns,rows,moves).value,1);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
-  assert.deepEqual([...s.interval],[1,1]);
+  assert.deepEqual(proofInterval(s),[1,1]);
 });
 
 test('CPC recognizes exact fork loss after enabling move',()=>{
@@ -169,7 +169,7 @@ test('CPC recognizes exact fork loss after enabling move',()=>{
   const q=connect4RbaFromMoves([1,1,2,1,3],{geometry:g,canonical:false});
   const s=prepareConnect4CpcScratch(g);
   assert.equal(evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s),CPC_EXACT);
-  assert.deepEqual([...s.interval],[3,3]);
+  assert.deepEqual(proofInterval(s),[3,3]);
 });
 
 test('CPC first-win ordering lets current immediate terminal supersede opponent fork',()=>{
@@ -179,7 +179,7 @@ test('CPC first-win ordering lets current immediate terminal supersede opponent 
   const kind=evaluateConnect4Cpc32(g,q.words,0,q.basis,0,q.basis.length,s);
   assert.equal(kind,CPC_EXACT);
   // P1 is to move and has an immediate win; that terminal happens before P0's two threats matter.
-  assert.deepEqual([...s.interval],[1,1]);
+  assert.deepEqual(proofInterval(s),[1,1]);
 });
 
 test('CPC alpha-beta uses live winning-line contribution for move ordering',()=>{
@@ -278,3 +278,11 @@ test('CPC intersects alternative fork-precursor preemption sets',()=>{
   const expected=((1<<2)|(1<<5))>>>0;
   assert.equal(s.preemptionMask32[0],expected);assert.equal(s.forcedColumn[0],-1);
 });
+
+// Test-local semantic oracle; production owns no endpoint array.
+function proofInterval(scratch){
+  const mask=scratch.proofMask[0];
+  assert.ok([1,2,3,4,6,7].includes(mask));
+  const values=[1,2,3].filter(v=>mask&(1<<(3-v)));
+  return [values[0],values.at(-1)];
+}

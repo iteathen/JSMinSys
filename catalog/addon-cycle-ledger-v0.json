@@ -1386,31 +1386,43 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 4
+          "count": "1+T*(6+4*P)"
         },
         {
           "op": "memory.load.u32",
-          "count": 1
+          "count": "1"
         },
         {
           "op": "alu.add.u32",
-          "count": 1
+          "count": "1"
         },
         {
           "op": "alu.and.u32",
-          "count": 1
+          "count": "1"
         },
         {
           "op": "control.test.u32",
-          "count": "2+P"
+          "count": "1+T"
         },
         {
           "op": "control.branch",
-          "count": "2+P"
+          "count": "1+T"
         },
         {
           "op": "memory.store.u32",
-          "count": "7+4*P"
+          "count": "T*(4+4*P)"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "T"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "T"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "T"
         },
         {
           "op": "runtime.call.subledger",
@@ -1420,12 +1432,12 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "4*C(runtime.field.load)+C(memory.load.u32)+C(alu.add.u32)+C(alu.and.u32)+(2+P)*C(control.test.u32)+(2+P)*C(control.branch)+(7+4*P)*C(memory.store.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)",
+        "expression": "(1+T*(6+4*P))*C(runtime.field.load)+(1)*C(memory.load.u32)+(1)*C(alu.add.u32)+(1)*C(alu.and.u32)+(1+T)*C(control.test.u32)+(1+T)*C(control.branch)+(T*(4+4*P))*C(memory.store.u32)+(T)*C(memory.store.u8)+(T)*C(alu.sub.u32)+(T)*C(alu.shl.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)",
         "parameters": {
           "T": "1 for terminal input; 0 for nonterminal delegation",
-          "P": "1 when projected advisory counters are reset on terminal input; otherwise 0"
+          "P": "1 when projectedAdvisory is enabled on terminal input; otherwise 0"
         },
-        "note": "Checked CPC wrapper."
+        "note": "Checked wrapper counted by executed terminal/delegation path. Terminal writes four int32 fields plus one proof byte; projected counters add four stores. Exact 1..3 code converts through 1<<(3-terminal). Nonterminal delegation performs no scratch stores."
       },
       "status": "decomposed"
     },
@@ -1436,20 +1448,24 @@
       "scope": "local-negamax-cpc",
       "operations": [
         {
-          "op": "runtime.field.load",
-          "count": "24+8*C+4*R+5*P+G"
-        },
-        {
           "op": "runtime.field.store",
-          "count": "10+6*C+4*R+5*P+G"
+          "count": "G+P",
+          "note": "Recount current direct accesses; inherited endpoint aggregate was incomplete. Nested helper work belongs to its own subledger."
         },
         {
-          "op": "memory.load.u32",
-          "count": "3+2*W+2*L+2*P"
+          "op": "runtime.field.load",
+          "count": "10+W+4*PR+2*C+2*ONE+M_ONE+5*G+LC+L+LL+M_LIFT+F+B+AFTER_EXACT+2*P+U",
+          "note": "Recount current direct accesses; inherited endpoint aggregate was incomplete. Nested helper work belongs to its own subledger."
         },
         {
           "op": "memory.store.u32",
-          "count": "7+4*P"
+          "count": "4+4*PR+3*G",
+          "note": "Recount current direct accesses; inherited endpoint aggregate was incomplete. Nested helper work belongs to its own subledger."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+2*W+2*ONE+L+2*P+U",
+          "note": "Recount current direct accesses; inherited endpoint aggregate was incomplete. Nested helper work belongs to its own subledger."
         },
         {
           "op": "alu.add.u32",
@@ -1512,14 +1528,44 @@
           "op": "runtime.call.subledger",
           "count": "P",
           "target": "collectProjected"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "1",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "PM_REF+PM_EXACT_TEST+PM_GATE",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "PM_EXACT_TEST",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "2*PM_TACTICAL",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "control.test.u32",
+          "count": "-PM_TACTICAL-PM_BOUND_SECOND",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "control.branch",
+          "count": "-PM_TACTICAL-PM_BOUND_SECOND",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(G+P)*C(runtime.field.store)+(10+W+4*PR+2*C+2*ONE+M_ONE+5*G+LC+L+LL+M_LIFT+F+B+AFTER_EXACT+2*P+U)*C(runtime.field.load)+(4+4*PR+3*G)*C(memory.store.u32)+(1+2*W+2*ONE+L+2*P+U)*C(memory.load.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+(2)*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+(1)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+(C)*CALL(collectSingletonProfiles)+(M)*CALL(cellMarked)+(D)*CALL(deriveForkPreemption32)+(F)*CALL(frontierResponseNoWin)+(B)*CALL(pairedResponseNoWin)+(P)*CALL(collectProjected)+(1)*C(memory.store.u8)+(PM_REF+PM_EXACT_TEST+PM_GATE)*C(alu.and.u32)+(PM_EXACT_TEST)*C(alu.sub.u32)+(2*PM_TACTICAL)*C(alu.shl.u32)+(-PM_TACTICAL-PM_BOUND_SECOND)*C(control.test.u32)+(-PM_TACTICAL-PM_BOUND_SECOND)*C(control.branch)",
         "parameters": {
           "W": "coordinate words scanned for any-live detection",
-          "L": "legal-column iterations executed by lift scan",
+          "L": "All-lift loop columns visited, including full columns skipped before legal-body work; LL counts legal bodies separately",
           "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
           "M": "cellMarked calls executed",
           "D": "deriveForkPreemption32 calls executed (0 or 1)",
@@ -1527,9 +1573,24 @@
           "B": "pairedResponseNoWin calls executed (0 or 1)",
           "P": "collectProjected calls executed (0 or 1)",
           "R": "long-range response branches evaluated",
-          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
+          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0",
+          "PM_REF": "Executed no-P0/no-P1 and response proof tightenings; one AND per former endpoint assignment, 0..2",
+          "PM_ASSIGN": "1 on explicit exhausted-coordinate or tactical exact return formerly assigning both endpoints; otherwise 0",
+          "PM_EXACT_TEST": "Executed exactness comparisons, before singleton collection and after response closure, 0..2",
+          "PM_GATE": "Executed response endpoint gate, 0 or 1",
+          "PM_BOUND_LOAD": "Old final endpoint loads: 0 if not reached; otherwise 1+PM_BOUND_SECOND",
+          "PM_BOUND_SECOND": "1 if final bound classifier reached and old lower endpoint ==1, requiring old second comparison; otherwise 0",
+          "PM_TACTICAL": "1 on immediate-win/double-threat/lift/fork exact return; otherwise 0",
+          "PR": "1 when initial projected-advisory reset executes, even if CPC returns before collectProjected; otherwise 0",
+          "ONE": "1 when single-opponent-threat branch reads threatColumns[0] and words[offset+column]; otherwise 0",
+          "U": "1 when final UNKNOWN classifier reads preemptionCount[0]; otherwise 0",
+          "M_ONE": "cellMarked call in the single-threat lift check, 0 or 1",
+          "LC": "Executed all-lift scan column<g.columns conditions, including final false test unless a break occurs",
+          "LL": "Legal-column bodies in all-lift scan, each reading g.rows for the height+1 test",
+          "M_LIFT": "cellMarked calls from the all-lift scan, each directly loading g.columns in the argument",
+          "AFTER_EXACT": "1 when response exactness check is passed and final projectedAdvisory condition executes; otherwise 0"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged. All proof refinement is local scalar work; every return publishes exactly one Uint8Array store/property load, with no endpoint scratch loads. Tactical exact mask uses two shifts rather than a value ternary. Delta enumerates each removed endpoint occurrence and each new bit/control operation; inherited non-proof aggregate terms remain conservative, not measured Intel instructions. Power-of-two tests rely on the sound nonzero convex-mask CPC contract, independently controlled in tests. Review repair: direct u32 traffic and object field traffic are recounted from current source, not subtracted from the old undercounted endpoint aggregate. PR is initial advisory reset, distinct from P=late collectProjected. Mandatory writes are four resets, three additional forced-action stores when G, four initial advisory stores when PR, and one proof byte on every return."
       },
       "status": "decomposed"
     },
@@ -1697,7 +1758,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "10+3*P+F"
+          "count": "11+3*P+F"
         },
         {
           "op": "control.test.u32",
@@ -1713,17 +1774,17 @@
         },
         {
           "op": "runtime.field.store",
-          "count": 18
+          "count": 20
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+18*C(runtime.field.store)",
+        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(11+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+20*C(runtime.field.store)",
         "parameters": {
           "P": "1 when projectedAdvisory allocations are enabled; otherwise 0",
           "F": "1 when <=32-column fork-target array is allocated; otherwise 0"
         },
-        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields."
+        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields. Corrected direct scratch inventory: 9+3*P+F Uint32Array, one Int32Array, one Uint8Array, 20 object fields. proofMask replaces the eight-byte endpoint payload with one byte, not a free allocation; allocator/zero-fill/GC cost remains symbolic and element-byte dependent. Existing cold arithmetic/field terms remain conservative."
       },
       "status": "decomposed"
     },
@@ -2431,11 +2492,41 @@
           "op": "control.branch",
           "count": "B",
           "note": "generic/Four-Front lane rejects a nonzero private bound code as non-exact"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*(N-PM_EXACT)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-(2*N-PM_EXACT)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N-PM_EXACT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N-PM_EXACT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidence)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbs)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(search)+(B)*C(control.test.u32)+(B)*C(control.branch)",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32)+(H+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidence)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbs)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(search)+(B)*C(control.test.u32)+(B)*C(control.branch)+(-2*(N-PM_EXACT))*C(runtime.field.load)+(-(2*N-PM_EXACT))*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N-PM_EXACT)*C(alu.shr.u32)+(2*N-PM_EXACT)*C(alu.and.u32)",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -2446,9 +2537,10 @@
           "F": "1 when Four-Front parent evidence executes; 0 in production CPC-only mode",
           "Q": "Four-Front action-bound queries executed; 0 in production CPC-only mode",
           "S": "exact-cache stores executed by this invocation (0 or 1)",
-          "B": "1 when the private slot returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise"
+          "B": "1 when the private slot returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise",
+          "PM_EXACT": "1 when CPC_EXACT exits this invocation; otherwise 0"
         },
-        "note": "Four-Front/generic path remains exact-only. A private zero-bound code is treated as a local-cache miss and cannot terminate this lane.",
+        "note": "Four-Front/generic path remains exact-only. A private zero-bound code is treated as a local-cache miss and cannot terminate this lane. One mask byte load and constant-nibble decode per CPC call. Low endpoint extracted before CPC_EXACT; high endpoint only on unresolved calls. Mover-relative subtraction, cache WDL codes and publication are unchanged. N counts only executed CPC calls, so cache/weak early exits incur no decode.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -2604,11 +2696,41 @@
           "op": "runtime.call.subledger",
           "count": "N*L*(1-Z7)",
           "target": "argMaxPlayableSlot32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)",
+        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelative)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidence)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnly)+F*CALL(search))+N*CALL(relativeToAbs)+CALL(metrics)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)+(-2*N)*C(runtime.field.load)+(-2*N)*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N)*C(alu.shr.u32)+(2*N)*C(alu.and.u32)",
         "parameters": {
           "T": "1 for terminal root; otherwise 0",
           "N": "1-T for nonterminal root work",
@@ -2624,7 +2746,7 @@
           "LG": "root moves using generic live-line scorer; L3+LG=L",
           "Z7": "1 for configured width 7, otherwise 0"
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion. Root CPC consumes one proof byte and extracts both interval endpoints with the same constant decoder. Root witness, ordering and Four-Front evidence remain unchanged."
       },
       "status": "decomposed"
     },
@@ -3000,11 +3122,41 @@
           "op": "alu.or.u32",
           "count": "MP*L",
           "note": "pack live-line score with column on selected recursive path"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*(N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-(2*N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+FT+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32)+MP*L*C(alu.or.u32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+FT+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32)+MP*L*C(alu.or.u32)+(-2*(N-E))*C(runtime.field.load)+(-(2*N-E))*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N-E)*C(alu.shr.u32)+(2*N-E)*C(alu.and.u32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -3036,7 +3188,7 @@
           "D": "1 when the invocation reaches a non-forced branching endpoint and selects packed-vs-fallback ordering; 0 otherwise",
           "MP": "1 when cold geometry qualification enables packed recursive move rows; 0 on exact two-field fallback"
         },
-        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic.",
+        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic. One mask byte load and constant-nibble decode per CPC call. Low endpoint extracted before CPC_EXACT; high endpoint only on unresolved calls. Mover-relative subtraction, cache WDL codes and publication are unchanged. N counts only executed CPC calls, so cache/weak early exits incur no decode.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -7718,11 +7870,41 @@
           "op": "control.branch",
           "count": "BND",
           "note": "behavior generic/Four-Front lane rejects private bound code as non-exact"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*(N-PM_EXACT)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-(2*N-PM_EXACT)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N-PM_EXACT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N-PM_EXACT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidenceBehavior)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbsBehavior)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(searchBehavior)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BND)*C(control.test.u32)+(BND)*C(control.branch)",
+        "expression": "(8+N*(9+10*A+6*F+4*Q))*C(runtime.field.load)+(1+N*(3+3*A+2*S+F))*C(runtime.field.store)+(4+N*(3+3*A+4*Q))*C(memory.load.u32)+(N*(2+3*Q))*C(memory.store.u32)+(3+N*(2+A+Q))*C(alu.imul.u32)+(4+N*(5+5*A+4*Q))*C(alu.add.u32)+(N*(4+2*A))*C(alu.sub.u32)+(2+N*(6+3*A+3*Q))*C(alu.and.u32)+(N*(A+Q))*C(alu.shl.u32)+(2+N*(3+Q))*C(alu.shr.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.test.u32)+(3+N*(12+10*A+5*Q+4*F))*C(control.branch)+CALL(mixSpan32Locator32)+CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(N*F)*CALL(frontEvidenceBehavior)+(N*Q)*CALL(queryConnect4RbaFourFront)+(N*S)*CALL(relativeToAbsBehavior)+(N*S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(N*C)*CALL(connect4RbaCofactorKnownHeight)+(N*R)*CALL(connect4RbaCanonicalize)+(N*R)*CALL(searchBehavior)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BND)*C(control.test.u32)+(BND)*C(control.branch)+(-2*(N-PM_EXACT))*C(runtime.field.load)+(-(2*N-PM_EXACT))*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N-PM_EXACT)*C(alu.shr.u32)+(2*N-PM_EXACT)*C(alu.and.u32)",
         "parameters": {
           "H": "1 on exact-cache hit; otherwise 0",
           "N": "1-H, meaning the node continues beyond exact-cache probe",
@@ -7735,9 +7917,10 @@
           "S": "exact-cache stores executed by this invocation (0 or 1)",
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
           "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
-          "BND": "1 when private cache returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise"
+          "BND": "1 when private cache returns LOWER0/UPPER0 to this exact-only generic lane; 0 otherwise",
+          "PM_EXACT": "1 when CPC_EXACT exits this invocation; otherwise 0"
         },
-        "note": "Behavior Four-Front/generic path remains exact-only; private zero-bound codes continue search and never become exact results.",
+        "note": "Behavior Four-Front/generic path remains exact-only; private zero-bound codes continue search and never become exact results. One mask byte load and constant-nibble decode per CPC call. Low endpoint extracted before CPC_EXACT; high endpoint only on unresolved calls. Mover-relative subtraction, cache WDL codes and publication are unchanged. N counts only executed CPC calls, so cache/weak early exits incur no decode.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -7906,11 +8089,41 @@
         {
           "op": "control.branch",
           "count": "K"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32Behavior)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidenceBehavior)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnlyBehavior)+F*CALL(searchBehavior))+N*CALL(relativeToAbsBehavior)+CALL(metricsBehavior)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))",
+        "expression": "(13+N*(12+8*A+4*Q))*C(runtime.field.load)+(15+N*(6+2*A))*C(runtime.field.store)+(4+N*(4+3*A+3*Q))*C(memory.load.u32)+(3+N*(2+3*Q))*C(memory.store.u32)+N*(2+A+Q)*C(alu.imul.u32)+N*(4+4*A+3*Q)*C(alu.add.u32)+N*(4+2*A)*C(alu.sub.u32)+(2+N*(5+2*A+2*Q))*C(alu.and.u32)+N*(A+Q)*C(alu.shl.u32)+(2+N*(2+Q))*C(alu.shr.u32)+N*R*C(alu.xor.u32)+(5+N*(15+8*A+4*Q))*C(control.test.u32)+(5+N*(15+8*A+4*Q))*C(control.branch)+CALL(resetConnect4RbaExactCache32Behavior)+2*CALL(publishSpan32)+(T+X)*CALL(absToRelativeBehavior)+N*CALL(evaluateConnect4CpcNonterminal32)+N*F*CALL(frontEvidenceBehavior)+N*Q*CALL(queryConnect4RbaFourFront)+N*C*CALL(connect4RbaCofactorKnownHeight)+N*R*CALL(connect4RbaCanonicalize)+N*R*((1-F)*CALL(searchCpcOnlyBehavior)+F*CALL(searchBehavior))+N*CALL(relativeToAbsBehavior)+CALL(metricsBehavior)+C(runtime.instanceof.check)+CALL(resetConnect4LiveLineState32)+M*CALL(advanceConnect4LiveLineState32)+N*L3*CALL(evaluateConnect4LiveLine3x32)+N*LG*CALL(evaluateConnect4LiveLineCell32)+N*L*(Z7*CALL(argMaxPlayableSlot7Nonempty32)+(1-Z7)*CALL(argMaxPlayableSlot32))+N*R*(1-F)*CALL(advanceConnect4LiveLineState32)+B*CALL(completeBehaviorNode32)+K*(C(control.test.u32)+C(control.branch))+(-2*N)*C(runtime.field.load)+(-2*N)*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N)*C(alu.shr.u32)+(2*N)*C(alu.and.u32)",
         "parameters": {
           "T": "1 for terminal root; otherwise 0",
           "N": "1-T for nonterminal root work",
@@ -7928,7 +8141,7 @@
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
           "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling."
         },
-        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion."
+        "note": "Root solve now reconstructs exact physical live-line state from preserved validated move history, orders surviving root actions by live winning-line contribution, and carries reflection parity into CPC-only recursion. Root CPC consumes one proof byte and extracts both interval endpoints with the same constant decoder. Root witness, ordering and Four-Front evidence remain unchanged."
       },
       "status": "decomposed"
     },
@@ -8317,11 +8530,41 @@
           "op": "alu.or.u32",
           "count": "MP*L",
           "note": "pack live-line score with column on selected recursive path"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*(N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-(2*N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)+MP*L*C(alu.or.u32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)+MP*L*C(alu.or.u32)+(-2*(N-E))*C(runtime.field.load)+(-(2*N-E))*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N-E)*C(alu.shr.u32)+(2*N-E)*C(alu.and.u32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -8355,7 +8598,7 @@
           "MP": "1 when cold geometry qualification enables packed recursive move rows; 0 on exact two-field fallback",
           "STOP_TEST": "Executed cancellation sentinel tests owned by this invocation, after recursive children and terminal/forced checkpoints."
         },
-        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic. Accounting repair from PR116: inherited K alias split into insertion K and STOP_TEST; runtime source is unchanged.",
+        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic. Accounting repair from PR116: inherited K alias split into insertion K and STOP_TEST; runtime source is unchanged. One mask byte load and constant-nibble decode per CPC call. Low endpoint extracted before CPC_EXACT; high endpoint only on unresolved calls. Mover-relative subtraction, cache WDL codes and publication are unchanged. N counts only executed CPC calls, so cache/weak early exits incur no decode.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9470,11 +9713,41 @@
           "op": "alu.or.u32",
           "count": "MP*L",
           "note": "pack live-line score with column on selected recursive path"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*(N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-(2*N-E)",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*N-E",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)+MP*L*C(alu.or.u32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O+2*D)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+(1-MP)*K)*C(memory.load.u32)+(2*N+(2-MP)*L+(2-MP)*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q+A)*C(alu.and.u32)+(A+O+Q+MP*L)*C(alu.shl.u32)+(1+3*N+MP*L)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL+D)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)+MP*L*C(alu.or.u32)+(-2*(N-E))*C(runtime.field.load)+(-(2*N-E))*C(memory.load.u32)+(N)*C(memory.load.u8)+(N)*C(alu.shl.u32)+(2*N-E)*C(alu.shr.u32)+(2*N-E)*C(alu.and.u32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -9512,7 +9785,7 @@
           "MP": "1 when cold geometry qualification enables packed recursive move rows; 0 on exact two-field fallback",
           "STOP_TEST": "Executed cancellation sentinel tests owned by this invocation, after recursive children and terminal/forced checkpoints."
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic. Accounting repair from PR116: inherited K alias split into insertion K and STOP_TEST; runtime source is unchanged.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. Exact packed-row specialization preserves the same live-line scores and stable worker-specific tie order while moving one uint32 per insertion shift instead of separate score+column fields. Root ordering is unchanged; fallback geometry retains the prior path. Address-arithmetic terms are conservatively retained where packing only removes array traffic. Accounting repair from PR116: inherited K alias split into insertion K and STOP_TEST; runtime source is unchanged. One mask byte load and constant-nibble decode per CPC call. Low endpoint extracted before CPC_EXACT; high endpoint only on unresolved calls. Mover-relative subtraction, cache WDL codes and publication are unchanged. N counts only executed CPC calls, so cache/weak early exits incur no decode.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9815,11 +10088,41 @@
         {
           "op": "runtime.to_int32",
           "count": "CHILD"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "-2*PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "-2*PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*PM_ROOT",
+          "note": "Proof-mask delta versus be7c2887; subtraction removes the corresponding old endpoint operation."
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1)*CALL(resetConnect4RbaExactCache32Frontier)+(2)*CALL(publishSpan32)+(1)*CALL(resetConnect4LiveLineState32)+(PLY+CHILD)*CALL(advanceConnect4LiveLineState32)+(1)*CALL(evaluateConnect4CpcNonterminal32)+(REL)*CALL(absToRelativeFrontier)+(RESULT)*CALL(relativeToAbsFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(O7)*CALL(argMaxPlayableSlot7Nonempty32)+(OG)*CALL(argMaxPlayableSlot32)+(CHECK)*CALL(completeRootFrontierNode32)+(ACTION)*CALL(connect4RbaCofactorKnownHeight)+(CHILD)*CALL(connect4RbaCanonicalize)+(CHILD)*CALL(searchCpcOnlyFrontier)+(1+EXACT_CHILD)*CALL(releaseNarrowFrontier)+(RESULT)*CALL(frontierResult)+(TERMINAL)*CALL(metricsFrontier)+(2)*C(runtime.typed_array.fill)+(PASS)*C(runtime.math.min)+(FL)*C(runtime.field.load)+(FS)*C(runtime.field.store)+(ML)*C(memory.load.u32)+(MS)*C(memory.store.u32)+(1)*C(memory.store.f64)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(ADD)*C(alu.add.u32)+(MUL)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHIFT)*C(alu.shl.u32)+(SHIFT)*C(alu.shr.u32)+(SUB)*C(alu.sub.u32)+(XOR)*C(alu.xor.u32)+(INVALID)*C(runtime.error.throw)+(TERMINAL)*C(runtime.object.allocate)+(CHILD)*C(runtime.to_int32)",
+        "expression": "(1)*CALL(resetConnect4RbaExactCache32Frontier)+(2)*CALL(publishSpan32)+(1)*CALL(resetConnect4LiveLineState32)+(PLY+CHILD)*CALL(advanceConnect4LiveLineState32)+(1)*CALL(evaluateConnect4CpcNonterminal32)+(REL)*CALL(absToRelativeFrontier)+(RESULT)*CALL(relativeToAbsFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(O7)*CALL(argMaxPlayableSlot7Nonempty32)+(OG)*CALL(argMaxPlayableSlot32)+(CHECK)*CALL(completeRootFrontierNode32)+(ACTION)*CALL(connect4RbaCofactorKnownHeight)+(CHILD)*CALL(connect4RbaCanonicalize)+(CHILD)*CALL(searchCpcOnlyFrontier)+(1+EXACT_CHILD)*CALL(releaseNarrowFrontier)+(RESULT)*CALL(frontierResult)+(TERMINAL)*CALL(metricsFrontier)+(2)*C(runtime.typed_array.fill)+(PASS)*C(runtime.math.min)+(FL)*C(runtime.field.load)+(FS)*C(runtime.field.store)+(ML)*C(memory.load.u32)+(MS)*C(memory.store.u32)+(1)*C(memory.store.f64)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(ADD)*C(alu.add.u32)+(MUL)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHIFT)*C(alu.shl.u32)+(SHIFT)*C(alu.shr.u32)+(SUB)*C(alu.sub.u32)+(XOR)*C(alu.xor.u32)+(INVALID)*C(runtime.error.throw)+(TERMINAL)*C(runtime.object.allocate)+(CHILD)*C(runtime.to_int32)+(-2*PM_ROOT)*C(runtime.field.load)+(-2*PM_ROOT)*C(memory.load.u32)+(PM_ROOT)*C(memory.load.u8)+(PM_ROOT)*C(alu.shl.u32)+(2*PM_ROOT)*C(alu.shr.u32)+(2*PM_ROOT)*C(alu.and.u32)",
         "parameters": {
           "PLY": "Root history length, cold live-line initialization once",
           "CHILD": "Nonterminal child visits across all frontier passes",
@@ -9845,9 +10148,10 @@
           "SHIFT": "Executed metadata/mask shifts",
           "SUB": "Executed signed conversion/subtraction",
           "XOR": "Executed mover/orientation XOR",
-          "INVALID": "Invalid cold input errors, normally 0"
+          "INVALID": "Invalid cold input errors, normally 0",
+          "PM_ROOT": "1 when nonterminal root reaches CPC consumption, otherwise 0; ML/FL baseline terms include former endpoint reads before the explicit replacement delta"
         },
-        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace."
+        "note": "Executed-path symbolic ledger. Intel qualification uses measured operation/process cycles; do not substitute the historical Zen3 numeric costs. Call/JIT/memory/control uncertainty remains explicit. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Root CPC consumes one proof byte and extracts both interval endpoints with the same constant decoder. Root witness, ordering and Four-Front evidence remain unchanged."
       }
     },
     {
@@ -10352,8 +10656,8 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "57984949393267d0a9521bb9cc81aacd71fb71ce",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/rba-connect4-alphabeta.mjs": "fd0d287b387888f4ac7780d2fb1a1f3339cdc6b2",
+    "addons/cpc-connect4.mjs": "dcfc87bfe6acc4e9febb33fcdeb1ff81d0a35f12",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
@@ -10366,10 +10670,10 @@
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "c80f3283e3d426e033dd51a9ebc109670c4a17ad",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "33696241ad694ad7cee2a10f2bed264e6a49c2f3",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "affed73b766e525e7626ea90964cc12e61341b20",
+    "addons/rba-connect4-frontier.mjs": "2f052708ecf096796244bc19b704510a531dcf3f",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
