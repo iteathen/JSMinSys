@@ -4,7 +4,7 @@ import {readFileSync,writeFileSync,appendFileSync,existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {cpus,totalmem,freemem,release} from 'node:os';
 const dir='evidence/isomax-memory-affinity-20260928',packetPath=process.argv[2],p=JSON.parse(readFileSync(packetPath,'utf8'));
-const runtime=JSON.parse(readFileSync(dir+'/runtime.json','utf8')),library='C:/r/isomax-p2-proof-mask-A',sha='be7c2887defcefb37080fa61de7ce1dc38dc2990';
+const runtime=JSON.parse(readFileSync(dir+'/runtime.json','utf8')),library=p.library??'C:/r/isomax-p2-proof-mask-A',sha=p.sourceSha??'be7c2887defcefb37080fa61de7ce1dc38dc2990';
 const git=(path,...args)=>execFileSync('git',['-C',path,...args],{encoding:'utf8'}).trim();
 const helperSha=git('.','rev-parse','HEAD');
 assert.match(p.id,/^[a-zA-Z0-9-]+$/);assert.ok(['AB','ABBA','ABBAABBA'].includes(p.order));assert.ok(p.timeoutMs<=600000&&p.timeoutMs>0);assert.ok(['','35333571','353335714'].includes(p.fixture));
