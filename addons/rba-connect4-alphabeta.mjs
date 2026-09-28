@@ -171,12 +171,15 @@ export function prepareConnect4RbaAlphaBeta({
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords,geometry:g});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
+  const moveColumnBits=32-Math.clz32(g.columns-1),
+    packedMoveOrder=moveColumnBits<31&&g.lineCount<=(0xffffffff>>>moveColumnBits)?1:0,
+    moveColumnMask=packedMoveOrder?(1<<moveColumnBits)-1:0xffffffff;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
       :null,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
-    basisSize:new Uint32Array(levels),cache,actionOrder,
+    basisSize:new Uint32Array(levels),cache,actionOrder,packedMoveOrder,moveColumnBits,moveColumnMask,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
     moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
@@ -289,9 +292,31 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       continue;
     }
 
-    const scores=state.moveScores,ordered=state.moveOrder,
+    const scores=state.moveScores,ordered=state.moveOrder,packedMoves=state.packedMoveOrder,
+      columnBits=state.moveColumnBits,columnMask=state.moveColumnMask,
       playerOffset=liveOffset+mover*live.wordCount;
     let actionCount=0;
+    if(packedMoves){
+      // HOT: exact score+column carrier, NOT a new tie policy. Compare the
+      // score threshold, not the full incoming entry; equal scores stay stable.
+      // One prior load/store per shift. Root row stays unpacked. Preserve.
+      for(let oi=0;oi<g.columns;oi+=1){
+        const column=state.actionOrder[oi],height=words[keyOffset+column];
+        if(height>=g.rows||!(actionMask&(1<<column)))continue;
+        const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
+          score=live.wordCount===3
+            ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
+            :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell),
+          threshold=(score<<columnBits)>>>0;
+        let at=actionCount;
+        while(at>0){
+          const prior=ordered[orderRow+at-1];
+          if(prior>=threshold)break;
+          ordered[orderRow+at]=prior;at-=1;
+        }
+        ordered[orderRow+at]=(threshold|column)>>>0;actionCount+=1;
+      }
+    }else{
     for(let oi=0;oi<g.columns;oi+=1){
       const column=state.actionOrder[oi],height=words[keyOffset+column];
       if(height>=g.rows||!(actionMask&(1<<column)))continue;
@@ -307,11 +332,12 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       }
       scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
     }
+    }
     if(!actionCount)return 0;
 
     let best=-2;
     for(let ai=0;ai<actionCount;ai+=1){
-      const column=ordered[orderRow+ai],height=words[keyOffset+column],
+      const column=ordered[orderRow+ai]&columnMask,height=words[keyOffset+column],
         physicalColumn=orientation?g.mirrorColumn[column]:column,
         physicalCell=height*g.columns+physicalColumn;
       const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
