@@ -182,6 +182,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
   const g=state.g,words=state.words,basis=state.basis,cache=state.cache,
     live=state.live,liveWords=live.stateWords;
   // HOT: signed integer polarity transport; zero is DRAW, never IEEE -0.
+  // Preserve |0 at sign/negation boundaries; all values and sentinels fit int32.
   let sign=1;
 
   // Deterministic CPC-forced transit states stay inside this invocation.
@@ -337,6 +338,8 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
       }
       if(best===1)break;
     }
+    // A witnessed cutoff remains valid even with unfinished siblings; absence
+    // of such a cutoff cannot be promoted to an exact value or a cache entry.
     if(unfinished)return completeBehaviorNode32(state,4);
     if(best===-2)return completeBehaviorNode32(state, 0);
     // If best is -1 here, every relevant action finished without a beta cutoff.
@@ -399,6 +402,11 @@ export function solveConnect4RbaFrontier(root,{state,reflected=0}={}){
   }
 
 
+  // HOT PFIF action loop: all storage prepared before search; root RBA and live
+  // state initialized once above. No ingress replay/cache reset between passes.
+  // Full-window child results are exact; sentinel 4 retains the obligation.
+  // The selected algorithm pays for full-window root probes. Count
+  // that cost and every repeated pass; do not imply equivalence to baseline AB.
   if(completeBehaviorNode32(state,0)===3)return frontierResult(state,3,0,-1);
   state.frontierLimit=state.frontierStride||g.cellCount;
   state.frontierPending=actionCount;
@@ -426,20 +434,30 @@ export function solveConnect4RbaFrontier(root,{state,reflected=0}={}){
           if(value===-3)return frontierResult(state,3,0,-1);
           if(value===-4){unfinished=1;continue;}
         }
-        values[ai]=value;state.frontierPending-=1;releaseNarrowFrontier(state);
+        values[ai]=value;
+        state.frontierPending-=1;
+        releaseNarrowFrontier(state);
       }
       if(value>best){best=value;bestMove=caller;}
+      // Earlier unresolved actions may tie this witness. Keep deterministic
+      // root action interpretation; never retire them using a heuristic rank.
       if(!unfinished&&(best===1||best===rootExact))return frontierResult(state,0,relativeToAbsFrontier(best,mover),bestMove);
     }
     if(!unfinished)return frontierResult(state,0,relativeToAbsFrontier(best,mover),bestMove);
     state.frontierLimit=state.frontierStride?Math.min(g.cellCount,state.frontierLimit+state.frontierStride):g.cellCount;
   }
 }
+// Root-boundary action only; never called at an ordinary recursive node.
+// Release as soon as the flag's narrowing target is met, not after another
+// broad pass. This counts unresolved ROOT actions, not all frontier leaves.
+// Keep exact values/cache and current frames. No copy, queue or TT mutation.
 function releaseNarrowFrontier(state){
   if(state.frontierTarget&&state.frontierPending<=state.frontierTarget&&state.frontierStride){
     state.frontierLimit=state.g.cellCount;state.frontierStride=0;state.frontierAutoReleases+=1;
   }
 }
+// Cold operation boundary only: string status and result allocation never run
+// at a recursive node or between frontier passes. Do not move them there.
 function frontierResult(state,cancel,value,move){
   if(!cancel&&completeBehaviorNode32(state,0)===3){cancel=3;move=-1;}
   const mover=(state.words[state.g.metaOffset]>>>2)&1;
