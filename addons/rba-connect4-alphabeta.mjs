@@ -6,11 +6,12 @@ import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaF
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../src/search32.mjs';
-import {probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {probeConnect4RbaSharedExactCacheKnownHash32,storeConnect4RbaSharedExactCacheKnownHash32} from './rba-connect4-shared-exact-cache.mjs';
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
 const MOVE_SCORE_NONE=-2147483648;
+const RBA_CACHE_LOWER0=4,RBA_CACHE_UPPER0=5;
 
 export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
@@ -41,18 +42,58 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,hash):0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,value,hash);
+  return value;
+}
+function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
+  // Exact rows outrank weak bounds even on a colliding q.
+  if(cache.stamp[slot]===cache.epoch){
+    const prior=cache.value[slot];
+    if(prior&&prior<=3)return 0;
+    if(prior>3){
+      const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
+      let same=0;
+      if(keyWords===14){
+        same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
+          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
+          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
+          (keys[base+6]^words[offset+6])|(keys[base+7]^words[offset+7])|
+          (keys[base+8]^words[offset+8])|(keys[base+9]^words[offset+9])|
+          (keys[base+10]^words[offset+10])|(keys[base+11]^words[offset+11])|
+          (keys[base+12]^words[offset+12])|(keys[base+13]^words[offset+13]));
+      }else if(keyWords===7){
+        same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
+          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
+          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
+          (keys[base+6]^words[offset+6]));
+      }else{
+        let diff=0;for(let w=0;w<keyWords;w+=1)diff|=keys[base+w]^words[offset+w];
+        same=diff===0;
+      }
+      if(same){
+        if(prior===value)return prior;
+        // Same q has both >=0 and <=0, therefore exact draw.
+        cache.value[slot]=2;
+        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheKnownHash32(cache.shared,words,offset,2,hash);
+        return 2;
+      }
+    }
+  }
+  const keyWords=cache.keyWords;
+  publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
+  cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
-  const hash=mixSpan32Locator32(words,offset,cache.keyWords),slot=hash&cache.mask;
-  return probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash);
+  const hash=mixSpan32Locator32(words,offset,cache.keyWords),slot=hash&cache.mask,
+    value=probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash);
+  return value<=3?value:0;
 }
 export function storeConnect4RbaExactCache32(cache,words,offset,value){
   const hash=mixSpan32Locator32(words,offset,cache.keyWords),slot=hash&cache.mask;
@@ -137,7 +178,16 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
 
     const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
     const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
-    if(cached){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
+    if(cached){
+      if(cached<=3){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
+      if(cached===RBA_CACHE_LOWER0){
+        if(beta<=0){state.cutoffs+=1;return 0;}
+        if(alpha<0)alpha=0;
+      }else{
+        if(alpha>=0){state.cutoffs+=1;return 0;}
+        if(beta>0)beta=0;
+      }
+    }
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
@@ -183,7 +233,10 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       state.cofactors+=1;
       if(term){
         const value=absToRelative(term,mover);
-        if(value>=beta){state.cutoffs+=1;return sign*value;}
+        if(value>=beta){
+          if(value===0)storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
+          state.cutoffs+=1;return sign*value;
+        }
         if(alphaOrig===-2&&betaOrig===2)
           storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash);
         return sign*value;
@@ -240,6 +293,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
       if(alpha>=beta){
+        if(best===0)storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
         state.cutoffs+=1;
         // A fail-high lower bound of +1 is exact in {-1,0,+1}. Publish the
         // current q/mover, before forced-tail sign transports it to the caller.
@@ -256,7 +310,8 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbs(best,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
-    }
+    }else if(best===0&&alphaOrig>=0)
+      storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_UPPER0,cacheSlot,cacheHash);
     return sign*best;
   }
 }
@@ -271,7 +326,7 @@ function search(state,depth,alpha,beta){
   // handling remains in solveConnect4RbaAlphaBeta().
   const cache=state.cache,cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
   const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
-  if(cached){state.cacheHits+=1;return absToRelative(cached,mover);}
+  if(cached&&cached<=3){state.cacheHits+=1;return absToRelative(cached,mover);}
 
   const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
   if(cpcKind===CPC_EXACT){
