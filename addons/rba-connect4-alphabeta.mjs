@@ -13,6 +13,14 @@ export const RBA_AB_CPC_FOUR_FRONT=1;
 const MOVE_SCORE_NONE=-2147483648;
 const RBA_CACHE_LOWER0=4,RBA_CACHE_UPPER0=5;
 
+function prepareConnect4MoveOrderPacking32(columns,lineCount){
+  let shift=0,stride=1;
+  while(stride<columns&&shift<31){stride*=2;shift+=1;}
+  return shift<31&&lineCount<=(0xffffffff>>>shift)
+    ?{shift,mask:stride-1}
+    :{shift:-1,mask:0xffffffff};
+}
+
 export function createConnect4RbaExactCache32({capacity=65536,keyWords,geometry=null}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
      !Number.isInteger(keyWords)||keyWords<1)throw new RangeError('invalid exact cache');
@@ -158,7 +166,8 @@ export function prepareConnect4RbaAlphaBeta({
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(mode!==RBA_AB_CPC_ONLY&&mode!==RBA_AB_CPC_FOUR_FRONT)throw new RangeError('invalid alpha-beta mode');
   const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),levels=g.cellCount+1,
-    live=prepareConnect4LiveLineEvaluator32(g);
+    live=prepareConnect4LiveLineEvaluator32(g),
+    movePacking=prepareConnect4MoveOrderPacking32(g.columns,g.lineCount);
   if(!Number.isInteger(orderOffset)||orderOffset<0||orderOffset>=g.columns)
     throw new RangeError('invalid alpha-beta order offset');
   if(sharedExactCache!==null&&
@@ -179,6 +188,7 @@ export function prepareConnect4RbaAlphaBeta({
     basisSize:new Uint32Array(levels),cache,actionOrder,
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
     moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
+    movePackShift:movePacking.shift,moveOrderMask:movePacking.mask,
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
@@ -290,28 +300,48 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     }
 
     const scores=state.moveScores,ordered=state.moveOrder,
-      playerOffset=liveOffset+mover*live.wordCount;
+      playerOffset=liveOffset+mover*live.wordCount,
+      movePackShift=state.movePackShift,moveOrderMask=state.moveOrderMask;
     let actionCount=0;
-    for(let oi=0;oi<g.columns;oi+=1){
-      const column=state.actionOrder[oi],height=words[keyOffset+column];
-      if(height>=g.rows||!(actionMask&(1<<column)))continue;
-      const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
-        score=live.wordCount===3
-          ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
-          :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
-      let at=actionCount;
-      while(at>0){
-        const priorScore=scores[at-1];
-        if(priorScore>=score)break;
-        scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
+    if(movePackShift>=0){
+      for(let oi=0;oi<g.columns;oi+=1){
+        const column=state.actionOrder[oi],height=words[keyOffset+column];
+        if(height>=g.rows||!(actionMask&(1<<column)))continue;
+        const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
+          score=live.wordCount===3
+            ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
+            :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell),
+          threshold=(score<<movePackShift)>>>0,entry=threshold|column;
+        let at=actionCount;
+        while(at>0){
+          const prior=ordered[orderRow+at-1];
+          if(prior>=threshold)break;
+          ordered[orderRow+at]=prior;at-=1;
+        }
+        ordered[orderRow+at]=entry;actionCount+=1;
       }
-      scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
+    }else{
+      for(let oi=0;oi<g.columns;oi+=1){
+        const column=state.actionOrder[oi],height=words[keyOffset+column];
+        if(height>=g.rows||!(actionMask&(1<<column)))continue;
+        const physicalColumn=orientation?g.mirrorColumn[column]:column,cell=height*g.columns+physicalColumn,
+          score=live.wordCount===3
+            ?evaluateConnect4LiveLine3x32(live.through,cell*3,state.liveState,playerOffset)
+            :evaluateConnect4LiveLineCell32(live,state.liveState,liveOffset,mover,cell);
+        let at=actionCount;
+        while(at>0){
+          const priorScore=scores[at-1];
+          if(priorScore>=score)break;
+          scores[at]=priorScore;ordered[orderRow+at]=ordered[orderRow+at-1];at-=1;
+        }
+        scores[at]=score;ordered[orderRow+at]=column;actionCount+=1;
+      }
     }
     if(!actionCount)return 0;
 
     let best=-2;
     for(let ai=0;ai<actionCount;ai+=1){
-      const column=ordered[orderRow+ai],height=words[keyOffset+column],
+      const column=ordered[orderRow+ai]&moveOrderMask,height=words[keyOffset+column],
         physicalColumn=orientation?g.mirrorColumn[column]:column,
         physicalCell=height*g.columns+physicalColumn;
       const term=connect4RbaCofactorKnownHeight(g,state.profile,words,keyOffset,basis,basisOffset,n,column,height,
