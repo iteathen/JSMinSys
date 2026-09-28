@@ -30,7 +30,11 @@ test('shared exact known-hash path retains full-key validation',()=>{
     a=Uint32Array.from([11,22]),b=Uint32Array.from([33,44]),
     hash=mixSpan32Locator32(a,0,2);
   assert.equal(storeConnect4RbaSharedExactCache32(cache,a,0,3,hash),3);
+  const slot=hash&cache.mask,packed=cache.value[slot];
+  assert.equal(packed&3,3);
+  assert.equal((packed^hash)>>>2,0);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0,hash),3);
+  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0,(hash^0x80000000)>>>0),0);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,b,0,hash),0);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
 });
