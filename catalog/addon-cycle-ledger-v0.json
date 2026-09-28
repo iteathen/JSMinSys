@@ -2208,7 +2208,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -2698,7 +2698,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -2784,7 +2784,7 @@
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
           "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected."
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
       },
       "status": "decomposed"
     },
@@ -6167,7 +6167,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-KH",
           "target": "mixSpan32Locator32"
         },
         {
@@ -6205,16 +6205,27 @@
         {
           "op": "atomic.rmw.u32",
           "count": "E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
       },
       "status": "decomposed"
     },
@@ -6226,7 +6237,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-KH",
           "target": "mixSpan32Locator32"
         },
         {
@@ -6268,16 +6279,27 @@
         {
           "op": "control.branch",
           "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(3)*C(control.test.u32)+(2)*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership"
+          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority."
+        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Known-hash callers skip duplicate locator mixing; sequence CAS/key/value publication is unchanged."
       },
       "status": "decomposed"
     },
@@ -7217,7 +7239,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -7737,7 +7759,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -7823,7 +7845,7 @@
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
           "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected."
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
       },
       "status": "decomposed"
     },
@@ -8645,7 +8667,7 @@
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
       },
       "status": "decomposed"
     },
@@ -8788,7 +8810,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -8874,7 +8896,7 @@
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
           "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected."
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
       },
       "status": "decomposed"
     },
@@ -9796,7 +9818,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "23609966207f427e50488fd154696d5d340ecddd",
+    "addons/rba-connect4-alphabeta.mjs": "2db14d8949e7b158c40d0c38afd17c61ba962a83",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -9805,15 +9827,15 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
     "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "e96a7355fb62723835476eadea22a72fc5e3b3c5",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "274f2c898d819703cfcec946eba380b06268969a",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "65a13a0c8528b5274ca4a20648186160079a8cf2",
+    "addons/rba-connect4-frontier.mjs": "cd28daeb85ec849607295b8f9ebb607afac3e5bf",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
