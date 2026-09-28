@@ -183,9 +183,17 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       if(cached===RBA_CACHE_LOWER0){
         if(beta<=0){state.cutoffs+=1;return 0;}
         if(alpha<0)alpha=0;
+        else if(cache.shared&&!(cacheHash&cache.sharedSampleBits)){
+          const sharedExact=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset);
+          if(sharedExact){state.cacheHits+=1;return sign*absToRelative(sharedExact,mover);}
+        }
       }else{
         if(alpha>=0){state.cutoffs+=1;return 0;}
         if(beta>0)beta=0;
+        else if(cache.shared&&!(cacheHash&cache.sharedSampleBits)){
+          const sharedExact=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset);
+          if(sharedExact){state.cacheHits+=1;return sign*absToRelative(sharedExact,mover);}
+        }
       }
     }
 
