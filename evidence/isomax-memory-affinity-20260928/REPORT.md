@@ -7,3 +7,17 @@ M16: empty, 600000ms, 67108864 shared entries, 1048576 private per worker, 1 wid
 Cold harness accounting: module sample performs O(moves + workers) validation/reporting, dynamic imports, source lookup, geometry preparation, process-cycle reads, and the entire solve (symbolic SOLVE(config,position,OS)); allocations/FFI/process spawning/IO are nonzero variable host costs. Process solveCycles brackets the complete host/worker operation, including initialization/cleanup. Controller costs are external and excluded. No changed production add-on units or generated seals. Existing interval-CPC mechanical-ledger undercounts remain a known prerequisite before NEES certification; these raw physical measurements are not a NEES certification.
 
 Stages 3–5 pending cold affinity implementation/qualification. Do not claim cache residency, exact solve improvement from censored samples, or capacity promotion before repeated comparison.
+
+## M16 observed result
+TIMEOUT at600028.2634ms; rootWdl=null; no solve claimed.
+1318300093 nodes;8133553305152 process cycles;2205126ms CPU.
+Shared hits305322080,stores48791093,contention436562.
+PeakRSS2944532480B; all4workers active/exited,cleanup=true,errorCode102,errors=[].
+Previous same-source/nightly4M-shared empty run also timed out600017ms:
+1478258352 nodes,8158168537640 cycles,204649042hits,43019502stores.
+These are noncontemporaneous censored windows,not an exact solve-speed ratio.
+The larger table increases reuse and per-node cost; completed hard controls follow.
+
+RED tests reproduced four expected failures: missing optional affinity API,
+malformed-topology API absent,and inherited CPC array/store accounting errors.
+These are cold/accounting repairs; selected measured solver remains unchanged.

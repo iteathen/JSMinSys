@@ -1,0 +1,98 @@
+✖ cold CPC ledger accounts for every actual scratch array and object field (1.1784ms)
+✖ terminal CPC ledger counts actual writes and delegation has no wrapper scratch writes (0.3103ms)
+✖ performance targets distinguish SMT siblings, efficiency classes and processor groups (1.0241ms)
+✖ malformed topology never silently supplies a placement (0.1726ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 88.223
+
+✖ failing tests:
+
+test at test\cpc-interval-ledger.test.mjs:11:1
+✖ cold CPC ledger accounts for every actual scratch array and object field (1.1784ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  11 !== 12
+  
+      at TestContext.<anonymous> (file:///C:/r/isomax-p2-memory/test/cpc-interval-ledger.test.mjs:15:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 11,
+    expected: 12,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-interval-ledger.test.mjs:19:1
+✖ terminal CPC ledger counts actual writes and delegation has no wrapper scratch writes (0.3103ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  7 !== 6
+  
+      at TestContext.<anonymous> (file:///C:/r/isomax-p2-memory/test/cpc-interval-ledger.test.mjs:25:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 6,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\worker-affinity.test.mjs:15:1
+✖ performance targets distinguish SMT siblings, efficiency classes and processor groups (1.0241ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///C:/r/isomax-p2-memory/test/worker-affinity.test.mjs:16:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\worker-affinity.test.mjs:25:1
+✖ malformed topology never silently supplies a placement (0.1726ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///C:/r/isomax-p2-memory/test/worker-affinity.test.mjs:26:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
