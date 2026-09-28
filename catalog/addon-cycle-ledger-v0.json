@@ -500,6 +500,13 @@
         "name": "COLD_AFFINITY_COST(unit,records,groups,workers,bytes,ffiState,osState,gcState)"
       },
       "note": "Cold JS validation/control/Buffer/BigInt/allocation/native FFI/module work; no numeric zero substitution. OS call and scheduler delay may be unbounded."
+    },
+    "runtime.number.multiply": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "NUMBER_MULTIPLY_COST(operands,v8Lowering,cpuProfile)"
+      },
+      "note": "Cold Number multiplication may exceed uint32; do not bind it to wrapping u32 IMUL or claim fixed Intel cycles."
     }
   },
   "units": [
@@ -10448,7 +10455,7 @@
           "count": 1
         },
         {
-          "op": "alu.imul.u32",
+          "op": "runtime.number.multiply",
           "count": 2
         },
         {
@@ -10470,7 +10477,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "FL*C(runtime.field.load)+REBUILD*C(runtime.field.store)+C(alu.add.u32)+2*C(alu.imul.u32)+TEST*C(control.test.u32)+TEST*C(control.branch)+REBUILD*C(runtime.typed_view.construct)+INVALID*C(runtime.error.throw)",
+        "expression": "FL*C(runtime.field.load)+REBUILD*C(runtime.field.store)+C(alu.add.u32)+2*C(runtime.number.multiply)+TEST*C(control.test.u32)+TEST*C(control.branch)+REBUILD*C(runtime.typed_view.construct)+INVALID*C(runtime.error.throw)",
         "parameters": {
           "FL": "Executed property reads including buffer getters (8+REBUILD on valid path)",
           "TEST": "Executed short-circuit validity/length conditions,5 on valid path",
@@ -10487,7 +10494,7 @@
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 71
+    "localExtensionOperations": 72
   },
   "neesOperationBindings": {
     "alu.add.u32": {
