@@ -39,7 +39,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
 
   const lineCount=lines.length,shapeCount=shapeList.length;
   const maxBasis=lineCount,coordWords=Math.ceil(maxBasis/32),shapeWordCount=Math.ceil(shapeCount/32);
-  const metaOffset=columns,p0Offset=metaOffset+1,p1Offset=p0Offset+coordWords,keyWords=p1Offset+coordWords;
+  const p0Offset=columns,p1Offset=p0Offset+coordWords,metaOffset=p1Offset+coordWords,cacheKeyWords=metaOffset,keyWords=metaOffset+1;
   const lineColumn=new Uint32Array(lineCount*4),lineRow=new Uint32Array(lineCount*4),lineShape=new Uint32Array(lineCount*16);
   const cellColumn=new Uint32Array(cellCount),cellRow=new Uint32Array(cellCount);
   for(let cell=0;cell<cellCount;cell+=1){cellColumn[cell]=cell%columns;cellRow[cell]=(cell/columns)|0;}
@@ -135,7 +135,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   }
 
   return {columns,rows,cellCount,lineCount,shapeCount,maxBasis,coordWords,shapeWordCount,
-    metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
+    metaOffset,p0Offset,p1Offset,cacheKeyWords,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
     lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
     specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
