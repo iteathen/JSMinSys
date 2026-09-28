@@ -210,7 +210,6 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
         if(completeBehaviorNode32(state,0)===3)return 3;
         const value=absToRelativeBehavior(term,mover);
         if(value>=beta){
-          if(value===0)storeConnect4RbaBoundCacheSlot32Behavior(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot);
           state.cutoffs+=1;return completeBehaviorNode32(state, sign*value);
         }
         if(alphaOrig===-2&&betaOrig===2)
@@ -271,7 +270,6 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
       if(alpha>=beta){
-        if(best===0)storeConnect4RbaBoundCacheSlot32Behavior(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot);
         state.cutoffs+=1;
         // A fail-high lower bound of +1 is exact in {-1,0,+1}. Publish the
         // current q/mover, before forced-tail sign transports it to the caller.
