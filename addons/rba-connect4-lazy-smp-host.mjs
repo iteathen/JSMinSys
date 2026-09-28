@@ -52,7 +52,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     workerGeometry=shareConnect4RbaGeometry32(geometry),
     sharedExactCache=createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
-      keyWords:geometry.keyWords,
+      keyWords:geometry.cacheKeyWords,
     }),
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
