@@ -2075,7 +2075,7 @@
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
           "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Prepared cache keyWords is geometry.cacheKeyWords, the exact support+coordinate identity prefix; trailing nonterminal meta remains in search state but is derived from support."
       },
       "status": "decomposed"
     },
@@ -2202,13 +2202,13 @@
         "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
+          "K": "cache identity words actually compared (13/6 on standard specialized paths; compared prefix length on generic path)",
+          "G": "1 on generic cache-identity-width path; 0 on 13/6 unrolled paths",
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
+        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1. Cache equality compares the exact meta-elided identity. Standard specialized widths are 13 words for 7x6 and 6 words for 4x4."
       },
       "status": "decomposed"
     },
@@ -2698,7 +2698,7 @@
       "cycleCount": {
         "kind": "expression",
         "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
+        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1. publishSpan32 copies cache.keyWords only; derived trailing meta is not published into local/shared cache identity.",
         "parameters": {
           "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
@@ -2778,13 +2778,13 @@
           "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
           "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
           "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "G": "1 on generic cache-identity-width loop comparison; 0 on unrolled 13/6-word comparison",
           "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
           "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
           "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
+        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1. Weak-bound same-q equality uses the same exact meta-elided identity; meta is support-derived on cacheable nonterminal q."
       },
       "status": "decomposed"
     },
@@ -3250,7 +3250,7 @@
           "P": "coordinate words compared on symmetric-support secondary ordering",
           "S": "1 when selectedSet is supplied and published; otherwise 0"
         },
-        "note": "Canonicalization exposes primary short-circuit, reflected-basis construction, coordinate permutation, secondary compare and final publication."
+        "note": "Canonicalization exposes primary short-circuit, reflected-basis construction, coordinate permutation, secondary compare and final publication. Symmetric-support secondary ordering compares coordinate identity through metaOffset; trailing meta is reflection-invariant and support-derived."
       },
       "status": "decomposed"
     },
@@ -4806,7 +4806,7 @@
           "DENSE_R": "1 when dense remove table allocation is admitted, else 0",
           "DENSE_S": "1 when dense subset table allocation is admitted, else 0"
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized."
+        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized. Cold geometry places meta after support+coordinates and exposes cacheKeyWords=metaOffset; arithmetic count is unchanged."
       },
       "status": "decomposed"
     },
@@ -6516,7 +6516,7 @@
           "RF": "1 when rootFrontier selected; 0 otherwise",
           "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced. Shared exact cache is allocated with geometry.cacheKeyWords, preserving exact support+coordinate identity while omitting derived meta."
       },
       "status": "decomposed"
     },
@@ -7233,8 +7233,8 @@
         "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
+          "K": "cache identity words actually compared (13/6 on standard specialized paths; compared prefix length on generic path)",
+          "G": "1 on generic cache-identity-width path; 0 on 13/6 unrolled paths",
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
@@ -7839,7 +7839,7 @@
           "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
           "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
           "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "G": "1 on generic cache-identity-width loop comparison; 0 on unrolled 13/6-word comparison",
           "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
           "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
@@ -8661,8 +8661,8 @@
         "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
           "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
+          "K": "cache identity words actually compared (13/6 on standard specialized paths; compared prefix length on generic path)",
+          "G": "1 on generic cache-identity-width path; 0 on 13/6 unrolled paths",
           "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
           "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
           "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
@@ -8890,7 +8890,7 @@
           "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
           "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
           "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
+          "G": "1 on generic cache-identity-width loop comparison; 0 on unrolled 13/6-word comparison",
           "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
           "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
           "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
@@ -9817,10 +9817,10 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "2db14d8949e7b158c40d0c38afd17c61ba962a83",
+    "addons/rba-connect4-geometry.mjs": "e128324e75af2b35f0878950435034166e842cc4",
+    "addons/rba-connect4-alphabeta.mjs": "5ede8671ffc123379d4101c0f93e3d5c239ffcdd",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
+    "addons/rba-connect4-coordinate.mjs": "c9b0d5c3c124673579936e29d8273825545e0488",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
@@ -9828,14 +9828,14 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
-    "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
+    "addons/rba-connect4-lazy-smp-host.mjs": "9e2b60d76393aaef4264761afa8fbca159009c4b",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "d54358ccf9556b4fcdc7a97e75c6d2ca90b690fb",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "74cabe1231781cdb743db619f26e4f9f05ad79be",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "73b5a467168c24f24197075a9c1097a74dc2dac5",
+    "addons/rba-connect4-frontier.mjs": "24eb4e5c3438598a29cb1d7958f8bd4e8fc01e04",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
