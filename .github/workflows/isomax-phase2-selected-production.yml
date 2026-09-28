@@ -1,0 +1,46 @@
+name: IsoMax Phase2 selected-production qualification
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-selected-production.yml"
+      - "experiments/isomax-phase2/selected-production-ab.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed selected-production sources
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/control" a3cf7f9ca5c90e5025542c3b27ab0b735a610e9a
+          git worktree add "$env:RUNNER_TEMP/candidate" 00ecc7d20ed08ee9585c92aa8441a8ef3969b7ee
+      - name: Short 45461667
+        shell: pwsh
+        run: node experiments/isomax-phase2/selected-production-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-selected/short" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 45461667 4 30000
+      - name: Derived long 353335714
+        shell: pwsh
+        run: node experiments/isomax-phase2/selected-production-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-selected/derived-long" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 353335714 8 90000
+      - name: Official hard 35333571
+        shell: pwsh
+        run: node experiments/isomax-phase2/selected-production-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-selected/official-hard" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 35333571 2 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-selected-production
+          path: ${{ runner.temp }}/isomax-phase2-selected
+          if-no-files-found: error
+          retention-days: 30
