@@ -1,10 +1,10 @@
 // Diagnostic-only shared exact traffic census for the pure coalesced Phase-2 candidate.
 // Instrumentation changes execution cost/interleaving. Timing/cycles are invalid.
+// Counters live in one disjoint shared-memory slice per worker so cancellation/
+// host termination cannot erase non-winning-worker observations.
 import {registerHooks} from 'node:module';
 
 const RANKS=43,CHANNELS=8,WIDTH=RANKS*CHANNELS;
-globalThis.__ISOMAX_SHARED_TRAFFIC_CENSUS??=new Float64Array(WIDTH);
-const C=globalThis.__ISOMAX_SHARED_TRAFFIC_CENSUS;
 
 function rep(source,from,to,count=1){
   const actual=source.split(from).length-1;
@@ -15,7 +15,6 @@ function rep(source,from,to,count=1){
 registerHooks({load(url,context,nextLoad){
   const result=nextLoad(url,context);
   const target=url.endsWith('/addons/rba-connect4-frontier.mjs')||
-    url.endsWith('/addons/rba-connect4-lazy-smp-worker-frontier.mjs')||
     url.endsWith('/addons/rba-connect4-lazy-smp-host.mjs');
   if(!target)return result;
   if(result.source===null||result.source===undefined)return result;
@@ -23,7 +22,12 @@ registerHooks({load(url,context,nextLoad){
   source=source.replaceAll('\r\n','\n');
 
   if(url.endsWith('/addons/rba-connect4-frontier.mjs')){
-    source='const __p2SharedTraffic=globalThis.__ISOMAX_SHARED_TRAFFIC_CENSUS;\nconst __p2TrafficRanks=43;\n'+source;
+    source=`import {workerData as __p2WorkerData} from 'node:worker_threads';
+const __p2TrafficRanks=43,__p2TrafficWidth=344;
+const __p2SharedTraffic=__p2WorkerData?.sharedTrafficBuffer
+  ?new Uint32Array(__p2WorkerData.sharedTrafficBuffer,__p2WorkerData.workerIndex*__p2TrafficWidth*Uint32Array.BYTES_PER_ELEMENT,__p2TrafficWidth)
+  :new Uint32Array(__p2TrafficWidth);
+`+source;
 
     source=rep(source,
       '  cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;',
@@ -58,19 +62,19 @@ registerHooks({load(url,context,nextLoad){
     return {...result,source};
   }
 
-  if(url.endsWith('/addons/rba-connect4-lazy-smp-worker-frontier.mjs')){
-    source=rep(source,'RESULT_STRIDE=4,METRIC_WIDTH=15,','RESULT_STRIDE=4,METRIC_WIDTH=359,');
-    source=rep(source,
-      'metrics[metricBase+14]=m.cofactors;',
-      'metrics[metricBase+14]=m.cofactors;\nfor(let i=0;i<344;i+=1)metrics[metricBase+15+i]=globalThis.__ISOMAX_SHARED_TRAFFIC_CENSUS[i];');
-    return {...result,source};
-  }
-
   if(url.endsWith('/addons/rba-connect4-lazy-smp-host.mjs')){
-    source=rep(source,'CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,','CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=359,');
+    source=rep(source,
+      '    metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),\n    metrics=new Float64Array(metricBuffer),',
+      '    metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),\n    metrics=new Float64Array(metricBuffer),\n    sharedTrafficBuffer=new SharedArrayBuffer(workers*344*Uint32Array.BYTES_PER_ELEMENT),');
+    source=rep(source,
+      '          metricBuffer,\n          nodeCounterBuffer,',
+      '          metricBuffer,\n          sharedTrafficBuffer,\n          nodeCounterBuffer,');
     source=rep(source,
       '    winnerMetrics,\n    nodeCounts:rootFrontier?',
-      '    winnerMetrics,\n    sharedTrafficCensus:Array.from({length:workers},(_,i)=>Array.from(metrics.slice(i*METRIC_WIDTH+15,i*METRIC_WIDTH+359))),\n    nodeCounts:rootFrontier?');
+      '    winnerMetrics,\n    sharedTrafficCensus:Array.from({length:workers},(_,i)=>Array.from(new Uint32Array(sharedTrafficBuffer,i*344*Uint32Array.BYTES_PER_ELEMENT,344))),\n    nodeCounts:rootFrontier?');
+    source=rep(source,
+      '      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+',
+      '      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+sharedTrafficBuffer.byteLength+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+');
     return {...result,source};
   }
 
