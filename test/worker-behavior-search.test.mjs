@@ -33,7 +33,7 @@ test('real search worker observes strategist stop published after search has beg
   const memory=behavior.createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
   const control=new Int32Array(new SharedArrayBuffer(20));control[4]=-1;
   const resultWords=new Int32Array(new SharedArrayBuffer(16)),metricBuffer=new SharedArrayBuffer(15*8);
-  const sharedExactCache=createConnect4RbaSharedExactCache32({capacity:4096,keyWords:g.keyWords});
+  const sharedExactCache=createConnect4RbaSharedExactCache32({capacity:4096,keyWords:g.cacheKeyWords});
   const worker=new Worker(new URL('../addons/rba-connect4-lazy-smp-worker-behavior.mjs',import.meta.url),{
     workerData:{geometry:g,root,rootReflected:root.reflected,control,resultWords,metricBuffer,
       workerIndex:0,workerCount:1,behaviorMemory:memory,sharedExactCache,localCacheCapacity:4096,sharedSampleMask:0},
@@ -75,7 +75,7 @@ test('mid-search cancellation preserves exact-cache semantics and a cleared flag
   for(const stopAt of [1,2,10,100,500]){
     const memory=behavior.createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
     const control=new behavior.BehaviorWorker(0,words,0,memory);
-    const sharedExactCache=createConnect4RbaSharedExactCache32({capacity:4096,keyWords:g.keyWords});
+    const sharedExactCache=createConnect4RbaSharedExactCache32({capacity:4096,keyWords:g.cacheKeyWords});
     const state=prepareConnect4RbaAlphaBetaBehavior({geometry:g,cacheCapacity:4096,behavior:control,sharedExactCache});
     const load=state.behaviorLoad;let checks=0;
     state.behaviorLoad=offset=>{if(++checks===stopAt)behavior.publishWorkerBehavior32(words,0,1);return load(offset);};
