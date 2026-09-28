@@ -5584,7 +5584,7 @@
         "parameters": {
           "C": "configured columns iterated on generic non-49 reflection; C=0 on disabled/specialized-49 early paths"
         },
-        "note": "Position-code reflection including specialized 7x6 packing or generic lane remap."
+        "note": "Position-code reflection including specialized standard compact profile packing or generic lane remap."
       },
       "status": "decomposed"
     },
@@ -6110,6 +6110,112 @@
       "status": "decomposed"
     },
     {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#isCompactProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "isCompactProfile8",
+      "scope": "cold-lazy-smp-cache-profile",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "geometry property loads reached before short-circuit, 0..8",
+          "Q": "guard/equality conditions evaluated before return, 1..11"
+        },
+        "note": "Cold standard-standard compact profile compact-layout guard. Geometry/key-width/layout equality is explicit; unsupported geometry falls back to full shared identity."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#compactSupportProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "compactSupportProfile8",
+      "scope": "hot-lazy-smp-cache-identity-pack",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 5
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 5
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "6*C(memory.load.u32)+6*C(alu.add.u32)+5*C(alu.shl.u32)+C(alu.and.u32)+5*C(alu.or.u32)+C(alu.shr.u32)",
+        "note": "Exact standard compact profile compact support field: heights 2..6 plus terminal bits. Rank is omitted because legal-q rank equals support-height sum."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#compactTailProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "compactTailProfile8",
+      "scope": "hot-lazy-smp-cache-identity-pack",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(memory.load.u32)+2*C(alu.add.u32)+2*C(alu.and.u32)+C(alu.shl.u32)+C(alu.or.u32)+C(alu.shr.u32)",
+        "note": "Exact standard compact profile packed coordinate tails: five semantic bits from each player's final coordinate word; padding is nonsemantic and omitted."
+      },
+      "status": "decomposed"
+    },
+    {
       "unit": "addons/rba-connect4-shared-exact-cache.mjs#createConnect4RbaSharedExactCache32",
       "source": "addons/rba-connect4-shared-exact-cache.mjs",
       "name": "createConnect4RbaSharedExactCache32",
@@ -6150,12 +6256,45 @@
         {
           "op": "runtime.object.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "G",
+          "note": "geometry.keyWords validation when geometry supplied"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+2*G",
+          "note": "optional geometry/profile validation"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+2*G",
+          "note": "optional geometry/profile validation"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "compact7x6 stored-width selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "compact7x6 stored-width selection"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)+G*C(runtime.field.load)+(1+2*G)*C(control.test.u32)+(1+2*G)*C(control.branch)+CALL(isCompactProfile8)+C(control.test.u32)+C(control.branch)",
+        "note": "Cold exact-only Lazy-SMP cache allocation. Optional geometry validation selects a guarded standard-standard compact profile compact layout; otherwise full-key storage is unchanged. The key SharedArrayBuffer byte count is capacity*storedKeyWords*4 (8 words on compact standard compact profile, keyWords otherwise).",
+        "parameters": {
+          "G": "1 when an explicit geometry contract is supplied; 0 for compatibility callers"
+        }
       },
       "status": "decomposed"
     },
@@ -6172,7 +6311,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "8+(1-C)*K"
         },
         {
           "op": "atomic.load.u32",
@@ -6180,7 +6319,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "K"
+          "count": "(1-C)*K+C*R"
         },
         {
           "op": "alu.and.u32",
@@ -6196,11 +6335,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "4+K+3*E"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "3+K+E"
         },
         {
           "op": "atomic.rmw.u32",
@@ -6215,17 +6354,31 @@
           "op": "control.branch",
           "count": 1,
           "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactTailProfile8"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(8+(1-C)*K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+((1-C)*K+C*R)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(4+K+3*E)*C(control.test.u32)+(3+K+E)*C(control.branch)+E*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)+CS*CALL(compactSupportProfile8)+CT*CALL(compactTailProfile8)",
         "parameters": {
-          "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
-          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
+          "KH": "1 when caller supplies the already-computed full-q locator hash; 0 when helper computes it",
+          "C": "1 on guarded compact standard-7x6 path; 0 on full-key compatibility path",
+          "K": "shared stored-key words atomically compared before mismatch/full equality (<=8 when C=1, <=keyWords otherwise)",
+          "R": "raw q words directly loaded by reached compact comparisons (0..6); pack-helper q loads are accounted in CS/CT",
+          "CS": "1 when compact comparison reaches packed-support field; 0 otherwise",
+          "CT": "1 when compact comparison reaches packed-tail field; 0 otherwise",
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
+        "note": "Seqlock shared exact probe. Compact standard compact profile preserves raw first-two-height mismatch prefix, then compares exact packed support/coordinate identity. Full-q equality remains exact by qualified lossless encoding; final sequence validation is unchanged."
       },
       "status": "decomposed"
     },
@@ -6242,7 +6395,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "9+(1-C)*K"
         },
         {
           "op": "atomic.load.u32",
@@ -6250,7 +6403,7 @@
         },
         {
           "op": "atomic.rmw.u32",
-          "count": "1+C"
+          "count": "1+X"
         },
         {
           "op": "atomic.store.u32",
@@ -6258,7 +6411,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "K"
+          "count": "(1-C)*K+C*R"
         },
         {
           "op": "alu.and.u32",
@@ -6274,11 +6427,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": "4+S"
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": "3+S"
         },
         {
           "op": "control.test.u32",
@@ -6289,17 +6442,30 @@
           "op": "control.branch",
           "count": 1,
           "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C*S",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C*S",
+          "target": "compactTailProfile8"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(3)*C(control.test.u32)+(2)*C(control.branch)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(9+(1-C)*K)*C(runtime.field.load)+C(atomic.load.u32)+(1+X)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+((1-C)*K+C*R)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(4+S)*C(control.test.u32)+(3+S)*C(control.branch)+C(control.test.u32)+C(control.branch)+C*S*CALL(compactSupportProfile8)+C*S*CALL(compactTailProfile8)",
         "parameters": {
-          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
-          "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
-          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
+          "KH": "1 when caller supplies the already-computed full-q locator hash; 0 when helper computes it",
+          "C": "1 on guarded compact standard-7x6 path; 0 on full-key compatibility path",
+          "S": "1 after successful sequence-slot ownership; 0 on early contention return",
+          "X": "1 when contention accounting Atomics.add executes; 0 on successful ownership",
+          "K": "shared key words atomically published: S*8 on compact 7x6; S*keyWords on compatibility path",
+          "R": "raw q words directly loaded for compact publication (6 when C*S=1); pack-helper q loads are accounted by subledgers"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Known-hash callers skip duplicate locator mixing; sequence CAS/key/value publication is unchanged."
+        "note": "Direct-mapped shared exact publication retains sequence CAS/value semantics. Compact standard compact profile publishes eight exact identity words instead of fourteen; compatibility geometries publish full keyWords. Contended stores remain safely droppable cache writes."
       },
       "status": "decomposed"
     },
@@ -6516,7 +6682,7 @@
           "RF": "1 when rootFrontier selected; 0 otherwise",
           "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced. Shared exact cache creation now receives the prepared geometry so init-time guarded compact identity can be selected; this is cold configuration only."
       },
       "status": "decomposed"
     },
@@ -9716,8 +9882,8 @@
     }
   ],
   "summary": {
-    "units": 156,
-    "decomposed": 156,
+    "units": 159,
+    "decomposed": 159,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -9827,8 +9993,8 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
-    "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
+    "addons/rba-connect4-shared-exact-cache.mjs": "a0a4ae5c8cb3f18bcf0f0fa9c112fc94a94f33ea",
+    "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
