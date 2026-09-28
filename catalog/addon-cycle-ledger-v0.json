@@ -8270,11 +8270,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "K"
+          "count": "STOP_TEST"
         },
         {
           "op": "control.branch",
-          "count": "K"
+          "count": "STOP_TEST"
         },
         {
           "op": "runtime.field.store",
@@ -8299,7 +8299,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -8319,7 +8319,7 @@
           "L3": "non-forced legal moves scored by the three-word live-line specialization",
           "LG": "non-forced legal moves scored by the generic live-line evaluator",
           "J": "stable insertion score comparisons at the non-forced endpoint",
-          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
+          "K": "Successful stable insertion shifts at the non-forced endpoint; independent of cancellation checks.",
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
           "EC": "1 when a non-forced alpha>=beta cutoff executes the endpoint test; otherwise 0",
           "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
@@ -8328,9 +8328,10 @@
           "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
           "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
           "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
-          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)",
+          "STOP_TEST": "Executed cancellation sentinel tests owned by this invocation, after recursive children and terminal/forced checkpoints."
         },
-        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged.",
+        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. Accounting repair: inherited K alias split into insertion K and STOP_TEST, without runtime/counter changes.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9386,11 +9387,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "K"
+          "count": "STOP_TEST"
         },
         {
           "op": "control.branch",
-          "count": "K"
+          "count": "STOP_TEST"
         },
         {
           "op": "memory.load.f64",
@@ -9439,7 +9440,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(STOP_TEST)*C(control.test.u32)+(STOP_TEST)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -9459,7 +9460,7 @@
           "L3": "non-forced legal moves scored by the three-word live-line specialization",
           "LG": "non-forced legal moves scored by the generic live-line evaluator",
           "J": "stable insertion score comparisons at the non-forced endpoint",
-          "K": "Executed cancellation sentinel tests after recursive children and terminal/forced checkpoints; including root result handling.",
+          "K": "Successful stable insertion shifts at the non-forced endpoint; independent of cancellation checks.",
           "B": "Executed completion checkpoints owned by this invocation: q exit, forced-transit continuation, terminal child. Propagating cancellation performs no checkpoint.",
           "EC": "1 when a non-forced alpha>=beta cutoff executes the endpoint test; otherwise 0",
           "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
@@ -9472,9 +9473,10 @@
           "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
           "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
           "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
-          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)",
+          "STOP_TEST": "Executed cancellation sentinel tests owned by this invocation, after recursive children and terminal/forced checkpoints."
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. Accounting repair: inherited K alias split into insertion K and STOP_TEST, without runtime/counter changes.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
