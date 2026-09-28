@@ -274,8 +274,7 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
     if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbsFrontier(best,mover);
       storeConnect4RbaExactCacheSlot32Frontier(cache,words,keyOffset,abs,cacheSlot,cacheHash);
-    }else if(best===0&&alphaOrig>=0)
-      storeConnect4RbaBoundCacheSlot32Frontier(cache,words,keyOffset,RBA_CACHE_UPPER0,cacheSlot);
+    }
     return completeBehaviorNode32(state, ((sign*best)|0));
   }
 }
