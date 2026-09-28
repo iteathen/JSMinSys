@@ -6117,15 +6117,15 @@
       "operations": [
         {
           "op": "runtime.integer.check",
-          "count": 2
+          "count": 3
         },
         {
           "op": "control.test.u32",
-          "count": 6
+          "count": 9
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.and.u32",
@@ -6133,7 +6133,7 @@
         },
         {
           "op": "alu.sub.u32",
-          "count": 1
+          "count": 2
         },
         {
           "op": "alu.imul.u32",
@@ -6154,8 +6154,8 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+6*C(control.test.u32)+2*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
-        "note": "Cold exact-only Lazy-SMP cache allocation: sequence/value/key/stat arrays use separate SharedArrayBuffers."
+        "expression": "3*C(runtime.integer.check)+9*C(control.test.u32)+3*C(control.branch)+C(alu.and.u32)+2*C(alu.sub.u32)+4*C(alu.imul.u32)+4*C(memory.allocate.shared.bytes)+4*C(runtime.typed_view.construct)+C(runtime.object.allocate)",
+        "note": "Cold exact-only Lazy-SMP cache allocation. derivedWord defaults to the no-omission sentinel keyWords. When derivedWord<keyWords, the shared key array stores keyWords-1 words per slot; only caller-proved exactly derivable identity words may be omitted."
       },
       "status": "decomposed"
     },
@@ -6172,7 +6172,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "6+K"
+          "count": "9+K"
         },
         {
           "op": "atomic.load.u32",
@@ -6192,15 +6192,19 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*K"
+          "count": "1+2*K"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "T"
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "4+K+3*E"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "3+K+E"
         },
         {
           "op": "atomic.rmw.u32",
@@ -6219,13 +6223,14 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(9+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(1+2*K)*C(alu.add.u32)+T*C(alu.sub.u32)+(4+K+3*E)*C(control.test.u32)+(3+K+E)*C(control.branch)+E*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
-          "K": "shared exact-cache key words compared before mismatch or full equality",
+          "K": "stored shared identity words compared before mismatch or full equality; full standard 7x6 derived-meta hit uses 13 rather than 14",
+          "T": "compared words in the post-derived segment, each using compressed shared-key index w-1",
           "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
           "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
+        "note": "Seqlock-style shared exact probe with two exact key segments around one caller-proved derived word. The full q hash remains the locator. Generic caches default derivedWord to keyWords and therefore retain full-key validation."
       },
       "status": "decomposed"
     },
@@ -6242,7 +6247,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "7+K"
+          "count": "10+K"
         },
         {
           "op": "atomic.load.u32",
@@ -6270,15 +6275,19 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2+2*K"
+          "count": "3+2*K"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "T"
         },
         {
           "op": "control.test.u32",
-          "count": 3
+          "count": 4
         },
         {
           "op": "control.branch",
-          "count": 2
+          "count": 3
         },
         {
           "op": "control.test.u32",
@@ -6293,13 +6302,14 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(3)*C(control.test.u32)+(2)*C(control.branch)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(10+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(3+2*K)*C(alu.add.u32)+T*C(alu.sub.u32)+4*C(control.test.u32)+3*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
-          "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
+          "K": "stored shared identity words atomically published on an uncontended store; full standard 7x6 derived-meta store uses 13 rather than 14",
+          "T": "published words in the post-derived segment, each using compressed shared-key index w-1",
           "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
           "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Known-hash callers skip duplicate locator mixing; sequence CAS/key/value publication is unchanged."
+        "note": "Direct-mapped shared exact publication with compressed exact identity around one caller-proved derived word. Contended stores are still safely dropped. Generic caches default to full-key storage."
       },
       "status": "decomposed"
     },
@@ -6496,12 +6506,17 @@
         {
           "op": "runtime.field.store",
           "count": "3*W"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1,
+          "note": "geometry.metaOffset supplied as the solver-owned exactly derived shared identity word"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+C(runtime.field.load)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6516,7 +6531,7 @@
           "RF": "1 when rootFrontier selected; 0 otherwise",
           "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive"
         },
-        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced."
+        "note": "Separate Lazy-SMP host option. sharedSampleMask controls optional exact-cache consultation/publication density using high hash bits while every worker continues its complete private search. No Branch Manager or surplus queue is introduced. The host configures geometry.metaOffset as the omitted shared identity word; rank/meta remains derivable from support for every cacheable nonterminal q."
       },
       "status": "decomposed"
     },
@@ -9827,8 +9842,8 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
-    "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
+    "addons/rba-connect4-shared-exact-cache.mjs": "67642c095ea88ca40b14afc3a09d75a3b6195111",
+    "addons/rba-connect4-lazy-smp-host.mjs": "269b475fd76218ee49e5e7c63ec14d589af7a8a0",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",

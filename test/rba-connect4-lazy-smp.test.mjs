@@ -35,6 +35,35 @@ test('shared exact known-hash path retains full-key validation',()=>{
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
 });
 
+test('shared exact cache omits only an explicitly derived q word',()=>{
+  const cases=[
+    {columns:4,rows:4,moves:[0,1,0,1]},
+    {columns:7,rows:6,moves:[3,2,3,2,4,1]},
+    {columns:10,rows:10,moves:[0,9,1,8,0,9]},
+  ];
+  for(const {columns,rows,moves} of cases){
+    const g=prepareConnect4RbaGeometry({columns,rows});
+    for(let n=0;n<=moves.length;n+=1){
+      const q=connect4RbaFromMoves(moves.slice(0,n),{geometry:g}).words;
+      let rank=0;
+      for(let c=0;c<g.columns;c+=1)rank+=q[c];
+      assert.equal(q[g.metaOffset],rank<<2,`${columns}x${rows} prefix ${n} meta must be support-derived`);
+    }
+    const q=connect4RbaFromMoves(moves,{geometry:g}).words,
+      cache=createConnect4RbaSharedExactCache32({
+        capacity:8,keyWords:g.keyWords,derivedWord:g.metaOffset,
+      }),
+      hash=mixSpan32Locator32(q,0,g.keyWords);
+    assert.equal(cache.storedKeyWords,g.keyWords-1);
+    assert.equal(cache.keys.length,8*(g.keyWords-1));
+    assert.equal(storeConnect4RbaSharedExactCache32(cache,q,0,3,hash),3);
+    assert.equal(probeConnect4RbaSharedExactCache32(cache,q,0,hash),3);
+    const different=q.slice();
+    different[0]^=1;
+    assert.equal(probeConnect4RbaSharedExactCache32(cache,different,0,hash),0);
+  }
+});
+
 test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
     moves=[0,1,0,1],
