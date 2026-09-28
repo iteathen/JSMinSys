@@ -13,3 +13,5 @@ canonical/generated solver, or TT. Preload binds before worker module evaluates;
 record OS accepted group/mask per worker. Both placement arms use the same preload,
 with off/no binding versus on. Compare default-off against unmodified launch first.
 This minimizes source disturbance while satisfying initialization-only placement.
+
+M16 complete/censored and pushed ba19a8f. Optional affinity GREEN178tests and native preflight e7e5499; independent review corrections e76294b. Shared comparison in progress; first A125.05s/B89.72s,secondB89.92s,all exact-1/move4. Provisional only; complete8 samples. No concurrent tests during timing.
