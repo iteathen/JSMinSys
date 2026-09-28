@@ -20,3 +20,15 @@ cold harness and adds no search instrumentation. Cold orchestration costs:
 four sequential child-process launches (OS/blocking work, unbounded); bounded
 JSON/file reads/writes and result checks, outside each measured solve bracket.
 Process launch and file work are not zero-cost solver operations.
+
+Harness correction after first hard sample: baseline returned TIMEOUT with
+HOST_DEADLINE=102, cleanup=true and four workers joined. The old exact-comparison
+controller incorrectly rejected any nonzero errorCode. Original raw output and
+controller error are retained. The standard-suite driver now calls the SAME
+unchanged source sample runner, accepts only TIMEOUT/102 or EXACT/0, validates
+all other lifecycle/configuration gates and resumes from raw process records.
+No completed sample is rerun. Inline controls reject wrong status/code pairs.
+All process outputs are persisted before classification. This changes cold
+orchestration only; timing bracket and both solver revisions are unchanged.
+Cold accounting: at most eight launches and git checks, O(raw bytes) parsing,
+fixed four-case/two-arm checks, filesystem/blocking costs outside measured solve.
