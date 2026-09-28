@@ -12,7 +12,7 @@ if(!Number.isSafeInteger(timeoutMs)||timeoutMs<=0)throw new RangeError('timeoutM
 
 const api=await import(pathToFileURL(resolve(library,'addons/index.mjs')).href);
 const {processCycleCounter}=await import(pathToFileURL(resolve(library,'tools/process-cycle-counter.mjs')).href);
-const profile=(await import(pathToFileURL(resolve(library,'profiles/isomax-i5-12600k.json')).href,{with:{type:'json'}})).default;
+const profile=(await import(pathToFileURL(resolve('profiles/isomax-i5-12600k-memory-selected.json')).href,{with:{type:'json'}})).default;
 const config={...profile.options,workers:4,sharedSampleMask:0,timeoutMs,sharedCacheCapacity,localCacheCapacity};
 assert.equal(config.rootFrontier,true);
 assert.equal(config.workers,4);

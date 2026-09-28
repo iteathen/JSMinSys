@@ -9,3 +9,5 @@ Owner requests1GiB next: nearest supported33554432entries=1152MiB/worker. One ca
 Owner requests200MiB: nearest native capacity4194304entries=144MiB/worker. One candidate-only process,unchanged profile/timeout,no baseline rerun.
 
 Owner requests576MiB: native16777216entries per worker. One candidate-only process,unchanged fixed source/runtime/pinning/sharedTT/fixture/300000ms ceiling,no baseline rerun.
+
+Owner locks576MiB private/worker and10GiB shared for this hardware profile. New explicit profiles/isomax-i5-12600k-memory-selected.json owns current4pinned/nightly configuration; historical7worker/stable profile preserved. One empty-board run600000ms,no baseline rerun. Sample labels actual selected profile. Fixed source6bbba7c,no search changes.

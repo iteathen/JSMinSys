@@ -1,0 +1,34 @@
+{
+  "id": "isomax-four-pcore-10g-576m-i5-12600k-20260928",
+  "status": "owner-selected hardware testing profile",
+  "selectedOn": "2026-09-28",
+  "sourceSha": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e",
+  "scope": {
+    "cpu": "Intel Core i5-12600K",
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "geometry": "7x6",
+    "ramGiBApprox": 32,
+    "platform": "win32"
+  },
+  "options": {
+    "sharedSampleMask": 0,
+    "localCacheCapacity": 16777216,
+    "sharedCacheCapacity": 268435456,
+    "rootFrontier": true,
+    "workers": 4
+  },
+  "execution": {
+    "targetsFile": "evidence/isomax-memory-affinity-20260928/targets.json",
+    "deepWorkers": [
+      1,
+      2,
+      3
+    ],
+    "preload": "tools/worker-affinity-preload.mjs",
+    "fixedBeforeSearch": true,
+    "wideWorker": 0
+  },
+  "cachePayloadBytes7x6": 13153337356,
+  "evidenceRevision": "9d87c7274b2753102f8c16f0961acf3bb2acd24b",
+  "limits": "Owner selection from local hard-fixture curve; no global or empty-board optimum proven. Four pinned P-cores; not the historical seven-worker stable-runtime profile."
+}
