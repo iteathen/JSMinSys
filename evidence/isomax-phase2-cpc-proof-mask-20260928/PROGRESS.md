@@ -1,5 +1,11 @@
 # CPC proof-mask execution checkpoint
 
+Final disposition: rejected local realization; PR118 closed without merge.
+See RESULT.md and the [PR disposition](https://github.com/iteathen/JSMinSys/pull/118#issuecomment-5876061951).
+Canonical result/next lead: Connect4 research/semantic-quotient@acdfb2ac.
+The dated checkpoints below are preserved as execution history, not unfinished
+current instructions. Selected continuation remains be7c2887.
+
 Plan: PLAN.md; canonical Connect4 CPC_PROOF_MASK_PLAN.md at 1c96bf6d.
 Base: be7c2887defcefb37080fa61de7ce1dc38dc2990.
 RED preserved: b4b1495f2ff403441e974456062d65ecf22e427e,

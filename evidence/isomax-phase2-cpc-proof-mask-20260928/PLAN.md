@@ -1,7 +1,9 @@
 # IsoMax Phase-2 plan — CPC six-state WDL proof mask
 
 Date: 2026-09-28
-Status: planned exact representation experiment.
+Status: completed local representation experiment; rejected for lack of a
+whole-solve cycle improvement. See [RESULT.md](RESULT.md). Historical RED/GREEN
+commits and the original planned protocol are preserved below.
 
 Selected continuation baseline:
 `be7c2887defcefb37080fa61de7ce1dc38dc2990`
