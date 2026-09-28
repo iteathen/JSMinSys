@@ -61,6 +61,33 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash)
   return value;
 }
 
+export function storeConnect4RbaSharedExactCacheRow32(cache,rowWords,rowOffset,value,knownHash){
+  const slot=knownHash&cache.mask,
+    current=Atomics.load(cache.sequence,slot);
+  if(current&1){Atomics.add(cache.stats,2,1);return value;}
+  const odd=(current+1)>>>0;
+  if(Atomics.compareExchange(cache.sequence,slot,current,odd)!==current){
+    Atomics.add(cache.stats,2,1);return value;
+  }
+  const keyWords=cache.storedKeyWords,base=slot*keyWords,keys=cache.keys;
+  if(keyWords===8){
+    Atomics.store(keys,base,rowWords[rowOffset]);
+    Atomics.store(keys,base+1,rowWords[rowOffset+1]);
+    Atomics.store(keys,base+2,rowWords[rowOffset+2]);
+    Atomics.store(keys,base+3,rowWords[rowOffset+3]);
+    Atomics.store(keys,base+4,rowWords[rowOffset+4]);
+    Atomics.store(keys,base+5,rowWords[rowOffset+5]);
+    Atomics.store(keys,base+6,rowWords[rowOffset+6]);
+    Atomics.store(keys,base+7,rowWords[rowOffset+7]);
+  }else{
+    for(let w=0;w<keyWords;w+=1)Atomics.store(keys,base+w,rowWords[rowOffset+w]);
+  }
+  Atomics.store(cache.value,slot,value);
+  Atomics.store(cache.sequence,slot,(odd+1)>>>0);
+  Atomics.add(cache.stats,1,1);
+  return value;
+}
+
 export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,knownHash){
   const hash=knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash,
     slot=hash&cache.mask,

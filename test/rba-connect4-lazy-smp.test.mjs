@@ -6,11 +6,13 @@ import {
   prepareConnect4RbaAlphaBeta,
   solveConnect4RbaAlphaBeta,
   RBA_AB_CPC_ONLY,
+  storeConnect4RbaExactCache32,
 } from '../addons/rba-connect4-alphabeta.mjs';
 import {
   createConnect4RbaSharedExactCache32,
   probeConnect4RbaSharedExactCache32,
   storeConnect4RbaSharedExactCache32,
+  storeConnect4RbaSharedExactCacheRow32,
 } from '../addons/rba-connect4-shared-exact-cache.mjs';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
@@ -62,6 +64,46 @@ test('non-7x6 shared exact cache retains full-key identity',()=>{
   storeConnect4RbaSharedExactCache32(cache,a.words,0,3);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a.words,0),3);
   assert.equal(probeConnect4RbaSharedExactCache32(cache,b.words,0),0);
+});
+
+test('row-carried shared publication preserves exact compact identity',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    root=connect4RbaFromMoves([3,2,3,2,4,2],{geometry:g,canonical:false}),
+    shared=createConnect4RbaSharedExactCache32({capacity:8,keyWords:g.keyWords,geometry:g}),
+    state=prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:8,sharedExactCache:shared}),
+    hash=mixSpan32Locator32(root.words,0,g.keyWords);
+  assert.equal(state.cache.storedKeyWords,shared.storedKeyWords);
+  assert.equal(state.cache.compact8,shared.compact8);
+  storeConnect4RbaExactCache32(state.cache,root.words,0,3);
+  assert.equal(probeConnect4RbaSharedExactCache32(shared,root.words,0,hash),3);
+  const different=connect4RbaFromMoves([3,2,3,2,5,2],{geometry:g,canonical:false});
+  assert.equal(probeConnect4RbaSharedExactCache32(shared,different.words,0,mixSpan32Locator32(different.words,0,g.keyWords)),0);
+
+  const direct=createConnect4RbaSharedExactCache32({capacity:8,keyWords:2}),
+    row=Uint32Array.from([11,22]),q=Uint32Array.from([11,22]),h=mixSpan32Locator32(q,0,2);
+  storeConnect4RbaSharedExactCacheRow32(direct,row,0,2,h);
+  assert.equal(probeConnect4RbaSharedExactCache32(direct,q,0,h),2);
+});
+
+test('private/shared exact row layouts must match before search',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    incompatible=createConnect4RbaSharedExactCache32({capacity:8,keyWords:g.keyWords});
+  assert.equal(incompatible.compact8,0);
+  assert.throws(
+    ()=>prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:8,sharedExactCache:incompatible}),
+    /shared exact cache\/profile mismatch/,
+  );
+});
+
+test('row-carried publication preserves full-key non-7x6 fallback',()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    root=connect4RbaFromMoves([0,1,0,1],{geometry:g,canonical:false}),
+    shared=createConnect4RbaSharedExactCache32({capacity:8,keyWords:g.keyWords,geometry:g}),
+    state=prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:8,sharedExactCache:shared}),
+    hash=mixSpan32Locator32(root.words,0,g.keyWords);
+  assert.equal(state.cache.compact8,0);assert.equal(shared.compact8,0);
+  storeConnect4RbaExactCache32(state.cache,root.words,0,3);
+  assert.equal(probeConnect4RbaSharedExactCache32(shared,root.words,0,hash),3);
 });
 
 test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{

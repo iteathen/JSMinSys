@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {resetConnect4LiveLineState32,advanceConnect4LiveLineState32} from '../addons/connect4-live-line-evaluator.mjs';
+import {createConnect4RbaSharedExactCache32,probeConnect4RbaSharedExactCache32} from '../addons/rba-connect4-shared-exact-cache.mjs';
 
 // Expose the real restricted recursion for directed-window tests without adding
 // a public production entry point or altering its body.
@@ -55,6 +56,17 @@ test('non-7x6 private cache retains full-key identity',()=>{
     cache=api.createConnect4RbaExactCache32({capacity:8,keyWords:g.keyWords,geometry:g});
   assert.equal(cache.compact8,0);assert.equal(cache.storedKeyWords,g.keyWords);
   assert.equal(cache.keys.length,8*g.keyWords);
+});
+
+test('opposite private zero bounds publish exact draw from the matched private row',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    root=connect4RbaFromMoves([3,2,3,2,4,2],{geometry:g,canonical:false}),
+    shared=createConnect4RbaSharedExactCache32({capacity:8,keyWords:g.keyWords,geometry:g}),
+    state=api.prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:8,sharedExactCache:shared}),
+    hash=api.mixSpan32Locator32(root.words,0,state.cache.keyWords),slot=hash&state.cache.mask;
+  assert.equal(api.storeConnect4RbaBoundCacheSlot32(state.cache,root.words,0,4,slot,hash),4);
+  assert.equal(api.storeConnect4RbaBoundCacheSlot32(state.cache,root.words,0,5,slot,hash),2);
+  assert.equal(probeConnect4RbaSharedExactCache32(shared,root.words,0,hash),2);
 });
 
 test('a recursive fail-high win publishes exact current-q WDL',()=>{

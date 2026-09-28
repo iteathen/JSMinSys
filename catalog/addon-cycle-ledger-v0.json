@@ -1975,11 +1975,11 @@
       "operations": [
         {
           "op": "control.test.u32",
-          "count": "10+3*F"
+          "count": "(10+3*F)+2*L"
         },
         {
           "op": "control.branch",
-          "count": "4+F"
+          "count": "(4+F)+2*L"
         },
         {
           "op": "runtime.integer.check",
@@ -1987,7 +1987,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "18+5*F+3*W"
+          "count": "(18+5*F+3*W)+4*L"
         },
         {
           "op": "runtime.field.store",
@@ -2082,12 +2082,13 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)",
+        "expression": "((10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store))+4*L*C(runtime.field.load)+2*L*C(control.test.u32)+2*L*C(control.branch)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "L": "1 when a shared exact cache is configured; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged. Preparation now requires local/shared keyWords, storedKeyWords and compact-profile layout identity before search; mismatched row layouts fail closed."
       },
       "status": "decomposed"
     },
@@ -2699,7 +2700,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         },
         {
           "op": "runtime.field.load",
@@ -2724,13 +2725,13 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCacheRow32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
           "C": "1 for compact private 7x6 row, else 0",
           "S": "1 when sharing admission publishes the exact row",
           "L": "1 when shared-cache sampling predicate is evaluated"
         },
-        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32. Admitted shared exact publication now reuses the private row already materialized by this store; the full-q hash remains the shared locator."
       },
       "status": "decomposed"
     },
@@ -2806,12 +2807,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "X",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCacheRow32)",
         "parameters": {
           "E": "1 when exact local W/D/L occupant blocks weak-bound store",
           "B": "1 when a weak-bound occupant requires same-q equality",
@@ -2829,7 +2830,7 @@
           "F": "1-E-M, full weak-bound publication",
           "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw. Opposite-bound exact-draw publication reuses the already-matched private row rather than reconstructing shared identity from q."
       },
       "status": "decomposed"
     },
@@ -6428,6 +6429,67 @@
       "status": "decomposed"
     },
     {
+      "unit": "addons/rba-connect4-shared-exact-cache.mjs#storeConnect4RbaSharedExactCacheRow32",
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "name": "storeConnect4RbaSharedExactCacheRow32",
+      "scope": "hot-lazy-smp-cache-row-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "3+B+2*C+5*S"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "B+2*C+2*S"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(K+2)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S*K"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+S*(2*K+2)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "2+C+S*(2+G*K)"
+        },
+        {
+          "op": "control.branch",
+          "count": "2+C+S*(2+G*K)"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(3+B+2*C+5*S)*C(runtime.field.load)+C(atomic.load.u32)+(B+2*C+2*S)*C(atomic.rmw.u32)+S*(K+2)*C(atomic.store.u32)+S*K*C(memory.load.u32)+2*C(alu.and.u32)+S*C(alu.imul.u32)+(1+S*(2*K+2))*C(alu.add.u32)+(2+C+S*(2+G*K))*C(control.test.u32)+(2+C+S*(2+G*K))*C(control.branch)",
+        "parameters": {
+          "B": "1 when the initially observed sequence is odd and contention stats are incremented; otherwise 0",
+          "C": "1 when compareExchange loses slot ownership and contention stats are incremented; otherwise 0",
+          "S": "1 when compareExchange acquires the slot and row/value/sequence/stats publication completes; otherwise 0",
+          "K": "stored exact identity words copied from the already-materialized private row; 8 on selected standard 7x6, otherwise storedKeyWords",
+          "G": "1 on the generic loop path when K is not 8; 0 on the unrolled 8-word path"
+        },
+        "note": "Mandatory-known-hash shared exact publication from an already-materialized private exact-identity row. No q hash or q-to-compact reconstruction occurs here. Direct-map locator, seqlock/CAS, exact-only value, contention/drop semantics and stored row identity are unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
       "unit": "addons/rba-connect4-shared-exact-cache.mjs#storeConnect4RbaSharedExactCache32",
       "source": "addons/rba-connect4-shared-exact-cache.mjs",
       "name": "storeConnect4RbaSharedExactCache32",
@@ -7212,11 +7274,11 @@
       "operations": [
         {
           "op": "control.test.u32",
-          "count": "10+3*F"
+          "count": "(10+3*F)+2*L"
         },
         {
           "op": "control.branch",
-          "count": "4+F"
+          "count": "(4+F)+2*L"
         },
         {
           "op": "runtime.integer.check",
@@ -7224,7 +7286,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "18+5*F+3*W"
+          "count": "(18+5*F+3*W)+4*L"
         },
         {
           "op": "runtime.field.store",
@@ -7324,12 +7386,13 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Behavior)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareSearchBehavior32)",
+        "expression": "((10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Behavior)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareSearchBehavior32))+4*L*C(runtime.field.load)+2*L*C(control.test.u32)+2*L*C(control.branch)",
         "parameters": {
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
-          "W": "configured board width; one-time private action-order diversification materialized before search"
+          "W": "configured board width; one-time private action-order diversification materialized before search",
+          "L": "1 when a shared exact cache is configured; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged. Preparation now requires local/shared keyWords, storedKeyWords and compact-profile layout identity before search; mismatched row layouts fail closed."
       },
       "status": "decomposed"
     },
@@ -7971,7 +8034,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         },
         {
           "op": "runtime.field.load",
@@ -7996,13 +8059,13 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCacheRow32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
           "C": "1 for compact private 7x6 row, else 0",
           "S": "1 when sharing admission publishes the exact row",
           "L": "1 when shared-cache sampling predicate is evaluated"
         },
-        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32. Admitted shared exact publication now reuses the private row already materialized by this store; the full-q hash remains the shared locator."
       },
       "status": "decomposed"
     },
@@ -8078,12 +8141,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "X",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCacheRow32)",
         "parameters": {
           "E": "1 when exact local W/D/L occupant blocks weak-bound store",
           "B": "1 when a weak-bound occupant requires same-q equality",
@@ -8101,7 +8164,7 @@
           "F": "1-E-M, full weak-bound publication",
           "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw. Opposite-bound exact-draw publication reuses the already-matched private row rather than reconstructing shared identity from q."
       },
       "status": "decomposed"
     },
@@ -8718,11 +8781,11 @@
       "operations": [
         {
           "op": "control.test.u32",
-          "count": "10+3*F"
+          "count": "(10+3*F)+2*L"
         },
         {
           "op": "control.branch",
-          "count": "4+F"
+          "count": "(4+F)+2*L"
         },
         {
           "op": "runtime.integer.check",
@@ -8730,7 +8793,7 @@
         },
         {
           "op": "runtime.field.load",
-          "count": "18+5*F+3*W"
+          "count": "(18+5*F+3*W)+4*L"
         },
         {
           "op": "runtime.field.store",
@@ -8838,13 +8901,14 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Frontier)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareRootFrontierBehavior32)+2*C(runtime.typed_array.allocate)+8*C(runtime.field.store)+PREP_VALIDATION",
+        "expression": "((10+3*F)*C(control.test.u32)+(4+F)*C(control.branch)+2*C(runtime.integer.check)+(18+5*F+3*W)*C(runtime.field.load)+(1+W)*C(runtime.field.store)+(1+2*W)*C(alu.add.u32)+W*C(alu.sub.u32)+(5+3*F)*C(alu.imul.u32)+W*C(alu.and.u32)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4CpcScratch)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineEvaluator32)+F*CALL(prepareConnect4RbaFrontArena)+CALL(createConnect4RbaExactCache32Frontier)+(8+3*F)*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+C(alu.shl.u32)+C(alu.shr.u32)+C(runtime.field.store)+CALL(prepareRootFrontierBehavior32)+2*C(runtime.typed_array.allocate)+8*C(runtime.field.store)+PREP_VALIDATION)+4*L*C(runtime.field.load)+2*L*C(control.test.u32)+2*L*C(control.branch)",
         "parameters": {
           "F": "Always 0; four-front branch removed from this profile",
           "W": "configured board width; one-time private action-order diversification materialized before search",
-          "PREP_VALIDATION": "Cold prepared Float64 counter validation and remaining shape stores; measured setup includes them"
+          "PREP_VALIDATION": "Cold prepared Float64 counter validation and remaining shape stores; measured setup includes them",
+          "L": "1 when a shared exact cache is configured; 0 otherwise"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged. Preparation now requires local/shared keyWords, storedKeyWords and compact-profile layout identity before search; mismatched row layouts fail closed."
       },
       "status": "decomposed"
     },
@@ -9067,7 +9131,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         },
         {
           "op": "runtime.field.load",
@@ -9092,13 +9156,13 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCacheRow32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
           "C": "1 for compact private 7x6 row, else 0",
           "S": "1 when sharing admission publishes the exact row",
           "L": "1 when shared-cache sampling predicate is evaluated"
         },
-        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32. Admitted shared exact publication now reuses the private row already materialized by this store; the full-q hash remains the shared locator."
       },
       "status": "decomposed"
     },
@@ -9174,12 +9238,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "X",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheRow32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCacheRow32)",
         "parameters": {
           "E": "1 when exact local W/D/L occupant blocks weak-bound store",
           "B": "1 when a weak-bound occupant requires same-q equality",
@@ -9197,7 +9261,7 @@
           "F": "1-E-M, full weak-bound publication",
           "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw. Opposite-bound exact-draw publication reuses the already-matched private row rather than reconstructing shared identity from q."
       },
       "status": "decomposed"
     },
@@ -10017,8 +10081,8 @@
     }
   ],
   "summary": {
-    "units": 159,
-    "decomposed": 159,
+    "units": 160,
+    "decomposed": 160,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10119,7 +10183,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "df69e5e03a1d5210de836a6bca8446599ce246d7",
+    "addons/rba-connect4-alphabeta.mjs": "cda18d184742744077cb99480d74c97420dd98d2",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -10128,15 +10192,15 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "cfd3b3c8f95fdbb45711f8062647354d9a5730e6",
+    "addons/rba-connect4-shared-exact-cache.mjs": "289ec8cd93f0b043438ed3f15d51576cb9fa7c83",
     "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "3a3b5d509656aae264391e43a0f61da65ad9b845",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "de3a048ab21d34a172e2ba1cf5bc1dfeb3fd6399",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "27e2197b55dcb46d784a9f45fccdb14548bde8ea",
+    "addons/rba-connect4-frontier.mjs": "5c29a10ad40ae67c55ecd5c4e19dfbf48e65e1bd",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },

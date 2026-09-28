@@ -6,7 +6,7 @@ import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaF
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../src/search32.mjs';
-import {isCompactProfile8,compactSupportProfile8,compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {isCompactProfile8,compactSupportProfile8,compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCacheRow32} from './rba-connect4-shared-exact-cache.mjs';
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
@@ -67,7 +67,7 @@ function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
     keys[base+7]=compactTailProfile8(words,offset);
   }else publishSpan32(keys,base,words,offset,cache.keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,hash);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheRow32(cache.shared,keys,base,value,hash);
   return value;
 }
 function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
@@ -108,7 +108,7 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
         if(prior===value)return prior;
         // Same q has both >=0 and <=0, therefore exact draw.
         cache.value[slot]=2;
-        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,2,hash);
+        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCacheRow32(cache.shared,keys,base,2,hash);
         return 2;
       }
     }
@@ -160,15 +160,18 @@ export function prepareConnect4RbaAlphaBeta({
     live=prepareConnect4LiveLineEvaluator32(g);
   if(!Number.isInteger(orderOffset)||orderOffset<0||orderOffset>=g.columns)
     throw new RangeError('invalid alpha-beta order offset');
-  if(sharedExactCache!==null&&
-     (sharedExactCache.keyWords!==g.keyWords||!Number.isInteger(sharedExactCache.mask)))
-    throw new RangeError('shared exact cache/profile mismatch');
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid shared sample mask');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords,geometry:g});
+  if(sharedExactCache!==null&&
+     (sharedExactCache.keyWords!==cache.keyWords||
+      sharedExactCache.storedKeyWords!==cache.storedKeyWords||
+      sharedExactCache.compact8!==cache.compact8||
+      !Number.isInteger(sharedExactCache.mask)))
+    throw new RangeError('shared exact cache/profile mismatch');
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
