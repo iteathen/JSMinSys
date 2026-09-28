@@ -1,0 +1,44 @@
+name: IsoMax Phase2 coalesced hash isolation
+
+on:
+  push:
+    branches:
+      - experiment/isomax-phase2-coalesced-hash-bench-20260927
+
+permissions:
+  contents: read
+
+jobs:
+  isolate:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Require 4-vCPU hosted topology
+        shell: pwsh
+        run: node -e "const os=require('node:os'); const n=os.availableParallelism(); console.log(JSON.stringify({availableParallelism:n})); if(n!==4) process.exit(2)"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" e449df20dc59cc6c1e5b2da78134751a2376f355
+          git worktree add "$env:RUNNER_TEMP/arm-b" f549dcfdd7d4d0c5ed5cd01cb3141812f1d59862
+          git worktree add "$env:RUNNER_TEMP/arm-c" 48c514e747cb2656666b951f97e0928dda501cf7
+      - name: Exact derived-long isolation
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-hash.mjs "$env:RUNNER_TEMP/isomax-phase2-coalesced-hash/derived-long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 353335714 6 90000
+      - name: Official hard fixed window
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-hash.mjs "$env:RUNNER_TEMP/isomax-phase2-coalesced-hash/hard" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-coalesced-hash-isolation
+          path: ${{ runner.temp }}/isomax-phase2-coalesced-hash
+          if-no-files-found: error
+          retention-days: 30
