@@ -1,0 +1,44 @@
+name: IsoMax Phase2 4-worker packed move rows
+
+on:
+  pull_request:
+    branches: [experiment/isomax-phase2-packed-private-cache-tag-20260928]
+    paths:
+      - ".github/workflows/isomax-phase2-packed-move-rows-4w.yml"
+      - "experiments/isomax-phase2/packed-move-rows-source-ab.mjs"
+      - "experiments/isomax-phase2/packed-move-rows-source-sample.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ab:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed source arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/baseline" f2d56c2788ef3a4c49fc4bef9d447c5be3184059
+          git worktree add "$env:RUNNER_TEMP/candidate" 7b1cbf0ddb77173cf614bde32b6bd2cdb459820e
+      - name: Derived long exact A-B
+        shell: pwsh
+        run: node experiments/isomax-phase2/packed-move-rows-source-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-packed-move-rows/derived-long" "$env:RUNNER_TEMP/baseline" "$env:RUNNER_TEMP/candidate" 353335714 8 90000
+      - name: Official hard fixed-window A-B
+        shell: pwsh
+        run: node experiments/isomax-phase2/packed-move-rows-source-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-packed-move-rows/official-hard" "$env:RUNNER_TEMP/baseline" "$env:RUNNER_TEMP/candidate" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-packed-move-rows-4w
+          path: ${{ runner.temp }}/isomax-phase2-packed-move-rows
+          if-no-files-found: error
+          retention-days: 30
