@@ -147,7 +147,7 @@ export function prepareConnect4RbaAlphaBeta({
     actionLo:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionHi:mode===RBA_AB_CPC_FOUR_FRONT?new Int8Array(levels*g.columns):null,
     actionKnown:mode===RBA_AB_CPC_FOUR_FRONT?new Uint8Array(levels*g.columns):null,
-    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,
+    nodes:0,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,cpcCloseExactDraws:0,
     frontCalls:0,frontExact:0,frontFailures:0,frontSteps:0,frontActionExact:0,
     cofactors:0};
 }
@@ -205,6 +205,14 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       const abs=relativeToAbs(semanticLo,mover);
       storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
       return sign*semanticLo;
+    }
+    // Close only: CPC weak evidence is persisted only when it immediately
+    // intersects an already-verified same-q search weak row to exact DRAW.
+    if((cached===RBA_CACHE_LOWER0&&semanticHi===0)||
+       (cached===RBA_CACHE_UPPER0&&semanticLo===0)){
+      state.cpcCloseExactDraws+=1;
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,2,cacheSlot,cacheHash);
+      return 0;
     }
     if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
     if(semanticHi<=alpha){state.cutoffs+=1;return sign*semanticHi;}
@@ -417,7 +425,7 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   if(!state)throw new TypeError('prepared alpha-beta state required');
   const g=state.g;
   resetConnect4RbaExactCache32(state.cache);
-  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=0;
+  state.nodes=state.cutoffs=state.cacheHits=state.cpcExact=state.cpcBounds=state.cpcRestrictions=state.cpcCloseExactDraws=0;
   state.cpc.projectedForkTotal=state.cpc.precursorTotal=state.cpc.forcedTotal=0;
   state.frontCalls=state.frontExact=state.frontFailures=state.frontSteps=state.frontActionExact=state.cofactors=0;
   publishSpan32(state.words,0,root.words,0,g.keyWords);publishSpan32(state.basis,0,root.basis,0,root.basis.length);
@@ -526,6 +534,6 @@ export function solveConnect4RbaAlphaBeta(root,{state,reflected=0}={}){
   return {value:relativeToAbs(relative,mover),relative,move:bestMove,metrics:metrics(state)};
 }
 function metrics(s){return {nodes:s.nodes,cutoffs:s.cutoffs,cacheHits:s.cacheHits,cpcExact:s.cpcExact,cpcBounds:s.cpcBounds,
-  cpcRestrictions:s.cpcRestrictions,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
+  cpcRestrictions:s.cpcRestrictions,cpcCloseExactDraws:s.cpcCloseExactDraws,cpcForced:s.cpc.forcedTotal,cpcPrecursors:s.cpc.precursorTotal,cpcProjectedForks:s.cpc.projectedForkTotal,
   frontCalls:s.frontCalls,frontExact:s.frontExact,
   frontFailures:s.frontFailures,frontSteps:s.frontSteps,frontActionExact:s.frontActionExact,cofactors:s.cofactors};}
