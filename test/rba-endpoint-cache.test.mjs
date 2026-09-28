@@ -9,7 +9,7 @@ import {resetConnect4LiveLineState32,advanceConnect4LiveLineState32} from '../ad
 // a public production entry point or altering its body.
 const url=new URL('../addons/rba-connect4-alphabeta.mjs',import.meta.url);
 const source=readFileSync(url,'utf8').replace(/from '([^']+)'/g,(_,p)=>`from '${new URL(p,url).href}'`);
-const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly,probeConnect4RbaExactCacheSlot32,mixSpan32Locator32};').toString('base64'));
+const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly,probeConnect4RbaExactCacheSlot32,storeConnect4RbaBoundCacheSlot32,mixSpan32Locator32};').toString('base64'));
 function prepared(g,moves){
   const root=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=api.prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:65536});
   s.words.set(root.words);s.basis.set(root.basis);s.basisSize[0]=root.basis.length;
@@ -27,6 +27,36 @@ const search=(g,moves,a,b)=>{
     privateCached=api.probeConnect4RbaExactCacheSlot32(s.cache,root.words,0,slot,hash);
   return {value,cached:api.probeConnect4RbaExactCache32(s.cache,root.words,0),privateCached,s};
 };
+test('standard 7x6 private exact/bound cache uses lossless compact identity',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    a=connect4RbaFromMoves([3,2,3,2,4,2],{geometry:g,canonical:false}),
+    b=connect4RbaFromMoves([3,2,3,2,5,2],{geometry:g,canonical:false}),
+    cache=api.createConnect4RbaExactCache32({capacity:1,keyWords:g.keyWords,geometry:g});
+  assert.equal(cache.keyWords,14);assert.equal(cache.storedKeyWords,8);assert.equal(cache.compact8,1);
+  assert.equal(cache.keys.length,8);
+  api.storeConnect4RbaExactCache32(cache,a.words,0,3);
+  assert.equal(api.probeConnect4RbaExactCache32(cache,a.words,0),3);
+  assert.equal(api.probeConnect4RbaExactCache32(cache,b.words,0),0,'forced direct-map collision must reject distinct compact q');
+
+  const bounds=api.createConnect4RbaExactCache32({capacity:1,keyWords:g.keyWords,geometry:g}),
+    hash=api.mixSpan32Locator32(a.words,0,g.keyWords),slot=hash&bounds.mask;
+  assert.equal(api.storeConnect4RbaBoundCacheSlot32(bounds,a.words,0,4,slot,hash),4);
+  assert.equal(api.storeConnect4RbaBoundCacheSlot32(bounds,a.words,0,5,slot,hash),2);
+  assert.equal(api.probeConnect4RbaExactCache32(bounds,a.words,0),2,'opposite zero bounds must still coalesce to exact draw');
+
+  const exact=api.createConnect4RbaExactCache32({capacity:1,keyWords:g.keyWords,geometry:g});
+  api.storeConnect4RbaExactCache32(exact,a.words,0,3);
+  assert.equal(api.storeConnect4RbaBoundCacheSlot32(exact,a.words,0,4,0,hash),0);
+  assert.equal(api.probeConnect4RbaExactCache32(exact,a.words,0),3,'exact row must outrank weak bound');
+});
+
+test('non-7x6 private cache retains full-key identity',()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    cache=api.createConnect4RbaExactCache32({capacity:8,keyWords:g.keyWords,geometry:g});
+  assert.equal(cache.compact8,0);assert.equal(cache.storedKeyWords,g.keyWords);
+  assert.equal(cache.keys.length,8*g.keyWords);
+});
+
 test('a recursive fail-high win publishes exact current-q WDL',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),moves=[3,4,3,5,0,5,5,6];
   const r=search(g,moves,0,1);

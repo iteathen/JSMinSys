@@ -6,23 +6,36 @@ import {prepareConnect4RbaFrontArena,buildConnect4RbaFourFront,queryConnect4RbaF
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc-connect4.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from './connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../src/search32.mjs';
-import {probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {isCompactProfile8,compactSupportProfile8,compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 
 export const RBA_AB_CPC_ONLY=0;
 export const RBA_AB_CPC_FOUR_FRONT=1;
 const MOVE_SCORE_NONE=-2147483648;
 const RBA_CACHE_LOWER0=4,RBA_CACHE_UPPER0=5;
 
-export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
+export function createConnect4RbaExactCache32({capacity=65536,keyWords,geometry=null}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
      !Number.isInteger(keyWords)||keyWords<1)throw new RangeError('invalid exact cache');
-  return {mask:capacity-1,keyWords,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
-    keys:new Uint32Array(capacity*keyWords)};
+  if(geometry!==null&&geometry!==undefined&&geometry.keyWords!==keyWords)
+    throw new RangeError('exact cache/profile mismatch');
+  const compact8=isCompactProfile8(geometry,keyWords)?1:0,storedKeyWords=compact8?8:keyWords;
+  return {mask:capacity-1,keyWords,storedKeyWords,compact8,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
+    keys:new Uint32Array(capacity*storedKeyWords)};
 }
 function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
   if(cache.stamp[slot]===cache.epoch){
-    const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
-    if(keyWords===14){
+    const keyWords=cache.keyWords,base=slot*cache.storedKeyWords,keys=cache.keys;
+    if(cache.compact8){
+      if(keys[base]===words[offset]&&
+         keys[base+1]===words[offset+1]&&
+         keys[base+2]===compactSupportProfile8(words,offset)&&
+         keys[base+3]===words[offset+8]&&
+         keys[base+4]===words[offset+9]&&
+         keys[base+5]===words[offset+11]&&
+         keys[base+6]===words[offset+12]&&
+         keys[base+7]===compactTailProfile8(words,offset))
+        return cache.value[slot];
+    }else if(keyWords===14){
       if(!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
@@ -45,8 +58,14 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
   return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
-  const keyWords=cache.keyWords;
-  publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
+  const base=slot*cache.storedKeyWords,keys=cache.keys;
+  if(cache.compact8){
+    keys[base]=words[offset];keys[base+1]=words[offset+1];
+    keys[base+2]=compactSupportProfile8(words,offset);
+    keys[base+3]=words[offset+8];keys[base+4]=words[offset+9];
+    keys[base+5]=words[offset+11];keys[base+6]=words[offset+12];
+    keys[base+7]=compactTailProfile8(words,offset);
+  }else publishSpan32(keys,base,words,offset,cache.keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
   if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,hash);
   return value;
@@ -57,9 +76,18 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
     const prior=cache.value[slot];
     if(prior&&prior<=3)return 0;
     if(prior>3){
-      const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
+      const keyWords=cache.keyWords,base=slot*cache.storedKeyWords,keys=cache.keys;
       let same=0;
-      if(keyWords===14){
+      if(cache.compact8){
+        same=keys[base]===words[offset]&&
+          keys[base+1]===words[offset+1]&&
+          keys[base+2]===compactSupportProfile8(words,offset)&&
+          keys[base+3]===words[offset+8]&&
+          keys[base+4]===words[offset+9]&&
+          keys[base+5]===words[offset+11]&&
+          keys[base+6]===words[offset+12]&&
+          keys[base+7]===compactTailProfile8(words,offset);
+      }else if(keyWords===14){
         same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
           (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
           (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
@@ -85,8 +113,14 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
       }
     }
   }
-  const keyWords=cache.keyWords;
-  publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
+  const base=slot*cache.storedKeyWords,keys=cache.keys;
+  if(cache.compact8){
+    keys[base]=words[offset];keys[base+1]=words[offset+1];
+    keys[base+2]=compactSupportProfile8(words,offset);
+    keys[base+3]=words[offset+8];keys[base+4]=words[offset+9];
+    keys[base+5]=words[offset+11];keys[base+6]=words[offset+12];
+    keys[base+7]=compactTailProfile8(words,offset);
+  }else publishSpan32(keys,base,words,offset,cache.keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
   return value;
 }
@@ -134,7 +168,7 @@ export function prepareConnect4RbaAlphaBeta({
     throw new RangeError('invalid shared sample mask');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
-  const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
+  const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords,geometry:g});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT

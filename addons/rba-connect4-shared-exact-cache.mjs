@@ -1,17 +1,17 @@
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 
-function isCompactProfile8(geometry,keyWords){
+export function isCompactProfile8(geometry,keyWords){
   return geometry!==null&&geometry!==undefined&&
     geometry.columns===7&&geometry.rows===6&&geometry.coordWords===3&&
     (geometry.lineCount-((geometry.coordWords-1)<<5))===5&&
     keyWords===14&&geometry.keyWords===14&&
     geometry.metaOffset===7&&geometry.p0Offset===8&&geometry.p1Offset===11;
 }
-function compactSupportProfile8(words,offset){
+export function compactSupportProfile8(words,offset){
   return (words[offset+2]|(words[offset+3]<<3)|(words[offset+4]<<6)|
     (words[offset+5]<<9)|(words[offset+6]<<12)|((words[offset+7]&3)<<15))>>>0;
 }
-function compactTailProfile8(words,offset){
+export function compactTailProfile8(words,offset){
   return ((words[offset+10]&31)|((words[offset+13]&31)<<5))>>>0;
 }
 

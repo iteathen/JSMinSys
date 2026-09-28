@@ -1843,11 +1843,15 @@
         },
         {
           "op": "control.test.u32",
-          "count": 5
+          "count": 9
         },
         {
           "op": "control.branch",
-          "count": 1
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "P"
         },
         {
           "op": "alu.and.u32",
@@ -1856,6 +1860,11 @@
         {
           "op": "alu.sub.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
         },
         {
           "op": "alu.imul.u32",
@@ -1872,8 +1881,11 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
-        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
+        "expression": "2*C(runtime.integer.check)+9*C(control.test.u32)+3*C(control.branch)+P*C(runtime.field.load)+C(alu.and.u32)+C(alu.sub.u32)+CALL(isCompactProfile8)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "parameters": {
+          "P": "1 when a geometry contract is supplied and geometry.keyWords is validated; 0 for compatibility callers"
+        },
+        "note": "Cold private cache selection. Standard 7x6 may use the exact 8-word compact identity already qualified for shared storage; unsupported/no-geometry callers retain full keyWords storage. Allocation cost remains explicit symbolic runtime work."
       },
       "status": "decomposed"
     },
@@ -2075,7 +2087,7 @@
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
           "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
       },
       "status": "decomposed"
     },
@@ -2129,11 +2141,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "2+3*H"
+          "count": "3+5*H"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*H*K"
+          "count": "1+H*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -2145,35 +2157,33 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*H*K"
+          "count": "H*(N*2*K+C*A)"
         },
         {
           "op": "alu.xor.u32",
-          "count": "H*K"
+          "count": "H*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "H*(K-1)*(1-G)"
+          "count": "H*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
           "op": "control.branch",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
-          "op": "runtime.field.load",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CS",
+          "target": "compactSupportProfile8"
         },
         {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CT",
+          "target": "compactTailProfile8"
         },
         {
           "op": "runtime.call.subledger",
@@ -2199,16 +2209,23 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(3+5*H)*C(runtime.field.load)+(1+H*(N*2*K+C*R))*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+H*(N*2*K+C*A)*C(alu.add.u32)+H*N*K*C(alu.xor.u32)+H*N*(K-1)*(1-G)*C(alu.or.u32)+(2+H*(4+N*G*K+C*Q))*C(control.test.u32)+(2+H*(4+N*G*K+C*Q))*C(control.branch)+H*C*CS*CALL(compactSupportProfile8)+H*C*CT*CALL(compactTailProfile8)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
-          "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
-          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
-          "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+          "H": "1 when epoch stamp hits; 0 on stamp miss",
+          "C": "1 for initialized standard 7x6 compact private layout; 0 for full-key fallback",
+          "N": "1-C",
+          "K": "full-key words actually compared on fallback path",
+          "G": "1 on generic fallback loop; 0 on unrolled 14/7 fallback",
+          "R": "raw u32 loads executed by the compact short-circuit comparison, including cache/source loads but excluding compact helper loads",
+          "A": "compact comparison address additions actually executed",
+          "Q": "compact equality conditions evaluated before mismatch/full match",
+          "CS": "1 only when the first two raw support words matched and compact support comparison is reached",
+          "CT": "1 only when prior compact fields matched and packed tail comparison is reached",
+          "V": "1 when local equality yields a cached value load",
+          "M": "1 when the private cache misses, shared cache exists, and sampling admits the shared probe",
+          "L": "1 when a shared cache exists and its sampling predicate is evaluated"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
+        "note": "Private cache retains the full-q locator hash. Standard 7x6 equality preserves the two raw support prefix words, then uses the qualified lossless 8-word identity; packing is paid only after an occupied local slot reaches the compact path. Local miss still reuses the full hash for shared exact lookup."
       },
       "status": "decomposed"
     },
@@ -2642,35 +2659,41 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 5
+          "count": "7+C*2"
         },
         {
           "op": "alu.imul.u32",
           "count": 1
         },
         {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "publishSpan32"
-        },
-        {
-          "op": "memory.store.u8",
-          "count": 1
-        },
-        {
-          "op": "memory.store.u32",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 1
-        },
-        {
           "op": "control.test.u32",
-          "count": 1
+          "count": "2+C"
         },
         {
           "op": "control.branch",
+          "count": "2+C"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-C",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+8*C"
+        },
+        {
+          "op": "memory.store.u8",
           "count": 1
         },
         {
@@ -2693,16 +2716,21 @@
         {
           "op": "control.branch",
           "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "14*C"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
-          "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
-        }
+          "C": "1 for compact private 7x6 row, else 0",
+          "S": "1 when sharing admission publishes the exact row",
+          "L": "1 when shared-cache sampling predicate is evaluated"
+        },
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
       },
       "status": "decomposed"
     },
@@ -2714,11 +2742,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+2*B+O+5*F+3*X"
+          "count": "5+4*B+O+6*F+3*X"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*B*K"
+          "count": "1+B*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -2730,40 +2758,50 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*B*K"
+          "count": "B*(N*2*K+C*A)+14*F*C"
         },
         {
           "op": "alu.xor.u32",
-          "count": "B*K"
+          "count": "B*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "B*(K-1)*(1-G)"
+          "count": "B*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "3+B*(5+G*K)+2*X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "control.branch",
-          "count": "3+B*(5+G*K)+2*X"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "F",
+          "count": "B*C*CS+F*C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B*C*CT+F*C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F*N",
           "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F*(1+8*C)"
         },
         {
           "op": "memory.store.u8",
           "count": "F+O"
         },
         {
-          "op": "memory.store.u32",
-          "count": "F"
+          "op": "alu.and.u32",
+          "count": "X"
         },
         {
           "op": "runtime.call.subledger",
@@ -2773,18 +2811,25 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
         "parameters": {
-          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
-          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
-          "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
-          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
-          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
-          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
-          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+          "E": "1 when exact local W/D/L occupant blocks weak-bound store",
+          "B": "1 when a weak-bound occupant requires same-q equality",
+          "C": "1 for compact private 7x6 layout; 0 full-key fallback",
+          "N": "1-C",
+          "K": "fallback full-key words compared",
+          "G": "1 on generic fallback loop, 0 on unrolled 14/7 fallback",
+          "R": "raw compact comparison loads reached",
+          "A": "compact comparison address additions reached",
+          "Q": "compact equality tests reached",
+          "CS": "compact support helper reached after first two raw support matches",
+          "CT": "compact tail helper reached after prior compact fields match",
+          "M": "1 when the weak-bound occupant is same q",
+          "O": "1 when opposite same-q bounds prove exact draw",
+          "F": "1-E-M, full weak-bound publication",
+          "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
       },
       "status": "decomposed"
     },
@@ -7035,11 +7080,15 @@
         },
         {
           "op": "control.test.u32",
-          "count": 5
+          "count": 9
         },
         {
           "op": "control.branch",
-          "count": 1
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "P"
         },
         {
           "op": "alu.and.u32",
@@ -7048,6 +7097,11 @@
         {
           "op": "alu.sub.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
         },
         {
           "op": "alu.imul.u32",
@@ -7064,8 +7118,11 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
-        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
+        "expression": "2*C(runtime.integer.check)+9*C(control.test.u32)+3*C(control.branch)+P*C(runtime.field.load)+C(alu.and.u32)+C(alu.sub.u32)+CALL(isCompactProfile8)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "parameters": {
+          "P": "1 when a geometry contract is supplied and geometry.keyWords is validated; 0 for compatibility callers"
+        },
+        "note": "Cold private cache selection. Standard 7x6 may use the exact 8-word compact identity already qualified for shared storage; unsupported/no-geometry callers retain full keyWords storage. Allocation cost remains explicit symbolic runtime work."
       },
       "status": "decomposed"
     },
@@ -7272,7 +7329,7 @@
           "F": "1 in Four-Front mode; 0 in production CPC-only mode",
           "W": "configured board width; one-time private action-order diversification materialized before search"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
       },
       "status": "decomposed"
     },
@@ -7326,11 +7383,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "2+3*H"
+          "count": "3+5*H"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*H*K"
+          "count": "1+H*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -7342,35 +7399,33 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*H*K"
+          "count": "H*(N*2*K+C*A)"
         },
         {
           "op": "alu.xor.u32",
-          "count": "H*K"
+          "count": "H*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "H*(K-1)*(1-G)"
+          "count": "H*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
           "op": "control.branch",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
-          "op": "runtime.field.load",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CS",
+          "target": "compactSupportProfile8"
         },
         {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CT",
+          "target": "compactTailProfile8"
         },
         {
           "op": "runtime.call.subledger",
@@ -7396,16 +7451,23 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(3+5*H)*C(runtime.field.load)+(1+H*(N*2*K+C*R))*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+H*(N*2*K+C*A)*C(alu.add.u32)+H*N*K*C(alu.xor.u32)+H*N*(K-1)*(1-G)*C(alu.or.u32)+(2+H*(4+N*G*K+C*Q))*C(control.test.u32)+(2+H*(4+N*G*K+C*Q))*C(control.branch)+H*C*CS*CALL(compactSupportProfile8)+H*C*CT*CALL(compactTailProfile8)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
-          "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
-          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
-          "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+          "H": "1 when epoch stamp hits; 0 on stamp miss",
+          "C": "1 for initialized standard 7x6 compact private layout; 0 for full-key fallback",
+          "N": "1-C",
+          "K": "full-key words actually compared on fallback path",
+          "G": "1 on generic fallback loop; 0 on unrolled 14/7 fallback",
+          "R": "raw u32 loads executed by the compact short-circuit comparison, including cache/source loads but excluding compact helper loads",
+          "A": "compact comparison address additions actually executed",
+          "Q": "compact equality conditions evaluated before mismatch/full match",
+          "CS": "1 only when the first two raw support words matched and compact support comparison is reached",
+          "CT": "1 only when prior compact fields matched and packed tail comparison is reached",
+          "V": "1 when local equality yields a cached value load",
+          "M": "1 when the private cache misses, shared cache exists, and sampling admits the shared probe",
+          "L": "1 when a shared cache exists and its sampling predicate is evaluated"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
+        "note": "Private cache retains the full-q locator hash. Standard 7x6 equality preserves the two raw support prefix words, then uses the qualified lossless 8-word identity; packing is paid only after an occupied local slot reaches the compact path. Local miss still reuses the full hash for shared exact lookup."
       },
       "status": "decomposed"
     },
@@ -7869,35 +7931,41 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 5
+          "count": "7+C*2"
         },
         {
           "op": "alu.imul.u32",
           "count": 1
         },
         {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "publishSpan32"
-        },
-        {
-          "op": "memory.store.u8",
-          "count": 1
-        },
-        {
-          "op": "memory.store.u32",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 1
-        },
-        {
           "op": "control.test.u32",
-          "count": 1
+          "count": "2+C"
         },
         {
           "op": "control.branch",
+          "count": "2+C"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-C",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+8*C"
+        },
+        {
+          "op": "memory.store.u8",
           "count": 1
         },
         {
@@ -7920,16 +7988,21 @@
         {
           "op": "control.branch",
           "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "14*C"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
-          "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
-        }
+          "C": "1 for compact private 7x6 row, else 0",
+          "S": "1 when sharing admission publishes the exact row",
+          "L": "1 when shared-cache sampling predicate is evaluated"
+        },
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
       },
       "status": "decomposed"
     },
@@ -7941,11 +8014,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+2*B+O+5*F+3*X"
+          "count": "5+4*B+O+6*F+3*X"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*B*K"
+          "count": "1+B*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -7957,40 +8030,50 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*B*K"
+          "count": "B*(N*2*K+C*A)+14*F*C"
         },
         {
           "op": "alu.xor.u32",
-          "count": "B*K"
+          "count": "B*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "B*(K-1)*(1-G)"
+          "count": "B*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "3+B*(5+G*K)+2*X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "control.branch",
-          "count": "3+B*(5+G*K)+2*X"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "F",
+          "count": "B*C*CS+F*C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B*C*CT+F*C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F*N",
           "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F*(1+8*C)"
         },
         {
           "op": "memory.store.u8",
           "count": "F+O"
         },
         {
-          "op": "memory.store.u32",
-          "count": "F"
+          "op": "alu.and.u32",
+          "count": "X"
         },
         {
           "op": "runtime.call.subledger",
@@ -8000,18 +8083,25 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
         "parameters": {
-          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
-          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
-          "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
-          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
-          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
-          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
-          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+          "E": "1 when exact local W/D/L occupant blocks weak-bound store",
+          "B": "1 when a weak-bound occupant requires same-q equality",
+          "C": "1 for compact private 7x6 layout; 0 full-key fallback",
+          "N": "1-C",
+          "K": "fallback full-key words compared",
+          "G": "1 on generic fallback loop, 0 on unrolled 14/7 fallback",
+          "R": "raw compact comparison loads reached",
+          "A": "compact comparison address additions reached",
+          "Q": "compact equality tests reached",
+          "CS": "compact support helper reached after first two raw support matches",
+          "CT": "compact tail helper reached after prior compact fields match",
+          "M": "1 when the weak-bound occupant is same q",
+          "O": "1 when opposite same-q bounds prove exact draw",
+          "F": "1-E-M, full weak-bound publication",
+          "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
       },
       "status": "decomposed"
     },
@@ -8574,11 +8664,15 @@
         },
         {
           "op": "control.test.u32",
-          "count": 5
+          "count": 9
         },
         {
           "op": "control.branch",
-          "count": 1
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "P"
         },
         {
           "op": "alu.and.u32",
@@ -8587,6 +8681,11 @@
         {
           "op": "alu.sub.u32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
         },
         {
           "op": "alu.imul.u32",
@@ -8603,8 +8702,11 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "2*C(runtime.integer.check)+5*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
-        "note": "Valid cache configuration path; allocation cost remains explicit symbolic runtime work."
+        "expression": "2*C(runtime.integer.check)+9*C(control.test.u32)+3*C(control.branch)+P*C(runtime.field.load)+C(alu.and.u32)+C(alu.sub.u32)+CALL(isCompactProfile8)+C(alu.imul.u32)+3*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "parameters": {
+          "P": "1 when a geometry contract is supplied and geometry.keyWords is validated; 0 for compatibility callers"
+        },
+        "note": "Cold private cache selection. Standard 7x6 may use the exact 8-word compact identity already qualified for shared storage; unsupported/no-geometry callers retain full keyWords storage. Allocation cost remains explicit symbolic runtime work."
       },
       "status": "decomposed"
     },
@@ -8742,7 +8844,7 @@
           "W": "configured board width; one-time private action-order diversification materialized before search",
           "PREP_VALIDATION": "Cold prepared Float64 counter validation and remaining shape stores; measured setup includes them"
         },
-        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search."
+        "note": "One-time worker preparation validates a Mersenne high-byte sharing mask and stores its pre-shifted high-bit predicate. No modulo, random source, or scheduler operation is introduced into recursive search. Private cache construction now receives the initialized geometry so the standard 7x6 compact layout is selected cold; full-q locator width remains unchanged."
       },
       "status": "decomposed"
     },
@@ -8754,11 +8856,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "2+3*H"
+          "count": "3+5*H"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*H*K"
+          "count": "1+H*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -8770,35 +8872,33 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*H*K"
+          "count": "H*(N*2*K+C*A)"
         },
         {
           "op": "alu.xor.u32",
-          "count": "H*K"
+          "count": "H*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "H*(K-1)*(1-G)"
+          "count": "H*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
           "op": "control.branch",
-          "count": "1+H*(3+G*K)"
+          "count": "2+H*(4+N*G*K+C*Q)"
         },
         {
-          "op": "runtime.field.load",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CS",
+          "target": "compactSupportProfile8"
         },
         {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
+          "op": "runtime.call.subledger",
+          "count": "H*C*CT",
+          "target": "compactTailProfile8"
         },
         {
           "op": "runtime.call.subledger",
@@ -8824,16 +8924,23 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(2+3*H)*C(runtime.field.load)+(1+2*H*K)*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+2*H*K*C(alu.add.u32)+H*K*C(alu.xor.u32)+H*(K-1)*(1-G)*C(alu.or.u32)+(1+H*(3+G*K))*C(control.test.u32)+(1+H*(3+G*K))*C(control.branch)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
+        "expression": "(3+5*H)*C(runtime.field.load)+(1+H*(N*2*K+C*R))*C(memory.load.u32)+H*V*C(memory.load.u8)+H*C(alu.imul.u32)+H*(N*2*K+C*A)*C(alu.add.u32)+H*N*K*C(alu.xor.u32)+H*N*(K-1)*(1-G)*C(alu.or.u32)+(2+H*(4+N*G*K+C*Q))*C(control.test.u32)+(2+H*(4+N*G*K+C*Q))*C(control.branch)+H*C*CS*CALL(compactSupportProfile8)+H*C*CT*CALL(compactTailProfile8)+M*CALL(probeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
         "parameters": {
-          "H": "1 when epoch stamp hits and key comparison executes; 0 on stamp miss",
-          "K": "key words actually compared (14/7 on specialized paths; compared prefix length on generic path)",
-          "G": "1 on generic loop key-width path; 0 on 14/7 unrolled paths",
-          "V": "1 when the compared key is exact and cached value is loaded; 0 on key mismatch",
-          "M": "1 when the private cache misses, a shared cache is configured, and the position passes the deterministic sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured and the high-hash sampling predicate is evaluated; 0 otherwise"
+          "H": "1 when epoch stamp hits; 0 on stamp miss",
+          "C": "1 for initialized standard 7x6 compact private layout; 0 for full-key fallback",
+          "N": "1-C",
+          "K": "full-key words actually compared on fallback path",
+          "G": "1 on generic fallback loop; 0 on unrolled 14/7 fallback",
+          "R": "raw u32 loads executed by the compact short-circuit comparison, including cache/source loads but excluding compact helper loads",
+          "A": "compact comparison address additions actually executed",
+          "Q": "compact equality conditions evaluated before mismatch/full match",
+          "CS": "1 only when the first two raw support words matched and compact support comparison is reached",
+          "CT": "1 only when prior compact fields matched and packed tail comparison is reached",
+          "V": "1 when local equality yields a cached value load",
+          "M": "1 when the private cache misses, shared cache exists, and sampling admits the shared probe",
+          "L": "1 when a shared cache exists and its sampling predicate is evaluated"
         },
-        "note": "Private exact-cache misses in Lazy SMP use the already-computed full hash to gate shared lookup by a high-bit sampling mask. Sampling changes only optional cross-worker evidence traffic; local exactness is unchanged. private-miss shared probes pass KH=1."
+        "note": "Private cache retains the full-q locator hash. Standard 7x6 equality preserves the two raw support prefix words, then uses the qualified lossless 8-word identity; packing is paid only after an occupied local slot reaches the compact path. Local miss still reuses the full hash for shared exact lookup."
       },
       "status": "decomposed"
     },
@@ -8920,35 +9027,41 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 5
+          "count": "7+C*2"
         },
         {
           "op": "alu.imul.u32",
           "count": 1
         },
         {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "publishSpan32"
-        },
-        {
-          "op": "memory.store.u8",
-          "count": 1
-        },
-        {
-          "op": "memory.store.u32",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 1
-        },
-        {
           "op": "control.test.u32",
-          "count": 1
+          "count": "2+C"
         },
         {
           "op": "control.branch",
+          "count": "2+C"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-C",
+          "target": "publishSpan32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "1+8*C"
+        },
+        {
+          "op": "memory.store.u8",
           "count": 1
         },
         {
@@ -8971,16 +9084,21 @@
         {
           "op": "control.branch",
           "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "14*C"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "5*C(runtime.field.load)+C(alu.imul.u32)+CALL(publishSpan32)+C(memory.store.u8)+C(memory.store.u32)+C(runtime.field.load)+C(control.test.u32)+C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)",
-        "note": "Local exact publication remains unconditional. Lazy-SMP shared publication is sampled by high hash bits, preserving complete private search while reducing optional shared-cache traffic. shared exact stores pass KH=1.",
+        "expression": "(7+2*C)*C(runtime.field.load)+C(alu.imul.u32)+(2+C)*C(control.test.u32)+(2+C)*C(control.branch)+(1-C)*CALL(publishSpan32)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)+(1+8*C)*C(memory.store.u32)+C(memory.store.u8)+S*CALL(storeConnect4RbaSharedExactCache32)+L*C(runtime.field.load)+L*C(alu.and.u32)+L*C(control.test.u32)+L*C(control.branch)+14*C*C(alu.add.u32)",
         "parameters": {
-          "S": "1 only when the exact position passes the deterministic high-hash sharing-density mask; otherwise 0",
-          "L": "1 when a shared Lazy-SMP exact cache is configured; 0 otherwise"
-        }
+          "C": "1 for compact private 7x6 row, else 0",
+          "S": "1 when sharing admission publishes the exact row",
+          "L": "1 when shared-cache sampling predicate is evaluated"
+        },
+        "note": "Exact local publication stores 8 exact compact words on selected 7x6 instead of copying 14 full words. Full-q state/hash and shared publication semantics are unchanged; fallback callers still use publishSpan32."
       },
       "status": "decomposed"
     },
@@ -8992,11 +9110,11 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "4+2*B+O+5*F+3*X"
+          "count": "5+4*B+O+6*F+3*X"
         },
         {
           "op": "memory.load.u32",
-          "count": "1+2*B*K"
+          "count": "1+B*(N*2*K+C*R)"
         },
         {
           "op": "memory.load.u8",
@@ -9008,40 +9126,50 @@
         },
         {
           "op": "alu.add.u32",
-          "count": "2*B*K"
+          "count": "B*(N*2*K+C*A)+14*F*C"
         },
         {
           "op": "alu.xor.u32",
-          "count": "B*K"
+          "count": "B*N*K"
         },
         {
           "op": "alu.or.u32",
-          "count": "B*(K-1)*(1-G)"
+          "count": "B*N*(K-1)*(1-G)"
         },
         {
           "op": "control.test.u32",
-          "count": "3+B*(5+G*K)+2*X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "control.branch",
-          "count": "3+B*(5+G*K)+2*X"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "X"
+          "count": "4+B*(6+N*G*K+C*Q)+F*C+2*X"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "F",
+          "count": "B*C*CS+F*C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B*C*CT+F*C",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "F*N",
           "target": "publishSpan32"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "F*(1+8*C)"
         },
         {
           "op": "memory.store.u8",
           "count": "F+O"
         },
         {
-          "op": "memory.store.u32",
-          "count": "F"
+          "op": "alu.and.u32",
+          "count": "X"
         },
         {
           "op": "runtime.call.subledger",
@@ -9051,18 +9179,25 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+2*B+O+5*F+3*X)*C(runtime.field.load)+(1+2*B*K)*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(2*B*K)*C(alu.add.u32)+(B*K)*C(alu.xor.u32)+(B*(K-1)*(1-G))*C(alu.or.u32)+(3+B*(5+G*K)+2*X)*C(control.test.u32)+(3+B*(5+G*K)+2*X)*C(control.branch)+(X)*C(alu.and.u32)+(F)*CALL(publishSpan32)+(F+O)*C(memory.store.u8)+(F)*C(memory.store.u32)+(X)*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "(5+4*B+O+6*F+3*X)*C(runtime.field.load)+(1+B*(N*2*K+C*R))*C(memory.load.u32)+C(memory.load.u8)+(B+F)*C(alu.imul.u32)+(B*(N*2*K+C*A)+14*F*C)*C(alu.add.u32)+B*N*K*C(alu.xor.u32)+B*N*(K-1)*(1-G)*C(alu.or.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.test.u32)+(4+B*(6+N*G*K+C*Q)+F*C+2*X)*C(control.branch)+(B*C*CS+F*C)*CALL(compactSupportProfile8)+(B*C*CT+F*C)*CALL(compactTailProfile8)+F*N*CALL(publishSpan32)+F*(1+8*C)*C(memory.store.u32)+(F+O)*C(memory.store.u8)+X*C(alu.and.u32)+X*CALL(storeConnect4RbaSharedExactCache32)",
         "parameters": {
-          "E": "1 when the addressed current-epoch slot contains exact W/D/L code 1..3 and blocks the weak-bound store; 0 otherwise",
-          "B": "1 when the current-epoch slot contains a weak bound code and a local q-key comparison executes; 0 otherwise",
-          "K": "cache key words compared when B=1",
-          "G": "1 on generic key-width loop comparison; 0 on unrolled 14/7-word comparison",
-          "M": "1 when B=1 and the stored weak-bound q key exactly matches the current q; 0 otherwise",
-          "O": "1 when M=1 and the stored weak bound is opposite to the new weak bound, proving exact draw; 0 otherwise",
-          "F": "1-E-M; full weak-bound key/value publication occurs only when no exact blocker and no same-q weak bound exists",
-          "X": "1 only when O=1, shared cache exists, and the existing shared-sampling predicate admits publication; otherwise 0"
+          "E": "1 when exact local W/D/L occupant blocks weak-bound store",
+          "B": "1 when a weak-bound occupant requires same-q equality",
+          "C": "1 for compact private 7x6 layout; 0 full-key fallback",
+          "N": "1-C",
+          "K": "fallback full-key words compared",
+          "G": "1 on generic fallback loop, 0 on unrolled 14/7 fallback",
+          "R": "raw compact comparison loads reached",
+          "A": "compact comparison address additions reached",
+          "Q": "compact equality tests reached",
+          "CS": "compact support helper reached after first two raw support matches",
+          "CT": "compact tail helper reached after prior compact fields match",
+          "M": "1 when the weak-bound occupant is same q",
+          "O": "1 when opposite same-q bounds prove exact draw",
+          "F": "1-E-M, full weak-bound publication",
+          "X": "1 when newly exact draw is admitted to shared exact publication"
         },
-        "note": "Private weak-bound publication with exact same-q coalescing. Repeated same-q/same-bound stores return without republishing the key. Opposite same-q LOWER0/UPPER0 proves exact draw and updates the local value byte; admitted exact draws also publish to the existing shared exact cache. Full q equality is verified before either action; exact occupants remain protected. coalesced exact-draw shared stores pass KH=1."
+        "note": "Private LOWER0/UPPER0 semantics are unchanged. Standard 7x6 same-q equality and weak-bound row publication use the same exact 8-word compact identity; exact occupants still outrank weak bounds and opposite same-q bounds still coalesce to exact draw."
       },
       "status": "decomposed"
     },
@@ -9984,7 +10119,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "2db14d8949e7b158c40d0c38afd17c61ba962a83",
+    "addons/rba-connect4-alphabeta.mjs": "df69e5e03a1d5210de836a6bca8446599ce246d7",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -9993,15 +10128,15 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "a0a4ae5c8cb3f18bcf0f0fa9c112fc94a94f33ea",
+    "addons/rba-connect4-shared-exact-cache.mjs": "cfd3b3c8f95fdbb45711f8062647354d9a5730e6",
     "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "d54358ccf9556b4fcdc7a97e75c6d2ca90b690fb",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "3a3b5d509656aae264391e43a0f61da65ad9b845",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "73b5a467168c24f24197075a9c1097a74dc2dac5",
+    "addons/rba-connect4-frontier.mjs": "27e2197b55dcb46d784a9f45fccdb14548bde8ea",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
