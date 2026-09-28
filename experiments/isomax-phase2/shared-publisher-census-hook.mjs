@@ -24,7 +24,7 @@ registerHooks({load(url,context,nextLoad){
     source='const __p2SourceCount='+SOURCE_COUNT+',__p2SourceWidth='+SOURCE_WIDTH+
       ',__p2DepthCount='+DEPTH_COUNT+',__p2DepthWidth='+DEPTH_WIDTH+
       ',__p2ReaderCount='+READER_COUNT+',__p2ReaderWidth='+READER_WIDTH+
-      ',__p2PublisherCount='+PUBLISHER_COUNT+',__p2PublisherWidth='+PUBLISHER_WIDTH+';\\n'+source;
+      ',__p2PublisherCount='+PUBLISHER_COUNT+',__p2PublisherWidth='+PUBLISHER_WIDTH+';\n'+source;
     source=rep(source,
       '    stats:new Uint32Array(new SharedArrayBuffer(3*Uint32Array.BYTES_PER_ELEMENT)),',
       '    stats:new Uint32Array(new SharedArrayBuffer(3*Uint32Array.BYTES_PER_ELEMENT)),\n'+
