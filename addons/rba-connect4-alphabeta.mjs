@@ -42,7 +42,7 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0;
+  return cache.sharedRead&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.sharedRead,words,offset,hash):0;
 }
 function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
@@ -135,7 +135,7 @@ export function prepareConnect4RbaAlphaBeta({
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
   const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
-  cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
+  cache.shared=sharedExactCache;cache.sharedRead=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
       ?prepareConnect4RbaFrontArena(g,{depth:boundaryDepth,capacity:boundaryCapacity,budget:boundaryBudget,profile})
