@@ -36,3 +36,9 @@ Updated curve:18MiB66.546s;36MiB historical mean56.255s;72MiB40.683s;288MiB32.93
 Nearest supported native capacity4194304entries=144MiB/worker. One candidate-only run,unchanged fixed source/nightly/pinning/four-worker profile/10GiB shared/35333571/300000ms. EXACT,-1,move4,all4workers active/exited,cleanup=true.34.0948028s,499079947062cycles,65526864nodes. No baseline rerun.200MiB itself was not tested.
 
 Curve in ascending private capacity:18MiB66.546s;36MiB historical mean56.255s;72MiB40.683s;144MiB34.095s;288MiB32.935s;1152MiB33.061s.144MiB is close to288MiB on this fixture,with half the private allocation; singleton comparisons do not resolve noise or establish global/empty-board optimum. Raw evidence and manifest retained in private-curve-144 files. No global default change.
+
+## Intermediate576MiB point
+
+Owner requested576MiB/worker,native16777216entries. One candidate-only run,unchanged6bbba7c source/nightly/four pinned workers/10GiB shared/35333571/300000ms. EXACT,-1,move4,all4workers active/exited,cleanup=true.32.4070529s,474132402721process cycles,59427894nodes. No baseline rerun.
+
+576MiB is the lowest observed whole-solve cost among these singleton larger-cache screens,near288MiB32.935s and1152MiB33.061s. Differences remain descriptive without paired repetition; no global/empty-board optimum inferred and no production default changed. Raw,manifest,analysis and sample outputs retained under private-curve-576.
