@@ -5,3 +5,5 @@ Owner requests sizes near15/100 MiB and explicitly forbids repeating baseline. N
 Owner next requests256MiB: nearest native capacity8388608entries=288MiB/worker. One candidate-only process; reuse historical36MiB and72MiB observations. Same source/runtime/pinning/sharedTT/fixture/300000ms ceiling. No solver changes.
 
 Owner requests1GiB next: nearest supported33554432entries=1152MiB/worker. One candidate process,unchanged source/profile/timeout,no baseline rerun.
+
+Owner requests200MiB: nearest native capacity4194304entries=144MiB/worker. One candidate-only process,unchanged profile/timeout,no baseline rerun.
