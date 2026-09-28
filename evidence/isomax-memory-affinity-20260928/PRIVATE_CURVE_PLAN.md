@@ -7,3 +7,5 @@ Owner next requests256MiB: nearest native capacity8388608entries=288MiB/worker. 
 Owner requests1GiB next: nearest supported33554432entries=1152MiB/worker. One candidate process,unchanged source/profile/timeout,no baseline rerun.
 
 Owner requests200MiB: nearest native capacity4194304entries=144MiB/worker. One candidate-only process,unchanged profile/timeout,no baseline rerun.
+
+Owner requests576MiB: native16777216entries per worker. One candidate-only process,unchanged fixed source/runtime/pinning/sharedTT/fixture/300000ms ceiling,no baseline rerun.
