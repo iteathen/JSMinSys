@@ -47,13 +47,13 @@ function probeConnect4RbaExactCacheSlot32Frontier(cache,words,offset,slot,hash){
       if(diff===0)return cache.value[slot];
     }
   }
-  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset):0;
+  return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0;
 }
 function storeConnect4RbaExactCacheSlot32Frontier(cache,words,offset,value,slot,hash){
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
-  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value);
+  if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,hash);
   return value;
 }
 function storeConnect4RbaBoundCacheSlot32Frontier(cache,words,offset,value,slot,hash){
@@ -85,7 +85,7 @@ function storeConnect4RbaBoundCacheSlot32Frontier(cache,words,offset,value,slot,
         if(prior===value)return prior;
         // Same q has both >=0 and <=0, therefore exact draw.
         cache.value[slot]=2;
-        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,2);
+        if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,2,hash);
         return 2;
       }
     }
