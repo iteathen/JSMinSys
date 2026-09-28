@@ -192,7 +192,6 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
         if(completeBehaviorNode32(state,0)===3)return 3;
         const value=absToRelativeFrontier(term,mover);
         if(value>=beta){
-          if(value===0)storeConnect4RbaBoundCacheSlot32Frontier(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot);
           state.cutoffs+=1;return completeBehaviorNode32(state, ((sign*value)|0));
         }
         if(alphaOrig===-2&&betaOrig===2)
@@ -254,7 +253,6 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
       if(alpha>=beta){
-        if(best===0)storeConnect4RbaBoundCacheSlot32Frontier(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot);
         state.cutoffs+=1;
         // A fail-high lower bound of +1 is exact in {-1,0,+1}. Publish the
         // current q/mover, before forced-tail sign transports it to the caller.
