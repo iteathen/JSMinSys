@@ -32,3 +32,9 @@ All process outputs are persisted before classification. This changes cold
 orchestration only; timing bracket and both solver revisions are unchanged.
 Cold accounting: at most eight launches and git checks, O(raw bytes) parsing,
 fixed four-case/two-arm checks, filesystem/blocking costs outside measured solve.
+
+Analysis is cold evidence processing: eight JSON decodes plus O(raw bytes) file
+I/O/hashing, fixed-row summaries and table formatting; these costs are outside
+solveCycles. Run analyze.mjs only after eight process records exist. No timed
+sample is synthesized or repeated. The report uses one observation per arm/input,
+so no confidence interval or promotion claim is justified.
