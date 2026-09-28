@@ -20,7 +20,15 @@ const summary={fixture:'35333571',timeoutMs:120000,allExact:exact,censored:!exac
 for(const arm of ['A','B']){
   const a=rows.filter(r=>r.arm===arm);
   summary.arms[arm]={sha:a[0].sha,exact:a.filter(r=>r.status==='EXACT').length,timeouts:a.filter(r=>r.status==='TIMEOUT').length,means:{},meanWorkerNodes:Array.from({length:7},(_,i)=>mean(a.map(r=>r.nodeCounts[i]))),minWorkerNodes:Math.min(...a.flatMap(r=>r.nodeCounts)),allWorkersExited:a.every(r=>r.workersExited===7&&r.cleanup),allWorkersWorked:a.every(r=>r.nodeCounts.every(n=>n>0))};
-  for(const k of fields){const v=a.map(r=>value(r,k));summary.arms[arm].means[k]=v.every(x=>x!==null&&x!==undefined)?mean(v.map(Number)):null;}
+  summary.arms[arm].repeatSpread={};
+  for(const k of fields){
+    const raw=a.map(r=>value(r,k)),valid=raw.every(x=>x!==null&&x!==undefined);
+    summary.arms[arm].means[k]=valid?mean(raw.map(Number)):null;
+    if(valid){
+      const v=raw.map(Number),avg=mean(v),sd=Math.sqrt(v.reduce((s,x)=>s+(x-avg)**2,0)/(v.length-1));
+      summary.arms[arm].repeatSpread[k]={min:Math.min(...v),max:Math.max(...v),sampleSD:sd,coefficientOfVariationPct:avg?100*sd/avg:null};
+    }
+  }
 }
 if(exact)for(const k of fields){
   const ratios=[0,1].map(b=>mean(rows.filter(r=>r.block===b&&r.arm==='B').map(r=>Number(value(r,k))))/mean(rows.filter(r=>r.block===b&&r.arm==='A').map(r=>Number(value(r,k)))));
