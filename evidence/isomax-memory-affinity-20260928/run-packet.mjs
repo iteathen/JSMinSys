@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {spawnSync,execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,appendFileSync,existsSync} from 'node:fs';
 import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {cpus,totalmem,freemem,release} from 'node:os';
 const dir='evidence/isomax-memory-affinity-20260928',packetPath=process.argv[2],p=JSON.parse(readFileSync(packetPath,'utf8'));
 const runtime=JSON.parse(readFileSync(dir+'/runtime.json','utf8')),library=p.library??'C:/r/isomax-p2-proof-mask-A',sha=p.sourceSha??'be7c2887defcefb37080fa61de7ce1dc38dc2990';
@@ -19,7 +20,7 @@ for(const [index,arm] of [...p.order].entries()){
  assert.ok([4194304,67108864,268435456].includes(c.shared));assert.ok([1048576,16384,32768,65536].includes(c.private));assert.ok(!c.pin||c.preload);
  const prefix=resolve(dir,`${p.id}-${index}-affinity`),env={...process.env};delete env.NODE_OPTIONS;delete env.JMS_WORKER_AFFINITY_FILE;delete env.JMS_WORKER_AFFINITY_REPORT;
  if(c.pin){env.JMS_WORKER_AFFINITY_FILE=resolve(dir,'targets.json');env.JMS_WORKER_AFFINITY_REPORT=prefix;}
- const args=['--experimental-ffi'];if(c.preload)args.push('--import',resolve('tools/worker-affinity-preload.mjs'));
+ const args=['--experimental-ffi'];if(c.preload)args.push('--import',pathToFileURL(resolve('tools/worker-affinity-preload.mjs')).href);
  args.push(dir+'/sample.mjs',library,p.fixture,String(p.timeoutMs),String(c.shared),String(c.private));
  const startedAt=new Date().toISOString();console.log(JSON.stringify({packet:p.id,index,arm,config:c,startedAt}));
  const r=spawnSync(runtime.nodeExe,args,{encoding:'utf8',env,windowsHide:true,timeout:p.timeoutMs+30000,maxBuffer:8*1024*1024});
