@@ -2992,7 +2992,7 @@
           "SP": "eligible weak-bound fallback probes that have a shared cache and pass the deterministic sharing-density mask",
           "SH": "selective fallback probes that recover an exact shared W/D/L result and terminate before CPC"
         },
-        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe.",
+        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe. Selective fallback shared-probe calls pass the already-computed current-q hash (KH=1).",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -6200,7 +6200,7 @@
       "operations": [
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-KH",
           "target": "mixSpan32Locator32"
         },
         {
@@ -6238,16 +6238,27 @@
         {
           "op": "atomic.rmw.u32",
           "count": "E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+E*C(atomic.rmw.u32)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise"
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss."
+        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
       },
       "status": "decomposed"
     },
@@ -8078,7 +8089,7 @@
           "SP": "eligible weak-bound fallback probes that have a shared cache and pass the deterministic sharing-density mask",
           "SH": "selective fallback probes that recover an exact shared W/D/L result and terminate before CPC"
         },
-        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe.",
+        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe. Selective fallback shared-probe calls pass the already-computed current-q hash (KH=1).",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9190,7 +9201,7 @@
           "SP": "eligible weak-bound fallback probes that have a shared cache and pass the deterministic sharing-density mask",
           "SH": "selective fallback probes that recover an exact shared W/D/L result and terminate before CPC"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. Selective shared-exact recovery executes after any non-cutoff private weak-bound hit; immediate weak-bound cutoffs never pay a shared probe. Selective fallback shared-probe calls pass the already-computed current-q hash (KH=1).",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9895,7 +9906,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "e09a51ad7f96798d6a7df38482f67c6623e33522",
+    "addons/rba-connect4-alphabeta.mjs": "e0631e20068636498738f6206373f1e918a0087c",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -9904,15 +9915,15 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "2092ff774d76c4002d8b93dc6a5a1278be6ca0d9",
+    "addons/rba-connect4-shared-exact-cache.mjs": "3405137c634ca69b5dbfc12f074c5fdbdf55fd13",
     "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "8d4f10626b7e2d9d02d2c0a79e0a4aa2e3d98062",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "9cf53cfb56b606b5ed847af81a98a10a2a78539f",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "68174a44d9a06cba3b0e65a7a9c3bad3f508cc79",
+    "addons/rba-connect4-frontier.mjs": "5eee8190f8f700929eb80c687f1909dc13082990",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
