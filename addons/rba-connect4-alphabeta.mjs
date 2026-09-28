@@ -180,13 +180,20 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
     if(cached){
       if(cached<=3){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
+      let boundNoop=0;
       if(cached===RBA_CACHE_LOWER0){
         if(beta<=0){state.cutoffs+=1;return 0;}
-        if(alpha<0)alpha=0;
+        boundNoop=alpha>=0;
       }else{
         if(alpha>=0){state.cutoffs+=1;return 0;}
-        if(beta>0)beta=0;
+        boundNoop=beta<=0;
       }
+      if(boundNoop&&cache.shared&&!(cacheHash&cache.sharedSampleBits)){
+        const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset);
+        if(shared){state.cacheHits+=1;return sign*absToRelative(shared,mover);}
+      }
+      if(cached===RBA_CACHE_LOWER0){if(alpha<0)alpha=0;}
+      else if(beta>0)beta=0;
     }
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
