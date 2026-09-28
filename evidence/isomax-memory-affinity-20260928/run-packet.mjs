@@ -8,7 +8,7 @@ const dir='evidence/isomax-memory-affinity-20260928',packetPath=process.argv[2],
 const runtime=JSON.parse(readFileSync(dir+'/runtime.json','utf8')),library=p.library??'C:/r/isomax-p2-proof-mask-A',sha=p.sourceSha??'be7c2887defcefb37080fa61de7ce1dc38dc2990';
 const git=(path,...args)=>execFileSync('git',['-C',path,...args],{encoding:'utf8'}).trim();
 const helperSha=git('.','rev-parse','HEAD');
-assert.match(p.id,/^[a-zA-Z0-9-]+$/);assert.ok(['AB','ABBA','ABBAABBA'].includes(p.order));assert.ok(p.timeoutMs<=600000&&p.timeoutMs>0);assert.ok(['','35333571','353335714'].includes(p.fixture));
+assert.match(p.id,/^[a-zA-Z0-9-]+$/);assert.ok(['A','AB','ABBA','ABBAABBA'].includes(p.order));assert.ok(p.timeoutMs<=600000&&p.timeoutMs>0);assert.ok(['','35333571','353335714'].includes(p.fixture));
 assert.equal(existsSync(`${dir}/${p.id}-raw.jsonl`),false,'never silently repeat a packet');
 assert.equal(execFileSync(runtime.nodeExe,['--version'],{encoding:'utf8'}).trim(),runtime.version);
 const targets=JSON.parse(readFileSync(dir+'/targets.json','utf8'));
@@ -17,7 +17,7 @@ const rows=[];
 for(const [index,arm] of [...p.order].entries()){
  const c=p.arms[arm];assert.equal(git(library,'rev-parse','HEAD'),sha);assert.equal(git(library,'status','--porcelain'),'');
  assert.equal(git('.','diff',helperSha,'--','addons','tools','catalog'),'','affinity/helper source drift');
- assert.ok([4194304,67108864,268435456].includes(c.shared));assert.ok([1048576,16384,32768,65536,524288,2097152].includes(c.private));assert.ok(!c.pin||c.preload);
+ assert.ok([4194304,67108864,268435456].includes(c.shared));assert.ok([1048576,16384,32768,65536,524288,2097152,8388608].includes(c.private));assert.ok(!c.pin||c.preload);
  const prefix=resolve(dir,`${p.id}-${index}-affinity`),env={...process.env};delete env.NODE_OPTIONS;delete env.JMS_WORKER_AFFINITY_FILE;delete env.JMS_WORKER_AFFINITY_REPORT;
  if(c.pin){env.JMS_WORKER_AFFINITY_FILE=resolve(dir,'targets.json');env.JMS_WORKER_AFFINITY_REPORT=prefix;}
  const args=['--experimental-ffi'];if(c.preload)args.push('--import',pathToFileURL(resolve('tools/worker-affinity-preload.mjs')).href);
