@@ -17,12 +17,22 @@ const geometry=api.prepareConnect4RbaGeometry({columns:7,rows:6}),
   moves=Array.from(movesText,ch=>ch.charCodeAt(0)-49),
   result=await api.runLazySmpConnect4Rba32(moves,{geometry,...config});
 
-if(movesText==='353335714'){
+if(result.status==='FAILED'){
+  console.log(JSON.stringify({
+    kind:'isomax-phase2-coalesced-bound-census-failure-v1',
+    fixture:movesText,status:result.status,errorCode:result.errorCode,
+    errors:result.errors,cleanup:result.cleanup,workersExited:result.workersExited,
+    completedWorkers:result.completedWorkers,nodeCounts:result.nodeCounts,
+    boundCensus:result.boundCensus
+  },null,2));
+  process.exitCode=2;
+}else if(movesText==='353335714'){
   assert.equal(result.status,'EXACT');
   assert.equal(result.rootWdl,-1);
   assert.equal(result.move,4);
 }else if(!['EXACT','TIMEOUT'].includes(result.status))throw Error('unexpected status '+result.status);
 
+if(result.status==='FAILED')process.exit();
 const perWorker=result.boundCensus;
 if(!Array.isArray(perWorker)||perWorker.length!==4)throw Error('census hook inactive');
 const total=new Array(7).fill(0);
