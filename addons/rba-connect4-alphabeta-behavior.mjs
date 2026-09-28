@@ -288,8 +288,7 @@ function searchCpcOnlyBehavior(state,depth,keyOffset,basisOffset,n,mover,orienta
     if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbsBehavior(best,mover);
       storeConnect4RbaExactCacheSlot32Behavior(cache,words,keyOffset,abs,cacheSlot,cacheHash);
-    }else if(best===0&&alphaOrig>=0)
-      storeConnect4RbaBoundCacheSlot32Behavior(cache,words,keyOffset,RBA_CACHE_UPPER0,cacheSlot);
+    }
     return completeBehaviorNode32(state, sign*best);
   }
 }
