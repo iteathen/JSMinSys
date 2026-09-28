@@ -1,0 +1,42 @@
+name: IsoMax Phase2 4-worker shared density sweep
+
+on:
+  pull_request:
+    branches: [experiment/isomax-phase2-shared-hash-coalesced-20260927]
+    paths:
+      - ".github/workflows/isomax-phase2-shared-density-4w.yml"
+      - "experiments/isomax-phase2/scaled4-shared-density.mjs"
+      - "experiments/isomax-phase2/scaled4-density-sample.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  density:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed preferred solver
+        shell: pwsh
+        run: git worktree add "$env:RUNNER_TEMP/pure" f549dcfdd7d4d0c5ed5cd01cb3141812f1d59862
+      - name: Derived long exact density sweep
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-density.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-density/derived-long" "$env:RUNNER_TEMP/pure" 353335714 8 90000
+      - name: Official hard fixed-window density sweep
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-density.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-density/official-hard" "$env:RUNNER_TEMP/pure" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-shared-density-4w
+          path: ${{ runner.temp }}/isomax-phase2-shared-density
+          if-no-files-found: error
+          retention-days: 30
