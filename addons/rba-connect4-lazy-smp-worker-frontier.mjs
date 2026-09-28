@@ -29,7 +29,7 @@ const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
     cpcFrontierResponse:!!workerData.cpcFrontierResponse,
     cpcProjectedAdvisory:!!workerData.cpcProjectedAdvisory,
   }),
-  started=(timing[0]=performance.now()),
+  started=(index===0&&(state.cache.sharedRead=null),timing[0]=performance.now()),
   result=solveConnect4RbaFrontier(
     workerData.root,
     {state,reflected:workerData.rootReflected?1:0},

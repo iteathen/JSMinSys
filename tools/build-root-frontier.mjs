@@ -164,7 +164,7 @@ worker=worker.replace("'./rba-connect4-alphabeta-behavior.mjs'","'./rba-connect4
   .replaceAll('prepareConnect4RbaAlphaBetaBehavior','prepareConnect4RbaFrontier').replaceAll('solveConnect4RbaAlphaBetaBehavior','solveConnect4RbaFrontier').replaceAll('RBA_AB_CPC_ONLY_BEHAVIOR','RBA_FRONTIER_CPC_ONLY');
 worker=worker.replace('  state=prepareConnect4RbaFrontier({','  timing=new Float64Array(workerData.timingBuffer,index*64,2),\n  frontierMetrics=new Float64Array(workerData.frontierMetricBuffer,index*32,4),\n  state=prepareConnect4RbaFrontier({');
 worker=worker.replace('    geometry:workerData.geometry,','    geometry:workerData.geometry,\n    nodeCounts:new Float64Array(workerData.nodeCounterBuffer,index*64,1),');
-worker=worker.replace('  result=solveConnect4RbaFrontier(','  started=(timing[0]=performance.now()),\n  result=solveConnect4RbaFrontier(');
+worker=worker.replace('  result=solveConnect4RbaFrontier(','  started=(index===0&&(state.cache.sharedRead=null),timing[0]=performance.now()),\n  result=solveConnect4RbaFrontier(');
 worker=worker.replace('  m=result.metrics;','  m=result.metrics;\ntiming[1]=performance.now();\nfrontierMetrics[0]=m.frontierPasses;frontierMetrics[1]=m.horizonStops;\nfrontierMetrics[2]=m.frontierAutoReleases;frontierMetrics[3]=m.frontierPending;');
 for(const name of ['frontCalls','frontExact','frontFailures','frontSteps','frontActionExact'])worker=worker.replace('=m.'+name+';','=0;');
 const workerPath=new URL('../addons/rba-connect4-lazy-smp-worker-frontier.mjs',import.meta.url);
