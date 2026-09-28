@@ -1,0 +1,82 @@
+{
+  "kind": "selected-production-local-hard",
+  "createdAt": "2026-09-28T01:11:26.305Z",
+  "sources": {
+    "A": {
+      "path": "C:/r/isomax-p2-local-A",
+      "sha": "a3cf7f9ca5c90e5025542c3b27ab0b735a610e9a",
+      "dirty": false
+    },
+    "B": {
+      "path": "C:/r/isomax-p2-local-B",
+      "sha": "00ecc7d20ed08ee9585c92aa8441a8ef3969b7ee",
+      "dirty": false
+    }
+  },
+  "profile": {
+    "id": "isomax-six-deep-one-wide-i5-12600k-20260927",
+    "status": "owner-selected operating baseline",
+    "selectedOn": "2026-09-27",
+    "scope": {
+      "solver": "IsoMax native JSMinSys RBA CPC alpha-beta with exact endpoint publication",
+      "method": "Lazy SMP, six deep workers and one iterative root-probing worker, full exact TT sharing, existing move order, no asynchronous strategist",
+      "geometry": "7x6",
+      "cpu": "Intel Core i5-12600K",
+      "physicalCores": 10,
+      "logicalProcessors": 16,
+      "ramGiBApprox": 32,
+      "platform": "win32",
+      "node": "v26.7.0"
+    },
+    "options": {
+      "workers": 7,
+      "sharedCacheCapacity": 4194304,
+      "localCacheCapacity": 1048576,
+      "sharedSampleMask": 0,
+      "rootFrontier": true
+    },
+    "cachePayloadBytes7x6": 716177420,
+    "execution": {
+      "api": "runLazySmpConnect4Rba32",
+      "launcher": "tools/run-isomax.mjs",
+      "wideWorker": 0,
+      "deepWorkers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "frontierStride": 2,
+      "releaseAtUnresolvedRootActions": 1
+    },
+    "evidenceRevision": "5b0a5f313d66d3929af8ea8fee14a39a16b031ed",
+    "evidence": "../evidence/isomax-resource-sustained-20260927/REPORT.md",
+    "configurationEvidenceRevision": "d238f1cf4a3370b47d91b9f63788ad8b9335e28e",
+    "configurationEvidence": "../evidence/isomax-move-confidence-focused-20260927/REPORT.md",
+    "limits": "Owner-selected six-deep/one-wide configuration using the direct native root-frontier profile. Not a proven global or empty-board optimum; three-repeat short-case evidence only for this worker mix. Existing sustained memory evidence belongs to the earlier all-deep method. Requalify materially different solver methods, revisions, runtimes or hardware. Historical comparison arms remain explicit."
+  },
+  "input": {
+    "moves": "35333571",
+    "timeoutMs": 120000
+  },
+  "expected": {
+    "rootWdl": -1,
+    "move": 4
+  },
+  "blocks": 2,
+  "sequence": "ABBA",
+  "node": "v26.7.0",
+  "v8": "14.6.202.34-node.28",
+  "nodePath": "C:\\r\\c4-compact-q1\\node-v26.7.0-win-x64\\node.exe",
+  "processCycleCounterAvailable": true,
+  "preflight": {
+    "candidateTestsPassed": 29,
+    "catalog": "298 sealed functions + 156 add-on units; 30/30 blocks; no deferred functions",
+    "generatedSources": "pass",
+    "runtimeGeometry": "pass",
+    "hotClosure": "50 functions audited"
+  },
+  "command": "node --experimental-ffi tools/run-isomax.mjs {\"moves\":\"35333571\",\"timeoutMs\":120000}"
+}
