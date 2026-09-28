@@ -211,7 +211,11 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     if((cached===RBA_CACHE_LOWER0&&semanticHi===0)||
        (cached===RBA_CACHE_UPPER0&&semanticLo===0)){
       state.cpcCloseExactDraws+=1;
-      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,2,cacheSlot,cacheHash);
+      // The local probe already proved this exact q owns cacheSlot. Refine the
+      // resident proof byte in place; do not republish the unchanged q key/stamp.
+      cache.value[cacheSlot]=2;
+      if(cache.shared&&!(cacheHash&cache.sharedSampleBits))
+        storeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset,2);
       return 0;
     }
     if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
