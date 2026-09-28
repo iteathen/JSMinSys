@@ -14,9 +14,13 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords}={}
   };
 }
 
-export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash){
-  const hash=knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash,
-    slot=hash&cache.mask,
+export function probeConnect4RbaSharedExactCache32(cache,words,offset){
+  return probeConnect4RbaSharedExactCacheKnownHash32(
+    cache,words,offset,mixSpan32Locator32(words,offset,cache.keyWords));
+}
+
+export function probeConnect4RbaSharedExactCacheKnownHash32(cache,words,offset,hash){
+  const slot=hash&cache.mask,
     before=Atomics.load(cache.sequence,slot);
   if(!before||(before&1))return 0;
   const base=slot*cache.keyWords;
@@ -29,9 +33,13 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash)
   return value;
 }
 
-export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,knownHash){
-  const hash=knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash,
-    slot=hash&cache.mask,
+export function storeConnect4RbaSharedExactCache32(cache,words,offset,value){
+  return storeConnect4RbaSharedExactCacheKnownHash32(
+    cache,words,offset,value,mixSpan32Locator32(words,offset,cache.keyWords));
+}
+
+export function storeConnect4RbaSharedExactCacheKnownHash32(cache,words,offset,value,hash){
+  const slot=hash&cache.mask,
     current=Atomics.load(cache.sequence,slot);
   if(current&1){Atomics.add(cache.stats,2,1);return value;}
   const odd=(current+1)>>>0;
