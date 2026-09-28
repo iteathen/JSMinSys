@@ -18,7 +18,7 @@ assert.equal(config.rootFrontier,true);
 assert.equal(config.workers,4);
 assert.equal(config.sharedSampleMask,0);
 assert.ok([4194304,67108864,268435456].includes(config.sharedCacheCapacity));
-assert.ok([16384,32768,65536,524288,1048576,2097152,8388608].includes(config.localCacheCapacity));
+assert.ok([16384,32768,65536,524288,1048576,2097152,8388608,33554432].includes(config.localCacheCapacity));
 assert.ok(availableParallelism()>=4);
 
 const geometry=api.prepareConnect4RbaGeometry({columns:7,rows:6}),
