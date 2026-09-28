@@ -1,0 +1,44 @@
+name: IsoMax Phase2 4-worker shared fallback
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-shared-fallback-4w.yml"
+      - "experiments/isomax-phase2/scaled4-shared-fallback.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" e449df20dc59cc6c1e5b2da78134751a2376f355
+          git worktree add "$env:RUNNER_TEMP/arm-b" 4d9b8458be9eff73f2537301b6d758fef24e7703
+          git worktree add "$env:RUNNER_TEMP/arm-c" 4161b37e949adf05d3e10978547a40adf15a2743
+      - name: Derived long 353335714
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-fallback.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-fallback/derived-long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 353335714 6 90000
+      - name: Official hard 35333571
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-fallback.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-fallback/official-hard" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-shared-fallback-4w
+          path: ${{ runner.temp }}/isomax-phase2-shared-fallback
+          if-no-files-found: error
+          retention-days: 30
