@@ -24,7 +24,7 @@ writeFileSync(dir+'/table.md',table.join('\n')+'\n');
 const summary={samples:rows.length,arms:Object.fromEntries(['A','B'].map(a=>{const rs=rows.filter(r=>r.arm===a);return [a,{sha:rs[0].sourceSha,exact:rs.filter(r=>r.status==='EXACT').length,timeouts:rs.filter(r=>r.status==='TIMEOUT').length,totalCycles:rs.reduce((s,r)=>s+Number(r.solveCycles),0),totalNodes:rs.reduce((s,r)=>s+r.totalNodes,0),wallMs:rs.reduce((s,r)=>s+r.wallMs,0)}]})),allWorkersActive:rows.every(r=>r.nodeCounts.every(n=>n>0)),allCleanup:rows.every(r=>r.cleanup&&r.workersExited===4),exactComparisons:[]};
 for(let i=0;i<rows.length;i+=2){const a=rows[i],b=rows[i+1];if(a.status==='EXACT'&&b.status==='EXACT'){assert.equal(a.move,b.move);summary.exactComparisons.push({moves:a.fixture,wdl:a.rootWdl,move:a.move,cycleDeltaPct:(Number(b.solveCycles)/Number(a.solveCycles)-1)*100,wallDeltaPct:(b.wallMs/a.wallMs-1)*100,interval95:null});}}
 writeFileSync(dir+'/summary.json',JSON.stringify(summary,null,2)+'\n');
-const hashes={algorithm:'sha256',encoding:'working-tree file bytes; validate before checkout newline conversion',files:{}};
-for(const entry of readdirSync(dir,{recursive:true}).sort()){if(entry==='hashes.json')continue;try{const b=readFileSync(dir+'/'+entry);hashes.files[entry]=createHash('sha256').update(b).digest('hex');}catch(e){if(e.code!=='EISDIR'&&e.code!=='EPERM')throw e;}}
+const hashes={algorithm:'sha256',encoding:'LF-normalized UTF-8 file bytes',files:{}};
+for(const entry of readdirSync(dir,{recursive:true}).sort()){if(entry==='hashes.json')continue;try{const b=readFileSync(dir+'/'+entry);hashes.files[entry]=createHash('sha256').update(b.toString('utf8').replace(/\r\n/g,'\n')).digest('hex');}catch(e){if(e.code!=='EISDIR'&&e.code!=='EPERM')throw e;}}
 writeFileSync(dir+'/hashes.json',JSON.stringify(hashes,null,2)+'\n');
 console.log(JSON.stringify(summary));console.log(table.join('\n'));
