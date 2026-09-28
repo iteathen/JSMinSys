@@ -8119,10 +8119,10 @@
         "metric": "NEES-static-serial-ledger-cycles",
         "kind": "expression",
         "expression": "WORDS*(L+2*XOR+SHR+IMUL+loop_control)",
-        "note": "Runtime-sized locator; exact key equality remains authoritative."
+        "note": "Runtime-sized locator over exact cache identity words; full equality remains authoritative. Production Connect4 may use a cache identity prefix narrower than the full search-state record when omitted fields are exactly derivable."
       },
       "preconditions": [
-        "wordCount is the complete initialization-selected key width"
+        "wordCount is the complete initialization-selected cache identity width"
       ]
     },
     {
