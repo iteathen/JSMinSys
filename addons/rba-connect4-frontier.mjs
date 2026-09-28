@@ -426,20 +426,30 @@ export function solveConnect4RbaFrontier(root,{state,reflected=0}={}){
           if(value===-3)return frontierResult(state,3,0,-1);
           if(value===-4){unfinished=1;continue;}
         }
-        values[ai]=value;state.frontierPending-=1;releaseNarrowFrontier(state);
+        values[ai]=value;
+        state.frontierPending-=1;
+        releaseNarrowFrontier(state);
       }
       if(value>best){best=value;bestMove=caller;}
+      // Earlier unresolved actions may tie this witness. Keep deterministic
+      // root action interpretation; never retire them using a heuristic rank.
       if(!unfinished&&(best===1||best===rootExact))return frontierResult(state,0,relativeToAbsFrontier(best,mover),bestMove);
     }
     if(!unfinished)return frontierResult(state,0,relativeToAbsFrontier(best,mover),bestMove);
     state.frontierLimit=state.frontierStride?Math.min(g.cellCount,state.frontierLimit+state.frontierStride):g.cellCount;
   }
 }
+// Root-boundary action only; never called at an ordinary recursive node.
+// Release as soon as the flag's narrowing target is met, not after another
+// broad pass. This counts unresolved ROOT actions, not all frontier leaves.
+// Keep exact values/cache and current frames. No copy, queue or TT mutation.
 function releaseNarrowFrontier(state){
   if(state.frontierTarget&&state.frontierPending<=state.frontierTarget&&state.frontierStride){
     state.frontierLimit=state.g.cellCount;state.frontierStride=0;state.frontierAutoReleases+=1;
   }
 }
+// Cold operation boundary only: string status and result allocation never run
+// at a recursive node or between frontier passes. Do not move them there.
 function frontierResult(state,cancel,value,move){
   if(!cancel&&completeBehaviorNode32(state,0)===3){cancel=3;move=-1;}
   const mover=(state.words[state.g.metaOffset]>>>2)&1;
