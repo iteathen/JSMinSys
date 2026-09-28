@@ -493,6 +493,13 @@
         "name": "TO_INT32_COST(valueRange,v8Tier,lowering)"
       },
       "note": "Explicit |0 normalization of bounded signed numeric values. Retains conversion/lowering cost until machine evidence resolves it; may fuse with the producing integer operation. Source count is not one added CPU instruction."
+    },
+    "runtime.cold.affinity": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "COLD_AFFINITY_COST(unit,records,groups,workers,bytes,ffiState,osState,gcState)"
+      },
+      "note": "Cold JS validation/control/Buffer/BigInt/allocation/native FFI/module work; no numeric zero substitution. OS call and scheduler delay may be unbounded."
     }
   },
   "units": [
@@ -1386,7 +1393,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 4
+          "count": "1+T*(7+4*P)"
         },
         {
           "op": "memory.load.u32",
@@ -1402,15 +1409,15 @@
         },
         {
           "op": "control.test.u32",
-          "count": "2+P"
+          "count": "1+T"
         },
         {
           "op": "control.branch",
-          "count": "2+P"
+          "count": "1+T"
         },
         {
           "op": "memory.store.u32",
-          "count": "7+4*P"
+          "count": "T*(6+4*P)"
         },
         {
           "op": "runtime.call.subledger",
@@ -1420,12 +1427,12 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "4*C(runtime.field.load)+C(memory.load.u32)+C(alu.add.u32)+C(alu.and.u32)+(2+P)*C(control.test.u32)+(2+P)*C(control.branch)+(7+4*P)*C(memory.store.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)",
+        "expression": "(1+T*(7+4*P))*C(runtime.field.load)+(1)*C(memory.load.u32)+(1)*C(alu.add.u32)+(1)*C(alu.and.u32)+(1+T)*C(control.test.u32)+(1+T)*C(control.branch)+(T*(6+4*P))*C(memory.store.u32)+(1-T)*CALL(evaluateConnect4CpcNonterminal32)",
         "parameters": {
           "T": "1 for terminal input; 0 for nonterminal delegation",
           "P": "1 when projected advisory counters are reset on terminal input; otherwise 0"
         },
-        "note": "Checked CPC wrapper."
+        "note": "Interval wrapper: six terminal scratch stores plus four advisory stores; delegation has no wrapper stores. Seven terminal property reads include projectedAdvisory; metaOffset read always occurs."
       },
       "status": "decomposed"
     },
@@ -1437,19 +1444,19 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "24+8*C+4*R+5*P+G"
+          "count": "11+W+4*PR+2*C+2*ONE+M_ONE+5*G+LC+L+LL+M_LIFT+F+B+AFTER_EXACT+2*P+U+2*ASSIGN+REF+2*EXACT_TEST+GATE+BOUND_LOAD"
         },
         {
           "op": "runtime.field.store",
-          "count": "10+6*C+4*R+5*P+G"
+          "count": "G+P"
         },
         {
           "op": "memory.load.u32",
-          "count": "3+2*W+2*L+2*P"
+          "count": "1+2*W+2*ONE+L+2*P+U+2*EXACT_TEST+GATE+BOUND_LOAD"
         },
         {
           "op": "memory.store.u32",
-          "count": "7+4*P"
+          "count": "6+4*PR+3*G+2*ASSIGN+REF"
         },
         {
           "op": "alu.add.u32",
@@ -1516,10 +1523,10 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(24+8*C+4*R+5*P+G)*C(runtime.field.load)+(10+6*C+4*R+5*P+G)*C(runtime.field.store)+(3+2*W+2*L+2*P)*C(memory.load.u32)+(7+4*P)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+2*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+4*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+C*CALL(collectSingletonProfiles)+M*CALL(cellMarked)+D*CALL(deriveForkPreemption32)+F*CALL(frontierResponseNoWin)+B*CALL(pairedResponseNoWin)+P*CALL(collectProjected)",
+        "expression": "(11+W+4*PR+2*C+2*ONE+M_ONE+5*G+LC+L+LL+M_LIFT+F+B+AFTER_EXACT+2*P+U+2*ASSIGN+REF+2*EXACT_TEST+GATE+BOUND_LOAD)*C(runtime.field.load)+(G+P)*C(runtime.field.store)+(1+2*W+2*ONE+L+2*P+U+2*EXACT_TEST+GATE+BOUND_LOAD)*C(memory.load.u32)+(6+4*PR+3*G+2*ASSIGN+REF)*C(memory.store.u32)+(4+4*L+2*P+G)*C(alu.add.u32)+(2)*C(alu.sub.u32)+(6+3*L)*C(alu.and.u32)+(1)*C(alu.xor.u32)+(2+L)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(18+2*W+6*L)*C(control.test.u32)+(18+2*W+6*L)*C(control.branch)+(C)*CALL(collectSingletonProfiles)+(M)*CALL(cellMarked)+(D)*CALL(deriveForkPreemption32)+(F)*CALL(frontierResponseNoWin)+(B)*CALL(pairedResponseNoWin)+(P)*CALL(collectProjected)",
         "parameters": {
           "W": "coordinate words scanned for any-live detection",
-          "L": "legal-column iterations executed by lift scan",
+          "L": "All-lift column iterations including skipped full columns",
           "C": "combined singleton-profile calls executed (0 or 1 after earlier CPC exhaustion exits)",
           "M": "cellMarked calls executed",
           "D": "deriveForkPreemption32 calls executed (0 or 1)",
@@ -1527,9 +1534,22 @@
           "B": "pairedResponseNoWin calls executed (0 or 1)",
           "P": "collectProjected calls executed (0 or 1)",
           "R": "long-range response branches evaluated",
-          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0"
+          "G": "1 when the single-current-threat branch installs a forced column and increments forcedTotal; otherwise 0",
+          "PR": "Initial advisory-reset flag (not late P collection)",
+          "ONE": "Single-threat branch entered",
+          "M_ONE": "single-threat cellMarked calls",
+          "LC": "all-lift column condition tests",
+          "LL": "all-lift legal bodies",
+          "M_LIFT": "all-lift cellMarked calls",
+          "AFTER_EXACT": "Late advisory condition reached",
+          "U": "Final preemption count read",
+          "ASSIGN": "Explicit exhausted-coordinate/tactical exact endpoint-pair assignment (0 or1)",
+          "REF": "Individual no-win endpoint tightenings",
+          "EXACT_TEST": "Endpoint-equality tests reached (0..2)",
+          "GATE": "Long-range endpoint gate read (0 or1)",
+          "BOUND_LOAD": "Final bound-classifier endpoint reads (0..2)"
         },
-        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged."
+        "note": "CPC uses one combined singleton-profile pass for mover and opponent, preserving current-player terminal priority while sharing basis/index/playability work. Projected, precursor and forced telemetry ownership is unchanged. Source-neutral interval-specific direct field/u32 traffic recount. Six initial stores, optional four advisory resets, three forced-action stores, explicit pair assignments and individual tightenings. Endpoint reads counted at both exactness gates, response gate and short-circuited bound classifier. Helper accesses remain owned by helper subledgers. Other inherited aggregate arithmetic/control estimates are not exact emitted instructions or physical Intel cycle claims."
       },
       "status": "decomposed"
     },
@@ -1697,7 +1717,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "10+3*P+F"
+          "count": "11+3*P+F"
         },
         {
           "op": "control.test.u32",
@@ -1713,17 +1733,17 @@
         },
         {
           "op": "runtime.field.store",
-          "count": 18
+          "count": 20
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+C(runtime.math.ceil)+C(alu.add.u32)+(10+3*P+F)*C(runtime.typed_array.allocate)+4*C(control.test.u32)+4*C(control.branch)+C(runtime.object.allocate)+18*C(runtime.field.store)",
+        "expression": "(6)*C(runtime.field.load)+(1)*C(runtime.math.ceil)+(1)*C(alu.add.u32)+(11+3*P+F)*C(runtime.typed_array.allocate)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*C(runtime.object.allocate)+(20)*C(runtime.field.store)",
         "parameters": {
           "P": "1 when projectedAdvisory allocations are enabled; otherwise 0",
           "F": "1 when <=32-column fork-target array is allocated; otherwise 0"
         },
-        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields."
+        "note": "Cold CPC scratch allocation, including projected-fork, precursor and forced cumulative telemetry fields. Recounted interval scratch: eleven unconditional arrays, three advisory arrays, one optional fork array; twenty object fields. Allocation remains byte/runtime-dependent."
       },
       "status": "decomposed"
     },
@@ -10247,15 +10267,148 @@
         "note": "Cold exact guard for packing recursive live-line score/column pairs into one uint32. Unsupported width/line-count combinations return shift=-1 and retain the two-field ordering path."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#parseWindowsTopology",
+      "source": "addons/worker-affinity.mjs",
+      "name": "parseWindowsTopology",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Walk R variable records/G group masks: buffer reads, bounds checks, 64-bit decode/string conversion, array/object allocations and pushes. O(R+G)."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Walk R variable records/G group masks: buffer reads, bounds checks, 64-bit decode/string conversion, array/object allocations and pushes. O(R+G)."
+      }
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#targetForProcessor",
+      "source": "addons/worker-affinity.mjs",
+      "name": "targetForProcessor",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Validate numeric target; allocate BigInt bit; find/some callbacks over cores/cache groups with mask parse/AND; allocate mapped target. O(R+G)."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Validate numeric target; allocate BigInt bit; find/some callbacks over cores/cache groups with mask parse/AND; allocate mapped target. O(R+G)."
+      }
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#validateWorkerTargets",
+      "source": "addons/worker-affinity.mjs",
+      "name": "validateWorkerTargets",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Length/range/class checks; two map callbacks and min/max; W calls to targetForProcessor plus prior-target some duplicate scan O(W^2); allocate returned target list."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Length/range/class checks; two map callbacks and min/max; W calls to targetForProcessor plus prior-target some duplicate scan O(W^2); allocate returned target list."
+      }
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#selectPerformanceTargets",
+      "source": "addons/worker-affinity.mjs",
+      "name": "selectPerformanceTargets",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Map/max class scan, core scan and up to64 bit tests per chosen core, BigInt shifts/AND, target allocation; call validateWorkerTargets."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Map/max class scan, core scan and up to64 bit tests per chosen core, BigInt shifts/AND, target allocation; call validateWorkerTargets."
+      }
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#queryWindowsTopology",
+      "source": "addons/worker-affinity.mjs",
+      "name": "queryWindowsTopology",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Platform/arch checks; dynamic FFI import/library open; three function bindings; two OS topology calls plus error query; allocate size/output buffers; parse returned records; close library in finally. Allocation/OS latency are not bounded constants."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Platform/arch checks; dynamic FFI import/library open; three function bindings; two OS topology calls plus error query; allocate size/output buffers; parse returned records; close library in finally. Allocation/OS latency are not bounded constants."
+      }
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#bindCurrentThread",
+      "source": "addons/worker-affinity.mjs",
+      "name": "bindCurrentThread",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Range/platform checks; dynamic import/open; four function bindings; three16-byte buffers; construct mask/group; GetCurrentThread+SetThreadGroupAffinity+GetThreadGroupAffinity; error paths GetLastError; compare accepted mask; allocate result and close library. Never called from recursion."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Range/platform checks; dynamic import/open; four function bindings; three16-byte buffers; construct mask/group; GetCurrentThread+SetThreadGroupAffinity+GetThreadGroupAffinity; error paths GetLastError; compare accepted mask; allocate result and close library. Never called from recursion."
+      }
+    },
+    {
+      "unit": "tools/worker-affinity-preload.mjs#<module-main>",
+      "source": "tools/worker-affinity-preload.mjs",
+      "name": "workerAffinityPreload",
+      "scope": "cold-optional-worker-placement",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "One isMainThread/env gate; off path no FFI. On path imports/fs read/JSON parse/index validation/query/validate/bind/report write. File IO, module loading, allocation, callbacks and OS calls are nonzero variable costs. Executed once per worker before solver initialization."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Complete cold preload cost. Added recursive-node operations: none. All enabled worker initialization falls inside measured solveCycles; main preload startup remains pre-bracket as in runner convention."
+      }
     }
   ],
   "summary": {
-    "units": 162,
+    "units": 169,
     "decomposed": 162,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 70
+    "localExtensionOperations": 71
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -10371,7 +10524,9 @@
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
     "addons/rba-connect4-frontier.mjs": "affed73b766e525e7626ea90964cc12e61341b20",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
-    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
+    "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a",
+    "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
+    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
