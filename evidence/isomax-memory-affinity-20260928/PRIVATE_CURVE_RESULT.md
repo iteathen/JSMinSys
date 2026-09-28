@@ -11,3 +11,16 @@ Both returned EXACT,rootWdl=-1,move=4,all4workers active/exited,cleanup=true. Sa
 |72MiB,one new sample|595178346882|40.683|87351245|
 
 Comparisons are descriptive against the existing placement B mean,not contemporaneous paired qualification. No confidence interval for either new singleton. See analysis JSON for exact percentage deltas.72MiB is a promising better setting on this fixture;18MiB regresses. Neither result proves an empty-board optimum or that100MiB specifically was tested. No additional runs or global default changes were made. Earlier small-cache results remain in CONTINUATION_REPORT.md; mixed repetition counts and acquisition times must stay visible when drawing the curve.
+
+## Larger point: owner requested256MiB
+
+Nearest supported power-of-two size is288MiB/worker (8388608entries);256MiB itself was not tested. One candidate-only process, same fixed source/runtime/four-P-core placement/10GiB shared/35333571/300000ms. EXACT,-1,move4,all4workers active/exited,cleanup=true. No baseline rerun.
+
+| Private MiB/worker | Wall seconds | Process cycles | Nodes |
+|---|---:|---:|---:|
+|18|66.546|972150131798|196946287|
+|36 (existing four-run mean)|56.255|822663778192.5|147229413.25|
+|72|40.683|595178346882|87351245|
+|288|32.935|482075353928|60615217|
+
+288MiB improves further on this hard fixture; reductions versus72MiB are descriptive single-run comparisons,not paired qualification. No confidence interval or universal saturation/empty-board conclusion. All new capacities remain curve experiments,not automatically promoted production defaults. See private-curve-288-analysis.json and raw/manifest/sample files for exact values and provenance.
