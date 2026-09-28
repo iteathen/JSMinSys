@@ -1,0 +1,221 @@
+{
+  "samples": 8,
+  "allExact": true,
+  "completedPlannedSeries": true,
+  "arms": {
+    "A": {
+      "sha": "be7c2887defcefb37080fa61de7ce1dc38dc2990",
+      "exact": 4,
+      "timeouts": 0,
+      "mean": {
+        "solveCycles": 1705955161423,
+        "wallMs": 124943.540175,
+        "cpuMs": 462921.75,
+        "totalNodes": 228976599.75,
+        "winnerNodes": 68255306.25,
+        "cyclesPerNode": 7450.35617119026,
+        "nodesPerSecond": 1832641.2681134671,
+        "sharedCacheHits": 37362705.75,
+        "sharedCacheStores": 25684054.5,
+        "sharedCacheStoreContention": 700717,
+        "processPeakRssBytes": 449972224
+      },
+      "perWorkerMean": [
+        24725887.25,
+        68111011,
+        67530856.5,
+        68608845
+      ]
+    },
+    "B": {
+      "sha": "7f74e324457c4237590bc6b0f924852f6d728e4c",
+      "exact": 4,
+      "timeouts": 0,
+      "mean": {
+        "solveCycles": 1703222391654.25,
+        "wallMs": 125195.6793,
+        "cpuMs": 462078,
+        "totalNodes": 228474673.25,
+        "winnerNodes": 68079738.25,
+        "cyclesPerNode": 7454.765416281206,
+        "nodesPerSecond": 1824948.7123525972,
+        "sharedCacheHits": 37115439.5,
+        "sharedCacheStores": 25672798.25,
+        "sharedCacheStoreContention": 695555,
+        "processPeakRssBytes": 449661952
+      },
+      "perWorkerMean": [
+        24695549,
+        67841869.25,
+        67646071.25,
+        68291183.75
+      ]
+    }
+  },
+  "paired": {
+    "solveCycles": {
+      "ratios": [
+        0.9959365470572251,
+        0.9978456251977764,
+        0.996136504681561,
+        1.0037011506147513
+      ],
+      "deltaPct": -0.15950431121715125,
+      "interval95Pct": [
+        -0.7376349211146938,
+        0.41862629868039125
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "wallMs": {
+      "ratios": [
+        1.0018631246719243,
+        0.9989589409127906,
+        1.0006670922761942,
+        1.0066072136926496
+      ],
+      "deltaPct": 0.20240928883896725,
+      "interval95Pct": [
+        -0.3194497594318113,
+        0.7242683371097458
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "cpuMs": {
+      "ratios": [
+        0.9963675724064618,
+        0.9998313283755409,
+        0.9937850469310021,
+        1.002740538539635
+      ],
+      "deltaPct": -0.18188784368400324,
+      "interval95Pct": [
+        -0.8058279188251305,
+        0.442052231457124
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "totalNodes": {
+      "ratios": [
+        0.9916396691466205,
+        1.0007069647693718,
+        0.9954175686940763,
+        1.003521351618767
+      ],
+      "deltaPct": -0.21786114427910785,
+      "interval95Pct": [
+        -1.0638978687312672,
+        0.6281755801730515
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "winnerNodes": {
+      "ratios": [
+        0.9885625796293622,
+        1.002954581795885,
+        0.9919820381314074,
+        1.0063441709057381
+      ],
+      "deltaPct": -0.2539157384401802,
+      "interval95Pct": [
+        -1.6112551240103912,
+        1.1034236471300307
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "cyclesPerNode": {
+      "ratios": [
+        1.0043331040944563,
+        0.9971406818655901,
+        1.0007222456284632,
+        1.0001791680821681
+      ],
+      "deltaPct": 0.059379991766927986,
+      "interval95Pct": [
+        -0.40991699233614565,
+        0.5286769758700016
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "nodesPerSecond": {
+      "ratios": [
+        0.9897955566249115,
+        1.0017498455491916,
+        0.9947539759999732,
+        0.9969343930463578
+      ],
+      "deltaPct": -0.4191557194891504,
+      "interval95Pct": [
+        -1.208562423385895,
+        0.3702509844075941
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "sharedCacheHits": {
+      "ratios": [
+        0.9755313663208679,
+        1.0013166283633737,
+        0.9817928190388996,
+        1.015606509652463
+      ],
+      "deltaPct": -0.6438169156098961,
+      "interval95Pct": [
+        -3.5630530687542628,
+        2.2754192375344706
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "sharedCacheStores": {
+      "ratios": [
+        0.9977764758778664,
+        1.0000248879670892,
+        0.9981873117196963,
+        1.0022652520119157
+      ],
+      "deltaPct": -0.04365181058580969,
+      "interval95Pct": [
+        -0.36975153326592736,
+        0.282447912094308
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "sharedCacheStoreContention": {
+      "ratios": [
+        0.9538430587356179,
+        1.0700213568248533,
+        0.9435681193296954,
+        1.0088805060527621
+      ],
+      "deltaPct": -0.5921739764267908,
+      "interval95Pct": [
+        -9.850762179604322,
+        8.66641422675074
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    },
+    "processPeakRssBytes": {
+      "ratios": [
+        0.9909198936874666,
+        1.0029472954230236,
+        1.0007559680489648,
+        1.0026593806921675
+      ],
+      "deltaPct": -0.06793655370943563,
+      "interval95Pct": [
+        -0.9724295803476002,
+        0.8365564729287289
+      ],
+      "method": "four adjacent matched pair ratios; descriptive Student t df3"
+    }
+  },
+  "fullAbbaBlocks": [
+    {
+      "block": 0,
+      "cycleRatio": 0.9968890976788434
+    },
+    {
+      "block": 1,
+      "cycleRatio": 0.9999138780194574
+    }
+  ]
+}
