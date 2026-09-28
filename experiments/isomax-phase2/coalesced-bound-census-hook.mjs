@@ -13,6 +13,11 @@ function rep(source,from,to,count=1){
 
 registerHooks({load(url,context,nextLoad){
   const result=nextLoad(url,context);
+  const target=url.endsWith('/addons/rba-connect4-frontier.mjs')||
+    url.endsWith('/addons/rba-connect4-lazy-smp-worker-frontier.mjs')||
+    url.endsWith('/addons/rba-connect4-lazy-smp-host.mjs');
+  if(!target)return result;
+  if(result.source===null||result.source===undefined)return result;
   let source=typeof result.source==='string'?result.source:new TextDecoder().decode(result.source);
   source=source.replaceAll('\r\n','\n');
 
