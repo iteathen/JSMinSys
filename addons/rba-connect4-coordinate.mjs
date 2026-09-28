@@ -144,8 +144,8 @@ export function connect4RbaCanonicalize(g,profile,words,offset,basis,bi,n,scratc
   );
 
   if(primary===0){
-    let w=g.p0Offset;while(w<g.keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
-    if(w===g.keyWords||words[offset+w]<scratch.mirror[w])return 0;
+    let w=g.p0Offset;while(w<g.metaOffset&&words[offset+w]===scratch.mirror[w])w+=1;
+    if(w===g.metaOffset||words[offset+w]<scratch.mirror[w])return 0;
   }
   // Support/meta are needed only when reflection is actually selected. In the
   // symmetric-support case that remains canonical, avoid writing them at all.
