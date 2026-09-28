@@ -52,9 +52,38 @@ function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
   return value;
 }
 function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot){
-  // Exact local rows outrank weak bounds. Sacrifice bound coverage instead of
-  // evicting exact W/D/L; exact stores may replace bounds later.
-  if(cache.stamp[slot]===cache.epoch&&cache.value[slot]&&cache.value[slot]<=3)return 0;
+  // Exact rows outrank weak bounds even on a colliding q.
+  if(cache.stamp[slot]===cache.epoch){
+    const prior=cache.value[slot];
+    if(prior&&prior<=3)return 0;
+    if(prior>3){
+      const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
+      let same=0;
+      if(keyWords===14){
+        same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
+          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
+          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
+          (keys[base+6]^words[offset+6])|(keys[base+7]^words[offset+7])|
+          (keys[base+8]^words[offset+8])|(keys[base+9]^words[offset+9])|
+          (keys[base+10]^words[offset+10])|(keys[base+11]^words[offset+11])|
+          (keys[base+12]^words[offset+12])|(keys[base+13]^words[offset+13]));
+      }else if(keyWords===7){
+        same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
+          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
+          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
+          (keys[base+6]^words[offset+6]));
+      }else{
+        let diff=0;for(let w=0;w<keyWords;w+=1)diff|=keys[base+w]^words[offset+w];
+        same=diff===0;
+      }
+      if(same){
+        if(prior===value)return prior;
+        // Same q has both >=0 and <=0, therefore exact draw.
+        cache.value[slot]=2;
+        return 2;
+      }
+    }
+  }
   const keyWords=cache.keyWords;
   publishSpan32(cache.keys,slot*keyWords,words,offset,keyWords);
   cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
