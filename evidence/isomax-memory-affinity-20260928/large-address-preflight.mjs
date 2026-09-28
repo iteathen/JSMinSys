@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {prepareConnect4RbaGeometry} from '../../../isomax-p2-proof-mask-A/addons/rba-connect4-geometry.mjs';
+import {createConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32,probeConnect4RbaSharedExactCache32} from '../../../isomax-p2-proof-mask-A/addons/rba-connect4-shared-exact-cache.mjs';
+const geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),capacity=268435456;
+const cache=createConnect4RbaSharedExactCache32({capacity,keyWords:geometry.keyWords,geometry});
+const q=new Uint32Array(geometry.keyWords);q[0]=1;q[7]=4;
+assert.equal(cache.keys.length,2147483648);
+storeConnect4RbaSharedExactCache32(cache,q,0,3,0xffffffff);
+assert.equal(probeConnect4RbaSharedExactCache32(cache,q,0,0xffffffff),3);
+assert.equal(probeConnect4RbaSharedExactCache32(cache,q,0,0),0);
+storeConnect4RbaSharedExactCache32(cache,q,0,1,0);
+assert.equal(probeConnect4RbaSharedExactCache32(cache,q,0,0),1);
+assert.equal(probeConnect4RbaSharedExactCache32(cache,q,0,0xffffffff),3);
+console.log(JSON.stringify({status:'PASS',capacity,bytes:cache.keys.byteLength+cache.sequence.byteLength+cache.value.byteLength+cache.stats.byteLength,lastKeyIndex:cache.keys.length-1,firstLastSlotsIndependent:true}));
