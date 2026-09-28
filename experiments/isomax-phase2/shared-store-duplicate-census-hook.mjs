@@ -27,10 +27,10 @@ registerHooks({load(url,context,nextLoad){
       'export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,knownHash){\n'+
       '  const hash=knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash,\n'+
       '    slot=hash&cache.mask,\n'+
-      '    current=Atomics.load(cache.sequence,slot);\n'+
+      '    __observed=Atomics.load(cache.sequence,slot);\n'+
       '  Atomics.add(cache.duplicateStoreStats,0,1);\n'+
-      '  if(!current)Atomics.add(cache.duplicateStoreStats,1,1);\n'+
-      '  else if(current&1)Atomics.add(cache.duplicateStoreStats,2,1);\n'+
+      '  if(!__observed)Atomics.add(cache.duplicateStoreStats,1,1);\n'+
+      '  else if(__observed&1)Atomics.add(cache.duplicateStoreStats,2,1);\n'+
       '  else{\n'+
       '    const __base=slot*cache.keyWords,__priorValue=Atomics.load(cache.value,slot);\n'+
       '    let __same=1,__loads=0,__mismatch=-1;\n'+
@@ -40,7 +40,7 @@ registerHooks({load(url,context,nextLoad){
       '    }\n'+
       '    Atomics.add(cache.duplicateStoreStats,8,__loads);\n'+
       '    const __after=Atomics.load(cache.sequence,slot);\n'+
-      '    if(current!==__after||(__after&1)||!__priorValue)Atomics.add(cache.duplicateStoreStats,3,1);\n'+
+      '    if(__observed!==__after||(__after&1)||!__priorValue)Atomics.add(cache.duplicateStoreStats,3,1);\n'+
       '    else if(__same){\n'+
       '      Atomics.add(cache.duplicateStoreStats,4,1);\n'+
       '      if(__priorValue===value)Atomics.add(cache.duplicateStoreStats,5,1);\n'+
@@ -49,7 +49,8 @@ registerHooks({load(url,context,nextLoad){
       '      Atomics.add(cache.duplicateStoreStats,7,1);\n'+
       '      Atomics.add(cache.duplicateStoreMismatch,__mismatch,1);\n'+
       '    }\n'+
-      '  }');
+      '  }\n'+
+      '  const current=Atomics.load(cache.sequence,slot);');
     return {...result,source};
   }
 
