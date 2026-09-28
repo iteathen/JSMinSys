@@ -19,10 +19,12 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash)
     slot=hash&cache.mask,
     before=Atomics.load(cache.sequence,slot);
   if(!before||(before&1))return 0;
+  const packed=Atomics.load(cache.value,slot);
+  if((packed^hash)>>>2)return 0;
   const base=slot*cache.keyWords;
   for(let w=0;w<cache.keyWords;w+=1)
     if(Atomics.load(cache.keys,base+w)!==words[offset+w])return 0;
-  const value=Atomics.load(cache.value,slot),
+  const value=packed&3,
     after=Atomics.load(cache.sequence,slot);
   if(before!==after||(after&1)||!value)return 0;
   Atomics.add(cache.stats,0,1);
@@ -40,7 +42,7 @@ export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,know
   }
   const base=slot*cache.keyWords;
   for(let w=0;w<cache.keyWords;w+=1)Atomics.store(cache.keys,base+w,words[offset+w]);
-  Atomics.store(cache.value,slot,value);
+  Atomics.store(cache.value,slot,(hash&~3)|value);
   Atomics.store(cache.sequence,slot,(odd+1)>>>0);
   Atomics.add(cache.stats,1,1);
   return value;
