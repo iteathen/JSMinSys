@@ -1,0 +1,47 @@
+{
+  "status": "PREPARED_NOT_RUN",
+  "solverSha": "be7c2887defcefb37080fa61de7ce1dc38dc2990",
+  "runtime": "v27.0.0-nightly20260928b59840b593",
+  "workers": 4,
+  "wideWorker": 0,
+  "deepWorkers": [1,2,3],
+  "rootFrontier": true,
+  "sharedSampleMask": 0,
+  "privateBytesPerEntry": 36,
+  "sharedBytesPerEntry": 40,
+  "sharedStatisticsBytes": 12,
+  "pCoreL2Bytes": 1310720,
+  "sharedCells": [
+    {"id":"shared-control","entries":4194304,"payloadBytes":167772172},
+    {"id":"shared-16x","entries":67108864,"payloadBytes":2684354572}
+  ],
+  "privateCells": [
+    {"id":"retention-control","entries":1048576,"payloadBytes":37748736},
+    {"id":"l2-headroom","entries":16384,"payloadBytes":589824},
+    {"id":"l2-near","entries":32768,"payloadBytes":1179648},
+    {"id":"l2-above","entries":65536,"payloadBytes":2359296}
+  ],
+  "nextRun": {
+    "id":"M16",
+    "moves":"",
+    "timeoutMs":600000,
+    "sharedCacheCapacity":67108864,
+    "localCacheCapacity":1048576,
+    "affinity":"off",
+    "repetitions":1,
+    "runnerStatus":"cold configurable runner still required"
+  },
+  "exactConfirmation": {"moves":"35333571","timeoutMs":300000,"order":"ABBAABBA"},
+  "affinity": {
+    "status":"NOT_IMPLEMENTED",
+    "mode":"one logical processor on each of four distinct physical P-cores",
+    "processorIds":null,
+    "discoveryRequired":true,
+    "verifyOsAffinity":true,
+    "hotLoopCalls":0,
+    "placementStagePrerequisite":true
+  },
+  "automaticCartesianSweep":false,
+  "residencyGuaranteed":false,
+  "performanceQualified":false
+}
