@@ -57,3 +57,36 @@ output is correctness integration evidence, not single-worker qualification.
 Full local Verify equivalents, GREEN hosted Verify, clean fixed source commits,
 four-worker matched whole-process measurement, accepted/rejected disposition,
 canonical Connect4 result. No performance claim is made at this checkpoint.
+
+## GREEN and fixed-source measurement checkpoint
+
+Candidate source: 7f74e324457c4237590bc6b0f924852f6d728e4c.
+Full local suite180/180; catalog, both generator checks, geometry/frontier
+audits, schema,80-module syntax and both required CI smoke scripts passed.
+Hosted normal Verify36464380804 passed verify/schema/node-compatibility.
+Independent review's direct-traffic finding and L/LL definition are repaired.
+
+Matched local command, using clean detached source worktrees:
+
+```text
+node experiments/isomax-phase2/cpc-proof-mask-source-ab.mjs evidence/isomax-phase2-cpc-proof-mask-20260928/local-exact C:/r/isomax-p2-proof-mask-A C:/r/isomax-p2-proof-mask-B 353335714 8 90000
+```
+
+The primary90000ms application ceiling matches the established primary runner;
+hard fixture ceiling remains120000ms. Configured workers4 (0 wide,1/2/3 deep),
+mask0, shared4194304/local1048576. Available host parallelism16 is recorded and
+does not change configured workers. QueryProcessCycleTime measures the same
+whole host/worker bracket as the established Windows authority, but local and
+hosted measurements remain separately labelled populations.
+
+The cold AB/sample scripts derive from the already-qualified source-runner
+pattern; they add fixed SHA/clean/config/result/cleanup checks, preserve every
+child stdout/stderr and record all samples incrementally. Controller module-main
+and git helper include process/IO latency (unbounded, not zero); loop and
+filter/map/find/reduce/mean callbacks cost O(samples*metrics) plus JSON byte cost.
+They execute outside the sampled child process. Sample module-main includes
+module/geometry/profile/FFI setup before the bracket and all selected host/worker
+operation inside it. Result reduce/map/every callbacks and JSON output are
+post-bracket. No benchmark helper runs inside recursive search. These cold costs
+are declared rather than silently treated as zero; no source-ledger number is
+substituted for measured Intel process cycles.
