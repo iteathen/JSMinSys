@@ -2885,23 +2885,23 @@
         },
         {
           "op": "control.test.u32",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, and search-derived store predicates"
         },
         {
           "op": "control.branch",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, and search-derived store predicates"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "SB",
+          "count": "SBU",
           "target": "storeConnect4RbaBoundCacheSlot32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+FT+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32)+(H+E+FT+T)*CALL(absToRelative)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbs)+(S)*CALL(storeConnect4RbaExactCacheSlot32)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnly)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZF+ZA)*C(control.branch)+(SBU)*CALL(storeConnect4RbaBoundCacheSlot32)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -2926,12 +2926,11 @@
           "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
           "BH": "private LOWER0/UPPER0 hits consumed across the P search-state iterations",
           "BC": "zero-bound hits that immediately close the current alpha/beta window",
-          "ZC": "search cutoff/forced-terminal seams that test a returned value for zero-bound publication (0 or 1 before return)",
           "ZF": "completed non-exact fail-low seam testing best===0 (0 or 1)",
           "ZA": "second alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
-          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+          "SBU": "admitted search-derived UPPER0 store attempts in this invocation (0 or 1)"
         },
-        "note": "Production CPC-only Negamax plus local search-derived LOWER0/UPPER0 reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only.",
+        "note": "Production CPC-only Negamax plus local search-derived UPPER0-only reuse. Bound hits are mover-relative, private-only, and can cut off or tighten the current window. Search fail-high/fail-low seams may publish one weak zero bound; exact stores remain authoritative and shared publication remains exact-only. LOWER0 publication is disabled in this experimental arm.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed",
@@ -7909,23 +7908,23 @@
         },
         {
           "op": "control.test.u32",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
         },
         {
           "op": "control.branch",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "SB",
+          "count": "SBU",
           "target": "storeConnect4RbaBoundCacheSlot32Behavior"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+(1+3*N+2*S+2*Q+3*A)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Behavior)+(H+E+FT+T)*CALL(absToRelativeBehavior)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsBehavior)+(S)*CALL(storeConnect4RbaExactCacheSlot32Behavior)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyBehavior)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeBehaviorNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZF+ZA)*C(control.branch)+(SBU)*CALL(storeConnect4RbaBoundCacheSlot32Behavior)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -7951,12 +7950,11 @@
           "EL": "1 when normal branch completion was not full-window and tests best===-1 for exact loss publication; otherwise 0",
           "BH": "private LOWER0/UPPER0 hits consumed across the P behavior search-state iterations",
           "BC": "zero-bound hits that immediately close the current alpha/beta window",
-          "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
           "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
           "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
-          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+          "SBU": "admitted search-derived UPPER0 store attempts in this invocation (0 or 1)"
         },
-        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived LOWER0/UPPER0 reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged.",
+        "note": "Behavior CPC-only Negamax mirrors canonical local search-derived UPPER0-only reuse while preserving completion/cancellation checkpoints. Bounds remain private and mover-relative; exact/shared semantics remain unchanged. LOWER0 publication is disabled in this experimental arm.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -8956,23 +8954,23 @@
         },
         {
           "op": "control.test.u32",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
         },
         {
           "op": "control.branch",
-          "count": "H+4*BH-BC+ZC+ZF+ZA",
+          "count": "H+4*BH-BC+ZF+ZA",
           "note": "exact-vs-bound class, bound kind/window/tighten, search-derived store predicates"
         },
         {
           "op": "runtime.call.subledger",
-          "count": "SB",
+          "count": "SBU",
           "target": "storeConnect4RbaBoundCacheSlot32Frontier"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZC+ZF+ZA)*C(control.branch)+(SB)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)",
+        "expression": "(4+8*P+8*Q+10*A+4*O)*C(runtime.field.load)+((1+3*N+2*S+2*Q+3*A)-P)*C(runtime.field.store)+(2+3*N+4*Q+4*A+3*O+J+K)*C(memory.load.u32)+(2*N+2*L+2*K)*C(memory.store.u32)+(1+2*Q+2*A+L+L3)*C(alu.imul.u32)+(3+5*N+6*Q+6*A+3*O+5*L+4*K+2*J)*C(alu.add.u32)+(4*N+2*A+K+2*Q)*C(alu.sub.u32)+(1+6*N+3*A+O+2*Q)*C(alu.and.u32)+(A+O+Q)*C(alu.shl.u32)+(1+3*N)*C(alu.shr.u32)+(2*(Q+R))*C(alu.xor.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.test.u32)+(3+7*N+5*A+U+4*O+4*L+2*J+5*Q + EC + EL)*C(control.branch)+(P)*CALL(mixSpan32Locator32)+(P)*CALL(probeConnect4RbaExactCacheSlot32Frontier)+(H+E+FT+T)*CALL(absToRelativeFrontier)+(N)*CALL(evaluateConnect4CpcNonterminal32)+(RA)*CALL(relativeToAbsFrontier)+(S)*CALL(storeConnect4RbaExactCacheSlot32Frontier)+(Q+FT+C)*CALL(connect4RbaCofactorKnownHeight)+(Q+R)*CALL(connect4RbaCanonicalize)+(R)*CALL(searchCpcOnlyFrontier)+(L3)*CALL(evaluateConnect4LiveLine3x32)+(LG)*CALL(evaluateConnect4LiveLineCell32)+(Q+R)*CALL(advanceConnect4LiveLineState32)+(B)*CALL(completeRootFrontierNode32)+(K)*C(control.test.u32)+(K)*C(control.branch)+(P)*C(memory.load.f64)+(P)*C(memory.store.f64)+(HORIZON)*C(runtime.field.load)+(HORIZON+R+BRANCH)*C(control.test.u32)+(HORIZON+R+BRANCH)*C(control.branch)+(POLARITY+2*Q+3*R)*C(runtime.to_int32)+(BC)*C(runtime.field.store)+(H+4*BH-BC+ZF+ZA)*C(control.test.u32)+(H+4*BH-BC+ZF+ZA)*C(control.branch)+(SBU)*CALL(storeConnect4RbaBoundCacheSlot32Frontier)",
         "parameters": {
           "P": "search-state iterations processed inside this invocation, including CPC-forced transit states and the terminating/branching state",
           "H": "1 when the terminating iteration is an exact-cache hit; otherwise 0",
@@ -9002,12 +9000,11 @@
           "POLARITY": "Executed sign*WDL/bound completion transports in this invocation (0 or 1); 2*Q normalizes forced child bounds; 3*R normalizes recursive bounds and returned result, including STOP/incomplete sentinels.",
           "BH": "private LOWER0/UPPER0 hits consumed across the P frontier search-state iterations",
           "BC": "zero-bound hits that immediately close the current alpha/beta window",
-          "ZC": "search cutoff/forced-terminal zero-bound publication tests (0 or 1 before return)",
           "ZF": "completed non-exact fail-low best===0 test (0 or 1)",
           "ZA": "alphaOrig>=0 test when the completed fail-low has best===0 (0 or 1)",
-          "SB": "admitted search-derived zero-bound store attempts in this invocation (0 or 1)"
+          "SBU": "admitted search-derived UPPER0 store attempts in this invocation (0 or 1)"
         },
-        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived LOWER0/UPPER0 reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private.",
+        "note": "Forced-macro CPC-only Negamax. Exact-cache probe and CPC closure remain visible on every transit state (P/N). Q forced nonterminal edges cofactor/canonicalize/advance live state in-loop and do not recurse or publish the resolved forced parent merely because a later state resolves. Ordinary branching occurs at most once per invocation and remains fully decomposed. Winning fail-high endpoints add one conditional test/branch at the cutoff; admitted publications use existing RA/S call costs. Current q/mover precedes forced-tail sign transport. Interior cutoff values are not published. After all relevant actions return without beta cutoff, an upper bound -1 also publishes exactly. Additional EL test/branch and existing RA/S subledger costs are retained. Selected frontier variant: inherits recursive work, adds horizon and unfinished propagation. P counter updates now use prepared Float64 storage; the prior field-counter store is removed and the typed load/store is counted; source-operation inventory is not an assertion of one instruction per operation. Integer-polarity realization: explicit |0 preserves finite WDL/bounds/sentinels while canonicalizing -0 to draw zero. Conversion cost is declared, not assumed free; avoids preserving IEEE signed zero. See evidence/isomax-int32-polarity-20260927 for matched operation cycles and V8 trace. Local search-derived UPPER0-only reuse is inherited from canonical search before the frontier horizon gate; immediate bound cutoffs skip CPC/horizon work and bounds remain private. LOWER0 publication is disabled in this experimental arm.",
         "targetCyclesPerNode": 1000
       },
       "status": "decomposed"
@@ -9712,7 +9709,7 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
-    "addons/rba-connect4-alphabeta.mjs": "1d38c46314d609abca23dc99029ede91e9f9bf32",
+    "addons/rba-connect4-alphabeta.mjs": "2303b9ff41ae247689dcd7aafe8d0ec13cd867d9",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
@@ -9726,10 +9723,10 @@
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
-    "addons/rba-connect4-alphabeta-behavior.mjs": "e85c0e38d363b2c8603b0d84cc21c8d3bca720aa",
+    "addons/rba-connect4-alphabeta-behavior.mjs": "031a1c11de0356db5f85edb1fc4dfa211908913e",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "67e7fd50890fc1cc7905bf8abc47361f27341c80",
     "addons/worker-behavior-search.mjs": "670adc721408d16d036f9afe4b621720655132ff",
-    "addons/rba-connect4-frontier.mjs": "994ebe7f5029ce834f94960de317a1591dd7cd00",
+    "addons/rba-connect4-frontier.mjs": "35ca34edbee9066e16794f68a75566f6d9debdc7",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "3e3b3cf90cd298929e63355204e1abb57f41d89a"
   },
