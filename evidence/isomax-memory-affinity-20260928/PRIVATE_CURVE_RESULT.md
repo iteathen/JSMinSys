@@ -24,3 +24,9 @@ Nearest supported power-of-two size is288MiB/worker (8388608entries);256MiB itse
 |288|32.935|482075353928|60615217|
 
 288MiB improves further on this hard fixture; reductions versus72MiB are descriptive single-run comparisons,not paired qualification. No confidence interval or universal saturation/empty-board conclusion. All new capacities remain curve experiments,not automatically promoted production defaults. See private-curve-288-analysis.json and raw/manifest/sample files for exact values and provenance.
+
+## Larger point: owner requested1GiB
+
+Nearest supported capacity33554432entries=1152MiB(1.125GiB)/worker. One candidate-only run; no baseline rerun. Same fixed source,nightly,4pinned workers,10GiB shared,35333571,300000ms. EXACT,-1,move4;all4workers active/exited,cleanup=true. Wall33.0614747s,483474833037cycles,59077579nodes. Compared with recorded288MiB: slightly higher cycles/wall and fewer nodes. This suggests diminishing returns on THIS fixture; no precise saturation point or empty-board optimum established. No default changed.
+
+Updated curve:18MiB66.546s;36MiB historical mean56.255s;72MiB40.683s;288MiB32.935s;1152MiB33.061s. All new points singleton screens. Complete raw evidence and exact comparison deltas in private-curve-1152 files.
