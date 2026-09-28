@@ -1,0 +1,41 @@
+name: IsoMax Phase2 isolated shared-hash screen
+
+on:
+  push:
+    branches:
+      - experiment/isomax-phase2-bench-orchestrator-20260927
+
+permissions:
+  contents: read
+
+jobs:
+  hash-reuse:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" 4161b37e949adf05d3e10978547a40adf15a2743
+          git worktree add "$env:RUNNER_TEMP/arm-b" 2cf45625023877072a9a4e6f4e2667a7aee7b4c2
+          git worktree add "$env:RUNNER_TEMP/arm-c" 48c514e747cb2656666b951f97e0928dda501cf7
+      - name: Exact derived long
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-hash.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-hash/derived-long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 353335714 6 90000
+      - name: Official hard fixed window
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-shared-hash.mjs "$env:RUNNER_TEMP/isomax-phase2-shared-hash/hard" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-isolated-shared-hash
+          path: ${{ runner.temp }}/isomax-phase2-shared-hash
+          if-no-files-found: error
+          retention-days: 30
