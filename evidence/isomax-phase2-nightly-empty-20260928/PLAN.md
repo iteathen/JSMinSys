@@ -22,3 +22,9 @@ sharedSampleMask0,rootFrontier=true. Reuse existing source-sample measurement.
 No ply instrumentation or hot loop changes. Raw output persisted before checks.
 Cold orchestration: at most10process launches with nonzero OS/blocking costs,
 Git checks, JSON/I/O O(raw bytes), fixed numeric validation. Outside solve bracket.
+
+Execution disposition: runtime screen completed8/8. Empty-board baseline reached
+600-second timeout; owner explicitly cancelled candidate during execution.
+Preserve cancellation.json and raw nonzero exit. Do not resume the old run.mjs
+empty command: this series is retired at owner direction,not awaiting retry.
+See REPORT.md and the canonical shared-TT/L2 experimental plan for next work.
