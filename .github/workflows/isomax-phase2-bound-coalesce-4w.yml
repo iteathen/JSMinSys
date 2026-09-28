@@ -1,0 +1,45 @@
+name: IsoMax Phase2 4-worker bound coalescing
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-bound-coalesce-4w.yml"
+      - "experiments/isomax-phase2/scaled4-bound-coalesce.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coalesce:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize fixed verified arms
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/arm-a" 00ecc7d20ed08ee9585c92aa8441a8ef3969b7ee
+          git worktree add "$env:RUNNER_TEMP/arm-b" 38ef5684180e129a805d42a6383377d17b0289a2
+          git worktree add "$env:RUNNER_TEMP/arm-c" 501540f69b0e3cfe3b3895291cfd34b05985554d
+          git worktree add "$env:RUNNER_TEMP/arm-d" e449df20dc59cc6c1e5b2da78134751a2376f355
+      - name: Derived long exact screen
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-bound-coalesce.mjs "$env:RUNNER_TEMP/isomax-phase2-bound-coalesce-4w/derived-long" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 353335714 4 90000
+      - name: Official hard fixed-window screen
+        shell: pwsh
+        run: node experiments/isomax-phase2/scaled4-bound-coalesce.mjs "$env:RUNNER_TEMP/isomax-phase2-bound-coalesce-4w/official-hard" "$env:RUNNER_TEMP/arm-a" "$env:RUNNER_TEMP/arm-b" "$env:RUNNER_TEMP/arm-c" "$env:RUNNER_TEMP/arm-d" 35333571 1 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-bound-coalesce-4w
+          path: ${{ runner.temp }}/isomax-phase2-bound-coalesce-4w
+          if-no-files-found: error
+          retention-days: 30

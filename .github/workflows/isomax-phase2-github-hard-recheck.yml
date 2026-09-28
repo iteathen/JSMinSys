@@ -1,0 +1,47 @@
+name: IsoMax Phase2 GitHub hard recheck
+
+on:
+  pull_request:
+    branches: [experiment/async-strategist-campaign-20260926]
+    paths:
+      - ".github/workflows/isomax-phase2-github-hard-recheck.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hard-recheck:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Record runner environment
+        shell: pwsh
+        run: |
+          node --version
+          node -p "process.versions.v8"
+          Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,TotalVisibleMemorySize
+          Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed
+          git rev-parse HEAD
+      - name: Materialize fixed selected-production sources
+        shell: pwsh
+        run: |
+          git worktree add "$env:RUNNER_TEMP/control" a3cf7f9ca5c90e5025542c3b27ab0b735a610e9a
+          git worktree add "$env:RUNNER_TEMP/candidate" 00ecc7d20ed08ee9585c92aa8441a8ef3969b7ee
+      - name: Official hard 35333571 rerun
+        shell: pwsh
+        run: node experiments/isomax-phase2/selected-production-ab.mjs "$env:RUNNER_TEMP/isomax-phase2-github-hard-recheck" "$env:RUNNER_TEMP/control" "$env:RUNNER_TEMP/candidate" 35333571 2 120000
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-github-hard-recheck
+          path: ${{ runner.temp }}/isomax-phase2-github-hard-recheck
+          if-no-files-found: error
+          retention-days: 30
