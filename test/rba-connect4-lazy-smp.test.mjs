@@ -10,8 +10,11 @@ import {
 import {
   createConnect4RbaSharedExactCache32,
   probeConnect4RbaSharedExactCache32,
+  probeConnect4RbaSharedExactCacheKnownHash32,
   storeConnect4RbaSharedExactCache32,
+  storeConnect4RbaSharedExactCacheKnownHash32,
 } from '../addons/rba-connect4-shared-exact-cache.mjs';
+import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
 
 test('shared exact cache publishes only fully committed exact rows',()=>{
@@ -22,6 +25,16 @@ test('shared exact cache publishes only fully committed exact rows',()=>{
   assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
   storeConnect4RbaSharedExactCache32(cache,b,0,2);
   assert.ok(cache.stats[1]>=2);
+});
+
+test('shared exact known-hash helpers retain full-key validation',()=>{
+  const cache=createConnect4RbaSharedExactCache32({capacity:8,keyWords:2}),
+    a=Uint32Array.from([11,22]),b=Uint32Array.from([33,44]),
+    hash=mixSpan32Locator32(a,0,2);
+  assert.equal(storeConnect4RbaSharedExactCacheKnownHash32(cache,a,0,3,hash),3);
+  assert.equal(probeConnect4RbaSharedExactCacheKnownHash32(cache,a,0,hash),3);
+  assert.equal(probeConnect4RbaSharedExactCacheKnownHash32(cache,b,0,hash),0);
+  assert.equal(probeConnect4RbaSharedExactCache32(cache,a,0),3);
 });
 
 test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
