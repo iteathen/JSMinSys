@@ -40,7 +40,7 @@ for(const [slot,arm] of [...'ABBA'].entries()){
   assert.deepEqual(row.config,{...manifest.profile.options,...manifest.input});
   assert.equal(row.requestedWorkers,7);assert.equal(row.workersUsed,7);
   assert.equal(row.workersExited,7);assert.equal(row.cleanup,true);
-  assert.equal(row.errorCode,0);assert.deepEqual(row.errors,[]);
+  assert.equal(row.errorCode,row.status==='TIMEOUT'?102:0);assert.deepEqual(row.errors,[]);
   assert.ok(row.nodeCounts.length===7&&row.nodeCounts.every(n=>n>0),'every worker must do work');
   assert.ok(['EXACT','TIMEOUT'].includes(row.status));
   if(row.status==='EXACT'){
