@@ -1,0 +1,44 @@
+name: IsoMax Phase2 shared traffic census
+
+on:
+  pull_request:
+    branches: [experiment/isomax-phase2-shared-hash-coalesced-20260927]
+    paths:
+      - ".github/workflows/isomax-phase2-shared-traffic-census.yml"
+      - "experiments/isomax-phase2/shared-traffic-census-*"
+      - "experiments/isomax-phase2/SHARED_TRAFFIC_CENSUS_ACCOUNTING.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "26.7.0"
+      - name: Materialize frozen preferred candidate
+        shell: pwsh
+        run: git worktree add "$env:RUNNER_TEMP/pure" f549dcfdd7d4d0c5ed5cd01cb3141812f1d59862
+      - name: Exact derived-long traffic census
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:RUNNER_TEMP/isomax-phase2-shared-traffic-census" | Out-Null
+          node --import ./experiments/isomax-phase2/shared-traffic-census-hook.mjs ./experiments/isomax-phase2/shared-traffic-census-run.mjs "$env:RUNNER_TEMP/pure" 353335714 90000 | Out-File -Encoding utf8 "$env:RUNNER_TEMP/isomax-phase2-shared-traffic-census/derived-long.json"
+      - name: Hard diagnostic window
+        shell: pwsh
+        run: node --import ./experiments/isomax-phase2/shared-traffic-census-hook.mjs ./experiments/isomax-phase2/shared-traffic-census-run.mjs "$env:RUNNER_TEMP/pure" 35333571 60000 | Out-File -Encoding utf8 "$env:RUNNER_TEMP/isomax-phase2-shared-traffic-census/hard-60s.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: isomax-phase2-shared-traffic-census
+          path: ${{ runner.temp }}/isomax-phase2-shared-traffic-census
+          if-no-files-found: error
+          retention-days: 30
