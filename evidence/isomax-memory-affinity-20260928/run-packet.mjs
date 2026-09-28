@@ -8,7 +8,7 @@ const dir='evidence/isomax-memory-affinity-20260928',packetPath=process.argv[2],
 const runtime=JSON.parse(readFileSync(dir+'/runtime.json','utf8')),library=p.library??'C:/r/isomax-p2-proof-mask-A',sha=p.sourceSha??'be7c2887defcefb37080fa61de7ce1dc38dc2990';
 const git=(path,...args)=>execFileSync('git',['-C',path,...args],{encoding:'utf8'}).trim();
 const helperSha=git('.','rev-parse','HEAD');
-assert.match(p.id,/^[a-zA-Z0-9-]+$/);assert.ok(['A','AB','ABBA','ABBAABBA'].includes(p.order));assert.ok(p.timeoutMs<=600000&&p.timeoutMs>0);assert.ok(['','35333571','353335714'].includes(p.fixture));
+assert.match(p.id,/^[a-zA-Z0-9-]+$/);assert.ok(['A','AB','ABBA','ABBAABBA'].includes(p.order));assert.ok(p.timeoutMs<=600000&&p.timeoutMs>0);assert.ok(['','35333571','353335714','151231'].includes(p.fixture));
 assert.equal(existsSync(`${dir}/${p.id}-raw.jsonl`),false,'never silently repeat a packet');
 assert.equal(execFileSync(runtime.nodeExe,['--version'],{encoding:'utf8'}).trim(),runtime.version);
 const targets=JSON.parse(readFileSync(dir+'/targets.json','utf8'));
@@ -30,7 +30,7 @@ for(const [index,arm] of [...p.order].entries()){
  appendFileSync(`${dir}/${p.id}-samples.jsonl`,JSON.stringify(row)+'\n');
  assert.equal(row.sourceSha,sha);assert.equal(row.fixture,p.fixture);assert.equal(row.config.sharedCacheCapacity,c.shared);assert.equal(row.config.localCacheCapacity,c.private);assert.equal(row.cleanup,true);assert.equal(row.workersExited,4);assert.deepEqual(row.errors,[]);assert.ok(row.nodeCounts.every(n=>n>0));
  if(c.pin)for(let i=0;i<4;i++){const rec=JSON.parse(readFileSync(prefix+'-'+i+'.json','utf8'));assert.equal(rec.index,i);assert.equal(rec.actual.group,targets[i].group);assert.equal(rec.actual.processor,targets[i].processor);assert.equal(rec.actual.mask,String(1n<<BigInt(targets[i].processor)));}
- if(row.status==='EXACT'){assert.equal(row.errorCode,0);assert.equal(row.rootWdl,p.fixture?-1:1);if(p.fixture)assert.equal(row.move,4);}
+ if(row.status==='EXACT'){assert.equal(row.errorCode,0);assert.equal(row.rootWdl,p.fixture==='151231'?1:p.fixture?-1:1);if(p.fixture&&p.fixture!=='151231')assert.equal(row.move,4);if(p.fixture==='151231')assert.ok(Number.isInteger(row.move)&&row.move>=0&&row.move<7);}
  else{assert.equal(row.status,'TIMEOUT');assert.equal(row.errorCode,102);assert.equal(row.rootWdl,null);}
  rows.push(row);console.log(JSON.stringify({packet:p.id,index,arm,status:row.status,cycles:row.solveCycles,wallMs:row.wallMs,nodes:row.totalNodes}));
  if(p.stopOnCensoredFirstPair&&index===1&&rows.some(r=>r.status!=='EXACT')){console.log('CENSORED FIRST PAIR: stopped per plan');break;}
