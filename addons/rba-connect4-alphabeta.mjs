@@ -182,11 +182,13 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       if(cached<=3){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
       if(cached===RBA_CACHE_LOWER0){
         if(beta<=0){state.cutoffs+=1;return 0;}
-        if(alpha<0)alpha=0;
-      }else{
-        if(alpha>=0){state.cutoffs+=1;return 0;}
-        if(beta>0)beta=0;
+      }else if(alpha>=0){state.cutoffs+=1;return 0;}
+      if(cache.shared&&!(cacheHash&cache.sharedSampleBits)){
+        const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset);
+        if(shared){state.cacheHits+=1;return sign*absToRelative(shared,mover);}
       }
+      if(cached===RBA_CACHE_LOWER0){if(alpha<0)alpha=0;}
+      else if(beta>0)beta=0;
     }
 
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
