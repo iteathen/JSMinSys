@@ -82,7 +82,8 @@ All eight samples report workersExited=7, cleanup=true, errors=[], and
 errorCode=102 (documented HOST_DEADLINE). No idle-worker regression observed.
 completedWorkers are all zero: no evaluator completed an exact proof. Frontier
 metric arrays are retained verbatim; their zero timeout rows are not proof of
-absent frontier work. No benchmark Node process remained after the final run.
+absent frontier work. The post-run check found no process using the benchmark's
+known Node executable; it did not establish absence under other runtimes.
 
 ## Why these results are suspicious
 
@@ -101,8 +102,9 @@ diagnostic discrepancy, not a measured code-regression ratio.
 Checks made without altering the experiment:
 
 - No wrong revision or dirty solver tree found.
-- No orphan benchmark process found. During execution only the active solver
-  and its controller used this Node runtime. Earlier sampled PIDs had exited.
+- No orphan process found under the known benchmark Node executable at the
+  checked timestamps. Only the active solver and controller used that runtime;
+  earlier sampled PIDs had exited. Other runtimes were outside this check.
 - Normal process priority and affinity mask 65535 (all 16 logical processors).
 - Cold controller used 0.25 CPU-seconds by late block 0; block 1 snapshot showed
   0.125 controller CPU-seconds versus 291.156 solver CPU-seconds. These snapshots
