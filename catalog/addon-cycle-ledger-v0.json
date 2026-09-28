@@ -6176,7 +6176,7 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": "1+K+2*E"
+          "count": "1+F+K+Q"
         },
         {
           "op": "memory.load.u32",
@@ -6196,11 +6196,11 @@
         },
         {
           "op": "control.test.u32",
-          "count": "3+K+3*E"
+          "count": "3+F+K+3*Q"
         },
         {
           "op": "control.branch",
-          "count": "2+K+E"
+          "count": "2+F+K+Q"
         },
         {
           "op": "atomic.rmw.u32",
@@ -6215,17 +6215,44 @@
           "op": "control.branch",
           "count": 1,
           "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "F",
+          "note": "packed locator fingerprint XOR"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "F",
+          "note": "ignore low two exact-code bits in fingerprint comparison"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "F",
+          "note": "packed fingerprint mismatch test"
+        },
+        {
+          "op": "control.branch",
+          "count": "F",
+          "note": "fail closed before full-key comparison on fingerprint mismatch"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "Q",
+          "note": "decode exact W/D/L from packed low two bits"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2*K)*C(alu.add.u32)+(3+K+3*E)*C(control.test.u32)+(2+K+E)*C(control.branch)+(E)*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(6+K)*C(runtime.field.load)+(1+F+K+Q)*C(atomic.load.u32)+K*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(3+F+K+3*Q)*C(control.test.u32)+(2+F+K+Q)*C(control.branch)+E*C(atomic.rmw.u32)+C(control.test.u32)+C(control.branch)+F*C(alu.xor.u32)+F*C(alu.shr.u32)+F*C(control.test.u32)+F*C(control.branch)+Q*C(alu.and.u32)",
         "parameters": {
-          "K": "shared exact-cache key words compared before mismatch or full equality",
-          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
-          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
+          "K": "shared exact-cache key words compared after the packed fingerprint matches; 0 on fingerprint mismatch",
+          "E": "1 when full key and final sequence validation yield a committed exact hit; 0 otherwise",
+          "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally",
+          "F": "1 when a nonzero even slot sequence admits the packed-value fingerprint check; 0 on empty/odd sequence",
+          "Q": "1 when the fingerprint passes and full q-key equality reaches exact-code decode/final sequence validation; 0 otherwise"
         },
-        "note": "Seqlock-style shared exact probe. Every shared key word is atomically loaded; an odd/changing sequence fails closed as a cache miss. Known-hash callers skip duplicate locator mixing but retain full shared key/sequence validation."
+        "note": "Shared exact probe reuses the known locator hash as a packed-value fingerprint. Fingerprint mismatch fails closed before full q-key loads. Fingerprint equality is never identity: full q-key and final sequence validation remain mandatory. Existing field-load inventory is retained conservatively."
       },
       "status": "decomposed"
     },
@@ -6262,7 +6289,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.imul.u32",
@@ -6289,17 +6316,22 @@
           "op": "control.branch",
           "count": 1,
           "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 1,
+          "note": "pack exact code into locator fingerprint value word"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+(K)*C(memory.load.u32)+(2)*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(3)*C(control.test.u32)+(2)*C(control.branch)+C(control.test.u32)+C(control.branch)",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+(7+K)*C(runtime.field.load)+C(atomic.load.u32)+(1+C)*C(atomic.rmw.u32)+(K+3)*C(atomic.store.u32)+K*C(memory.load.u32)+3*C(alu.and.u32)+C(alu.or.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+3*C(control.test.u32)+2*C(control.branch)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "K": "shared exact-cache key words atomically published on an uncontended store; 0 on early contention return",
           "C": "1 when contention accounting Atomics.add executes; 0 on successful slot ownership",
           "KH": "1 when the caller supplies the already-computed full q locator hash; 0 when the shared helper computes it locally"
         },
-        "note": "Direct-mapped shared exact publication uses per-slot sequence CAS. Contended stores are safely dropped because the shared table is only a cache, never an ownership authority. Known-hash callers skip duplicate locator mixing; sequence CAS/key/value publication is unchanged."
+        "note": "Direct-mapped shared exact publication packs the locator fingerprint into unused high bits of the existing value word; low two bits remain exact W/D/L. No extra per-slot storage or hash computation is added. Sequence CAS/key publication semantics are unchanged."
       },
       "status": "decomposed"
     },
@@ -9827,7 +9859,7 @@
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
-    "addons/rba-connect4-shared-exact-cache.mjs": "fcee9a5142adb54976a40429b24534c9f459d63d",
+    "addons/rba-connect4-shared-exact-cache.mjs": "7c6bab239d03a396a9ffaec8c0ef14c4ad47fc53",
     "addons/rba-connect4-lazy-smp-host.mjs": "0229e81d0e2ec3d2b108ea7180b128d2cd2a3709",
     "addons/rba-connect4-lazy-smp-worker.mjs": "92ac955265067acb81ffc139c2b844be938a278f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
