@@ -19,11 +19,12 @@ export function createConnect4RbaExactCache32({capacity=65536,keyWords,geometry=
   if(geometry!==null&&geometry!==undefined&&geometry.keyWords!==keyWords)
     throw new RangeError('exact cache/profile mismatch');
   const compact8=isCompactProfile8(geometry,keyWords)?1:0,storedKeyWords=compact8?8:keyWords;
-  return {mask:capacity-1,keyWords,storedKeyWords,compact8,epoch:1,stamp:new Uint32Array(capacity),value:new Uint8Array(capacity),
+  return {mask:capacity-1,keyWords,storedKeyWords,compact8,epoch:1,tag:new Uint32Array(capacity),
     keys:new Uint32Array(capacity*storedKeyWords)};
 }
 function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
-  if(cache.stamp[slot]===cache.epoch){
+  const tag=cache.tag[slot];
+  if((tag>>>3)===cache.epoch){
     const keyWords=cache.keyWords,base=slot*cache.storedKeyWords,keys=cache.keys;
     if(cache.compact8){
       if(keys[base]===words[offset]&&
@@ -34,7 +35,7 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
          keys[base+5]===words[offset+11]&&
          keys[base+6]===words[offset+12]&&
          keys[base+7]===compactTailProfile8(words,offset))
-        return cache.value[slot];
+        return tag&7;
     }else if(keyWords===14){
       if(!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
@@ -43,16 +44,16 @@ function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
          (keys[base+8]^words[offset+8])|(keys[base+9]^words[offset+9])|
          (keys[base+10]^words[offset+10])|(keys[base+11]^words[offset+11])|
          (keys[base+12]^words[offset+12])|(keys[base+13]^words[offset+13])))
-        return cache.value[slot];
+        return tag&7;
     }else if(keyWords===7){
       if(!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
-         (keys[base+6]^words[offset+6])))return cache.value[slot];
+         (keys[base+6]^words[offset+6])))return tag&7;
     }else{
       let diff=0;
       for(let w=0;w<keyWords;w+=1)diff|=keys[base+w]^words[offset+w];
-      if(diff===0)return cache.value[slot];
+      if(diff===0)return tag&7;
     }
   }
   return cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0;
@@ -66,14 +67,15 @@ function storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash){
     keys[base+5]=words[offset+11];keys[base+6]=words[offset+12];
     keys[base+7]=compactTailProfile8(words,offset);
   }else publishSpan32(keys,base,words,offset,cache.keyWords);
-  cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
+  cache.tag[slot]=((cache.epoch<<3)|value)>>>0;
   if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,value,hash);
   return value;
 }
 function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
   // Exact rows outrank weak bounds even on a colliding q.
-  if(cache.stamp[slot]===cache.epoch){
-    const prior=cache.value[slot];
+  const tag=cache.tag[slot];
+  if((tag>>>3)===cache.epoch){
+    const prior=tag&7;
     if(prior&&prior<=3)return 0;
     if(prior>3){
       const keyWords=cache.keyWords,base=slot*cache.storedKeyWords,keys=cache.keys;
@@ -107,7 +109,7 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
       if(same){
         if(prior===value)return prior;
         // Same q has both >=0 and <=0, therefore exact draw.
-        cache.value[slot]=2;
+        cache.tag[slot]=((cache.epoch<<3)|2)>>>0;
         if(cache.shared&&!(hash&cache.sharedSampleBits))storeConnect4RbaSharedExactCache32(cache.shared,words,offset,2,hash);
         return 2;
       }
@@ -121,7 +123,7 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
     keys[base+5]=words[offset+11];keys[base+6]=words[offset+12];
     keys[base+7]=compactTailProfile8(words,offset);
   }else publishSpan32(keys,base,words,offset,cache.keyWords);
-  cache.value[slot]=value;cache.stamp[slot]=cache.epoch;
+  cache.tag[slot]=((cache.epoch<<3)|value)>>>0;
   return value;
 }
 export function probeConnect4RbaExactCache32(cache,words,offset){
@@ -134,11 +136,10 @@ export function storeConnect4RbaExactCache32(cache,words,offset,value){
   return storeConnect4RbaExactCacheSlot32(cache,words,offset,value,slot,hash);
 }
 function resetConnect4RbaExactCache32(cache){
-  let epoch=(cache.epoch+1)>>>0;
-  if(!epoch){cache.stamp.fill(0);epoch=1;}
+  let epoch=cache.epoch+1;
+  if(epoch>0x1fffffff){cache.tag.fill(0);epoch=1;}
   cache.epoch=epoch;
 }
-
 function absToRelative(value,mover){return value===2?0:mover===0?value-2:2-value;}
 function relativeToAbs(value,mover){return value===0?2:mover===0?value+2:2-value;}
 export function prepareConnect4RbaAlphaBeta({

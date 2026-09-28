@@ -9,7 +9,7 @@ import {resetConnect4LiveLineState32,advanceConnect4LiveLineState32} from '../ad
 // a public production entry point or altering its body.
 const url=new URL('../addons/rba-connect4-alphabeta.mjs',import.meta.url);
 const source=readFileSync(url,'utf8').replace(/from '([^']+)'/g,(_,p)=>`from '${new URL(p,url).href}'`);
-const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly,probeConnect4RbaExactCacheSlot32,storeConnect4RbaBoundCacheSlot32,mixSpan32Locator32};').toString('base64'));
+const api=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {searchCpcOnly,probeConnect4RbaExactCacheSlot32,storeConnect4RbaBoundCacheSlot32,resetConnect4RbaExactCache32,mixSpan32Locator32};').toString('base64'));
 function prepared(g,moves){
   const root=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),s=api.prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:65536});
   s.words.set(root.words);s.basis.set(root.basis);s.basisSize[0]=root.basis.length;
@@ -27,6 +27,23 @@ const search=(g,moves,a,b)=>{
     privateCached=api.probeConnect4RbaExactCacheSlot32(s.cache,root.words,0,slot,hash);
   return {value,cached:api.probeConnect4RbaExactCache32(s.cache,root.words,0),privateCached,s};
 };
+test('private cache packs epoch and value into one exact uint32 tag',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    q=connect4RbaFromMoves([3,2,3,2,4,2],{geometry:g,canonical:false}),
+    cache=api.createConnect4RbaExactCache32({capacity:8,keyWords:g.keyWords,geometry:g});
+  assert.ok(cache.tag instanceof Uint32Array);
+  assert.equal('stamp' in cache,false);assert.equal('value' in cache,false);
+  api.storeConnect4RbaExactCache32(cache,q.words,0,3);
+  const hash=api.mixSpan32Locator32(q.words,0,g.keyWords),slot=hash&cache.mask,tag=cache.tag[slot];
+  assert.equal(tag>>>3,cache.epoch);assert.equal(tag&7,3);
+  assert.equal(api.probeConnect4RbaExactCache32(cache,q.words,0),3);
+  api.resetConnect4RbaExactCache32(cache);
+  assert.equal(api.probeConnect4RbaExactCache32(cache,q.words,0),0);
+  cache.epoch=0x1fffffff;cache.tag.fill(0xffffffff);
+  api.resetConnect4RbaExactCache32(cache);
+  assert.equal(cache.epoch,1);assert.ok(cache.tag.every(v=>v===0));
+});
+
 test('standard 7x6 private exact/bound cache uses lossless compact identity',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
     a=connect4RbaFromMoves([3,2,3,2,4,2],{geometry:g,canonical:false}),
