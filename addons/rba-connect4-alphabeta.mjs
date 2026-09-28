@@ -184,7 +184,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
         if(beta<=0){state.cutoffs+=1;return 0;}
       }else if(alpha>=0){state.cutoffs+=1;return 0;}
       if(cache.shared&&!(cacheHash&cache.sharedSampleBits)){
-        const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset);
+        const shared=probeConnect4RbaSharedExactCache32(cache.shared,words,keyOffset,cacheHash);
         if(shared){state.cacheHits+=1;return sign*absToRelative(shared,mover);}
       }
       if(cached===RBA_CACHE_LOWER0){if(alpha<0)alpha=0;}
