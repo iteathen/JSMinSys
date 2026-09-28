@@ -22,20 +22,19 @@ export function createConnect4RbaExactCache32({capacity=65536,keyWords}={}){
 function probeConnect4RbaExactCacheSlot32(cache,words,offset,slot,hash){
   if(cache.stamp[slot]===cache.epoch){
     const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
-    if(keyWords===14){
+    if(keyWords===13){
       if(!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
          (keys[base+6]^words[offset+6])|(keys[base+7]^words[offset+7])|
          (keys[base+8]^words[offset+8])|(keys[base+9]^words[offset+9])|
          (keys[base+10]^words[offset+10])|(keys[base+11]^words[offset+11])|
-         (keys[base+12]^words[offset+12])|(keys[base+13]^words[offset+13])))
+         (keys[base+12]^words[offset+12])))
         return cache.value[slot];
-    }else if(keyWords===7){
+    }else if(keyWords===6){
       if(!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
          (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
-         (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
-         (keys[base+6]^words[offset+6])))return cache.value[slot];
+         (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])))return cache.value[slot];
     }else{
       let diff=0;
       for(let w=0;w<keyWords;w+=1)diff|=keys[base+w]^words[offset+w];
@@ -59,19 +58,18 @@ function storeConnect4RbaBoundCacheSlot32(cache,words,offset,value,slot,hash){
     if(prior>3){
       const keyWords=cache.keyWords,base=slot*keyWords,keys=cache.keys;
       let same=0;
-      if(keyWords===14){
+      if(keyWords===13){
         same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
           (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
           (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
           (keys[base+6]^words[offset+6])|(keys[base+7]^words[offset+7])|
           (keys[base+8]^words[offset+8])|(keys[base+9]^words[offset+9])|
           (keys[base+10]^words[offset+10])|(keys[base+11]^words[offset+11])|
-          (keys[base+12]^words[offset+12])|(keys[base+13]^words[offset+13]));
-      }else if(keyWords===7){
+          (keys[base+12]^words[offset+12]));
+      }else if(keyWords===6){
         same=!((keys[base]^words[offset])|(keys[base+1]^words[offset+1])|
           (keys[base+2]^words[offset+2])|(keys[base+3]^words[offset+3])|
-          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5])|
-          (keys[base+6]^words[offset+6]));
+          (keys[base+4]^words[offset+4])|(keys[base+5]^words[offset+5]));
       }else{
         let diff=0;for(let w=0;w<keyWords;w+=1)diff|=keys[base+w]^words[offset+w];
         same=diff===0;
@@ -127,14 +125,14 @@ export function prepareConnect4RbaAlphaBeta({
   if(!Number.isInteger(orderOffset)||orderOffset<0||orderOffset>=g.columns)
     throw new RangeError('invalid alpha-beta order offset');
   if(sharedExactCache!==null&&
-     (sharedExactCache.keyWords!==g.keyWords||!Number.isInteger(sharedExactCache.mask)))
+     (sharedExactCache.keyWords!==g.cacheKeyWords||!Number.isInteger(sharedExactCache.mask)))
     throw new RangeError('shared exact cache/profile mismatch');
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid shared sample mask');
   const actionOrder=new Uint32Array(g.columns);
   for(let i=0;i<g.columns;i+=1)actionOrder[i]=g.actionOrder[(i+orderOffset)%g.columns];
-  const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.keyWords});
+  const cache=createConnect4RbaExactCache32({capacity:cacheCapacity,keyWords:g.cacheKeyWords});
   cache.shared=sharedExactCache;cache.sharedSampleBits=(sharedSampleMask<<24)>>>0;
   return {g,profile,mode,cpc:prepareConnect4CpcScratch(g,{frontierResponse:cpcFrontierResponse,projectedAdvisory:cpcProjectedAdvisory}),coord:prepareConnect4RbaCoordinateScratch(g),live,
     front:mode===RBA_AB_CPC_FOUR_FRONT
