@@ -16,7 +16,7 @@ const rows=[];
 for(const [index,arm] of [...p.order].entries()){
  const c=p.arms[arm];assert.equal(git(library,'rev-parse','HEAD'),sha);assert.equal(git(library,'status','--porcelain'),'');
  assert.equal(git('.','diff',helperSha,'--','addons','tools','catalog'),'','affinity/helper source drift');
- assert.ok([4194304,67108864].includes(c.shared));assert.ok([1048576,16384,32768,65536].includes(c.private));assert.ok(!c.pin||c.preload);
+ assert.ok([4194304,67108864,268435456].includes(c.shared));assert.ok([1048576,16384,32768,65536].includes(c.private));assert.ok(!c.pin||c.preload);
  const prefix=resolve(dir,`${p.id}-${index}-affinity`),env={...process.env};delete env.NODE_OPTIONS;delete env.JMS_WORKER_AFFINITY_FILE;delete env.JMS_WORKER_AFFINITY_REPORT;
  if(c.pin){env.JMS_WORKER_AFFINITY_FILE=resolve(dir,'targets.json');env.JMS_WORKER_AFFINITY_REPORT=prefix;}
  const args=['--experimental-ffi'];if(c.preload)args.push('--import',resolve('tools/worker-affinity-preload.mjs'));

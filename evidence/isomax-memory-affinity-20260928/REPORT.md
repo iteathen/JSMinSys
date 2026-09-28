@@ -21,3 +21,5 @@ The larger table increases reuse and per-node cost; completed hard controls foll
 RED tests reproduced four expected failures: missing optional affinity API,
 malformed-topology API absent,and inherited CPC array/store accounting errors.
 These are cold/accounting repairs; selected measured solver remains unchanged.
+
+Owner stopped original8-run series after5 exact samples; index5 cancelled,6/7notrun. No complete8-run CI claimed. Next authorized test is one matchedAB hard pair:2.5GiB versus10GiB shared,5min ceiling,private unchanged. Budget is80% startup-available RAM less144MiB private and1GiB runtime headroom,rounded down to supported power-of-two capacity. No hot-path allocation/growth. Affinity/private stages deferred.

@@ -17,7 +17,7 @@ const config={...profile.options,workers:4,sharedSampleMask:0,timeoutMs,sharedCa
 assert.equal(config.rootFrontier,true);
 assert.equal(config.workers,4);
 assert.equal(config.sharedSampleMask,0);
-assert.ok([4194304,67108864].includes(config.sharedCacheCapacity));
+assert.ok([4194304,67108864,268435456].includes(config.sharedCacheCapacity));
 assert.ok([16384,32768,65536,1048576].includes(config.localCacheCapacity));
 assert.ok(availableParallelism()>=4);
 
