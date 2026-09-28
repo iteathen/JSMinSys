@@ -278,3 +278,28 @@ test('CPC intersects alternative fork-precursor preemption sets',()=>{
   const expected=((1<<2)|(1<<5))>>>0;
   assert.equal(s.preemptionMask32[0],expected);assert.equal(s.forcedColumn[0],-1);
 });
+
+
+test('CPC close-only fusion promotes opposite weak evidence to exact draw without changing WDL',()=>{
+  const columns=4,rows=4,g=prepareConnect4RbaGeometry({columns,rows});
+  const fixtures=[
+    [],
+    [0,1,0,1],
+    [1,2,1,2,0,3],
+    [0,1,1,3,2],
+    [2,1,2,0,3,1],
+    [0,3,1,3,2,0,2],
+  ];
+  const memo=new Map();
+  let closures=0;
+  for(const moves of fixtures){
+    const oracle=exact(columns,rows,moves,memo),
+      root=connect4RbaFromMoves(moves,{geometry:g}),
+      state=prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+      result=solveConnect4RbaAlphaBeta(root,{state,reflected:root.reflected});
+    assert.equal(result.value,oracle.value,JSON.stringify({moves,oracle,result}));
+    assertOptimalWitness(columns,rows,moves,result,memo);
+    closures+=result.metrics.cpcCloseExactDraws??0;
+  }
+  assert.ok(closures>0,'expected at least one search-weak + opposite-CPC exact-draw closure');
+});
