@@ -23,7 +23,8 @@ export function prepareConnect4LiveLineEvaluator32(g){
     lineColumn=g.lineColumn,lineRow=g.lineRow,
     wordCount=(lineCount+31)>>>5,stateWords=wordCount<<1,
     through=new Uint32Array(cellCount*wordCount),
-    all=new Uint32Array(wordCount);
+    all=new Uint32Array(wordCount),
+    maxScore=new Uint8Array(cellCount);
 
   for(let line=0;line<lineCount;line+=1){
     const word=line>>>5,bit=1<<(line&31),base=line*4;
@@ -32,10 +33,11 @@ export function prepareConnect4LiveLineEvaluator32(g){
       const cell=lineRow[base+i]*columns+lineColumn[base+i],
         at=cell*wordCount+word;
       through[at]|=bit;
+      maxScore[cell]+=1;
     }
   }
 
-  return {columns:g.columns,rows:g.rows,cellCount,lineCount,wordCount,stateWords,through,all};
+  return {columns:g.columns,rows:g.rows,cellCount,lineCount,wordCount,stateWords,through,all,maxScore};
 }
 
 export function resetConnect4LiveLineState32(profile,state,stateOffset=0){
