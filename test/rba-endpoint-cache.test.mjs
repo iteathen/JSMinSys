@@ -27,6 +27,28 @@ const search=(g,moves,a,b)=>{
     privateCached=api.probeConnect4RbaExactCacheSlot32(s.cache,root.words,0,slot,hash);
   return {value,cached:api.probeConnect4RbaExactCache32(s.cache,root.words,0),privateCached,s};
 };
+
+test('cache identity excludes only derived nonterminal meta across configured geometry',()=>{
+  for(const [columns,rows,expectedCacheWords] of [[4,4,6],[7,6,13],[10,10,26]]){
+    const g=prepareConnect4RbaGeometry({columns,rows}),moves=[0,1,0,1],
+      root=connect4RbaFromMoves(moves,{geometry:g,canonical:false}),
+      state=api.prepareConnect4RbaAlphaBeta({geometry:g,cacheCapacity:64});
+    assert.equal(g.metaOffset,g.cacheKeyWords);
+    assert.equal(g.keyWords,g.cacheKeyWords+1);
+    assert.equal(g.cacheKeyWords,expectedCacheWords);
+    assert.equal(state.cache.keyWords,g.cacheKeyWords);
+    let rank=0;for(let column=0;column<g.columns;column++)rank+=root.words[column];
+    assert.equal(root.words[g.metaOffset],rank<<2,'nonterminal meta must be derived from support');
+
+    const cache=api.createConnect4RbaExactCache32({capacity:64,keyWords:g.cacheKeyWords}),
+      altered=root.words.slice();
+    api.storeConnect4RbaExactCache32(cache,root.words,0,3);
+    altered[g.metaOffset]^=0xffffffff;
+    assert.equal(api.probeConnect4RbaExactCache32(cache,altered,0),3,
+      'trailing derived meta is intentionally outside cache identity');
+  }
+});
+
 test('a recursive fail-high win publishes exact current-q WDL',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),moves=[3,4,3,5,0,5,5,6];
   const r=search(g,moves,0,1);
