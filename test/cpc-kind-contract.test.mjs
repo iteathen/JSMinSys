@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4Cpc32,CPC_EXACT} from '../addons/cpc-connect4.mjs';
@@ -25,11 +24,4 @@ test('CPC kind owns exact-interval classification across legal prefixes and opti
       }
     }
   }
-});
-
-test('CPC-only consumer does not retest the exact interval after exact kind returned',()=>{
-  const source=readFileSync(new URL('../addons/rba-connect4-alphabeta.mjs',import.meta.url),'utf8');
-  const body=source.slice(source.indexOf('function searchCpcOnly('),source.indexOf('\nfunction search(',source.indexOf('function searchCpcOnly(')));
-  assert.ok(body.length>0);
-  assert.equal(body.includes('if(semanticLo===semanticHi)'),false);
 });

@@ -246,8 +246,11 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     let semanticLo,semanticHi;
     if(mover===0){semanticLo=state.cpc.interval[0]-2;semanticHi=state.cpc.interval[1]-2;}
     else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
-    // CPC_EXACT already consumed every singleton interval. Preserve this
-    // producer contract; do not duplicate its exactness test in the hot path.
+    if(semanticLo===semanticHi){
+      const abs=relativeToAbs(semanticLo,mover);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
+      return sign*semanticLo;
+    }
     if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
     if(semanticHi<=alpha){state.cutoffs+=1;return sign*semanticHi;}
     if(semanticLo>alpha)alpha=semanticLo;
