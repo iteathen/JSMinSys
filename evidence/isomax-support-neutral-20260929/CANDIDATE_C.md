@@ -1,5 +1,7 @@
 # Deferred sparse-coordinate candidate C
 
+**WITHDRAWN by owner correction.** Historical candidate description, not current architecture or a qualified optimization. Runtime changes removed; see WITHDRAWN.md and IDENTITY_AUDIT.md.
+
 The census recovered the historical 1,174 nonterminal 4x4 merges. An additional 356 terminal merges explain the total 1,530. Of the nonterminal merges, 613 have differing raw coordinate bits. Consequently masking heights while expecting current coordinate equality to find every new equivalence is insufficient. No false raw-bit alias was observed; absence of an observed alias is not a proof that that shortcut is safe.
 
 A/B general streaming-mask realization is deferred, not performance-rejected. Accepted cofactor insertions are not necessarily final minimal generators: three standard-board sample children retained extra column bits in the streaming OR. This is conservative, but not the exact requested mask. A mask alone also does not resolve support-dependent coordinate indexing. Producing a general exact minimal key would add a pass/state that this experiment is supposed to avoid.

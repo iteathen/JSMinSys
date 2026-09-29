@@ -1,0 +1,67 @@
+{
+  "sources": {
+    "A": {
+      "library": "C:/r/isomax-p2-memory-source",
+      "sourceSha": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e"
+    },
+    "B": {
+      "library": "C:/r/isomax-support-neutral-c-source",
+      "sourceSha": "de8394ab44bea9892f1cbb8a84160efb753a4cc3"
+    }
+  },
+  "schedule": [
+    {
+      "fixture": "353335714",
+      "arm": "A",
+      "id": "sn-c-exact-0-0-a"
+    },
+    {
+      "fixture": "353335714",
+      "arm": "B",
+      "id": "sn-c-exact-0-1-b"
+    },
+    {
+      "fixture": "353335714",
+      "arm": "B",
+      "id": "sn-c-exact-0-2-b"
+    },
+    {
+      "fixture": "353335714",
+      "arm": "A",
+      "id": "sn-c-exact-0-3-a"
+    },
+    {
+      "fixture": "35333571",
+      "arm": "A",
+      "id": "sn-c-exact-1-0-a"
+    },
+    {
+      "fixture": "35333571",
+      "arm": "B",
+      "id": "sn-c-exact-1-1-b"
+    },
+    {
+      "fixture": "35333571",
+      "arm": "B",
+      "id": "sn-c-exact-1-2-b"
+    },
+    {
+      "fixture": "35333571",
+      "arm": "A",
+      "id": "sn-c-exact-1-3-a"
+    },
+    {
+      "fixture": "",
+      "arm": "A",
+      "id": "sn-c-empty-a"
+    },
+    {
+      "fixture": "",
+      "arm": "B",
+      "id": "sn-c-empty-b"
+    }
+  ],
+  "timeoutMs": 600000,
+  "profile": "isomax-four-pcore-10g-576m-i5-12600k-20260928",
+  "note": "Packet-local A is the sole unchanged resource configuration. Scientific arm A/B is identified by source SHA and schedule, not packet-local resource label."
+}

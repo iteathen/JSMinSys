@@ -1,4 +1,3 @@
-import {prepareSupportNeutralSparse32,projectSupportNeutralSparse32} from './rba-connect4-support-neutral.mjs';
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
@@ -187,7 +186,6 @@ export function prepareConnect4RbaAlphaBeta({
       :null,
     words:new Uint32Array(levels*g.keyWords),basis:new Uint32Array(levels*g.maxBasis),
     basisSize:new Uint32Array(levels),cache,actionOrder,
-    neutralColumns:prepareSupportNeutralSparse32(g),cacheWords:new Uint32Array(levels*g.keyWords),
     liveState:new Uint32Array(levels*live.stateWords),liveHeights:new Uint32Array(g.columns),
     moveScores:new Int32Array(g.columns),moveOrder:new Uint32Array(levels*g.columns),
     movePackShift:movePacking.shift,moveOrderMask:movePacking.mask,
@@ -223,9 +221,8 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const alphaOrig=alpha,betaOrig=beta;
     state.nodes+=1;
 
-    const cacheWords=state.neutralColumns&&projectSupportNeutralSparse32(state.neutralColumns,words,keyOffset,basis,basisOffset,state.cacheWords)?state.cacheWords:words,
-      cacheHash=mixSpan32Locator32(cacheWords,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
-    const cached=probeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,cacheSlot,cacheHash);
+    const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;
+    const cached=probeConnect4RbaExactCacheSlot32(cache,words,keyOffset,cacheSlot,cacheHash);
     if(cached){
       if(cached<=3){state.cacheHits+=1;return sign*absToRelative(cached,mover);}
       if(cached===RBA_CACHE_LOWER0){
@@ -240,7 +237,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     const cpcKind=evaluateConnect4CpcNonterminal32(g,words,keyOffset,basis,basisOffset,n,state.cpc);
     if(cpcKind===CPC_EXACT){
       state.cpcExact+=1;const value=state.cpc.interval[0];
-      storeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,value,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,value,cacheSlot,cacheHash);
       return sign*absToRelative(value,mover);
     }
     if(cpcKind===CPC_BOUND)state.cpcBounds+=1;
@@ -251,7 +248,7 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     else{semanticLo=2-state.cpc.interval[1];semanticHi=2-state.cpc.interval[0];}
     if(semanticLo===semanticHi){
       const abs=relativeToAbs(semanticLo,mover);
-      storeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,abs,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
       return sign*semanticLo;
     }
     if(semanticLo>=beta){state.cutoffs+=1;return sign*semanticLo;}
@@ -282,11 +279,11 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       if(term){
         const value=absToRelative(term,mover);
         if(value>=beta){
-          if(value===0)storeConnect4RbaBoundCacheSlot32(cache,cacheWords,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
+          if(value===0)storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
           state.cutoffs+=1;return sign*value;
         }
         if(alphaOrig===-2&&betaOrig===2)
-          storeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,term,cacheSlot,cacheHash);
+          storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,term,cacheSlot,cacheHash);
         return sign*value;
       }
 
@@ -361,12 +358,12 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
       }
       if(value>best){best=value;if(value>alpha)alpha=value;}
       if(alpha>=beta){
-        if(best===0)storeConnect4RbaBoundCacheSlot32(cache,cacheWords,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
+        if(best===0)storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_LOWER0,cacheSlot,cacheHash);
         state.cutoffs+=1;
         // A fail-high lower bound of +1 is exact in {-1,0,+1}. Publish the
         // current q/mover, before forced-tail sign transports it to the caller.
         // Interior cutoffs remain bounds and MUST NOT enter this exact cache.
-        if(best===1)storeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,
+        if(best===1)storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,
           relativeToAbs(best,mover),cacheSlot,cacheHash);
         return sign*best;
       }
@@ -377,9 +374,9 @@ function searchCpcOnly(state,depth,keyOffset,basisOffset,n,mover,orientation,liv
     // An upper bound of -1 is exact; a narrow-window draw is still only a bound.
     if((alphaOrig===-2&&betaOrig===2)||best===-1){
       const abs=relativeToAbs(best,mover);
-      storeConnect4RbaExactCacheSlot32(cache,cacheWords,keyOffset,abs,cacheSlot,cacheHash);
+      storeConnect4RbaExactCacheSlot32(cache,words,keyOffset,abs,cacheSlot,cacheHash);
     }else if(best===0&&alphaOrig>=0)
-      storeConnect4RbaBoundCacheSlot32(cache,cacheWords,keyOffset,RBA_CACHE_UPPER0,cacheSlot,cacheHash);
+      storeConnect4RbaBoundCacheSlot32(cache,words,keyOffset,RBA_CACHE_UPPER0,cacheSlot,cacheHash);
     return sign*best;
   }
 }

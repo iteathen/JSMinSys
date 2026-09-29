@@ -1,5 +1,7 @@
 # Support-neutral experiment plan
 
+**WITHDRAWN by owner correction.** Historical plan only; see WITHDRAWN.md and IDENTITY_AUDIT.md. Do not resume this assumed column quotient.
+
 Owner-authorized bounded A/B/C experiment. Existing linked worktree now isolated branch experiment/isomax-support-neutral-local-20260929. Control runtime6bbba7c;selected profile and launcher unchanged. Prior raw148b187/reportc55a2eb baseline preserved. No hidden answers.
 
 First gate: offline native-cofactor census plus exact pooled-capacity identity validation. Reuse profile.prepareSubset callback to observe accepted image insertions without changing source. Independently decode final minimal generators; test whether streaming OR is exact. Key must retain active heights,player residual minima,rank/terminal,and pooled neutral capacity. Raw support-local coordinate bits cannot simply survive changed support as an equality key. Terminal first-win and action transport qualified before any cache alias. Observation uses allocating diagnostic code outside production; no performance claim from diagnostic cycles.

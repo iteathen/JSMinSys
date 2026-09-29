@@ -1,0 +1,18 @@
+NEUTRAL_QUOTIENT_AUDIT {"states":161029,"neutralClasses":42168,"rbaQClasses":34461,"neutralMultiQ":0,"qMultiNeutral":15182,"physicalCollapsedByQ":13526,"nonterminalCollapsedByQ":13259,"maxQPerNeutral":1,"maxNeutralPerQ":84,"maxPhysicalPerQ":5336,"witness":{"q":"4,4,4,4,66,0,0","neutral":"4,4,4,4,:","physical":["16:4,4,4,4,:0001111000011101","16:4,4,4,4,:0001111000011110"]},"nonterminalWitness":{"q":"4,4,4,3,60,0,0","neutral":"4,4,4,3,:","physical":["15:4,4,4,3,:000111100001110_","15:4,4,4,3,:000111010010110_"]}}
+✔ audit neutral-token quotient against current RBA q on exhaustive 4x4 legal states (1242.7754ms)
+✔ completed principal upset absorbs later images without repeated expansion (31.1998ms)
+✔ absorbed native transitions match physical residuals across players, bases and profiles (747.584ms)
+✔ private cache packs epoch and value into one exact uint32 tag (8.2335ms)
+✔ standard 7x6 private exact/bound cache uses lossless compact identity (4.8152ms)
+✔ non-7x6 private cache retains full-key identity (0.8409ms)
+✔ a recursive fail-high win publishes exact current-q WDL (140.7079ms)
+✔ a completed fail-low loss publishes exact q without caching an interior bound (1.5293ms)
+✔ directed narrow windows and cached q values agree with an independent physical 4x4 oracle (73.8784ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1329.1157
