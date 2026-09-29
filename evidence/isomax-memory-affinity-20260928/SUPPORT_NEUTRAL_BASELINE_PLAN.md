@@ -1,0 +1,5 @@
+# Issue174 clean selected-localhost baseline
+
+Fresh600000ms empty7x6 run using existing selected-profile packet and launcher unchanged. Live recovery confirms profiles/isomax-i5-12600k-memory-selected.json owns source6bbba7c and current hardware configuration. The recent support-neutral branches add hosted workflows only; issue174 latest correction identifies this same profile. Existing sample overrides match selected profile exactly. No hot source,mask,q,CPC,ordering,TT or per-node instrumentation change. No generic defaults or2-worker fallback. This run is a fresh baseline requested by owner; historical empty-selected result remains separate.
+
+Reproduction: pinned runtime from runtime.json,run-packet.mjs support-neutral-local-baseline-20260929-packet.json. Profile packet assertions pass before launch. Preserve raw/manifest/affinity/full result. On completion report fixed-window workload,reuse,role contributions,aggregate cycles/visit and economic sensitivity. Added cost tolerance is conditional on benefit,not inferable from timeout throughput alone. Post results to Connect4#174; old2-worker64K/64K Actions baseline is stale-profile diagnostic only.
