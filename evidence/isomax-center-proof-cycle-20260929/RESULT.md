@@ -1,4 +1,18 @@
-# C1 rejected at initial localhost screen
+# C1 adverse short-control screen; deeper qualification pending
+
+## Owner correction after initial disposition
+
+The initial rejection below was too broad. A roughly 3.2-second completed
+7x6 control establishes only the measured effect on that workload. It does
+not establish economics on larger, branch-heavy searches. The original raw
+samples and ratios remain unchanged. Current disposition is
+ADVERSE_SHORT_CONTROL_DEEP_QUALIFICATION_PENDING, not a campaign-wide rejection.
+Candidate source 37d369c remains preserved. Selected source remains restored
+while the candidate is unqualified. Further tests are paused at owner direction.
+Before retention or rejection across the intended workload, include deeper
+completed 7x6 controls and a bounded branch-heavy workload, with unchanged
+selected profile and total-process-cycle accounting. Censored throughput alone
+cannot establish whole-solve improvement.
 
 Question: does trusting CPC_EXACT eliminate a repeated interval equality test
 profitably? The contract is valid, but the measured candidate is not selected.
@@ -29,9 +43,9 @@ Adjacent balanced pair cycle ratios: 1.0498165, 1.0256213.
 Every sample EXACT, absolute P0 WDL -1, zero-based move 4; all four workers
 contributed and exited, cleanup true, no errors. No single-worker timing.
 
-This is a rejection screen, not an eight-pair population qualification or a
-claim that the idea loses on every position. Do not spend deeper runs to promote
-a candidate whose first completed matched screen is adverse. No speedup claim.
+Historical initial disposition was rejection after this screen; the owner
+correction above supersedes that decision. This is not an eight-pair population
+qualification or a claim that the idea loses on every position. No speedup claim.
 The precise JIT/layout mechanism is unmeasured; fewer source operations did not
 yield lower observed whole-operation cost. Selected runtime is restored.
 
