@@ -38,3 +38,20 @@ The report prefix must be fresh because the preload records each target with exc
 Independent review of prior main through selected runtime found no critical/important defect in compact identity, epoch tags, bound/coalescing polarity, endpoint exactness, publication, frontier/cancellation, or large-view attachment. 33 focused tests and both generator checks passed. This review is not an exhaustive proof; actual large allocations are additionally checked by the selected-profile confirmation.
 
 Full local validation: 298 catalog functions, 170 sealed add-on units, 30/30 blocks, zero deferred blocks; generated behavior/frontier freshness; frontier and runtime-geometry audits; 180 tests passed. Raw verification and the final selected-profile confirmation will be recorded alongside this report. Protected-main Verify/schema/node-compatibility checks and exact-head review are required before merge.
+
+## Fixed-head localhost confirmation
+
+Clean source `e7ab2138e2bf1fce59687adf4ac6aa5bab49235b`, same runtime blobs as selected 6bbba7c. Fixture `35333571`, unchanged selected four-worker/10 GiB/576 MiB profile, 120000 ms ceiling, fresh pinned-nightly process. **EXACT**, rootWdl -1, zero-based move 4, matching existing qualified evidence.
+
+- Wall 33.324750 s; process CPU 132.751 s.
+- Process solve cycles 487526972082; 8222.253 cycles/node.
+- Total nodes 59293601; winner nodes 16046309; throughput 1779266 nodes/s.
+- Per-worker nodes [11256819,16027014,15963459,16046309]; all four contributed.
+- Shared hits 7292424; stores 19707412; store contention 1444797.
+- Peak process RSS 12824293376 bytes; four worker exits; cleanup true; errors empty.
+- All affinity reports confirm requested P-core target before solver initialization.
+- Standard FFI experimental notices are preserved in stderr.
+
+This is an integration confirmation, not a new paired performance comparison. It verifies actual large shared allocation/transfer and selected-profile execution. It does not establish an empty-board solve or a fresh speedup estimate. Full raw result: `hard-confirmation.json`.
+
+Review disposition: no critical/important finding; retained-runtime source unchanged. Local Verify equivalents passed, including 180 tests on Node 26.7 and 180 on the pinned nightly. Merge remains subject to all three required protected checks on the final PR head.
