@@ -1,0 +1,58 @@
+name: Support-neutral empty-board 10m baseline
+
+on:
+  push:
+    branches:
+      - experiment/support-neutral-empty-10m-20260928
+    paths:
+      - '.github/workflows/support-neutral-empty-10m.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '26'
+      - name: Empty 7x6 Lazy SMP baseline, 10 minute search deadline
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import os from 'node:os';
+          import {prepareConnect4RbaGeometry} from './addons/rba-connect4-geometry.mjs';
+          import {runLazySmpConnect4Rba32} from './addons/rba-connect4-lazy-smp-host.mjs';
+
+          const geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
+          console.log(JSON.stringify({
+            kind:'support-neutral-empty-board-10m-baseline-v1',
+            sha:process.env.GITHUB_SHA,
+            node:process.version,
+            cpuCount:os.cpus().length,
+            cpuModel:os.cpus()[0]?.model ?? null,
+            workers:2,
+            timeoutMs:600000,
+            sharedCacheCapacity:65536,
+            localCacheCapacity:65536,
+            moves:[]
+          }));
+
+          const result=await runLazySmpConnect4Rba32([],{
+            geometry,
+            workers:2,
+            sharedCacheCapacity:65536,
+            localCacheCapacity:65536,
+            timeoutMs:600000,
+          });
+
+          console.log(JSON.stringify({
+            kind:'support-neutral-empty-board-10m-baseline-result-v1',
+            ...result
+          },null,2));
+          NODE
