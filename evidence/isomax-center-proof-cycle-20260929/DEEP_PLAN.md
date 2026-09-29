@@ -27,3 +27,18 @@ append 4..15 in ABBA blocks, without dropping the initial slower control.
 No optional stopping on intermediate performance. Stop only on correctness,
 environmental failure or user instruction; preserve every sample. The short
 control regression remains separate evidence even if the deep result qualifies.
+
+## Owner focus correction / stopped expansion
+
+The owner clarified that the immediate target is a limited-information proof
+of the nominated center continuation, not further full solutions of a known
+position. The orchestration loop was stopped during sample 9; its already
+running child was allowed to finish. Samples 0..9 are preserved in full, all
+EXACT with matching WDL/move and cleanup=true. No samples 10..15 were launched.
+The benchmark child and packet processes exited; no timing process remains.
+
+This is an incomplete planned eight-pair campaign (two complete ABBA blocks
+plus one AB pair), stopped for owner-directed scope correction, not selected
+from intermediate timing results. No full-qualification/promotion claim is
+made. The runtime remains the selected baseline. Exact solve outputs remain
+benchmark validation and must not seed the center-proof certificate producer.
