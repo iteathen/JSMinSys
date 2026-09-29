@@ -13,7 +13,7 @@ The withdrawn experiment `de8394ab44bea9892f1cbb8a84160efb753a4cc3` is not the s
 1. Cold `connect4RbaFromMoves` creates q and its basis. Selected host passes `positionCode:false`. Root history is retained for cold initialization of ordering state, not for TT identity.
 2. `connect4RbaCofactorKnownHeight` increments the played height and rank. A mover singleton completion ends the game before exhaustion. Otherwise it maps residual shapes through the move: own requirements lose the played cell, opponent requirements containing it disappear, and the resulting coordinates are closed upward in the child support-local basis. Duplicate/absorbed requirements are represented by the same upset, not distinguished by originating line or token history.
 3. `connect4RbaCanonicalize` compares support with its reflection first, then coordinates on a support tie; it permutes basis and coordinates consistently. A separate orientation bit transports literal actions.
-4. Search hashes the canonical full q using `mixSpan32Locator32`, masks the hash to a direct-map slot, and verifies exact key content. Hash collisions do not establish equality. Private caches can fall through to the shared exact cache.
+4. For standard 7×6, the TT hashes the canonical 14-word q and verifies equality using a lossless 8-word packing of that same q. `mixSpan32Locator32` selects a direct-map slot; hash collisions do not establish equality. Private caches can fall through to the shared exact cache.
 
 For standard 7x6, execution q is fourteen u32 words:
 
@@ -81,6 +81,8 @@ Reflection work is performed at the state boundary for canonical reuse and actio
 No surviving owner-neutral split in the current q/TT was demonstrated. Same-q repetition after eviction, separate worker-local caches, or a new epoch is not evidence of a finer semantic identity. The earlier column-based census is historical evidence from a withdrawn hypothesis, not authority to select the next quotient. Its bounded observations do not qualify a standard7x6 removal.
 
 **Decision A:** the original ownership optimization is already realized. No new worker machinery, cache schema or hot-loop change is warranted for it. Evidence is insufficient to remove other semantic information generally.
+
+Owner-approved disposition: Connect4 issue #174's proposed new runtime mechanism is **not planned**. Additional worker cost for the original gray-token idea is zero: it requires no added computation. The column/support-capacity hypothesis is separate, unqualified research and is not continued by this audit. Preserve the clean ten-minute localhost run as a general performance baseline, not as justification for a new quotient.
 
 If additional validation is desired, the smallest next experiment is read-only: take legal history pairs with equal support, terminal status and both residual upsets; verify equal canonical q, full locator hash and actual private/shared compact equality (including reflected pairs). Sufficient merge condition: those conditions hold, or the histories are related by the already-proved reflection transport. This is not claimed necessary for every possible equal-WDL pair. It validates the existing boundary; it does not propose a new quotient or benchmark candidate.
 
