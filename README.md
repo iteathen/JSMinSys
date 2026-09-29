@@ -46,7 +46,7 @@ Slow operations are allowed when their cost can be accounted for faithfully. JSM
 
 The current catalog implementation is exported from `src/index.mjs`.
 
-- 295 catalog functions implemented
+- 298 catalog functions implemented
 - 30 of 30 research blocks implemented
 - fixed-width relational/RBA-enabling blocks cover 3/6/8-lane sets, six-word skylines, exact wide keys, durable intervals, sparse remaps, and generation-stamped intrusive work lists
 - worker execution substrate covers stamped take/validate/release, runtime-count dependency publication, retained-child handoff, wake/park, and stop/done polling while leaving the outer loop and evaluator application-owned
@@ -64,6 +64,11 @@ node --test test/*.test.mjs
 to verify catalog/admission consistency and behavior.
 
 ## Cold host add-ons
+
+Optional shared behavior controls: [worker behavior contract](docs/worker-behavior.md).
+Select `BehaviorWorker` during initialization to consume a strategist-owned,
+four-word extensible flag set. Ordinary `Worker` and current Lazy SMP execution
+remain unchanged. The flag transport does not define PFIF or domain behaviors.
 
 Host lifecycle that is intentionally outside JMS-RESTRICTED/JMS-SEALED hot
 execution lives under `addons/`. These modules may use Node host mechanisms
@@ -94,6 +99,26 @@ search and private local exact cache; workers share only committed exact W/D/L
 cache evidence through the concurrency-safe shared exact cache. There is no
 shared surplus queue and no Branch Manager in the Connect4 execution path.
 
+The current owner-selected localhost configuration is **one wide/root-frontier
+worker and three deep workers**, pinned to four P-cores on the Windows
+i5-12600K. Its shared TT is 10 GiB and each private cache is 576 MiB. This is a
+hardware-specific measured selection, not a portable default or a proven
+empty-board optimum. Full sharing and exact-only shared publication are retained.
+
+Use the pinned Node nightly and existing selected-profile sample launcher as
+shown in [the promotion record](evidence/isomax-selected-promotion-20260929/REPORT.md).
+The [profile](profiles/isomax-i5-12600k-memory-selected.json) records capacities,
+worker roles, affinity targets, runtime, and scope. Affinity is set before solver
+initialization; no per-node affinity operation is introduced.
+
+`tools/run-isomax.mjs` retains the historical seven-worker Node 26.7 comparison
+profile in `profiles/isomax-i5-12600k.json`. It does **not** automatically select
+the current localhost memory/affinity profile. Both use the native root-frontier
+worker; no strategist or runtime source rewriting is involved.
+
+See [scope and conformance](docs/isomax-root-frontier-nees.md) and
+[campaign cleanup history](history/2026-09-27-selected-frontier-cleanup.md).
+
 Lazy SMP requires at least two search workers. Generic TT, worker, and
 BranchManager primitives remain reusable library/research building blocks, but
 they no longer constitute a supported Connect4 execution composition.
@@ -107,7 +132,7 @@ The RBA add-on stack derives its carrier from application configuration at initi
 - `addons/rba-connect4-front.mjs` supplies the configured four-front algebra.
 - `addons/rba-connect4-ingress.mjs` supplies cold external-root conversion only.
 - `addons/cpc-connect4.mjs` supplies conservative CPC/NDC closure: per-column XOR event parity, exact exhaustion/paired-response bounds, immediate terminal/fork closure, forced-block restriction, and non-authoritative projected future forks.
-- `addons/rba-connect4-alphabeta.mjs` supplies the CPC-first exact negamax/alpha-beta control path. CPC-only mode iterates the immutable prepared action order directly and carries no per-depth action-order scratch.
+- `addons/rba-connect4-alphabeta.mjs` supplies the CPC-first exact negamax/alpha-beta control path. CPC-only mode scores live-line contributions and packs sorted action rows into per-depth numeric scratch; prepared action order breaks score ties.
 
 Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general paths use runtime-sized spans and one height word per configured column, so rows above seven and boards above 64 cells do not require board reconstruction or a new solver representation.
 

@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: '26'
       - run: node tools/verify-catalog.mjs
+      - run: node tools/build-behavior-search.mjs --check
+      - run: node tools/build-root-frontier.mjs --check
+      - run: node tools/audit-root-frontier.mjs
       - run: node tools/audit-runtime-geometry.mjs
       - run: node --test test/*.test.mjs
       - run: node tools/bench-rba-cpc-ab.mjs

@@ -1,4 +1,6 @@
 export * from './worker.mjs';
+export * from './worker-behavior.mjs';
+export * from './worker-behavior-search.mjs';
 export * from './branch-manager.mjs';
 export * from './branch-manager-host.mjs';
 export * from './rba-connect4-geometry.mjs';
@@ -9,5 +11,8 @@ export * from './rba-connect4-profile.mjs';
 export * from './cpc-connect4.mjs';
 export * from './connect4-live-line-evaluator.mjs';
 export * from './rba-connect4-alphabeta.mjs';
+export * from './rba-connect4-alphabeta-behavior.mjs';
 export * from './rba-connect4-shared-exact-cache.mjs';
 export * from './rba-connect4-lazy-smp-host.mjs';
+export * from './rba-connect4-frontier.mjs';
+export * from './worker-root-frontier.mjs';
