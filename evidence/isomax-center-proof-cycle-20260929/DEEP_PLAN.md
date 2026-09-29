@@ -18,3 +18,12 @@ cost. Censored samples provide descriptive data only. Two samples per arm are
 screen/confirmation evidence, not the full eight-pair promotion qualification.
 If both short and deeper screens are adverse, stop this realization and retain
 the selected runtime. A favorable deeper result requires further qualification.
+
+First deep ABBA completed: all four EXACT at absolute +1 / zero-based move 3,
+with all workers active/exited. Cycle mean B/A -0.631%, but paired effects have
+opposite signs. This is favorable in mean only and cannot qualify the candidate.
+Complete eight balanced pairs on this same fixture: retain samples 0..3 and
+append 4..15 in ABBA blocks, without dropping the initial slower control.
+No optional stopping on intermediate performance. Stop only on correctness,
+environmental failure or user instruction; preserve every sample. The short
+control regression remains separate evidence even if the deep result qualifies.
