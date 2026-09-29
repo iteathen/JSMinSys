@@ -3,6 +3,8 @@ import {createManagedThreadSession32,sharedViewBytes32} from './branch-manager-h
 import {connect4RbaFromMoves} from './rba-connect4-ingress.mjs';
 import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from './worker-behavior.mjs';
+import {encodeRootFrontier32} from './worker-root-frontier.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_ERROR=2,CONTROL_WAKE=3,CONTROL_WINNER=4,
   CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,
@@ -18,6 +20,8 @@ export async function runLazySmpConnect4Rba32(moves,{
   signal,
   cpcFrontierResponse=false,
   cpcProjectedAdvisory=false,
+  behaviorMemory=null,
+  rootFrontier=false,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<2||workers>64)
@@ -33,17 +37,31 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
+  if(typeof rootFrontier!=='boolean')throw new TypeError('rootFrontier must be boolean');
+  if(rootFrontier){
+    if(behaviorMemory!==null)throw new TypeError('rootFrontier owns initial behavior memory');
+    behaviorMemory=createWorkerBehaviorMemory32(workers);
+    const words=new Uint32Array(behaviorMemory.buffer);
+    for(let i=0;i<workers;i+=1)publishWorkerBehavior32(words,i,encodeRootFrontier32({release:i!==0}));
+  }
+  if(behaviorMemory!==null&&(!(behaviorMemory instanceof WebAssembly.Memory)||
+     !(behaviorMemory.buffer instanceof SharedArrayBuffer)||behaviorMemory.buffer.byteLength<workers*128))
+    throw new TypeError('prepared shared behavior memory required');
 
   const root=connect4RbaFromMoves(moves,{geometry,positionCode:false}),
     workerGeometry=shareConnect4RbaGeometry32(geometry),
     sharedExactCache=createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
       keyWords:geometry.keyWords,
+      geometry,
     }),
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
     metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
     metrics=new Float64Array(metricBuffer),
+    nodeCounterBuffer=rootFrontier?new SharedArrayBuffer(workers*64):null,
+    timingBuffer=rootFrontier?new SharedArrayBuffer(workers*64):null,
+    frontierMetricBuffer=rootFrontier?new SharedArrayBuffer(workers*32):null,
     session=createManagedThreadSession32({
       control,
       stopIndex:CONTROL_STOP,
@@ -60,12 +78,18 @@ export async function runLazySmpConnect4Rba32(moves,{
   try{
     for(let i=0;i<workers;i+=1)
       session.spawn(
-        new URL('./rba-connect4-lazy-smp-worker.mjs',import.meta.url),
+        new URL(rootFrontier?'./rba-connect4-lazy-smp-worker-frontier.mjs':behaviorMemory===null?'./rba-connect4-lazy-smp-worker.mjs':
+          './rba-connect4-lazy-smp-worker-behavior.mjs',import.meta.url),
         {
           control,
           resultWords,
           metricBuffer,
+          nodeCounterBuffer,
+          timingBuffer,
+          frontierMetricBuffer,
           workerIndex:i,
+          workerCount:workers,
+          behaviorMemory,
           geometry:workerGeometry,
           root,
           rootReflected:root.reflected,
@@ -119,6 +143,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     move:exact?Atomics.load(resultWords,winner*RESULT_STRIDE+2):-1,
     winner,
     winnerMetrics,
+    nodeCounts:rootFrontier?Array.from({length:workers},(_,i)=>new Float64Array(nodeCounterBuffer,i*64,1)[0]):null,
+    workerTiming:rootFrontier?Array.from({length:workers},(_,i)=>Array.from(new Float64Array(timingBuffer,i*64,2))):null,
+    frontierMetrics:rootFrontier?Array.from({length:workers},(_,i)=>Array.from(new Float64Array(frontierMetricBuffer,i*32,4))):null,
     sharedCacheHits:Atomics.load(sharedExactCache.stats,0),
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
@@ -133,6 +160,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
-      control.byteLength+resultWords.byteLength+metricBuffer.byteLength,
+      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+
+      (rootFrontier?nodeCounterBuffer.byteLength+timingBuffer.byteLength+frontierMetricBuffer.byteLength:0),
   };
 }

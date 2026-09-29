@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-09-28T23:52:33.2252845-07:00",
+  "priorMain": "93aca1758718bcbf0635c11a957a67ca6387d50c",
+  "runtimeSource": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e",
+  "sourceSnapshot": "c55a2ebad560a239cc2572a8214ec8f670410783",
+  "cpu": {
+    "Name": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "NumberOfCores": 10,
+    "NumberOfLogicalProcessors": 16
+  },
+  "os": {
+    "Caption": "Microsoft Windows 11 Pro",
+    "Version": "10.0.26200",
+    "BuildNumber": "26200",
+    "TotalVisibleMemorySize": 33289648
+  },
+  "node": {
+    "node": "27.0.0-nightly20260928b59840b593",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.8",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "libffi": "3.8.0",
+    "lief": "0.17.0",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "147",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.8",
+    "simdjson": "4.6.11",
+    "simdutf": "7.7.0",
+    "sqlite": "3.53.4",
+    "tz": "2026c",
+    "undici": "8.10.2",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "14.6.202.34-node.36",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "counter": "Windows QueryProcessCycleTime",
+  "profile": {
+    "id": "isomax-four-pcore-10g-576m-i5-12600k-20260928",
+    "status": "owner-selected hardware testing profile",
+    "selectedOn": "2026-09-28",
+    "sourceSha": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e",
+    "scope": {
+      "cpu": "Intel Core i5-12600K",
+      "node": "v27.0.0-nightly20260928b59840b593",
+      "geometry": "7x6",
+      "ramGiBApprox": 32,
+      "platform": "win32"
+    },
+    "options": {
+      "sharedSampleMask": 0,
+      "localCacheCapacity": 16777216,
+      "sharedCacheCapacity": 268435456,
+      "rootFrontier": true,
+      "workers": 4
+    },
+    "execution": {
+      "targetsFile": "evidence/isomax-memory-affinity-20260928/targets.json",
+      "deepWorkers": [
+        1,
+        2,
+        3
+      ],
+      "preload": "tools/worker-affinity-preload.mjs",
+      "fixedBeforeSearch": true,
+      "wideWorker": 0
+    },
+    "cachePayloadBytes7x6": 13153337356,
+    "evidenceRevision": "9d87c7274b2753102f8c16f0961acf3bb2acd24b",
+    "limits": "Owner selection from local hard-fixture curve; no global or empty-board optimum proven. Four pinned P-cores; not the historical seven-worker stable-runtime profile."
+  },
+  "review": {
+    "scope": "93aca17..6bbba7c focused runtime correctness",
+    "critical": 0,
+    "important": 0,
+    "focusedTests": 33,
+    "reviewer": "independent selected_runtime_review agent"
+  }
+}

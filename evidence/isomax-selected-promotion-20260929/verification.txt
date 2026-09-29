@@ -1,0 +1,1059 @@
+node tools/verify-catalog.mjs
+JSMinSys catalog verified: 298 sealed functions + 170 add-on units cycle-ledgered, 30/30 blocks complete, 0 deferred function(s).
+node tools/build-behavior-search.mjs --check
+node tools/build-root-frontier.mjs --check
+node tools/audit-root-frontier.mjs
+Root-frontier structural audit: 52 transitive functions checked; source/call checks only, not a machine-code cost claim.
+node tools/audit-runtime-geometry.mjs
+Runtime geometry audit passed: general path present; RBA add-ons contain no 7x6 carrier constants.
+node --test test/*.test.mjs
+✔ BranchManager is the minimal canonical JSMinSys manager base (1.6185ms)
+✔ file-worker argv filter removes only input-type mode (2.4681ms)
+✔ managed host completes, joins, and reports cleanup (33.5196ms)
+✔ managed host deadline fails closed and wakes a waiting worker (43.0221ms)
+✔ managed host cancellation and explicit failure preserve first error (14.6992ms)
+✔ unexpected worker exit fails the session (36.1081ms)
+✔ metric and shared-byte helpers stay numeric and caller-owned (0.3903ms)
+✔ runtime-sized set and exact-key primitives exceed former fixed widths (0.9435ms)
+✔ runtime-sized skyline/product supports records wider than six words (0.3418ms)
+✔ runtime action-count reductions and dependency publication handle width ten (0.9973ms)
+✔ runtime packed-bit permutation spans more than three words (0.2454ms)
+✔ runtime-sized board transition supports 10x10 without packed-three-bit heights (0.2706ms)
+✔ live-line evaluator keeps only winning lines not blocked by the opponent (13.475ms)
+✔ CPC per-column XOR parity equals literal future-event count on configured geometries (14.7092ms)
+✔ nonterminal CPC path matches checked evaluator after terminal assertion (33.5372ms)
+✔ projected CPC advisory collection is semantically inert and opt-in (14.2619ms)
+✔ CPC pooled-frontier response extends all-even pairing without counting omitted frontiers (287.4178ms)
+✔ CPC closes a forced block that lifts another opponent terminal singleton (0.8915ms)
+✔ CPC closes when every legal move lifts an opponent terminal singleton (0.8007ms)
+✔ CPC recognizes exact fork loss after enabling move (1.1528ms)
+✔ CPC first-win ordering lets current immediate terminal supersede opponent fork (0.728ms)
+✔ CPC alpha-beta uses live winning-line contribution for move ordering (14.8834ms)
+✔ CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle (223.9183ms)
+✔ CPC alpha-beta modes agree with independent late standard-7x6 oracle (70.6721ms)
+✔ multi-action preemption count implies <=32-column mask support (9.0471ms)
+✔ CPC fork precursor restricts current defense without recursion (4.4196ms)
+✔ CPC intersects alternative fork-precursor preemption sets (3.6713ms)
+✔ cold CPC ledger accounts for every actual scratch array and object field (1.5628ms)
+✔ terminal CPC ledger counts actual writes and delegation has no wrapper scratch writes (0.5947ms)
+✔ generated search ledger distinguishes insertion shifts and stop checks (7.1046ms)
+✔ Connect4 exports Lazy SMP without the retired shared-work scheduler (1.1049ms)
+✔ native worker execution cannot reenter cold ingress (4.9768ms)
+✔ ManagedThreadSession is the canonical managed host lifecycle object (1.7158ms)
+NEUTRAL_QUOTIENT_AUDIT {"states":161029,"neutralClasses":42168,"rbaQClasses":34461,"neutralMultiQ":0,"qMultiNeutral":15182,"physicalCollapsedByQ":13526,"nonterminalCollapsedByQ":13259,"maxQPerNeutral":1,"maxNeutralPerQ":84,"maxPhysicalPerQ":5336,"witness":{"q":"4,4,4,4,66,0,0","neutral":"4,4,4,4,:","physical":["16:4,4,4,4,:0001111000011101","16:4,4,4,4,:0001111000011110"]},"nonterminalWitness":{"q":"4,4,4,3,60,0,0","neutral":"4,4,4,3,:","physical":["15:4,4,4,3,:000111100001110_","15:4,4,4,3,:000111010010110_"]}}
+✔ audit neutral-token quotient against current RBA q on exhaustive 4x4 legal states (1575.2202ms)
+✔ 49-bit position code matches independent board encoding and reflection (1.7316ms)
+✔ 49-bit position code is collision-free across all gravity-valid sequences through ply 6 (521.1166ms)
+✔ RBA root reflection carries the same canonical physical position code for mirrored roots (2.6213ms)
+✔ completed principal upset absorbs later images without repeated expansion (55.985ms)
+✔ absorbed native transitions match physical residuals across players, bases and profiles (1048.9475ms)
+✔ geometry derives different native carrier sizes for 4x4 and 10x10 (17.7979ms)
+✔ configured winning geometry implies singleton residual id equals physical cell (16.0858ms)
+✔ known-legal cofactor matches checked ingress after caller assertions (8.9318ms)
+✔ configured RBA coordinates match independent physical residuals on 4x4 and 10x10 (16.2475ms)
+✔ configured reflection canonicalizes mirrored 4x4 and 10x10 roots identically (10.8995ms)
+✔ configured four-front bounds match independent physical propagation (70.9193ms)
+✔ init-time specialization profile selects fast paths without changing semantics (45.4048ms)
+✔ shared exact cache publishes only fully committed exact rows (1.3311ms)
+✔ shared exact known-hash path retains full-key validation (0.224ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (15.9427ms)
+✔ non-7x6 shared exact cache retains full-key identity (1.7822ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (74.4846ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (10.3712ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (76.1104ms)
+✔ sharing-density masks preserve exact Lazy SMP results (475.4696ms)
+✔ private cache packs epoch and value into one exact uint32 tag (17.6947ms)
+✔ standard 7x6 private exact/bound cache uses lossless compact identity (12.6366ms)
+✔ non-7x6 private cache retains full-key identity (7.6534ms)
+✔ a recursive fail-high win publishes exact current-q WDL (242.8489ms)
+✔ a completed fail-low loss publishes exact q without caching an interior bound (2.133ms)
+✔ directed narrow windows and cached q values agree with an independent physical 4x4 oracle (101.8753ms)
+✔ packed move-row geometry guard is exact and conservative (1.4328ms)
+✔ packed move rows preserve maximum fields and stable score ties (0.384ms)
+✔ prepared solver uses packed recursive rows but keeps root row as columns (31.3928ms)
+✔ fixed 3/6/8 word set operations preserve bit-31 and lane boundaries (6.5605ms)
+✔ six-word skyline insert rejects dominated candidates and removes dominated retained generators (0.5103ms)
+✔ streamed six-word join product absorbs the Cartesian product immediately (0.4911ms)
+✔ eight-word locator, exact probe/publication and span publication preserve exact identity (0.5828ms)
+✔ exact interval tightening and fixed-degree Bellman reductions remain monotone (12.3397ms)
+✔ ordered basis transform deduplicates mapped IDs and three-word permutation remaps active bits (10.2461ms)
+✔ seven-slot masks stay inside seven bits (0.3204ms)
+✔ intrusive stamped work list supports coalescing, arbitrary removal and generation validation (0.3479ms)
+✔ selected hot closure stays allocation/string/experiment-free (30.2026ms)
+✔ hot structural detector rejects representative negative controls (1.3939ms)
+✔ native frontier closes the same root WDL across configured geometry and reflection (498.3988ms)
+✔ incomplete frontier cancellation publishes no WDL and reused state can solve (11.0652ms)
+✔ direct Lazy SMP frontier host preserves exact closure, counters and timeout cleanup (335.5345ms)
+✔ worker attachment restores a truncated full-buffer view without copying storage (0.9414ms)
+✔ worker attachment rejects wrong backing size rather than fabricating capacity (0.3221ms)
+✔ word32 bit blocks (1.6878ms)
+✔ first set bit index (0.2497ms)
+✔ popcount32 (0.1802ms)
+✔ signed bit-pattern profile (0.1673ms)
+✔ subset32 (0.1297ms)
+✔ two-lane wordwise blocks (0.8775ms)
+✔ single-required-lane containment matches two-lane containment (0.1647ms)
+✔ packed support can replace duplicate height storage (0.1924ms)
+✔ guarded metadata prefix projects without scanning later words (0.3389ms)
+✔ indexed and table blocks (0.4846ms)
+✔ sentinel triple probe folds occupancy into exact key storage (0.2564ms)
+✔ scalar two-word interner probe preserves producer-owned exact keys (0.2408ms)
+✔ run-grouped indexed word reuse preserves exact values (0.1516ms)
+✔ caller-owned residual frame restores parent without history loads (0.1121ms)
+✔ apply and undo support state (0.2455ms)
+✔ caller-owned ply transition profiles match state-owned transition mechanics (0.3998ms)
+✔ known-cell apply profiles reuse an already observed landing cell (0.3085ms)
+✔ known-cell undo profiles reuse the cell returned by apply (0.2725ms)
+✔ known-cell undo prepared top-row boundary (0.0684ms)
+✔ caller-ply odd-center omission fully packs eligible one-lane state (0.3861ms)
+✔ omitted-center specialized transition skips zero support work (0.3969ms)
+✔ caller-ply odd-center omission compresses 7x6 transition state (0.3016ms)
+✔ general packed support+ply transitions match separate state (0.2926ms)
+✔ packed support+ply transition profile preserves support-only reflection boundary (0.293ms)
+✔ rank-low packed support+ply layout keeps extraction cheap (0.139ms)
+✔ packed high-playable meta state matches separate two-lane state (0.3668ms)
+✔ fully packed one-lane state matches separate transition state (0.2742ms)
+✔ caller-carried meta restores support/high by recursive ownership (0.2797ms)
+✔ one-lane caller meta makes known-cell undo landing-only (0.1965ms)
+✔ exact ten-slot tuple hash matches generic separable builder (3.001ms)
+✔ separable tuple hash updates from exact slot deltas (3.8338ms)
+✔ joint two-word direct index covers structured power-of-two buckets (0.8044ms)
+✔ triple key publication hashes live scalars without scratch reload (0.2695ms)
+✔ joint triple locator mixes exact-key coordinates without becoming identity (0.7888ms)
+✔ direct triple power-of-two index preserves primary collision partition (2.6694ms)
+✔ primary canonical comparison routes expensive secondary work (0.1475ms)
+✔ mix and reflection blocks (0.6824ms)
+✔ exact C3/C4 reflection tables match direct reference (5.355ms)
+✔ configured packed-3 register reflection profiles (8.6302ms)
+✔ 5-column reflection fused final alignment preserves edge fields (0.2136ms)
+✔ 9/10-column reflection fused final alignment preserves edge fields (0.254ms)
+✔ prepared 6/7 packed reflection shifts match direct reflection (0.5761ms)
+✔ frontier normalization blocks (0.2707ms)
+✔ signed frontier normalization profiles (0.2633ms)
+✔ one-lane signed frontier normalization profiles (0.2077ms)
+✔ lazy frontier compaction skips accepted-prefix rewrites (0.5483ms)
+✔ lazy frontier normalizers seed the first accepted entry (0.1624ms)
+✔ unsigned lazy frontier profiles preserve bit-31 semantics (0.3844ms)
+✔ search scalar blocks (0.2834ms)
+✔ two-lane shifts and arithmetic (0.4573ms)
+✔ two-lane set iteration and cardinality (0.2348ms)
+✔ sparse exact popcount profiles (0.2291ms)
+✔ two-lane popcount fused at nibble stage (0.153ms)
+✔ three-lane popcount fused at nibble stage (0.1671ms)
+✔ 10-bit high-lane popcount table profile (0.3023ms)
+✔ configured exact selectors cover runtime candidate counts 2 through 10 (0.4799ms)
+✔ scalar-producer selectors cover runtime candidate counts 2 through 10 (0.3733ms)
+✔ move-slot index space removes hot physical-column remap (0.2256ms)
+✔ isolated-bit clear profiles reuse caller isolation (0.114ms)
+✔ isolated-bit index profiles reuse caller isolation (0.1083ms)
+✔ one-lane cardinality classification (0.0974ms)
+✔ known landing cell legality reuses observed state (0.0896ms)
+✔ trusted legality and coordinate reference decode (0.2278ms)
+✔ capacity helpers and overwrite rehash (0.2426ms)
+✔ atomic blocks (1.1986ms)
+✔ bounded shared queue blocks without waiting (0.2576ms)
+✔ queue dequeue ready sequence is int32-normalized across wrap (0.1701ms)
+✔ caller-owned queue positions remove reservation CAS (0.1402ms)
+✔ owned queue next-position profiles reuse publication increment (0.1719ms)
+✔ owned blocking queue positions remove reservation RMW (0.179ms)
+✔ typed capacity allocation (0.0879ms)
+✔ high-lane apply and undo derives masks without lookup tables (0.0909ms)
+✔ runtime-configured 4x4 transition (0.0832ms)
+✔ bit-31 transition survives typed-store coercion (0.067ms)
+✔ one-lane full-column transition (0.0689ms)
+✔ nonblocking queue try paths (0.1164ms)
+✔ performance targets distinguish SMT siblings, efficiency classes and processor groups (2.4201ms)
+✔ malformed topology never silently supplies a placement (0.3019ms)
+✔ prepared behavior worker reads every publication including extended unsigned words (4.0709ms)
+✔ real search worker observes strategist stop published after search has begun (113.2595ms)
+✔ Lazy SMP host selects optional per-node worker and returns interruption without WDL (60.8384ms)
+✔ retiring one optional worker leaves the other worker able to solve (78.7686ms)
+✔ mid-search cancellation preserves exact-cache semantics and a cleared flag permits a new solve (44.8661ms)
+✔ optional search consumes stop at its first completed node and never returns WDL (2.2908ms)
+✔ zero-flags optional search preserves exact value, move and visited-node count (16.1611ms)
+✔ standard 7x6 optional search preserves all baseline metrics and observes every completed q (11.361ms)
+✔ in-flight extended publication defers then applies STOP at the next coherent node boundary (2.3384ms)
+✔ flag-free Worker stays minimal; behavior variant is explicitly selected (1.8259ms)
+✔ one-word read never reads a version or extension and never writes shared memory (0.4198ms)
+✔ extension chain supports sparse four-word flags, truncation and all 124 payload bits (0.2489ms)
+✔ overlapping extension publication defers without retry or modifying prior private snapshot (0.1662ms)
+✔ a completed publication during extension reading cannot mix two flag sets (0.8981ms)
+✔ publication before the version bracket rereads primary for every new chain length (0.5077ms)
+✔ one-word checkpoint performs exactly one shared read (0.206ms)
+✔ cold writer rejects invalid flags/index/storage and version exhaustion before mutation (0.4566ms)
+✔ real reader worker observes complete extended generations while strategist publishes (71.1598ms)
+✔ Worker is the minimal canonical JSMinSys worker base (1.8176ms)
+✔ worker take establishes ownership and lazily skips resolved/retired rows (2.8441ms)
+✔ worker take rejects stale generation/ownership before touching the list (0.2473ms)
+✔ resolved publication orders value before marker and validates owned work separately (0.7811ms)
+✔ dependency publication carries fixed rows and retained handoff claims first runnable child (0.5547ms)
+✔ wake observe/signal/park and stop/done primitives compose without hidden policy (0.3483ms)
+ℹ tests 180
+ℹ suites 0
+ℹ pass 180
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1785.0426
+node tools/bench-rba-cpc-ab.mjs
+{
+  "kind": "rba-cpc-alpha-beta-ab-v3",
+  "warmup": 3,
+  "repeats": 9,
+  "frontierResponseScan": [],
+  "rows": [
+    {
+      "geometry": "4x4",
+      "moves": "0101",
+      "mode": "cpc-alpha-beta",
+      "value": 2,
+      "move": 1,
+      "elapsedMs": 2.4172999999999973,
+      "warmMedianMs": 0.30400000000000205,
+      "warmMinMs": 0.20840000000000458,
+      "nodes": 384,
+      "cutoffs": 196,
+      "cacheHits": 37,
+      "cpcExact": 25,
+      "cpcBounds": 76,
+      "cpcRestrictions": 58,
+      "cpcForced": 73,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 385
+    },
+    {
+      "geometry": "4x4",
+      "moves": "0101",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 2,
+      "move": 1,
+      "elapsedMs": 0.36410000000000053,
+      "warmMedianMs": 0.134999999999998,
+      "warmMinMs": 0.12699999999999534,
+      "nodes": 243,
+      "cutoffs": 127,
+      "cacheHits": 28,
+      "cpcExact": 18,
+      "cpcBounds": 63,
+      "cpcRestrictions": 30,
+      "cpcForced": 43,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 243
+    },
+    {
+      "geometry": "4x4",
+      "moves": "0101",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 2,
+      "move": 1,
+      "elapsedMs": 14.0109,
+      "warmMedianMs": 5.827099999999987,
+      "warmMinMs": 5.5478999999999985,
+      "nodes": 1525,
+      "cutoffs": 809,
+      "cacheHits": 369,
+      "cpcExact": 25,
+      "cpcBounds": 395,
+      "cpcRestrictions": 145,
+      "cpcForced": 158,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1132,
+      "frontExact": 10,
+      "frontFailures": 0,
+      "frontSteps": 112774,
+      "frontActionExact": 25,
+      "cofactors": 1525
+    },
+    {
+      "geometry": "4x4",
+      "moves": "121203",
+      "mode": "cpc-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.09290000000001442,
+      "warmMedianMs": 0.028499999999979764,
+      "warmMinMs": 0.028300000000001546,
+      "nodes": 42,
+      "cutoffs": 17,
+      "cacheHits": 1,
+      "cpcExact": 11,
+      "cpcBounds": 6,
+      "cpcRestrictions": 4,
+      "cpcForced": 5,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 42
+    },
+    {
+      "geometry": "4x4",
+      "moves": "121203",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.06210000000001514,
+      "warmMedianMs": 0.028500000000008185,
+      "warmMinMs": 0.028300000000001546,
+      "nodes": 37,
+      "cutoffs": 16,
+      "cacheHits": 1,
+      "cpcExact": 10,
+      "cpcBounds": 5,
+      "cpcRestrictions": 3,
+      "cpcForced": 4,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 37
+    },
+    {
+      "geometry": "4x4",
+      "moves": "121203",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.21510000000000673,
+      "warmMedianMs": 0.11490000000000578,
+      "warmMinMs": 0.11070000000000846,
+      "nodes": 35,
+      "cutoffs": 16,
+      "cacheHits": 4,
+      "cpcExact": 5,
+      "cpcBounds": 5,
+      "cpcRestrictions": 2,
+      "cpcForced": 2,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 27,
+      "frontExact": 2,
+      "frontFailures": 0,
+      "frontSteps": 2483,
+      "frontActionExact": 7,
+      "cofactors": 35
+    },
+    {
+      "geometry": "4x4",
+      "moves": "01132",
+      "mode": "cpc-alpha-beta",
+      "value": 1,
+      "move": 1,
+      "elapsedMs": 0.1921999999999855,
+      "warmMedianMs": 0.07889999999997599,
+      "warmMinMs": 0.0771000000000015,
+      "nodes": 192,
+      "cutoffs": 59,
+      "cacheHits": 34,
+      "cpcExact": 28,
+      "cpcBounds": 30,
+      "cpcRestrictions": 31,
+      "cpcForced": 35,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 192
+    },
+    {
+      "geometry": "4x4",
+      "moves": "01132",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 1,
+      "move": 1,
+      "elapsedMs": 0.14760000000001128,
+      "warmMedianMs": 0.06700000000000728,
+      "warmMinMs": 0.0660000000000025,
+      "nodes": 156,
+      "cutoffs": 40,
+      "cacheHits": 31,
+      "cpcExact": 25,
+      "cpcBounds": 37,
+      "cpcRestrictions": 26,
+      "cpcForced": 30,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 156
+    },
+    {
+      "geometry": "4x4",
+      "moves": "01132",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 1,
+      "move": 1,
+      "elapsedMs": 1.123899999999992,
+      "warmMedianMs": 1.0531999999999755,
+      "warmMinMs": 1.0250000000000057,
+      "nodes": 279,
+      "cutoffs": 140,
+      "cacheHits": 65,
+      "cpcExact": 8,
+      "cpcBounds": 55,
+      "cpcRestrictions": 43,
+      "cpcForced": 45,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 207,
+      "frontExact": 6,
+      "frontFailures": 0,
+      "frontSteps": 21980,
+      "frontActionExact": 29,
+      "cofactors": 279
+    },
+    {
+      "geometry": "4x4",
+      "moves": "212031",
+      "mode": "cpc-alpha-beta",
+      "value": 3,
+      "move": 2,
+      "elapsedMs": 0.10410000000001673,
+      "warmMedianMs": 0.03799999999998249,
+      "warmMinMs": 0.037599999999997635,
+      "nodes": 96,
+      "cutoffs": 32,
+      "cacheHits": 12,
+      "cpcExact": 21,
+      "cpcBounds": 10,
+      "cpcRestrictions": 11,
+      "cpcForced": 12,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 96
+    },
+    {
+      "geometry": "4x4",
+      "moves": "212031",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 3,
+      "move": 2,
+      "elapsedMs": 0.09889999999998622,
+      "warmMedianMs": 0.039500000000003865,
+      "warmMinMs": 0.039199999999993906,
+      "nodes": 91,
+      "cutoffs": 31,
+      "cacheHits": 12,
+      "cpcExact": 20,
+      "cpcBounds": 16,
+      "cpcRestrictions": 10,
+      "cpcForced": 11,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 91
+    },
+    {
+      "geometry": "4x4",
+      "moves": "212031",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 3,
+      "move": 2,
+      "elapsedMs": 0.3745000000000118,
+      "warmMedianMs": 0.27660000000000196,
+      "warmMinMs": 0.2723000000000013,
+      "nodes": 83,
+      "cutoffs": 40,
+      "cacheHits": 12,
+      "cpcExact": 7,
+      "cpcBounds": 13,
+      "cpcRestrictions": 11,
+      "cpcForced": 11,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 65,
+      "frontExact": 2,
+      "frontFailures": 0,
+      "frontSteps": 6298,
+      "frontActionExact": 22,
+      "cofactors": 83
+    },
+    {
+      "geometry": "4x4",
+      "moves": "0313202",
+      "mode": "cpc-alpha-beta",
+      "value": 2,
+      "move": 3,
+      "elapsedMs": 0.1599999999999966,
+      "warmMedianMs": 0.054199999999980264,
+      "warmMinMs": 0.05389999999999873,
+      "nodes": 152,
+      "cutoffs": 71,
+      "cacheHits": 16,
+      "cpcExact": 13,
+      "cpcBounds": 53,
+      "cpcRestrictions": 23,
+      "cpcForced": 39,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 154
+    },
+    {
+      "geometry": "4x4",
+      "moves": "0313202",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 2,
+      "move": 3,
+      "elapsedMs": 0.12289999999998713,
+      "warmMedianMs": 0.05340000000001055,
+      "warmMinMs": 0.05120000000002278,
+      "nodes": 130,
+      "cutoffs": 60,
+      "cacheHits": 14,
+      "cpcExact": 12,
+      "cpcBounds": 64,
+      "cpcRestrictions": 10,
+      "cpcForced": 33,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 130
+    },
+    {
+      "geometry": "4x4",
+      "moves": "0313202",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 2,
+      "move": 3,
+      "elapsedMs": 0.6751000000000147,
+      "warmMedianMs": 0.5687000000000069,
+      "warmMinMs": 0.5553999999999917,
+      "nodes": 136,
+      "cutoffs": 72,
+      "cacheHits": 22,
+      "cpcExact": 9,
+      "cpcBounds": 46,
+      "cpcRestrictions": 21,
+      "cpcForced": 28,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 106,
+      "frontExact": 8,
+      "frontFailures": 0,
+      "frontSteps": 11993,
+      "frontActionExact": 3,
+      "cofactors": 136
+    },
+    {
+      "geometry": "7x6",
+      "moves": "4000330062302363634622612564",
+      "mode": "cpc-alpha-beta",
+      "value": 3,
+      "move": 4,
+      "elapsedMs": 0.5786999999999978,
+      "warmMedianMs": 0.19939999999999714,
+      "warmMinMs": 0.16569999999998686,
+      "nodes": 147,
+      "cutoffs": 34,
+      "cacheHits": 18,
+      "cpcExact": 35,
+      "cpcBounds": 26,
+      "cpcRestrictions": 36,
+      "cpcForced": 43,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 147
+    },
+    {
+      "geometry": "7x6",
+      "moves": "4000330062302363634622612564",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 3,
+      "move": 4,
+      "elapsedMs": 0.24459999999999127,
+      "warmMedianMs": 0.24799999999999045,
+      "warmMinMs": 0.1711999999999989,
+      "nodes": 147,
+      "cutoffs": 34,
+      "cacheHits": 18,
+      "cpcExact": 35,
+      "cpcBounds": 26,
+      "cpcRestrictions": 36,
+      "cpcForced": 43,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 147
+    },
+    {
+      "geometry": "7x6",
+      "moves": "4000330062302363634622612564",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 3,
+      "move": 4,
+      "elapsedMs": 2.7293999999999983,
+      "warmMedianMs": 0.7823999999999955,
+      "warmMinMs": 0.6904999999999859,
+      "nodes": 58,
+      "cutoffs": 27,
+      "cacheHits": 5,
+      "cpcExact": 6,
+      "cpcBounds": 6,
+      "cpcRestrictions": 16,
+      "cpcForced": 17,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 48,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 5443,
+      "frontActionExact": 18,
+      "cofactors": 58
+    },
+    {
+      "geometry": "7x6",
+      "moves": "2053635233350500161434266064",
+      "mode": "cpc-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.061299999999988586,
+      "warmMedianMs": 0.0037999999999840384,
+      "warmMinMs": 0.0036000000000058208,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "2053635233350500161434266064",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.004500000000007276,
+      "warmMedianMs": 0.0037000000000091404,
+      "warmMinMs": 0.0036000000000058208,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "2053635233350500161434266064",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 3,
+      "move": 1,
+      "elapsedMs": 0.16630000000000678,
+      "warmMedianMs": 0.09379999999998745,
+      "warmMinMs": 0.08840000000000714,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 397,
+      "frontActionExact": 1,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "60215211105252410143266662440603454",
+      "mode": "cpc-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.010099999999994225,
+      "warmMedianMs": 0.0037999999999840384,
+      "warmMinMs": 0.0036000000000058208,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "60215211105252410143266662440603454",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.004300000000000637,
+      "warmMedianMs": 0.0037000000000091404,
+      "warmMinMs": 0.0036000000000058208,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "60215211105252410143266662440603454",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.07550000000000523,
+      "warmMedianMs": 0.018000000000000682,
+      "warmMinMs": 0.01670000000001437,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 212,
+      "frontActionExact": 1,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433",
+      "mode": "cpc-alpha-beta",
+      "value": 1,
+      "move": 6,
+      "elapsedMs": 0.022699999999986176,
+      "warmMedianMs": 0.004600000000010596,
+      "warmMinMs": 0.0030999999999892225,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 1,
+      "move": 6,
+      "elapsedMs": 0.0053000000000054115,
+      "warmMedianMs": 0.002900000000011005,
+      "warmMinMs": 0.0028000000000076852,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 1,
+      "move": 6,
+      "elapsedMs": 0.07200000000000273,
+      "warmMedianMs": 0.02580000000000382,
+      "warmMinMs": 0.02539999999999054,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 196,
+      "frontActionExact": 0,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "42230356565663606202100101455144422",
+      "mode": "cpc-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.0049999999999954525,
+      "warmMedianMs": 0.0030999999999892225,
+      "warmMinMs": 0.0030999999999892225,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "42230356565663606202100101455144422",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.0036000000000058208,
+      "warmMedianMs": 0.003199999999992542,
+      "warmMinMs": 0.0030999999999892225,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 1
+    },
+    {
+      "geometry": "7x6",
+      "moves": "42230356565663606202100101455144422",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 1,
+      "move": 3,
+      "elapsedMs": 0.06630000000001246,
+      "warmMedianMs": 0.026199999999988677,
+      "warmMinMs": 0.025999999999982037,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 401,
+      "frontActionExact": 1,
+      "cofactors": 0
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433635",
+      "mode": "cpc-alpha-beta",
+      "value": 1,
+      "move": 0,
+      "elapsedMs": 0.012600000000020373,
+      "warmMedianMs": 0.0049999999999954525,
+      "warmMinMs": 0.004899999999992133,
+      "nodes": 2,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 3,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 3
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433635",
+      "mode": "cpc-frontier-response-alpha-beta",
+      "value": 1,
+      "move": 0,
+      "elapsedMs": 0.007699999999999818,
+      "warmMedianMs": 0.005099999999998772,
+      "warmMinMs": 0.004899999999992133,
+      "nodes": 2,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 3,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 0,
+      "frontExact": 0,
+      "frontFailures": 0,
+      "frontSteps": 0,
+      "frontActionExact": 0,
+      "cofactors": 3
+    },
+    {
+      "geometry": "7x6",
+      "moves": "13204610245223111513246044620433635",
+      "mode": "cpc-four-front-alpha-beta",
+      "value": 1,
+      "move": 0,
+      "elapsedMs": 0.05000000000001137,
+      "warmMedianMs": 0.01680000000001769,
+      "warmMinMs": 0.01669999999998595,
+      "nodes": 0,
+      "cutoffs": 0,
+      "cacheHits": 0,
+      "cpcExact": 1,
+      "cpcBounds": 0,
+      "cpcRestrictions": 0,
+      "cpcForced": 0,
+      "cpcPrecursors": 0,
+      "cpcProjectedForks": 0,
+      "frontCalls": 1,
+      "frontExact": 1,
+      "frontFailures": 0,
+      "frontSteps": 239,
+      "frontActionExact": 3,
+      "cofactors": 0
+    }
+  ]
+}
+node tools/bench-rba-addons.mjs
+{
+  "kind": "rba-addon-bench-v1",
+  "warmup": 2,
+  "repeats": 7,
+  "rows": [
+    {
+      "name": "metric-sum-8x16",
+      "warmMedianMs": 3.3573999999999984,
+      "warmMinMs": 3.2179,
+      "checksum": 320
+    },
+    {
+      "name": "geometry-7x6-init-x3",
+      "warmMedianMs": 8.718400000000003,
+      "warmMinMs": 6.670799999999986,
+      "checksum": 1668061
+    },
+    {
+      "name": "geometry-10x10-init",
+      "warmMedianMs": 3.6469999999999914,
+      "warmMinMs": 3.1964000000000112,
+      "checksum": 778597
+    }
+  ]
+}
+JSON schema parsing and all source syntax checks passed.

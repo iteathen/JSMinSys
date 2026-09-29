@@ -1,5 +1,5 @@
 {
-  "version": "0.111.0",
+  "version": "0.112.0",
   "status": "catalog-implementation-complete",
   "rule": "When a required primitive is not admitted, record that function in deferred and continue implementing every independent function expressible with the admitted vocabulary.",
   "functions": [
@@ -8373,15 +8373,48 @@
         "playable has ceil(cellCount/32) lanes",
         "caller supplies a column with a move to undo"
       ]
+    },
+    {
+      "name": "readWorkerBehavior32",
+      "source": "src/worker-behavior32.mjs",
+      "block": "worker-execution-substrate",
+      "primitives": [
+        "Atomics.load",
+        "&",
+        "!",
+        "+",
+        "!==",
+        "ST32"
+      ],
+      "status": "implemented",
+      "preconditions": [
+        "prepared shared Uint32 control region with primary at base, extension at base+1..3 and version at base+4",
+        "exactly one publisher follows the documented no-wrap version protocol",
+        "output has three private uint32 lanes; bit meanings and checkpoint cadence are consumer-owned"
+      ],
+      "cycleCount": {
+        "profile": "node26-v8-14.6/x86_64-amd-zen3",
+        "metric": "NEES-static-serial-ledger-cycles",
+        "kind": "expression",
+        "expression": "primary: ATOMIC_LOAD + AND32 + TEST_BRANCH + RETURN; extended success: (4+n)*ATOMIC_LOAD + (n+4)*ADD32 + (3+min(n,2))*AND32 + (4+min(n,2))*TEST_BRANCH + 3*ST32 + RETURN",
+        "parameters": {
+          "n": "0..3 extension words actually read; n=0 when primary became single-word inside version bracket"
+        },
+        "paths": {
+          "busy": "2*ATOMIC_LOAD + ADD32 + 2*AND32 + 2*TEST_BRANCH + RETURN",
+          "changed": "extended path without the 3*ST32 and two output-index ADD32"
+        },
+        "note": "Branch predicates include the final version comparison. Constant/register assignments and call/return lowering remain V8 dependent; inspect assembly. Atomic/cache-coherence terms and wrappers are not zero. No retry, shared write, allocation or wait. These symbolic totals are not hardware measurements."
+      }
     }
   ],
   "deferred": [],
   "summary": {
-    "functionsImplemented": 297,
+    "functionsImplemented": 298,
     "catalogBlocks": 30,
     "blocksCompleteWithoutNewPrimitive": 29,
     "deferredMissingPrimitive": 0,
-    "functionsWithCycleCount": 297,
+    "functionsWithCycleCount": 298,
     "functionsMissingCycleCount": 0,
     "blocksComplete": 30,
     "blocksCompletedWithAdmittedPrimitive": 1
