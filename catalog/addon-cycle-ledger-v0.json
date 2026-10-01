@@ -10918,28 +10918,22 @@
         {
           "op": "control.branch",
           "count": "Q"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "U",
-          "target": "subsetDensePrepared"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+R*C(alu.shr.u32)+N*C(alu.and.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+U*CALL(subsetDensePrepared)",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+R*C(alu.shr.u32)+N*C(alu.and.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
         "parameters": {
-          "F": "prepared field loads",
-          "L": "basis/coordinate/shape-size loads",
+          "F": "prepared field loads including dense subset-table carrier",
+          "L": "basis/coordinate/shape-size/subset-row/subset-table loads",
           "S": "minimal-id/count stores",
-          "A": "loop/index additions",
+          "A": "loop/index additions including prepared subset-row plus superset id",
           "R": "coordinate-word shifts",
           "N": "bit tests ANDs",
           "H": "bit-mask shifts",
-          "Q": "loop/active/minimality conditions",
-          "U": "subset tests reached before minimality decision"
+          "Q": "loop/active/minimality conditions"
         },
-        "note": "Exact active-minimal residual scan into preallocated per-frame storage using the initialization-prepared dense subset table."
+        "note": "Exact active-minimal residual scan into preallocated per-frame storage using direct lookup in the initialization-proven dense subset table."
       },
       "status": "decomposed"
     },
@@ -12116,7 +12110,7 @@
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
     "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518",
-    "addons/cpc-connect4-guard-survival.mjs": "bc12212b25100107903afe21d972be413ab9249b"
+    "addons/cpc-connect4-guard-survival.mjs": "8e5daf7a9d1aa46ad24750eac927b3dd5d225204"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
