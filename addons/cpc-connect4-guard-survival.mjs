@@ -1,4 +1,3 @@
-import {connect4RbaShapeSubset} from './rba-connect4-geometry.mjs';
 import {connect4RbaCofactorKnownHeight} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {isCompactProfile8} from './rba-connect4-shared-exact-cache.mjs';
@@ -15,10 +14,15 @@ const COLUMNS=7,ROWS=6,CELLS=42,FRAMES=43,NONE=7;
 export function prepareConnect4GuardSurvival32({geometry,memoCapacity=4194304}={}){
   if(!geometry||!isCompactProfile8(geometry,geometry.keyWords))
     throw new RangeError('guard survival requires standard 7x6 compact RBA profile');
-  const g=geometry,frameWords=FRAMES*g.keyWords,frameBasis=FRAMES*g.maxBasis;
+  const g=geometry,frameWords=FRAMES*g.keyWords,frameBasis=FRAMES*g.maxBasis,
+    profile=prepareConnect4RbaExecutionProfile(g),
+    subsetPrepared=new Uint32Array(g.shapeCount);
+  if(profile.subsetMode!==1)throw new RangeError('guard survival requires dense prepared subset profile');
+  for(let id=0;id<g.shapeCount;id+=1)subsetPrepared[id]=profile.prepareSubset(g,id);
   return {
     g,
-    profile:prepareConnect4RbaExecutionProfile(g),
+    profile,
+    subsetPrepared,
     memo:prepareConnect4RbaProofMemo32({capacity:memoCapacity,keyWords:g.keyWords,geometry:g}),
     words:new Uint32Array(frameWords),
     basis:new Uint32Array(frameBasis),
@@ -67,7 +71,8 @@ function fillMinimal32(ctx,frame,player){
     for(let j=0;j<n;j+=1){
       const other=basis[bi+j],otherSize=g.shapeSize[other];
       if(otherSize>=size)break;
-      if((words[coord+(j>>>5)]&(1<<(j&31)))&&connect4RbaShapeSubset(g,other,id)){
+      if((words[coord+(j>>>5)]&(1<<(j&31)))&&
+         ctx.profile.shapeSubsetPrepared(g,ctx.subsetPrepared[other],id)){
         minimal=0;break;
       }
     }
