@@ -383,3 +383,58 @@ export function proveConnect4GuardSurvival32(ctx,horizon,oddDefenderMask){
   const attacker=(meta>>>2)&1;
   return searchGuardSurvival32(ctx,0,attacker,horizon,oddDefenderMask>>>0);
 }
+
+
+// E3 diagnostic over one root attacker trigger. Caller supplies >=18 Uint32
+// words. Layout: [candidateMask, guardMask, triggerTerminal, reserved,
+// childCode[7], childOddMask[7]]. childCode 0 means not a candidate, 1 means
+// closed/survives, 2..8 identifies the next unclosed attacker trigger.
+export function diagnoseConnect4GuardSurvivalTrigger32(
+  ctx,horizon,oddDefenderMask,column,out,outOffset=0
+){
+  if(column<0||column>=COLUMNS||horizon<3||!(horizon&1))return -1;
+  for(let i=0;i<18;i+=1)out[outOffset+i]=0;
+  const g=ctx.g,words=ctx.words,off=0,
+    meta=words[g.metaOffset],terminal=meta&3;
+  if(terminal)return -1;
+  const attacker=(meta>>>2)&1,attackerTerminal=attacker?1:3,
+    oddMask=oddDefenderMask>>>0,
+    guardColumns=guardColumnMask32(ctx,0,oddMask);
+  out[outOffset+1]=guardColumns;
+
+  fillMinimal32(ctx,0,attacker);
+  const triggerTerm=cofactorFrame32(ctx,0,1,column);
+  out[outOffset+2]=triggerTerm;
+  if(triggerTerm===attackerTerminal)return 0;
+  if(triggerTerm)return 0;
+
+  let candidates=adaptiveResponseMask32(ctx,0,column);
+  if((guardColumns&(1<<column))&&words[column]<5)candidates|=1<<column;
+
+  const childOff=g.keyWords;
+  fillMinimal32(ctx,1,attacker);
+  if(words[childOff+column]<ROWS){
+    const released=words[childOff+column]*COLUMNS+column;
+    if(minimalContainsCell32(ctx,1,released))candidates|=1<<column;
+  }else{
+    for(let rcol=0;rcol<COLUMNS;rcol+=1){
+      if(rcol===column||words[childOff+rcol]>=ROWS)continue;
+      if(!(guardColumns&~(1<<column)&~(1<<rcol)))continue;
+      const responseCell=words[childOff+rcol]*COLUMNS+rcol;
+      if(minimalContainsCell32(ctx,1,responseCell))candidates|=1<<rcol;
+    }
+  }
+  out[outOffset]=candidates>>>0;
+
+  for(let rcol=0;rcol<COLUMNS;rcol+=1)if(candidates&(1<<rcol)){
+    const responseTerm=cofactorFrame32(ctx,1,2,rcol);
+    if(responseTerm){
+      out[outOffset+4+rcol]=1;
+      continue;
+    }
+    const nextMask=maskAfterPair32(ctx,0,oddMask,column,rcol);
+    out[outOffset+11+rcol]=nextMask;
+    out[outOffset+4+rcol]=searchGuardSurvival32(ctx,2,attacker,horizon-2,nextMask);
+  }
+  return candidates>>>0;
+}
