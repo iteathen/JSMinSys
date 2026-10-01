@@ -10486,11 +10486,243 @@
         },
         "note": "Cold full-buffer view header restoration only; constructor creates view metadata over existing SAB, no new backing or memory copy. Native instance checks/getters remain runtime-dependent; allocation cost is not zero. Once per worker; no recursive calls."
       }
+    },
+    {
+      "unit": "addons/rba-connect4-proof-memo.mjs#prepareConnect4RbaProofMemo32",
+      "source": "addons/rba-connect4-proof-memo.mjs",
+      "name": "prepareConnect4RbaProofMemo32",
+      "scope": "cold-cpc-guard-proof-memo",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 2
+        },
+        {
+          "op": "control.test.u32",
+          "count": "6+3*G"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+3*G"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "G"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 2
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*C(runtime.integer.check)+(6+3*G)*C(control.test.u32)+(3+3*G)*C(control.branch)+C(alu.and.u32)+C(alu.sub.u32)+C(alu.add.u32)+C(alu.imul.u32)+G*C(runtime.field.load)+CALL(isCompactProfile8)+2*C(runtime.typed_array.allocate)+C(runtime.object.allocate)",
+        "parameters": {
+          "G": "1 when explicit geometry is supplied; 0 for compatibility callers"
+        },
+        "note": "COLD allocation/validation only. Selects the inherited lossless standard-7x6 compact RBA identity at initialization; hot probe/store allocate nothing."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-proof-memo.mjs#mixConnect4RbaProofMemoKey32",
+      "source": "addons/rba-connect4-proof-memo.mjs",
+      "name": "mixConnect4RbaProofMemoKey32",
+      "scope": "hot-cpc-guard-proof-memo-key",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": 4
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": 5
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "CALL(mixSpan32Locator32)+4*C(alu.xor.u32)+2*C(alu.shr.u32)+2*C(alu.imul.u32)+5*C(runtime.to_int32)",
+        "note": "E1 trusted mixer. Full RBA q locator is extended with guard-mask and horizon only for addressing; exact stored-key equality remains semantic authority."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-proof-memo.mjs#probeConnect4RbaProofMemo32",
+      "source": "addons/rba-connect4-proof-memo.mjs",
+      "name": "probeConnect4RbaProofMemo32",
+      "scope": "hot-cpc-guard-proof-memo-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+C(alu.and.u32)+C(alu.imul.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+T*C(runtime.to_int32)+CS*CALL(compactSupportProfile8)+CT*CALL(compactTailProfile8)",
+        "parameters": {
+          "F": "prepared memo field loads reached on path; 2..6",
+          "L": "ordinary Uint32 loads from value/key/q arrays reached before miss or exact hit; compact full hit <=17 excluding pack-helper loads, generic full hit <=1+2*keyWords+2",
+          "A": "index/loop additions reached on path; 0..keyWords+12",
+          "Q": "empty/key/side equality and loop conditions reached on path; 1..keyWords+14",
+          "T": "explicit uint32 coercions of guard/horizon reached on path; 0..2",
+          "CS": "1 when compact comparison reaches packed-support word; 0 otherwise",
+          "CT": "1 when compact comparison reaches packed-tail word; 0 otherwise"
+        },
+        "note": "E1 single-owner direct-map probe. Hash collision or overwritten slot is a safe miss. Compact standard-7x6 exact equality stores eight lossless RBA identity words plus guard mask and horizon; generic geometry compares full q words plus the same side state."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-proof-memo.mjs#storeConnect4RbaProofMemo32",
+      "source": "addons/rba-connect4-proof-memo.mjs",
+      "name": "storeConnect4RbaProofMemo32",
+      "scope": "hot-cpc-guard-proof-memo-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+C(alu.and.u32)+C(alu.imul.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+T*C(runtime.to_int32)+CS*CALL(compactSupportProfile8)+CT*CALL(compactTailProfile8)",
+        "parameters": {
+          "F": "prepared memo field loads reached on path; 3..6",
+          "L": "ordinary q-word loads used for publication; compact path 6 excluding pack-helper loads, generic path keyWords",
+          "S": "ordinary memo stores; compact path 11 (10 key words plus value), generic path keyWords+3",
+          "A": "index/loop additions reached on path; compact bounded, generic <=keyWords+12",
+          "Q": "compact/generic selection and generic loop conditions; compact 1, generic keyWords+2",
+          "T": "explicit uint32 coercions of guard/horizon/value; 3",
+          "CS": "1 on compact standard-7x6 publication; 0 otherwise",
+          "CT": "1 on compact standard-7x6 publication; 0 otherwise"
+        },
+        "note": "E1 single-owner direct-map publication. Exact key is written before nonzero memo value. Replacement is cache policy only and cannot create semantic equality."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 170,
-    "decomposed": 170,
+    "units": 174,
+    "decomposed": 174,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10612,7 +10844,8 @@
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "0a604bfc3b9257ebe2cc80bc3534aaa43dcac70a",
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
-    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f"
+    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
+    "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
