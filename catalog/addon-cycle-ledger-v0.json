@@ -11982,11 +11982,131 @@
         "note": "E3 entry over an already-ingressed exact RBA root."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#diagnoseConnect4GuardSurvivalTrigger32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "diagnoseConnect4GuardSurvivalTrigger32",
+      "scope": "e3-cpc-guard-survival-diagnostic",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.not.u32",
+          "count": "X"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "guardColumnMask32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FM",
+          "target": "fillMinimal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CF",
+          "target": "cofactorFrame32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "adaptiveResponseMask32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MC",
+          "target": "minimalContainsCell32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MP",
+          "target": "maskAfterPair32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SR",
+          "target": "searchGuardSurvival32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+X*C(alu.not.u32)+H*C(alu.shl.u32)+R*C(alu.shr.u32)+Q*C(control.test.u32)+Q*C(control.branch)+T*C(runtime.to_int32)+CALL(guardColumnMask32)+FM*CALL(fillMinimal32)+CF*CALL(cofactorFrame32)+CALL(adaptiveResponseMask32)+MC*CALL(minimalContainsCell32)+MP*CALL(maskAfterPair32)+SR*CALL(searchGuardSurvival32)",
+        "parameters": {
+          "F": "prepared context/geometry field loads",
+          "L": "root/child support and output-state loads",
+          "S": "18 output clears plus reached diagnostic result stores",
+          "A": "bounded output/column/frame index additions",
+          "D": "horizon/support subtractions",
+          "N": "range/parity/mask tests",
+          "O": "candidate-mask unions",
+          "X": "preserved-guard mask complements",
+          "H": "column-bit shifts",
+          "R": "root rank/player decode shifts",
+          "Q": "argument, terminal, legal, candidate and response conditions",
+          "T": "odd-mask/candidate result uint32 normalizations",
+          "FM": "root/post-trigger minimal-residual fills, 1..2",
+          "CF": "one attacker cofactor plus one response cofactor per reached candidate",
+          "MC": "support-lift/top-debt attachment tests",
+          "MP": "nonterminal candidate response mask updates",
+          "SR": "nonterminal candidate D-2 survival calls"
+        },
+        "note": "Off-production diagnostic entry. Reuses the exact kernel grammar and fixed arena to report one root trigger's licensed response mask and each child proof result; it introduces no response or semantic identity."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 195,
-    "decomposed": 195,
+    "units": 196,
+    "decomposed": 196,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -12110,7 +12230,7 @@
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
     "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518",
-    "addons/cpc-connect4-guard-survival.mjs": "8e5daf7a9d1aa46ad24750eac927b3dd5d225204"
+    "addons/cpc-connect4-guard-survival.mjs": "155629413eb745c074944be51b6f203f2ab50c23"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
