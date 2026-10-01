@@ -72,7 +72,7 @@ function fillMinimal32(ctx,frame,player){
       const other=basis[bi+j],otherSize=g.shapeSize[other];
       if(otherSize>=size)break;
       if((words[coord+(j>>>5)]&(1<<(j&31)))&&
-         ctx.profile.shapeSubsetPrepared(g,ctx.subsetPrepared[other],id)){
+         g.subsetTable[ctx.subsetPrepared[other]+id]){
         minimal=0;break;
       }
     }
