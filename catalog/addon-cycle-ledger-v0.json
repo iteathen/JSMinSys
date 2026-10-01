@@ -10718,11 +10718,1265 @@
         "note": "E1 single-owner direct-map publication. Exact key is written before nonzero memo value. Replacement is cache policy only and cannot create semantic equality."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#prepareConnect4GuardSurvival32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "prepareConnect4GuardSurvival32",
+      "scope": "cold-cpc-guard-survival",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 2
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 10
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaProofMemo32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+Q*C(control.test.u32)+Q*C(control.branch)+2*C(alu.imul.u32)+10*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+CALL(isCompactProfile8)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaProofMemo32)",
+        "parameters": {
+          "F": "geometry/profile field loads reached during guarded standard-7x6 preparation",
+          "Q": "validation and compact-profile branch conditions"
+        },
+        "note": "COLD only. Allocates all frame/scratch/memo storage before proof execution."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#loadConnect4GuardSurvivalRoot32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "loadConnect4GuardSurvivalRoot32",
+      "scope": "cold-cpc-guard-survival-root",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared context field loads",
+          "L": "keyWords+basisSize source loads",
+          "S": "keyWords+basisSize+1 destination stores",
+          "A": "loop/index increments",
+          "Q": "loop conditions"
+        },
+        "note": "COLD/E3 root import only; no board reconstruction below this boundary."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#cofactorFrame32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "cofactorFrame32",
+      "scope": "e1-cpc-guard-survival-transition",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 4
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "connect4RbaCofactorKnownHeight"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+4*C(alu.imul.u32)+A*C(alu.add.u32)+CALL(connect4RbaCofactorKnownHeight)",
+        "parameters": {
+          "F": "prepared arena/geometry/profile field loads",
+          "L": "basis-size and support-height loads",
+          "A": "frame/span address additions"
+        },
+        "note": "E1 transition wrapper over caller-owned RBA frames; allocates nothing."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#fillMinimal32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "fillMinimal32",
+      "scope": "e1-cpc-guard-minimal-residuals",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "U",
+          "target": "connect4RbaShapeSubset"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+R*C(alu.shr.u32)+N*C(alu.and.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+U*CALL(connect4RbaShapeSubset)",
+        "parameters": {
+          "F": "prepared field loads",
+          "L": "basis/coordinate/shape-size loads",
+          "S": "minimal-id/count stores",
+          "A": "loop/index additions",
+          "R": "coordinate-word shifts",
+          "N": "bit tests ANDs",
+          "H": "bit-mask shifts",
+          "Q": "loop/active/minimality conditions",
+          "U": "subset tests reached before minimality decision"
+        },
+        "note": "Exact active-minimal residual scan into preallocated per-frame storage."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#shapeHasCell32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "shapeHasCell32",
+      "scope": "e1-cpc-guard-shape-membership",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+C(alu.imul.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "geometry field loads",
+          "L": "shape-size/cell loads reached before result",
+          "A": "cell-span indexing/loop increments",
+          "Q": "loop/equality tests"
+        },
+        "note": "Bounded <=4-cell exact membership."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#earliestAttacker32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "earliestAttacker32",
+      "scope": "e1-cpc-guard-deadline",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+R*C(alu.shr.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared geometry/context field loads",
+          "L": "shape/support/need scratch loads",
+          "S": "need scratch stores",
+          "A": "index/slot increments",
+          "D": "support/deadline subtractions",
+          "R": "rank decode shift",
+          "Q": "bounded insertion-sort and slot tests"
+        },
+        "note": "Allocation-free <=4-cell deadline calculation using prepared need scratch."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#pooledNoWin32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "pooledNoWin32",
+      "scope": "e1-cpc-guard-pooled-nowin",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared context/geometry loads",
+          "L": "support/minimal/shape-cell loads",
+          "A": "loop/index additions",
+          "D": "remaining/support response-depth subtractions",
+          "N": "parity tests",
+          "Q": "pool parity/residual coverage conditions"
+        },
+        "note": "Pooled paired-response closure evaluated directly from support; no Set construction."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#shapeCoveredByTemplate32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "shapeCoveredByTemplate32",
+      "scope": "e1-cpc-guard-template-cover",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+M*C(alu.imul.u32)+N*C(alu.and.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared geometry/template field loads",
+          "L": "shape/support/partner/length loads",
+          "A": "index/row additions",
+          "D": "relative-row subtractions",
+          "M": "cell-index multiplies",
+          "N": "parity masks",
+          "Q": "vertical/cross coverage tests"
+        },
+        "note": "Checks one <=4-cell residual against one in-scratch synchronized template."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#templateCoversCritical32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "templateCoversCritical32",
+      "scope": "e1-cpc-guard-template-critical",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "shapeCoveredByTemplate32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+C*CALL(shapeCoveredByTemplate32)",
+        "parameters": {
+          "F": "prepared field loads",
+          "L": "critical-id loads",
+          "A": "loop increments",
+          "Q": "loop/early-fail tests",
+          "C": "critical residuals checked before result"
+        },
+        "note": "Terminal template test; short-circuits on first uncovered critical residual."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#firstColumnBit32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "firstColumnBit32",
+      "scope": "e1-cpc-guard-column-mask",
+      "operations": [
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "H*C(alu.shl.u32)+N*C(alu.and.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "H": "candidate bit shifts reached",
+          "N": "mask tests reached",
+          "A": "column increments",
+          "Q": "loop/mask tests"
+        },
+        "note": "Bounded seven-column first-set-bit scan; no generic collection."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#templateCoverSearch32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "templateCoverSearch32",
+      "scope": "e1-cpc-guard-template-search",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.not.u32",
+          "count": "X"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "B",
+          "target": "firstColumnBit32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "templateCoverSearch32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "templateCoversCritical32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+X*C(alu.not.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+B*CALL(firstColumnBit32)+R*CALL(templateCoverSearch32)+T*CALL(templateCoversCritical32)",
+        "parameters": {
+          "F": "prepared support/template field loads",
+          "L": "support/partner/length loads",
+          "S": "partner/length scratch stores",
+          "A": "pair/length loop increments",
+          "D": "remaining-height subtractions",
+          "N": "mask/parity tests",
+          "X": "mask bit removals",
+          "H": "column-bit shifts",
+          "Q": "recursive pairing/length branch tests",
+          "B": "first-bit helper calls",
+          "R": "recursive child searches",
+          "T": "terminal critical-coverage tests"
+        },
+        "note": "Finite <=7-column recursive pairing search over preallocated scalar scratch. Recurrence is explicit in the ledger."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#baseSafe32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "baseSafe32",
+      "scope": "e1-cpc-guard-bounded-response",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "earliestAttacker32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "templateCoverSearch32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+E*CALL(earliestAttacker32)+T*CALL(templateCoverSearch32)",
+        "parameters": {
+          "F": "prepared context/geometry field loads",
+          "L": "minimal/support loads",
+          "S": "critical-id stores",
+          "A": "loop/count increments",
+          "D": "remaining-height subtractions",
+          "N": "parity/mask tests",
+          "O": "column-mask accumulation",
+          "H": "column-bit shifts",
+          "Q": "deadline/parity/empty conditions",
+          "E": "minimal residual deadline calls",
+          "T": "0/1 template search after critical-set formation"
+        },
+        "note": "Bounded synchronized-response base theorem without dynamic template objects."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#synchronizedResponseMask32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "synchronizedResponseMask32",
+      "scope": "e1-cpc-guard-sync-response-mask",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.not.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+C(alu.not.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared context loads",
+          "L": "seven support loads plus trigger support",
+          "A": "column/count increments",
+          "D": "remaining-height subtractions",
+          "N": "parity/mask tests",
+          "O": "odd/even response-mask accumulation",
+          "H": "column-bit shifts",
+          "Q": "nonfull/parity/pairability conditions"
+        },
+        "note": "Closed-form union of all complete synchronized-template frontier response columns."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#adaptiveResponseMask32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "adaptiveResponseMask32",
+      "scope": "e1-cpc-guard-adaptive-response-mask",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "synchronizedResponseMask32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "shapeHasCell32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+M*C(alu.imul.u32)+O*C(alu.or.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+CALL(synchronizedResponseMask32)+C*CALL(shapeHasCell32)",
+        "parameters": {
+          "F": "prepared geometry/minimal/support field loads",
+          "L": "minimal/shape/support loads",
+          "A": "bounded loop/index additions",
+          "D": "ladder row offsets",
+          "M": "cell-index multiplies",
+          "O": "response-mask unions",
+          "H": "column-bit shifts",
+          "Q": "frontier/shape/ladder/playability conditions",
+          "C": "bounded shape-membership helper calls"
+        },
+        "note": "Unions synchronized, same-residual frontier, and +2-row cross-residual ladder responses into one 7-bit mask."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#minimalContainsCell32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "minimalContainsCell32",
+      "scope": "e1-cpc-guard-minimal-cell",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "shapeHasCell32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+C*CALL(shapeHasCell32)",
+        "parameters": {
+          "F": "prepared frame/minimal field loads",
+          "L": "minimal-id/count loads",
+          "A": "loop increments",
+          "Q": "loop/hit tests",
+          "C": "minimal shapes tested before result"
+        },
+        "note": "Exact attachment query over prepared minimal-residual span."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#guardColumnMask32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "guardColumnMask32",
+      "scope": "e1-cpc-guard-column-resource",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+H*C(alu.shl.u32)+R*C(alu.shr.u32)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "prepared context loads",
+          "L": "seven support loads",
+          "A": "column/count additions",
+          "D": "required-mask arithmetic",
+          "N": "height/parity/mask tests",
+          "O": "guard-mask accumulation",
+          "H": "required/column shifts",
+          "R": "stage shift",
+          "Q": "height/parity/equality conditions"
+        },
+        "note": "Reconstructs seven guard-carrier bits from compact odd-row proof side-state plus support."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#maskMove32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "maskMove32",
+      "scope": "e1-cpc-guard-mask-transition",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.not.u32",
+          "count": "X"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": "T"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "N*C(alu.and.u32)+O*C(alu.or.u32)+X*C(alu.not.u32)+H*C(alu.shl.u32)+R*C(alu.shr.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+T*C(runtime.to_int32)",
+        "parameters": {
+          "N": "row parity and optional clear-mask ANDs",
+          "O": "optional defender-bit set",
+          "X": "optional attacker-bit clear",
+          "H": "odd-slot bit construction shifts",
+          "R": "row-to-slot shift",
+          "A": "slot index arithmetic",
+          "Q": "row parity/owner branch tests",
+          "T": "uint32 result normalization"
+        },
+        "note": "One odd-row side-state update; no board identity or gray-token structure."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#maskAfterPair32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "maskAfterPair32",
+      "scope": "e1-cpc-guard-pair-mask-transition",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 2,
+          "target": "maskMove32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+2*CALL(maskMove32)",
+        "parameters": {
+          "F": "prepared context loads",
+          "L": "attacker/response support loads",
+          "A": "same-column response row addition"
+        },
+        "note": "Exact two-ply update of the compact 21-bit odd-row proof resource."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#noImmediateAttackerWin32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "noImmediateAttackerWin32",
+      "scope": "e1-cpc-guard-one-ply-terminal",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "cofactorFrame32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+C*CALL(cofactorFrame32)",
+        "parameters": {
+          "F": "prepared geometry/context loads",
+          "L": "legal support loads",
+          "A": "column increments",
+          "Q": "legal/terminal tests",
+          "C": "legal attacker cofactors reached before result"
+        },
+        "note": "D1 terminal guard using caller-owned next frame."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#searchGuardSurvival32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "searchGuardSurvival32",
+      "scope": "e0-cpc-guard-survival-search",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "D"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.not.u32",
+          "count": "X"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "noImmediateAttackerWin32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "mixConnect4RbaProofMemoKey32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "probeConnect4RbaProofMemo32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FM",
+          "target": "fillMinimal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PN",
+          "target": "pooledNoWin32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BS",
+          "target": "baseSafe32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "GM",
+          "target": "guardColumnMask32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CF",
+          "target": "cofactorFrame32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "AR",
+          "target": "adaptiveResponseMask32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MC",
+          "target": "minimalContainsCell32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MP",
+          "target": "maskAfterPair32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "searchGuardSurvival32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ST",
+          "target": "storeConnect4RbaProofMemo32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+D*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+X*C(alu.not.u32)+H*C(alu.shl.u32)+M*C(alu.imul.u32)+Q*C(control.test.u32)+Q*C(control.branch)+I*CALL(noImmediateAttackerWin32)+K*CALL(mixConnect4RbaProofMemoKey32)+P*CALL(probeConnect4RbaProofMemo32)+FM*CALL(fillMinimal32)+PN*CALL(pooledNoWin32)+BS*CALL(baseSafe32)+GM*CALL(guardColumnMask32)+CF*CALL(cofactorFrame32)+AR*CALL(adaptiveResponseMask32)+MC*CALL(minimalContainsCell32)+MP*CALL(maskAfterPair32)+R*CALL(searchGuardSurvival32)+ST*CALL(storeConnect4RbaProofMemo32)",
+        "parameters": {
+          "F": "prepared arena/geometry/memo field loads",
+          "L": "support/state loads performed directly by orchestration",
+          "A": "frame/column/row/count additions",
+          "D": "horizon/support subtractions",
+          "N": "mask/legal/parity tests",
+          "O": "candidate-mask unions",
+          "X": "preserved-guard mask complements",
+          "H": "column-bit shifts",
+          "M": "frame/cell-index multiplies",
+          "Q": "base/memo/legal/terminal/candidate/child branch conditions",
+          "I": "0/1 D1 terminal helper call",
+          "K": "0/1 memo-key mix call",
+          "P": "0/1 memo probe",
+          "FM": "minimal-set fills in this invocation",
+          "PN": "0/1 pooled closure call",
+          "BS": "0/1 bounded-template base call",
+          "GM": "0/1 guard reconstruction call",
+          "CF": "attacker/defender cofactor transitions",
+          "AR": "attacker-trigger response-mask calls",
+          "MC": "support-lift/top-debt attachment tests",
+          "MP": "nonterminal response mask updates",
+          "R": "recursive D-2 survival calls",
+          "ST": "0/1 memo publication on resolved D>=3 invocation"
+        },
+        "note": "E0 recurrence. All game states live in preallocated RBA frame spans; candidate responses are 7-bit masks; memoization is fixed typed storage. Recursive work remains explicit rather than hidden in a legacy body."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4-guard-survival.mjs#proveConnect4GuardSurvival32",
+      "source": "addons/cpc-connect4-guard-survival.mjs",
+      "name": "proveConnect4GuardSurvival32",
+      "scope": "e3-cpc-guard-survival-entry",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        },
+        {
+          "op": "runtime.to_int32",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "searchGuardSurvival32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+C(memory.load.u32)+C(alu.and.u32)+C(alu.shr.u32)+Q*C(control.test.u32)+Q*C(control.branch)+C(runtime.to_int32)+S*CALL(searchGuardSurvival32)",
+        "parameters": {
+          "F": "prepared context/geometry loads",
+          "Q": "terminal/result branch tests",
+          "S": "1 for nonterminal root, 0 for already-terminal root"
+        },
+        "note": "E3 entry over an already-ingressed exact RBA root."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 174,
-    "decomposed": 174,
+    "units": 195,
+    "decomposed": 195,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10845,7 +12099,8 @@
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "0a604bfc3b9257ebe2cc80bc3534aaa43dcac70a",
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
-    "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518"
+    "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518",
+    "addons/cpc-connect4-guard-survival.mjs": "0593e2c955050cb85aa74ad1c9001ccaf56e0004"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
