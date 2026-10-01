@@ -10730,6 +10730,14 @@
           "count": "F"
         },
         {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
           "op": "control.test.u32",
           "count": "Q"
         },
@@ -10743,7 +10751,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": 10
+          "count": 11
         },
         {
           "op": "runtime.object.allocate",
@@ -10761,18 +10769,26 @@
         },
         {
           "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "prepareSubsetDense"
+        },
+        {
+          "op": "runtime.call.subledger",
           "count": 1,
           "target": "prepareConnect4RbaProofMemo32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "F*C(runtime.field.load)+Q*C(control.test.u32)+Q*C(control.branch)+2*C(alu.imul.u32)+10*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+CALL(isCompactProfile8)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaProofMemo32)",
+        "expression": "F*C(runtime.field.load)+S*C(memory.store.u32)+A*C(alu.add.u32)+Q*C(control.test.u32)+Q*C(control.branch)+2*C(alu.imul.u32)+11*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+CALL(isCompactProfile8)+CALL(prepareConnect4RbaExecutionProfile)+P*CALL(prepareSubsetDense)+CALL(prepareConnect4RbaProofMemo32)",
         "parameters": {
-          "F": "geometry/profile field loads reached during guarded standard-7x6 preparation",
-          "Q": "validation and compact-profile branch conditions"
+          "F": "geometry/profile field loads including dense-subset-mode guard",
+          "S": "shapeCount prepared-subset row stores",
+          "A": "shape-id loop increments",
+          "Q": "validation, compact-profile, dense-subset and loop conditions",
+          "P": "shapeCount prepareSubsetDense calls"
         },
-        "note": "COLD only. Allocates all frame/scratch/memo storage before proof execution."
+        "note": "COLD only. Allocates all frame/scratch/memo storage and precomputes dense subset-table row offsets before proof execution."
       },
       "status": "decomposed"
     },
@@ -10906,12 +10922,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "U",
-          "target": "connect4RbaShapeSubset"
+          "target": "subsetDensePrepared"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+R*C(alu.shr.u32)+N*C(alu.and.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+U*CALL(connect4RbaShapeSubset)",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+R*C(alu.shr.u32)+N*C(alu.and.u32)+H*C(alu.shl.u32)+Q*C(control.test.u32)+Q*C(control.branch)+U*CALL(subsetDensePrepared)",
         "parameters": {
           "F": "prepared field loads",
           "L": "basis/coordinate/shape-size loads",
@@ -10923,7 +10939,7 @@
           "Q": "loop/active/minimality conditions",
           "U": "subset tests reached before minimality decision"
         },
-        "note": "Exact active-minimal residual scan into preallocated per-frame storage."
+        "note": "Exact active-minimal residual scan into preallocated per-frame storage using the initialization-prepared dense subset table."
       },
       "status": "decomposed"
     },
@@ -12100,7 +12116,7 @@
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
     "addons/rba-connect4-proof-memo.mjs": "535dd952beffde3e0f9e892135173bc2ea659518",
-    "addons/cpc-connect4-guard-survival.mjs": "0593e2c955050cb85aa74ad1c9001ccaf56e0004"
+    "addons/cpc-connect4-guard-survival.mjs": "bc12212b25100107903afe21d972be413ab9249b"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
