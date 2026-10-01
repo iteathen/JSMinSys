@@ -7,7 +7,9 @@ on:
     paths:
       - .github/workflows/nees-rba-guard-proof-memo.yml
       - addons/rba-connect4-proof-memo.mjs
+      - addons/cpc-connect4-guard-survival.mjs
       - test/rba-connect4-proof-memo.test.mjs
+      - test/cpc-connect4-guard-survival.test.mjs
       - catalog/addon-cycle-ledger-v0.json
       - catalog/rba-addon-v0.json
       - tools/verify-catalog.mjs
@@ -27,5 +29,5 @@ jobs:
           node-version: 26.7.0
       - name: Verify JSMinSys catalog and NEES cycle ledger
         run: node tools/verify-catalog.mjs
-      - name: Run exact proof-memo tests
-        run: node --test test/rba-connect4-proof-memo.test.mjs
+      - name: Run exact proof-memo and guard-survival tests
+        run: node --test test/rba-connect4-proof-memo.test.mjs test/cpc-connect4-guard-survival.test.mjs
