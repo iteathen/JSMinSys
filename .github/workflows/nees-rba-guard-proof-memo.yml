@@ -29,5 +29,5 @@ jobs:
           node-version: 26.7.0
       - name: Verify JSMinSys catalog and NEES cycle ledger
         run: node tools/verify-catalog.mjs
-      - name: Run exact proof-memo and guard-survival tests
-        run: node --test test/rba-connect4-proof-memo.test.mjs test/cpc-connect4-guard-survival.test.mjs
+      - name: Run full JSMinSys test suite
+        run: node --test test/*.test.mjs
