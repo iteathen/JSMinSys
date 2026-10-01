@@ -11,6 +11,7 @@
     "addons/rba-connect4-alphabeta.mjs",
     "addons/rba-connect4-shared-exact-cache.mjs",
     "addons/rba-connect4-proof-memo.mjs",
+    "addons/cpc-connect4-guard-survival.mjs",
     "addons/rba-connect4-lazy-smp-host.mjs",
     "addons/rba-connect4-lazy-smp-worker.mjs"
   ],
@@ -71,7 +72,8 @@
     "forced-block and universal support-lift terminal-response closures match independent 4x4 exact oracles",
     "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan",
     "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states",
-    "NEES RBA guard proof memo: exact compact 7x6 identity, side-state separation, direct-map collision-as-miss, and generic-geometry compatibility tests"
+    "NEES RBA guard proof memo: exact compact 7x6 identity, side-state separation, direct-map collision-as-miss, and generic-geometry compatibility tests",
+    "NEES CPC guard-survival kernel reproduces candidate6 D15 certificate with preallocated RBA frames and typed proof memo"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -181,5 +183,24 @@
       "cycleLedger": "catalog/addon-cycle-ledger-v0.json",
       "sourceBlobGuard": true
     }
+  },
+  "guardSurvivalKernelContract": {
+    "status": "research-qualified-nees-candidate",
+    "geometry": "standard 7x6 guarded specialization; generic RBA remains separate",
+    "boardIdentity": "exact RBA q only; no physical bitboard/position-code/gray-token duplicate identity",
+    "proofSideState": "21-bit odd-row guard ownership resource plus horizon",
+    "hotStorage": "preallocated 43-frame RBA word/basis arena, fixed scratch, 7-bit response masks, typed proof memo",
+    "hotAllocation": "none by kernel design",
+    "responseGrammar": [
+      "synchronized-template frontier response rendered as parity response mask",
+      "same-residual frontier attachment",
+      "cross-residual +2-row ladder",
+      "odd-row guard renewal",
+      "support-lift blocker",
+      "top-exhaustion attached repair"
+    ],
+    "result": "constructive survival certificate only; failure is not attacker forced completion",
+    "neesRecord": "docs/cpc-guard-survival-nees.md",
+    "cycleLedger": "catalog/addon-cycle-ledger-v0.json"
   }
 }
