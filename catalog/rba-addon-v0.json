@@ -10,6 +10,7 @@
     "addons/cpc-connect4.mjs",
     "addons/rba-connect4-alphabeta.mjs",
     "addons/rba-connect4-shared-exact-cache.mjs",
+    "addons/rba-connect4-proof-memo.mjs",
     "addons/rba-connect4-lazy-smp-host.mjs",
     "addons/rba-connect4-lazy-smp-worker.mjs"
   ],
@@ -69,7 +70,8 @@
     "corrected rank-16+ standard-7x6 prefix A/B scan found zero interval/kind changes from the frontier-response extension",
     "forced-block and universal support-lift terminal-response closures match independent 4x4 exact oracles",
     "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan",
-    "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states"
+    "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states",
+    "NEES RBA guard proof memo: exact compact 7x6 identity, side-state separation, direct-map collision-as-miss, and generic-geometry compatibility tests"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -157,5 +159,27 @@
       "dependency topology",
       "refcounted work lifetime"
     ]
+  },
+  "proofMemoContract": {
+    "status": "research-qualified-nees-substrate",
+    "purpose": "Bounded single-owner memoization for constructive CPC/RBA proof classes without reintroducing physical-board identity.",
+    "semanticIdentity": "Exact RBA q equality plus explicitly supplied proof side-state (guard mask and horizon). Hash/slot identity is addressing only.",
+    "standard7x6Storage": "Lossless inherited compact profile stores 8 exact RBA identity words plus guard mask and horizon (10 Uint32 words per slot) instead of 14 raw q words plus object/string overhead.",
+    "collisionPolicy": "Direct-mapped replacement is a safe cache miss on later non-equality; collisions never imply semantic equality or proof acceptance.",
+    "neutralTokenPolicy": "No raw board or gray-token identity is stored. The qualified RBA neutral-token quotient remains authoritative and is not split by memo identity.",
+    "hotAllocationPolicy": "Probe/mix/store allocate nothing; all typed-array storage is prepared cold.",
+    "concurrency": "Single owner only. Shared-worker use requires a separate publication protocol and is not implied by this contract.",
+    "nees": {
+      "authority": "NEES Draft 0.5 @ 7650bef0aecc0d2b226ecf253a1f8937ccf89d69",
+      "profile": "node26-v8-14.6/x86_64-amd-zen3",
+      "executionClasses": {
+        "prepare": "COLD",
+        "mix": "E1",
+        "probe": "E1",
+        "store": "E1"
+      },
+      "cycleLedger": "catalog/addon-cycle-ledger-v0.json",
+      "sourceBlobGuard": true
+    }
   }
 }
