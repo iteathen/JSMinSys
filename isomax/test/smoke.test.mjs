@@ -19,7 +19,7 @@ test('standard board with sparse initialization keeps a valid worker path',async
   assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,-1);assert.equal(r.cleanup,true);
 });
 for(const [columns,rows,moves,wdl] of [
-  [7,6,[...'1320461024522311'].map(Number),-1],[4,4,[1,2,0,2,3,2,3,1,0,3],0],
+  [7,6,[...'1320461024522311'].map(Number),-1],[7,5,[...'1320461024522311'].map(Number),-1],[4,4,[1,2,0,2,3,2,3,1,0,3],0],
   [4,5,[0,0,3,0,0,1,1,1,3,0,1,1,2,3],-1],
   [33,1,[8,3,22,19,15,24,1,10,20,28,27,7,32,25,18,23,17,16,21,2,12,6,11,9,31,5,29],-1],
   [1,1,[],0],
@@ -30,4 +30,14 @@ for(const [columns,rows,moves,wdl] of [
   assert.equal(result.cleanup,true);assert.equal(result.workersExited,2);
   assert.equal(result.nodeCounts,null);
   if(result.move>=0){assert.ok(result.move<columns);assert.ok(moves.filter(c=>c===result.move).length<rows);}
+});
+
+test('7x5 selects optimized library kernels under both preparation budgets',async()=>{
+  for(const budget of [0,2097152]){
+    const geometry=prepareConnect4RbaGeometry({columns:7,rows:5,specializationBudgetBytes:budget});
+    const result=await runLazySmpConnect4Rba32([...'1320461024522311'].map(Number),{geometry,workers:2,sharedCacheCapacity:256,localCacheCapacity:256,timeoutMs:10000});
+    assert.equal(result.status,'EXACT');assert.equal(result.rootWdl,-1);assert.equal(result.cleanup,true);
+    assert.equal(result.executionProfile.solver,budget?'./solver-general-dense.mjs':'./solver-general.mjs');
+    assert.ok(geometry.containmentBytes>0);
+  }
 });

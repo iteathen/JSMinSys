@@ -10,7 +10,8 @@ test('prepared grouped supersets are exact across configured geometry and global
     const g=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:budget});
     const profile=prepareConnect4RbaExecutionProfile(g);
     for(const field of ['supersetWordOffsets','supersetWords','supersetMasks']){
-      assert.ok(g[field] instanceof Uint32Array,`${columns}x${rows}: ${field} must not truncate global word indices`);
+      const Native=field==='supersetWords'?(g.shapeWordCount<=256?Uint8Array:g.shapeWordCount<=65536?Uint16Array:Uint32Array):Uint32Array;
+      assert.ok(g[field] instanceof Native,`${columns}x${rows}: ${field} uses the smallest exact native width`);
       assert.equal(profile[field],g[field],'profile must reuse the cold geometry plan');
     }
     const offsets=g.supersetWordOffsets,words=g.supersetWords,masks=g.supersetMasks;

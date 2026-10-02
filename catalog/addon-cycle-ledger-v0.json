@@ -514,6 +514,20 @@
         "name": "CLZ32_COST(lowering,cpu)"
       },
       "note": "Math.clz32 on the isolated uint32 bit. Lowering and CPU dependent; not priced as zero or assumed one instruction."
+    },
+    "memory.load.native_index": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "LOAD_NATIVE_INDEX_COST(wordBytes,cacheLevel,lowering)"
+      },
+      "note": "One direct supersetWords[index] load from the initialization-selected Uint8Array, Uint16Array or Uint32Array. wordBytes is 1/2/4 and fixed for the prepared geometry. No per-node width branch or decoder; no assumed machine-cycle equivalence among widths."
+    },
+    "memory.store.native_index": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STORE_NATIVE_INDEX_COST(wordBytes,cacheLevel,lowering)"
+      },
+      "note": "One cold direct store to the exact initialization-selected native superset word-index array; wordBytes is 1/2/4."
     }
   },
   "units": [
@@ -3510,7 +3524,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O"
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
         },
         {
           "op": "memory.store.u32",
@@ -3574,11 +3588,15 @@
           "op": "runtime.callback",
           "count": "RM",
           "target": "removePrepared"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "H"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaCofactorBasis)+(PR)*CALLBACK(prepareRemove)+(RM)*CALLBACK(removePrepared)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaCofactorBasis)+(PR)*CALLBACK(prepareRemove)+(RM)*CALLBACK(removePrepared)+(H)*C(memory.load.native_index)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -3607,9 +3625,10 @@
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
           "PR": "0 or 1 extra prepareRemove call when nonterminal and removed[] is absent.",
-          "RM": "Active-parent removal callback calls when removed[] is absent; otherwise zero."
+          "RM": "Active-parent removal callback calls when removed[] is absent; otherwise zero.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
       },
       "status": "decomposed"
     },
@@ -4954,7 +4973,7 @@
         },
         {
           "op": "memory.store.u32",
-          "count": "3*SHAPE+3*PROPER+5*GROUP"
+          "count": "3*SHAPE+3*PROPER+4*GROUP"
         },
         {
           "op": "alu.add.u32",
@@ -4995,11 +5014,27 @@
         {
           "op": "control.branch",
           "count": "CONTAIN_BRANCH"
+        },
+        {
+          "op": "memory.store.native_index",
+          "count": "GROUP"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "WORD_SELECT"
+        },
+        {
+          "op": "control.branch",
+          "count": "WORD_SELECT"
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(3)*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+(1)*C(runtime.array.from)+(1)*C(runtime.map.construct)+(15*LINE)*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+(1)*C(runtime.map.clear)+(15*LINE+SHAPE+SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+(2)*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+(1)*C(runtime.object.allocate)+(5)*C(runtime.typed_array.allocate)+(1)*C(runtime.array.slice)+(2)*C(runtime.typed_array.fill)+(CONTAIN_FIELD)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4*SHAPE+8*PROPER)*C(memory.load.u32)+(3*SHAPE+3*PROPER+5*GROUP)*C(memory.store.u32)+(CONTAIN_ADD)*C(alu.add.u32)+(CONTAIN_SUB)*C(alu.sub.u32)+(CONTAIN_AND)*C(alu.and.u32)+(CONTAIN_OR)*C(alu.or.u32)+(2*PROPER)*C(alu.xor.u32)+(CONTAIN_SHL)*C(alu.shl.u32)+(2*SHAPE)*C(alu.shr.u32)+(2*PROPER)*C(runtime.number.multiply)+(CONTAIN_TEST)*C(control.test.u32)+(CONTAIN_BRANCH)*C(control.branch)",
+        "expression": "(3)*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+(1)*C(runtime.array.from)+(1)*C(runtime.map.construct)+(15*LINE)*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+(1)*C(runtime.map.clear)+(15*LINE+SHAPE+SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+(2)*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+(1)*C(runtime.object.allocate)+(5)*C(runtime.typed_array.allocate)+(1)*C(runtime.array.slice)+(2)*C(runtime.typed_array.fill)+(CONTAIN_FIELD)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4*SHAPE+8*PROPER)*C(memory.load.u32)+(3*SHAPE+3*PROPER+4*GROUP)*C(memory.store.u32)+(CONTAIN_ADD)*C(alu.add.u32)+(CONTAIN_SUB)*C(alu.sub.u32)+(CONTAIN_AND)*C(alu.and.u32)+(CONTAIN_OR)*C(alu.or.u32)+(2*PROPER)*C(alu.xor.u32)+(CONTAIN_SHL)*C(alu.shl.u32)+(2*SHAPE)*C(alu.shr.u32)+(2*PROPER)*C(runtime.number.multiply)+(CONTAIN_TEST)*C(control.test.u32)+(CONTAIN_BRANCH)*C(control.branch)+(GROUP)*C(memory.store.native_index)+(WORD_SELECT)*C(control.test.u32)+(WORD_SELECT)*C(control.branch)+(1)*C(runtime.constructor.dispatch)",
         "parameters": {
           "CELL": "configured cell count iterations across geometry setup",
           "LINE": "winning-line records generated/scanned",
@@ -5015,10 +5050,12 @@
           "CONTAIN_AND": "Executed compiler AND operations for low-bit extraction, subset position enumeration and mask bit indices.",
           "CONTAIN_OR": "Executed compiler OR operations for subset parent masks and group-mask accumulation.",
           "CONTAIN_SHL": "Executed compiler shifts for full masks and emitted superset bits.",
-          "CONTAIN_TEST": "Executed compiler loop/short-circuit/branch predicate evaluations, including group-limit check.",
-          "CONTAIN_BRANCH": "Executed compiler source control selections, including both passes, all loops and group count/fill branches."
+          "CONTAIN_TEST": "Executed compiler loop/short-circuit/branch predicate evaluations, including group-limit check. Excludes separately counted WORD_SELECT comparisons.",
+          "CONTAIN_BRANCH": "Executed compiler source control selections, including both passes, all loops and group count/fill branches. Excludes separately counted WORD_SELECT selections.",
+          "WORD_SELECT": "One or two cold ternary comparisons/selectors choosing Uint8Array for shapeWordCount <= 256, Uint16Array for <= 65536, or Uint32Array otherwise; excluded from CONTAIN_TEST/CONTAIN_BRANCH.",
+          "WORD_BYTES": "Native word-index bytes selected cold: 1/2/4. All group masks and row offsets remain Uint32."
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized. Grouped containment adds two bounded subset-enumeration passes O(14*SHAPE), not a pairwise SHAPE^2 scan. Per-pass low-bit position scans are bounded by three iterations per proper subset. The preexisting optional dense subset table remains independently O(SHAPE^2) when budget admits it (SUB); this compiler does not remove that cost. Additional five typed arrays plus one cursor slice are allocated cold; offsets/word/mask arrays persist, lastWord/subsetIds/cursors are temporary. Persistent bytes are 4*(SHAPE+1)+8*GROUP; temporary typed storage is 8*SHAPE+64 bytes. Array fills and slice copying are separate from listed scalar memory counts. Existing geometry envelope is retained; added compiler memory counts expose both passes. No per-worker rebuild: geometry-owned arrays are shared by shareConnect4RbaGeometry32."
+        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized. Grouped containment adds two bounded subset-enumeration passes O(14*SHAPE), not a pairwise SHAPE^2 scan. Per-pass low-bit position scans are bounded by three iterations per proper subset. The preexisting optional dense subset table remains independently O(SHAPE^2) when budget admits it (SUB); this compiler does not remove that cost. Additional five typed arrays plus one cursor slice are allocated cold; offsets/word/mask arrays persist, lastWord/subsetIds/cursors are temporary. Persistent bytes are 4*(SHAPE+1)+(4+WORD_BYTES)*GROUP; temporary typed storage is 8*SHAPE+64 bytes. Array fills and slice copying are separate from listed scalar memory counts. Existing geometry envelope is retained; added compiler memory counts expose both passes. No per-worker rebuild: geometry-owned arrays are shared by shareConnect4RbaGeometry32. The word-index allocation alone is WORD_BYTES*GROUP bytes; its GROUP fill stores use the selected native width. A cold constructor selection retains exact maximum word IDs without truncation: maximum index is shapeWordCount-1. The constructor call remains charged, with no decoder or runtime search dispatch."
       },
       "status": "decomposed"
     },
@@ -5063,7 +5100,7 @@
           "V": "typed-array property count not already shared",
           "B": "total bytes copied into shared backing stores"
         },
-        "note": "One cold shared image replaces W independent geometry rebuilds. P includes containmentBytes and three containment-plan fields; V/B include supersetWordOffsets, supersetWords and supersetMasks when not already shared. The compiler temporaries are not geometry fields and are not copied."
+        "note": "One cold shared image replaces W independent geometry rebuilds. P includes containmentBytes and three containment-plan fields; V/B include supersetWordOffsets, supersetWords and supersetMasks when not already shared. The compiler temporaries are not geometry fields and are not copied. Shared supersetWords keeps its native constructor and WORD_BYTES*GROUP backing size; masks/offsets stay Uint32. Width changes copy-byte cost, not field/view counts."
       },
       "status": "decomposed"
     },
@@ -10788,7 +10825,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O"
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
         },
         {
           "op": "memory.store.u32",
@@ -10842,11 +10879,15 @@
           "op": "runtime.call.subledger",
           "count": "K",
           "target": "connect4RbaPreparedCofactorBasis"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "H"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaPreparedCofactorBasis)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaPreparedCofactorBasis)+(H)*C(memory.load.native_index)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -10873,9 +10914,10 @@
           "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
-          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
       },
       "status": "decomposed"
     },
@@ -10963,7 +11005,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O"
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
         },
         {
           "op": "memory.store.u32",
@@ -11017,11 +11059,15 @@
           "op": "runtime.call.subledger",
           "count": "K",
           "target": "connect4RbaDenseCofactorBasis"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "H"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaDenseCofactorBasis)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaDenseCofactorBasis)+(H)*C(memory.load.native_index)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -11048,9 +11094,10 @@
           "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
-          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
       },
       "status": "decomposed"
     },
@@ -11192,7 +11239,7 @@
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 73
+    "localExtensionOperations": 75
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -11288,7 +11335,7 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-connect4-geometry.mjs": "e7fa077217152b36050edc2227f10e60fb8d9dd3",
+    "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
     "addons/rba-connect4-alphabeta.mjs": "57984949393267d0a9521bb9cc81aacd71fb71ce",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
     "addons/rba-connect4-coordinate.mjs": "8d30f8cfba0f1690d611b45b030682a6cd7a376b",

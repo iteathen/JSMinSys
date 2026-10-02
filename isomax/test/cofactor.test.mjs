@@ -4,9 +4,9 @@ import {prepareConnect4RbaGeometry,prepareConnect4RbaCoordinateScratch,connect4R
 import {prepareConnect4RbaExecutionProfile as prepareReference} from '../runtime/addons/rba-connect4-profile.mjs';
 import {connect4RbaCofactorKnownHeight as reference,connect4RbaBasisFromSupport} from '../runtime/addons/rba-connect4-coordinate.mjs';
 import {connect4RbaFromMoves} from '../runtime/addons/rba-connect4-ingress.mjs';
-import {prepareConnect4RbaExecutionProfile as prepareCandidate} from '../runtime/experiments/isomax-lean/profile-masks.mjs';
-import * as prepared from '../runtime/experiments/isomax-lean/coordinate-prepared.mjs';
-import * as dense from '../runtime/experiments/isomax-lean/coordinate-dense.mjs';
+import {prepareConnect4RbaExecutionProfile as prepareCandidate} from '../runtime/addons/rba-connect4-profile.mjs';
+import * as prepared from '../runtime/addons/rba-connect4-coordinate-prepared.mjs';
+import * as dense from '../runtime/addons/rba-connect4-coordinate-dense.mjs';
 
 function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
   const src=3,bi=5,dst=4,ci=7;
@@ -28,7 +28,7 @@ function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
 }
 
 for(const [label,api] of Object.entries({prepared,dense})){
-const {connect4RbaCofactorKnownHeight:candidate,connect4RbaCanonicalize}=api;
+const candidate=api[label==='dense'?'connect4RbaDenseCofactorKnownHeight':'connect4RbaPreparedCofactorKnownHeight'],connect4RbaCanonicalize=api.connect4RbaPreparedCanonicalize;
 test(label+': cofactors match every legal child along deterministic walks and reflected gauges',()=>{
   let checked=0,terminals=0,seed=0x510ca7e;
   const random=()=>seed=(Math.imul(seed,1664525)+1013904223)>>>0;

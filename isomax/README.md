@@ -3,11 +3,13 @@
 **Start here. Everything needed to run this candidate is inside this folder.**
 Prepared for publication and checked into main; **not published**. Registry
 publication is disabled with `private: true`. No release or release tag exists
-for this package. Candidate version: `0.1.0-rc.2`.
+for this package. Candidate version: `0.1.0-rc.3`.
 
 This packages the qualified solver with prepared closure masks, a 32-byte shared
-TT, four deep workers, and initialization-selected board dimensions. The standard
-board selects dense or sparse removal before search. Runtime modules are copied without
+TT, four deep workers, and initialization-selected board dimensions. Every admitted
+board size selects dense or sparse removal before search. Containment masks and
+prepared coordinate kernels now belong to the canonical RBA support libraries.
+7x5 uses the optimized path too; there is no 7x6-only closure fallback. Runtime modules are copied without
 rewriting, bundling, minification, or hot-loop changes. There are no third-party
 runtime dependencies. Keep the whole folder together; worker modules load by URL.
 
