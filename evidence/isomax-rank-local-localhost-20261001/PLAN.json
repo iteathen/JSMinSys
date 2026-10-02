@@ -1,0 +1,19 @@
+{
+  "status": "FROZEN_BEFORE_CONTROLS_AND_GAME",
+  "jsMinSysRecoveredHead": "1f3947d52be4dc35569d898b13951ee6f1b2df28",
+  "connect4RecoveredHead": "9201e6b26489deed814cf6fc33f91e4e710cd0a2",
+  "historicalEvidenceCommit": "9d87c7274b2753102f8c16f0961acf3bb2acd24b",
+  "config": {
+    "workers": 4,
+    "rootFrontier": true,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 268435456,
+    "localCacheCapacity": 16777216,
+    "timeoutMs": 300000
+  },
+  "affinity": "Unchanged tools/worker-affinity-preload.mjs and historical targets.json; fresh report prefix per search; verify actual OS masks0/2/4/6.",
+  "controls": "Six certified histories through actual selector with searchStarted:false;44444 A=B=6 H=0 unresolved; actually invoke search then cancel after6s to prove workers entered search. Separate process from measured game.",
+  "measurement": "One game, no chosen continuation or oracle premise. Timer starts with empty board ready, includes all local calculations, allocations, worker startup/cleanup and all moves until first terminal. Crash-safe trace per ply; no forced GC; no cache reuse beyond unchanged API. Full process peakRSS, CPU and Windows cycle counter.",
+  "hypothesis": "Complete game wall<60000ms; do not stop at60s. Incomplete or timeout never promoted to performance conclusion.",
+  "expectedDeviation": "Hardware/runtime/affinity available. About10GiB free RAM observed before preflight, less than cache payload; retain requested memory regime and record actual free RAM/peakRSS."
+}
