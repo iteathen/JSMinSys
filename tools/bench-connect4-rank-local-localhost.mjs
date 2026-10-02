@@ -11,12 +11,18 @@ import {evaluateConnect4RankLocalLanding32} from '../addons/connect4-rank-local-
 import {runIsoMaxConnect4Move32} from '../addons/rba-connect4-move-selector.mjs';
 import {queryWindowsTopology,validateWorkerTargets} from '../addons/worker-affinity.mjs';
 import {processCycleCounter} from './process-cycle-counter.mjs';
+import v8 from 'node:v8';
+import vm from 'node:vm';
+import {setImmediate as nextTurn} from 'node:timers/promises';
 
 const [mode,outArg]=process.argv.slice(2);
 assert.ok(['controls','game'].includes(mode));assert.ok(outArg);
 const out=path.resolve(outArg);fs.mkdirSync(out,{recursive:true});
 const resultPath=path.join(out,mode+'.json');assert.ok(!fs.existsSync(resultPath),'Preserve previous attempts; use a new output directory');
 const config={workers:4,rootFrontier:true,sharedSampleMask:0,sharedCacheCapacity:268435456,localCacheCapacity:16777216,timeoutMs:300000};
+const explicitCollection=process.env.C4_BENCH_COLLECT_BETWEEN_SEARCHES==='1';
+let collect=null;
+if(explicitCollection){v8.setFlagsFromString('--expose_gc');collect=vm.runInNewContext('gc');}
 const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const addonsTree=execFileSync('git',['rev-parse','HEAD:addons'],{encoding:'utf8'}).trim();
 assert.equal(execFileSync('git',['diff','HEAD','--','addons'],{encoding:'utf8'}),'','Measured addons must match SHA');
@@ -34,8 +40,9 @@ const metadata={repositorySha:sha,addonsTree,config,node:process.version,v8:proc
   cpu:os.cpus()[0].model,totalMemoryBytes:os.totalmem(),freeMemoryBeforeBytes:os.freemem(),platform:process.platform,arch:process.arch,
   topology:{workers:4,wideWorker:0,deepWorkers:[1,2,3],rootFrontier:true,targets},
   affinityPreloadSha256:createHash('sha256').update(fs.readFileSync(preload)).digest('hex'),targetsFile,
-  environmentDeviation:'No runtime/cache/affinity substitution. Background applications are running; available RAM recorded, no applications stopped.',
-  measurement:'Primary wall includes every selector call, allocation, worker startup/cleanup, moves, terminal detection and between-ply trace I/O. No TT reused outside the unchanged selector. No forced GC.'};
+  environmentDeviation:explicitCollection?'Benchmark-only explicit main-thread collection between completed searches to reclaim unreachable per-call shared buffers; cost included. Same executable, caches, affinity and addons. Background applications unchanged.':'No runtime/cache/affinity substitution. Background applications are running; available RAM recorded, no applications stopped.',
+  explicitCollection,
+  measurement:'Primary wall includes every selector call, allocation, worker startup/cleanup, moves, terminal detection, between-ply trace I/O and any declared explicit collection. No TT reused outside the unchanged selector.'};
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 const cols=s=>Array.from(s,c=>Number(c)-1),sequence=m=>m.map(c=>c+1).join('');
 const save=j=>fs.writeFileSync(resultPath,JSON.stringify(j,null,2)+'\n');
@@ -79,6 +86,11 @@ if(mode==='controls'){
     under60Seconds:(terminal.kind==='WIN'||terminal.kind==='BOARD_FULL')&&totalWallMs<60000,peakRssBytes:process.resourceUsage().maxRSS*1024,error};}
   try{
     for(let ply=1;ply<=42;ply++){
+      let collectionBeforePly=null;
+      if(collect&&trace.at(-1)?.source==='SEARCH'){
+        const t=performance.now(),before=process.memoryUsage();collect();await nextTurn();collect();await nextTurn();
+        collectionBeforePly={elapsedMs:performance.now()-t,before,after:process.memoryUsage()};
+      }
       const before=sequence(moves),prefix=path.join(out,'ply-'+String(ply).padStart(2,'0')+'-affinity');process.env.JMS_WORKER_AFFINITY_REPORT=prefix;
       fs.appendFileSync(path.join(out,'events.jsonl'),JSON.stringify({event:'SELECTOR_BEGIN',ply,sequence:before,cumulativeWallMs:performance.now()-start})+'\n');
       console.log('SELECTOR_BEGIN '+ply+' '+before);
@@ -92,7 +104,7 @@ if(mode==='controls'){
         selectedABH:valid?measurement(r.preSearch,r.move):null,unresolvedMaximumABH:measurement(r.preSearch,r.preSearch.uniqueParetoColumn),
         searchStatus:r.source==='SEARCH'?r.status:'NOT_STARTED',rootWdl:r.rootWdl,winnerWorker:r.winner,
         workerNodeCounts:r.nodeCounts??[],totalSearchNodes:(r.nodeCounts??[]).reduce((a,b)=>a+b,0),searchElapsedMs:r.source==='SEARCH'?r.elapsedMs:0,
-        selectorElapsedMs,cumulativeWallMs:totalWallMs,affinity:r.source==='SEARCH'?affinity(prefix):[],raw:r};
+        selectorElapsedMs,cumulativeWallMs:totalWallMs,collectionBeforePly,affinity:r.source==='SEARCH'?affinity(prefix):[],raw:r};
       trace.push(row);fs.appendFileSync(path.join(out,'trace.jsonl'),JSON.stringify(row)+'\n');save(snapshot(valid?'RUNNING':'INCOMPLETE'));
       console.log(JSON.stringify({ply,move:row.selectedMove,source:row.source,status:r.status,wallMs:totalWallMs,nodes:row.totalSearchNodes}));
       if(!valid||won||moves.length===42)break;

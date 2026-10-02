@@ -1,0 +1,8 @@
+{
+  "status": "DECLARED_BEFORE_RETRY",
+  "reason": "First run completed first search at52747.7658ms then Worker creation raisedEINVAL on nextsearch. Lifetime probe: completed/cancelled search retained~10.74GB array buffers; two explicit collections plus event-loop turns reclaim to1.84MB; consecutive configured searches both start afterward.",
+  "change": "Only benchmark adapter performs main-thread GC between searched plies. Solver/API, cache capacities, move choice, worker topology/affinity unchanged. GC cost included in primary full-game wall.",
+  "controls": "Copied original7 PASS results; addons tree and config equality checked by harness. Original experiment source and first attempt preserved.",
+  "comparison": "No performance claim from incomplete first attempt. This retry explicitly includes process memory-reclamation policy deviation.",
+  "cpuScope": "CPU/cycles cover board operation through final trace serialization; primary wall ends at first terminal detection."
+}
