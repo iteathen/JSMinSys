@@ -1,7 +1,10 @@
-# Frozen current IsoMax version
+# Historical frozen IsoMax version
+
+The current prepared candidate is [the self-contained isomax package](../isomax/README.md).
+This document and its source lock preserve the earlier measured version unchanged.
 
 The owner selected the exact measured empty-board composition on 2026-10-02.
-`profiles/isomax-current.json` is the current configuration and source lock.
+`profiles/isomax-current.json` is that historical configuration and source lock.
 The immutable tag `isomax-tested-empty-structural-20261001` preserves the original
 research evidence at `5ea441d8964077ee4de98f52ed74b1ad6a71c3e8`.
 
