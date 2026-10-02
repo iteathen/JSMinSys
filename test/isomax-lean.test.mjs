@@ -22,9 +22,9 @@ function logical(cache,field){
   const n=cache.mask+1,out=new Uint32Array(n*(field==='keys'?8:1));
   if(cache.layout?.kind==='compact32'){
     for(let i=0;i<n;i++){
-      if(field==='keys')out.set([cache.bytes[i*32+26],cache.bytes[i*32+27],cache.entries[i*8+1],
-        ...cache.entries.slice(i*8+2,i*8+6),cache.halves[i*16+12]],i*8);
-      else out[i]=cache.entries[i*8+(field==='value'?7:0)];
+      if(field==='keys')out.set([cache.halves[i*16+12],cache.halves[i*16+13],cache.entries[i*8+1],
+        ...cache.entries.slice(i*8+2,i*8+6),cache.halves[i*16+14]],i*8);
+      else out[i]=field==='value'?cache.halves[i*16+15]:cache.entries[i*8];
     }
     return out;
   }

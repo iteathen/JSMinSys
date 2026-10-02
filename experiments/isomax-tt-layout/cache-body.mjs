@@ -31,7 +31,7 @@ export function attachConnect4RbaSharedExactCache32(cache){
     throw RangeError('invalid shared exact backing');
   if(entries.length!==bytes/4)cache.entries=new Uint32Array(entries.buffer);
   if(layout.kind==='compact32'){
-    cache.bytes=new Uint8Array(entries.buffer);cache.halves=new Uint16Array(entries.buffer);
+    cache.halves=new Uint16Array(entries.buffer);
   }else{
     const Type=layout.heightBytes===1?Uint8Array:layout.heightBytes===2?Uint16Array:Uint32Array;
     cache.heights=new Type(entries.buffer);
@@ -48,22 +48,25 @@ export function prepareSharedCacheAccess(cache){
 }
 
 // Bytes: seq[0..3], support[4..7], four full coordinates[8..23],
-// tail[24..25], heights 0/1[26..27], exact value[28..31].
+// heights 0/1[24..27], tail[28..29], exact value[30..31].
 // Every field has a disjoint address range, including narrow atomic accesses.
+// Full-size 2^27-slot table: halfword index <= 2^31-1. Byte indices exceeded
+// V8's Smi range and boxed at Atomics calls. Native halfwords need no decoding.
+// Exact shared values are only 1/2/3; the sequence counter remains full uint32.
 export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash){
   const slot=knownHash&cache.mask,record=slot*8,
     before=Atomics.load(cache.entries,record);
   if(!before||(before&1))return 0;
-  const keys=cache.entries,byte=slot*32;
-  if(Atomics.load(cache.bytes,byte+26)!==words[offset]||
-     Atomics.load(cache.bytes,byte+27)!==words[offset+1]||
+  const keys=cache.entries,half=slot*16,halves=cache.halves;
+  if(Atomics.load(halves,half+12)!==words[offset]||
+     Atomics.load(halves,half+13)!==words[offset+1]||
      Atomics.load(keys,record+1)!==compactSupportProfile8(words,offset)||
      Atomics.load(keys,record+2)!==words[offset+8]||
      Atomics.load(keys,record+3)!==words[offset+9]||
      Atomics.load(keys,record+4)!==words[offset+11]||
      Atomics.load(keys,record+5)!==words[offset+12]||
-     Atomics.load(cache.halves,slot*16+12)!==compactTailProfile8(words,offset))return 0;
-  const value=Atomics.load(keys,record+7),after=Atomics.load(keys,record);
+     Atomics.load(halves,half+14)!==compactTailProfile8(words,offset))return 0;
+  const value=Atomics.load(halves,half+15),after=Atomics.load(keys,record);
   if(before!==after||(after&1)||!value)return 0;
   return value;
 }
@@ -73,16 +76,16 @@ export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,know
   if(current&1)return value;
   const odd=(current+1)>>>0;
   if(Atomics.compareExchange(cache.entries,record,current,odd)!==current)return value;
-  const keys=cache.entries,byte=slot*32;
-  Atomics.store(cache.bytes,byte+26,words[offset]);
-  Atomics.store(cache.bytes,byte+27,words[offset+1]);
+  const keys=cache.entries,half=slot*16,halves=cache.halves;
+  Atomics.store(halves,half+12,words[offset]);
+  Atomics.store(halves,half+13,words[offset+1]);
   Atomics.store(keys,record+1,compactSupportProfile8(words,offset));
   Atomics.store(keys,record+2,words[offset+8]);
   Atomics.store(keys,record+3,words[offset+9]);
   Atomics.store(keys,record+4,words[offset+11]);
   Atomics.store(keys,record+5,words[offset+12]);
-  Atomics.store(cache.halves,slot*16+12,compactTailProfile8(words,offset));
-  Atomics.store(keys,record+7,value);
+  Atomics.store(halves,half+14,compactTailProfile8(words,offset));
+  Atomics.store(halves,half+15,value);
   Atomics.store(keys,record,(odd+1)>>>0);
   return value;
 }

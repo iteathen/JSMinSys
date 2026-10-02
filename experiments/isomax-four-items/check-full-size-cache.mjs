@@ -11,6 +11,10 @@ if(isMainThread){
   const cache=tt.createConnect4RbaSharedExactCache32({capacity,keyWords:14,geometry});
   const stride=cache.layout?.entryBytes??40;
   assert.equal(cache.entries.byteLength,capacity*stride);
+  // On this qualified V8 profile, larger Atomics indices require boxed Numbers.
+  // Guard the actual full-size view domain, not only small correctness fixtures.
+  for(const view of [cache.entries,cache.bytes,cache.halves].filter(Boolean))
+    assert.ok(view.length-1<=0x7fffffff,'full-size atomic index must fit the qualified Smi range');
   tt.storeConnect4RbaSharedExactCache32(cache,words,0,2,hash);
   const worker=new Worker(new URL(import.meta.url),{workerData:{cache}});
   const result=await new Promise((resolve,reject)=>{
