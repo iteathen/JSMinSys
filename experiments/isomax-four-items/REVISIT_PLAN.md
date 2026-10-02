@@ -53,3 +53,26 @@ Never enable a known regression merely to claim four completed optimizations.
 
 Report implementation status separately from performance evidence. Correctness
 tests and removal of redundant operations do not prove fastest possible code.
+
+## Targeted follow-up frozen after the sixteen-run diagnosis
+
+All sixteen scored runs completed and passed. The helper-based combined result
+was effectively tied with A (+0.013% wall improvement, +0.002% cycle improvement).
+Actual solver compiler traces then showed the decisive implementation issue:
+V8 inlined the original general hash into search but rejected the unrolled
+helper because it exceeded its bytecode inlining limit. Isolated hash-code
+inspection had not exposed this call-site behavior.
+
+Candidate B now emits the identical fourteen-step recurrence directly at the
+recursive search site, with no hash helper call and no loop. It also retains
+fused CPC, live and layout. All 43 legal key-frame offsets are compared against
+the original hash over 250 random word arrays; deterministic solver/TT equality
+and the full suite remain qualification gates. Actual solver JIT trace must
+confirm the modified search reaches optimized compilation. Do not alter engine
+flags in the timed benchmark to coerce inlining.
+
+Compare the current baseline A with B using **ABBA BAAB**, four samples each,
+under the identical memory/runtime/affinity/timing contract. Analyze the four
+adjacent AB/BA pair log ratios with the same descriptive t interval and report
+every run. This is a new implementation test, not repeated sampling until the
+old helper achieves a favorable score. Keep the complete inconclusive screen.

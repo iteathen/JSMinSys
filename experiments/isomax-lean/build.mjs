@@ -5,8 +5,9 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','live','layout'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','live','layout'].includes(f)));
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
+assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 const root=new URL('../../',import.meta.url),inputs={};
 function read(name){const s=readFileSync(new URL(name,root),'utf8').replaceAll('\r\n','\n');inputs[name]=createHash('sha256').update(s).digest('hex');return s;}
 function once(s,old,value){assert.equal(s.split(old).length,2,old);return s.replace(old,value);}
@@ -139,6 +140,12 @@ s=s.slice(0,s.indexOf('function metricsFrontier(s)'));
 s=s.replaceAll('metrics:metricsFrontier(state)','metrics:null');
 s=relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'});
 if(features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
+if(features.includes('hash-inline')){
+  let code='    // BEGIN fixed fourteen-word hash: same bits, no helper call or loop.\n    let cacheHash=0,hashWord;\n';
+  for(let i=0;i<14;i++)code+=`    hashWord=cacheHash^words[keyOffset+${i}];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);\n`;
+  code+='    cacheHash=cacheHash>>>0;\n    // END fixed fourteen-word hash\n    const cacheSlot=cacheHash&cache.mask;';
+  s=once(s,'    const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;',code);
+}
 if(features.includes('live')){
   s="import {advanceLive3x32} from './fixed-ops.mjs';\n"+s;
   s=s.replaceAll('advanceConnect4LiveLineState32(live,','advanceLive3x32(live,').replaceAll('advanceConnect4LiveLineState32(state.live,','advanceLive3x32(state.live,');

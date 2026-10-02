@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Worker} from 'node:worker_threads';
+import {readFileSync} from 'node:fs';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {mix14x32Locator32,advanceLive3x32} from '../experiments/isomax-lean/fixed-ops.mjs';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
@@ -8,6 +9,20 @@ import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {advanceConnect4LiveLineState32,prepareConnect4LiveLineEvaluator32} from '../addons/connect4-live-line-evaluator.mjs';
 import * as tt from '../experiments/isomax-lean/shared-cache.mjs';
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+const features=JSON.parse(readFileSync(new URL('../experiments/isomax-lean/features.json',import.meta.url)));
+test('actual in-search unrolled hash preserves full fourteen-word identity at every legal frame',{
+  skip:!features.includes('hash-inline')&&process.env.ISOMAX_REQUIRE_INLINE_HASH!=='1'
+},()=>{
+  const source=readFileSync(new URL('../experiments/isomax-lean/solver.mjs',import.meta.url),'utf8');
+  const start=source.indexOf('    // BEGIN fixed fourteen-word hash'),end=source.indexOf('    // END fixed fourteen-word hash',start);
+  assert.ok(start>=0&&end>start,'fixed recurrence must reside at the actual recursive search site');
+  const hash=new Function('words','keyOffset',source.slice(start,end)+'\nreturn cacheHash;');
+  const words=new Uint32Array(14*43);let seed=792561;
+  for(let sample=0;sample<250;sample++){
+    for(let i=0;i<words.length;i++)words[i]=seed=(Math.imul(seed,1664525)+1013904223)>>>0;
+    for(let depth=0;depth<43;depth++)assert.equal(hash(words,depth*14),mixSpan32Locator32(words,depth*14,14));
+  }
+});
 test('fixed fourteen-word hash preserves every output bit and ignores surrounding words',()=>{
   let seed=89277;const words=new Uint32Array(20);
   for(let i=0;i<10000;i++){

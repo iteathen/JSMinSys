@@ -30,3 +30,20 @@ test('CPC processes singleton prefix once and clears preemption once on legal 55
   assert.equal(reads[0],1,'the completed singleton prefix must not be scanned again');
   assert.equal(clears,1,'the caller already cleared this semantic output');
 });
+test('CPC retains literal fork restrictions and immediate-win priority after scratch reuse',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),scratch=cpc.prepareConnect4CpcScratch(g);
+  const cases=[
+    {moves:[3,1,5],kind:cpc.CPC_RESTRICT,mask:84,count:3,interval:[1,3]},
+    {moves:[3,0,4],kind:cpc.CPC_RESTRICT,mask:36,count:2,interval:[1,3]},
+    {moves:[3,1,3,1,3,1],kind:cpc.CPC_EXACT,mask:0,count:0,interval:[3,3]},
+  ];
+  for(const fixture of cases){
+    const root=connect4RbaFromMoves(fixture.moves,{geometry:g,canonical:false});
+    scratch.preemptionMask32[0]=0xffffffff;scratch.preemptionCount[0]=123;
+    assert.equal(cpc.evaluateConnect4Cpc32(g,root.words,0,root.basis,0,root.basis.length,scratch),fixture.kind);
+    assert.deepEqual([...scratch.interval],fixture.interval);
+    assert.equal(scratch.preemptionMask32[0],fixture.mask);
+    assert.equal(scratch.preemptionCount[0],fixture.count);
+    assert.equal(scratch.forcedColumn[0],-1);
+  }
+});
