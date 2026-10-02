@@ -27,6 +27,10 @@ for(const sequence of ['','4','44','444','4444','44444','41']){
 }
 const config={workers:4,sharedCacheCapacity:134217728,localCacheCapacity:16777216,
   sharedSampleMask:0,rootFrontier:false,timeoutMs:300000};
+// Cold measurement metadata from the actual arm's allocator, outside timing.
+const tt=await import(pathToFileURL(resolve(library,'experiments/isomax-lean/shared-cache.mjs')).href);
+const oneEntry=tt.createConnect4RbaSharedExactCache32({capacity:1,keyWords:g.keyWords,geometry:g});
+const sharedEntryBytes=oneEntry.entries.buffer.byteLength;
 const environment={node:process.version,v8:process.versions.v8,cpu:cpus()[0].model,
   os:release(),ramBytes:totalmem(),freeRamBytes:freemem()};
 const meter=await processCycleCounter(),moves=[],trace=[];
@@ -43,7 +47,8 @@ try{
   trace.at(-1).searchStarted=true;
   const result=await runLazySmpConnect4Rba32(moves,{geometry:g,...config});
   const wallMs=performance.now()-start,solveCycles=String(meter.read()-cycles),used=process.cpuUsage(cpu);
-  console.log(JSON.stringify({sourceSha,library,features,arm,config,environment,controls,trace,structuralMs,
+  console.log(JSON.stringify({sourceSha,library,features,arm,config,sharedEntryBytes,
+    sharedTableBytes:sharedEntryBytes*config.sharedCacheCapacity,environment,controls,trace,structuralMs,
     searchRootSequence,structuralMoves:moves.length,firstSearchPly:moves.length+1,searchCalls:1,
     topology:{workers:4,wide:null,deep:[0,1,2,3]},...result,wallMs,solveCycles,
     cpuMs:(used.user+used.system)/1000,peakRssBytes:process.resourceUsage().maxRSS*1024,
