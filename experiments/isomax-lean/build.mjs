@@ -29,8 +29,11 @@ function fixedIf(s,condition,take){
       const next=s.indexOf('{',end);tail=endBlock(s,next);other=s.slice(next+1,tail-1);
     }else if(s.slice(end).match(/^\s*else if/)){
       let next=end;
-      do{const brace=s.indexOf('{',next);tail=endBlock(s,brace);next=tail;}while(s.slice(tail).match(/^\s*else/));
-      assert.equal(take,true,'else-if specialization only supports first branch');
+      do{const brace=s.indexOf('{',next);tail=endBlock(s,brace);
+        if(s.slice(next,brace).match(/^\s*else\s*$/))other=s.slice(brace+1,tail-1);
+        next=tail;
+      }while(s.slice(tail).match(/^\s*else/));
+      assert.ok(take||other,'generic specialization requires final else');
     }
     s=s.slice(0,start)+(take?s.slice(open+1,end-1):other)+s.slice(tail);
   }
@@ -57,17 +60,28 @@ else if(features.includes('layout'))cache=optimizeSharedCache(cache);
 output('shared-cache.mjs',relocate(cache));
 output('fixed-ops.mjs',fixedOpsSource());
 
+for(const variant of ['standard','general','wide']){
 let cpc=read('addons/cpc-connect4.mjs');
 cpc=cpc.replace(/scratch\.(forcedTotal|precursorTotal|projectedForkTotal)\+=[^;]+;/g,'');
 cpc=cpc.replace(/    (forcedTotal|precursorTotal|projectedForkTotal):0,\n/g,'');
 cpc=cpc.replace(/scratch\.precursorCount\[0\](?:\+=1|=0);/g,'');
 cpc=cpc.replace(/    precursorCount:new Uint32Array\(1\),\n/,'');
-cpc=once(cpc,'if(!targets||moverHasSingleton)','if(moverHasSingleton)');
+if(variant!=='wide')cpc=once(cpc,'if(!targets||moverHasSingleton)','if(moverHasSingleton)');
 cpc=fixedIf(cpc,'scratch.projectedAdvisory',false);
 cpc=cpc.replace(/scratch\.frontierResponse\s*\?frontierResponseNoWin\([^;]+?\)\s*:(pairedResponseNoWin\([^;]+?\))/g,'$1');
-cpc=cpc.replaceAll('g.columns<=32?((1<<column)>>>0):0','((1<<column)>>>0)');
-cpc=once(cpc,'  const cellWords=Math.ceil(g.cellCount/32);',"  if(g.columns!==7||g.rows!==6||g.lineCount!==69||frontierResponse||projectedAdvisory)throw RangeError('lean CPC requires standard baseline configuration');\n  const cellWords=Math.ceil(g.cellCount/32);");
-output('cpc.mjs',relocate(features.includes('cpc-fused')?optimizeCpcFused(cpc):features.includes('cpc')?optimizeCpc(cpc):cpc));
+cpc=cpc.replaceAll('g.columns<=32?((1<<column)>>>0):0',variant==='wide'?'0':'((1<<column)>>>0)');
+const cpcGuard=variant==='standard'?"g.columns!==7||g.rows!==6||g.lineCount!==69":variant==='wide'?'g.columns<=32':'g.columns>32';
+cpc=once(cpc,'  const cellWords=Math.ceil(g.cellCount/32);',`  if(${cpcGuard}||frontierResponse||projectedAdvisory)throw RangeError('lean CPC requires ${variant==='standard'?'standard baseline':'matching initialized'} configuration');\n  const cellWords=Math.ceil(g.cellCount/32);`);
+cpc=features.includes('cpc-fused')?optimizeCpcFused(cpc):features.includes('cpc')?optimizeCpc(cpc):cpc;
+if(variant==='wide'){
+  // The reference deliberately skips this proof for widths above 32. Erase
+  // its call at build time rather than testing an invariant at every node.
+  cpc=once(cpc,functionText(cpc,'deriveForkPreemption32'),'');
+  cpc=cpc.replace(/const precursor=deriveForkPreemption32\([^;]+\);/,'const precursor=0;');
+  cpc=fixedIf(cpc,'precursor<0',false);
+}
+output(variant==='standard'?'cpc.mjs':`cpc-${variant}.mjs`,relocate(cpc));
+}
 
 // Private, prepared-only coordinate functions. Every caller supplies removed
 // and child-index scratch, uses seen offset zero and requests no selected set.
@@ -87,11 +101,17 @@ coordinate=coordinate.replace(',selectedSet=null,selectedSetOffset=0','');
 coordinate=once(coordinate,'  if(selectedSet)publishSpan32(selectedSet,selectedSetOffset,scratch.seen,0,g.shapeWordCount);\n','');
 output('coordinate.mjs',coordinate);
 
+const profiles=[{name:'',general:false,packed:true,wide:false},
+  ...[false,true].flatMap(wide=>[true,false].map(packed=>({general:true,packed,wide,
+    name:`-general${wide?'-wide':''}${packed?'':'-unpacked'}`})))];
+for(const {name,general,packed,wide} of profiles){
 let s=read('addons/rba-connect4-frontier.mjs');
 s=s.slice(s.indexOf('import '));
 s=once(s,"import {prepareRootFrontierBehavior32 as prepareSearchBehavior32,completeRootFrontierNode32 as completeBehaviorNode32} from './worker-root-frontier.mjs';","import {prepareSearchBehavior32,completeBehaviorNode32} from './worker-behavior-search.mjs';");
 s=s.replace(/  nodeCounts=new Float64Array\(1\),\n/,'').replace(/  if\(!\(nodeCounts instanceof Float64Array\)[^\n]+\n/,'');
-s=once(s,"  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');", "  if(!isCompactProfile8(geometry,geometry?.keyWords))throw RangeError('lean solver requires standard 7x6 geometry');\n  if(sharedExactCache===null||!sharedExactCache.compact8||sharedSampleMask!==0)throw RangeError('lean solver requires compact shared TT with sample mask zero');");
+s=once(s,"  if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');",general
+  ? `  if(!geometry||isCompactProfile8(geometry,geometry.keyWords)||(${wide?'geometry.columns<=32':'geometry.columns>32'}))throw RangeError('general solver/profile mismatch');\n  if(sharedExactCache===null||sharedExactCache.layout.kind!=='direct'||sharedExactCache.keyWords!==geometry.keyWords||sharedSampleMask!==0)throw RangeError('general solver requires matching direct shared TT with sample mask zero');\n  if((prepareConnect4MoveOrderPacking32Frontier(geometry.columns,geometry.lineCount).shift>=0)!==${packed})throw RangeError('move order packing/profile mismatch');`
+  : "  if(!isCompactProfile8(geometry,geometry?.keyWords))throw RangeError('lean solver requires standard 7x6 geometry');\n  if(sharedExactCache===null||!sharedExactCache.compact8||sharedSampleMask!==0)throw RangeError('lean solver requires compact shared TT with sample mask zero');");
 s=s.replace(/    frontierValues:[\s\S]*?frontierAutoReleases:0,\n/,'');
 s=once(s,'    nodeCounts,cutoffs:0,cacheHits:0,cpcExact:0,cpcBounds:0,cpcRestrictions:0,\n    cofactors:0},behavior);','  },behavior);');
 s=s.replace(/    if\(cpcKind===CPC_BOUND\)state.cpcBounds\+=1;\n    else if\(cpcKind===CPC_RESTRICT\)state.cpcRestrictions\+=1;\n/,'');
@@ -103,13 +123,19 @@ s=s.replace(/    \/\/ HOT: one scalar horizon[\s\S]*?if\(depth>=state.frontierLi
 s=s.replaceAll('let best=-2,unfinished=0;','let best=-2;');
 s=s.replace(/        if\(value===-4\)\{unfinished=1;continue;\}\n/g,'');
 s=s.replace(/    \/\/ A witnessed cutoff[\s\S]*?if\(unfinished\)return completeBehaviorNode32\(state,4\);\n/,'');
-s=fixedIf(s,'cache.compact8',true);
-s=s.replace(/else publishSpan32\(keys,base,words,offset,cache.keyWords\);/g,'');
+if(general){
+  s=s.replaceAll('else publishSpan32(keys,base,words,offset,cache.keyWords);','else{publishSpan32(keys,base,words,offset,cache.keyWords);}');
+  s=fixedIf(s,'cache.compact8',false);
+  s=once(s,'const compact8=isCompactProfile8(geometry,keyWords)?1:0,storedKeyWords=compact8?8:keyWords;','const compact8=0,storedKeyWords=keyWords;');
+}else{
+  s=fixedIf(s,'cache.compact8',true);
+  s=s.replace(/else publishSpan32\(keys,base,words,offset,cache.keyWords\);/g,'');
+}
 s=s.replaceAll('cache.shared&&!(hash&cache.sharedSampleBits)?probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash):0','probeConnect4RbaSharedExactCache32(cache.shared,words,offset,hash)');
 s=s.replaceAll('if(cache.shared&&!(hash&cache.sharedSampleBits))','');
-s=fixedIf(s,'movePackShift>=0',true);
-s=s.replace(/live\.wordCount===3\s*\?(evaluateConnect4LiveLine3x32\([^\n]+\))\s*:evaluateConnect4LiveLineCell32\([^\n]+?\)/g,'$1');
-s=s.replaceAll('g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns)','argMaxPlayableSlot7Nonempty32(scores)');
+s=fixedIf(s,'movePackShift>=0',packed);
+s=s.replace(/live\.wordCount===3\s*\?(evaluateConnect4LiveLine3x32\([^\n]+\))\s*:(evaluateConnect4LiveLineCell32\([^\n]+?\))/g,general?'$2':'$1');
+s=s.replaceAll('g.columns===7?argMaxPlayableSlot7Nonempty32(scores):argMaxPlayableSlot32(scores,g.columns)',general?'argMaxPlayableSlot32(scores,g.columns)':'argMaxPlayableSlot7Nonempty32(scores)');
 const start=s.indexOf('  // HOT PFIF action loop'),end=s.indexOf('// Cold operation boundary only:');
 assert.ok(start>0&&end>start);
 s=s.slice(0,start)+`  // Same full-window root probes and deterministic tie-breaking as released
@@ -141,9 +167,20 @@ s=s.slice(0,start)+`  // Same full-window root probes and deterministic tie-brea
 `+s.slice(end);
 s=s.slice(0,s.indexOf('function metricsFrontier(s)'));
 s=s.replaceAll('metrics:metricsFrontier(state)','metrics:null');
-s=relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'});
-if(features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
-if(features.includes('hash-inline')){
+if(wide){
+  // Above 32 columns the reference skips fork preemption. The only remaining
+  // restriction is forcedColumn; count is 0/1, so actionMask is always -1.
+  s=s.replace(/\s*preemptCount=state\.cpc\.preemptionCount\[0\],/g,'');
+  s=s.replace(/\s*preemptMask=state\.cpc\.preemptionMask32\[0\],/g,'');
+  s=s.replace(/\s*actionMask=preemptCount>1\?preemptMask:-1,/g,'');
+  s=s.replace(/\|\|!\(actionMask&\(1<<(forced|column)\)\)/g,'');
+  s=s.replace('&&(actionMask&(1<<forced))','');
+}
+s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'});
+if(general)s=once(s,'compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32}', 'compactTailProfile8,probeDirectSharedCache as probeConnect4RbaSharedExactCache32,storeDirectSharedCache as storeConnect4RbaSharedExactCache32}');
+if(general)s=once(s,"from '../../addons/connect4-live-line-evaluator.mjs'","from './live-profile.mjs'");
+if(!general&&features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
+if(!general&&features.includes('hash-inline')){
   let code='    // BEGIN fixed fourteen-word hash: same bits, no helper call or loop.\n    let cacheHash=0,hashWord;\n';
   // Private standard-board frames occupy indices 0..601. Int32 addressing is
   // exact throughout that domain and avoids per-add JS overflow deopt guards.
@@ -154,11 +191,12 @@ if(features.includes('hash-inline')){
   code+='    cacheHash=cacheHash>>>0;\n    // END fixed fourteen-word hash\n    const cacheSlot=cacheHash&cache.mask;';
   s=once(s,'    const cacheHash=mixSpan32Locator32(words,keyOffset,cache.keyWords),cacheSlot=cacheHash&cache.mask;',code);
 }
-if(features.includes('live')){
+if(!general&&features.includes('live')){
   s="import {advanceLive3x32} from './fixed-ops.mjs';\n"+s;
   s=s.replaceAll('advanceConnect4LiveLineState32(live,','advanceLive3x32(live,').replaceAll('advanceConnect4LiveLineState32(state.live,','advanceLive3x32(state.live,');
 }
-output('solver.mjs',s);
+output(`solver${name}.mjs`,s);
+}
 
 let worker=read('addons/rba-connect4-lazy-smp-worker-frontier.mjs');
 worker=worker.slice(worker.indexOf('import '));
@@ -168,6 +206,8 @@ worker=worker.replace(/  frontierMetrics=[^\n]+\n/,'').replace(/    nodeCounts:[
 worker=once(worker,'  ),\n  m=result.metrics;','  );');
 worker=worker.replace(/frontierMetrics\[0\]=[\s\S]*?(?=if\(result.status===)/,'');
 output('worker.mjs',relocate(worker,{'./rba-connect4-frontier.mjs':'./solver.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
+for(const {name,general} of profiles)if(general)
+  output(`worker${name}.mjs`,relocate(worker,{'./rba-connect4-frontier.mjs':`./solver${name}.mjs`,'./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
 
 let host=read('addons/rba-connect4-lazy-smp-host.mjs');
 host=host.replace("import {encodeRootFrontier32} from './worker-root-frontier.mjs';\n",'');
@@ -179,15 +219,18 @@ host=host.slice(0,hs)+`  if(rootFrontier)throw RangeError('lean profile is deep 
   if(behaviorMemory===null)behaviorMemory=createWorkerBehaviorMemory32(workers);
 `+host.slice(he);
 host=host.replace(/    metricBuffer=[\s\S]*?    session=createManagedThreadSession32/,'    timingBuffer=new SharedArrayBuffer(workers*64),\n    session=createManagedThreadSession32');
-host=host.replace(/new URL\(rootFrontier\?[\s\S]*?import.meta.url\)/,"new URL('./worker.mjs',import.meta.url)");
+host=host.replace(/new URL\(rootFrontier\?[\s\S]*?import.meta.url\)/,'workerUrl');
+host="import {prepareLeanExecutionProfile} from './execution-profile.mjs';\n"+host;
+host=once(host,'  const root=connect4RbaFromMoves',"  const executionProfile=prepareLeanExecutionProfile(geometry),\n    workerUrl=new URL(executionProfile.worker,import.meta.url);\n  const root=connect4RbaFromMoves");
 for(const field of ['metricBuffer','nodeCounterBuffer','frontierMetricBuffer'])host=host.replace('          '+field+',\n','');
 host=host.replace(/  let winnerMetrics=null;[\s\S]*?(?=  return \{)/,'');
 host=host.replace('    winnerMetrics,','    winnerMetrics:null,');
+host=once(host,'    winnerMetrics:null,','    executionProfile,\n    winnerMetrics:null,');
 host=host.replace(/    nodeCounts:[^\n]+\n/,'    nodeCounts:null,\n');
 host=host.replace(/    workerTiming:[^\n]+\n/,'    workerTiming:Array.from({length:workers},(_,i)=>Array.from(new Float64Array(timingBuffer,i*64,2))),\n');
 host=host.replace(/    frontierMetrics:[^\n]+\n/,'    frontierMetrics:null,\n');
 host=host.replace(/Atomics.load\(sharedExactCache.stats,[012]\)/g,'null');
 host=host.replace(/control.byteLength\+resultWords.byteLength\+metricBuffer.byteLength[\s\S]*?:0\),/,'control.byteLength+resultWords.byteLength+behaviorMemory.buffer.byteLength+timingBuffer.byteLength,');
 if(features.includes('layout32'))host=once(host,'sharedViewBytes32(sharedExactCache)','sharedExactCache.entries.buffer.byteLength');
-output('host.mjs',relocate(host,{'./shared-cache.mjs':'./shared-cache.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
+output('host.mjs',relocate(host,{'./execution-profile.mjs':'./execution-profile.mjs','./shared-cache.mjs':'./shared-cache.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
 output('inputs.json',JSON.stringify(inputs,null,2)+'\n');
