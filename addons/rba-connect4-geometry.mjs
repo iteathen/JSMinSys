@@ -141,7 +141,9 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
       if(groupCount>0xffffffff)throw new RangeError('containment plan exceeds uint32 offsets');
       for(let a=0;a<shapeCount;a+=1)supersetWordOffsets[a+1]+=supersetWordOffsets[a];
       cursors=supersetWordOffsets.slice(0,shapeCount);
-      supersetWords=new Uint32Array(groupCount);supersetMasks=new Uint32Array(groupCount);
+      // Native width is chosen once; indexed loads need no decoder or hot dispatch.
+      const WordIndex=shapeWordCount<=256?Uint8Array:shapeWordCount<=65536?Uint16Array:Uint32Array;
+      supersetWords=new WordIndex(groupCount);supersetMasks=new Uint32Array(groupCount);
     }
   }
   const containmentBytes=supersetWordOffsets.byteLength+supersetWords.byteLength+supersetMasks.byteLength;

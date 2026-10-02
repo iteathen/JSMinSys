@@ -4,40 +4,38 @@
 import {emitSortedSetBits32} from '../src/basis32.mjs';
 export {connect4RbaCanonicalize} from './rba-connect4-coordinate.mjs';
 function connect4RbaDenseCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed){
-  const geometry_shapeWordCount=g.shapeWordCount,geometry_shapeCount=g.shapeCount;
-  for(let w=0;w<geometry_shapeWordCount;w+=1)seen[w]=0;
-  const remove=cell*geometry_shapeCount,removeByCell=g.removeByCell;
+  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  const remove=cell*g.shapeCount,removeByCell=g.removeByCell;
   for(let i=0;i<count;i+=1){
     const id=removeByCell[remove+parent[parentOffset+i]];
     removed[i]=id;
     if(id>=0)seen[(id>>>5)]|=1<<(id&31);
   }
-  return emitSortedSetBits32(seen,geometry_shapeWordCount,out,outOffset);
+  return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
 }
 export function connect4RbaDenseCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
-  const geometry_metaOffset=g.metaOffset,geometry_columns=g.columns,geometry_coordWords=g.coordWords,geometry_p0Offset=g.p0Offset,geometry_p1Offset=g.p1Offset,geometry_cellCount=g.cellCount;
-  const meta=source[src+geometry_metaOffset],rank=meta>>>2,
-    cell=height*geometry_columns+column,player=rank&1;
-  for(let c=0;c<geometry_columns;c+=1)target[dst+c]=source[src+c];
-  target[dst+column]=height+1;target[dst+geometry_metaOffset]=(rank+1)<<2;
-  for(let w=0;w<2*geometry_coordWords;w+=1)target[dst+geometry_p0Offset+w]=0;
+  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    cell=height*g.columns+column,player=rank&1;
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
   sizes[sizeIndex]=0;
 
   // Every physical cell is a singleton residual whenever winning geometry
   // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
-  const singleton=cell,coord=src+(player?geometry_p1Offset:geometry_p0Offset);
+  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
   let lo=0,hi=n;
   while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
   if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
-    const value=player?1:3;target[dst+geometry_metaOffset]=((rank+1)<<2)|value;return value;
+    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
   }
-  if(rank+1===geometry_cellCount){target[dst+geometry_metaOffset]=((rank+1)<<2)|2;return 2;}
+  if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaDenseCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
   const
-    p0Source=src+geometry_p0Offset,p1Source=src+geometry_p1Offset,
-    p0Target=dst+geometry_p0Offset,p1Target=dst+geometry_p1Offset,
+    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
