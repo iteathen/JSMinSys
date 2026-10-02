@@ -1,0 +1,35 @@
+name: Connect4 Rank-Local Full-Game Benchmark
+
+on:
+  push:
+    branches:
+      - research/cpc-guard-proof-memo-nees-v1
+    paths:
+      - '.github/workflows/connect4-rank-local-full-game-bench.yml'
+      - 'tools/bench-connect4-rank-local-full-game.mjs'
+      - 'addons/connect4-rank-local-presearch.mjs'
+      - 'addons/rba-connect4-move-selector.mjs'
+      - 'addons/rba-connect4-lazy-smp-host.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      C4_WORKERS: '4'
+      C4_SEARCH_TIMEOUT_MS: '120000'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '26'
+      - run: node tools/bench-connect4-rank-local-full-game.mjs | tee full-game.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rank-local-full-game
+          path: full-game.json
