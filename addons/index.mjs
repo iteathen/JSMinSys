@@ -16,3 +16,5 @@ export * from './rba-connect4-shared-exact-cache.mjs';
 export * from './rba-connect4-lazy-smp-host.mjs';
 export * from './rba-connect4-frontier.mjs';
 export * from './worker-root-frontier.mjs';
+export * from './connect4-rank-local-presearch.mjs';
+export * from './rba-connect4-move-selector.mjs';
