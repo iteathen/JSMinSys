@@ -120,9 +120,12 @@ test('public solver initializes a nonstandard board and completes through real w
   assert.equal(result.workersExited,2);
 });
 
-for(const [columns,rows] of [[4,4],[4,5],[5,4],[8,4],[4,8],[8,6],[7,5],[33,1],[1,256]]){
-  test(`initialized ${columns}x${rows}: exact physical oracle, reference traversal/TT, workers`,async t=>{
-    const g=prepareConnect4RbaGeometry({columns,rows}),profile=prepareLeanExecutionProfile(g);
+for(const [columns,rows,budget=2097152] of [[4,4],[4,5],[5,4],[8,4],[4,8],[8,6],[7,5],[7,5,0],[33,1],[1,256]]){
+  test(`initialized ${columns}x${rows} budget=${budget}: exact physical oracle, reference traversal/TT, workers`,async t=>{
+    const g=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:budget}),profile=prepareLeanExecutionProfile(g);
+    assert.equal(profile.solver.endsWith('-dense.mjs'),g.removeByCell!==null);
+    assert.equal(profile.worker.endsWith('-dense.mjs'),g.removeByCell!==null);
+    if(columns===7&&rows===5)assert.equal(profile.solver,budget?'./solver-general-dense.mjs':'./solver-general.mjs');
     const api=await import('../experiments/isomax-lean/'+profile.solver.slice(2));
     const samples=fixtures(columns,rows),records=[];
     let publications=0;
@@ -178,13 +181,33 @@ test('general CPC preserves guards and results across the 32-column boundary',()
 });
 
 test('general cancellation and state reuse preserve exact result',async()=>{
-  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),api=await import('../experiments/isomax-lean/solver-general.mjs');
+  for(const [columns,rows] of [[4,4],[7,5]])for(const budget of [0,2097152]){
+  const g=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:budget}),profile=prepareLeanExecutionProfile(g);
+  const api=await import('../experiments/isomax-lean/'+profile.solver.slice(2));
   const {state,words}=stateFor(api,g,0,false),root=connect4RbaFromMoves([],{geometry:g});
+  state.coord.map.fill(0xffffffff);
   const load=state.behaviorLoad;let calls=0;
   state.behaviorLoad=()=>{if(++calls===8)publishWorkerBehavior32(words,0,1);return load();};
   assert.equal(api.solveConnect4RbaFrontier(root,{state,reflected:root.reflected}).status,'CANCELLED');
+  assert.ok(state.coord.map.some(value=>value!==0xffffffff),'cancelled run must have constructed a nonterminal child');
   state.behaviorLoad=load;publishWorkerBehavior32(words,0,0);
-  assert.equal(api.solveConnect4RbaFrontier(root,{state,reflected:root.reflected}).relative,0);
+  const reuseMoves=columns===4?[]:fixtures(columns,rows,1)[0];
+  const reuse=connect4RbaFromMoves(reuseMoves,{geometry:g});
+  assert.equal(api.solveConnect4RbaFrontier(reuse,{state,reflected:reuse.reflected}).relative,
+    columns===4?0:boardOracle(columns,rows,reuseMoves).relative||0);
+  }
+});
+
+test('cold dense solver selection rejects sparse geometry before entering search',async()=>{
+  for(const [columns,rows] of [[7,6],[7,5],[33,1]]){
+    const sparse=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:0});
+    const initializedDense=prepareConnect4RbaGeometry({columns,rows});
+    assert.equal(sparse.removeByCell,null);assert.notEqual(initializedDense.removeByCell,null);
+    const sparseProfile=prepareLeanExecutionProfile(sparse),denseProfile=prepareLeanExecutionProfile(initializedDense);
+    assert.ok(!sparseProfile.solver.endsWith('-dense.mjs'));assert.ok(denseProfile.solver.endsWith('-dense.mjs'));
+    const denseApi=await import('../experiments/isomax-lean/'+denseProfile.solver.slice(2));
+    assert.throws(()=>stateFor(denseApi,sparse,0,false),/dense removal table required/);
+  }
 });
 
 test('valid small geometries with no winning lines initialize as exact draws',async()=>{
@@ -201,10 +224,11 @@ test('unpacked fallback preserves ordering, weak/exact TT rows, and result',asyn
   // Exercise the emitted fallback algorithm on affordable real positions.
   // The public cold guard still requires true overflow before choosing it.
   // Only prepared order representation changes in these test-owned states.
-  for(const [columns,rows] of [[4,4],[33,1]]){
-    const g=prepareConnect4RbaGeometry({columns,rows}),wide=columns>32;
-    const packed=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}.mjs`);
-    const unpacked=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}-unpacked.mjs`);
+  for(const budget of [0,2097152])for(const [columns,rows] of [[4,4],[33,1]]){
+    const g=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:budget}),wide=columns>32;
+    const suffix=g.removeByCell!==null?'-dense':'';
+    const packed=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}${suffix}.mjs`);
+    const unpacked=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}-unpacked${suffix}.mjs`);
     let recursiveSorts=0;
     for(const moves of fixtures(columns,rows,wide?12:3,wide?10:6)){
       const a=stateFor(baseline,g,0,true).state,b=stateFor(packed,g,0,false).state;
@@ -229,22 +253,28 @@ test('unpacked fallback preserves ordering, weak/exact TT rows, and result',asyn
   }
 });
 
-test('geometry choices are cold; qualified standard hot files are unchanged',()=>{
+test('geometry choices are cold; qualified standard search is unchanged except canonical kernel binding',()=>{
   const base='4e7af0e74b82b6bb70fef94a211196b4235a4039';
-  for(const file of ['solver','cpc','coordinate','fixed-ops','shared-cache','worker']){
+  for(const file of ['solver','cpc','fixed-ops','shared-cache','worker']){
     const path='experiments/isomax-lean/'+file+'.mjs';
     const before=execFileSync('git',['show',base+':'+path],{encoding:'utf8'}).replaceAll('\r\n','\n');
-    const after=readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n').replace(/from '\.\/coordinate-(?:supersets|constants|masks|prepared)\.mjs'/,"from './coordinate.mjs'").replace(/from '\.\/profile-(?:supersets|masks)\.mjs'/,"from '../../addons/rba-connect4-profile.mjs'");
+    const after=readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n')
+      .replace("{connect4RbaPreparedCofactorKnownHeight as connect4RbaCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from '../../addons/rba-connect4-coordinate-prepared.mjs'",
+        "{connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './coordinate.mjs'");
     assert.equal(createHash('sha256').update(after).digest('hex'),createHash('sha256').update(before).digest('hex'),path);
   }
-  for(const wide of [false,true])for(const packed of [true,false]){
+  for(const wide of [false,true])for(const packed of [true,false])for(const dense of [false,true]){
     // Huge synthetic layout metadata exercises selection/overflow without
     // pretending to allocate an impractically large board.
-    const profile=prepareLeanExecutionProfile({columns:wide?33:4,rows:8,keyWords:23,lineCount:packed?100:0xffffffff});
+    const profile=prepareLeanExecutionProfile({columns:wide?33:4,rows:8,keyWords:23,lineCount:packed?100:0xffffffff,
+      removeByCell:dense?new Int32Array(1):null});
     assert.equal(profile.wide,wide);assert.equal(profile.packed,packed);
+    assert.equal(profile.solver.endsWith('-dense.mjs'),dense);assert.equal(profile.worker.endsWith('-dense.mjs'),dense);
     const src=readFileSync(new URL('../experiments/isomax-lean/'+profile.solver.slice(2),import.meta.url),'utf8');
     const hot=src.slice(src.indexOf('function searchCpcOnlyFrontier'),src.indexOf('export function solveConnect4RbaFrontier')).replace(/\/\/[^\n]*/g,'');
     assert.doesNotMatch(hot,/if\(movePackShift|live\.wordCount===|cache\.compact8|sharedSampleBits|nodeCounts|cacheHits|horizon|performance|Date\.|console\./);
     if(wide)assert.doesNotMatch(src,/actionMask|preemptCount|preemptMask/);
+    assert.match(src,new RegExp("from '../../addons/rba-connect4-coordinate-"+(dense?'dense':'prepared')+"\\.mjs'"));
+    if(dense)assert.match(src,/if\(geometry\.removeByCell===null\)throw RangeError\('dense removal table required'\)/);
   }
 });

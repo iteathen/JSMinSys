@@ -5,11 +5,11 @@ import {cpus,freemem,totalmem,release} from 'node:os';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {readFileSync} from 'node:fs';
-import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs';
 import {evaluateConnect4RankLocalLanding32} from '../../addons/connect4-rank-local-presearch.mjs';
 import {processCycleCounter} from '../../tools/process-cycle-counter.mjs';
 const library=resolve(process.argv[2]),arm=process.argv[3];
 const {runLazySmpConnect4Rba32}=await import(pathToFileURL(resolve(library,'experiments/isomax-lean/host.mjs')).href);
+const {prepareConnect4RbaGeometry}=await import(pathToFileURL(resolve(library,'addons/rba-connect4-geometry.mjs')).href);
 const sourceSha=execFileSync('git',['-C',library,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
 let features=[];try{features=JSON.parse(readFileSync(resolve(library,'experiments/isomax-lean/features.json'),'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
 const g=prepareConnect4RbaGeometry({columns:7,rows:6}),controls=[];

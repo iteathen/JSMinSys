@@ -59,19 +59,11 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed,seenOffset);sizes[sizeIndex]=cn;
-  // One child-basis pass publishes the exact id->index map already owned by
-  // coordinate scratch and discovers all cardinality boundaries.
-  let childPair=cn,childTriple=cn,childQuad=cn;
-  for(let j=0;j<cn;j+=1){
-    const id=childBasis[ci+j];
-    if(childIndex)childIndex[id]=j;
-    if(childPair===cn&&id>=g.pairShapeStart)childPair=j;
-    if(childTriple===cn&&id>=g.tripleShapeStart)childTriple=j;
-    if(childQuad===cn&&id>=g.quadShapeStart)childQuad=j;
-  }
+  if(childIndex)for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
   const remove=removed?0:profile.prepareRemove(g,cell),
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset;
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
       active0=source[p0Source+sourceWord]&sourceMask,
@@ -80,8 +72,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     const id=basis[bi+i],raw=removed?removed[i]:profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
-    let write0=active0&&(player===0||image===id),
-      write1=active1&&(player===1||image===id);
+    let write0=(active0!==0)&&(player===0||image===id),
+      write1=(active1!==0)&&(player===1||image===id);
     if(!write0&&!write1)continue;
 
     // Both coordinates share the same residual image whenever they survive.
@@ -105,14 +97,23 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     if(write0)target[p0Target+targetWord]|=targetMask;
     if(write1)target[p1Target+targetWord]|=targetMask;
 
-    let j=image<g.pairShapeStart?childPair:
-      image<g.tripleShapeStart?childTriple:
-      image<g.quadShapeStart?childQuad:cn;
-    const subset=profile.prepareSubset(g,image);
-    for(;j<cn;j+=1)if(profile.shapeSubsetPrepared(g,subset,childBasis[ci+j])){
-      targetWord=j>>>5;targetMask=1<<(j&31);
-      if(write0)target[p0Target+targetWord]|=targetMask;
-      if(write1)target[p1Target+targetWord]|=targetMask;
+    for(let at=offsets[image],end=offsets[image+1];at<end;at+=1){
+      const word=words[at],shapeBase=word<<5;let bits=masks[at]&seen[seenOffset+word];
+      // The intersection contains only current child-basis IDs. Stale inverse
+      // entries cannot enter this path. Do not mutate the shared seen scratch.
+      while(bits){
+        const bit=bits&-bits,id=shapeBase+(31-Math.clz32(bit));
+        let j;
+        if(childIndex)j=childIndex[id];
+        else{
+          j=0;let hi=cn;
+          while(j<hi){const mid=(j+hi)>>>1;if(childBasis[ci+mid]<id)j=mid+1;else hi=mid;}
+        }
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+        bits^=bit;
+      }
     }
   }
   return 0;

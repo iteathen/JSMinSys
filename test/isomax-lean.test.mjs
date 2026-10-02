@@ -34,23 +34,36 @@ function logical(cache,field){
   return out;
 }
 function setSequence(cache,slot,value){Atomics.store(cache.entries??cache.sequence,cache.entries?slot*(cache.layout?.entryWords??10):slot,value);}
-for(const solverFile of ['solver','solver-dense'])test(solverFile+': transitive deep call graph has no reporting or runtime measurement machinery',()=>{
+const solverFiles=['solver','solver-dense',...[false,true].flatMap(wide=>[false,true].flatMap(unpacked=>[false,true].map(dense=>
+  `solver-general${wide?'-wide':''}${unpacked?'-unpacked':''}${dense?'-dense':''}`)))];
+for(const solverFile of solverFiles)test(solverFile+': transitive deep call graph has no reporting or runtime measurement machinery',()=>{
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
   const ledger=JSON.parse(read('catalog/addon-cycle-ledger-v0.json'));
   const core=JSON.parse(read('catalog/functions-v0.json'));
   const units=new Map([...ledger.units,...core.functions].map(u=>[u.name,u]));
-  const local=new Map();
-  const selected=read('experiments/isomax-lean/'+solverFile+'.mjs').match(/from '\.\/(coordinate[^']*)\.mjs'/)[1];
-  for(const file of [solverFile,'cpc','shared-cache',selected,'fixed-ops']){
-    const source=read('experiments/isomax-lean/'+file+'.mjs');
+  const local=new Map(),aliases=new Map();
+  const solverPath='experiments/isomax-lean/'+solverFile+'.mjs',solver=read(solverPath);
+  const kernelImport=solver.match(/import \{(connect4Rba(?:Prepared|Dense)CofactorKnownHeight) as connect4RbaCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize\} from '(\.\.\/\.\.\/addons\/rba-connect4-coordinate-(?:prepared|dense)\.mjs)'/);
+  assert.ok(kernelImport,'solver must use a canonical prepared kernel');
+  aliases.set('connect4RbaCofactorKnownHeight',kernelImport[1]);
+  const selected=kernelImport[2].replace('../../','');
+  const cpcFile=solver.match(/from '\.\/(cpc[^']*)\.mjs'/)[1];
+  const paths=[solverPath,...[cpcFile,'shared-cache','fixed-ops'].map(file=>'experiments/isomax-lean/'+file+'.mjs'),
+    selected,'addons/rba-connect4-coordinate-prepared.mjs','addons/rba-connect4-coordinate.mjs'];
+  for(const path of paths){
+    const source=read(path);
+    for(const imported of source.matchAll(/import \{([^}]+)\} from/g))for(const specifier of imported[1].split(',')){
+      const alias=specifier.trim().match(/^(\w+) as (\w+)$/);if(alias)aliases.set(alias[2],alias[1]);
+    }
     for(const match of source.matchAll(/function (\w+)\(/g)){
       local.set(match[1],source);
+      if(path===selected||path==='addons/rba-connect4-coordinate-prepared.mjs')assert.ok(units.has(match[1]),'canonical kernel lacks cycle-ledger coverage: '+match[1]);
       if(!units.has(match[1]))units.set(match[1],{name:match[1],operations:[]});
     }
   }
   const pending=['searchCpcOnlyFrontier'],seen=new Set();
   while(pending.length){
-    const name=pending.pop();if(seen.has(name))continue;seen.add(name);
+    const requested=pending.pop(),name=aliases.get(requested)??requested;if(seen.has(name))continue;seen.add(name);
     const u=units.get(name);assert.ok(u,'unknown hot target '+name);
     const source=(local.get(name)??read(u.source)).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,'');
     const start=source.indexOf('function '+name+'(');assert.ok(start>=0,name);
@@ -67,7 +80,17 @@ for(const solverFile of ['solver','solver-dense'])test(solverFile+': transitive 
     for(const m of body.matchAll(/(?<![.\w])([A-Za-z_$][\w$]*)\s*\(/g))
       if(!['if','for','while','switch','return'].includes(m[1]))pending.push(m[1]);
   }
-  assert.ok(seen.size>30);
+  // General dense paths intentionally omit removal callbacks and fixed-width
+  // helpers. Assert their actual dependency identities instead of inheriting
+  // the standard profile's unrelated minimum graph size.
+  for(const required of ['searchCpcOnlyFrontier',kernelImport[1],kernelImport[1].replace('KnownHeight','Basis'),
+    'connect4RbaPreparedCanonicalize','comparePreparedReflectedSupport','emitSortedSetBits32','publishSpan32',
+    'evaluateConnect4CpcNonterminal32','completeBehaviorNode32',
+    solverFile.includes('-general')?'probeDirectSharedCache':'probeConnect4RbaSharedExactCache32',
+    solverFile.includes('-general')?'storeDirectSharedCache':'storeConnect4RbaSharedExactCache32'])
+    assert.ok(seen.has(required),'hot dependency was not audited: '+required);
+  assert.ok(!seen.has('connect4RbaCanonicalize'),'prepared path must not silently audit the optional canonicalizer');
+  if(!solverFile.includes('-general'))assert.ok(seen.size>30);
 });
 function prepare(api,offset=0){
   const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
@@ -86,8 +109,13 @@ test('lean recursive path has no reporting, frontier or fixed configuration bran
   const cpcSrc=readFileSync(new URL('../experiments/isomax-lean/cpc.mjs',import.meta.url),'utf8');
   assert.doesNotMatch(cpcSrc,/scratch\.(forcedTotal|precursorTotal|projectedForkTotal|precursorCount)|if\(scratch\.projectedAdvisory\)|=scratch\.frontierResponse/);
   assert.doesNotMatch(cpcSrc,/!targets/);
-  const coordinates=readFileSync(new URL('../experiments/isomax-lean/coordinate.mjs',import.meta.url),'utf8');
-  assert.doesNotMatch(coordinates,/if\(removed\)|if\(childIndex\)|if\(selectedSet\)|removed\?|return seenOffset/);
+  for(const kind of ['prepared','dense']){
+    const coordinates=readFileSync(new URL('../addons/rba-connect4-coordinate-'+kind+'.mjs',import.meta.url),'utf8');
+    assert.doesNotMatch(coordinates,/if\(removed\)|if\(childIndex\)|if\(selectedSet\)|removed\?|return seenOffset/);
+    assert.match(coordinates,/export \{connect4RbaCanonicalize\} from '\.\/rba-connect4-coordinate\.mjs'/);
+    if(kind==='prepared')assert.match(coordinates,/export function connect4RbaPreparedCanonicalize\(g,profile,words,offset,basis,bi,n,scratch\)/);
+    else assert.match(coordinates,/export \{connect4RbaPreparedCanonicalize\} from '\.\/rba-connect4-coordinate-prepared\.mjs'/);
+  }
 });
 for(const api of [lean,dense])test('full-window deep result and tie-breaking match released baseline for every worker order and reflection ('+(api===dense?'dense':'prepared')+')',()=>{
   for(let order=0;order<4;order++){

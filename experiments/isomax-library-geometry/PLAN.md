@@ -1,0 +1,5 @@
+# Library and initialization geometry correction
+
+The rc.2 grouped-mask optimization was restricted to 7x6 and privately owned. Move exact containment compilation into canonical geometry preparation and compiled closure into canonical coordinate libraries. Compile strict subset groups in O(14*shapeCount), use Uint32 word indices, share immutable arrays across workers, and select dense/prepared worker kernels once before search. Generic Worker identity/run remains domain-neutral. No production CPC or BSFP changes.
+
+Qualification: independent physical residual oracles; poisoned scratch and terminal precedence; actual workers across dimensions; canonical source/catalog checks; generated source parity; printed optimized code; matched ABBA full-capacity 7x6 and 7x5 measurements with fixed P-core affinity. Historical immutable baseline remains archived, not re-hashed to new source. 7x5 uses four computed local moves and first search ply5; 7x6 retains five and ply6. Compare within geometry only. No hot diagnostics/counters.

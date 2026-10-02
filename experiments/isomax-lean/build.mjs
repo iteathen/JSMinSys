@@ -1,13 +1,12 @@
-// Cold build only. Derive the fixed standard-board deep profile from the locked
+// Cold build only. Derive initialized geometry profiles from the canonical
 // solver; retain the original source and its CPC/TT semantics as the reference.
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
-import {optimizeMaskCoordinate} from './optimize-coordinate.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets','superset-masks','coordinate-constants','mask-prepared'].includes(f)));
-assert.ok(!features.includes('mask-prepared')||features.includes('superset-masks'));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','library-kernels'].includes(f)));
+assert.ok(features.includes('library-kernels'),'canonical library kernels are required');
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 assert.ok(!features.includes('hash-index32')||features.includes('hash-inline'));
@@ -85,62 +84,13 @@ if(variant==='wide'){
 output(variant==='standard'?'cpc.mjs':`cpc-${variant}.mjs`,relocate(cpc));
 }
 
-// Private, prepared-only coordinate functions. Every caller supplies removed
-// and child-index scratch, uses seen offset zero and requests no selected set.
-const coordinateBase=read('addons/rba-connect4-coordinate.mjs');
-let coordinate="import {emitSortedSetBits32} from '../../src/basis32.mjs';\nimport {publishSpan32} from '../../src/widekey32.mjs';\n";
-for(const name of ['connect4RbaCofactorBasis','connect4RbaCofactorKnownHeight','compareReflectedSupport','connect4RbaCanonicalize'])
-  coordinate+=(['connect4RbaCofactorKnownHeight','connect4RbaCanonicalize'].includes(name)?'export ':'')+functionText(coordinateBase,name)+'\n';
-coordinate=coordinate.replaceAll('removed=null,childIndex=null,seenOffset=0','removed,childIndex').replaceAll('removed=null,seenOffset=0','removed');
-coordinate=coordinate.replaceAll('removed,seenOffset','removed').replaceAll('seenOffset+','');
-coordinate=once(coordinate,'if(removed)removed[i]=id;','removed[i]=id;');
-coordinate=once(coordinate,'return seenOffset\n    ?emitSortedSetBitsAt32(seen,seenOffset,g.shapeWordCount,out,outOffset)\n    :emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);','return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);');
-coordinate=once(coordinate,'if(childIndex)childIndex[id]=j;','childIndex[id]=j;');
-coordinate=once(coordinate,'const remove=removed?0:profile.prepareRemove(g,cell),','const');
-coordinate=once(coordinate,'raw=removed?removed[i]:profile.removePrepared(g,id,remove)','raw=removed[i]');
-coordinate=once(coordinate,'    if(childIndex)lo=childIndex[image];\n    else{\n      lo=0;let hi=cn;\n      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}\n    }','    lo=childIndex[image];');
-coordinate=coordinate.replace(',selectedSet=null,selectedSetOffset=0','');
-coordinate=once(coordinate,'  if(selectedSet)publishSpan32(selectedSet,selectedSetOffset,scratch.seen,0,g.shapeWordCount);\n','');
-output('coordinate.mjs',coordinate);
-let supersets=coordinate;
-const mapStart=supersets.indexOf('  // One child-basis pass'),mapEnd=supersets.indexOf('  const\n    p0Source',mapStart);
-assert.ok(mapStart>0&&mapEnd>mapStart);
-supersets=supersets.slice(0,mapStart)+'  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;\n'+supersets.slice(mapEnd);
-const closureStart=supersets.indexOf('    let j=image<'),closureEnd=supersets.indexOf('      targetWord=j>>>5;',closureStart);
-assert.ok(closureStart>0&&closureEnd>closureStart);
-supersets=supersets.slice(0,closureStart)+`    const offsets=profile.supersetOffsets,ids=profile.supersetIds;
-    for(let at=offsets[image],end=offsets[image+1];at<end;at+=1){
-      const id=ids[at],j=childIndex[id];
-      // Inverse scratch outside this basis is stale; both checks are required.
-      if(j>=cn||childBasis[ci+j]!==id)continue;
-`+supersets.slice(closureEnd);
-output('coordinate-supersets.mjs',supersets);
-const constants={columns:7,rows:6,cellCount:42,shapeWordCount:20,metaOffset:7,p0Offset:8,p1Offset:11,coordWords:3,keyWords:14,pairShapeStart:42,tripleShapeStart:324,quadShapeStart:556};
-let constantCoordinate=features.includes('supersets')?supersets:coordinate;
-for(const [name,value] of Object.entries(constants))constantCoordinate=constantCoordinate.replaceAll('g.'+name,String(value));
-output('coordinate-constants.mjs',constantCoordinate);
-let masked=supersets;
-const ms=masked.indexOf('    const offsets=profile.supersetOffsets'),me=masked.indexOf('\n  }\n  return 0;',ms);
-assert.ok(ms>0&&me>ms);
-masked=masked.slice(0,ms)+`    const offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
-    for(let at=offsets[image],end=offsets[image+1];at<end;at+=1){
-      const word=words[at];let bits=masks[at]&seen[word];
-      // seen is the exact current child basis and remains read-only here.
-      while(bits){
-        const bit=bits&-bits,id=(word<<5)+(31-Math.clz32(bit)),j=childIndex[id];
-        targetWord=j>>>5;targetMask=1<<(j&31);
-        if(write0)target[p0Target+targetWord]|=targetMask;
-        if(write1)target[p1Target+targetWord]|=targetMask;
-        bits^=bit;
-      }
-    }`+masked.slice(me);
-output('coordinate-masks.mjs',masked);
-output('coordinate-prepared.mjs',optimizeMaskCoordinate(masked));
-output('coordinate-dense.mjs',optimizeMaskCoordinate(masked,{dense:true}));
-
+// Canonical support libraries own geometry-dependent containment and cofactors.
+// Read generated authorities into the source lock; no private semantic fork.
+for(const name of ['geometry','profile','coordinate','coordinate-prepared','coordinate-dense'])
+  read('addons/rba-connect4-'+name+'.mjs');
 const profiles=[{name:'',general:false,packed:true,wide:false},{name:'-dense',general:false,packed:true,wide:false,dense:true},
-  ...[false,true].flatMap(wide=>[true,false].map(packed=>({general:true,packed,wide,
-    name:`-general${wide?'-wide':''}${packed?'':'-unpacked'}`})))];
+  ...[false,true].flatMap(wide=>[true,false].flatMap(packed=>[false,true].map(dense=>({general:true,packed,wide,dense,
+    name:'-general'+(wide?'-wide':'')+(packed?'':'-unpacked')+(dense?'-dense':'')}))))];
 for(const {name,general,packed,wide,dense=false} of profiles){
 let s=read('addons/rba-connect4-frontier.mjs');
 s=s.slice(s.indexOf('import '));
@@ -213,7 +163,11 @@ if(wide){
   s=s.replace(/\|\|!\(actionMask&\(1<<(forced|column)\)\)/g,'');
   s=s.replace('&&(actionMask&(1<<forced))','');
 }
-s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':!general&&features.includes('superset-masks')?'./coordinate-masks.mjs':!general&&features.includes('coordinate-constants')?'./coordinate-constants.mjs':!general&&features.includes('supersets')?'./coordinate-supersets.mjs':'./coordinate.mjs',...(!general&&(features.includes('supersets')||features.includes('superset-masks'))?{'./rba-connect4-profile.mjs':'./profile-supersets.mjs'}:{})});
+s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs',
+  './rba-connect4-coordinate.mjs':`../../addons/rba-connect4-coordinate-${dense?'dense':'prepared'}.mjs`});
+s=once(s,'{connect4RbaCofactorKnownHeight,connect4RbaCanonicalize}',`{connect4Rba${dense?'Dense':'Prepared'}CofactorKnownHeight as connect4RbaCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize}`);
+if(dense)s=once(s,'  const g=geometry,',"  if(geometry.removeByCell===null)throw RangeError('dense removal table required');\n  const g=geometry,");
+
 if(general)s=once(s,'compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32}', 'compactTailProfile8,probeDirectSharedCache as probeConnect4RbaSharedExactCache32,storeDirectSharedCache as storeConnect4RbaSharedExactCache32}');
 if(general)s=once(s,"from '../../addons/connect4-live-line-evaluator.mjs'","from './live-profile.mjs'");
 if(!general&&features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
@@ -231,11 +185,6 @@ if(!general&&features.includes('hash-inline')){
 if(!general&&features.includes('live')){
   s="import {advanceLive3x32} from './fixed-ops.mjs';\n"+s;
   s=s.replaceAll('advanceConnect4LiveLineState32(live,','advanceLive3x32(live,').replaceAll('advanceConnect4LiveLineState32(state.live,','advanceLive3x32(state.live,');
-}
-if(features.includes('mask-prepared')&&!general){
-  s=s.replace("from './coordinate-masks.mjs'",`from './coordinate-${dense?'dense':'prepared'}.mjs'`);
-  s=s.replace("from './profile-supersets.mjs'","from './profile-masks.mjs'");
-  if(dense)s=once(s,"  if(!isCompactProfile8(geometry,geometry?.keyWords))", "  if(geometry?.removeByCell===null)throw RangeError('dense removal table required');\n  if(!isCompactProfile8(geometry,geometry?.keyWords))");
 }
 output(`solver${name}.mjs`,s);
 }

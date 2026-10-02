@@ -38,6 +38,7 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
   for(let id=0;id<shapeList.length;id+=1)shapeMap.set(keyOf(shapeList[id]),id);
 
   const lineCount=lines.length,shapeCount=shapeList.length;
+  if(shapeCount>0x7fffffff)throw new RangeError('Connect4 shape IDs exceed signed removal representation');
   const maxBasis=lineCount,coordWords=Math.ceil(maxBasis/32),shapeWordCount=Math.ceil(shapeCount/32);
   const metaOffset=columns,p0Offset=metaOffset+1,p1Offset=p0Offset+coordWords,keyWords=p1Offset+coordWords;
   const lineColumn=new Uint32Array(lineCount*4),lineRow=new Uint32Array(lineCount*4),lineShape=new Uint32Array(lineCount*16);
@@ -110,6 +111,41 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     specializationBytes+=subsetBytes;
   }
 
+  // COLD: compile strict containment using each shape's at-most-four cells.
+  // Descending subset masks obtain their parent through one removal edge.
+  // Each superset emits at most fourteen proper nonempty subsets. Visiting
+  // supersets in ID order also visits each row's word groups in sorted order.
+  // Unlike a pairwise shape scan this scales linearly with the shape catalogue.
+  const supersetWordOffsets=new Uint32Array(shapeCount+1),
+    lastWord=new Int32Array(shapeCount),subsetIds=new Int32Array(16);
+  let supersetWords,supersetMasks,cursors,groupCount=0;
+  for(let pass=0;pass<2;pass+=1){
+    lastWord.fill(-1);
+    for(let b=0;b<shapeCount;b+=1){
+      const full=(1<<shapeSize[b])-1,word=b>>>5;subsetIds[full]=b;
+      for(let mask=full-1;mask>0;mask-=1){
+        const absent=full^mask,bit=absent&-absent,parent=mask|bit;
+        let below=parent&(bit-1),position=0;
+        while(below){below&=below-1;position+=1;}
+        const a=removeAt[subsetIds[parent]*4+position];subsetIds[mask]=a;
+        if(lastWord[a]!==word){
+          lastWord[a]=word;
+          if(pass===0){supersetWordOffsets[a+1]+=1;groupCount+=1;}
+          else{
+            const slot=cursors[a]++;supersetWords[slot]=word;supersetMasks[slot]=(1<<(b&31))>>>0;
+          }
+        }else if(pass===1)supersetMasks[cursors[a]-1]|=1<<(b&31);
+      }
+    }
+    if(pass===0){
+      if(groupCount>0xffffffff)throw new RangeError('containment plan exceeds uint32 offsets');
+      for(let a=0;a<shapeCount;a+=1)supersetWordOffsets[a+1]+=supersetWordOffsets[a];
+      cursors=supersetWordOffsets.slice(0,shapeCount);
+      supersetWords=new Uint32Array(groupCount);supersetMasks=new Uint32Array(groupCount);
+    }
+  }
+  const containmentBytes=supersetWordOffsets.byteLength+supersetWords.byteLength+supersetMasks.byteLength;
+
   let order;
   if(actionOrder!==undefined){
     if(!(actionOrder instanceof Uint32Array)&&!Array.isArray(actionOrder))throw new TypeError('actionOrder must be numeric');
@@ -138,7 +174,8 @@ export function prepareConnect4RbaGeometry({columns,rows,actionOrder,specializat
     metaOffset,p0Offset,p1Offset,keyWords,edgeCapacity:columns,generatorWords:coordWords*2,
     lineColumn,lineRow,lineShape,cellColumn,cellRow,shapeSize,shapeCells,reflect,removeAt,removeByCell,subsetTable,pairedResponseCover,
     pairShapeStart,tripleShapeStart,quadShapeStart,pairedResponseRowParity:(rows-1)&1,
-    specializationBudgetBytes,specializationBytes,actionOrder:order,priorityByColumn,mirrorColumn,
+    specializationBudgetBytes,specializationBytes,containmentBytes,supersetWordOffsets,supersetWords,supersetMasks,
+    actionOrder:order,priorityByColumn,mirrorColumn,
     positionStride,positionBits,positionMode,positionBitBase,positionEmptyLo:positionEmptyLo>>>0,positionEmptyHi:positionEmptyHi>>>0,
     cpcTargetOwnerBase};
 }
