@@ -101,15 +101,18 @@ shared surplus queue and no Branch Manager in the Connect4 execution path.
 
 The current owner-selected localhost configuration is **one wide/root-frontier
 worker and three deep workers**, pinned to four P-cores on the Windows
-i5-12600K. Its shared TT is 10 GiB and each private cache is 576 MiB. This is a
+i5-12600K. Its shared TT is **5 GiB** and each private cache is **576 MiB**. This is a
 hardware-specific measured selection, not a portable default or a proven
 empty-board optimum. Full sharing and exact-only shared publication are retained.
 
-Use the pinned Node nightly and existing selected-profile sample launcher as
-shown in [the promotion record](evidence/isomax-selected-promotion-20260929/REPORT.md).
-The [profile](profiles/isomax-i5-12600k-memory-selected.json) records capacities,
-worker roles, affinity targets, runtime, and scope. Affinity is set before solver
-initialization; no per-node affinity operation is introduced.
+The [current version lock](profiles/isomax-current.json) preserves the exact
+measured composition: one structural phase from empty computes five moves,
+then one unchanged exact search starts at the unresolved position. The combined
+operation measured **47.033 seconds**. See [reproduction and preservation](docs/isomax-current.md).
+The lock records source hashes, capacities, worker roles, affinity, runtime, and
+evidence. Affinity is set before solver initialization. The earlier 10 GiB profile
+and its [promotion record](evidence/isomax-selected-promotion-20260929/REPORT.md)
+remain historical evidence, not the current selection.
 
 `tools/run-isomax.mjs` retains the historical seven-worker Node 26.7 comparison
 profile in `profiles/isomax-i5-12600k.json`. It does **not** automatically select
