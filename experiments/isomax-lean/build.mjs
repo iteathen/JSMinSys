@@ -5,7 +5,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets'].includes(f)));
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 assert.ok(!features.includes('hash-index32')||features.includes('hash-inline'));
@@ -100,6 +100,19 @@ coordinate=once(coordinate,'    if(childIndex)lo=childIndex[image];\n    else{\n
 coordinate=coordinate.replace(',selectedSet=null,selectedSetOffset=0','');
 coordinate=once(coordinate,'  if(selectedSet)publishSpan32(selectedSet,selectedSetOffset,scratch.seen,0,g.shapeWordCount);\n','');
 output('coordinate.mjs',coordinate);
+let supersets=coordinate;
+const mapStart=supersets.indexOf('  // One child-basis pass'),mapEnd=supersets.indexOf('  const\n    p0Source',mapStart);
+assert.ok(mapStart>0&&mapEnd>mapStart);
+supersets=supersets.slice(0,mapStart)+'  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;\n'+supersets.slice(mapEnd);
+const closureStart=supersets.indexOf('    let j=image<'),closureEnd=supersets.indexOf('      targetWord=j>>>5;',closureStart);
+assert.ok(closureStart>0&&closureEnd>closureStart);
+supersets=supersets.slice(0,closureStart)+`    const offsets=profile.supersetOffsets,ids=profile.supersetIds;
+    for(let at=offsets[image],end=offsets[image+1];at<end;at+=1){
+      const id=ids[at],j=childIndex[id];
+      // Inverse scratch outside this basis is stale; both checks are required.
+      if(j>=cn||childBasis[ci+j]!==id)continue;
+`+supersets.slice(closureEnd);
+output('coordinate-supersets.mjs',supersets);
 
 const profiles=[{name:'',general:false,packed:true,wide:false},
   ...[false,true].flatMap(wide=>[true,false].map(packed=>({general:true,packed,wide,
@@ -176,7 +189,7 @@ if(wide){
   s=s.replace(/\|\|!\(actionMask&\(1<<(forced|column)\)\)/g,'');
   s=s.replace('&&(actionMask&(1<<forced))','');
 }
-s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'});
+s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':!general&&features.includes('supersets')?'./coordinate-supersets.mjs':'./coordinate.mjs',...(!general&&features.includes('supersets')?{'./rba-connect4-profile.mjs':'./profile-supersets.mjs'}:{})});
 if(general)s=once(s,'compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32}', 'compactTailProfile8,probeDirectSharedCache as probeConnect4RbaSharedExactCache32,storeDirectSharedCache as storeConnect4RbaSharedExactCache32}');
 if(general)s=once(s,"from '../../addons/connect4-live-line-evaluator.mjs'","from './live-profile.mjs'");
 if(!general&&features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
