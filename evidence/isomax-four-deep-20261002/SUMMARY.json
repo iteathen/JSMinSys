@@ -1,0 +1,97 @@
+{
+  "task": "Frozen empty-board structural phase plus one exact solve, with worker0 released to deep mode at initialization",
+  "baselineCommit": "e76e9ab3ca0e7a292badf9d9ac38a811d7971c99",
+  "experimentFreezeCommit": "6132136",
+  "solverSourceSha": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e",
+  "structuralModuleSha256": "8e3d78990bd980fc97c1e364f37cf780799ca13272e1cf1f096f4225d2064e5d",
+  "topology": {
+    "workers": 4,
+    "wideWorker": null,
+    "deepWorkers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "availableParallelism": 16
+  },
+  "config": {
+    "sharedSampleMask": 0,
+    "localCacheCapacity": 16777216,
+    "sharedCacheCapacity": 134217728,
+    "rootFrontier": true,
+    "workers": 4,
+    "timeoutMs": 600000
+  },
+  "status": "EXACT",
+  "rootWdl": 1,
+  "rootWdlScope": "Absolute first-player win at computed 44444 search root",
+  "selectedColumn": 4,
+  "winnerWorker": 0,
+  "controlsPassed": true,
+  "structuralMoves": 5,
+  "searchRootSequence": "44444",
+  "firstSearchPly": 6,
+  "searchCalls": 1,
+  "structuralElapsedMs": 0.14819999999997435,
+  "searchElapsedMs": 44919.2728,
+  "totalWallMs": 44919.522000000004,
+  "baselineWallMs": 47033.1095,
+  "improvementMs": 2113.587499999994,
+  "percentFaster": 4.493828969568758,
+  "totalNodes": 83753574,
+  "baselineNodes": 79702065,
+  "nodeCounts": [
+    19924754,
+    21919439,
+    21506278,
+    20403103
+  ],
+  "cpuMs": 168563,
+  "processCycles": "621936830235",
+  "peakRssBytes": 7908483072,
+  "peakRssGiB": 7.365348815917969,
+  "baselinePeakRssGiB": 6.9537353515625,
+  "actualRoles": [
+    "DEEP",
+    "DEEP",
+    "DEEP",
+    "DEEP"
+  ],
+  "frontierMetrics": [
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ]
+  ],
+  "zeroHorizonStops": true,
+  "affinityVerified": true,
+  "cleanup": true,
+  "workersExited": 4,
+  "errors": [],
+  "freeRamAtStartBytes": 11594354688,
+  "baselineFreeRamAtStartBytes": 12163076096,
+  "executionDifference": "Experiment-only preload uses existing cold publisher to set worker0 release=true before solver initialization; others remain deep. Native worker family rootFrontier=true retained for identical implementation and counters.",
+  "frozenVersionUnchanged": true,
+  "limits": "One observation per configuration, historical baseline not interleaved. Lower starting available RAM recorded. This is a structural prefix plus one root solve, not full self-play; no promotion or general claim that wide workers are useless."
+}
