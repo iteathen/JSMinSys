@@ -31,6 +31,7 @@ requires a qualified composite, not a count of fewer operations.
 | Repeated shape-word base calculation | REMOVED in source | Hoisted outside bit enumeration |
 | Dense removal helper dispatch | REMOVED | Cold-selected dense module loads prepared table directly |
 | Geometry scalar property interpretation | REMOVED | Generated standard constants; general fallback retained |
+| Mixed zero/Boolean publication flags | REMOVED | Explicit Boolean flags eliminate four emitted HeapNumber-map guards |
 | Sparse removal helper | REQUIRED fallback / UNVERIFIED-DEBT cost | Budget0 remains valid; performance qualified on dense profile |
 | Child basis materialization, sorted bit emission | REQUIRED by current representation / UNVERIFIED-DEBT | Needed by CPC/identity; full transition compiler is separate work |
 | Child-index publication | REQUIRED by current grouped realization | Exact local-coordinate translation, bounded preallocated scratch |
@@ -74,3 +75,33 @@ first wins before full-board draw, dense/sparse tables, general dimensions,
 deterministic full TT contents across orders, STOP/reuse, real worker cleanup.
 Generated source remains derived from the same authority; packaging must copy
 the qualified bytes and retain both cold-selected worker entry points.
+
+## Compiler and independent review evidence
+
+The actual recursive-caller diagnostic uses 4,096-slot caches in the local
+process. It is not scored timing or a claim about steady full-size Worker-process
+deoptimization. Saved output is under qualification/dense-jit.txt and
+qualification/boolean-jit.txt in the campaign evidence. Dense removal is direct;
+basis construction and sorted emission inline. Hoisted table references and
+shapeBase appear as intended. Before/after optimized cofactor blocks are
+9,488/8,700 bytes initially and9,520/8,644 after recompilation. HeapNumber-map
+checks fall from5 to1 per printed block. Neither block has an observed allocation
+sequence; the remaining type check is not evidence of allocation. No matched
+original-baseline disassembly was captured, so this is a narrow Boolean change
+comparison, not a total baseline code-size claim.
+
+One insufficient-binary-feedback cofactor bailout occurs in each finite
+diagnostic, followed by recompilation. Other solver/TT/behavior deoptimizations
+remain. Cofactor exceeds the caller inlining limit; bounds, overflow and interrupt
+guards remain. Repeatedly creating states/callbacks in the diagnostic can change
+feedback relative to one worker lifetime. These facts limit stability claims.
+
+Independent source reviews found no correctness blocker. Final source tests:
+test/isomax-supersets-differential.test.mjs covers each realization and both
+budget paths where admitted; test/isomax-lean.test.mjs compares full result/order
+and private/shared logical TT contents for dense and prepared kernels;
+test/isomax-structural-cost.test.mjs checks all compiled relations plus real cold
+dispatch. Node26 and recorded Node27 each pass236 tests; saved final logs identify
+the runtime and outcomes. This maps tested coverage, not exhaustive proof of all
+possible boards. Methods listed above are reviewed scope, with unresolved debt
+explicitly retained rather than a broad conformance seal.
