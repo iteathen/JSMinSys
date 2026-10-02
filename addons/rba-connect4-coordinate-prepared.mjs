@@ -4,38 +4,40 @@ import {publishSpan32} from '../src/widekey32.mjs';
 import {emitSortedSetBits32} from '../src/basis32.mjs';
 export {connect4RbaCanonicalize} from './rba-connect4-coordinate.mjs';
 function connect4RbaPreparedCofactorBasis(g,profile,parent,parentOffset,count,cell,out,outOffset,seen,removed){
-  for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
+  const geometry_shapeWordCount=g.shapeWordCount;
+  for(let w=0;w<geometry_shapeWordCount;w+=1)seen[w]=0;
   const remove=profile.prepareRemove(g,cell);
   for(let i=0;i<count;i+=1){
     const id=profile.removePrepared(g,parent[parentOffset+i],remove);
     removed[i]=id;
     if(id>=0)seen[(id>>>5)]|=1<<(id&31);
   }
-  return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);
+  return emitSortedSetBits32(seen,geometry_shapeWordCount,out,outOffset);
 }
 export function connect4RbaPreparedCofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
-  const meta=source[src+g.metaOffset],rank=meta>>>2,
-    cell=height*g.columns+column,player=rank&1;
-  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
-  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
-  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
+  const geometry_metaOffset=g.metaOffset,geometry_columns=g.columns,geometry_coordWords=g.coordWords,geometry_p0Offset=g.p0Offset,geometry_p1Offset=g.p1Offset,geometry_cellCount=g.cellCount;
+  const meta=source[src+geometry_metaOffset],rank=meta>>>2,
+    cell=height*geometry_columns+column,player=rank&1;
+  for(let c=0;c<geometry_columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+geometry_metaOffset]=(rank+1)<<2;
+  for(let w=0;w<2*geometry_coordWords;w+=1)target[dst+geometry_p0Offset+w]=0;
   sizes[sizeIndex]=0;
 
   // Every physical cell is a singleton residual whenever winning geometry
   // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
-  const singleton=cell,coord=src+(player?g.p1Offset:g.p0Offset);
+  const singleton=cell,coord=src+(player?geometry_p1Offset:geometry_p0Offset);
   let lo=0,hi=n;
   while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
   if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
-    const value=player?1:3;target[dst+g.metaOffset]=((rank+1)<<2)|value;return value;
+    const value=player?1:3;target[dst+geometry_metaOffset]=((rank+1)<<2)|value;return value;
   }
-  if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
+  if(rank+1===geometry_cellCount){target[dst+geometry_metaOffset]=((rank+1)<<2)|2;return 2;}
 
   const cn=connect4RbaPreparedCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
   for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
   const
-    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
-    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    p0Source=src+geometry_p0Offset,p1Source=src+geometry_p1Offset,
+    p0Target=dst+geometry_p0Offset,p1Target=dst+geometry_p1Offset,
     offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
   for(let i=0;i<n;i+=1){
     const sourceWord=i>>>5,sourceMask=1<<(i&31),
@@ -84,7 +86,8 @@ export function connect4RbaPreparedCofactorKnownHeight(g,profile,source,src,basi
   return 0;
 }
 function comparePreparedReflectedSupport(g,words,offset){
-  const half=g.columns>>>1;
+  const geometry_columns=g.columns;
+  const half=geometry_columns>>>1;
   for(let c=0;c<half;c+=1){
     const a=words[offset+c],b=words[offset+g.mirrorColumn[c]];
     if(a<b)return -1;if(a>b)return 1;
@@ -92,30 +95,31 @@ function comparePreparedReflectedSupport(g,words,offset){
   return 0;
 }
 export function connect4RbaPreparedCanonicalize(g,profile,words,offset,basis,bi,n,scratch){
+  const geometry_shapeWordCount=g.shapeWordCount,geometry_p0Offset=g.p0Offset,geometry_p1Offset=g.p1Offset,geometry_coordWords=g.coordWords,geometry_keyWords=g.keyWords,geometry_columns=g.columns,geometry_metaOffset=g.metaOffset;
   const primary=comparePreparedReflectedSupport(g,words,offset);
   if(primary<0)return 0;
 
-  for(let w=0;w<g.shapeWordCount;w+=1)scratch.seen[w]=0;
+  for(let w=0;w<geometry_shapeWordCount;w+=1)scratch.seen[w]=0;
   for(let i=0;i<n;i+=1){
     const id=g.reflect[basis[bi+i]];scratch.map[i]=id;scratch.seen[id>>>5]|=1<<(id&31);
   }
-  emitSortedSetBits32(scratch.seen,g.shapeWordCount,scratch.mirrorBasis,0);
+  emitSortedSetBits32(scratch.seen,geometry_shapeWordCount,scratch.mirrorBasis,0);
   for(let i=0;i<n;i+=1)scratch.inverse[scratch.mirrorBasis[i]]=i;
   for(let i=0;i<n;i+=1)scratch.map[i]=scratch.inverse[scratch.map[i]];
   profile.permuteCoordinates(
-    scratch.mirror,g.p0Offset,g.p1Offset,g.coordWords,
-    words,offset+g.p0Offset,offset+g.p1Offset,scratch.map,0,n,
+    scratch.mirror,geometry_p0Offset,geometry_p1Offset,geometry_coordWords,
+    words,offset+geometry_p0Offset,offset+geometry_p1Offset,scratch.map,0,n,
   );
 
   if(primary===0){
-    let w=g.p0Offset;while(w<g.keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
-    if(w===g.keyWords||words[offset+w]<scratch.mirror[w])return 0;
+    let w=geometry_p0Offset;while(w<geometry_keyWords&&words[offset+w]===scratch.mirror[w])w+=1;
+    if(w===geometry_keyWords||words[offset+w]<scratch.mirror[w])return 0;
   }
   // Support/meta are needed only when reflection is actually selected. In the
   // symmetric-support case that remains canonical, avoid writing them at all.
-  for(let c=0;c<g.columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
-  scratch.mirror[g.metaOffset]=words[offset+g.metaOffset];
-  publishSpan32(words,offset,scratch.mirror,0,g.keyWords);
+  for(let c=0;c<geometry_columns;c+=1)scratch.mirror[c]=words[offset+g.mirrorColumn[c]];
+  scratch.mirror[geometry_metaOffset]=words[offset+geometry_metaOffset];
+  publishSpan32(words,offset,scratch.mirror,0,geometry_keyWords);
   publishSpan32(basis,bi,scratch.mirrorBasis,0,n);
   return 1;
 }

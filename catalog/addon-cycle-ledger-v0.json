@@ -10702,7 +10702,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "FIELD"
+          "count": "2+N"
         },
         {
           "op": "memory.load.u32",
@@ -10762,17 +10762,16 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(0)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)+(1)*CALLBACK(prepareRemove)+(N)*CALLBACK(removePrepared)",
+        "expression": "(2+N)*C(runtime.field.load)+(N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(0)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)+(1)*CALLBACK(prepareRemove)+(N)*CALLBACK(removePrepared)",
         "parameters": {
           "W": "shapeWordCount cleared once.",
           "N": "Parent basis entries transformed; saved removed[] is always written.",
           "S": "Nonnegative removal images published to seen, including duplicate images.",
-          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
           "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
         },
-        "note": "Prepared scratch removes optional-store and seen-offset branches; selected dense/sparse removal callbacks remain explicit. Set construction and sorted emission are not eliminated."
+        "note": "Prepared scratch removes optional-store and seen-offset branches; selected dense/sparse removal callbacks remain explicit. Set construction and sorted emission are not eliminated. Universal geometry-scalar hoist: dimensions remain g values loaded once per function invocation, not 7x6 constants. The field-load coefficient is a source property-access count, not a claim of actual machine loads or zero-cost locals; V8 reuse, guards, register pressure and spills remain symbolic/unverified. Field count 2+N is one shapeWordCount read plus one prepareRemove method lookup and N removePrepared method lookups; callback bodies are charged separately."
       },
       "status": "decomposed"
     },
@@ -10784,7 +10783,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "FIELD"
+          "count": "6+3*K"
         },
         {
           "op": "memory.load.u32",
@@ -10846,7 +10845,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaPreparedCofactorBasis)",
+        "expression": "(6+3*K)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaPreparedCofactorBasis)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -10868,14 +10867,13 @@
           "I": "Total binary-search iterations for image/superset lookup when inverse scratch absent; zero on prepared paths.",
           "E": "Player-coordinate OR publications of newly unabsorbed images; at most two per U.",
           "O": "Player-coordinate OR publications of intersected strict supersets; at most two per V.",
-          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
           "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
           "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Universal geometry-scalar hoist: dimensions remain g values loaded once per function invocation, not 7x6 constants. The field-load coefficient is a source property-access count, not a claim of actual machine loads or zero-cost locals; V8 reuse, guards, register pressure and spills remain symbolic/unverified. Six geometry scalars are read at entry even on terminal paths; three containment-array references are read only on the nonterminal K path."
       },
       "status": "decomposed"
     },
@@ -10887,7 +10885,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "FIELD"
+          "count": 3
         },
         {
           "op": "memory.load.u32",
@@ -10937,17 +10935,16 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(2*N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(1)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)",
+        "expression": "(3)*C(runtime.field.load)+(2*N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(1)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)",
         "parameters": {
           "W": "shapeWordCount cleared once.",
           "N": "Parent basis entries transformed; saved removed[] is always written.",
           "S": "Nonnegative removal images published to seen, including duplicate images.",
-          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
           "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
         },
-        "note": "Cold selection proves removeByCell is present. One direct removal-table load per N replaces profile removal callbacks. Saved removal, set construction and sorted emission remain explicit; no subset callback or hot layout selection."
+        "note": "Cold selection proves removeByCell is present. One direct removal-table load per N replaces profile removal callbacks. Saved removal, set construction and sorted emission remain explicit; no subset callback or hot layout selection. Universal geometry-scalar hoist: dimensions remain g values loaded once per function invocation, not 7x6 constants. The field-load coefficient is a source property-access count, not a claim of actual machine loads or zero-cost locals; V8 reuse, guards, register pressure and spills remain symbolic/unverified. Three fields are shapeWordCount, shapeCount and removeByCell, each read once."
       },
       "status": "decomposed"
     },
@@ -10959,7 +10956,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "FIELD"
+          "count": "6+3*K"
         },
         {
           "op": "memory.load.u32",
@@ -11021,7 +11018,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaDenseCofactorBasis)",
+        "expression": "(6+3*K)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+3*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaDenseCofactorBasis)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -11043,14 +11040,13 @@
           "I": "Total binary-search iterations for image/superset lookup when inverse scratch absent; zero on prepared paths.",
           "E": "Player-coordinate OR publications of newly unabsorbed images; at most two per U.",
           "O": "Player-coordinate OR publications of intersected strict supersets; at most two per V.",
-          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
           "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
           "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts three mask/word/seen loads and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Universal geometry-scalar hoist: dimensions remain g values loaded once per function invocation, not 7x6 constants. The field-load coefficient is a source property-access count, not a claim of actual machine loads or zero-cost locals; V8 reuse, guards, register pressure and spills remain symbolic/unverified. Six geometry scalars are read at entry even on terminal paths; three containment-array references are read only on the nonterminal K path."
       },
       "status": "decomposed"
     },
@@ -11094,7 +11090,7 @@
           "TEST": "Executed source predicate evaluations including loop exits and short-circuit operands; no runtime counters.",
           "BRANCH": "Executed source control selections, including early returns and short-circuit paths; does not imply one machine branch per source predicate."
         },
-        "note": "Prepared helper preserves generic configured columns and short-circuits at the first support difference. Source-operation multiplicities remain symbolic; actual lowering/locality are unverified machine debt."
+        "note": "Prepared helper preserves generic configured columns and short-circuits at the first support difference. Source-operation multiplicities remain symbolic; actual lowering/locality are unverified machine debt. The geometry_columns local reads g.columns once; mirrorColumn remains one property read per compared pair. No dimension constant is substituted."
       },
       "status": "decomposed"
     },
@@ -11106,7 +11102,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "FIELD"
+          "count": "7+W+8*N+5*K+P+Q+2*C+3*R"
         },
         {
           "op": "memory.load.u32",
@@ -11167,7 +11163,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(6*N+2*P+2*Q+2*C+R)*C(memory.load.u32)+(W+4*N+C+R)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(N)*C(alu.and.u32)+(N)*C(alu.or.u32)+(N)*C(alu.shl.u32)+(N)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(comparePreparedReflectedSupport)+(K)*CALL(emitSortedSetBits32)+(K)*CALLBACK(permuteCoordinates)+(2*R)*CALL(publishSpan32)",
+        "expression": "(7+W+8*N+5*K+P+Q+2*C+3*R)*C(runtime.field.load)+(6*N+2*P+2*Q+2*C+R)*C(memory.load.u32)+(W+4*N+C+R)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(N)*C(alu.and.u32)+(N)*C(alu.or.u32)+(N)*C(alu.shl.u32)+(N)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(comparePreparedReflectedSupport)+(K)*CALL(emitSortedSetBits32)+(K)*CALLBACK(permuteCoordinates)+(2*R)*CALL(publishSpan32)",
         "parameters": {
           "K": "1 when primary support comparison does not take the early preferred-orientation return; otherwise zero.",
           "W": "Shape words actually cleared; zero on primary early exit.",
@@ -11176,12 +11172,11 @@
           "Q": "0 or 1 final coordinate less-than comparison after equality scan; zero when w reaches keyWords or support differs.",
           "R": "1 only when reflected orientation is selected and final key/basis publication executes; otherwise zero.",
           "C": "Configured support columns actually copied; R times configured columns.",
-          "FIELD": "Executed geometry/profile/scratch property loads in this function only; stable-field lowering remains unverified.",
           "ADD": "Executed source additions/address calculations and loop increments in this function only.",
           "TEST": "Executed source predicate evaluations including loop exits and short-circuit operands; no runtime counters.",
           "BRANCH": "Executed source control selections, including early returns and short-circuit paths; does not imply one machine branch per source predicate."
         },
-        "note": "Prepared canonicalization removes only selectedSet/selectedSetOffset and their conditional publication. All dimensions remain prepared geometry values. Reflection scratch construction may execute while R remains zero, so publishSpan32 is charged 2*R, not merely by failure of the primary early-exit test. Each basis entry has six typed reads and four writes across reflection/seen, inverse-map and remap stages. Callee work is charged separately. No optional selectedSet test or write is retained; field/control/arithmetic lowering, bounds guards, register pressure and locality remain unverified debt."
+        "note": "Prepared canonicalization removes only selectedSet/selectedSetOffset and their conditional publication. All dimensions remain prepared geometry values. Reflection scratch construction may execute while R remains zero, so publishSpan32 is charged 2*R, not merely by failure of the primary early-exit test. Each basis entry has six typed reads and four writes across reflection/seen, inverse-map and remap stages. Callee work is charged separately. No optional selectedSet test or write is retained; field/control/arithmetic lowering, bounds guards, register pressure and locality remain unverified debt. Universal geometry-scalar hoist: dimensions remain g values loaded once per function invocation, not 7x6 constants. The field-load coefficient is a source property-access count, not a claim of actual machine loads or zero-cost locals; V8 reuse, guards, register pressure and spills remain symbolic/unverified. Seven geometry scalars are read before the primary early exit, including when K=0. Remaining field terms count scratch/profile/array references in reflection, remapping, comparison and selected publication; they have not been priced away."
       },
       "status": "decomposed"
     }
@@ -11312,8 +11307,8 @@
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
     "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be",
-    "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
-    "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39"
+    "addons/rba-connect4-coordinate-prepared.mjs": "70888b49da3a8a8e8da71f61d78f74c7bdc050cd",
+    "addons/rba-connect4-coordinate-dense.mjs": "62030d74784e1fc0d8b4f61f85756c44745fb0b5"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
