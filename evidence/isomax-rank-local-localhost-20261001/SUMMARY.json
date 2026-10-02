@@ -1,0 +1,124 @@
+{
+  "status": "COMPLETE_WITH_DECLARED_BENCHMARK_RECLAMATION",
+  "performanceConclusion": "One complete game under60000ms with explicit between-search collection counted in wall; unmodified no-explicit-collection attempt failed, so no unconditional production full-game completion claim.",
+  "controlsPassed": 7,
+  "firstFiveComputedWithoutSearch": true,
+  "firstSearchPly": 6,
+  "finalSequence": "4444443333555533552",
+  "terminal": {
+    "kind": "WIN",
+    "winner": 1
+  },
+  "totalPlies": 19,
+  "rankLocalMoves": 11,
+  "searchedMoves": 8,
+  "totalWallMs": 51803.7435,
+  "totalSearchNodes": 80519176,
+  "under60Seconds": true,
+  "peakRssBytes": 12822052864,
+  "peakRssGiB": 11.94146728515625,
+  "cpuMs": 190235,
+  "processCycles": "702009652757",
+  "config": {
+    "workers": 4,
+    "rootFrontier": true,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 268435456,
+    "localCacheCapacity": 16777216,
+    "timeoutMs": 300000
+  },
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "executable": "C:\\r\\isomax-nightly-runtime\\node-v27.0.0-nightly20260928b59840b593-win-x64\\node.exe"
+  },
+  "topology": {
+    "workers": 4,
+    "wideWorker": 0,
+    "deepWorkers": [
+      1,
+      2,
+      3
+    ],
+    "rootFrontier": true,
+    "targets": [
+      {
+        "group": 0,
+        "processor": 0,
+        "core": 0,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 2,
+        "core": 1,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 4,
+        "core": 2,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 6,
+        "core": 3,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      }
+    ]
+  },
+  "measuredSourceSha": "7ec3fedabfab372e66cbfa57e76674fc5c42bcc1",
+  "initialSourceSha": "1f3947d52be4dc35569d898b13951ee6f1b2df28",
+  "addonsTree": "d0e342bd9d5bb8c2d384bf5128467c1b08cdc9a7",
+  "solverFilesUnchanged": true,
+  "productionCpcUnchanged": true,
+  "bsfpChanged": false,
+  "deviations": {
+    "explicitBetweenSearchCollection": true,
+    "collectionMsIncluded": 1354.61329999999,
+    "backgroundApplications": "Not stopped; memory pressure recorded",
+    "freeRamBeforeCompletedAttemptBytes": 13051281408,
+    "cacheRuntimeAffinitySubstitution": false
+  },
+  "originalAttempt": {
+    "path": "game.json",
+    "status": "INCOMPLETE",
+    "reason": "native Worker construction EINVAL at ply7",
+    "performanceConclusion": "NONE"
+  },
+  "completeAttemptPath": "attempt-02-explicit-reclamation/game.json",
+  "rawTracePath": "attempt-02-explicit-reclamation/trace.jsonl",
+  "independentVerification": {
+    "status": "PASS",
+    "independentWinningLines": 69,
+    "checkedPlies": 19,
+    "affinityChecks": 32,
+    "controls": 7,
+    "firstTerminal": {
+      "kind": "WIN",
+      "winner": 1
+    },
+    "sequence": "4444443333555533552",
+    "totalNodes": 80519176,
+    "totalWallMs": 51803.7435,
+    "under60Seconds": true,
+    "peakRssBytes": 12822052864,
+    "sourceSha": "7ec3fedabfab372e66cbfa57e76674fc5c42bcc1",
+    "addonsUnchanged": true,
+    "gameSha256": "617ba58c7e8c087c8b9790c4dadf428cb9f00dd1ecd4da358b79e2ba92e54df3",
+    "qualifier": "Single completed attempt with explicit between-search GC included in wall. Baseline without explicit reclamation was incomplete. No independent exact-solver correctness or universal structural-certificate qualification claimed."
+  },
+  "historicalMemoryAuthority": {
+    "commit": "9d87c7274b2753102f8c16f0961acf3bb2acd24b",
+    "path": "evidence/isomax-memory-affinity-20260928/private-curve-576-raw.jsonl",
+    "wallMs": 32407.0529,
+    "use": "Memory/affinity configuration authority, not equivalent whole-game fixture or solver-version timing comparison"
+  },
+  "limits": "Single observed complete game. No solver redesign, game-theory promotion or universal structural-policy correctness claim."
+}
