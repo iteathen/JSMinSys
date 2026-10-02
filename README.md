@@ -1,5 +1,9 @@
 # JSMinSys
 
+**Looking for the current IsoMax candidate? Open [isomax/](isomax/README.md).**
+It is self-contained: public API, runtime, configuration, example, evidence and
+transfer archive in one folder. Prepared on main; **not published**.
+
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
 The current normative draft is [SPEC.md](SPEC.md). JSMinSys is a strict NEES-EXTREME execution profile: NEES supplies the governing optimization, evidence, qualification, and cost-accounting standard; JSMinSys adds narrower admissible data, operations, blocks, and mechanical sealing.
@@ -99,13 +103,17 @@ search and private local exact cache; workers share only committed exact W/D/L
 cache evidence through the concurrency-safe shared exact cache. There is no
 shared surplus queue and no Branch Manager in the Connect4 execution path.
 
-The current owner-selected localhost configuration is **one wide/root-frontier
+The current prepared candidate is [the self-contained IsoMax package](isomax/README.md):
+four deep workers, initialization-selected geometry, and a 32-byte standard TT.
+The following records the **historical frozen version**, preserved for recovery.
+
+The earlier owner-selected localhost configuration was **one wide/root-frontier
 worker and three deep workers**, pinned to four P-cores on the Windows
 i5-12600K. Its shared TT is **5 GiB** and each private cache is **576 MiB**. This is a
 hardware-specific measured selection, not a portable default or a proven
 empty-board optimum. Full sharing and exact-only shared publication are retained.
 
-The [current version lock](profiles/isomax-current.json) preserves the exact
+The [historical version lock](profiles/isomax-current.json) preserves the exact
 measured composition: one structural phase from empty computes five moves,
 then one unchanged exact search starts at the unresolved position. The combined
 operation measured **47.033 seconds**. See [reproduction and preservation](docs/isomax-current.md).
@@ -116,7 +124,7 @@ remain historical evidence, not the current selection.
 
 `tools/run-isomax.mjs` retains the historical seven-worker Node 26.7 comparison
 profile in `profiles/isomax-i5-12600k.json`. It does **not** automatically select
-the current localhost memory/affinity profile. Both use the native root-frontier
+the prepared candidate's memory/affinity profile. Both historical tools use the native root-frontier
 worker; no strategist or runtime source rewriting is involved.
 
 See [scope and conformance](docs/isomax-root-frontier-nees.md) and

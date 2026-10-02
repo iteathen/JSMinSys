@@ -1,0 +1,13 @@
+{
+  "name": "@iteathen/isomax",
+  "version": "0.1.0-rc.1",
+  "private": true,
+  "description": "Prepared IsoMax candidate with initialization-selected geometry and exact Lazy SMP search",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "engines": {"node": ">=26"},
+  "exports": {".": "./index.mjs", "./profile": "./profile.json"},
+  "files": ["index.mjs", "example.mjs", "verify.mjs", "test", "runtime", "profile.json", "targets.json", "provenance.json", "README.md", "LICENSE", "evidence"],
+  "scripts": {"test": "node --test test/*.test.mjs", "verify": "node verify.mjs", "example": "node example.mjs"},
+  "repository": {"type": "git", "url": "https://github.com/iteathen/JSMinSys.git", "directory": "isomax"}
+}

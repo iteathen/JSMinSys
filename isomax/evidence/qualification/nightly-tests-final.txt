@@ -1,0 +1,49 @@
+✔ actual in-search unrolled hash preserves full fourteen-word identity at every legal frame (5.4419ms)
+✔ fixed fourteen-word hash preserves every output bit and ignores surrounding words (3.267ms)
+✔ three-word live update preserves in-place and disjoint frame semantics (1.1906ms)
+✔ gray-owner swap with live residuals retains hash, exact identity and TT reuse (2.3465ms)
+✔ shared TT rejects torn mixed keys during concurrent collision stress (42.8459ms)
+✔ public solver initializes a nonstandard board and completes through real workers (39.7568ms)
+✔ initialized 4x4: exact physical oracle, reference traversal/TT, workers (114.957ms)
+ℹ {"columns":4,"rows":4,"keyWords":7,"coordWords":1,"entryBytes":32,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":156,"records":[{"moves":[1,2,0,2,3,2,3,1,0,3],"wdl":0,"move":2},{"moves":[1,1,0,2,3,2,3,3,3,1],"wdl":0,"move":1},{"moves":[2,3,0,0,3,3,3,2,0,1],"wdl":0,"move":1}]}
+✔ initialized 4x5: exact physical oracle, reference traversal/TT, workers (96.9545ms)
+ℹ {"columns":4,"rows":5,"keyWords":7,"coordWords":1,"entryBytes":32,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":84,"records":[{"moves":[1,2,3,2,2,1,1,1,2,0,3,0,0,2],"wdl":1,"move":3},{"moves":[0,0,3,0,0,1,1,1,3,0,1,1,2,3],"wdl":-1,"move":2},{"moves":[3,0,1,3,0,0,1,2,2,0,3,3,0,1],"wdl":0,"move":2}]}
+✔ initialized 5x4: exact physical oracle, reference traversal/TT, workers (98.3646ms)
+ℹ {"columns":5,"rows":4,"keyWords":8,"coordWords":1,"entryBytes":32,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":410,"records":[{"moves":[2,2,2,0,3,1,3,2,3,3,0,4,4,0],"wdl":1,"move":4},{"moves":[0,4,3,2,3,2,3,1,0,0,1,3,4,1],"wdl":0,"move":2},{"moves":[2,2,4,3,3,1,2,0,4,4,0,4,1,1],"wdl":1,"move":1}]}
+✔ initialized 8x4: exact physical oracle, reference traversal/TT, workers (104.5995ms)
+ℹ {"columns":8,"rows":4,"keyWords":13,"coordWords":2,"entryBytes":64,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":28,"records":[{"moves":[4,6,5,7,4,6,1,0,4,2,2,1,0,0,3,4,1,7,5,3,7,0,2,7,5,2],"wdl":1,"move":3},{"moves":[3,4,1,0,6,6,7,5,1,5,0,1,4,3,4,4,1,7,2,6,0,7,2,5,5,6],"wdl":0,"move":7},{"moves":[0,4,2,0,6,0,6,0,2,7,5,4,4,6,1,2,1,5,2,6,4,1,1,7,7,5],"wdl":1,"move":3}]}
+✔ initialized 4x8: exact physical oracle, reference traversal/TT, workers (93.7989ms)
+ℹ {"columns":4,"rows":8,"keyWords":9,"coordWords":2,"entryBytes":32,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":232,"records":[{"moves":[1,3,3,2,2,2,2,0,1,0,0,0,3,2,3,2,1,0,2,0,0,0,2,1,1,3],"wdl":0,"move":3},{"moves":[1,3,0,0,0,1,0,3,2,0,0,1,2,0,1,3,1,0,2,1,3,1,3,3,3,2],"wdl":0,"move":2},{"moves":[2,1,3,0,0,1,1,1,2,1,3,3,3,0,1,0,0,3,0,0,3,2,1,1,3,2],"wdl":1,"move":3}]}
+✔ initialized 8x6: exact physical oracle, reference traversal/TT, workers (93.1726ms)
+ℹ {"columns":8,"rows":6,"keyWords":15,"coordWords":3,"entryBytes":64,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":0,"records":[{"moves":[3,6,4,4,7,0,4,1,6,6,7,0,5,7,1,7,5,4,4,4,6,7,1,3,0,6,5,1,6,5,7,1,5,2,0,2,5,2,2,1,2,2],"wdl":-1,"move":3},{"moves":[6,2,3,1,2,0,5,2,6,1,5,0,3,7,5,1,6,4,2,0,3,4,0,0,0,6,1,1,1,6,7,4,4,6,4,7,2,4,7,2,7,5],"wdl":1,"move":3},{"moves":[0,5,2,5,3,3,5,7,5,6,5,3,2,5,6,6,3,7,2,3,6,7,6,6,0,3,0,2,7,2,4,0,7,0,7,1,0,1,1,1,1,1],"wdl":1,"move":4}]}
+✔ initialized 7x5: exact physical oracle, reference traversal/TT, workers (86.9872ms)
+ℹ {"columns":7,"rows":5,"keyWords":12,"coordWords":2,"entryBytes":64,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":0,"records":[{"moves":[3,0,0,2,4,0,5,0,4,5,4,2,1,4,3,5,3,3,5,3,2,0,5,1,4,6,6,6,6],"wdl":1,"move":2},{"moves":[5,2,6,3,3,0,0,6,1,1,2,2,0,3,2,1,5,6,5,5,4,1,1,0,3,2,5,0,6],"wdl":1,"move":4},{"moves":[5,2,4,3,3,5,2,6,0,6,4,3,5,1,2,1,0,4,2,1,5,4,6,2,4,5,3,3,0],"wdl":-1,"move":1}]}
+✔ initialized 33x1: exact physical oracle, reference traversal/TT, workers (87.1684ms)
+ℹ {"columns":33,"rows":1,"keyWords":36,"coordWords":1,"entryBytes":64,"profile":{"kind":"general","worker":"./worker-general-wide.mjs","solver":"./solver-general-wide.mjs","packed":true,"wide":true},"publications":0,"records":[{"moves":[16,15,3,21,25,26,6,31,23,11,8,24,1,12,17,14,4,27,29,10,22,7,19,20,32,2,30],"wdl":-1,"move":13},{"moves":[12,23,7,32,18,3,13,22,19,24,0,16,9,27,6,14,29,31,17,15,30,20,4,8,10,2,26],"wdl":-1,"move":21},{"moves":[10,28,13,14,23,18,6,3,19,27,22,1,4,24,16,8,17,9,25,12,11,31,15,5,30,0,26],"wdl":-1,"move":2}]}
+✔ initialized 1x256: exact physical oracle, reference traversal/TT, workers (97.4137ms)
+ℹ {"columns":1,"rows":256,"keyWords":18,"coordWords":8,"entryBytes":96,"profile":{"kind":"general","worker":"./worker-general.mjs","solver":"./solver-general.mjs","packed":true,"wide":false},"publications":6,"records":[{"moves":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"wdl":0,"move":0},{"moves":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"wdl":0,"move":0},{"moves":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"wdl":0,"move":0}]}
+✔ general CPC preserves guards and results across the 32-column boundary (44.7121ms)
+✔ general cancellation and state reuse preserve exact result (15.2271ms)
+✔ valid small geometries with no winning lines initialize as exact draws (73.0515ms)
+✔ unpacked fallback preserves ordering, weak/exact TT rows, and result (32.1715ms)
+ℹ {"columns":4,"rows":4,"recursiveSorts":9}
+ℹ {"columns":33,"rows":1,"recursiveSorts":32}
+✔ geometry choices are cold; qualified standard hot files are unchanged (275.6781ms)
+✔ transitive deep call graph has no reporting or runtime measurement machinery (13.0712ms)
+✔ lean recursive path has no reporting, frontier or fixed configuration branches (1.1266ms)
+✔ full-window deep result and tie-breaking match released baseline for every worker order and reflection (1035.8991ms)
+✔ CPC retains exact intervals, forced moves and restriction masks on deterministic legal walks (157.4986ms)
+✔ shared TT keeps seqlock, compact identity and collisions without statistics (0.6406ms)
+✔ STOP cancels deep search without publishing WDL and state can be reused (44.0295ms)
+✔ lean host returns unavailable counters honestly and closes workers on exact and timeout (199.5519ms)
+✔ standard shared TT occupies exactly 32 bytes per slot without shortening sequence counter (10.525ms)
+✔ initialization chooses exact accessors for multiple widths and heights (28.0168ms)
+✔ native height width transitions preserve maximum height and last coordinate (0.6622ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1603.0673
