@@ -5,7 +5,10 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {runIsoMaxConnect4Move32} from '../addons/rba-connect4-move-selector.mjs';
 
 const WORKERS=Number(process.env.C4_WORKERS||4);
-const SEARCH_TIMEOUT_MS=Number(process.env.C4_SEARCH_TIMEOUT_MS||120000);
+const SEARCH_TIMEOUT_MS=Number(process.env.C4_SEARCH_TIMEOUT_MS||60000);
+const SHARED_CACHE_CAPACITY=Number(process.env.C4_SHARED_CACHE_CAPACITY||(1<<22));
+const LOCAL_CACHE_CAPACITY=Number(process.env.C4_LOCAL_CACHE_CAPACITY||(1<<20));
+const ROOT_FRONTIER=(process.env.C4_ROOT_FRONTIER??'1')!=='0';
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 const board=new Int8Array(g.cellCount);board.fill(-1);
 const heights=new Uint32Array(g.columns);
@@ -44,13 +47,29 @@ for(let ply=1;ply<=g.cellCount;ply+=1){
   const result=await runIsoMaxConnect4Move32(before,{
     geometry:g,
     workers:WORKERS,
-    sharedCacheCapacity:1<<20,
-    localCacheCapacity:1<<20,
+    sharedCacheCapacity:SHARED_CACHE_CAPACITY,
+    localCacheCapacity:LOCAL_CACHE_CAPACITY,
     timeoutMs:SEARCH_TIMEOUT_MS,
-    rootFrontier:true,
+    rootFrontier:ROOT_FRONTIER,
   });
   const elapsedMs=performance.now()-t0;
-  assert.ok(result.status==='RANK_LOCAL_MOVE'||result.status==='EXACT',JSON.stringify(result));
+  if(result.status!=='RANK_LOCAL_MOVE'&&result.status!=='EXACT'){
+    trace.push({
+      ply,
+      player:((ply-1)&1)+1,
+      sequenceBefore:before.map(c=>c+1).join(''),
+      move:null,
+      source:result.source,
+      status:result.status,
+      rootWdl:result.rootWdl,
+      elapsedMs,
+      localReason:result.preSearch?.reason??null,
+      searchNodes:Array.isArray(result.nodeCounts)?result.nodeCounts.reduce((a,b)=>a+b,0):null,
+      workersUsed:result.workersUsed,
+    });
+    terminal={kind:'INCOMPLETE',winner:null,status:result.status,errorCode:result.errorCode??null};
+    break;
+  }
   assert.ok(result.move>=0&&result.move<g.columns,JSON.stringify(result));
   const player=(ply-1)&1,won=apply(result.move,player);
   trace.push({
@@ -81,8 +100,12 @@ const output={
   jsMinSysHead:process.env.GITHUB_SHA??null,
   workers:WORKERS,
   searchTimeoutMs:SEARCH_TIMEOUT_MS,
+  sharedCacheCapacity:SHARED_CACHE_CAPACITY,
+  localCacheCapacity:LOCAL_CACHE_CAPACITY,
+  rootFrontier:ROOT_FRONTIER,
   totalMs,
-  under60Seconds:totalMs<60000,
+  completed:terminal.kind==='WIN'||terminal.kind==='BOARD_FULL',
+  under60Seconds:(terminal.kind==='WIN'||terminal.kind==='BOARD_FULL')&&totalMs<60000,
   plies:trace.length,
   terminal,
   sequence:moves.map(c=>c+1).join(''),
