@@ -1,0 +1,24 @@
+{
+  "id": "empty-four-deep-5g-576-20261002",
+  "baselineTag": "isomax-current-20261002",
+  "baselineCommit": "e76e9ab3ca0e7a292badf9d9ac38a811d7971c99",
+  "baselineWallMs": 47033.1095,
+  "solverSha": "6bbba7c71c60afb1018a22b6d5c03f495f5d2c9e",
+  "change": "Before each worker solver initializes, verify its native role flags; release worker0 into existing deep mode through publishWorkerBehavior32. Workers1-3 already deep remain unchanged.",
+  "preserved": [
+    "one structural phase from empty",
+    "exactly one search",
+    "native root-frontier worker implementation",
+    "all solver source",
+    "5GiB shared TT",
+    "576MiB private per worker",
+    "four pinned P-cores 0/2/4/6",
+    "pinned Node runtime",
+    "move ordering",
+    "TT semantics",
+    "timing boundary",
+    "600000ms search ceiling"
+  ],
+  "roleEvidence": "Four before-initialization role records and zero horizon stops in all four returned frontier metrics",
+  "scope": "One experimental observation against frozen historical observation, not statistical proof of worker-role superiority; no promotion or baseline modification"
+}
