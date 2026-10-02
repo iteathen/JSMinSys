@@ -5,8 +5,6 @@ export * from './branch-manager.mjs';
 export * from './branch-manager-host.mjs';
 export * from './rba-connect4-geometry.mjs';
 export * from './rba-connect4-coordinate.mjs';
-export {connect4RbaPreparedCofactorKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
-export {connect4RbaDenseCofactorKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 export * from './rba-connect4-front.mjs';
 export * from './rba-connect4-ingress.mjs';
 export * from './rba-connect4-profile.mjs';

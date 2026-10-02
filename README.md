@@ -147,6 +147,10 @@ The RBA add-on stack derives its carrier from application configuration at initi
 
 Fixed 3-bit/fixed-lane helpers remain optional specializations only. The general paths use runtime-sized spans and one height word per configured column, so rows above seven and boards above 64 cells do not require board reconstruction or a new solver representation.
 
+**Compiled containment:** Geometry initialization builds exact grouped strict-superset masks in two bounded passes over the residual catalogue (at most 14 proper nonempty subsets per shape). The immutable Uint32 tables are shared with workers and borrowed by their execution profiles. This applies to every admitted board size, including 7x5; it has no 625-shape or byte-sized word-index limit. `containmentBytes` reports required table storage separately from the optional dense specialization budget.
+
+**Prepared coordinate APIs:** `rba-connect4-coordinate-prepared.mjs` and `rba-connect4-coordinate-dense.mjs` are generated from the canonical coordinate implementation. Select dense only when `geometry.removeByCell !== null`; use prepared otherwise. Both require the distinct, preallocated `map`, `inverse`, and `seen` arrays produced by `prepareConnect4RbaCoordinateScratch`, with seen offset zero. The public optional cofactor also supports omitted scratch and nonzero seen offsets; its seen span must remain disjoint from target/inverse storage throughout closure. The generic Worker base still owns identity/execution; these game-specific functions belong to RBA support libraries.
+
 **Initialization-time specialization:** `prepareConnect4RbaExecutionProfile()` selects eligible fast paths once after geometry preparation. Current selectors include dense versus sparse residual transition/subset relations, 3-word versus runtime-span coordinate permutation, and 6-word versus runtime-span skyline/product. The hot path calls the selected implementation without re-testing board width/height. The dense-table choice is additionally bounded by the initialization specialization memory budget.
 
 See `catalog/rba-addon-v0.json`.

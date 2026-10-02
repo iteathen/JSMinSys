@@ -50,10 +50,6 @@ export function prepareConnect4RbaExecutionProfile(g){
   const denseRemove=g.removeByCell!==null,denseSubset=g.subsetTable!==null;
   const coordinate3=g.coordWords===3,front6=g.generatorWords===6;
   return {
-    // Immutable geometry-owned plan; shared once with all workers at setup.
-    supersetWordOffsets:g.supersetWordOffsets,
-    supersetWords:g.supersetWords,
-    supersetMasks:g.supersetMasks,
     prepareRemove:denseRemove?prepareRemoveDense:prepareRemoveSparse,
     removePrepared:denseRemove?removeDensePrepared:removeSparsePrepared,
     prepareSubset:denseSubset?prepareSubsetDense:prepareSubsetSparse,
