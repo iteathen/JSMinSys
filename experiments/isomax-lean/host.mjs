@@ -126,7 +126,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     workersExited:host.workersExited,
     requestedWorkers:workers,
     workersUsed:workers,
-    sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
+    sharedBytes:sharedExactCache.entries.buffer.byteLength+sharedViewBytes32(workerGeometry)+
       control.byteLength+resultWords.byteLength+behaviorMemory.buffer.byteLength+timingBuffer.byteLength,
   };
 }

@@ -5,7 +5,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32'].includes(f)));
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 assert.ok(!features.includes('hash-index32')||features.includes('hash-inline'));
@@ -52,7 +52,9 @@ cache=cache.replace(/Atomics\.add\(cache\.stats,[012],1\);/g,'');
 cache=cache.replaceAll('knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash','knownHash');
 cache=fixedIf(cache,'cache.compact8',true);
 cache=once(cache,'  const compact8=isCompactProfile8(geometry,keyWords)?1:0,',"  if(!isCompactProfile8(geometry,keyWords))throw RangeError('lean cache requires standard 7x6 geometry');\n  const compact8=1,");
-output('shared-cache.mjs',relocate(features.includes('layout')?optimizeSharedCache(cache):cache));
+if(features.includes('layout32'))cache=cache.slice(0,cache.indexOf('export function createConnect4RbaSharedExactCache32'))+read('experiments/isomax-tt-layout/cache-body.mjs');
+else if(features.includes('layout'))cache=optimizeSharedCache(cache);
+output('shared-cache.mjs',relocate(cache));
 output('fixed-ops.mjs',fixedOpsSource());
 
 let cpc=read('addons/cpc-connect4.mjs');
@@ -186,5 +188,6 @@ host=host.replace(/    workerTiming:[^\n]+\n/,'    workerTiming:Array.from({leng
 host=host.replace(/    frontierMetrics:[^\n]+\n/,'    frontierMetrics:null,\n');
 host=host.replace(/Atomics.load\(sharedExactCache.stats,[012]\)/g,'null');
 host=host.replace(/control.byteLength\+resultWords.byteLength\+metricBuffer.byteLength[\s\S]*?:0\),/,'control.byteLength+resultWords.byteLength+behaviorMemory.buffer.byteLength+timingBuffer.byteLength,');
+if(features.includes('layout32'))host=once(host,'sharedViewBytes32(sharedExactCache)','sharedExactCache.entries.buffer.byteLength');
 output('host.mjs',relocate(host,{'./shared-cache.mjs':'./shared-cache.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
 output('inputs.json',JSON.stringify(inputs,null,2)+'\n');

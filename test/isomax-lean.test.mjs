@@ -20,11 +20,19 @@ const sequences=['1320461024522311','2053635233350500','0011223'];
 function logical(cache,field){
   if(!cache.entries)return cache[field];
   const n=cache.mask+1,out=new Uint32Array(n*(field==='keys'?8:1));
+  if(cache.layout?.kind==='compact32'){
+    for(let i=0;i<n;i++){
+      if(field==='keys')out.set([cache.bytes[i*32+26],cache.bytes[i*32+27],cache.entries[i*8+1],
+        ...cache.entries.slice(i*8+2,i*8+6),cache.halves[i*16+12]],i*8);
+      else out[i]=cache.entries[i*8+(field==='value'?7:0)];
+    }
+    return out;
+  }
   for(let i=0;i<n;i++)if(field==='keys')for(let k=0;k<8;k++)out[i*8+k]=cache.entries[i*10+2+k];
   else out[i]=cache.entries[i*10+(field==='value'?1:0)];
   return out;
 }
-function setSequence(cache,slot,value){Atomics.store(cache.entries??cache.sequence,cache.entries?slot*10:slot,value);}
+function setSequence(cache,slot,value){Atomics.store(cache.entries??cache.sequence,cache.entries?slot*(cache.layout?.entryWords??10):slot,value);}
 test('transitive deep call graph has no reporting or runtime measurement machinery',()=>{
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
   const ledger=JSON.parse(read('catalog/addon-cycle-ledger-v0.json'));
