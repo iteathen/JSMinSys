@@ -3,9 +3,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {optimizeCpc,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
+import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','hash','live','layout'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','live','layout'].includes(f)));
+assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 const root=new URL('../../',import.meta.url),inputs={};
 function read(name){const s=readFileSync(new URL(name,root),'utf8').replaceAll('\r\n','\n');inputs[name]=createHash('sha256').update(s).digest('hex');return s;}
 function once(s,old,value){assert.equal(s.split(old).length,2,old);return s.replace(old,value);}
@@ -62,7 +63,7 @@ cpc=fixedIf(cpc,'scratch.projectedAdvisory',false);
 cpc=cpc.replace(/scratch\.frontierResponse\s*\?frontierResponseNoWin\([^;]+?\)\s*:(pairedResponseNoWin\([^;]+?\))/g,'$1');
 cpc=cpc.replaceAll('g.columns<=32?((1<<column)>>>0):0','((1<<column)>>>0)');
 cpc=once(cpc,'  const cellWords=Math.ceil(g.cellCount/32);',"  if(g.columns!==7||g.rows!==6||g.lineCount!==69||frontierResponse||projectedAdvisory)throw RangeError('lean CPC requires standard baseline configuration');\n  const cellWords=Math.ceil(g.cellCount/32);");
-output('cpc.mjs',relocate(features.includes('cpc')?optimizeCpc(cpc):cpc));
+output('cpc.mjs',relocate(features.includes('cpc-fused')?optimizeCpcFused(cpc):features.includes('cpc')?optimizeCpc(cpc):cpc));
 
 // Private, prepared-only coordinate functions. Every caller supplies removed
 // and child-index scratch, uses seen offset zero and requests no selected set.
