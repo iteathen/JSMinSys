@@ -5,7 +5,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets','coordinate-constants'].includes(f)));
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 assert.ok(!features.includes('hash-index32')||features.includes('hash-inline'));
@@ -113,6 +113,10 @@ supersets=supersets.slice(0,closureStart)+`    const offsets=profile.supersetOff
       if(j>=cn||childBasis[ci+j]!==id)continue;
 `+supersets.slice(closureEnd);
 output('coordinate-supersets.mjs',supersets);
+const constants={columns:7,rows:6,cellCount:42,shapeWordCount:20,metaOffset:7,p0Offset:8,p1Offset:11,coordWords:3,keyWords:14,pairShapeStart:42,tripleShapeStart:324,quadShapeStart:556};
+let constantCoordinate=features.includes('supersets')?supersets:coordinate;
+for(const [name,value] of Object.entries(constants))constantCoordinate=constantCoordinate.replaceAll('g.'+name,String(value));
+output('coordinate-constants.mjs',constantCoordinate);
 
 const profiles=[{name:'',general:false,packed:true,wide:false},
   ...[false,true].flatMap(wide=>[true,false].map(packed=>({general:true,packed,wide,
@@ -189,7 +193,7 @@ if(wide){
   s=s.replace(/\|\|!\(actionMask&\(1<<(forced|column)\)\)/g,'');
   s=s.replace('&&(actionMask&(1<<forced))','');
 }
-s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':!general&&features.includes('supersets')?'./coordinate-supersets.mjs':'./coordinate.mjs',...(!general&&features.includes('supersets')?{'./rba-connect4-profile.mjs':'./profile-supersets.mjs'}:{})});
+s=relocate(s,{'./cpc-connect4.mjs':general?`./cpc-${wide?'wide':'general'}.mjs`:'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':!general&&features.includes('coordinate-constants')?'./coordinate-constants.mjs':!general&&features.includes('supersets')?'./coordinate-supersets.mjs':'./coordinate.mjs',...(!general&&features.includes('supersets')?{'./rba-connect4-profile.mjs':'./profile-supersets.mjs'}:{})});
 if(general)s=once(s,'compactTailProfile8,probeConnect4RbaSharedExactCache32,storeConnect4RbaSharedExactCache32}', 'compactTailProfile8,probeDirectSharedCache as probeConnect4RbaSharedExactCache32,storeDirectSharedCache as storeConnect4RbaSharedExactCache32}');
 if(general)s=once(s,"from '../../addons/connect4-live-line-evaluator.mjs'","from './live-profile.mjs'");
 if(!general&&features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');

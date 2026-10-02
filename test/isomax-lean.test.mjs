@@ -39,7 +39,8 @@ test('transitive deep call graph has no reporting or runtime measurement machine
   const core=JSON.parse(read('catalog/functions-v0.json'));
   const units=new Map([...ledger.units,...core.functions].map(u=>[u.name,u]));
   const local=new Map();
-  for(const file of ['solver','cpc','shared-cache','coordinate-supersets','fixed-ops']){
+  const selected=read('experiments/isomax-lean/solver.mjs').match(/from '\.\/(coordinate[^']*)\.mjs'/)[1];
+  for(const file of ['solver','cpc','shared-cache',selected,'fixed-ops']){
     const source=read('experiments/isomax-lean/'+file+'.mjs');
     for(const match of source.matchAll(/function (\w+)\(/g)){
       local.set(match[1],source);

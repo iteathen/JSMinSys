@@ -234,7 +234,7 @@ test('geometry choices are cold; qualified standard hot files are unchanged',()=
   for(const file of ['solver','cpc','coordinate','fixed-ops','shared-cache','worker']){
     const path='experiments/isomax-lean/'+file+'.mjs';
     const before=execFileSync('git',['show',base+':'+path],{encoding:'utf8'}).replaceAll('\r\n','\n');
-    const after=readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n').replace("from './coordinate-supersets.mjs'","from './coordinate.mjs'").replace("from './profile-supersets.mjs'","from '../../addons/rba-connect4-profile.mjs'");
+    const after=readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n').replace(/from '\.\/coordinate-(?:supersets|constants)\.mjs'/,"from './coordinate.mjs'").replace("from './profile-supersets.mjs'","from '../../addons/rba-connect4-profile.mjs'");
     assert.equal(createHash('sha256').update(after).digest('hex'),createHash('sha256').update(before).digest('hex'),path);
   }
   for(const wide of [false,true])for(const packed of [true,false]){
