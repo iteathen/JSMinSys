@@ -27,6 +27,13 @@ export function optimizeMaskCoordinate(source,{dense=false}={}){
     'id=(word<<5)+(31-Math.clz32(bit))',
     'id=shapeBase+(31-Math.clz32(bit))');
 
+  // Bitwise coordinates are numbers; the publication flags are booleans.
+  // Avoid a zero-or-boolean union and repeated generic truthiness lowering.
+  source=once(source,'let write0=active0&&(player===0||image===id),',
+    'let write0=(active0!==0)&&(player===0||image===id),');
+  source=once(source,'write1=active1&&(player===1||image===id);',
+    'write1=(active1!==0)&&(player===1||image===id);');
+
   if(dense){
     source=once(source,
       '  const remove=profile.prepareRemove(g,cell);',

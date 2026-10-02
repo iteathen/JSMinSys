@@ -43,8 +43,8 @@ export function connect4RbaCofactorKnownHeight(g,profile,source,src,basis,bi,n,c
     const id=basis[bi+i],raw=removed[i],
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
-    let write0=active0&&(player===0||image===id),
-      write1=active1&&(player===1||image===id);
+    let write0=(active0!==0)&&(player===0||image===id),
+      write1=(active1!==0)&&(player===1||image===id);
     if(!write0&&!write1)continue;
 
     // Both coordinates share the same residual image whenever they survive.
