@@ -3,10 +3,11 @@
 **Start here. Everything needed to run this candidate is inside this folder.**
 Prepared for publication and checked into main; **not published**. Registry
 publication is disabled with `private: true`. No release or release tag exists
-for this package. Candidate version: `0.1.0-rc.1`.
+for this package. Candidate version: `0.1.0-rc.2`.
 
-This packages the exact qualified 32-byte shared-TT solver, four deep workers,
-and initialization-selected board dimensions. Runtime modules are copied without
+This packages the qualified solver with prepared closure masks, a 32-byte shared
+TT, four deep workers, and initialization-selected board dimensions. The standard
+board selects dense or sparse removal before search. Runtime modules are copied without
 rewriting, bundling, minification, or hot-loop changes. There are no third-party
 runtime dependencies. Keep the whole folder together; worker modules load by URL.
 
@@ -92,10 +93,8 @@ and closes them afterward; this package does not claim a persistent worker pool.
 
 ## Preservation and future publication
 
-`provenance.json` binds the runtime to source commit
-`fb0f60adcb9341b42af770f05899bbf61fd3c129`; the measured runtime is
-`302ebcd91bca13e76cc8d1b0de25631b5e768af4`. Runtime content is identical between
-those revisions. `node prepare.mjs --check` reproduces the source comparison in
+`provenance.json` records the exact source and measured runtime commits and binds
+each module to its source checksum. `node prepare.mjs --check` reproduces the source comparison in
 the full repository with that Git history available. It is a maintainer tool,
 not needed by users of the extracted package.
 

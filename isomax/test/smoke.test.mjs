@@ -11,6 +11,13 @@ test('packaged calculator computes five moves and all seven controls',()=>{
     if(sequence==='44444')assert.equal(result.reason,'UNIQUE_MAX_EXHAUSTS_COLUMN');
   }
 });
+test('standard board with sparse initialization keeps a valid worker path',async()=>{
+  const geometry=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:0});
+  const r=await runLazySmpConnect4Rba32([...'1320461024522311'].map(Number),{
+    geometry,workers:2,sharedCacheCapacity:256,localCacheCapacity:256,timeoutMs:10000});
+  assert.equal(r.executionProfile.solver,'./solver.mjs');
+  assert.equal(r.status,'EXACT');assert.equal(r.rootWdl,-1);assert.equal(r.cleanup,true);
+});
 for(const [columns,rows,moves,wdl] of [
   [7,6,[...'1320461024522311'].map(Number),-1],[4,4,[1,2,0,2,3,2,3,1,0,3],0],
   [4,5,[0,0,3,0,0,1,1,1,3,0,1,1,2,3],-1],

@@ -1,100 +1,77 @@
-# Initialization-selected TT and solver: completed qualification
+# Qualified prepared-closure candidate
 
-The public host now accepts prepared board dimensions and selects the complete
-solver/worker/TT combination before search. This repairs the earlier incomplete
-claim in which only the TT factory supported nonstandard dimensions.
+The selected candidate averages **29.729 seconds**, versus
+**37.295 seconds** for the qualified baseline: **20.29%
+less wall time** and **20.25% fewer process cycles**.
+This is local evidence for the existing empty-board structural prefix plus ONE
+exact root search, including preparation and cleanup. It is not full self-play.
 
-The measured 7x6 result is **20% less shared TT memory with essentially unchanged
-time**. Eight scored runs passed. A small nominal speed difference is within the
-paired uncertainty and is not promoted as an established speedup.
+Eight frozen matched trials, order ABBABAAB, all completed EXACT with WDL+1 and
+column4. All seven controls passed, five opening moves were computed without
+search, and the one search began at ply6 from44444. All runs finished below60s.
+No runtime oracle, opening book or hard-coded opening was introduced.
 
-| Measure | A: 40-byte reference | B: initialized 32-byte candidate |
-| --- | ---: | ---: |
-| Mean complete interval | 37,364.5604 ms | 37,211.10975 ms |
-| Mean process cycles | 528,603,752,416.75 | 526,838,805,164.75 |
-| Peak RSS, maximum across runs | 7.362873 GiB | 6.362946 GiB |
-| Shared TT bytes | 5,368,709,120 | 4,294,967,296 |
-| Shared TT entries | 134,217,728 | 134,217,728 |
-| Private cache per worker | 576 MiB | 576 MiB |
+| Arm | Exact revision | Mean seconds | Mean process cycles |
+|---|---|---:|---:|
+| Baseline | 302ebcd91bca13e76cc8d1b0de25631b5e768af4 | 37.295 | 527017238043 |
+| Candidate | 98b51d3c118bf34878af0430b82174578f5a7011 | 29.729 | 420311631385 |
 
-Mean wall difference: 0.410685% lower; mean cycles: 0.333889% lower. Four paired
-log-ratio blocks give a descriptive 95% wall-improvement interval of
-[-0.479207%, 1.292224%], and cycles [-0.456785%, 1.118203%]. Both cross zero.
-Three pairs favored B, one favored A. One host and four pairs cannot establish
-universal performance. The deterministic storage reduction is the solid result.
+Candidate range: 29.591–29.903s.
+Maximum candidate peak RSS: 6831898624 bytes (6.363GiB).
+Four-pair descriptive wall reduction interval:
+19.42 to 21.14%; cycle interval:
+19.60 to 20.89%.
+These t intervals assume normal/independent pair log ratios; four pairs on one
+host are not a universal guarantee or robust population inference.
 
-## Exact versions and environment
+## Exact environment and boundaries
 
-- A runtime: cbc4ddf995be83334ea26190c749028435e353fa.
-- B runtime: 302ebcd91bca13e76cc8d1b0de25631b5e768af4.
-- Controller: 8320e8584994cf5d0a8b3545d0f022eca8950de7.
-- Protocol: `../../../experiments/isomax-tt-layout/INITIALIZATION_PROTOCOL.md`.
-- Node v27.0.0-nightly20260928b59840b593, V8 14.6.202.34-node.36.
-- Intel Core i5-12600K, Windows 10.0.26200, reported RAM 34,088,599,552 bytes.
-- Four deep workers; no wide worker; sharedSampleMask=0; 300-second ceiling.
-- All 32 worker reports confirm historical affinity targets 0/2/4/6, group 0.
-- No observed runtime, hardware or placement deviation. Shared allocation is
-  intentionally smaller at identical entry count, not a cache-capacity change.
+i5-12600K, Windows10.0.26200, Node27.0.0-nightly20260928b59840b593,
+V8 14.6.202.34-node.36. Four deep workers, no wide worker, actual affinity0/2/4/6
+verified per run. Shared134217728 entries x32bytes =4GiB; private16777216 entries
+x36bytes =576MiB/worker. Sample mask0; safety ceiling300s. Same runtime, capacities,
+worker topology and timing interval for both arms. No reported environment deviation.
+No counters were restored: node counts and TT hits remain unavailable.
 
-## Every scored sample
+The candidate compiles strict superset word masks during initialization, intersects
+them with the already-built child-basis set, and uses exact local inverse indices.
+Tables/scratch are allocated before search. Constants, table references, dense
+removal and Boolean publication flags are specialized; sparse initialization and
+general dimensions retain valid separate paths. No new coordinate codec is used.
+Search ordering, TT identity/replacement/synchronization, CPC and STOP remain intact.
+Production addons/src (including CPC) and BSFP were not changed; holdouts stay sealed.
 
-| Index | Arm | Wall ms | Process cycles | Peak RSS bytes |
-| --- | --- | ---: | ---: | ---: |
-| 0 | A | 37194.7323 | 526324731237 | 7905087488 |
-| 1 | B | 37109.2628 | 525838350204 | 6831276032 |
-| 2 | B | 37070.0916 | 524260911058 | 6831689728 |
-| 3 | A | 37456.2907 | 528946733777 | 7905824768 |
-| 4 | B | 37349.2632 | 528693702443 | 6832160768 |
-| 5 | A | 37249.9814 | 527507807315 | 7903756288 |
-| 6 | A | 37557.2372 | 531635737338 | 7905198080 |
-| 7 | B | 37315.8214 | 528562256954 | 6831300608 |
+## Investigation and selection
 
-One unscored B warm-up: 37177.578 ms, preserved in
-`../isomax-tt-init-warmup-20261002/`; excluded from the table and inference.
-No samples were rejected or replaced. Raw, machine-readable records are
-`raw.jsonl`, `samples.jsonl`, `manifest.json`, `SUMMARY.json`, and
-`BLOCK_ANALYSIS.json`, plus each actual affinity report.
+The initial CSR list was correct but screened1.79% slower. Scalar constants alone
+screened neutral (+0.25% wall, effectively unchanged cycles). Those observations
+do not falsify compiled transitions or specialization as parent approaches.
+Grouped masks screened about12% faster. Prepared tables, cold dense dispatch and
+hoisting reduced that realization's time by another5.19% in its own screen.
+An eight-run pre-Boolean confirmation measured16.82% paired wall reduction.
+Compiler review then found removable mixed zero/Boolean guards; normalizing them
+removed four HeapNumber-map checks and reduced cofactor machine-code size8–9%.
+The final eight runs above qualify the resulting composite. Differences across
+campaign stages do not isolate a constituent's independent performance effect.
 
-All seven pre-search controls passed in each sample. The first five moves were
-computed by the structural calculator with no search. The actual search root
-was 44444, first search ply 6, exactly one search, EXACT WDL +1, returned c4.
-All eight intervals were under 60 seconds, with clean termination and four worker
-exits. This interval includes structural calculation, solver/worker preparation,
-one search and cleanup. It is not a self-play game-to-terminal measurement.
-Node counts and TT hit statistics remain unavailable: no reporting was restored
-to the hot loop. Process cycles/CPU/RSS are collected externally.
+All ten original claims have explicit dispositions in CLAIM_AUDIT.md; deferred
+parents remain unverified debt, not rejected theories. The prepared subset compiler
+is a bounded implementation of part of the transition idea, not a claim that all
+support transitions, make/unmake or canonical-key-only reflection are finished.
+No50% improvement or global optimality is claimed.
 
-## Correctness and hot-path audit
+## Qualification and durable evidence
 
-217/217 full tests passed; 30/30 focused tests passed on the measured Node
-nightly. Actual public-host worker solves cover twelve configurations, including
-12 variable-dimension cases (4x4, 4x5, 5x4, 8x4, 4x8, 8x6, 7x5, 33x1, 1x256,
-1x1, 2x3, 3x3), in addition to existing 7x6 coverage.
+Node26 and the benchmark Node27 each pass236 source tests. Directed cofactor
+comparisons cover dense/sparse geometry, legal children, reflection, both players,
+stale inverse/tail memory, first wins and full-board terminal precedence. Deterministic
+search comparisons preserve full private and logical shared TT contents and ties.
+Independent reviews found no correctness blocker. General-dimension kernels are
+unchanged. Packaging adds standalone worker and selected-cofactor tests.
 
-Independent physical-board minimax, reference move ordering, private keys/tags,
-logical shared keys/values/sequence, reflection, CPC guard behavior, cancellation
-and cleanup all agree. Sealed formula-holdout boards were excluded.
-
-The standard solver, worker, CPC, TT accessors, coordinates and fixed operations
-are byte-identical after newline normalization to the earlier repaired 32-byte
-runtime 4e7af0e74b82b6bb70fef94a211196b4235a4039. There is no added dimension
-dispatch, codec, callback, statistic or allocation inside that hot path.
-
-Review found and resolved a valid tiny-board initialization failure, unnecessary
-wide-board mask work, and a legal-move assertion gap. A final coverage refinement
-executes unpacked recursive ordering on both normal and wide boards: 9 observed
-prepared rows for 4x4 and 32 for 33x1. Observation uses prefilled test-owned
-buffers inspected after solving, not runtime counters. These tests were expanded
-after measurement; the measured runtime files did not change. Final outputs:
-`../isomax-init-integration-20261002/full-suite-final.txt` and
-`../isomax-init-integration-20261002/nightly-tests-final.txt`.
-
-General configurations retain dimension-driven key, hash and live-line loops.
-Their correctness is qualified; full-size latency, additional unrolling choices,
-and very large generic atomic-index domains are not performance-qualified.
-These are explicit optimization limits, not a claim that every remaining loop
-is unavoidable. Cold profile selection adds no general per-node layout dispatch.
-
-Production CPC, BSFP, search semantics, ordering and worker topology are unchanged.
-Main remains e76e9ab3ca0e7a292badf9d9ac38a811d7971c99; this is committed candidate
-evidence on `codex/isomax-init-tt-layout-20261002`, not a promotion.
+SUMMARY.json, samples.jsonl, raw.jsonl, manifest.json, BLOCK_ANALYSIS.json and every
+affinity report are retained beside this report. Campaign profile/qualification
+and all four preliminary screens are retained separately. Profiling/compiler runs
+are excluded from scored timing. CPU samples are attribution estimates, not PMU
+memory stalls; small-cache codegen evidence is not full-worker stability proof.
+NEES_REVIEW.md records the changed cost scope and remaining debt.
