@@ -1,39 +1,44 @@
 # Candidate evidence
 
-The eight-run localhost comparison held entry counts, runtime and affinity
-constant. All seven structural controls passed in every run. Five moves were
-computed without search; one exact search began at ply 6 from `44444` and
-returned WDL +1 and column 4. This is not full self-play.
+The final eight-run localhost comparison measured **29.729 seconds** for the
+prepared-closure candidate versus **37.295 seconds** for the qualified baseline:
+**20.29% less wall time and 20.25% fewer process cycles**.
 
-| | Previous 40-byte TT | Packaged 32-byte candidate |
-| --- | ---: | ---: |
-| Mean complete interval | 37.3645604 s | 37.21110975 s |
-| Maximum peak RSS | 7.362873 GiB | 6.362946 GiB |
-| Shared TT memory | 5 GiB | 4 GiB |
-| Shared entries | 134217728 | 134217728 |
-| Private memory per worker | 576 MiB | 576 MiB |
+Both arms used the same i5-12600K, Node27 nightly, four pinned deep workers,
+4 GiB shared TT and 576 MiB private TT per worker. Maximum candidate peak RSS
+was **6.363 GiB**. Candidate runs ranged from **29.591 to 29.903 seconds**.
+All runs passed the seven controls, computed five structural moves, then made
+one exact search from `44444` at ply 6. Every search returned WDL +1 and column 4;
+all workers exited. This measures one root solve, not a complete self-play game.
 
-All eight runs completed under 60 seconds. The nominal 0.41% speed improvement
-is within paired measurement uncertainty (-0.48% to +1.29%); the supported
-conclusion is **20% less shared TT memory with effectively unchanged time**.
+The four-pair descriptive interval for wall reduction is 19.42–21.14%.
+This is bounded evidence on one host, not a universal speed guarantee.
+No 50% result is claimed. Hot node counters and TT statistics remain absent.
 
-- [Machine-readable summary](benchmark/SUMMARY.json)
-- [All measured samples](benchmark/samples.jsonl), [raw process output](benchmark/raw.jsonl)
-- [Paired uncertainty](benchmark/BLOCK_ANALYSIS.json)
-- [Environment and exact revisions](benchmark/manifest.json)
-- Actual worker placement: `benchmark/affinity-<run>-<worker>.json`
-- [217-test qualification](qualification/full-suite-final.txt)
-- [30 focused tests on benchmark Node nightly](qualification/nightly-tests-final.txt)
-- [Original protocol](INITIALIZATION_PROTOCOL.md) and [original detailed report](benchmark/REPORT.md)
+- [Final report](benchmark/REPORT.md), [summary](benchmark/SUMMARY.json)
+- [Per-run results](benchmark/samples.jsonl), [raw output](benchmark/raw.jsonl)
+- [Exact configuration and revisions](benchmark/manifest.json), [paired analysis](benchmark/BLOCK_ANALYSIS.json)
+- [All ten optimization claims](CLAIM_AUDIT.md), [scoped NEES review and remaining debt](NEES_REVIEW.md)
+- [Sampled CPU attribution](campaign/profile/ANALYSIS.json); raw profiles are beside it
+- [236 source tests on Node26](campaign/qualification/node26-final.txt)
+- [236 source tests on the benchmark Node27](campaign/qualification/nightly-final.txt)
+- [Compiler evidence before Boolean normalization](campaign/qualification/dense-jit.txt)
+  and [after](campaign/qualification/boolean-jit.txt)
+- [Earlier 32-byte TT evidence](tt-layout/REPORT.md)
 
-The last two documents are preserved historical snapshots: their original
-repository-relative paths and statements about promotion describe the pre-package
-research commit. This page is the package-local index. The current package status
-is prepared on main and unpublished. The new standalone packaging smoke tests
-live in `../test/`; they supplement, rather than replace, the recorded qualification.
+`screens/` preserves the CSR, constants, grouped-mask, prepared-kernel screens
+and the pre-Boolean eight-run confirmation. The slower first list realization
+was not used to reject the compiled-transition approach. Grouped masks, cold
+specialization and compiler-guided Boolean normalization were tested next.
 
-Correctness covers twelve nonstandard dimension configurations plus standard
-7x6, independent late-position board minimax, reference traversal/cache equivalence,
-CPC guards, STOP/reuse and cleanup. Formula holdouts remain sealed.
-Runtime modules are SHA-256 locked and unchanged by packaging. Generic large-cache
-latency and further variable-width specialization remain unqualified.
+All tables and scratch are prepared before search; the selected hot path adds
+no allocation, reporting or geometry dispatch. Search order, exact gray-token
+TT identity, CPC and general-dimension kernels are preserved. Broader proposed
+search changes remain unqualified research, with explicit dispositions in the audit.
+Formula holdouts stay sealed.
+
+Source reports and logs retain their original research-repository paths and
+pre-package context. This is the package-local index. The standalone package
+tests in `../test/` additionally verify selected cofactors and real workers,
+including sparse standard initialization. Runtime bytes and evidence are pinned
+by `../provenance.json`. The candidate is on main and remains unpublished.
