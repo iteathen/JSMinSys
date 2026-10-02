@@ -1,13 +1,15 @@
 # IsoMax deep worker without reporting in search
 
 Entry point: `host.mjs`, export `runLazySmpConnect4Rba32`.
-This branch contains the repaired 32-byte TT candidate. See
-`../../evidence/isomax-tt-half-confirm-20261002/REPORT.md`: **20% less shared
-TT memory**, with matched mean time **37.712 s → 37.376 s** (0.893% lower).
+This branch contains the repaired 32-byte TT candidate with complete
+initialization-selected geometry support. See
+`../../evidence/isomax-tt-init-confirm-20261002/REPORT.md`: **20% less shared
+TT memory**, with matched mean time **37.365 s → 37.211 s**. The nominal 0.41%
+difference is within measurement uncertainty; timing is effectively unchanged.
 The first implementation's boxed high byte indices were removed using native
 halfword fields; no key encoder/decoder was added. The scoped NEES audit and
 remaining debt are in `../isomax-tt-layout/NEES_REVALIDATION.md`.
-Current qualification: 202 tests, plus 15 focused tests on the benchmark runtime.
+Current qualification: 217 tests, plus 30 focused tests on the benchmark runtime.
 This is a correctness-qualified memory-saving option, not a promotion. The locked main
 version and all existing `src/` and `addons/` files remain unchanged.
 
@@ -50,10 +52,15 @@ less wall time, 5.046% fewer process cycles), with all 193 tests passing.
 See `../../evidence/isomax-four-items-confirm-20261002/REPORT.md` for raw-run
 links, exact revisions, unchanged configuration and measurement limits.
 
-The candidate specializes the **released deep** implementation for standard
-7x6, baseline CPC, compact shared/private TT and shared sample mask zero.
-All workers are deep. `rootFrontier:true`, alternative CPC options and other
-geometries are rejected at initialization. The worker still supports the
+The candidate selects a specialization of the **released deep** implementation
+at initialization. Standard 7x6 keeps its qualified compact kernel unchanged.
+Other dimensions select general key/live storage and direct shared TT accessors;
+width-dependent CPC proof availability and move-order packing are also selected
+cold, without node-level layout dispatch. Supply a prepared geometry from
+`prepareConnect4RbaGeometry({columns, rows})` to the public host's `geometry` option.
+See `../isomax-tt-layout/INITIALIZATION_PROTOCOL.md` for qualification and limits.
+All workers are deep. `rootFrontier:true` and alternative CPC options are
+rejected at initialization. The worker still supports the
 existing STOP behavior flag; this profile does not implement dynamic wide
 roles. The existing wide implementation remains separate.
 
@@ -80,7 +87,7 @@ measurement overhead: the cold operation boundaries still read clocks.
 
 Build/check: `node experiments/isomax-lean/build.mjs [--check]`.
 Tests: `node --test test/*.test.mjs`.
-Latest measurement packet: `../isomax-tt-layout/half-confirm.json`.
+Latest measurement packet: `../isomax-tt-layout/init-confirm.json`.
 Runner: `node experiments/isomax-four-items/measure.mjs <packet.json>`.
 For replay, copy the packet with a new evidence ID and paths to the exact
 checked-out revisions; the runner intentionally refuses to overwrite evidence.

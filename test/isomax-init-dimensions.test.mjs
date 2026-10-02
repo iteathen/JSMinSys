@@ -56,13 +56,13 @@ function boardOracle(columns,rows,moves){
   return {relative:Math.max(...values.values()),values};
 }
 
-function fixtures(columns,rows){
+function fixtures(columns,rows,count=3,remaining=6){
   let seed=23271+columns*97+rows;
   const next=()=>seed=(Math.imul(seed,1664525)+1013904223)>>>0;
   const result=[];
-  for(let attempt=0;attempt<400&&result.length<3;attempt++){
+  for(let attempt=0;attempt<400&&result.length<count;attempt++){
     const moves=[],board=new Uint8Array(columns*rows),heights=new Uint32Array(columns);
-    while(moves.length<columns*rows-6){
+    while(moves.length<columns*rows-remaining){
       const legal=[];
       for(let c=0;c<columns;c++)if(heights[c]<rows){
         const r=heights[c],p=1+(moves.length&1);board[r*columns+c]=p;
@@ -81,9 +81,9 @@ function fixtures(columns,rows){
       if(!legal.length)break;
       const c=legal[Math.floor(next()/0x100000000*legal.length)];board[heights[c]++*columns+c]=1+(moves.length&1);moves.push(c);
     }
-    if(moves.length===columns*rows-6)result.push(moves);
+    if(moves.length===columns*rows-remaining)result.push(moves);
   }
-  assert.equal(result.length,3);return result;
+  assert.equal(result.length,count);return result;
 }
 
 function stateFor(api,g,order,reference){
@@ -197,7 +197,7 @@ test('valid small geometries with no winning lines initialize as exact draws',as
   }
 });
 
-test('unpacked fallback preserves ordering, weak/exact TT rows, and result',async()=>{
+test('unpacked fallback preserves ordering, weak/exact TT rows, and result',async t=>{
   // Exercise the emitted fallback algorithm on affordable real positions.
   // The public cold guard still requires true overflow before choosing it.
   // Only prepared order representation changes in these test-owned states.
@@ -205,9 +205,11 @@ test('unpacked fallback preserves ordering, weak/exact TT rows, and result',asyn
     const g=prepareConnect4RbaGeometry({columns,rows}),wide=columns>32;
     const packed=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}.mjs`);
     const unpacked=await import(`../experiments/isomax-lean/solver-general${wide?'-wide':''}-unpacked.mjs`);
-    for(const moves of fixtures(columns,rows)){
+    let recursiveSorts=0;
+    for(const moves of fixtures(columns,rows,wide?12:3,wide?10:6)){
       const a=stateFor(baseline,g,0,true).state,b=stateFor(packed,g,0,false).state;
       a.movePackShift=b.movePackShift=-1;a.moveOrderMask=b.moveOrderMask=0xffffffff;
+      a.moveOrder.fill(0xffffffff);b.moveOrder.fill(0xffffffff);
       const root=connect4RbaFromMoves(moves,{geometry:g});
       const expected=baseline.solveConnect4RbaFrontier(root,{state:a,reflected:root.reflected});
       const actual=unpacked.solveConnect4RbaFrontier(root,{state:b,reflected:root.reflected});
@@ -215,11 +217,15 @@ test('unpacked fallback preserves ordering, weak/exact TT rows, and result',asyn
         [expected.status,expected.value,expected.relative,expected.move]);
       for(const field of ['keys','tag'])assert.deepEqual(b.cache[field],a.cache[field]);
       compareShared(a.cache.shared,b.cache.shared);
+      for(let row=columns;row<b.moveOrder.length;row+=columns)
+        if(b.moveOrder[row]!==0xffffffff&&b.moveOrder[row+1]!==0xffffffff)recursiveSorts++;
       const memory=createWorkerBehaviorMemory32(1);
       const args={geometry:g,sharedExactCache:b.cache.shared,behavior:new BehaviorWorker(0,
         new Uint32Array(memory.buffer),0,memory)};
       assert.throws(()=>unpacked.prepareConnect4RbaFrontier(args),/packing\/profile/);
     }
+    assert.ok(recursiveSorts>0,`${columns}x${rows} must execute recursive multi-action unpacked ordering`);
+    t.diagnostic(JSON.stringify({columns,rows,recursiveSorts}));
   }
 });
 
