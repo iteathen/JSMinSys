@@ -7,6 +7,7 @@ import {
   RANK_LOCAL_CERTIFIED,
   RANK_LOCAL_UNRESOLVED,
 } from '../addons/connect4-rank-local-presearch.mjs';
+import {runIsoMaxConnect4Move32} from '../addons/rba-connect4-move-selector.mjs';
 
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 
@@ -84,4 +85,17 @@ test('certificate is descriptive enough to reproduce every elimination',()=>{
     solvedValues:false,
     projection:false,
   });
+});
+
+
+test('IsoMax selector returns a certified local move before Lazy SMP starts',async()=>{
+  const result=await runIsoMaxConnect4Move32(cols('41'),{geometry:g,workers:1});
+  assert.equal(result.status,'RANK_LOCAL_MOVE',JSON.stringify(result));
+  assert.equal(result.source,'RANK_LOCAL');
+  assert.equal(result.searchStarted,false);
+  assert.equal(result.move,3);
+  assert.equal(result.workersUsed,0);
+  // workers:1 would be rejected by Lazy SMP. Reaching this assertion therefore
+  // also proves the wrapper returned before entering the search host.
+  assert.equal(result.requestedWorkers,1);
 });
