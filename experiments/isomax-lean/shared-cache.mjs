@@ -30,9 +30,8 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,geo
     keyWords,
     storedKeyWords,
     compact8,
-    sequence:new Uint32Array(new SharedArrayBuffer(capacity*Uint32Array.BYTES_PER_ELEMENT)),
-    value:new Uint32Array(new SharedArrayBuffer(capacity*Uint32Array.BYTES_PER_ELEMENT)),
-    keys:new Uint32Array(new SharedArrayBuffer(capacity*storedKeyWords*Uint32Array.BYTES_PER_ELEMENT)),
+    // Ten words per entry: sequence, value, eight exact key words.
+    entries:new Uint32Array(new SharedArrayBuffer(capacity*40)),
   };
 }
 
@@ -40,20 +39,20 @@ export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,geo
 // a >=4GiB typed-array view length while preserving its SharedArrayBuffer. Restore
 // only the view header over the existing full-span backing; never copy/grow data.
 export function attachConnect4RbaSharedExactCache32(cache){
-  const keys=cache.keys,expected=(cache.mask+1)*cache.storedKeyWords;
-  if(!(keys instanceof Uint32Array)||!(keys.buffer instanceof SharedArrayBuffer)||
-     keys.byteOffset!==0||keys.buffer.byteLength!==expected*4)
-    throw new RangeError('invalid shared exact key backing');
-  if(keys.length!==expected)cache.keys=new Uint32Array(keys.buffer);
+  const entries=cache.entries,expected=(cache.mask+1)*10;
+  if(!(entries instanceof Uint32Array)||!(entries.buffer instanceof SharedArrayBuffer)||
+     entries.byteOffset!==0||entries.buffer.byteLength!==expected*4)
+    throw new RangeError('invalid shared exact entry backing');
+  if(entries.length!==expected)cache.entries=new Uint32Array(entries.buffer);
   return cache;
 }
 
 export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash){
   const hash=knownHash,
-    slot=hash&cache.mask,
-    before=Atomics.load(cache.sequence,slot);
+    slot=hash&cache.mask,record=slot*10,
+    before=Atomics.load(cache.entries,record);
   if(!before||(before&1))return 0;
-  const base=slot*cache.storedKeyWords,keys=cache.keys;
+  const base=record+2,keys=cache.entries;
   
     if(Atomics.load(keys,base)!==words[offset]||
        Atomics.load(keys,base+1)!==words[offset+1]||
@@ -64,8 +63,8 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash)
        Atomics.load(keys,base+6)!==words[offset+12]||
        Atomics.load(keys,base+7)!==compactTailProfile8(words,offset))return 0;
   
-  const value=Atomics.load(cache.value,slot),
-    after=Atomics.load(cache.sequence,slot);
+  const value=Atomics.load(cache.entries,record+1),
+    after=Atomics.load(cache.entries,record);
   if(before!==after||(after&1)||!value)return 0;
   
   return value;
@@ -73,14 +72,14 @@ export function probeConnect4RbaSharedExactCache32(cache,words,offset,knownHash)
 
 export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,knownHash){
   const hash=knownHash,
-    slot=hash&cache.mask,
-    current=Atomics.load(cache.sequence,slot);
+    slot=hash&cache.mask,record=slot*10,
+    current=Atomics.load(cache.entries,record);
   if(current&1){return value;}
   const odd=(current+1)>>>0;
-  if(Atomics.compareExchange(cache.sequence,slot,current,odd)!==current){
+  if(Atomics.compareExchange(cache.entries,record,current,odd)!==current){
     return value;
   }
-  const base=slot*cache.storedKeyWords,keys=cache.keys;
+  const base=record+2,keys=cache.entries;
   
     Atomics.store(keys,base,words[offset]);
     Atomics.store(keys,base+1,words[offset+1]);
@@ -91,8 +90,8 @@ export function storeConnect4RbaSharedExactCache32(cache,words,offset,value,know
     Atomics.store(keys,base+6,words[offset+12]);
     Atomics.store(keys,base+7,compactTailProfile8(words,offset));
   
-  Atomics.store(cache.value,slot,value);
-  Atomics.store(cache.sequence,slot,(odd+1)>>>0);
+  Atomics.store(cache.entries,record+1,value);
+  Atomics.store(cache.entries,record,(odd+1)>>>0);
   
   return value;
 }
