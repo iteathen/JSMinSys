@@ -13,7 +13,9 @@
     "addons/rba-connect4-proof-memo.mjs",
     "addons/cpc-connect4-guard-survival.mjs",
     "addons/rba-connect4-lazy-smp-host.mjs",
-    "addons/rba-connect4-lazy-smp-worker.mjs"
+    "addons/rba-connect4-lazy-smp-worker.mjs",
+    "addons/connect4-rank-local-presearch.mjs",
+    "addons/rba-connect4-move-selector.mjs"
   ],
   "geometryContract": {
     "configurationTime": [
@@ -202,5 +204,35 @@
     "result": "constructive survival certificate only; failure is not attacker forced completion",
     "neesRecord": "docs/cpc-guard-survival-nees.md",
     "cycleLedger": "catalog/addon-cycle-ledger-v0.json"
+  },
+  "rankLocalPresearchContract": {
+    "status": "research-integrated-additive",
+    "role": "cold pre-search move certificate before unchanged Lazy SMP search",
+    "inputs": [
+      "actual current move history",
+      "prepared runtime Connect4 geometry"
+    ],
+    "measurements": [
+      "current legal landing cell",
+      "mover live-line incidence through landing",
+      "opponent live-line denial through landing",
+      "remaining same-column headroom after landing",
+      "Pareto dominance relation among legal landings"
+    ],
+    "certificate": "exactly one Pareto-maximal landing and that landing leaves positive same-column headroom",
+    "unresolved": [
+      "non-unique Pareto maximum",
+      "unique incidence maximum exhausts its column",
+      "terminal/full board"
+    ],
+    "searchPolicy": "runIsoMaxConnect4Move32 returns the local move when certified; otherwise it delegates the unchanged position to runLazySmpConnect4Rba32",
+    "exclusions": [
+      "descendant enumeration",
+      "recursive search",
+      "CPC invocation",
+      "oracle or solved W/D/L",
+      "opening-sequence lookup"
+    ],
+    "claimBoundary": "research structural certificate only; not promoted here to a universal perfect-play theorem"
   }
 }
