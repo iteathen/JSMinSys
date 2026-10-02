@@ -1,7 +1,11 @@
 # IsoMax deep worker without reporting in search
 
 Entry point: `host.mjs`, export `runLazySmpConnect4Rba32`.
-This is the correctness-qualified optimization candidate. The locked main
+This branch contains the experimental 32-byte TT candidate. See
+`../../evidence/isomax-tt-layout-confirm-20261002/REPORT.md`: **20% less shared
+TT memory, no established speed improvement** (38.564 s → 39.051 s mean).
+Current qualification: 202 tests, plus 15 focused tests on the benchmark runtime.
+This is a correctness-qualified memory-saving option, not a promotion. The locked main
 version and all existing `src/` and `addons/` files remain unchanged.
 
 All four requested changes are now enabled in `features.json`:
@@ -12,7 +16,8 @@ All four requested changes are now enabled in `features.json`:
   directly at the search site, with exact integer addresses in the private
   0..601 frame-index domain. No hash loop or helper call. Hash bits stay identical.
 - `live`: fixed three-word live-state update, preserving write order.
-- `layout`: shared TT sequence/value/exact-key in each 40-byte record.
+- `layout32`: native narrow atomic fields in each 32-byte shared TT record;
+  no new encoding/decoding. The preceding `layout` feature uses 40-byte records.
 
 Capacity, exact key comparisons, atomic publication order and search decisions
 are preserved. Feature selection happens only during generation; there are no
@@ -24,7 +29,7 @@ emission removes that call boundary; explicit fixed-frame integer addressing
 also removes thirteen emitted overflow guards. All **199 tests pass**, plus
 17 focused tests on the benchmark runtime.
 
-Latest eight-run comparison: **37.547 s baseline → 37.370 s candidate mean**,
+Earlier CPC/hash eight-run comparison: **37.547 s baseline → 37.370 s candidate mean**,
 nominally 0.470% less wall time and 0.479% fewer cycles. The paired intervals
 cross zero, so a reliable additional whole-solve speedup remains unestablished.
 See `../../evidence/isomax-cpc-hash-index32-confirm-20261002/REPORT.md` for the
@@ -72,7 +77,7 @@ measurement overhead: the cold operation boundaries still read clocks.
 
 Build/check: `node experiments/isomax-lean/build.mjs [--check]`.
 Tests: `node --test test/*.test.mjs`.
-Latest measurement packet: `../isomax-four-items/revisit-index32.json`.
+Latest measurement packet: `../isomax-tt-layout/confirm.json`.
 Runner: `node experiments/isomax-four-items/measure.mjs <packet.json>`.
 For replay, copy the packet with a new evidence ID and paths to the exact
 checked-out revisions; the runner intentionally refuses to overwrite evidence.

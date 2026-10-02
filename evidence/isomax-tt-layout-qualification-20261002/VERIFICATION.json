@@ -1,0 +1,63 @@
+{
+  "fullSizeLog": "full-size-cache.json",
+  "nightly": {
+    "passed": 15,
+    "tests": 15,
+    "log": "nightly-tests-final.txt"
+  },
+  "sourceChecks": [
+    {
+      "exitCode": 0,
+      "command": "node experiments/isomax-lean/build.mjs --check",
+      "output": ""
+    },
+    {
+      "exitCode": 0,
+      "command": "node tools/verify-catalog.mjs",
+      "output": "JSMinSys catalog verified: 298 sealed functions + 171 add-on units cycle-ledgered, 30/30 blocks complete, 0 deferred function(s)."
+    },
+    {
+      "exitCode": 0,
+      "command": "node tools/build-behavior-search.mjs --check",
+      "output": ""
+    },
+    {
+      "exitCode": 0,
+      "command": "node tools/build-root-frontier.mjs --check",
+      "output": ""
+    },
+    {
+      "exitCode": 0,
+      "command": "node tools/audit-root-frontier.mjs",
+      "output": "Root-frontier structural audit: 52 transitive functions checked; source/call checks only, not a machine-code cost claim."
+    },
+    {
+      "exitCode": 0,
+      "command": "node tools/audit-runtime-geometry.mjs",
+      "output": "Runtime geometry audit passed: general path present; RBA add-ons contain no 7x6 carrier constants."
+    }
+  ],
+  "jit": {
+    "performanceEvidence": false,
+    "candidate": "narrow-jit.txt",
+    "baseline": "base-jit.txt",
+    "fixture": "experiments/isomax-four-items/inspect-solver-jit.mjs",
+    "flags": [
+      "--trace-turbo-inlining",
+      "--print-opt-code",
+      "--print-opt-code-filter=probeConnect4RbaSharedExactCache32"
+    ]
+  },
+  "suite": {
+    "passed": 202,
+    "tests": 202,
+    "log": "tests-final.txt"
+  },
+  "testedRuntimeSha": "4d1158a60b7ecc00aec5e1e185aa7696a7cb3934",
+  "review": {
+    "blockingIssues": 0,
+    "nonblocking": "Added height-width boundaries and high/low coordinate-bit tests",
+    "revision": "4d1158a60b7ecc00aec5e1e185aa7696a7cb3934"
+  },
+  "productionDiffExitCode": 0
+}
