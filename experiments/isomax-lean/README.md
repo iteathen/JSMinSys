@@ -4,6 +4,21 @@ Entry point: `host.mjs`, export `runLazySmpConnect4Rba32`.
 This is the separately qualified optimization candidate. The locked main
 version and all existing `src/` and `addons/` files remain unchanged.
 
+The subsequent four-item screen selected `live` and `layout` in `features.json`:
+the fixed three-word live-state update and a shared TT containing 40-byte
+sequence/value/exact-key records. Capacity, hash bits, exact key comparisons,
+atomic publication order and search decisions are preserved. CPC scan reuse
+showed no gain; hash unrolling missed the declared cycle threshold. Both stay
+disabled. `optimize.mjs` applies feature selection only when generating files;
+there are no runtime feature checks in the recursive path.
+
+Four-item protocol and benchmark runner: `../isomax-four-items/PLAN.md` and
+`../isomax-four-items/measure.mjs`. Screen evidence is in
+`../../evidence/isomax-four-items-screen-20261002/`; combined confirmation is
+recorded separately. The full-size cache check explicitly verifies attachment
+and two-way publication at the last entry of the 5 GiB backing. It runs only
+when invoked, not as part of the default small-memory test suite.
+
 The candidate specializes the **released deep** implementation for standard
 7x6, baseline CPC, compact shared/private TT and shared sample mask zero.
 All workers are deep. `rootFrontier:true`, alternative CPC options and other
