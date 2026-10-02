@@ -5,6 +5,7 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const packet=JSON.parse(readFileSync(process.argv[2],'utf8'));
 assert.match(packet.id,/^[a-z0-9-]+$/);
+assert.ok(packet.order.length>0&&[...packet.order].every(arm=>packet.arms[arm]));
 const dir='evidence/'+packet.id;
 const runtime=JSON.parse(readFileSync('evidence/isomax-memory-affinity-20260928/runtime.json'));
 const targets=JSON.parse(readFileSync('evidence/isomax-memory-affinity-20260928/targets.json'));
