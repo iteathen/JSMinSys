@@ -48,4 +48,5 @@ const comparison=Object.keys(packet.arms).map(arm=>({arm,sourceSha:packet.arms[a
   percentLowerCycles:100*(1-mean(arm,'solveCycles')/mean('A','solveCycles'))}));
 writeFileSync(dir+'/SUMMARY.json',JSON.stringify({helperSha,order,comparison,
   rows:rows.map(({index,arm,wallMs,solveCycles,cpuMs,peakRssBytes})=>({index,arm,wallMs,solveCycles,cpuMs,peakRssBytes})),
-  limits:'Two samples per arm on this host; screening evidence, not a universal or statistically robust speed claim. Node counts intentionally unavailable.'},null,2)+'\n');
+  sampleCounts:Object.fromEntries(Object.keys(packet.arms).map(arm=>[arm,rows.filter(r=>r.arm===arm).length])),
+  limits:'Local comparison on this host, not a universal or statistically robust speed claim. Node counts intentionally unavailable. See the packet protocol for warm-up exclusion and block analysis.'},null,2)+'\n');
