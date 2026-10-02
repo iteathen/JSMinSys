@@ -1,16 +1,34 @@
 # IsoMax deep worker without reporting in search
 
 Entry point: `host.mjs`, export `runLazySmpConnect4Rba32`.
-This is the separately qualified optimization candidate. The locked main
+This is the correctness-qualified optimization candidate. The locked main
 version and all existing `src/` and `addons/` files remain unchanged.
 
-The subsequent four-item screen selected `live` and `layout` in `features.json`:
-the fixed three-word live-state update and a shared TT containing 40-byte
-sequence/value/exact-key records. Capacity, hash bits, exact key comparisons,
-atomic publication order and search decisions are preserved. CPC scan reuse
-showed no gain; hash unrolling missed the declared cycle threshold. Both stay
-disabled. `optimize.mjs` applies feature selection only when generating files;
-there are no runtime feature checks in the recursive path.
+All four requested changes are now enabled in `features.json`:
+
+- `cpc-fused`: one singleton-prefix scan, local flags/index, no duplicate
+  preemption reset. Tactical guards and immediate-win priority are unchanged.
+- `hash-inline` plus `hash-index32`: the identical fourteen-step recurrence
+  directly at the search site, with exact integer addresses in the private
+  0..601 frame-index domain. No hash loop or helper call. Hash bits stay identical.
+- `live`: fixed three-word live-state update, preserving write order.
+- `layout`: shared TT sequence/value/exact-key in each 40-byte record.
+
+Capacity, exact key comparisons, atomic publication order and search decisions
+are preserved. Feature selection happens only during generation; there are no
+runtime feature checks in the recursive path.
+
+The CPC/hash revisit found why the first unrolled helper was a poor replacement:
+V8 inlined the original loop but refused to inline the larger helper. Direct
+emission removes that call boundary; explicit fixed-frame integer addressing
+also removes thirteen emitted overflow guards. All **199 tests pass**, plus
+17 focused tests on the benchmark runtime.
+
+Latest eight-run comparison: **37.547 s baseline → 37.370 s candidate mean**,
+nominally 0.470% less wall time and 0.479% fewer cycles. The paired intervals
+cross zero, so a reliable additional whole-solve speedup remains unestablished.
+See `../../evidence/isomax-cpc-hash-index32-confirm-20261002/REPORT.md` for the
+complete 32-run revisit, exact revisions, compiler evidence and limitations.
 
 Four-item protocol and benchmark runner: `../isomax-four-items/PLAN.md` and
 `../isomax-four-items/measure.mjs`. Screen evidence is in
@@ -19,7 +37,7 @@ recorded separately. The full-size cache check explicitly verifies attachment
 and two-way publication at the last entry of the 5 GiB backing. It runs only
 when invoked, not as part of the default small-memory test suite.
 
-Combined confirmation: **39.676 s baseline → 37.690 s selected mean** (5.004%
+Earlier live/layout-only confirmation: **39.676 s baseline → 37.690 s mean** (5.004%
 less wall time, 5.046% fewer process cycles), with all 193 tests passing.
 See `../../evidence/isomax-four-items-confirm-20261002/REPORT.md` for raw-run
 links, exact revisions, unchanged configuration and measurement limits.
@@ -53,10 +71,13 @@ or hidden reporting callback in the node loop. This does not claim zero total
 measurement overhead: the cold operation boundaries still read clocks.
 
 Build/check: `node experiments/isomax-lean/build.mjs [--check]`.
-Tests: `node --test test/isomax-lean.test.mjs`.
-Measurement: `node experiments/isomax-lean/measure.mjs`.
+Tests: `node --test test/*.test.mjs`.
+Latest measurement packet: `../isomax-four-items/revisit-index32.json`.
+Runner: `node experiments/isomax-four-items/measure.mjs <packet.json>`.
+For replay, copy the packet with a new evidence ID and paths to the exact
+checked-out revisions; the runner intentionally refuses to overwrite evidence.
 
-Measurement protocol frozen before replay: sequential **A B B A**, where A is
+Original cleanup measurement protocol: sequential **A B B A**, where A is
 the unchanged released four-deep baseline and B is this candidate. Each starts
 empty, computes the structural prefix once, and invokes one exact root solve.
 Same historical Node nightly, affinity targets 0/2/4/6, 5 GiB shared TT,

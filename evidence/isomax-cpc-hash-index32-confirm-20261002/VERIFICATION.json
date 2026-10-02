@@ -1,0 +1,25 @@
+{
+  "candidateSha": "eefbdf5c33ee087f558541a29cdc6f1b3940cfab",
+  "baselineSha": "f35c7e352e8178abb23b380d6ab7afe4962ebe22",
+  "enabled": ["cpc-fused", "hash-inline", "hash-index32", "live", "layout"],
+  "correctness": {"node26Passed": 199, "benchmarkNightlyPassed": 17, "failures": 0},
+  "sourceChecks": [
+    "Generated profile reproducibility --check",
+    "Catalog verified",
+    "Behavior and frontier generators --check",
+    "Transitive source audit; no reporting in recursive path",
+    "Runtime geometry audit",
+    "Production addons/src identical to frozen main e76e9ab3ca0e7a292badf9d9ac38a811d7971c99",
+    "Host, worker, shared-cache and coordinate modules identical to prior qualified f35c7e3"
+  ],
+  "regressions": [
+    "Legal5542 duplicate singleton scan failed before change: two visits instead of one; now one visit and one output clear",
+    "Actual in-search hash absent before direct emission; emitted recurrence now matches original at every legal frame",
+    "Incomplete benchmark analysis falsely succeeded before completion gate; now rejected",
+    "Literal fork restriction masks84/36 and counts3/2 preserved, immediate win has priority, poisoned scratch cleared"
+  ],
+  "review": {"revision": "eefbdf5c33ee087f558541a29cdc6f1b3940cfab", "result": "No blocking findings", "scope": "CPC control flow, fixed hash recurrence, proven frame-index domain, unsigned coercion, exact TT slots, analysis completion gates"},
+  "timedQualification": {"scoredSolves": 32, "unscoredWarmups": 1, "finalScoredSolves": 8, "allExact": true, "allSevenControlsPassed": true, "allCleanupAndAffinityGatesPassed": true},
+  "disposition": "Retain all four requested changes as correctness-qualified experimental candidate. Final mean slightly lower; reliable additional whole-solve speedup remains unestablished. Frozen main not promoted.",
+  "limits": ["Bounded tests, not exhaustive game-state or concurrency proof", "Compiler trace is mechanism evidence, not timing", "Four paired timing differences on one machine; interval crosses zero", "No production hot-loop counters or instrumentation"]
+}
