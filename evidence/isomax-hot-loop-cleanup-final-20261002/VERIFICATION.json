@@ -1,0 +1,33 @@
+{
+  "sourceSha": "136226250a3f23c78f625668edf5ffa9ce51c27c",
+  "tests": {
+    "stableNode": "v26.7.0",
+    "allTests": 189,
+    "allPassed": true,
+    "benchmarkRuntime": "v27.0.0-nightly20260928b59840b593",
+    "focusedTests": 7,
+    "focusedPassed": true
+  },
+  "checks": [
+    "candidate generator --check",
+    "catalog verifier",
+    "baseline behavior/frontier generator --check",
+    "baseline transitive frontier audit",
+    "runtime geometry audit",
+    "frozen addons/src/profile unchanged"
+  ],
+  "review": {
+    "firstRevision": "054c209d8829c602df22fd8677a8b8cc90b5ca2f",
+    "findings": [
+      "remaining diagnostic precursorCount",
+      "remaining invariant scratch-option branches"
+    ],
+    "reviewedRevision": "136226250a3f23c78f625668edf5ffa9ce51c27c",
+    "result": "Both findings resolved; no blocking findings",
+    "limitations": [
+      "No exhaustive concurrent TT interleaving proof",
+      "STOP extension-overlap implementation reused unchanged; no new dedicated overlap test"
+    ]
+  },
+  "evidenceClass": "bounded differential tests, source call-graph audit and local performance measurements"
+}
