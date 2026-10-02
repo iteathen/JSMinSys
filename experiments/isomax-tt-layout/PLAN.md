@@ -1,5 +1,10 @@
 # Initialization-selected TT layout experiment
 
+Historical first-candidate protocol, preserved as frozen before its measurements.
+Its byte-height layout and 32-bit value field are **superseded** by the native
+halfword layout in NEES_REVALIDATION.md. The first candidate introduced boxed
+high byte indices; it must not be treated as fully machine-cost-qualified.
+
 Approved objective: shrink shared TT storage without adding key encoding or
 decoding, weakening exact identity, or fixing the engine to one board size.
 Choose layout/accessors once from prepared geometry. Preserve production CPC,

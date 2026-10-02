@@ -11,6 +11,57 @@ NODE_V8_METHODS (especially M03/M05/M09/M13/M20/M27/M28/M44–M52), and COST_ACC
 Scope is the changed shared TT and its callers; production semantics are inherited
 unchanged, not a fresh NEES certification of the entire solver.
 
+## Conformance declaration and realization record
+
+- Target standard/level: NEES Draft 0.5 / NEES-EXTREME, JSMinSys Draft 0.2.
+- Declared scope: compact shared TT accessors and preparation, generated from
+  `cache-body.mjs`; their composition with the unchanged private TT and search.
+- Execution classes: E1 probes/stores executed in E0 recursive node work;
+  shared publication remains at that frequency (not mislabeled as infrequent E2).
+  Geometry/layout/view preparation and evidence collection are COLD. Host startup
+  and cleanup are unchanged E3 and included in the governing benchmark interval.
+- Runtime profile: Node v27.0.0-nightly20260928b59840b593,
+  V8 14.6.202.34-node.36, Windows 10.0.26200 x64, Intel Core i5-12600K;
+  four deep workers pinned to P-core logical processors 0/2/4/6.
+- Semantic owner: existing RBA canonical key, shared exact WDL 1/2/3 and seqlock
+  contract in `addons/rba-connect4-shared-exact-cache.mjs`; only physical layout
+  changes. Source files remain unchanged; no new independent WDL premise.
+- Mechanism classes: REPRESENTATION, JIT-ENGINE, ALLOCATION-LIFETIME, LOCALITY.
+- Causal role: COUPLED. Narrow field widths, address domain and memory footprint
+  jointly affect the whole solve; diagnostic GC counts are subordinate evidence.
+- Admission: valid prepared 7x6 compact keys, exact shared values 1/2/3; original
+  runtime and 2^27 shared slots for the Smi-domain performance qualification.
+  The general dimension-selected TT remains a correctness fallback, not a claim
+  of measured performance at all sizes/capacities.
+- Falsifiers: lost key distinction, publication mismatch, extra codecs, high-index
+  boxing reappearing, or worse governing-unit cost/unsafe geometry fallback.
+- Requalification triggers: Node/V8/platform change, table capacity above 2^27,
+  different key/value domain, altered view layout, Atomics implementation or
+  compiler lowering, changed topology, allocation lifecycle or workload.
+- Cycle ledger: symbolic executed-path ledger below; no unsupported numeric
+  instruction-latency table. Whole-process cycles are QueryProcessCycleTime on the
+  exact CPU/runtime profile, not a sum of guessed one-cycle source operations.
+- Conformance claim boundary: this records the affected methods and remaining
+  debt. It does not self-certify the complete solver as JMS-SEALED/NEES-EXTREME.
+
+| Applicable rules/methods | Disposition in this changed scope |
+| --- | --- |
+| EVID-001..007; M44/M47..M51 | CONFORMS: pinned authority/runtime, negative and positive domain controls, exact-revision whole-solve comparison; no promotion from a proxy |
+| COST-001..007; M52 | CONFORMS: executed-path atomic counts, symbolic guards/memory/builtin/coherence costs, externally measured all-thread cycles; no zero-cost unknowns |
+| CORE-001..005; XTRM-001..007; M45/M46 | New index-allocation mechanism REMOVED; coupled locality/operation cost qualified at whole-solve boundary; inherited optimization debt remains visible below |
+| BOUND-001..004; REP-001..004; M01/M03/M05/M06/M08/M09/M10 | CONFORMS for declared domain: geometry preparation, stable two-view representation, native field access, unchanged exact identity/hash; controlled full-size numeric-domain evidence |
+| ALLOC-001..004; M11/M13/M14 | New index boxing REMOVED; no per-node view/aggregate allocation, views rebuilt cold on the same backing. Other potential inherited payload boxing remains UNVERIFIED-DEBT |
+| COMP-001..004; FINITE-001..002; M15/M16/M19/M38/M42 | CONFORMS: no additional node traversal or codec, no change to search complexity, existing compile-time specialization and cold layout choice |
+| CF-001..002; JIT-001..003; M02/M17/M20/M22 | Stable signatures and branch-free dimension specialization retained; final generated-code evidence required before final lowering claims |
+| CONC-001..004; M26/M27/M28 | CONFORMS for safety: same publishers/readers and seqlock order, no added global counters/retries; coherence cost remains symbolic and coupled to the measured layout |
+| NATIVE-001; M31..M34 | No new hot native boundary; existing Atomics builtins costed symbolically. FFI cycle accounting is unchanged and outside the hot loop |
+| DIAG-001; M35/M36 | CONFORMS: no added hot reporting; GC/JIT diagnostics run separately from scored solves |
+| M29/M30 | Host worker creation/transport/cleanup unchanged; no claim of a newly reusable pool or a new lifetime optimization |
+
+Methods about strings, priority structures, callbacks, dynamic aggregates, native
+addons and arena generation redesign introduce no changed mechanism here. Existing
+transitive contracts remain inherited, not reclassified as universally inapplicable.
+
 ## Established defect and controlled repair
 
 At 134217728 entries, a byte-view index can reach 4294967291. On the qualified

@@ -1,0 +1,68 @@
+{
+  "diagnostics": {
+    "timingEvidence": false,
+    "iterations": 200000,
+    "command": "node --allow-natives-syntax --trace-gc --trace-deopt experiments/isomax-tt-layout/inspect-index-domain.mjs <library> high|low",
+    "processScavenges": {
+      "baselineHigh": 4,
+      "firstNarrowHigh": 29,
+      "repairedHigh": 4,
+      "firstNarrowLow": 4
+    }
+  },
+  "scopeRecord": "experiments/isomax-tt-layout/NEES_REVALIDATION.md",
+  "neesAuthority": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69",
+  "nightly": {
+    "tests": 15,
+    "passed": 15,
+    "log": "nightly-tests-half.txt"
+  },
+  "testedRuntimeSha": "4e7af0e74b82b6bb70fef94a211196b4235a4039",
+  "productionDiffExitCode": 0,
+  "fullSizeRegression": {
+    "after": "index-regression-green.json",
+    "before": "index-regression-red.txt"
+  },
+  "review": {
+    "recordFindings": "Historical plan marked superseded; scoped conformance declaration added; repaired caller and full-size accessor compiler output captured",
+    "revision": "4e7af0e74b82b6bb70fef94a211196b4235a4039",
+    "blockingRuntimeIssues": 0
+  },
+  "sourceChecks": [
+    {
+      "exitCode": 0,
+      "output": "",
+      "command": "node experiments/isomax-lean/build.mjs --check"
+    },
+    {
+      "exitCode": 0,
+      "output": "JSMinSys catalog verified: 298 sealed functions + 171 add-on units cycle-ledgered, 30/30 blocks complete, 0 deferred function(s).",
+      "command": "node tools/verify-catalog.mjs"
+    },
+    {
+      "exitCode": 0,
+      "output": "",
+      "command": "node tools/build-behavior-search.mjs --check"
+    },
+    {
+      "exitCode": 0,
+      "output": "",
+      "command": "node tools/build-root-frontier.mjs --check"
+    },
+    {
+      "exitCode": 0,
+      "output": "Root-frontier structural audit: 52 transitive functions checked; source/call checks only, not a machine-code cost claim.",
+      "command": "node tools/audit-root-frontier.mjs"
+    },
+    {
+      "exitCode": 0,
+      "output": "Runtime geometry audit passed: general path present; RBA add-ons contain no 7x6 carrier constants.",
+      "command": "node tools/audit-runtime-geometry.mjs"
+    }
+  ],
+  "suite": {
+    "tests": 202,
+    "passed": 202,
+    "log": "tests-half.txt"
+  }
+}

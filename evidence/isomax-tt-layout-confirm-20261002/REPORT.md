@@ -1,5 +1,10 @@
 # 32-byte shared TT: saves memory, speed improvement not established
 
+**Superseded implementation:** the subsequent NEES audit found boxed full-size
+byte indices that this qualification missed. The repair and new matched results
+are in `../isomax-tt-half-confirm-20261002/REPORT.md`. The observations below remain
+the historical first-candidate results, not the final TT disposition.
+
 The candidate reduces the standard 7x6 shared TT entry from 40 to 32 bytes with
 native narrow atomic fields and **no new key encoding or decoding**. Same entry
 capacity, exact key identity, full-width sequence counter, value and publication

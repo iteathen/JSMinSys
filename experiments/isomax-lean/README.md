@@ -1,9 +1,12 @@
 # IsoMax deep worker without reporting in search
 
 Entry point: `host.mjs`, export `runLazySmpConnect4Rba32`.
-This branch contains the experimental 32-byte TT candidate. See
-`../../evidence/isomax-tt-layout-confirm-20261002/REPORT.md`: **20% less shared
-TT memory, no established speed improvement** (38.564 s → 39.051 s mean).
+This branch contains the repaired 32-byte TT candidate. See
+`../../evidence/isomax-tt-half-confirm-20261002/REPORT.md`: **20% less shared
+TT memory**, with matched mean time **37.712 s → 37.376 s** (0.893% lower).
+The first implementation's boxed high byte indices were removed using native
+halfword fields; no key encoder/decoder was added. The scoped NEES audit and
+remaining debt are in `../isomax-tt-layout/NEES_REVALIDATION.md`.
 Current qualification: 202 tests, plus 15 focused tests on the benchmark runtime.
 This is a correctness-qualified memory-saving option, not a promotion. The locked main
 version and all existing `src/` and `addons/` files remain unchanged.
@@ -77,7 +80,7 @@ measurement overhead: the cold operation boundaries still read clocks.
 
 Build/check: `node experiments/isomax-lean/build.mjs [--check]`.
 Tests: `node --test test/*.test.mjs`.
-Latest measurement packet: `../isomax-tt-layout/confirm.json`.
+Latest measurement packet: `../isomax-tt-layout/half-confirm.json`.
 Runner: `node experiments/isomax-four-items/measure.mjs <packet.json>`.
 For replay, copy the packet with a new evidence ID and paths to the exact
 checked-out revisions; the runner intentionally refuses to overwrite evidence.
