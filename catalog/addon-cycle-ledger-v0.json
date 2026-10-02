@@ -10486,11 +10486,110 @@
         },
         "note": "Cold full-buffer view header restoration only; constructor creates view metadata over existing SAB, no new backing or memory copy. Native instance checks/getters remain runtime-dependent; allocation cost is not zero. Once per worker; no recursive calls."
       }
+    },
+    {
+      "unit": "addons/connect4-rank-local-presearch.mjs#evaluateConnect4RankLocalLanding32",
+      "source": "addons/connect4-rank-local-presearch.mjs",
+      "name": "evaluateConnect4RankLocalLanding32",
+      "scope": "cold-rank-local-presearch",
+      "operations": [
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.move.validation",
+          "count": "M"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 2
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": 1
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "M+C"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "M"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "8*L*C+4*L+8*C+C*C"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "4*L+4*L*C"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": "4+3*C"
+        },
+        {
+          "op": "runtime.array.push",
+          "count": "C*(2*L+C)"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "5+C"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "12+8*M+20*L*C+12*C+8*C*C"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "12+12*C+C*C"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "4+M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "12+5*M+8*L+12*L*C+9*C+8*C*C"
+        },
+        {
+          "op": "control.branch",
+          "count": "10+4*M+7*L+10*L*C+8*C+7*C*C"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "5*M+8*L+8*L*C+2*C"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4*M+12*L+12*L*C+8*C+2*C*C"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "2*C"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "M+1"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.host.bookkeeping)+M*C(runtime.move.validation)+2*C(runtime.typed_array.allocate)+C(runtime.typed_array.fill)+(M+C)*C(memory.store.u32)+M*C(memory.store.u8)+(8*L*C+4*L+8*C+C*C)*C(memory.load.u32)+(4*L+4*L*C)*C(memory.load.u8)+(4+3*C)*C(runtime.array.allocate)+C*(2*L+C)*C(runtime.array.push)+(5+C)*C(runtime.object.allocate)+(12+8*M+20*L*C+12*C+8*C*C)*C(runtime.field.load)+(12+12*C+C*C)*C(runtime.field.store)+(4+M)*C(runtime.integer.check)+(12+5*M+8*L+12*L*C+9*C+8*C*C)*C(control.test.u32)+(10+4*M+7*L+10*L*C+8*C+7*C*C)*C(control.branch)+(5*M+8*L+8*L*C+2*C)*C(alu.imul.u32)+(4*M+12*L+12*L*C+8*C+2*C*C)*C(alu.add.u32)+2*C*C(alu.sub.u32)+(M+1)*C(alu.and.u32)",
+        "parameters": {
+          "M": "current move-history length",
+          "C": "configured column count",
+          "L": "configured winning-line count"
+        },
+        "note": "Cold pre-search structural measurement only. Counts cover current-board reconstruction, line-incidence scans, Pareto relation construction, descriptive result assembly, and explicit headroom gate; no descendant/search work is hidden."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 170,
-    "decomposed": 170,
+    "units": 171,
+    "decomposed": 171,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -10612,7 +10711,8 @@
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "0a604bfc3b9257ebe2cc80bc3534aaa43dcac70a",
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
-    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f"
+    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
+    "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
