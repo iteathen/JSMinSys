@@ -1,0 +1,31 @@
+name: Connect4 Rank-Local Pre-Search
+
+on:
+  push:
+    branches:
+      - research/cpc-guard-proof-memo-nees-v1
+    paths:
+      - '.github/workflows/connect4-rank-local-presearch.yml'
+      - 'addons/connect4-rank-local-presearch.mjs'
+      - 'addons/rba-connect4-move-selector.mjs'
+      - 'addons/index.mjs'
+      - 'catalog/rba-addon-v0.json'
+      - 'catalog/addon-cycle-ledger-v0.json'
+      - 'test/connect4-rank-local-presearch.test.mjs'
+      - 'docs/connect4-rank-local-presearch.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rank-local-presearch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '26'
+      - run: node --test test/connect4-rank-local-presearch.test.mjs
+      - run: node tools/verify-catalog.mjs
