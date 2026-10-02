@@ -12,9 +12,41 @@ import * as lean from '../experiments/isomax-lean/solver.mjs';
 import * as cpc from '../experiments/isomax-lean/cpc.mjs';
 import * as tt from '../experiments/isomax-lean/shared-cache.mjs';
 import {runLazySmpConnect4Rba32} from '../experiments/isomax-lean/host.mjs';
+import {checkHotBody} from '../tools/audit-root-frontier.mjs';
 
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 const sequences=['1320461024522311','2053635233350500','0011223'];
+test('transitive deep call graph has no reporting or runtime measurement machinery',()=>{
+  const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+  const ledger=JSON.parse(read('catalog/addon-cycle-ledger-v0.json'));
+  const core=JSON.parse(read('catalog/functions-v0.json'));
+  const units=new Map([...ledger.units,...core.functions].map(u=>[u.name,u]));
+  const local=new Map();
+  for(const file of ['solver','cpc','shared-cache','coordinate']){
+    const source=read('experiments/isomax-lean/'+file+'.mjs');
+    for(const match of source.matchAll(/function (\w+)\(/g))local.set(match[1],source);
+  }
+  const pending=['searchCpcOnlyFrontier'],seen=new Set();
+  while(pending.length){
+    const name=pending.pop();if(seen.has(name))continue;seen.add(name);
+    const u=units.get(name);assert.ok(u,'unknown hot target '+name);
+    const source=(local.get(name)??read(u.source)).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,'');
+    const start=source.indexOf('function '+name+'(');assert.ok(start>=0,name);
+    let at=source.indexOf('(',start),depth=1;
+    while(depth){at++;if(source[at]==='(')depth++;if(source[at]===')')depth--;assert.ok(at<source.length);}
+    const begin=source.indexOf('{',at)+1;at=begin;depth=1;
+    while(depth){if(source[at]==='{')depth++;if(source[at]==='}')depth--;at++;assert.ok(at<=source.length);}
+    const body=source.slice(begin,at-1);checkHotBody(body,name);
+    assert.doesNotMatch(body,/Atomics\.add|cache\.stats|state\.(nodeCounts|cutoffs|cacheHits|cpcExact|cpcBounds|cpcRestrictions|cofactors)|scratch\.(forcedTotal|precursorTotal|projectedForkTotal|precursorCount)/,name);
+    for(const op of u.operations??[])if(op.op==='runtime.callback'){
+      const targets=ledger.isomaxSystemCycleGraph.callbackTargets[op.target];assert.ok(targets,op.target);
+      pending.push(...targets.map(t=>t.split('#')[1]));
+    }
+    for(const m of body.matchAll(/(?<![.\w])([A-Za-z_$][\w$]*)\s*\(/g))
+      if(!['if','for','while','switch','return'].includes(m[1]))pending.push(m[1]);
+  }
+  assert.ok(seen.size>30);
+});
 function prepare(api,offset=0){
   const memory=createWorkerBehaviorMemory32(1),words=new Uint32Array(memory.buffer);
   publishWorkerBehavior32(words,0,encodeRootFrontier32({release:true}));
@@ -30,7 +62,10 @@ test('lean recursive path has no reporting, frontier or fixed configuration bran
   const cache=readFileSync(new URL('../experiments/isomax-lean/shared-cache.mjs',import.meta.url),'utf8');
   assert.doesNotMatch(cache,/Atomics\.add|cache\.stats|knownHash===undefined|if\(cache\.compact8\)/);
   const cpcSrc=readFileSync(new URL('../experiments/isomax-lean/cpc.mjs',import.meta.url),'utf8');
-  assert.doesNotMatch(cpcSrc,/scratch\.(forcedTotal|precursorTotal|projectedForkTotal)|if\(scratch\.projectedAdvisory\)|=scratch\.frontierResponse/);
+  assert.doesNotMatch(cpcSrc,/scratch\.(forcedTotal|precursorTotal|projectedForkTotal|precursorCount)|if\(scratch\.projectedAdvisory\)|=scratch\.frontierResponse/);
+  assert.doesNotMatch(cpcSrc,/!targets/);
+  const coordinates=readFileSync(new URL('../experiments/isomax-lean/coordinate.mjs',import.meta.url),'utf8');
+  assert.doesNotMatch(coordinates,/if\(removed\)|if\(childIndex\)|if\(selectedSet\)|removed\?|return seenOffset/);
 });
 test('full-window deep result and tie-breaking match released baseline for every worker order and reflection',()=>{
   for(let order=0;order<4;order++){
@@ -59,8 +94,9 @@ test('CPC retains exact intervals, forced moves and restriction masks on determi
       const root=connect4RbaFromMoves(moves,{geometry:g});
       const args=[g,root.words,0,root.basis,0,root.basis.length];
       assert.equal(cpc.evaluateConnect4Cpc32(...args,b),oldCpc.evaluateConnect4Cpc32(...args,a));
-      for(const field of ['interval','forcedColumn','preemptionCount','preemptionMask32','precursorCount'])
+      for(const field of ['interval','forcedColumn','preemptionCount','preemptionMask32'])
         assert.deepEqual(b[field],a[field],field);
+      assert.equal(b.precursorCount,undefined);
       positions++;
       if(root.words[g.metaOffset]&3)break;
       const legal=Array.from({length:7},(_,c)=>c).filter(c=>heights[c]<6);

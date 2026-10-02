@@ -17,13 +17,15 @@ Removed from the candidate's recursive path and callees:
 - Node, cutoff, cache-hit, cofactor and aggregate CPC diagnostic updates.
 - Horizon tests, unfinished-frontier propagation and repeated root passes.
 - Fixed compact-key, shared-cache sampling, move-packing, live-line word-width
-  and CPC-option branches.
+  and CPC-option branches, plus optional-scratch checks in coordinate helpers.
 
 The generator derives the candidate from the locked source, specializing the
 declared configuration and retaining full-window root probes, root tie-breaking,
 forced transit, CPC intervals/masks, key identity and TT publication rules.
 Production `addons/cpc-connect4.mjs` is unchanged. CPC diagnostics are removed
-only in the generated candidate; semantic counters/masks are retained.
+only in the generated candidate; semantic preemption counts/masks are retained.
+The precursor diagnostic count is removed as well as its aggregate. Coordinate
+helpers are private to this prepared profile, not general optional-buffer APIs.
 
 Exact node/hit counts are unavailable (`null`), not zero. Timing and Windows
 CPU/cycle/RSS accounting occur outside recursive search. There is no sampling
@@ -43,5 +45,7 @@ structural work and the complete host invocation, including allocation, worker
 creation and cleanup, as in the prior benchmark. This change does not redesign
 the host lifecycle into a persistent initialized application pool.
 
-Results go to `evidence/isomax-hot-loop-cleanup-20261002/`. Four samples can
+Final results go to `evidence/isomax-hot-loop-cleanup-final-20261002/`;
+the initial counter-removal measurements are retained separately in
+`evidence/isomax-hot-loop-cleanup-20261002/`. Four samples can
 detect a material regression; they do not establish a universal speedup.

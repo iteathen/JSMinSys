@@ -7,6 +7,11 @@ const root=new URL('../../',import.meta.url),inputs={};
 function read(name){const s=readFileSync(new URL(name,root),'utf8').replaceAll('\r\n','\n');inputs[name]=createHash('sha256').update(s).digest('hex');return s;}
 function once(s,old,value){assert.equal(s.split(old).length,2,old);return s.replace(old,value);}
 function endBlock(s,open){let depth=1,i=open+1;for(;depth&&i<s.length;i++){if(s[i]==='{')depth++;if(s[i]==='}')depth--;}assert.equal(depth,0);return i;}
+function functionText(s,name){
+  const start=s.indexOf('function '+name+'(');assert.ok(start>=0,name);
+  const open=s.indexOf('){',start)+1;assert.ok(open>start,name);
+  return s.slice(start,endBlock(s,open));
+}
 // Applied only to pinned, balanced source blocks; --check detects source drift.
 function fixedIf(s,condition,take){
   const needle='if('+condition+')';
@@ -46,11 +51,32 @@ output('shared-cache.mjs',relocate(cache));
 let cpc=read('addons/cpc-connect4.mjs');
 cpc=cpc.replace(/scratch\.(forcedTotal|precursorTotal|projectedForkTotal)\+=[^;]+;/g,'');
 cpc=cpc.replace(/    (forcedTotal|precursorTotal|projectedForkTotal):0,\n/g,'');
+cpc=cpc.replace(/scratch\.precursorCount\[0\](?:\+=1|=0);/g,'');
+cpc=cpc.replace(/    precursorCount:new Uint32Array\(1\),\n/,'');
+cpc=once(cpc,'if(!targets||moverHasSingleton)','if(moverHasSingleton)');
 cpc=fixedIf(cpc,'scratch.projectedAdvisory',false);
 cpc=cpc.replace(/scratch\.frontierResponse\s*\?frontierResponseNoWin\([^;]+?\)\s*:(pairedResponseNoWin\([^;]+?\))/g,'$1');
 cpc=cpc.replaceAll('g.columns<=32?((1<<column)>>>0):0','((1<<column)>>>0)');
 cpc=once(cpc,'  const cellWords=Math.ceil(g.cellCount/32);',"  if(g.columns!==7||g.rows!==6||g.lineCount!==69||frontierResponse||projectedAdvisory)throw RangeError('lean CPC requires standard baseline configuration');\n  const cellWords=Math.ceil(g.cellCount/32);");
 output('cpc.mjs',relocate(cpc));
+
+// Private, prepared-only coordinate functions. Every caller supplies removed
+// and child-index scratch, uses seen offset zero and requests no selected set.
+const coordinateBase=read('addons/rba-connect4-coordinate.mjs');
+let coordinate="import {emitSortedSetBits32} from '../../src/basis32.mjs';\nimport {publishSpan32} from '../../src/widekey32.mjs';\n";
+for(const name of ['connect4RbaCofactorBasis','connect4RbaCofactorKnownHeight','compareReflectedSupport','connect4RbaCanonicalize'])
+  coordinate+=(['connect4RbaCofactorKnownHeight','connect4RbaCanonicalize'].includes(name)?'export ':'')+functionText(coordinateBase,name)+'\n';
+coordinate=coordinate.replaceAll('removed=null,childIndex=null,seenOffset=0','removed,childIndex').replaceAll('removed=null,seenOffset=0','removed');
+coordinate=coordinate.replaceAll('removed,seenOffset','removed').replaceAll('seenOffset+','');
+coordinate=once(coordinate,'if(removed)removed[i]=id;','removed[i]=id;');
+coordinate=once(coordinate,'return seenOffset\n    ?emitSortedSetBitsAt32(seen,seenOffset,g.shapeWordCount,out,outOffset)\n    :emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);','return emitSortedSetBits32(seen,g.shapeWordCount,out,outOffset);');
+coordinate=once(coordinate,'if(childIndex)childIndex[id]=j;','childIndex[id]=j;');
+coordinate=once(coordinate,'const remove=removed?0:profile.prepareRemove(g,cell),','const');
+coordinate=once(coordinate,'raw=removed?removed[i]:profile.removePrepared(g,id,remove)','raw=removed[i]');
+coordinate=once(coordinate,'    if(childIndex)lo=childIndex[image];\n    else{\n      lo=0;let hi=cn;\n      while(lo<hi){const mid=(lo+hi)>>>1;if(childBasis[ci+mid]<image)lo=mid+1;else hi=mid;}\n    }','    lo=childIndex[image];');
+coordinate=coordinate.replace(',selectedSet=null,selectedSetOffset=0','');
+coordinate=once(coordinate,'  if(selectedSet)publishSpan32(selectedSet,selectedSetOffset,scratch.seen,0,g.shapeWordCount);\n','');
+output('coordinate.mjs',coordinate);
 
 let s=read('addons/rba-connect4-frontier.mjs');
 s=s.slice(s.indexOf('import '));
@@ -106,7 +132,7 @@ s=s.slice(0,start)+`  // Same full-window root probes and deterministic tie-brea
 `+s.slice(end);
 s=s.slice(0,s.indexOf('function metricsFrontier(s)'));
 s=s.replaceAll('metrics:metricsFrontier(state)','metrics:null');
-output('solver.mjs',relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
+output('solver.mjs',relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'}));
 
 let worker=read('addons/rba-connect4-lazy-smp-worker-frontier.mjs');
 worker=worker.slice(worker.indexOf('import '));

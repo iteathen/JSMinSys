@@ -3,7 +3,7 @@ import {execFileSync,spawnSync} from 'node:child_process';
 import {readFileSync,writeFileSync,appendFileSync,mkdirSync,existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-const dir='evidence/isomax-hot-loop-cleanup-20261002';
+const dir='evidence/isomax-hot-loop-cleanup-final-20261002';
 const runtime=JSON.parse(readFileSync('evidence/isomax-memory-affinity-20260928/runtime.json'));
 const targets=JSON.parse(readFileSync('evidence/isomax-memory-affinity-20260928/targets.json'));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();

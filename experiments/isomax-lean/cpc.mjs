@@ -25,7 +25,6 @@ export function prepareConnect4CpcScratch(g,{frontierResponse=false,projectedAdv
     activeSingletonCells:new Uint32Array(cellWords),
     activeSingletonCellsOther:new Uint32Array(cellWords),
     forkTargets32:g.columns<=32?new Uint32Array(g.columns):null,
-    precursorCount:new Uint32Array(1),
     preemptionCount:new Uint32Array(1),
     preemptionMask32:new Uint32Array(1),
     forcedColumn:new Int32Array(1),
@@ -89,8 +88,8 @@ function collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mov
 // For configured widths above 32 the proof optimization is simply skipped;
 // correctness then falls through to ordinary traversal.
 function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch){
-  scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
-  const targets=scratch.forkTargets32;if(!targets||moverHasSingleton)return 0;
+  scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
+  const targets=scratch.forkTargets32;if(moverHasSingleton)return 0;
 
   const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
   const moverBits=mover?p1Bits:p0Bits,attackerBits=mover?p0Bits:p1Bits;
@@ -126,7 +125,7 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
     let preempt=((1<<column)>>>0);
     if(targetCount===2)preempt=(preempt|targetMask)>>>0;
     intersection=first?preempt:(intersection&preempt)>>>0;
-    first=0;scratch.precursorCount[0]+=1;
+    first=0;
   }
   if(first)return 0;
   
@@ -269,14 +268,14 @@ export function evaluateConnect4Cpc32(g,words,offset,basis,basisOffset,basisSize
   const terminal=words[offset+g.metaOffset]&3;
   if(!terminal)return evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch);
   scratch.interval[0]=terminal;scratch.interval[1]=terminal;scratch.forcedColumn[0]=-1;
-  scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
+  scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   
   return CPC_EXACT;
 }
 
 export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffset,basisSize,scratch){
   scratch.interval[0]=1;scratch.interval[1]=3;scratch.forcedColumn[0]=-1;
-  scratch.precursorCount[0]=0;scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
+  scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
   
   const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
 
