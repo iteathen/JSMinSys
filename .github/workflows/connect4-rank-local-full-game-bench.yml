@@ -21,7 +21,10 @@ jobs:
     timeout-minutes: 5
     env:
       C4_WORKERS: '4'
-      C4_SEARCH_TIMEOUT_MS: '120000'
+      C4_SEARCH_TIMEOUT_MS: '60000'
+      C4_SHARED_CACHE_CAPACITY: '4194304'
+      C4_LOCAL_CACHE_CAPACITY: '1048576'
+      C4_ROOT_FRONTIER: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
