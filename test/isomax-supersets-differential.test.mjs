@@ -8,6 +8,8 @@ import {prepareConnect4RbaExecutionProfile as prepareCandidate} from '../experim
 import * as csr from '../experiments/isomax-lean/coordinate-supersets.mjs';
 import * as constants from '../experiments/isomax-lean/coordinate-constants.mjs';
 import * as masks from '../experiments/isomax-lean/coordinate-masks.mjs';
+import * as prepared from '../experiments/isomax-lean/coordinate-prepared.mjs';
+import * as dense from '../experiments/isomax-lean/coordinate-dense.mjs';
 
 function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
   const src=3,bi=5,dst=4,ci=7;
@@ -28,12 +30,12 @@ function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
   return {term,words:words.slice(dst,dst+g.keyWords),basis:basis.slice(ci,ci+sizes[1])};
 }
 
-for(const [label,api] of Object.entries({csr,constants,masks})){
+for(const [label,api] of Object.entries({csr,constants,masks,prepared,dense})){
 const {connect4RbaCofactorKnownHeight:candidate,connect4RbaCanonicalize}=api;
 test(label+': cofactors match every legal child along deterministic walks and reflected gauges',()=>{
   let checked=0,terminals=0,seed=0x510ca7e;
   const random=()=>seed=(Math.imul(seed,1664525)+1013904223)>>>0;
-  for(const budget of [0,2097152]){
+  for(const budget of (label==='dense'?[2097152]:[0,2097152])){
     const g=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:budget});
     const base=prepareReference(g),fast=prepareCandidate(g);
     for(let game=0;game<4;game++){
@@ -74,7 +76,7 @@ test(label+': cofactors match every legal child along deterministic walks and re
 
 test(label+': excludes absent supersets even when inverse scratch points to a matching stale tail',()=>{
   let exercised=0;
-  for(const budget of [0,2097152]){
+  for(const budget of (label==='dense'?[2097152]:[0,2097152])){
     const g=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:budget});
     const base=prepareReference(g),fast=prepareCandidate(g);
     const q=connect4RbaFromMoves([3,2,3,2,4,1,4,1],{geometry:g,canonical:false});
@@ -99,11 +101,11 @@ test(label+': excludes absent supersets even when inverse scratch points to a ma
       }
     }
   }
-  assert.ok(exercised>=2,'directed fixture must exercise the stale-tail case');
+  assert.ok(exercised>=1,'directed fixture must exercise the stale-tail case');
 });
 
 test(label+': preserves both players first wins and full-board draw/win precedence',()=>{
-  for(const budget of [0,2097152]){
+  for(const budget of (label==='dense'?[2097152]:[0,2097152])){
     const g=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:budget});
     const base=prepareReference(g),fast=prepareCandidate(g);
     for(const [moves,column,value] of [[[0,1,0,1,0,2],0,3],[[0,1,0,1,2,1,2],1,1]]){

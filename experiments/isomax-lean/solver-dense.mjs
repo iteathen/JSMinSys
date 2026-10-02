@@ -4,7 +4,7 @@ import {prepareSearchBehavior32,completeBehaviorNode32} from '../../addons/worke
 import {mixSpan32Locator32,publishSpan32} from '../../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './profile-masks.mjs';
 import {prepareConnect4RbaCoordinateScratch} from '../../addons/rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './coordinate-prepared.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './coordinate-dense.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from '../../addons/connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../../src/search32.mjs';
@@ -120,6 +120,7 @@ export function prepareConnect4RbaFrontier({
   cpcProjectedAdvisory=false,
   behavior,
 }={}){
+  if(geometry?.removeByCell===null)throw RangeError('dense removal table required');
   if(!isCompactProfile8(geometry,geometry?.keyWords))throw RangeError('lean solver requires standard 7x6 geometry');
   if(sharedExactCache===null||!sharedExactCache.compact8||sharedSampleMask!==0)throw RangeError('lean solver requires compact shared TT with sample mask zero');
   if(mode!==RBA_FRONTIER_CPC_ONLY)throw RangeError('PFIF requires CPC-only');

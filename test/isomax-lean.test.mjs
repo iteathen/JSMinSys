@@ -9,6 +9,7 @@ import * as baseline from '../addons/rba-connect4-frontier.mjs';
 import * as oldCpc from '../addons/cpc-connect4.mjs';
 import * as oldTT from '../addons/rba-connect4-shared-exact-cache.mjs';
 import * as lean from '../experiments/isomax-lean/solver.mjs';
+import * as dense from '../experiments/isomax-lean/solver-dense.mjs';
 import * as cpc from '../experiments/isomax-lean/cpc.mjs';
 import * as tt from '../experiments/isomax-lean/shared-cache.mjs';
 import {runLazySmpConnect4Rba32} from '../experiments/isomax-lean/host.mjs';
@@ -33,14 +34,14 @@ function logical(cache,field){
   return out;
 }
 function setSequence(cache,slot,value){Atomics.store(cache.entries??cache.sequence,cache.entries?slot*(cache.layout?.entryWords??10):slot,value);}
-test('transitive deep call graph has no reporting or runtime measurement machinery',()=>{
+for(const solverFile of ['solver','solver-dense'])test(solverFile+': transitive deep call graph has no reporting or runtime measurement machinery',()=>{
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
   const ledger=JSON.parse(read('catalog/addon-cycle-ledger-v0.json'));
   const core=JSON.parse(read('catalog/functions-v0.json'));
   const units=new Map([...ledger.units,...core.functions].map(u=>[u.name,u]));
   const local=new Map();
-  const selected=read('experiments/isomax-lean/solver.mjs').match(/from '\.\/(coordinate[^']*)\.mjs'/)[1];
-  for(const file of ['solver','cpc','shared-cache',selected,'fixed-ops']){
+  const selected=read('experiments/isomax-lean/'+solverFile+'.mjs').match(/from '\.\/(coordinate[^']*)\.mjs'/)[1];
+  for(const file of [solverFile,'cpc','shared-cache',selected,'fixed-ops']){
     const source=read('experiments/isomax-lean/'+file+'.mjs');
     for(const match of source.matchAll(/function (\w+)\(/g)){
       local.set(match[1],source);
@@ -88,14 +89,14 @@ test('lean recursive path has no reporting, frontier or fixed configuration bran
   const coordinates=readFileSync(new URL('../experiments/isomax-lean/coordinate.mjs',import.meta.url),'utf8');
   assert.doesNotMatch(coordinates,/if\(removed\)|if\(childIndex\)|if\(selectedSet\)|removed\?|return seenOffset/);
 });
-test('full-window deep result and tie-breaking match released baseline for every worker order and reflection',()=>{
+for(const api of [lean,dense])test('full-window deep result and tie-breaking match released baseline for every worker order and reflection ('+(api===dense?'dense':'prepared')+')',()=>{
   for(let order=0;order<4;order++){
-    const a=prepare(baseline,order).state,b=prepare(lean,order).state;
+    const a=prepare(baseline,order).state,b=prepare(api,order).state;
     for(const sequence of sequences)for(const mirror of [false,true]){
       const moves=[...sequence].map(Number).map(c=>mirror?6-c:c);
       const root=connect4RbaFromMoves(moves,{geometry:g});
       const expected=baseline.solveConnect4RbaFrontier(root,{state:a,reflected:root.reflected});
-      const actual=lean.solveConnect4RbaFrontier(root,{state:b,reflected:root.reflected});
+      const actual=api.solveConnect4RbaFrontier(root,{state:b,reflected:root.reflected});
       assert.deepEqual([actual.status,actual.value,actual.relative,actual.move],
         [expected.status,expected.value,expected.relative,expected.move]);
       assert.equal(actual.metrics,null);

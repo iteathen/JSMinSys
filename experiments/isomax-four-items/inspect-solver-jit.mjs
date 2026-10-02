@@ -8,7 +8,7 @@ import {BehaviorWorker,createWorkerBehaviorMemory32,publishWorkerBehavior32} fro
 import {encodeRootFrontier32} from '../../addons/worker-root-frontier.mjs';
 const library=resolve(process.argv[2]);
 const load=name=>import(pathToFileURL(resolve(library,'experiments/isomax-lean/'+name+'.mjs')).href);
-const solver=await load('solver'),tt=await load('shared-cache');
+const solver=await load(process.argv[3]??'solver'),tt=await load('shared-cache');
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 let checksum=0;
 for(let repeat=0;repeat<4;repeat++)for(const sequence of ['1320461024522311','2053635233350500']){

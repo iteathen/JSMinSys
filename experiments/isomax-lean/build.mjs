@@ -4,8 +4,10 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {optimizeCpc,optimizeCpcFused,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
+import {optimizeMaskCoordinate} from './optimize-coordinate.mjs';
 const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
-assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets','superset-masks','coordinate-constants'].includes(f)));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','cpc-fused','hash','hash-inline','hash-index32','live','layout','layout32','supersets','superset-masks','coordinate-constants','mask-prepared'].includes(f)));
+assert.ok(!features.includes('mask-prepared')||features.includes('superset-masks'));
 assert.ok(!(features.includes('cpc')&&features.includes('cpc-fused')));
 assert.ok(!(features.includes('hash')&&features.includes('hash-inline')));
 assert.ok(!features.includes('hash-index32')||features.includes('hash-inline'));
@@ -133,11 +135,13 @@ masked=masked.slice(0,ms)+`    const offsets=profile.supersetWordOffsets,words=p
       }
     }`+masked.slice(me);
 output('coordinate-masks.mjs',masked);
+output('coordinate-prepared.mjs',optimizeMaskCoordinate(masked));
+output('coordinate-dense.mjs',optimizeMaskCoordinate(masked,{dense:true}));
 
-const profiles=[{name:'',general:false,packed:true,wide:false},
+const profiles=[{name:'',general:false,packed:true,wide:false},{name:'-dense',general:false,packed:true,wide:false,dense:true},
   ...[false,true].flatMap(wide=>[true,false].map(packed=>({general:true,packed,wide,
     name:`-general${wide?'-wide':''}${packed?'':'-unpacked'}`})))];
-for(const {name,general,packed,wide} of profiles){
+for(const {name,general,packed,wide,dense=false} of profiles){
 let s=read('addons/rba-connect4-frontier.mjs');
 s=s.slice(s.indexOf('import '));
 s=once(s,"import {prepareRootFrontierBehavior32 as prepareSearchBehavior32,completeRootFrontierNode32 as completeBehaviorNode32} from './worker-root-frontier.mjs';","import {prepareSearchBehavior32,completeBehaviorNode32} from './worker-behavior-search.mjs';");
@@ -228,6 +232,11 @@ if(!general&&features.includes('live')){
   s="import {advanceLive3x32} from './fixed-ops.mjs';\n"+s;
   s=s.replaceAll('advanceConnect4LiveLineState32(live,','advanceLive3x32(live,').replaceAll('advanceConnect4LiveLineState32(state.live,','advanceLive3x32(state.live,');
 }
+if(features.includes('mask-prepared')&&!general){
+  s=s.replace("from './coordinate-masks.mjs'",`from './coordinate-${dense?'dense':'prepared'}.mjs'`);
+  s=s.replace("from './profile-supersets.mjs'","from './profile-masks.mjs'");
+  if(dense)s=once(s,"  if(!isCompactProfile8(geometry,geometry?.keyWords))", "  if(geometry?.removeByCell===null)throw RangeError('dense removal table required');\n  if(!isCompactProfile8(geometry,geometry?.keyWords))");
+}
 output(`solver${name}.mjs`,s);
 }
 
@@ -239,7 +248,7 @@ worker=worker.replace(/  frontierMetrics=[^\n]+\n/,'').replace(/    nodeCounts:[
 worker=once(worker,'  ),\n  m=result.metrics;','  );');
 worker=worker.replace(/frontierMetrics\[0\]=[\s\S]*?(?=if\(result.status===)/,'');
 output('worker.mjs',relocate(worker,{'./rba-connect4-frontier.mjs':'./solver.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
-for(const {name,general} of profiles)if(general)
+for(const {name} of profiles)if(name)
   output(`worker${name}.mjs`,relocate(worker,{'./rba-connect4-frontier.mjs':`./solver${name}.mjs`,'./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs'}));
 
 let host=read('addons/rba-connect4-lazy-smp-host.mjs');
