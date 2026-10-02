@@ -76,3 +76,21 @@ under the identical memory/runtime/affinity/timing contract. Analyze the four
 adjacent AB/BA pair log ratios with the same descriptive t interval and report
 every run. This is a new implementation test, not repeated sampling until the
 old helper achieves a favorable score. Keep the complete inconclusive screen.
+
+## Address-arithmetic refinement
+
+The direct-hash eight-run comparison remained inconclusive: -0.134% geometric
+wall improvement with a descriptive interval spanning -0.839% to +0.567%.
+Inspecting the actual compiled search then found thirteen `jo` overflow guards
+in the straight-line hash address calculation. For this private prepared 7x6
+worker, depth-frame base is 14*depth (0..588), and every accessed word index
+lies in 0..601. `(keyOffset+lane)|0` therefore preserves every valid address.
+It makes wrapping int32 arithmetic explicit, removing those thirteen overflow
+guards without removing typed-array bounds checks or changing any hash bits.
+Actual compiled excerpts show 13 guards before and zero afterward, with all
+fourteen hash multiplications retained. Whole-function size fell 18432→18252
+bytes in that diagnostic run; this is not itself performance evidence.
+
+Freeze this final refinement and run **ABBA BAAB** against the same A, four
+samples each. Preserve both preceding complete inconclusive comparisons.
+The actual emitted hash is tested at every one of the 43 legal frame offsets.

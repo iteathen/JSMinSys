@@ -165,20 +165,20 @@ function searchCpcOnlyFrontier(state,depth,keyOffset,basisOffset,n,mover,orienta
 
     // BEGIN fixed fourteen-word hash: same bits, no helper call or loop.
     let cacheHash=0,hashWord;
-    hashWord=cacheHash^words[keyOffset+0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+1];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+2];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+3];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+4];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+5];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+6];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+7];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+8];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+9];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+10];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+11];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+12];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
-    hashWord=cacheHash^words[keyOffset+13];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+0)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+1)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+2)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+3)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+4)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+5)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+6)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+7)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+8)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+9)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+10)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+11)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+12)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
+    hashWord=cacheHash^words[(keyOffset+13)|0];cacheHash=Math.imul(hashWord^(hashWord>>>16),0x7feb352d);
     cacheHash=cacheHash>>>0;
     // END fixed fourteen-word hash
     const cacheSlot=cacheHash&cache.mask;
