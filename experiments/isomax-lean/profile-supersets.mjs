@@ -10,5 +10,18 @@ export function prepareConnect4RbaExecutionProfile(g){
   }
   offsets[g.shapeCount]=ids.length;
   profile.supersetOffsets=offsets;profile.supersetIds=Uint16Array.from(ids);
+  const wordOffsets=new Uint32Array(g.shapeCount+1),words=[],masks=[];
+  for(let a=0;a<g.shapeCount;a++){
+    wordOffsets[a]=words.length;
+    let last=-1;
+    for(let i=offsets[a];i<offsets[a+1];i++){
+      const id=ids[i],word=id>>>5;
+      if(word!==last){words.push(word);masks.push(0);last=word;}
+      masks[masks.length-1]|=1<<(id&31);
+    }
+  }
+  wordOffsets[g.shapeCount]=words.length;
+  profile.supersetWordOffsets=wordOffsets;
+  profile.supersetWords=Uint8Array.from(words);profile.supersetMasks=Uint32Array.from(masks);
   return profile;
 }

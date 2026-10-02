@@ -5,7 +5,9 @@ import {prepareConnect4RbaExecutionProfile as prepareReference} from '../addons/
 import {connect4RbaCofactorKnownHeight as reference,connect4RbaBasisFromSupport} from '../addons/rba-connect4-coordinate.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4RbaExecutionProfile as prepareCandidate} from '../experiments/isomax-lean/profile-supersets.mjs';
-import {connect4RbaCofactorKnownHeight as candidate,connect4RbaCanonicalize} from '../experiments/isomax-lean/coordinate-supersets.mjs';
+import * as csr from '../experiments/isomax-lean/coordinate-supersets.mjs';
+import * as constants from '../experiments/isomax-lean/coordinate-constants.mjs';
+import * as masks from '../experiments/isomax-lean/coordinate-masks.mjs';
 
 function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
   const src=3,bi=5,dst=4,ci=7;
@@ -26,7 +28,9 @@ function transition(g,profile,fn,q,column,poison=0,tailId=-1,tailIndex=0){
   return {term,words:words.slice(dst,dst+g.keyWords),basis:basis.slice(ci,ci+sizes[1])};
 }
 
-test('CSR cofactors match every legal child along deterministic walks and reflected gauges',()=>{
+for(const [label,api] of Object.entries({csr,constants,masks})){
+const {connect4RbaCofactorKnownHeight:candidate,connect4RbaCanonicalize}=api;
+test(label+': cofactors match every legal child along deterministic walks and reflected gauges',()=>{
   let checked=0,terminals=0,seed=0x510ca7e;
   const random=()=>seed=(Math.imul(seed,1664525)+1013904223)>>>0;
   for(const budget of [0,2097152]){
@@ -68,7 +72,7 @@ test('CSR cofactors match every legal child along deterministic walks and reflec
   assert.ok(checked>1000);assert.ok(terminals>0);
 });
 
-test('CSR excludes absent supersets even when inverse scratch points to a matching stale tail',()=>{
+test(label+': excludes absent supersets even when inverse scratch points to a matching stale tail',()=>{
   let exercised=0;
   for(const budget of [0,2097152]){
     const g=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:budget});
@@ -98,7 +102,7 @@ test('CSR excludes absent supersets even when inverse scratch points to a matchi
   assert.ok(exercised>=2,'directed fixture must exercise the stale-tail case');
 });
 
-test('CSR preserves both players first wins and full-board draw/win precedence',()=>{
+test(label+': preserves both players first wins and full-board draw/win precedence',()=>{
   for(const budget of [0,2097152]){
     const g=prepareConnect4RbaGeometry({columns:7,rows:6,specializationBudgetBytes:budget});
     const base=prepareReference(g),fast=prepareCandidate(g);
@@ -123,3 +127,4 @@ test('CSR preserves both players first wins and full-board draw/win precedence',
     }
   }
 });
+}
