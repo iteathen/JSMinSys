@@ -16,8 +16,10 @@ test('completed principal upset absorbs later images without repeated expansion'
     q.words.fill(0,g.p0Offset);
     const coord=player?g.p1Offset:g.p0Offset;
     for(let i=0;i<q.basis.length;i++)if(connect4RbaShapeSubset(g,seed,q.basis[i]))q.words[coord+(i>>>5)]|=1<<(i&31);
-    const base=prepareConnect4RbaExecutionProfile(g);let expansions=0;
-    const profile={...base,prepareSubset(g,id){expansions++;return base.prepareSubset(g,id);}};
+    const base=prepareConnect4RbaExecutionProfile(g);let offsetReads=0;
+    const profile={...base,supersetWordOffsets:new Proxy(base.supersetWordOffsets,{
+      get(target,key){if(typeof key==='string'&&/^\d+$/.test(key))offsetReads++;return Reflect.get(target,key,target);}
+    }),prepareSubset(){throw Error('closure must use the prepared relation');}};
     const scratch=prepareConnect4RbaCoordinateScratch(g),words=new Uint32Array(g.keyWords),basis=new Uint32Array(g.maxBasis),size=new Uint32Array(1);
     assert.equal(connect4RbaCofactorKnownLegal(g,profile,q.words,0,q.basis,0,q.basis.length,column,
       words,0,basis,0,scratch.seen,size,0,scratch.map,scratch.inverse),0);
@@ -25,7 +27,7 @@ test('completed principal upset absorbs later images without repeated expansion'
       assert.equal(!!(words[coord+(i>>>5)]&(1<<(i&31))),!!connect4RbaShapeSubset(g,seed,basis[i]));
       assert.equal(words[(player?g.p0Offset:g.p1Offset)+(i>>>5)],0,'other player must remain separate');
     }
-    assert.equal(expansions,1,'one generator requires only one completed subset expansion');
+    assert.equal(offsetReads,2,'one generator reads one start/end pair; absorbed images do not re-expand');
   }
 });
 

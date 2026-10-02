@@ -507,6 +507,27 @@
         "name": "NUMBER_MULTIPLY_COST(operands,v8Lowering,cpuProfile)"
       },
       "note": "Cold Number multiplication may exceed uint32; do not bind it to wrapping u32 IMUL or claim fixed Intel cycles."
+    },
+    "alu.clz.u32": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "CLZ32_COST(lowering,cpu)"
+      },
+      "note": "Math.clz32 on the isolated uint32 bit. Lowering and CPU dependent; not priced as zero or assumed one instruction."
+    },
+    "memory.load.native_index": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "LOAD_NATIVE_INDEX_COST(wordBytes,cacheLevel,lowering)"
+      },
+      "note": "One direct supersetWords[index] load from the initialization-selected Uint8Array, Uint16Array or Uint32Array. wordBytes is 1/2/4 and fixed for the prepared geometry. No per-node width branch or decoder; no assumed machine-cycle equivalence among widths."
+    },
+    "memory.store.native_index": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "STORE_NATIVE_INDEX_COST(wordBytes,cacheLevel,lowering)"
+      },
+      "note": "One cold direct store to the exact initialization-selected native superset word-index array; wordBytes is 1/2/4."
     }
   },
   "units": [
@@ -3414,39 +3435,43 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "5+2*N"
+          "count": "FIELD"
         },
         {
           "op": "memory.load.u32",
-          "count": "N"
+          "count": "N+S"
         },
         {
           "op": "memory.store.u32",
-          "count": "W+2*N"
+          "count": "W+S+SAVED"
         },
         {
           "op": "alu.add.u32",
-          "count": "W+4*N"
+          "count": "ADD"
         },
         {
           "op": "alu.and.u32",
-          "count": "2*N"
+          "count": "S"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "S"
         },
         {
           "op": "alu.shl.u32",
-          "count": "N"
+          "count": "S"
         },
         {
           "op": "alu.shr.u32",
-          "count": "N"
+          "count": "S"
         },
         {
           "op": "control.test.u32",
-          "count": "2+2*W+4*N"
+          "count": "TEST"
         },
         {
           "op": "control.branch",
-          "count": "2+2*W+4*N"
+          "count": "BRANCH"
         },
         {
           "op": "runtime.callback",
@@ -3470,14 +3495,20 @@
         }
       ],
       "cycleCount": {
-        "kind": "expression",
-        "expression": "(5+2*N)*C(runtime.field.load)+N*C(memory.load.u32)+(W+2*N)*C(memory.store.u32)+(W+4*N)*C(alu.add.u32)+2*N*C(alu.and.u32)+N*C(alu.shl.u32)+N*C(alu.shr.u32)+(2+2*W+4*N)*C(control.test.u32)+(2+2*W+4*N)*C(control.branch)+CALLBACK(prepareRemove)+N*CALLBACK(removePrepared)+A*CALL(emitSortedSetBitsAt32)+(1-A)*CALL(emitSortedSetBits32)",
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(N+S)*C(memory.load.u32)+(W+S+SAVED)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALLBACK(prepareRemove)+(N)*CALLBACK(removePrepared)+(A)*CALL(emitSortedSetBitsAt32)+(1-A)*CALL(emitSortedSetBits32)",
         "parameters": {
-          "W": "shapeWordCount words zeroed",
-          "N": "parent basis entries transformed",
-          "A": "1 when seenOffset selects emitSortedSetBitsAt32; otherwise 0"
+          "W": "Shape words cleared.",
+          "N": "Parent basis entries transformed.",
+          "S": "Nonnegative removal images published to seen, including repeated images.",
+          "SAVED": "N when removed[] is supplied, otherwise zero.",
+          "A": "1 when seenOffset selects emitSortedSetBitsAt32, otherwise zero.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop tests.",
+          "ADD": "Executed source additions/address calculations and loop increments in this function only, including seenOffset.",
+          "TEST": "Executed source predicates including removed[] and nonnegative-image tests; no hot statistics.",
+          "BRANCH": "Executed source control selections including offset-sensitive emitter choice; machine lowering remains unverified."
         },
-        "note": "Basis cofactor explicitly counts zeroing, per-basis removal, bit publication and sorted-bit emission."
+        "note": "General optional-scratch cofactor basis construction retains offset-sensitive zeroing and sorted emission. Each valid image performs seen read/OR/write; optional saved removals are counted separately. Callback work belongs to its subledger. Source-operation counts are symbolic; bounds checks, conversions, locality and lowering are unverified debt, not zero."
       },
       "status": "decomposed"
     },
@@ -3489,51 +3520,59 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": "18+4*G+7*CN+9*N+4*U+A"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "8+CN+4*N+2*U"
+          "count": "FIELD"
         },
         {
           "op": "memory.load.u32",
-          "count": "6+2*G+3*CN+5*N+2*U+A"
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
         },
         {
           "op": "memory.store.u32",
-          "count": "G+2*Z+3+CN+2*N+2*U"
+          "count": "C+2*Z+3+END+K+M+E+O"
         },
         {
-          "op": "alu.imul.u32",
-          "count": "2+N"
+          "op": "runtime.number.multiply",
+          "count": "MULTIPLY"
         },
         {
           "op": "alu.add.u32",
-          "count": "8+3*G+5*CN+8*N+3*U+A"
+          "count": "ADD"
         },
         {
           "op": "alu.sub.u32",
-          "count": "2+B+I"
+          "count": "SUBTRACT"
         },
         {
           "op": "alu.and.u32",
-          "count": "6+4*N+2*U+A"
+          "count": "1+2*T+3*N+J+P+H+2*V"
         },
         {
           "op": "alu.shl.u32",
-          "count": "2+3*N+U"
+          "count": "1+END+T+N+J+H+V"
         },
         {
           "op": "alu.shr.u32",
-          "count": "3+B+CN+2*N+I+U"
+          "count": "1+T+N+J+V+B+I"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N+END+E+O"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.clz.u32",
+          "count": "V"
         },
         {
           "op": "control.test.u32",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "TEST"
         },
         {
           "op": "control.branch",
-          "count": "12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J"
+          "count": "BRANCH"
         },
         {
           "op": "runtime.call.subledger",
@@ -3542,44 +3581,54 @@
         },
         {
           "op": "runtime.callback",
-          "count": "K*PR",
+          "count": "PR",
           "target": "prepareRemove"
         },
         {
           "op": "runtime.callback",
-          "count": "K*RM",
+          "count": "RM",
           "target": "removePrepared"
         },
         {
-          "op": "runtime.callback",
-          "count": "K*PS",
-          "target": "prepareSubset"
-        },
-        {
-          "op": "runtime.callback",
-          "count": "K*U",
-          "target": "shapeSubsetPrepared"
+          "op": "memory.load.native_index",
+          "count": "H"
         }
       ],
       "cycleCount": {
-        "kind": "expression",
-        "expression": "(18+4*G+7*CN+9*N+4*U+A)*C(runtime.field.load)+(8+CN+4*N+2*U)*C(runtime.field.store)+(6+2*G+3*CN+5*N+2*U+A)*C(memory.load.u32)+(G+2*Z+3+CN+2*N+2*U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(8+3*G+5*CN+8*N+3*U+A)*C(alu.add.u32)+(2+B+I)*C(alu.sub.u32)+(6+4*N+2*U+A)*C(alu.and.u32)+(2+3*N+U)*C(alu.shl.u32)+(3+B+CN+2*N+I+U)*C(alu.shr.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.test.u32)+(12+2*G+3*B+4*CN+10*N+3*I+4*U+2*A+3*J)*C(control.branch)+K*CALL(connect4RbaCofactorBasis)+K*PR*CALLBACK(prepareRemove)+K*RM*CALLBACK(removePrepared)+K*PS*CALLBACK(prepareSubset)+K*U*CALLBACK(shapeSubsetPrepared)",
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaCofactorBasis)+(PR)*CALLBACK(prepareRemove)+(RM)*CALLBACK(removePrepared)+(H)*C(memory.load.native_index)",
         "parameters": {
-          "G": "configured columns copied into child support",
-          "Z": "coordWords cleared per player coordinate",
-          "B": "singleton-basis binary-search iterations",
-          "CN": "child basis size scanned for cardinality boundaries",
-          "N": "active parent basis entries scanned",
-          "I": "total child-image binary-search iterations when childIndex is unavailable",
-          "U": "subset-candidate tests for images not already covered in every surviving target coordinate",
-          "K": "1 when no immediate terminal/draw and deep cofactor construction executes; otherwise 0",
-          "PR": "1 when removed[] is absent and prepareRemove executes; otherwise 0",
-          "RM": "removePrepared calls on the selected path (normally N when removed[] is absent, otherwise 0)",
-          "PS": "prepareSubset calls for images requiring at least one new target closure",
-          "A": "surviving player-image membership checks actually executed (0..2 per J); short-circuited inactive players excluded",
-          "J": "surviving images reaching the per-player absorption guard"
+          "C": "Configured columns copied to child support.",
+          "Z": "Coordinate words per player cleared before terminal tests.",
+          "B": "Singleton binary-search iterations.",
+          "D": "0 or 1 basis equality load after singleton search when lo < n.",
+          "T": "0 or 1 singleton-coordinate bit test reached.",
+          "END": "0 or 1 terminal metadata write (immediate win or full-board draw).",
+          "K": "0 or 1 nonterminal construction path; all N/M/A/J/P/U/H/V/Q/I/RS/E/O counts below are zero on terminal paths.",
+          "N": "Parent basis entries visited by the nonterminal source loop, including inactive entries.",
+          "M": "Child basis entries mapped to childIndex; zero if optional inverse scratch is absent.",
+          "A": "Active parent entries reaching id/removal lookup after the inactive-player guard.",
+          "RS": "Loads from saved removed[]; A on prepared paths, zero when generic removal callback is used.",
+          "J": "Surviving images reaching child-image lookup and absorption; both-player ownership tests have already passed.",
+          "P": "Player-coordinate absorption loads actually evaluated; at most two per J.",
+          "U": "Images requiring at least one new upward closure after absorption.",
+          "H": "Total grouped strict-superset word-mask intersections for those U images.",
+          "V": "Set bits enumerated after intersecting each group with the current child seen set.",
+          "Q": "Inverse childIndex loads for image and strict-superset lookup; J+V on prepared paths, zero if inverse scratch absent.",
+          "I": "Total binary-search iterations for image/superset lookup when inverse scratch absent; zero on prepared paths.",
+          "E": "Player-coordinate OR publications of newly unabsorbed images; at most two per U.",
+          "O": "Player-coordinate OR publications of intersected strict supersets; at most two per V.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
+          "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
+          "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
+          "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
+          "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
+          "PR": "0 or 1 extra prepareRemove call when nonterminal and removed[] is absent.",
+          "RM": "Active-parent removal callback calls when removed[] is absent; otherwise zero.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
         },
-        "note": "Known-height cofactor exposes support copy, terminal check, basis transformation, residual remap, upset expansion and profile callbacks. Variable geometry/search cardinalities remain named parameters. C1 adds per-surviving-player load/address/AND and short-circuit tests. Control terms conservatively account Boolean selection/negation and the early exit; generated lowering, overlap and cache costs remain profile-dependent rather than claimed fixed Intel cycle values. PS/U now exclude absorbed work. Whole-operation measured cycles are the promotion evidence, not this inherited source-operation envelope."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
       },
       "status": "decomposed"
     },
@@ -4897,20 +4946,116 @@
         {
           "op": "runtime.object.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 5
+        },
+        {
+          "op": "runtime.array.slice",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": 2
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "CONTAIN_FIELD"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 4
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "4*SHAPE+8*PROPER"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "3*SHAPE+3*PROPER+4*GROUP"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "CONTAIN_ADD"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "CONTAIN_SUB"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "CONTAIN_AND"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "CONTAIN_OR"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "2*PROPER"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "CONTAIN_SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*SHAPE"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "2*PROPER"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "CONTAIN_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "CONTAIN_BRANCH"
+        },
+        {
+          "op": "memory.store.native_index",
+          "count": "GROUP"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "WORD_SELECT"
+        },
+        {
+          "op": "control.branch",
+          "count": "WORD_SELECT"
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "3*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+C(runtime.array.from)+C(runtime.map.construct)+15*LINE*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+C(runtime.map.clear)+(15*LINE+2*SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+2*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+C(runtime.object.allocate)",
+        "expression": "(3)*C(runtime.integer.check)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.test.u32)+(20+8*CELL+10*LINE+8*SHAPE+5*SUB)*C(control.branch)+(8+LINE+SHAPE)*C(runtime.array.allocate)+(LINE+15*LINE+SHAPE)*C(runtime.array.push)+(2+SHAPE)*C(runtime.array.sort)+(1)*C(runtime.array.from)+(1)*C(runtime.map.construct)+(15*LINE)*C(runtime.map.has)+(16*LINE+4*SHAPE)*C(runtime.map.get)+(15*LINE+SHAPE)*C(runtime.map.set)+(1)*C(runtime.map.clear)+(15*LINE+SHAPE+SHAPE)*C(runtime.array.join)+(18+DENSE_R+DENSE_S)*C(runtime.typed_array.allocate)+(2)*C(runtime.typed_array.fill)+(20*CELL+24*LINE+24*SHAPE+8*SUB)*C(memory.load.u32)+(8*CELL+24*LINE+20*SHAPE+4*SUB)*C(memory.store.u32)+(10*CELL+20*LINE+18*SHAPE+6*SUB)*C(alu.imul.u32)+(20*CELL+35*LINE+30*SHAPE+12*SUB)*C(alu.add.u32)+(3*CELL+8*SHAPE+4*SUB)*C(alu.sub.u32)+(8*LINE+6*SHAPE)*C(alu.and.u32)+(8*LINE+4*SHAPE)*C(alu.or.u32)+(8*LINE+4*SHAPE)*C(alu.shl.u32)+(4*CELL+4*SHAPE)*C(alu.shr.u32)+(1)*C(runtime.object.allocate)+(5)*C(runtime.typed_array.allocate)+(1)*C(runtime.array.slice)+(2)*C(runtime.typed_array.fill)+(CONTAIN_FIELD)*C(runtime.field.load)+(4)*C(runtime.field.store)+(4*SHAPE+8*PROPER)*C(memory.load.u32)+(3*SHAPE+3*PROPER+4*GROUP)*C(memory.store.u32)+(CONTAIN_ADD)*C(alu.add.u32)+(CONTAIN_SUB)*C(alu.sub.u32)+(CONTAIN_AND)*C(alu.and.u32)+(CONTAIN_OR)*C(alu.or.u32)+(2*PROPER)*C(alu.xor.u32)+(CONTAIN_SHL)*C(alu.shl.u32)+(2*SHAPE)*C(alu.shr.u32)+(2*PROPER)*C(runtime.number.multiply)+(CONTAIN_TEST)*C(control.test.u32)+(CONTAIN_BRANCH)*C(control.branch)+(GROUP)*C(memory.store.native_index)+(WORD_SELECT)*C(control.test.u32)+(WORD_SELECT)*C(control.branch)+(1)*C(runtime.constructor.dispatch)",
         "parameters": {
           "CELL": "configured cell count iterations across geometry setup",
           "LINE": "winning-line records generated/scanned",
           "SHAPE": "unique residual shapes generated/scanned",
           "SUB": "shape-pair subset comparisons when specialization table is admitted",
           "DENSE_R": "1 when dense remove table allocation is admitted, else 0",
-          "DENSE_S": "1 when dense subset table allocation is admitted, else 0"
+          "DENSE_S": "1 when dense subset table allocation is admitted, else 0",
+          "PROPER": "Sum of (2^shapeSize - 2) proper nonempty subsets over all shapes for ONE pass, at most 14*SHAPE. Compiler performs two passes; singleton contributes zero.",
+          "GROUP": "Number of nonempty (subset ID, superset word) groups; at most PROPER. Count and fill passes visit each group once.",
+          "CONTAIN_FIELD": "Executed property loads for compiler array fills/slice, shape plan byte lengths and allocation sizing; costs remain symbolic.",
+          "CONTAIN_ADD": "Executed compiler additions/address calculations and loop increments, including bounded below-bit enumeration and offsets prefix sum.",
+          "CONTAIN_SUB": "Executed compiler subtractions/negations, including mask descent, low-bit extraction, position enumeration and duplicate-group indexing.",
+          "CONTAIN_AND": "Executed compiler AND operations for low-bit extraction, subset position enumeration and mask bit indices.",
+          "CONTAIN_OR": "Executed compiler OR operations for subset parent masks and group-mask accumulation.",
+          "CONTAIN_SHL": "Executed compiler shifts for full masks and emitted superset bits.",
+          "CONTAIN_TEST": "Executed compiler loop/short-circuit/branch predicate evaluations, including group-limit check. Excludes separately counted WORD_SELECT comparisons.",
+          "CONTAIN_BRANCH": "Executed compiler source control selections, including both passes, all loops and group count/fill branches. Excludes separately counted WORD_SELECT selections.",
+          "WORD_SELECT": "One or two cold ternary comparisons/selectors choosing Uint8Array for shapeWordCount <= 256, Uint16Array for <= 65536, or Uint32Array otherwise; excluded from CONTAIN_TEST/CONTAIN_BRANCH.",
+          "WORD_BYTES": "Native word-index bytes selected cold: 1/2/4. All group masks and row offsets remain Uint32."
         },
-        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized."
+        "note": "Cold initialization geometry ledger. Dynamic Map/Array/sort costs remain explicit symbolic runtime operations; all dimension-dependent loop work is parameterized. Grouped containment adds two bounded subset-enumeration passes O(14*SHAPE), not a pairwise SHAPE^2 scan. Per-pass low-bit position scans are bounded by three iterations per proper subset. The preexisting optional dense subset table remains independently O(SHAPE^2) when budget admits it (SUB); this compiler does not remove that cost. Additional five typed arrays plus one cursor slice are allocated cold; offsets/word/mask arrays persist, lastWord/subsetIds/cursors are temporary. Persistent bytes are 4*(SHAPE+1)+(4+WORD_BYTES)*GROUP; temporary typed storage is 8*SHAPE+64 bytes. Array fills and slice copying are separate from listed scalar memory counts. Existing geometry envelope is retained; added compiler memory counts expose both passes. No per-worker rebuild: geometry-owned arrays are shared by shareConnect4RbaGeometry32. The word-index allocation alone is WORD_BYTES*GROUP bytes; its GROUP fill stores use the selected native width. A cold constructor selection retains exact maximum word IDs without truncation: maximum index is shapeWordCount-1. The constructor call remains charged, with no decoder or runtime search dispatch."
       },
       "status": "decomposed"
     },
@@ -4955,7 +5100,7 @@
           "V": "typed-array property count not already shared",
           "B": "total bytes copied into shared backing stores"
         },
-        "note": "One cold shared image replaces W independent geometry rebuilds."
+        "note": "One cold shared image replaces W independent geometry rebuilds. P includes containmentBytes and three containment-plan fields; V/B include supersetWordOffsets, supersetWords and supersetMasks when not already shared. The compiler temporaries are not geometry fields and are not copied. Shared supersetWords keeps its native constructor and WORD_BYTES*GROUP backing size; masks/offsets stay Uint32. Width changes copy-byte cost, not field/view counts."
       },
       "status": "decomposed"
     },
@@ -5129,7 +5274,7 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 6
+          "count": 7
         },
         {
           "op": "control.test.u32",
@@ -5137,7 +5282,7 @@
         },
         {
           "op": "control.branch",
-          "count": 7
+          "count": 11
         },
         {
           "op": "runtime.object.allocate",
@@ -5145,13 +5290,13 @@
         },
         {
           "op": "runtime.field.store",
-          "count": 12
+          "count": 14
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+4*C(control.test.u32)+7*C(control.branch)+C(runtime.object.allocate)+12*C(runtime.field.store)",
-        "note": "Cold specialization selection; selected callbacks are individually cycle-ledgered."
+        "expression": "(7)*C(runtime.field.load)+(4)*C(control.test.u32)+(11)*C(control.branch)+(1)*C(runtime.object.allocate)+(14)*C(runtime.field.store)",
+        "note": "Four geometry selectors plus three borrowed containment-array references. Seven selected callbacks and four metadata ternaries plus three array fields produce fourteen object fields. No compiler or table copy runs per profile; immutable geometry arrays are shared. Source selections need not become machine branches; actual lowering remains unverified."
       },
       "status": "decomposed"
     },
@@ -10585,15 +10730,516 @@
         "note": "Cold pre-search structural measurement only. Counts cover current-board reconstruction, line-incidence scans, Pareto relation construction, descriptive result assembly, and explicit headroom gate; no descendant/search work is hidden."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-prepared.mjs#connect4RbaPreparedCofactorBasis",
+      "source": "addons/rba-connect4-coordinate-prepared.mjs",
+      "name": "connect4RbaPreparedCofactorBasis",
+      "scope": "local-negamax-cofactor",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "FIELD"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "N+S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W+N+S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "0"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "emitSortedSetBits32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": 1,
+          "target": "prepareRemove"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "N",
+          "target": "removePrepared"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(0)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)+(1)*CALLBACK(prepareRemove)+(N)*CALLBACK(removePrepared)",
+        "parameters": {
+          "W": "shapeWordCount cleared once.",
+          "N": "Parent basis entries transformed; saved removed[] is always written.",
+          "S": "Nonnegative removal images published to seen, including duplicate images.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
+          "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
+          "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
+        },
+        "note": "Prepared scratch removes optional-store and seen-offset branches; selected dense/sparse removal callbacks remain explicit. Set construction and sorted emission are not eliminated."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-prepared.mjs#connect4RbaPreparedCofactorKnownHeight",
+      "source": "addons/rba-connect4-coordinate-prepared.mjs",
+      "name": "connect4RbaPreparedCofactorKnownHeight",
+      "scope": "local-negamax-cofactor",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "FIELD"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "C+2*Z+3+END+K+M+E+O"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MULTIPLY"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUBTRACT"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+2*T+3*N+J+P+H+2*V"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "1+END+T+N+J+H+V"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+T+N+J+V+B+I"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N+END+E+O"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.clz.u32",
+          "count": "V"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "connect4RbaPreparedCofactorBasis"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "H"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaPreparedCofactorBasis)+(H)*C(memory.load.native_index)",
+        "parameters": {
+          "C": "Configured columns copied to child support.",
+          "Z": "Coordinate words per player cleared before terminal tests.",
+          "B": "Singleton binary-search iterations.",
+          "D": "0 or 1 basis equality load after singleton search when lo < n.",
+          "T": "0 or 1 singleton-coordinate bit test reached.",
+          "END": "0 or 1 terminal metadata write (immediate win or full-board draw).",
+          "K": "0 or 1 nonterminal construction path; all N/M/A/J/P/U/H/V/Q/I/RS/E/O counts below are zero on terminal paths.",
+          "N": "Parent basis entries visited by the nonterminal source loop, including inactive entries.",
+          "M": "Child basis entries mapped to childIndex; zero if optional inverse scratch is absent.",
+          "A": "Active parent entries reaching id/removal lookup after the inactive-player guard.",
+          "RS": "Loads from saved removed[]; A on prepared paths, zero when generic removal callback is used.",
+          "J": "Surviving images reaching child-image lookup and absorption; both-player ownership tests have already passed.",
+          "P": "Player-coordinate absorption loads actually evaluated; at most two per J.",
+          "U": "Images requiring at least one new upward closure after absorption.",
+          "H": "Total grouped strict-superset word-mask intersections for those U images.",
+          "V": "Set bits enumerated after intersecting each group with the current child seen set.",
+          "Q": "Inverse childIndex loads for image and strict-superset lookup; J+V on prepared paths, zero if inverse scratch absent.",
+          "I": "Total binary-search iterations for image/superset lookup when inverse scratch absent; zero on prepared paths.",
+          "E": "Player-coordinate OR publications of newly unabsorbed images; at most two per U.",
+          "O": "Player-coordinate OR publications of intersected strict supersets; at most two per V.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
+          "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
+          "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
+          "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
+          "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
+        },
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-dense.mjs#connect4RbaDenseCofactorBasis",
+      "source": "addons/rba-connect4-coordinate-dense.mjs",
+      "name": "connect4RbaDenseCofactorBasis",
+      "scope": "local-negamax-cofactor",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "FIELD"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*N+S"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W+N+S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "1"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "emitSortedSetBits32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(2*N+S)*C(memory.load.u32)+(W+N+S)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(1)*C(runtime.number.multiply)+(S)*C(alu.and.u32)+(S)*C(alu.or.u32)+(S)*C(alu.shl.u32)+(S)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(emitSortedSetBits32)",
+        "parameters": {
+          "W": "shapeWordCount cleared once.",
+          "N": "Parent basis entries transformed; saved removed[] is always written.",
+          "S": "Nonnegative removal images published to seen, including duplicate images.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
+          "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
+          "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified."
+        },
+        "note": "Cold selection proves removeByCell is present. One direct removal-table load per N replaces profile removal callbacks. Saved removal, set construction and sorted emission remain explicit; no subset callback or hot layout selection."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-dense.mjs#connect4RbaDenseCofactorKnownHeight",
+      "source": "addons/rba-connect4-coordinate-dense.mjs",
+      "name": "connect4RbaDenseCofactorKnownHeight",
+      "scope": "local-negamax-cofactor",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "FIELD"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "C+2*Z+3+END+K+M+E+O"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MULTIPLY"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUBTRACT"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+2*T+3*N+J+P+H+2*V"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "1+END+T+N+J+H+V"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "1+T+N+J+V+B+I"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N+END+E+O"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "V"
+        },
+        {
+          "op": "alu.clz.u32",
+          "count": "V"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "connect4RbaDenseCofactorBasis"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "H"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*N+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+N+J+V+B+I)*C(alu.shr.u32)+(N+END+E+O)*C(alu.or.u32)+(V)*C(alu.xor.u32)+(V)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(connect4RbaDenseCofactorBasis)+(H)*C(memory.load.native_index)",
+        "parameters": {
+          "C": "Configured columns copied to child support.",
+          "Z": "Coordinate words per player cleared before terminal tests.",
+          "B": "Singleton binary-search iterations.",
+          "D": "0 or 1 basis equality load after singleton search when lo < n.",
+          "T": "0 or 1 singleton-coordinate bit test reached.",
+          "END": "0 or 1 terminal metadata write (immediate win or full-board draw).",
+          "K": "0 or 1 nonterminal construction path; all N/M/A/J/P/U/H/V/Q/I/RS/E/O counts below are zero on terminal paths.",
+          "N": "Parent basis entries visited by the nonterminal source loop, including inactive entries.",
+          "M": "Child basis entries mapped to childIndex; zero if optional inverse scratch is absent.",
+          "A": "Active parent entries reaching id/removal lookup after the inactive-player guard.",
+          "RS": "Loads from saved removed[]; A on prepared paths, zero when generic removal callback is used.",
+          "J": "Surviving images reaching child-image lookup and absorption; both-player ownership tests have already passed.",
+          "P": "Player-coordinate absorption loads actually evaluated; at most two per J.",
+          "U": "Images requiring at least one new upward closure after absorption.",
+          "H": "Total grouped strict-superset word-mask intersections for those U images.",
+          "V": "Set bits enumerated after intersecting each group with the current child seen set.",
+          "Q": "Inverse childIndex loads for image and strict-superset lookup; J+V on prepared paths, zero if inverse scratch absent.",
+          "I": "Total binary-search iterations for image/superset lookup when inverse scratch absent; zero on prepared paths.",
+          "E": "Player-coordinate OR publications of newly unabsorbed images; at most two per U.",
+          "O": "Player-coordinate OR publications of intersected strict supersets; at most two per V.",
+          "FIELD": "Executed geometry/profile property loads in this function only, including loop conditions; stable-field lowering remains unverified.",
+          "ADD": "Executed numeric additions in this function only, including addresses, rank and loop increments; excludes called subledgers.",
+          "SUBTRACT": "Executed numeric subtractions/unary negations in this function only, including singleton/child binary search and isolated-bit extraction.",
+          "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
+          "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
+          "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
+          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch."
+        },
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-prepared.mjs#comparePreparedReflectedSupport",
+      "source": "addons/rba-connect4-coordinate-prepared.mjs",
+      "name": "comparePreparedReflectedSupport",
+      "scope": "local-negamax-canonicalization",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "1+C"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "3*C"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1+C)*C(runtime.field.load)+(3*C)*C(memory.load.u32)+(1)*C(alu.shr.u32)+(ADD)*C(alu.add.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)",
+        "parameters": {
+          "C": "Support column pairs visited before first difference or complete equality; each reads mirrorColumn once and support twice.",
+          "ADD": "Executed source additions/address calculations and loop increments in this function only.",
+          "TEST": "Executed source predicate evaluations including loop exits and short-circuit operands; no runtime counters.",
+          "BRANCH": "Executed source control selections, including early returns and short-circuit paths; does not imply one machine branch per source predicate."
+        },
+        "note": "Prepared helper preserves generic configured columns and short-circuits at the first support difference. Source-operation multiplicities remain symbolic; actual lowering/locality are unverified machine debt."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate-prepared.mjs#connect4RbaPreparedCanonicalize",
+      "source": "addons/rba-connect4-coordinate-prepared.mjs",
+      "name": "connect4RbaPreparedCanonicalize",
+      "scope": "local-negamax-canonicalization",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "FIELD"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6*N+2*P+2*Q+2*C+R"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "W+4*N+C+R"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "comparePreparedReflectedSupport"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "emitSortedSetBits32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "K",
+          "target": "permuteCoordinates"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "2*R",
+          "target": "publishSpan32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(FIELD)*C(runtime.field.load)+(6*N+2*P+2*Q+2*C+R)*C(memory.load.u32)+(W+4*N+C+R)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(N)*C(alu.and.u32)+(N)*C(alu.or.u32)+(N)*C(alu.shl.u32)+(N)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(1)*CALL(comparePreparedReflectedSupport)+(K)*CALL(emitSortedSetBits32)+(K)*CALLBACK(permuteCoordinates)+(2*R)*CALL(publishSpan32)",
+        "parameters": {
+          "K": "1 when primary support comparison does not take the early preferred-orientation return; otherwise zero.",
+          "W": "Shape words actually cleared; zero on primary early exit.",
+          "N": "Basis entries actually reflected and remapped; zero on primary early exit.",
+          "P": "Secondary coordinate equality comparisons actually reached when support is symmetric, including the first unequal pair.",
+          "Q": "0 or 1 final coordinate less-than comparison after equality scan; zero when w reaches keyWords or support differs.",
+          "R": "1 only when reflected orientation is selected and final key/basis publication executes; otherwise zero.",
+          "C": "Configured support columns actually copied; R times configured columns.",
+          "FIELD": "Executed geometry/profile/scratch property loads in this function only; stable-field lowering remains unverified.",
+          "ADD": "Executed source additions/address calculations and loop increments in this function only.",
+          "TEST": "Executed source predicate evaluations including loop exits and short-circuit operands; no runtime counters.",
+          "BRANCH": "Executed source control selections, including early returns and short-circuit paths; does not imply one machine branch per source predicate."
+        },
+        "note": "Prepared canonicalization removes only selectedSet/selectedSetOffset and their conditional publication. All dimensions remain prepared geometry values. Reflection scratch construction may execute while R remains zero, so publishSpan32 is charged 2*R, not merely by failure of the primary early-exit test. Each basis entry has six typed reads and four writes across reflection/seen, inverse-map and remap stages. Callee work is charged separately. No optional selectedSet test or write is retained; field/control/arithmetic lowering, bounds guards, register pressure and locality remain unverified debt."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 171,
-    "decomposed": 171,
+    "units": 177,
+    "decomposed": 177,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 72
+    "localExtensionOperations": 75
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -10689,12 +11335,12 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-connect4-geometry.mjs": "9beb1ef652651fef94ba8e5956d210058399cdb9",
+    "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
     "addons/rba-connect4-alphabeta.mjs": "57984949393267d0a9521bb9cc81aacd71fb71ce",
     "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
-    "addons/rba-connect4-coordinate.mjs": "6c10f0b4b2bc9371bfb1ada4d44cde5eb6ea31f6",
+    "addons/rba-connect4-coordinate.mjs": "8d30f8cfba0f1690d611b45b030682a6cd7a376b",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
-    "addons/rba-connect4-profile.mjs": "e78df7fac3f8e15fd9366bb3ace59c1db3f907b8",
+    "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
@@ -10712,7 +11358,9 @@
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "0a604bfc3b9257ebe2cc80bc3534aaa43dcac70a",
     "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
     "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
-    "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be"
+    "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be",
+    "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
+    "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

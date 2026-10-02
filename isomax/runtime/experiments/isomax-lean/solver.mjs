@@ -2,9 +2,9 @@
 import {advanceLive3x32} from './fixed-ops.mjs';
 import {prepareSearchBehavior32,completeBehaviorNode32} from '../../addons/worker-behavior-search.mjs';
 import {mixSpan32Locator32,publishSpan32} from '../../src/widekey32.mjs';
-import {prepareConnect4RbaExecutionProfile} from './profile-masks.mjs';
+import {prepareConnect4RbaExecutionProfile} from '../../addons/rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from '../../addons/rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './coordinate-prepared.mjs';
+import {connect4RbaPreparedCofactorKnownHeight as connect4RbaCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from '../../addons/rba-connect4-coordinate-prepared.mjs';
 import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT,CPC_BOUND,CPC_RESTRICT} from './cpc.mjs';
 import {prepareConnect4LiveLineEvaluator32,resetConnect4LiveLineState32,advanceConnect4LiveLineState32,evaluateConnect4LiveLineCell32,evaluateConnect4LiveLine3x32} from '../../addons/connect4-live-line-evaluator.mjs';
 import {argMaxPlayableSlot32,argMaxPlayableSlot7Nonempty32} from '../../src/search32.mjs';
