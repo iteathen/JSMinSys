@@ -16,15 +16,27 @@ import {checkHotBody} from '../tools/audit-root-frontier.mjs';
 
 const g=prepareConnect4RbaGeometry({columns:7,rows:6});
 const sequences=['1320461024522311','2053635233350500','0011223'];
+// Cold test adapters compare logical entries independently of physical layout.
+function logical(cache,field){
+  if(!cache.entries)return cache[field];
+  const n=cache.mask+1,out=new Uint32Array(n*(field==='keys'?8:1));
+  for(let i=0;i<n;i++)if(field==='keys')for(let k=0;k<8;k++)out[i*8+k]=cache.entries[i*10+2+k];
+  else out[i]=cache.entries[i*10+(field==='value'?1:0)];
+  return out;
+}
+function setSequence(cache,slot,value){Atomics.store(cache.entries??cache.sequence,cache.entries?slot*10:slot,value);}
 test('transitive deep call graph has no reporting or runtime measurement machinery',()=>{
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
   const ledger=JSON.parse(read('catalog/addon-cycle-ledger-v0.json'));
   const core=JSON.parse(read('catalog/functions-v0.json'));
   const units=new Map([...ledger.units,...core.functions].map(u=>[u.name,u]));
   const local=new Map();
-  for(const file of ['solver','cpc','shared-cache','coordinate']){
+  for(const file of ['solver','cpc','shared-cache','coordinate','fixed-ops']){
     const source=read('experiments/isomax-lean/'+file+'.mjs');
-    for(const match of source.matchAll(/function (\w+)\(/g))local.set(match[1],source);
+    for(const match of source.matchAll(/function (\w+)\(/g)){
+      local.set(match[1],source);
+      if(!units.has(match[1]))units.set(match[1],{name:match[1],operations:[]});
+    }
   }
   const pending=['searchCpcOnlyFrontier'],seen=new Set();
   while(pending.length){
@@ -81,18 +93,20 @@ test('full-window deep result and tie-breaking match released baseline for every
       // Single-thread deterministic traversal must leave identical TT contents,
       // including weak-bound tags, replacements and exact shared publications.
       for(const field of ['keys','tag'])assert.deepEqual(b.cache[field],a.cache[field]);
-      for(const field of ['keys','sequence','value'])assert.deepEqual(b.cache.shared[field],a.cache.shared[field]);
+      for(const field of ['keys','sequence','value'])assert.deepEqual(logical(b.cache.shared,field),a.cache.shared[field]);
     }
   }
 });
 test('CPC retains exact intervals, forced moves and restriction masks on deterministic legal walks',()=>{
   const a=oldCpc.prepareConnect4CpcScratch(g),b=cpc.prepareConnect4CpcScratch(g);
   let seed=72391,positions=0;
-  for(let game=0;game<30;game++){
+  for(let game=0;game<200;game++){
     const moves=[],heights=new Uint8Array(7);
     for(let ply=0;ply<=42;ply++){
       const root=connect4RbaFromMoves(moves,{geometry:g});
       const args=[g,root.words,0,root.basis,0,root.basis.length];
+      // Entry reset must remain correct after removing the helper's duplicate reset.
+      b.preemptionCount[0]=123;b.preemptionMask32[0]=0xffffffff;
       assert.equal(cpc.evaluateConnect4Cpc32(...args,b),oldCpc.evaluateConnect4Cpc32(...args,a));
       for(const field of ['interval','forcedColumn','preemptionCount','preemptionMask32'])
         assert.deepEqual(b[field],a[field],field);
@@ -115,11 +129,11 @@ test('shared TT keeps seqlock, compact identity and collisions without statistic
       assert.equal(tt.probeConnect4RbaSharedExactCache32(b,root.words,0,hash),oldTT.probeConnect4RbaSharedExactCache32(a,root.words,0,hash));
       tt.storeConnect4RbaSharedExactCache32(b,root.words,0,3,hash);
       oldTT.storeConnect4RbaSharedExactCache32(a,root.words,0,3,hash);
-      for(const field of ['keys','sequence','value'])assert.deepEqual(b[field],a[field]);
+      for(const field of ['keys','sequence','value'])assert.deepEqual(logical(b,field),a[field]);
       assert.equal(tt.probeConnect4RbaSharedExactCache32(b,root.words,0,hash),3);
-      Atomics.store(b.sequence,hash&1,5);
+      setSequence(b,hash&1,5);
       assert.equal(tt.probeConnect4RbaSharedExactCache32(b,root.words,0,hash),0);
-      Atomics.store(b.sequence,hash&1,a.sequence[hash&1]);
+      setSequence(b,hash&1,a.sequence[hash&1]);
     }
   }
   assert.equal(b.stats,undefined);

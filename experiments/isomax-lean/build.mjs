@@ -3,6 +3,9 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {optimizeCpc,optimizeSharedCache,fixedOpsSource} from './optimize.mjs';
+const features=JSON.parse(readFileSync(new URL('./features.json',import.meta.url),'utf8'));
+assert.ok(Array.isArray(features)&&new Set(features).size===features.length&&features.every(f=>['cpc','hash','live','layout'].includes(f)));
 const root=new URL('../../',import.meta.url),inputs={};
 function read(name){const s=readFileSync(new URL(name,root),'utf8').replaceAll('\r\n','\n');inputs[name]=createHash('sha256').update(s).digest('hex');return s;}
 function once(s,old,value){assert.equal(s.split(old).length,2,old);return s.replace(old,value);}
@@ -46,7 +49,8 @@ cache=cache.replace(/Atomics\.add\(cache\.stats,[012],1\);/g,'');
 cache=cache.replaceAll('knownHash===undefined?mixSpan32Locator32(words,offset,cache.keyWords):knownHash','knownHash');
 cache=fixedIf(cache,'cache.compact8',true);
 cache=once(cache,'  const compact8=isCompactProfile8(geometry,keyWords)?1:0,',"  if(!isCompactProfile8(geometry,keyWords))throw RangeError('lean cache requires standard 7x6 geometry');\n  const compact8=1,");
-output('shared-cache.mjs',relocate(cache));
+output('shared-cache.mjs',relocate(features.includes('layout')?optimizeSharedCache(cache):cache));
+output('fixed-ops.mjs',fixedOpsSource());
 
 let cpc=read('addons/cpc-connect4.mjs');
 cpc=cpc.replace(/scratch\.(forcedTotal|precursorTotal|projectedForkTotal)\+=[^;]+;/g,'');
@@ -58,7 +62,7 @@ cpc=fixedIf(cpc,'scratch.projectedAdvisory',false);
 cpc=cpc.replace(/scratch\.frontierResponse\s*\?frontierResponseNoWin\([^;]+?\)\s*:(pairedResponseNoWin\([^;]+?\))/g,'$1');
 cpc=cpc.replaceAll('g.columns<=32?((1<<column)>>>0):0','((1<<column)>>>0)');
 cpc=once(cpc,'  const cellWords=Math.ceil(g.cellCount/32);',"  if(g.columns!==7||g.rows!==6||g.lineCount!==69||frontierResponse||projectedAdvisory)throw RangeError('lean CPC requires standard baseline configuration');\n  const cellWords=Math.ceil(g.cellCount/32);");
-output('cpc.mjs',relocate(cpc));
+output('cpc.mjs',relocate(features.includes('cpc')?optimizeCpc(cpc):cpc));
 
 // Private, prepared-only coordinate functions. Every caller supplies removed
 // and child-index scratch, uses seen offset zero and requests no selected set.
@@ -132,7 +136,13 @@ s=s.slice(0,start)+`  // Same full-window root probes and deterministic tie-brea
 `+s.slice(end);
 s=s.slice(0,s.indexOf('function metricsFrontier(s)'));
 s=s.replaceAll('metrics:metricsFrontier(state)','metrics:null');
-output('solver.mjs',relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'}));
+s=relocate(s,{'./cpc-connect4.mjs':'./cpc.mjs','./rba-connect4-shared-exact-cache.mjs':'./shared-cache.mjs','./rba-connect4-coordinate.mjs':'./coordinate.mjs'});
+if(features.includes('hash'))s="import {mix14x32Locator32} from './fixed-ops.mjs';\n"+once(s,'mixSpan32Locator32(words,keyOffset,cache.keyWords)','mix14x32Locator32(words,keyOffset)');
+if(features.includes('live')){
+  s="import {advanceLive3x32} from './fixed-ops.mjs';\n"+s;
+  s=s.replaceAll('advanceConnect4LiveLineState32(live,','advanceLive3x32(live,').replaceAll('advanceConnect4LiveLineState32(state.live,','advanceLive3x32(state.live,');
+}
+output('solver.mjs',s);
 
 let worker=read('addons/rba-connect4-lazy-smp-worker-frontier.mjs');
 worker=worker.slice(worker.indexOf('import '));

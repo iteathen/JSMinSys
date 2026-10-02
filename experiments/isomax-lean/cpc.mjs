@@ -52,7 +52,8 @@ function collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mov
   const moverCoord=offset+(mover?g.p1Offset:g.p0Offset),
     opponentCoord=offset+(mover?g.p0Offset:g.p1Offset);
   let moverAny=0,opponentAny=0,threats=0;
-  for(let i=0;i<basisSize;i+=1){
+  let i=0;
+  for(;i<basisSize;i+=1){
     const id=basis[basisOffset+i];
     // Basis ids are cardinality-sorted; singleton id is the physical cell.
     if(id>=g.pairShapeStart)break;
@@ -78,7 +79,7 @@ function collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mov
       }
     }
   }
-  return (threats<<1)|(moverAny<<3)|(opponentAny<<4);
+  return (threats<<1)|(moverAny<<3)|(opponentAny<<4)|(i<<5);
 }
 
 // Qualified one-step fork-precursor closure.
@@ -87,8 +88,8 @@ function collectSingletonProfiles(g,words,offset,basis,basisOffset,basisSize,mov
 // counter-terminal before the opponent's enabler/fork sequence.
 // For configured widths above 32 the proof optimization is simply skipped;
 // correctness then falls through to ordinary traversal.
-function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch){
-  scratch.preemptionCount[0]=0;scratch.preemptionMask32[0]=0;
+function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch,pairStart){
+  // Caller resets these fields before tactical closure; do not clear twice.
   const targets=scratch.forkTargets32;if(moverHasSingleton)return 0;
 
   const p0Bits=scratch.activeSingletonCells,p1Bits=scratch.activeSingletonCellsOther;
@@ -99,7 +100,7 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   // A second basis pass handles both the mover minimal-pair guard and the
   // opponent's playable pair-to-fork precursor relation. Skip the singleton
   // prefix once, then stop at the triple boundary.
-  let i=0;while(i<basisSize&&basis[basisOffset+i]<g.pairShapeStart)i+=1;
+  let i=pairStart;
   for(;i<basisSize;i+=1){
     const id=basis[basisOffset+i];
     if(id>=g.tripleShapeStart)break;
@@ -335,7 +336,7 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
         return CPC_EXACT;
       }
     }
-    const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch);
+    const precursor=deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover,moverHasSingleton,scratch,singletonProfile>>>5);
     if(precursor<0){
       const value=opponent?1:3;scratch.interval[0]=value;scratch.interval[1]=value;
       return CPC_EXACT;
