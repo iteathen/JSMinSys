@@ -19,6 +19,11 @@ recorded separately. The full-size cache check explicitly verifies attachment
 and two-way publication at the last entry of the 5 GiB backing. It runs only
 when invoked, not as part of the default small-memory test suite.
 
+Combined confirmation: **39.676 s baseline → 37.690 s selected mean** (5.004%
+less wall time, 5.046% fewer process cycles), with all 193 tests passing.
+See `../../evidence/isomax-four-items-confirm-20261002/REPORT.md` for raw-run
+links, exact revisions, unchanged configuration and measurement limits.
+
 The candidate specializes the **released deep** implementation for standard
 7x6, baseline CPC, compact shared/private TT and shared sample mask zero.
 All workers are deep. `rootFrontier:true`, alternative CPC options and other
