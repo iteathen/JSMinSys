@@ -1,0 +1,5416 @@
+{
+  "schema": "isomax.rank-local.localhost.full-game.v1",
+  "status": "COMPLETE",
+  "repositorySha": "7ec3fedabfab372e66cbfa57e76674fc5c42bcc1",
+  "addonsTree": "d0e342bd9d5bb8c2d384bf5128467c1b08cdc9a7",
+  "config": {
+    "workers": 4,
+    "rootFrontier": true,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 268435456,
+    "localCacheCapacity": 16777216,
+    "timeoutMs": 300000
+  },
+  "node": "v27.0.0-nightly20260928b59840b593",
+  "v8": "14.6.202.34-node.36",
+  "nodeExecutable": "C:\\r\\isomax-nightly-runtime\\node-v27.0.0-nightly20260928b59840b593-win-x64\\node.exe",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+  "totalMemoryBytes": 34088599552,
+  "freeMemoryBeforeBytes": 13051281408,
+  "platform": "win32",
+  "arch": "x64",
+  "topology": {
+    "workers": 4,
+    "wideWorker": 0,
+    "deepWorkers": [
+      1,
+      2,
+      3
+    ],
+    "rootFrontier": true,
+    "targets": [
+      {
+        "group": 0,
+        "processor": 0,
+        "core": 0,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 2,
+        "core": 1,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 4,
+        "core": 2,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      {
+        "group": 0,
+        "processor": 6,
+        "core": 3,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      }
+    ]
+  },
+  "affinityPreloadSha256": "c76141300339725c9a8d8f6b3447c3934ab3ee14597bb81531e5e2705219a400",
+  "targetsFile": "C:\\r\\isomax-rank-local-benchmark\\evidence\\isomax-memory-affinity-20260928\\targets.json",
+  "environmentDeviation": "Benchmark-only explicit main-thread collection between completed searches to reclaim unreachable per-call shared buffers; cost included. Same executable, caches, affinity and addons. Background applications unchanged.",
+  "explicitCollection": true,
+  "measurement": "Primary wall includes every selector call, allocation, worker startup/cleanup, moves, terminal detection, between-ply trace I/O and any declared explicit collection. No TT reused outside the unchanged selector.",
+  "startedUtc": "2026-10-02T06:04:57.006Z",
+  "controlsPassed": true,
+  "trace": [
+    {
+      "ply": 1,
+      "player": 1,
+      "sequenceBefore": "",
+      "selectedMove": 4,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 7,
+        "B": 7,
+        "H": 5
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 7,
+        "B": 7,
+        "H": 5
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.5064000000000135,
+      "cumulativeWallMs": 11.404300000000006,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 3,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 0,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1,
+                2
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 5,
+              "opponentDeniedLines": 5,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                6,
+                7,
+                8
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                6,
+                7,
+                8
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 3,
+              "landingRow": 0,
+              "moverLiveLines": 7,
+              "opponentDeniedLines": 7,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                6,
+                9,
+                10,
+                11,
+                46
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                6,
+                9,
+                10,
+                11,
+                46
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 5,
+              "opponentDeniedLines": 5,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12,
+                48
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12,
+                48
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14,
+                52
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 3
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 2,
+      "player": 2,
+      "sequenceBefore": "4",
+      "selectedMove": 4,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 9,
+        "B": 10,
+        "H": 4
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 9,
+        "B": 10,
+        "H": 4
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.11789999999999168,
+      "cumulativeWallMs": 13.09190000000001,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 3,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 1,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1,
+                2
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4,
+                5
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 5,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                7,
+                8
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                6,
+                7,
+                8
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 10,
+              "landingRow": 1,
+              "moverLiveLines": 9,
+              "opponentDeniedLines": 10,
+              "headroom": 4,
+              "moverLiveLineIds": [
+                8,
+                15,
+                18,
+                21,
+                24,
+                25,
+                26,
+                48,
+                54
+              ],
+              "opponentLiveLineIds": [
+                8,
+                10,
+                15,
+                18,
+                21,
+                24,
+                25,
+                26,
+                48,
+                54
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 5,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                12,
+                48
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12,
+                48
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14,
+                52
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 3
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 3,
+      "player": 1,
+      "sequenceBefore": "44",
+      "selectedMove": 4,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 11,
+        "B": 12,
+        "H": 3
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 11,
+        "B": 12,
+        "H": 3
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.09979999999998768,
+      "cumulativeWallMs": 14.428500000000014,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 3,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 2,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                1,
+                2
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "opponentLiveLineIds": [
+                4,
+                5
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "opponentLiveLineIds": [
+                7,
+                8
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 17,
+              "landingRow": 2,
+              "moverLiveLines": 11,
+              "opponentDeniedLines": 12,
+              "headroom": 3,
+              "moverLiveLineIds": [
+                5,
+                23,
+                30,
+                33,
+                36,
+                39,
+                40,
+                41,
+                50,
+                56,
+                62
+              ],
+              "opponentLiveLineIds": [
+                5,
+                23,
+                25,
+                30,
+                33,
+                36,
+                39,
+                40,
+                41,
+                50,
+                56,
+                62
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "opponentLiveLineIds": [
+                12,
+                48
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                13,
+                50
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 3
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 4,
+      "player": 2,
+      "sequenceBefore": "444",
+      "selectedMove": 4,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 10,
+        "B": 11,
+        "H": 2
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 10,
+        "B": 11,
+        "H": 2
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.1307999999999936,
+      "cumulativeWallMs": 15.780300000000011,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 3,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 3,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1,
+                2
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                7,
+                8
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 24,
+              "landingRow": 3,
+              "moverLiveLines": 10,
+              "opponentDeniedLines": 11,
+              "headroom": 2,
+              "moverLiveLineIds": [
+                2,
+                20,
+                38,
+                45,
+                47,
+                49,
+                51,
+                52,
+                58,
+                64
+              ],
+              "opponentLiveLineIds": [
+                2,
+                20,
+                38,
+                40,
+                45,
+                47,
+                49,
+                51,
+                52,
+                58,
+                64
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                12,
+                48
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 3
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 5,
+      "player": 1,
+      "sequenceBefore": "4444",
+      "selectedMove": 4,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 8,
+        "B": 8,
+        "H": 1
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 8,
+        "B": 8,
+        "H": 1
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.11230000000000473,
+      "cumulativeWallMs": 17.001700000000028,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 3,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 4,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1,
+                2
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "opponentLiveLineIds": [
+                7,
+                8
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 31,
+              "landingRow": 4,
+              "moverLiveLines": 8,
+              "opponentDeniedLines": 8,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                17,
+                35,
+                53,
+                55,
+                57,
+                59,
+                60,
+                66
+              ],
+              "opponentLiveLineIds": [
+                17,
+                35,
+                53,
+                55,
+                57,
+                59,
+                60,
+                66
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "opponentLiveLineIds": [
+                12,
+                48
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 3
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 6,
+      "player": 2,
+      "sequenceBefore": "44444",
+      "selectedMove": 4,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "UNIQUE_MAX_EXHAUSTS_COLUMN",
+      "uniqueParetoColumn": 4,
+      "selectedABH": {
+        "column": 4,
+        "A": 6,
+        "B": 6,
+        "H": 0
+      },
+      "unresolvedMaximumABH": {
+        "column": 4,
+        "A": 6,
+        "B": 6,
+        "H": 0
+      },
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 1,
+      "workerNodeCounts": [
+        13250676,
+        22341256,
+        21463666,
+        20249725
+      ],
+      "totalSearchNodes": 77305323,
+      "searchElapsedMs": 47662.086299999995,
+      "selectorElapsedMs": 47666.0665,
+      "cumulativeWallMs": 47685.553799999994,
+      "collectionBeforePly": null,
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 3,
+        "winner": 1,
+        "winnerMetrics": {
+          "nodes": 22341256,
+          "cutoffs": 6054805,
+          "cacheHits": 6457494,
+          "cpcExact": 2709268,
+          "cpcBounds": 269794,
+          "cpcRestrictions": 4730428,
+          "cpcForced": 4831449,
+          "cpcPrecursors": 7874,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 22341395
+        },
+        "nodeCounts": [
+          13250676,
+          22341256,
+          21463666,
+          20249725
+        ],
+        "workerTiming": [
+          [
+            320.7742,
+            0
+          ],
+          [
+            319.6399,
+            47839.7468
+          ],
+          [
+            317.4754,
+            47839.8409
+          ],
+          [
+            317.4761,
+            47839.8439
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 8940603,
+        "sharedCacheStores": 22892276,
+        "sharedCacheStoreContention": 347690,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "reflected": 0,
+        "elapsedMs": 47662.086299999995,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 5,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            0,
+            5,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                7,
+                8
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 3,
+              "landingCell": 38,
+              "landingRow": 5,
+              "moverLiveLines": 6,
+              "opponentDeniedLines": 6,
+              "headroom": 0,
+              "moverLiveLineIds": [
+                32,
+                61,
+                63,
+                65,
+                67,
+                68
+              ],
+              "opponentLiveLineIds": [
+                32,
+                61,
+                63,
+                65,
+                67,
+                68
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                12,
+                48
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "dominatedBy": [
+                3
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                2,
+                3,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            3
+          ],
+          "uniqueParetoColumn": 3,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "UNIQUE_MAX_EXHAUSTS_COLUMN",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 7,
+      "player": 1,
+      "sequenceBefore": "444444",
+      "selectedMove": 3,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 3,
+        "A": 4,
+        "B": 2,
+        "H": 5
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 3,
+      "workerNodeCounts": [
+        655477,
+        844497,
+        857661,
+        856214
+      ],
+      "totalSearchNodes": 3213849,
+      "searchElapsedMs": 2450.5455999999976,
+      "selectorElapsedMs": 2453.421900000001,
+      "cumulativeWallMs": 51042.9084,
+      "collectionBeforePly": {
+        "elapsedMs": 900.7273999999961,
+        "before": {
+          "rss": 10821840896,
+          "heapTotal": 8261632,
+          "heapUsed": 7426664,
+          "external": 4674249,
+          "arrayBuffers": 10740964197
+        },
+        "after": {
+          "rss": 83968000,
+          "heapTotal": 7737344,
+          "heapUsed": 6890792,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 2,
+        "winner": 3,
+        "winnerMetrics": {
+          "nodes": 856214,
+          "cutoffs": 229399,
+          "cacheHits": 233021,
+          "cpcExact": 108241,
+          "cpcBounds": 20724,
+          "cpcRestrictions": 186088,
+          "cpcForced": 193769,
+          "cpcPrecursors": 731,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 856214
+        },
+        "nodeCounts": [
+          655477,
+          844497,
+          857661,
+          856214
+        ],
+        "workerTiming": [
+          [
+            48860.8887,
+            0
+          ],
+          [
+            48858.7986,
+            0
+          ],
+          [
+            48858.4731,
+            0
+          ],
+          [
+            48862.3553,
+            51209.9113
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            5
+          ]
+        ],
+        "sharedCacheHits": 263605,
+        "sharedCacheStores": 949984,
+        "sharedCacheStoreContention": 17604,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "reflected": 0,
+        "elapsedMs": 2450.5455999999976,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 6,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            0,
+            6,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1,
+                2
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 2,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "opponentLiveLineIds": [
+                7,
+                8
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "opponentLiveLineIds": [
+                12,
+                48
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            2,
+            4
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 8,
+      "player": 2,
+      "sequenceBefore": "4444443",
+      "selectedMove": 3,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 3,
+      "selectedABH": {
+        "column": 3,
+        "A": 4,
+        "B": 5,
+        "H": 4
+      },
+      "unresolvedMaximumABH": {
+        "column": 3,
+        "A": 4,
+        "B": 5,
+        "H": 4
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.1356000000014319,
+      "cumulativeWallMs": 51477.094399999994,
+      "collectionBeforePly": {
+        "elapsedMs": 430.87019999999757,
+        "before": {
+          "rss": 5284098048,
+          "heapTotal": 7999488,
+          "heapUsed": 7519864,
+          "external": 4678085,
+          "arrayBuffers": 10740967993
+        },
+        "after": {
+          "rss": 90435584,
+          "heapTotal": 7737344,
+          "heapUsed": 6998960,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 2,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 7,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            1,
+            6,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1,
+                2
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4,
+                5
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 9,
+              "landingRow": 1,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 5,
+              "headroom": 4,
+              "moverLiveLineIds": [
+                15,
+                18,
+                21,
+                22
+              ],
+              "opponentLiveLineIds": [
+                5,
+                7,
+                22,
+                23,
+                46
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                12,
+                48
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "dominatedBy": [
+                2
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            2
+          ],
+          "uniqueParetoColumn": 2,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 2
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 9,
+      "player": 1,
+      "sequenceBefore": "44444433",
+      "selectedMove": 3,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 3,
+      "selectedABH": {
+        "column": 3,
+        "A": 4,
+        "B": 7,
+        "H": 3
+      },
+      "unresolvedMaximumABH": {
+        "column": 3,
+        "A": 4,
+        "B": 7,
+        "H": 3
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.16140000000450527,
+      "cumulativeWallMs": 51479.1997,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 2,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 8,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            2,
+            6,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1,
+                2
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 16,
+              "landingRow": 2,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 7,
+              "headroom": 3,
+              "moverLiveLineIds": [
+                30,
+                33,
+                36,
+                37
+              ],
+              "opponentLiveLineIds": [
+                2,
+                20,
+                22,
+                37,
+                38,
+                48,
+                54
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "opponentLiveLineIds": [
+                12,
+                48
+              ],
+              "dominatedBy": [
+                2
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            2
+          ],
+          "uniqueParetoColumn": 2,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 2
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 10,
+      "player": 2,
+      "sequenceBefore": "444444333",
+      "selectedMove": 3,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 3,
+      "selectedABH": {
+        "column": 3,
+        "A": 3,
+        "B": 6,
+        "H": 2
+      },
+      "unresolvedMaximumABH": {
+        "column": 3,
+        "A": 3,
+        "B": 6,
+        "H": 2
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.10809999999764841,
+      "cumulativeWallMs": 51488.886999999995,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 2,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 9,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            3,
+            6,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 23,
+              "landingRow": 3,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 6,
+              "headroom": 2,
+              "moverLiveLineIds": [
+                45,
+                47,
+                49
+              ],
+              "opponentLiveLineIds": [
+                17,
+                35,
+                37,
+                50,
+                56,
+                62
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                12
+              ],
+              "opponentLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "dominatedBy": [
+                2
+              ]
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 4,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13,
+                50
+              ],
+              "dominatedBy": [
+                2
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                2
+              ]
+            }
+          ],
+          "paretoColumns": [
+            2
+          ],
+          "uniqueParetoColumn": 2,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 2
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 11,
+      "player": 1,
+      "sequenceBefore": "4444443333",
+      "selectedMove": 5,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 5,
+        "A": 4,
+        "B": 1,
+        "H": 5
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 2,
+      "workerNodeCounts": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "totalSearchNodes": 2,
+      "searchElapsedMs": 41.783400000000256,
+      "selectorElapsedMs": 42.72950000000128,
+      "cumulativeWallMs": 51539.296299999995,
+      "collectionBeforePly": null,
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 4,
+        "winner": 2,
+        "winnerMetrics": {
+          "nodes": 1,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 1,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 1
+        },
+        "nodeCounts": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            51762.156,
+            51764.295
+          ],
+          [
+            51762.5243,
+            51764.1688
+          ],
+          [
+            51763.3606,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            5
+          ],
+          [
+            1,
+            0,
+            0,
+            5
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 1,
+        "sharedCacheStores": 1,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 41.783400000000256,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 10,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            4,
+            6,
+            0,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 30,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 3,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                53,
+                55,
+                57
+              ],
+              "opponentLiveLineIds": [
+                32,
+                58,
+                64
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 4,
+              "landingRow": 0,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "opponentLiveLineIds": [
+                12
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2
+              ]
+            }
+          ],
+          "paretoColumns": [
+            2,
+            4
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 12,
+      "player": 2,
+      "sequenceBefore": "44444433335",
+      "selectedMove": 5,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 5,
+      "selectedABH": {
+        "column": 5,
+        "A": 4,
+        "B": 3,
+        "H": 4
+      },
+      "unresolvedMaximumABH": {
+        "column": 5,
+        "A": 4,
+        "B": 3,
+        "H": 4
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.10080000000016298,
+      "cumulativeWallMs": 51545.4522,
+      "collectionBeforePly": {
+        "elapsedMs": 3.7681999999986147,
+        "before": {
+          "rss": 90648576,
+          "heapTotal": 8785920,
+          "heapUsed": 7362168,
+          "external": 4678097,
+          "arrayBuffers": 1844220
+        },
+        "after": {
+          "rss": 90726400,
+          "heapTotal": 8785920,
+          "heapUsed": 7066008,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 4,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 11,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            4,
+            6,
+            1,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 30,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 3,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                32,
+                58,
+                64
+              ],
+              "opponentLiveLineIds": [
+                53,
+                55,
+                57
+              ],
+              "dominatedBy": [
+                4
+              ]
+            },
+            {
+              "column": 4,
+              "landingCell": 11,
+              "landingRow": 1,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 3,
+              "headroom": 4,
+              "moverLiveLineIds": [
+                18,
+                21,
+                24,
+                27
+              ],
+              "opponentLiveLineIds": [
+                11,
+                12,
+                27
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14,
+                52
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            4
+          ],
+          "uniqueParetoColumn": 4,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 4
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 13,
+      "player": 1,
+      "sequenceBefore": "444444333355",
+      "selectedMove": 5,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 5,
+      "selectedABH": {
+        "column": 5,
+        "A": 4,
+        "B": 6,
+        "H": 3
+      },
+      "unresolvedMaximumABH": {
+        "column": 5,
+        "A": 4,
+        "B": 6,
+        "H": 3
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.11759999999776483,
+      "cumulativeWallMs": 51549.083699999996,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 4,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 12,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            4,
+            6,
+            2,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 30,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 3,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                53,
+                55,
+                57
+              ],
+              "opponentLiveLineIds": [
+                32,
+                58,
+                64
+              ],
+              "dominatedBy": [
+                4
+              ]
+            },
+            {
+              "column": 4,
+              "landingCell": 18,
+              "landingRow": 2,
+              "moverLiveLines": 4,
+              "opponentDeniedLines": 6,
+              "headroom": 3,
+              "moverLiveLineIds": [
+                33,
+                36,
+                39,
+                42
+              ],
+              "opponentLiveLineIds": [
+                26,
+                27,
+                42,
+                52,
+                58,
+                64
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14,
+                52
+              ],
+              "dominatedBy": [
+                2,
+                4
+              ]
+            }
+          ],
+          "paretoColumns": [
+            4
+          ],
+          "uniqueParetoColumn": 4,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 4
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 14,
+      "player": 2,
+      "sequenceBefore": "4444443333555",
+      "selectedMove": 5,
+      "source": "RANK_LOCAL",
+      "searchStarted": false,
+      "rankLocalStatus": "CERTIFIED",
+      "rankLocalReason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+      "uniqueParetoColumn": 5,
+      "selectedABH": {
+        "column": 5,
+        "A": 3,
+        "B": 4,
+        "H": 2
+      },
+      "unresolvedMaximumABH": {
+        "column": 5,
+        "A": 3,
+        "B": 4,
+        "H": 2
+      },
+      "searchStatus": "NOT_STARTED",
+      "rootWdl": null,
+      "winnerWorker": -1,
+      "workerNodeCounts": [],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 0,
+      "selectorElapsedMs": 0.11350000000675209,
+      "cumulativeWallMs": 51556.462199999994,
+      "collectionBeforePly": null,
+      "affinity": [],
+      "raw": {
+        "status": "RANK_LOCAL_MOVE",
+        "rootWdl": null,
+        "move": 4,
+        "source": "RANK_LOCAL",
+        "searchStarted": false,
+        "preSearch": {
+          "rank": 13,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            4,
+            6,
+            3,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "dominatedBy": [
+                4
+              ]
+            },
+            {
+              "column": 2,
+              "landingCell": 30,
+              "landingRow": 4,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                32
+              ],
+              "opponentLiveLineIds": [
+                53,
+                55,
+                57
+              ],
+              "dominatedBy": [
+                4
+              ]
+            },
+            {
+              "column": 4,
+              "landingCell": 25,
+              "landingRow": 3,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 4,
+              "headroom": 2,
+              "moverLiveLineIds": [
+                47,
+                49,
+                51
+              ],
+              "opponentLiveLineIds": [
+                41,
+                42,
+                60,
+                66
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "dominatedBy": [
+                4
+              ]
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            4
+          ],
+          "uniqueParetoColumn": 4,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "CERTIFIED",
+          "reason": "UNIQUE_PARETO_MAX_WITH_COLUMN_HEADROOM",
+          "move": 4
+        },
+        "winner": -1,
+        "winnerMetrics": null,
+        "workersUsed": 0,
+        "requestedWorkers": 4,
+        "elapsedMs": 0
+      }
+    },
+    {
+      "ply": 15,
+      "player": 1,
+      "sequenceBefore": "44444433335555",
+      "selectedMove": 3,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 3,
+        "A": 3,
+        "B": 1,
+        "H": 1
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 2,
+      "workerNodeCounts": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "totalSearchNodes": 1,
+      "searchElapsedMs": 37.196499999998196,
+      "selectorElapsedMs": 38.495999999999185,
+      "cumulativeWallMs": 51602.5749,
+      "collectionBeforePly": null,
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 2,
+        "winner": 2,
+        "winnerMetrics": {
+          "nodes": 1,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 2,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 1
+        },
+        "nodeCounts": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            51830.3031,
+            0
+          ],
+          [
+            51828.2796,
+            51829.8442
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            5
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 1,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 37.196499999998196,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 14,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            4,
+            6,
+            4,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 2,
+              "landingCell": 30,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                53,
+                55,
+                57
+              ],
+              "opponentLiveLineIds": [
+                32
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 32,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                55,
+                57,
+                59
+              ],
+              "opponentLiveLineIds": [
+                68
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14
+              ],
+              "dominatedBy": [
+                1,
+                2,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            1,
+            2,
+            4,
+            5
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 16,
+      "player": 2,
+      "sequenceBefore": "444444333355553",
+      "selectedMove": 3,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 3,
+        "A": 3,
+        "B": 0,
+        "H": 0
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 2,
+      "workerNodeCounts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 37.548399999999674,
+      "selectorElapsedMs": 38.6649000000034,
+      "cumulativeWallMs": 51647.0135,
+      "collectionBeforePly": {
+        "elapsedMs": 3.7347000000008848,
+        "before": {
+          "rss": 92442624,
+          "heapTotal": 9834496,
+          "heapUsed": 8435160,
+          "external": 4678093,
+          "arrayBuffers": 10740968001
+        },
+        "after": {
+          "rss": 90906624,
+          "heapTotal": 9834496,
+          "heapUsed": 7179648,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 2,
+        "winner": 2,
+        "winnerMetrics": {
+          "nodes": 0,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 1,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 0
+        },
+        "nodeCounts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            51874.3879,
+            51875.1069
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            6
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 37.548399999999674,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 15,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            5,
+            6,
+            4,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                1,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 2,
+              "landingCell": 37,
+              "landingRow": 5,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 0,
+              "headroom": 0,
+              "moverLiveLineIds": [
+                61,
+                63,
+                65
+              ],
+              "opponentLiveLineIds": [],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 32,
+              "landingRow": 4,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                68
+              ],
+              "opponentLiveLineIds": [
+                55,
+                57,
+                59
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                1,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            1,
+            2,
+            4,
+            5
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 17,
+      "player": 1,
+      "sequenceBefore": "4444443333555533",
+      "selectedMove": 5,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 5,
+        "A": 3,
+        "B": 1,
+        "H": 1
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 1,
+      "workerNodeCounts": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "totalSearchNodes": 1,
+      "searchElapsedMs": 36.70969999999943,
+      "selectorElapsedMs": 37.87779999999475,
+      "cumulativeWallMs": 51692.0398,
+      "collectionBeforePly": {
+        "elapsedMs": 4.917799999995623,
+        "before": {
+          "rss": 92549120,
+          "heapTotal": 9834496,
+          "heapUsed": 7855984,
+          "external": 4678089,
+          "arrayBuffers": 10740967997
+        },
+        "after": {
+          "rss": 90173440,
+          "heapTotal": 9834496,
+          "heapUsed": 7207656,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 4,
+        "winner": 1,
+        "winnerMetrics": {
+          "nodes": 1,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 2,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 1
+        },
+        "nodeCounts": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            51918.5589,
+            51920.137
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            51919.7899,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            4
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 1,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 36.70969999999943,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 16,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            6,
+            6,
+            4,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1
+              ],
+              "dominatedBy": [
+                1,
+                4,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 32,
+              "landingRow": 4,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 1,
+              "moverLiveLineIds": [
+                55,
+                57,
+                59
+              ],
+              "opponentLiveLineIds": [
+                68
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14
+              ],
+              "dominatedBy": [
+                1,
+                4,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            1,
+            4,
+            5
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 18,
+      "player": 2,
+      "sequenceBefore": "44444433335555335",
+      "selectedMove": 5,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 5,
+        "A": 3,
+        "B": 0,
+        "H": 0
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 2,
+      "workerNodeCounts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 48.33050000000367,
+      "selectorElapsedMs": 49.659599999999045,
+      "cumulativeWallMs": 51748.0888,
+      "collectionBeforePly": {
+        "elapsedMs": 4.22439999999915,
+        "before": {
+          "rss": 93061120,
+          "heapTotal": 10096640,
+          "heapUsed": 7917136,
+          "external": 4678085,
+          "arrayBuffers": 10740967993
+        },
+        "after": {
+          "rss": 91508736,
+          "heapTotal": 10096640,
+          "heapUsed": 7257032,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 4,
+        "winner": 2,
+        "winnerMetrics": {
+          "nodes": 0,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 1,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 0
+        },
+        "nodeCounts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            51974.9855,
+            0
+          ],
+          [
+            51975.2779,
+            51976.299
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            5
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 48.33050000000367,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 17,
+          "mover": 1,
+          "heights": [
+            0,
+            0,
+            6,
+            6,
+            5,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                1
+              ],
+              "opponentLiveLineIds": [
+                0,
+                1
+              ],
+              "dominatedBy": [
+                1,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                4
+              ],
+              "opponentLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 4,
+              "landingCell": 39,
+              "landingRow": 5,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 0,
+              "headroom": 0,
+              "moverLiveLineIds": [
+                63,
+                65,
+                67
+              ],
+              "opponentLiveLineIds": [],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 3,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                13
+              ],
+              "opponentLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 1,
+              "opponentDeniedLines": 2,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                14
+              ],
+              "opponentLiveLineIds": [
+                9,
+                14
+              ],
+              "dominatedBy": [
+                1,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            1,
+            4,
+            5
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    },
+    {
+      "ply": 19,
+      "player": 1,
+      "sequenceBefore": "444444333355553355",
+      "selectedMove": 2,
+      "source": "SEARCH",
+      "searchStarted": true,
+      "rankLocalStatus": "UNRESOLVED",
+      "rankLocalReason": "NON_UNIQUE_PARETO_MAX",
+      "uniqueParetoColumn": null,
+      "selectedABH": {
+        "column": 2,
+        "A": 3,
+        "B": 1,
+        "H": 5
+      },
+      "unresolvedMaximumABH": null,
+      "searchStatus": "EXACT",
+      "rootWdl": 1,
+      "winnerWorker": 2,
+      "workerNodeCounts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "totalSearchNodes": 0,
+      "searchElapsedMs": 45.98920000000362,
+      "selectorElapsedMs": 47.156699999999546,
+      "cumulativeWallMs": 51803.7435,
+      "collectionBeforePly": {
+        "elapsedMs": 6.370600000002014,
+        "before": {
+          "rss": 99602432,
+          "heapTotal": 10096640,
+          "heapUsed": 7936384,
+          "external": 4678073,
+          "arrayBuffers": 10740967981
+        },
+        "after": {
+          "rss": 90542080,
+          "heapTotal": 10096640,
+          "heapUsed": 7289528,
+          "external": 4673945,
+          "arrayBuffers": 1844200
+        }
+      },
+      "affinity": [
+        {
+          "index": 0,
+          "target": {
+            "group": 0,
+            "processor": 0,
+            "core": 0,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 0,
+            "mask": "1",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 1,
+          "target": {
+            "group": 0,
+            "processor": 2,
+            "core": 1,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 2,
+            "mask": "4",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 2,
+          "target": {
+            "group": 0,
+            "processor": 4,
+            "core": 2,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 4,
+            "mask": "16",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        },
+        {
+          "index": 3,
+          "target": {
+            "group": 0,
+            "processor": 6,
+            "core": 3,
+            "efficiency": 1,
+            "l2Bytes": 1310720
+          },
+          "actual": {
+            "group": 0,
+            "processor": 6,
+            "mask": "64",
+            "previousGroup": 0,
+            "previousMask": "65535"
+          },
+          "beforeSolverInitialization": true
+        }
+      ],
+      "raw": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 1,
+        "winner": 2,
+        "winnerMetrics": {
+          "nodes": 0,
+          "cutoffs": 0,
+          "cacheHits": 0,
+          "cpcExact": 1,
+          "cpcBounds": 0,
+          "cpcRestrictions": 0,
+          "cpcForced": 0,
+          "cpcPrecursors": 0,
+          "cpcProjectedForks": 0,
+          "frontCalls": 0,
+          "frontExact": 0,
+          "frontFailures": 0,
+          "frontSteps": 0,
+          "frontActionExact": 0,
+          "cofactors": 1
+        },
+        "nodeCounts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "workerTiming": [
+          [
+            0,
+            0
+          ],
+          [
+            52028.3287,
+            52030.9436
+          ],
+          [
+            52028.0775,
+            52029.5277
+          ],
+          [
+            52030.8301,
+            0
+          ]
+        ],
+        "frontierMetrics": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            3
+          ],
+          [
+            1,
+            0,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 45.98920000000362,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 10739185189,
+        "source": "SEARCH",
+        "searchStarted": true,
+        "preSearch": {
+          "rank": 18,
+          "mover": 0,
+          "heights": [
+            0,
+            0,
+            6,
+            6,
+            6,
+            0,
+            0
+          ],
+          "candidates": [
+            {
+              "column": 0,
+              "landingCell": 0,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                1
+              ],
+              "opponentLiveLineIds": [
+                1
+              ],
+              "dominatedBy": [
+                1,
+                5
+              ]
+            },
+            {
+              "column": 1,
+              "landingCell": 1,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                0,
+                3,
+                4
+              ],
+              "opponentLiveLineIds": [
+                4
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 5,
+              "landingCell": 5,
+              "landingRow": 0,
+              "moverLiveLines": 3,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                6,
+                9,
+                13
+              ],
+              "opponentLiveLineIds": [
+                13
+              ],
+              "dominatedBy": []
+            },
+            {
+              "column": 6,
+              "landingCell": 6,
+              "landingRow": 0,
+              "moverLiveLines": 2,
+              "opponentDeniedLines": 1,
+              "headroom": 5,
+              "moverLiveLineIds": [
+                9,
+                14
+              ],
+              "opponentLiveLineIds": [
+                14
+              ],
+              "dominatedBy": [
+                1,
+                5
+              ]
+            }
+          ],
+          "paretoColumns": [
+            1,
+            5
+          ],
+          "uniqueParetoColumn": -1,
+          "formula": {
+            "moverLiveLines": "live mover winning lines containing current legal landing",
+            "opponentDeniedLines": "live opponent winning lines containing current legal landing",
+            "dominance": "A>= and B>= with at least one strict component",
+            "headroom": "empty cells above the candidate landing after that landing"
+          },
+          "premises": {
+            "descendantEnumeration": false,
+            "recursiveSearch": false,
+            "oracle": false,
+            "solvedValues": false,
+            "projection": false
+          },
+          "status": "UNRESOLVED",
+          "reason": "NON_UNIQUE_PARETO_MAX",
+          "move": -1
+        }
+      }
+    }
+  ],
+  "finalSequence": "4444443333555533552",
+  "terminal": {
+    "kind": "WIN",
+    "winner": 1
+  },
+  "totalPlies": 19,
+  "rankLocalMoves": 11,
+  "searchedMoves": 8,
+  "firstSearchPly": 6,
+  "firstFiveComputedWithoutSearch": true,
+  "totalSearchNodes": 80519176,
+  "totalWallMs": 51803.7435,
+  "completed": true,
+  "under60Seconds": true,
+  "peakRssBytes": 12822052864,
+  "error": null,
+  "cpuMs": 190235,
+  "processCycles": "702009652757"
+}
