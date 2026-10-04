@@ -115,10 +115,9 @@ function storeBound(src,hash,slot,value){
   return value;
 }
 
-function negamax(depth,n,mover,alpha,beta){
+function negamax(depth,src,bi,n,mover,alpha,beta){
   if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
-  const src=depth*g.keyWords,bi=depth*g.maxBasis,
-    dst=src+g.keyWords,ci=bi+g.maxBasis,
+  const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
     slot=depth?(hash&localMask):0;
@@ -152,7 +151,7 @@ function negamax(depth,n,mover,alpha,beta){
     else{
       const childN=basisSize[depth+1];
       connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
-      value=negamax(depth+1,childN,mover^1,-beta,-alpha);
+      value=negamax(depth+1,dst,ci,childN,mover^1,-beta,-alpha);
       if(value===CANCELLED)return CANCELLED;
       value=-value;
     }
@@ -192,7 +191,7 @@ function negamax(depth,n,mover,alpha,beta){
 }
 
 const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3,
-  relative=terminal?relativeTerminal(terminal,mover):negamax(0,basisSize[0],mover,-2,2);
+  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,-2,2);
 
 if(relative!==CANCELLED){
   const resultBase=index*RESULT_STRIDE,
