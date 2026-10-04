@@ -21,7 +21,10 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
   basisSize=new Uint32Array(g.cellCount+1),
   seen=new Uint32Array(g.shapeWordCount),
-  orderOffset=index%g.columns,
+  centerOrder=Uint32Array.from(
+    Array.from({length:g.columns},(_,column)=>column)
+      .sort((a,b)=>Math.abs((a<<1)-(g.columns-1))-Math.abs((b<<1)-(g.columns-1))||a-b),
+  ),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
@@ -103,7 +106,7 @@ function negamax(depth,n,mover,alpha,beta){
 
   let best=-2;
   for(let oi=0;oi<g.columns;oi+=1){
-    const column=g.actionOrder[(oi+orderOffset)%g.columns],
+    const column=centerOrder[oi],
       height=words[src+column];
     if(height>=g.rows)continue;
 
