@@ -11844,8 +11844,8 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "E",
-          "target": "storeExact"
+          "count": "D",
+          "target": "storeLocalEntry"
         },
         {
           "op": "runtime.call.subledger",
@@ -11855,15 +11855,15 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+E*CALL(storeExact)+S*CALL(storeLocalEntry)",
+        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+D*CALL(storeLocalEntry)+S*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
           "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
-          "E": "1 when opposite local bounds prove exact draw and are promoted through storeExact, otherwise 0.",
-          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0."
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
+          "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0."
         },
-        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw; only that promoted exact value may reach the shared exact cache."
+        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT."
       },
       "status": "decomposed"
     }
@@ -11997,7 +11997,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "657cf29d2bdf3b051d2777779523779badd9e09e"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "bd3b8aeaa8dad565babb593e11d0519e9344bd9a"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
