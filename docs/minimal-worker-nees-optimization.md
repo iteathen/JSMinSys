@@ -403,6 +403,21 @@ The harder 7x6 controls improved approximately 7.7–8.4%. The 4-worker 4x4-empt
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-006A disposition — child-depth hoist rejected
+
+Ten-repeat same-VM development A/B showed:
+
+- 2 workers: -1.5% aggregate;
+- 4 workers: **+0.8% aggregate regression**;
+- 4w rank-24 7x6: +0.7%;
+- 4w 7x6-B: +2.0%.
+
+All solves remained exact.
+
+The four-worker production target did not establish an enclosing win. The explicit `childDepth` live range has therefore been removed and the source returned to the MW-006 form.
+
+**Disposition:** COSTED-OUT / REJECTED. Do not reintroduce solely on the claim that fewer source additions must be faster.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
