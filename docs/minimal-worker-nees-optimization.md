@@ -102,6 +102,41 @@ Promotion must consider at least:
 - shared-cache contention and exact-only publication;
 - Node 26 / V8 14.6-family behavior and code-size/JIT effects when a realization-specific method is load-bearing.
 
+## Representative empty-board development baseline
+
+A complete current-minimal empty-board 7x6 solve was attempted on the GitHub Node 26 development runner with:
+
+- 4 minimal workers;
+- 4,194,304-entry shared exact TT;
+- 1,048,576-entry local TT per worker;
+- full shared probing/publication policy;
+- no structural opening shortcut;
+- 600,000 ms solve deadline.
+
+Result:
+
+```text
+status: TIMEOUT
+wallMs: 600011.585147
+rootWdl: unresolved
+move: -1
+sharedCacheHits: 3
+sharedCacheStores: 49
+sharedCacheStoreContention: 1
+workersExited: 4
+cleanup: true
+```
+
+This result is **not** target-hardware qualification: the runner CPU, OS and cache capacities differ from the declared i5 profile. It is nevertheless authoritative for development-benchmark representativeness: the real empty-board workload exceeds the late/endgame fixture durations by more than four orders of magnitude and does not complete within ten minutes under this runner-safe configuration.
+
+Consequences:
+
+1. millisecond late/endgame fixture averages MUST NOT be used as the primary evidence that an optimization advances the <=10 s empty-board target;
+2. all previously retained primitive/search optimizations are **provisional for the empty-board performance objective** until target-i5 full-solve A/B or an admitted bulk-search proxy confirms them;
+3. fixture regressions remain correctness/pathology evidence, but fixture wins do not establish full-solve wins;
+4. development proxies must move toward early/mid search roots representing substantial unresolved subtrees, preferably selected from an instrumented empty-board search;
+5. the sparse shared-exact activity observed in this timed-out run (3 hits / 49 stores) is a candidate structural signal, not yet a conclusion: it suggests the current full-window-only shared publication policy may provide little cross-worker reuse during the unresolved bulk search and therefore deserves representative profiling.
+
 ## Baseline development evidence
 
 Same-runner GitHub Actions comparison on Node 26, four workers, 65,536-entry local/shared caches, 11 maintained 4x4/7x6 fixtures, five repeats each:
