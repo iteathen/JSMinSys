@@ -15,6 +15,19 @@ export function compactTailProfile8(words,offset){
   return ((words[offset+10]&31)|((words[offset+13]&31)<<5))>>>0;
 }
 
+export function mixCompactConnect4Rba8Locator32(words,offset){
+  let hash=0,x;
+  x=hash^words[offset];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^words[offset+1];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^compactSupportProfile8(words,offset);hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^words[offset+8];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^words[offset+9];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^words[offset+11];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^words[offset+12];hash=Math.imul(x^(x>>>16),0x7feb352d);
+  x=hash^compactTailProfile8(words,offset);hash=Math.imul(x^(x>>>16),0x7feb352d);
+  return hash>>>0;
+}
+
 export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,geometry=null}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
      !Number.isInteger(keyWords)||keyWords<1)
