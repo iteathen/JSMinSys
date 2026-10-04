@@ -270,3 +270,14 @@ test('minimal worker never publishes local bounds to shared exact cache',async()
   await Promise.all(running);
   for(const value of sharedExactCache.value)assert.ok(value<=3,'local-only bound leaked into shared exact cache');
 });
+
+
+test('minimal worker omits hot diagnostic counters',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    result=await runLazySmpConnect4Rba32([0,1,0,1],{
+      geometry:g,workers:2,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+      sharedCacheCapacity:4096,localCacheCapacity:4096,timeoutMs:5000,
+    });
+  assert.equal(result.status,'EXACT',JSON.stringify(result));
+  assert.equal(result.winnerMetrics,null);
+});
