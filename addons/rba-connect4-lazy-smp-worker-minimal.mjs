@@ -107,7 +107,9 @@ function storeBound(src,hash,slot,value){
   if(prior&&localKeyMatches(slot,src)){
     if(prior<=3||prior===value)return prior;
     // The same canonical q has both >=0 and <=0, therefore exact draw.
-    storeExact(src,hash,slot,2);
+    // Keep this inferred draw worker-local; shared publication is reserved for
+    // exact values produced by the ordinary search result path.
+    storeLocalEntry(slot,src,2);
     return 2;
   }
   storeLocalEntry(slot,src,value);
