@@ -13,11 +13,10 @@ import {
 } from './rba-connect4-shared-exact-cache.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  RESULT_STRIDE=4,METRIC_WIDTH=15,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
+  RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),
   control=workerData.control,resultWords=workerData.resultWords,
-  metrics=new Float64Array(workerData.metricBuffer),
   words=new Uint32Array((g.cellCount+1)*g.keyWords),
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
   basisSize=new Uint32Array(g.cellCount+1),
@@ -49,7 +48,7 @@ words.set(workerData.root.words);
 basis.set(workerData.root.basis);
 basisSize[0]=workerData.root.basis.length;
 
-let nodes=0,cutoffs=0,cacheHits=0,bestMove=-1;
+let bestMove=-1;
 
 function relativeTerminal(value,mover){
   return value===2?0:value===(mover?1:3)?1:-1;
@@ -88,10 +87,10 @@ function storeLocalEntry(slot,src,value){
 
 function probeCache(src,hash,slot){
   const local=localValues[slot];
-  if(local&&localKeyMatches(slot,src)){cacheHits+=1;return local;}
+  if(local&&localKeyMatches(slot,src)){return local;}
   if(!(hash&sharedSampleBits)){
     const value=probeConnect4RbaSharedExactCache32(shared,words,src,hash);
-    if(value){storeLocalEntry(slot,src,value);cacheHits+=1;return value;}
+    if(value){storeLocalEntry(slot,src,value);return value;}
   }
   return 0;
 }
@@ -118,7 +117,6 @@ function storeBound(src,hash,slot,value){
 
 function negamax(depth,n,mover,alpha,beta){
   if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
-  nodes+=1;
   const src=depth*g.keyWords,bi=depth*g.maxBasis,
     dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
@@ -130,10 +128,10 @@ function negamax(depth,n,mover,alpha,beta){
     if(cached){
       if(cached<=3)return relativeTerminal(cached,mover);
       if(cached===LOCAL_LOWER0){
-        if(beta<=0){cutoffs+=1;return 0;}
+        if(beta<=0){return 0;}
         if(alpha<0)alpha=0;
       }else{
-        if(alpha>=0){cutoffs+=1;return 0;}
+        if(alpha>=0){return 0;}
         if(beta>0)beta=0;
       }
     }
@@ -164,7 +162,7 @@ function negamax(depth,n,mover,alpha,beta){
       if(depth===0)bestMove=column;
     }
     if(value>alpha)alpha=value;
-    if(alpha>=beta){cutoffs+=1;break;}
+    if(alpha>=beta){break;}
   }
 
   if(depth){
@@ -197,13 +195,9 @@ const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3,
   relative=terminal?relativeTerminal(terminal,mover):negamax(0,basisSize[0],mover,-2,2);
 
 if(relative!==CANCELLED){
-  const resultBase=index*RESULT_STRIDE,metricBase=index*METRIC_WIDTH,
+  const resultBase=index*RESULT_STRIDE,
     value=terminal||relativeToAbsolute(relative,mover),
     move=bestMove<0?-1:workerData.rootReflected?g.mirrorColumn[bestMove]:bestMove;
-
-  metrics[metricBase]=nodes;
-  metrics[metricBase+1]=cutoffs;
-  metrics[metricBase+2]=cacheHits;
 
   Atomics.store(resultWords,resultBase,value);
   Atomics.store(resultWords,resultBase+1,relative);
