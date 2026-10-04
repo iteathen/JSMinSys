@@ -479,6 +479,16 @@ The semantic elimination is therefore valid but the four-worker performance admi
 
 **Disposition:** full elimination COSTED-OUT / REJECTED for now. MW-004 remains UNVERIFIED-DEBT for cheaper sampled/depth-gated polling because the host-owned lifecycle proof still permits such experiments.
 
+## MW-004A — depth-gated stop polling
+
+**Mechanism:** replace the per-node stop atomic with `if (!(depth & 3) && Atomics.load(...))`. Every node pays one depth mask/branch; only depths divisible by four perform the shared atomic load.
+
+**Admission:** full removal failed the four-worker development gate, but host-owned termination proves cooperative polling can be reduced without changing correctness. A depth gate preserves regular cancellation opportunities while reducing shared-memory traffic.
+
+**Falsifier:** reject if the extra local mask/branch plus altered execution timing does not reduce four-worker complete-solve cost, or if timeout/abort/cleanup controls regress.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
