@@ -281,3 +281,29 @@ test('minimal worker omits hot diagnostic counters',async()=>{
   assert.equal(result.status,'EXACT',JSON.stringify(result));
   assert.equal(result.winnerMetrics,null);
 });
+
+
+test('minimal timeout is host-terminated without recursive polling',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    result=await runLazySmpConnect4Rba32([],{
+      geometry:g,workers:2,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+      sharedCacheCapacity:65536,localCacheCapacity:65536,timeoutMs:1,
+    });
+  assert.equal(result.status,'TIMEOUT',JSON.stringify(result));
+  assert.equal(result.cleanup,true);
+  assert.equal(result.workersExited,2);
+});
+
+test('minimal abort is host-terminated without recursive polling',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
+    controller=new AbortController();
+  controller.abort();
+  const result=await runLazySmpConnect4Rba32([],{
+    geometry:g,workers:2,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+    sharedCacheCapacity:65536,localCacheCapacity:65536,timeoutMs:5000,
+    signal:controller.signal,
+  });
+  assert.equal(result.status,'INTERRUPTED',JSON.stringify(result));
+  assert.equal(result.cleanup,true);
+  assert.equal(result.workersExited,2);
+});
