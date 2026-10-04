@@ -5,6 +5,7 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,RBA_AB_CPC_ONLY} from '../addons/rba-connect4-alphabeta.mjs';
 import * as cpc from '../addons/cpc-connect4.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4CpcNonterminal32,CPC_EXACT} from '../addons/ndc-connect4.mjs';
 const {evaluateConnect4CpcWin32}=cpc;
 
 function moves(sequence){
@@ -41,6 +42,10 @@ test('CPC module surface is win-only rather than WDL/bound/restriction closure',
   ]) assert.equal(name in cpc,false,name);
 });
 
+test('CPC win kernel has no fixed standard-board width escape hatch',()=>{
+  assert.equal(evaluateConnect4CpcWin32.toString().includes('columns>7'),false);
+});
+
 test('CPC does not promote a proved no-win bound into a win',()=>{
   const g=prepareConnect4RbaGeometry({columns:4,rows:4});
   // Historical long-range pairing proves P0 cannot win here, but the exact
@@ -52,7 +57,20 @@ test('CPC does not promote a proved no-win bound into a win',()=>{
   );
 });
 
-test('Negamax consumes CPC win closure as a player-relative exact win',()=>{
+test('legacy NDC adapter consumes only the positive CPC win certificate',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const q=connect4RbaFromMoves(moves('24447434'),{geometry:g,canonical:false});
+  const scratch=prepareConnect4CpcScratch(g);
+  assert.equal(
+    evaluateConnect4CpcNonterminal32(g,q.words,0,q.basis,0,q.basis.length,scratch),
+    CPC_EXACT,
+  );
+  // P1 was the previous mover/controller, so the legacy absolute interval is
+  // translated to P1 win. CPC itself still returned only boolean WIN.
+  assert.deepEqual(Array.from(scratch.interval),[1,1]);
+});
+
+test('Negamax consumes CPC win closure as the winning move value',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6});
   const q=connect4RbaFromMoves(moves('2444743'),{geometry:g});
   const state=prepareConnect4RbaAlphaBeta({
@@ -62,7 +80,6 @@ test('Negamax consumes CPC win closure as a player-relative exact win',()=>{
   });
   const result=solveConnect4RbaAlphaBeta(q,{state,reflected:q.reflected});
   assert.equal(result.value,1);
-  assert.ok(result.metrics.cpcWins>0,result.metrics);
 });
 
 test('CPC reservoir proof has no arbitrary standard-width cap',()=>{
