@@ -523,6 +523,20 @@ All 160 solves remained exact.
 
 **Disposition:** COSTED-OUT / REJECTED. Depth-4 polling remains the current development optimum. Less frequent atomics did not imply lower total solve cost.
 
+## MW-013 — prepare hot geometry scalars
+
+**Candidate cost:** repeated hot reads of immutable geometry object fields (`columns`, `rows`, `keyWords`, `maxBasis`) in loop bounds, legality checks, arena offset increments and hashing.
+
+**Mechanism:** copy those immutable fields into module-scope numeric scalar bindings during worker initialization and consume the scalars in E0.
+
+**Causal role:** STANDALONE realization candidate. Modern V8 may already constant-fold/hoist the stable object fields.
+
+**Admission:** the geometry object is immutable for the worker lifetime and the values are already validated before search.
+
+**Falsifier:** reject if complete four-worker solve timing is flat/worse, indicating V8 already removes the property-read cost or scalar live ranges/code shape are inferior.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
