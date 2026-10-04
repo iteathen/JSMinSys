@@ -30,11 +30,18 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),
   localValues=new Uint8Array(workerData.localCacheCapacity);
 
-let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1;
+let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1,pair=0;
 if(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}
 while(orderAt<g.columns){
-  if(left>=0)centerOrder[orderAt++]=left--;
-  if(right<g.columns)centerOrder[orderAt++]=right++;
+  const rightFirst=(index>>>pair)&1;
+  if(rightFirst){
+    if(right<g.columns)centerOrder[orderAt++]=right++;
+    if(left>=0)centerOrder[orderAt++]=left--;
+  }else{
+    if(left>=0)centerOrder[orderAt++]=left--;
+    if(right<g.columns)centerOrder[orderAt++]=right++;
+  }
+  pair+=1;
 }
 
 words.set(workerData.root.words);
