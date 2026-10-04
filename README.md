@@ -98,10 +98,25 @@ sealed hot vocabulary.
 ### Connect4 parallel execution
 
 JSMinSys exposes `runLazySmpConnect4Rba32` as the sole supported exact
-Connect4 parallel composition. Each worker owns a complete private CPC/Negamax
-search and private local exact cache; workers share only committed exact W/D/L
-cache evidence through the concurrency-safe shared exact cache. There is no
-shared surplus queue and no Branch Manager in the Connect4 execution path.
+Connect4 parallel composition. It supports two explicit deep-worker modes while
+preserving the same 2+ worker host, local exact caches, and concurrency-safe
+shared exact cache.
+
+- `workerMode: 'legacy'` is the compatibility default. It uses
+  `rba-connect4-lazy-smp-worker.mjs` and retains the existing CPC/NDC-first
+  alpha-beta path plus Behavior/Root-Frontier compatibility.
+- `workerMode: 'minimal'` uses
+  `rba-connect4-lazy-smp-worker-minimal.mjs`. It is exact canonical-RBA
+  Negamax/alpha-beta with local/shared exact TT support, center-distance move
+  ordering diversified only within equal-distance shells, and no CPC, NDC,
+  evaluator, heuristic score, restriction, or interval layer. Neutral/gray-token
+  ownership is already quotiented by RBA q; child reflection is canonicalized
+  before TT identity.
+
+The minimal worker rejects legacy-only Behavior/CPC/Root-Frontier options rather
+than silently switching execution semantics. Workers share only committed exact
+W/D/L cache evidence. There is no shared surplus queue and no Branch Manager in
+the Connect4 execution path.
 
 The current prepared candidate is [the self-contained IsoMax package](isomax/README.md):
 four deep workers, initialization-selected geometry, and a 32-byte standard TT.
