@@ -552,6 +552,20 @@ All 160 solves remained exact.
 
 **Disposition:** COSTED-OUT / REJECTED. Direct stable geometry field access is restored. The result is consistent with current V8 already optimizing these reads sufficiently; source-level scalarization is not a valid optimization claim here.
 
+## MW-014 — player-relative local exact tags
+
+**Candidate cost:** worker-local exact TT entries used the shared cache's absolute 1/2/3 W/D/L encoding. Every local exact hit therefore called absolute-to-relative conversion, and every narrow-window exact local store performed relative-to-absolute conversion even though the value never crossed the worker boundary.
+
+**Mechanism:** local exact tags now encode `relative + 2` (loss=1, draw=2, win=3) for the side-to-move already contained in q identity. Local hits return `tag - 2` directly. Narrow exact stores write the relative tag directly. Shared hits convert absolute->relative exactly once when promoted locally; full-window shared publication converts relative->absolute at the shared boundary.
+
+**Semantic boundary:** mover is part of the canonical q key, so a relative exact value is stable semantic truth for that local q. Shared cache/result wire semantics remain unchanged.
+
+**Admission:** remove representation conversion from the dominant private-cache reuse path while preserving the existing external/shared representation.
+
+**Falsifier:** reject if extra boundary logic/code shape outweighs the removed local conversions at the four-worker complete-solve boundary, or if any W/D/L/reflection/shared-cache correctness control changes.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
