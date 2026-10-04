@@ -320,6 +320,18 @@ However, MW-001B is **not yet promotable as the final sharing policy**. The targ
 
 **Falsifier:** reject any selector whose complete-solve performance fails to beat the better of MW-001A/MW-001B on the regression surface, or whose benefit depends only on a proxy counter rather than governing-unit elapsed cost.
 
+## MW-001C disposition — partitioned narrow sharing rejected
+
+A deterministic narrow-proof publisher partition was tested by reusing the existing q hash: for power-of-two worker counts, `hash & (workers-1)` selected the one worker eligible to publish a narrow-window exact.
+
+On the four-worker target development surface, MW-001C was effectively flat versus MW-001B overall (**+0.6%**) while increasing mean shared stores from about 10.8 to 274.9 in the targeted set. It also regressed 4x4-empty by about 3.5% versus MW-001B. The added hot-path AND/compare/branch and renewed shared-TT/coherence traffic therefore did not establish a governing-unit win.
+
+**Disposition:** COSTED-OUT / REJECTED for the current four-worker target.
+
+The source has been returned to MW-001B: local zero-threshold bounds, local narrow-window exacts, and shared publication only for full-window exact results.
+
+This does not prove that every future selective-sharing scheme is inferior; it proves that this specific hash-partition mechanism failed its admission test and must not remain in the production hot path.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
