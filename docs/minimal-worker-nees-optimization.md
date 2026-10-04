@@ -391,6 +391,18 @@ The harder 7x6 controls improved approximately 7.7–8.4%. The 4-worker 4x4-empt
 
 **Development disposition:** RETAIN pending target i5 generated-code/process-cycle qualification. The source and ledger now remove the two depth-derived arena multiplications from E0.
 
+## MW-006A — derive child depth once
+
+**Candidate cost:** `depth + 1` was expressed separately at cofactor size publication, child basis-size lookup, and recursive call sites.
+
+**Mechanism:** derive `childDepth` once on node entry and reuse it throughout the action loop.
+
+**Causal role:** STANDALONE arithmetic expression; current V8 may already common the expression, so source reduction is not sufficient evidence.
+
+**Falsifier:** cost out/revert if complete-solve timing or target generated code shows no reduction, or if added live range/register pressure offsets the saved arithmetic.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
