@@ -11578,8 +11578,8 @@
         ],
         "parameters": {
           "F": "Geometry and worker-local state field reads outside subledgers.",
-          "L": "Action-order, support-height and child-size reads.",
-          "MUL": "Depth/arena and action-order index multiplications.",
+          "L": "Center-order, support-height and child-size reads.",
+          "MUL": "Depth/arena multiplications.",
           "ADD": "Offsets, loop increments and node/cutoff counters.",
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
@@ -11593,7 +11593,7 @@
           "R": "Nonterminal child actions recursively searched.",
           "X": "1 only for non-root full-window nodes whose result is exact and is published to the TTs, otherwise 0."
         },
-        "note": "Exact RBA Negamax/alpha-beta with local-first and sampled shared exact TT. No CPC, NDC, evaluator, heuristic score, restriction mask or interval layer."
+        "note": "Exact RBA Negamax/alpha-beta with center-line-distance move order, local-first exact TT and sampled shared exact TT. No CPC, NDC, evaluator, heuristic score, restriction mask or interval layer."
       },
       "status": "decomposed"
     },
@@ -11613,7 +11613,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": 6
+          "count": 7
         },
         {
           "op": "runtime.field.load",
@@ -11697,22 +11697,22 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+3*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+C(alu.and.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+7*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+3*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+C(alu.and.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
         "parameters": {
           "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers.",
-          "S": "Root key/basis publication and initial basis-size stores.",
+          "S": "Root key/basis publication, center-order construction and initial basis-size stores.",
           "MUL": "Worker/result/metric, arena and local-TT allocation multiplications.",
-          "ADD": "Arena sizing, offsets and result indices.",
-          "TEST": "Root terminal, cancellation, move/reflection and winner predicates.",
-          "BRANCH": "Executed module-level control selections.",
+          "ADD": "Arena sizing, center-out ordering indices, offsets and result indices.",
+          "TEST": "Center-order construction, root terminal, cancellation, move/reflection and winner predicates.",
+          "BRANCH": "Center-order construction and executed module-level control selections.",
           "T": "1 for a terminal root, otherwise 0.",
           "N": "1 for a nonterminal root, otherwise 0.",
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0."
         },
-        "note": "Minimal production worker: exact RBA Negamax, local/shared exact TT, and result publication. CPC and evaluation hooks are intentionally absent."
+        "note": "Minimal production worker: exact RBA Negamax, center-line-distance-only move ordering, local/shared exact TT, and result publication. CPC and evaluation hooks are intentionally absent."
       },
       "status": "decomposed"
     }
@@ -11831,7 +11831,7 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
     "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "11db2acefd443f624e1e5344e62d37232be2db97",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "47d0cfaf1a6c29d03b387a89afc30c113b714c7f",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
     "addons/rba-connect4-alphabeta-behavior.mjs": "3055d703a37be032dbf627b8f7f5c0b43eb0550d",
