@@ -6,6 +6,9 @@ import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-c
 import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from './worker-behavior.mjs';
 import {encodeRootFrontier32} from './worker-root-frontier.mjs';
 
+export const RBA_LAZY_SMP_WORKER_LEGACY='legacy';
+export const RBA_LAZY_SMP_WORKER_MINIMAL='minimal';
+
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_ERROR=2,CONTROL_WAKE=3,CONTROL_WINNER=4,
   CONTROL_WORDS=5,RESULT_STRIDE=4,METRIC_WIDTH=15,
   HOST_WORKER_DIED=101,HOST_DEADLINE=102,HOST_CANCELLED=103;
@@ -22,6 +25,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   cpcProjectedAdvisory=false,
   behaviorMemory=null,
   rootFrontier=false,
+  workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
 }={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<2||workers>64)
@@ -38,6 +42,11 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
   if(typeof rootFrontier!=='boolean')throw new TypeError('rootFrontier must be boolean');
+  if(workerMode!==RBA_LAZY_SMP_WORKER_LEGACY&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL)
+    throw new RangeError('invalid Lazy SMP worker mode');
+  if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL&&
+     (rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory))
+    throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
   if(rootFrontier){
     if(behaviorMemory!==null)throw new TypeError('rootFrontier owns initial behavior memory');
     behaviorMemory=createWorkerBehaviorMemory32(workers);
@@ -78,8 +87,8 @@ export async function runLazySmpConnect4Rba32(moves,{
   try{
     for(let i=0;i<workers;i+=1)
       session.spawn(
-        new URL(rootFrontier?'./rba-connect4-lazy-smp-worker-frontier.mjs':behaviorMemory===null?'./rba-connect4-lazy-smp-worker.mjs':
-          './rba-connect4-lazy-smp-worker-behavior.mjs',import.meta.url),
+        new URL(rootFrontier?'./rba-connect4-lazy-smp-worker-frontier.mjs':behaviorMemory!==null?'./rba-connect4-lazy-smp-worker-behavior.mjs':
+          workerMode===RBA_LAZY_SMP_WORKER_MINIMAL?'./rba-connect4-lazy-smp-worker-minimal.mjs':'./rba-connect4-lazy-smp-worker.mjs',import.meta.url),
         {
           control,
           resultWords,
@@ -150,6 +159,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     sharedCacheStores:Atomics.load(sharedExactCache.stats,1),
     sharedCacheStoreContention:Atomics.load(sharedExactCache.stats,2),
     sharedSampleMask,
+    workerMode,
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
