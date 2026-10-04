@@ -4,6 +4,9 @@
 **Scope:** `addons/rba-connect4-lazy-smp-worker-minimal.mjs` and the directly coupled RBA/TT execution it invokes  
 **NEES authority:** NEES Draft 0.5, NEES-EXTREME  
 **Runtime profile:** `node26-v8-14.6`  
+**Performance target:** exact empty-board standard 7x6 solve in **<= 10,000 ms** on the local Intel Core i5-12600K target  
+**Hardware target authority:** `profiles/minimal-worker-i5-12600k-target.json`  
+**Primitive-cycle policy:** every repeated E0/E1 primitive remains optimization debt until its role is required, its realization is cycle-qualified on the target, or a lower-cost replacement is costed out.  
 **Current worker source identity at baseline:** `ecca6a46a535c7209c83ea22f6422577aa12cea0`
 
 This document is the durable first-adoption E0-E2 baseline audit and optimization-debt/disposition record required by NEES-EXTREME. Later coherent changes inherit this record and re-audit the affected causal neighborhood plus any invalidated assumptions.
@@ -105,6 +108,48 @@ The maintained fixture set is short enough that worker startup materially affect
 The source is covered by `catalog/addon-cycle-ledger-v0.json`, with unknown/unbounded recurrence preserved symbolically.
 
 The NEES reference quantified CPU profile is `node26-v8-14.6/x86_64-amd-zen3`. GitHub-hosted runner microarchitecture is not pinned as Zen 3, so its cycle constants MUST NOT be presented as exact runner latency. The symbolic ledger is retained for operation accounting; governing-unit elapsed measurements remain authoritative for promotion.
+
+## i5-12600K primitive-cycle discipline
+
+The local Intel Core i5-12600K is the promotion hardware. The NEES Zen 3 reference cost profile is useful for vocabulary/accounting only and MUST NOT be used as authoritative cycle cost for this target.
+
+The production qualification loop is:
+
+1. run the complete empty-board solve with `tools/bench-minimal-i5.mjs`;
+2. record wall time and `QueryProcessCycleTime` process cycles;
+3. pin workers to the recorded P-core targets through `tools/worker-affinity-preload.mjs`;
+4. use current generated/runtime evidence on the exact Node/V8 build when source-to-machine lowering matters;
+5. reduce the highest-frequency/highest-cycle primitive or remove the structure that causes it;
+6. re-measure the complete solve before promotion.
+
+The explicit objective is **<=10 seconds**, not a proxy node count or local helper score.
+
+### Primitive hot-path audit
+
+Every primitive below is considered live optimization debt unless marked required/tradeoff:
+
+| Primitive / mechanism | Frequency | Current status | Required next evidence |
+| --- | --- | --- | --- |
+| shared stop `Atomics.load` | every visited node | UNVERIFIED-DEBT | target generated code + cycle impact; test reduced polling only if cancellation/cleanup bound preserved |
+| node/cutoff/cache-hit counter increments | node/cutoff/hit frequency | UNVERIFIED-DEBT | production path should not pay diagnostic cost unless contract requires it |
+| key/basis arena offset arithmetic | every node | UNVERIFIED-DEBT | compare carried offsets vs derived offsets on i5 generated code |
+| q hash mixing | every non-root node | UNVERIFIED-DEBT | qualify full-q vs compact-identity hash on standard 7x6 |
+| local TT tag load | every non-root node | REQUIRED by current TT design | minimize representation/load count |
+| local semantic-key compare | occupied local slot | REQUIRED/optimizable | verify 7x6 compact compare lowering and branch behavior |
+| shared TT probe Atomics | admitted shared probes | COUPLED TRADEOFF | tune sharing only at full-solve boundary |
+| local TT key publication | local stores | REQUIRED/optimizable | reduce copies/projection recomputation if possible |
+| shared TT publication Atomics | shared exact stores | COUPLED | MW-001C currently targets redundant narrow-proof publication |
+| legal height load/full-column branch | each action candidate | REQUIRED | generated-code audit; no speculative branchless rewrite without evidence |
+| RBA cofactor transition | each searched action | REQUIRED semantic transition | optimize in coupled worker/RBA boundary |
+| reflection support compare | each nonterminal child | ENABLING | retained unless replacement preserves canonical-cache collapse |
+| reflection basis/coordinate permutation | reflected/symmetric candidates | ENABLING/optimizable | branch distribution + fused canonicalization candidates |
+| q hash after canonicalization | each non-root node | COUPLED | investigate canonicalize/hash fusion |
+| recursive call + alpha/beta sign transport | nonterminal action | REQUIRED/optimizable | current V8 call/inlining evidence |
+| center-order load | each action | REQUIRED by chosen move policy | keep prepared; remove any redundant indexing arithmetic |
+| worker-index narrow-share partition AND/compare | narrow exact store only | EXPERIMENTAL MW-001C | retain only if full-solve total cycles improve |
+| result/metric publication | once per worker completion | E2/E3 | low priority but still accountable |
+
+A primitive is not considered optimized merely because its source form is short. Actual target cycles and the enclosing solve remain authoritative.
 
 ## Initial candidate-cost inventory
 
