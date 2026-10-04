@@ -11231,11 +11231,83 @@
         "note": "Prepared canonicalization removes only selectedSet/selectedSetOffset and their conditional publication. All dimensions remain prepared geometry values. Reflection scratch construction may execute while R remains zero, so publishSpan32 is charged 2*R, not merely by failure of the primary early-exit test. Each basis entry has six typed reads and four writes across reflection/seen, inverse-map and remap stages. Callee work is charged separately. No optional selectedSet test or write is retained; field/control/arithmetic lowering, bounds guards, register pressure and locality remain unverified debt."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/cpc-connect4.mjs#evaluateConnect4CpcWin32",
+      "source": "addons/cpc-connect4.mjs",
+      "name": "evaluateConnect4CpcWin32",
+      "scope": "local-negamax-cpc-win",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "O"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "I",
+          "target": "firstSetBitIndex32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+S*C(alu.sub.u32)+N*C(alu.and.u32)+O*C(alu.or.u32)+H*C(alu.shl.u32)+R*C(alu.shr.u32)+T*C(control.test.u32)+B*C(control.branch)+I*CALL(firstSetBitIndex32)",
+        "parameters": {
+          "F": "geometry/shape/coordinate field reads across reservoir construction and residual scans",
+          "L": "typed u32 loads from state words, basis and prepared geometry arrays",
+          "A": "index/address additions",
+          "S": "support-distance and remaining-capacity subtractions",
+          "N": "bit tests, parity tests and active-bit clears",
+          "O": "cross-pair incidence accumulation",
+          "H": "coordinate-word and pair-bit shifts",
+          "R": "rank/index shifts",
+          "T": "guard, parity, coverage and equality tests",
+          "B": "short-circuit branches and loop control",
+          "I": "active residual ids decoded from set coordinate bits"
+        },
+        "note": "Win-only whole-reservoir response-pairing CPC. Conservative source-level symbolic envelope; no W/D/L interval, loss, draw, bound, restriction, fork, or threat-classification work is charged here."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 177,
-    "decomposed": 177,
+    "units": 178,
+    "decomposed": 178,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11337,7 +11409,7 @@
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
     "addons/rba-connect4-alphabeta.mjs": "57984949393267d0a9521bb9cc81aacd71fb71ce",
-    "addons/cpc-connect4.mjs": "cd8c062f267509f120253633f38449c8040589ce",
+    "addons/cpc-connect4.mjs": "f8041de5a68f87ae3800fd1422b5083d4760b961",
     "addons/rba-connect4-coordinate.mjs": "8d30f8cfba0f1690d611b45b030682a6cd7a376b",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
