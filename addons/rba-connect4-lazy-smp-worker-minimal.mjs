@@ -85,20 +85,24 @@ function storeLocalEntry(slot,src,value){
   localValues[slot]=value;
 }
 
-function probeCache(src,hash,slot){
+function probeCache(src,hash,slot,mover){
   const local=localValues[slot];
-  if(local&&localKeyMatches(slot,src)){return local;}
+  if(local&&localKeyMatches(slot,src))return local;
   if(!(hash&sharedSampleBits)){
-    const value=probeConnect4RbaSharedExactCache32(shared,words,src,hash);
-    if(value){storeLocalEntry(slot,src,value);return value;}
+    const absolute=probeConnect4RbaSharedExactCache32(shared,words,src,hash);
+    if(absolute){
+      const localExact=relativeTerminal(absolute,mover)+2;
+      storeLocalEntry(slot,src,localExact);
+      return localExact;
+    }
   }
   return 0;
 }
 
-function storeExact(src,hash,slot,value){
-  storeLocalEntry(slot,src,value);
+function storeExact(src,hash,slot,relative,mover){
+  storeLocalEntry(slot,src,relative+2);
   if(!(hash&sharedSampleBits))
-    storeConnect4RbaSharedExactCache32(shared,words,src,value,hash);
+    storeConnect4RbaSharedExactCache32(shared,words,src,relativeToAbsolute(relative,mover),hash);
 }
 
 function storeBound(src,hash,slot,value){
@@ -123,9 +127,9 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     slot=depth?(hash&localMask):0;
 
   if(depth){
-    const cached=probeCache(src,hash,slot);
+    const cached=probeCache(src,hash,slot,mover);
     if(cached){
-      if(cached<=3)return relativeTerminal(cached,mover);
+      if(cached<=3)return cached-2;
       if(cached===LOCAL_LOWER0){
         if(beta<=0){return 0;}
         if(alpha<0)alpha=0;
@@ -170,20 +174,17 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     // proofs to avoid turning local bound reuse into excessive atomic traffic.
     const shareExact=alphaOrig===-2&&betaOrig===2;
     if(best>alphaOrig&&best<betaOrig){
-      const exact=relativeToAbsolute(best,mover);
-      if(shareExact)storeExact(src,hash,slot,exact);
-      else storeLocalEntry(slot,src,exact);
+      if(shareExact)storeExact(src,hash,slot,best,mover);
+      else storeLocalEntry(slot,src,best+2);
     }else if(best>=betaOrig){
       if(best===1){
-        const exact=relativeToAbsolute(1,mover);
-        if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        if(shareExact)storeExact(src,hash,slot,1,mover);
+        else storeLocalEntry(slot,src,3);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
     }else if(best<=alphaOrig){
       if(best===-1){
-        const exact=relativeToAbsolute(-1,mover);
-        if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        if(shareExact)storeExact(src,hash,slot,-1,mover);
+        else storeLocalEntry(slot,src,1);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
     }
   }
