@@ -1,4 +1,5 @@
 import {firstSetBitIndex32,popcount32} from '../src/word32.mjs';
+import {connect4CpcTargetOwner32,connect4CpcTargetSupportDistance32} from './cpc-connect4.mjs';
 
 // Legacy exact/conservative dependency closure over a prepared Connect4 RBA q.\n// Kept separate from win-only CPC; this module owns interval/restriction/tactical closure.
 // This module does not recursively enumerate continuations. It derives
@@ -136,19 +137,6 @@ function deriveForkPreemption32(g,words,offset,basis,basisOffset,basisSize,mover
   const count=popcount32(intersection);scratch.preemptionCount[0]=count;
   if(count===1){scratch.forcedColumn[0]=firstSetBitIndex32(intersection);scratch.forcedTotal+=1;}
   return count===0?-1:count;
-}
-
-// Basic CPC event-reservoir parity for one future target. The target-column
-// contribution is truncated at the target; every other column contributes its
-// currently remaining slots. XOR of the per-column parities is exactly the
-// parity of their sum. This is a projection, not unconditional W/D/L.
-export function connect4CpcTargetOwner32(g,words,offset,targetCell){
-  return g.cpcTargetOwnerBase^(g.cellRow[targetCell]&1);
-}
-
-export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
-  const column=g.cellColumn[targetCell],row=g.cellRow[targetCell];
-  return row-words[offset+column];
 }
 
 function pairedResponseNoWin(g,words,offset,basis,basisOffset,basisSize,player){
