@@ -74,6 +74,19 @@ For changes that affect recurrence, TT identity, canonicalization, move traversa
 
 A single-worker helper or local microbenchmark is explanatory evidence only because worker races and the shared TT can change which worker wins and how much duplicated work is performed.
 
+## Benchmark representativeness policy
+
+The optimization target is **not** late-game or isolated fixture latency. It is the complete exact empty-board 7x6 solve. Benchmark authority therefore follows this hierarchy:
+
+1. **Promotion authority — target hardware full solve.** The complete empty-board solve on the declared Intel Core i5-12600K target is the governing performance measurement. The <=10,000 ms goal is evaluated only here.
+2. **Development authority — complete empty-board solve.** When a development host can complete the exact empty-board solve within practical limits, same-host before/after full-solve measurements outrank all fixture suites.
+3. **Bulk-profile proxy — trace-derived early/mid search roots.** If full solves are too expensive for every development iteration, proxies MUST be sampled from the actual empty-board search and weighted by measured contribution to full-solve nodes/cycles/time. Early and midgame subtrees that dominate the solve are the intended proxy population.
+4. **Regression-only fixtures — late/endgame/settled controls.** Small maintained 4x4 and late 7x6 positions remain valuable for correctness, W/D/L equivalence, cancellation, TT semantics, reflection, and pathological regressions. They MUST NOT by themselves authorize or reject an optimization intended for the empty-board 10-second target unless the changed mechanism is specifically dominant in those positions.
+
+A benchmark set that is mostly worker startup, terminal closures, CPC-resolved legacy positions, or single-digit-node searches is **non-representative for performance promotion** of the minimal empty-board solver.
+
+When development evidence conflicts, prefer the measurement whose execution profile most closely matches the actual empty-board solve. A local primitive win on late fixtures is subordinate to an opposite result on the full solve or on trace-weighted bulk-search proxies.
+
 ## Regression surface
 
 Promotion must consider at least:
@@ -101,7 +114,7 @@ Same-runner GitHub Actions comparison on Node 26, four workers, 65,536-entry loc
 
 All 165 solves were exact with zero W/D/L disagreements. Restoring reflection canonicalization reduced the minimal worker's winner-node count by about 39% and increased local TT hits by about 29%, while short-fixture wall time was effectively flat. This qualifies reflection canonicalization as an **ENABLING/TRADEOFF** component of the cache-collapse composite, not removable overhead merely because it has local cost.
 
-The maintained fixture set is short enough that worker startup materially affects wall time. It is therefore development evidence, not a claim about hard-position asymptotics. Harder-position governing-unit qualification remains required before promotion of a search-structure change.
+The maintained fixture set is short enough that worker startup materially affects wall time. It is retained only as regression/correctness evidence. Performance promotion for the 10-second target requires the complete empty-board solve or a trace-derived, bulk-weighted proxy from that solve.
 
 ## Cost-profile / ledger status
 
