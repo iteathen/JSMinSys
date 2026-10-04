@@ -1,0 +1,71 @@
+name: Minimal Worker NEES MW012
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bench-minimal-mw012.yml
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout full-q hash baseline
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 880cdeabc3f1058d946e00ce54e50110f3e427a9
+          path: baseline
+      - name: Checkout compact-hash candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: work/cpc-rebuild-20261004
+          path: candidate
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 26
+          check-latest: false
+      - name: Run same-runner MW012 benchmark
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {performance} from 'node:perf_hooks';
+          import {pathToFileURL} from 'node:url';
+          async function load(base){
+            const geom=await import(pathToFileURL(process.cwd()+'/'+base+'/addons/rba-connect4-geometry.mjs'));
+            const host=await import(pathToFileURL(process.cwd()+'/'+base+'/addons/rba-connect4-lazy-smp-host.mjs'));
+            return {prepare:geom.prepareConnect4RbaGeometry,run:host.runLazySmpConnect4Rba32};
+          }
+          const impl={baseline:await load('baseline'),candidate:await load('candidate')};
+          const fullA=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4];
+          const cases=[
+            {name:'7x6-A-r24',moves:fullA.slice(0,24),timeoutMs:60000},
+            {name:'7x6-A',moves:fullA,timeoutMs:30000},
+            {name:'7x6-B',moves:[2,0,5,3,6,3,5,2,3,3,3,5,0,5,0,0,1,6,1,4,3,4,2,6,6,0,6,4],timeoutMs:30000},
+            {name:'7x6-D',moves:[1,3,2,0,4,6,1,0,2,4,5,2,2,3,1,1,1,5,1,3,2,4,6,0,4,4,6,2,0,4,3,3],timeoutMs:30000}
+          ];
+          const labels=['baseline','candidate'],repeats=10;
+          const geometry={
+            baseline:impl.baseline.prepare({columns:7,rows:6}),
+            candidate:impl.candidate.prepare({columns:7,rows:6})
+          };
+          for(const workers of [2,4])for(const c of cases)for(let run=0;run<repeats;run++){
+            const order=run&1?['candidate','baseline']:['baseline','candidate'];
+            for(const label of order){
+              const t0=performance.now();
+              const result=await impl[label].run(c.moves,{
+                geometry:geometry[label],workers,workerMode:'minimal',
+                sharedCacheCapacity:65536,localCacheCapacity:65536,
+                sharedSampleMask:0,timeoutMs:c.timeoutMs
+              });
+              console.log('MW012 '+JSON.stringify({
+                label,case:c.name,workers,run,wallMs:performance.now()-t0,
+                status:result.status,rootWdl:result.rootWdl,move:result.move,
+                sharedCacheHits:result.sharedCacheHits,
+                sharedCacheStores:result.sharedCacheStores,
+                sharedCacheStoreContention:result.sharedCacheStoreContention
+              }));
+              if(result.status!=='EXACT')process.exitCode=1;
+            }
+          }
+          NODE
