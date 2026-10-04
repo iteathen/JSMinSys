@@ -1,0 +1,54 @@
+name: Minimal Early Bulk Development Solve
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bench-minimal-early-bulk.yml
+
+jobs:
+  solve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: work/cpc-rebuild-20261004
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 26
+          check-latest: false
+      - name: Run rank-5 early bulk minimal solve
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {performance} from 'node:perf_hooks';
+          import {prepareConnect4RbaGeometry} from './addons/rba-connect4-geometry.mjs';
+          import {
+            runLazySmpConnect4Rba32,
+            RBA_LAZY_SMP_WORKER_MINIMAL,
+          } from './addons/rba-connect4-lazy-smp-host.mjs';
+
+          const geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
+            moves=[3,3,3,3,3],
+            t0=performance.now(),
+            result=await runLazySmpConnect4Rba32(moves,{
+              geometry,
+              workers:4,
+              workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+              sharedCacheCapacity:4194304,
+              localCacheCapacity:1048576,
+              sharedSampleMask:0,
+              timeoutMs:300000,
+            });
+          console.log('EARLY5 '+JSON.stringify({
+            moves,wallMs:performance.now()-t0,status:result.status,
+            rootWdl:result.rootWdl,move:result.move,winner:result.winner,
+            sharedCacheHits:result.sharedCacheHits,
+            sharedCacheStores:result.sharedCacheStores,
+            sharedCacheStoreContention:result.sharedCacheStoreContention,
+            cleanup:result.cleanup,workersExited:result.workersExited,errorCode:result.errorCode,
+          }));
+          if(result.status!=='EXACT')process.exitCode=2;
+          NODE
