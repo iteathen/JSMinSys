@@ -1,5 +1,5 @@
 import {firstSetBitIndex32,popcount32} from '../src/word32.mjs';
-import {connect4CpcTargetOwner32,connect4CpcTargetSupportDistance32} from './cpc-connect4.mjs';
+import {connect4CpcTargetOwner32,connect4CpcTargetSupportDistance32,evaluateConnect4CpcWin32} from './cpc-connect4.mjs';
 
 // Legacy exact/conservative dependency closure over a prepared Connect4 RBA q.\n// Kept separate from win-only CPC; this module owns interval/restriction/tactical closure.
 // This module does not recursively enumerate continuations. It derives
@@ -272,6 +272,17 @@ export function evaluateConnect4CpcNonterminal32(g,words,offset,basis,basisOffse
     scratch.projectedCount[0]=0;scratch.projectedCount[1]=0;scratch.projectedForks[0]=0;scratch.projectedForks[1]=0;
   }
   const meta=words[offset+g.metaOffset],rank=meta>>>2,mover=rank&1;
+
+  // CPC is win-only and player-relative. At a nonterminal child, the previous
+  // mover is the controller. If CPC proves that controller's whole-reservoir
+  // win, this legacy NDC adapter translates only that positive certificate into
+  // its historical absolute interval; CPC itself does not classify a loss.
+  const controller=mover^1;
+  if(evaluateConnect4CpcWin32(g,words,offset,basis,basisOffset,basisSize,controller)){
+    const value=controller?1:3;
+    scratch.interval[0]=value;scratch.interval[1]=value;
+    return CPC_EXACT;
+  }
 
   const p0Base=offset+g.p0Offset,p1Base=offset+g.p1Offset;let p0Any=0,p1Any=0;
   for(let w=0;w<g.coordWords;w+=1){p0Any|=words[p0Base+w];p1Any|=words[p1Base+w];}
