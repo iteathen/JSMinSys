@@ -11414,9 +11414,9 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeLocalExact",
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeLocalEntry",
       "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
-      "name": "storeLocalExact",
+      "name": "storeLocalEntry",
       "scope": "lazy-smp-local-tt",
       "operations": [
         {
@@ -11474,14 +11474,14 @@
           "B": "Compact/full-key control selections.",
           "C": "1 for compact 7x6 identity, otherwise 0."
         },
-        "note": "Worker-private exact-TT publication only."
+        "note": "Worker-private local-TT entry publication for exact values or local-only alpha/beta bound tags."
       },
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#probeExact",
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#probeCache",
       "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
-      "name": "probeExact",
+      "name": "probeCache",
       "scope": "lazy-smp-tt-probe",
       "operations": [
         {
@@ -11513,12 +11513,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "P",
-          "target": "storeLocalExact"
+          "target": "storeLocalEntry"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalExact)",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -11526,7 +11526,7 @@
           "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
           "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0."
         },
-        "note": "Local-first exact TT probe with sampled shared fallback; shared hits are promoted locally."
+        "note": "Local-first TT probe. Local entries may be exact or local-only WDL bounds; shared fallback remains exact-only and shared hits are promoted locally."
       },
       "status": "decomposed"
     },
@@ -11551,7 +11551,7 @@
         {
           "op": "runtime.call.subledger",
           "count": 1,
-          "target": "storeLocalExact"
+          "target": "storeLocalEntry"
         },
         {
           "op": "runtime.call.subledger",
@@ -11561,7 +11561,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalExact)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCache32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
         },
@@ -11623,7 +11623,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "P",
-          "target": "probeExact"
+          "target": "probeCache"
         },
         {
           "op": "runtime.call.subledger",
@@ -11654,12 +11654,17 @@
           "op": "runtime.call.subledger",
           "count": "R",
           "target": "connect4RbaCanonicalize"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BND",
+          "target": "storeBound"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeExact)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)",
+        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11678,9 +11683,10 @@
           "A": "Legal actions whose RBA cofactors are constructed.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
-          "X": "1 only for non-root full-window nodes whose result is exact and is published to the TTs, otherwise 0."
+          "X": "Globally exact non-root results published to the local and sampled shared exact TTs.",
+          "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification."
         },
-        "note": "Exact RBA Negamax/alpha-beta over canonical RBA q: neutral/gray-token ownership is already erased by residual coordinates, child reflection is canonicalized before TT identity, move order is center-line distance, and the TT is local-first with sampled shared exact fallback. No CPC, NDC, evaluator, heuristic score, restriction mask or interval layer."
+        "note": "Exact RBA Negamax/alpha-beta over canonical RBA q with local zero-threshold bound retention. Neutral/gray-token ownership is erased by residual coordinates, child reflection is canonicalized before TT identity, move order is center-line distance, and only globally exact q values may enter the shared TT."
       },
       "status": "decomposed"
     },
@@ -11812,11 +11818,59 @@
         "note": "Minimal production worker: exact RBA Negamax over gray/neutral-token-quotiented and reflection-canonicalized q, center-distance ordering diversified only inside equal-distance shells, local/shared exact TT, and result publication. CPC and evaluation hooks are intentionally absent."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeBound",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+      "name": "storeBound",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "memory.load.u8",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "localKeyMatches"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "storeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeLocalEntry"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+E*CALL(storeExact)+S*CALL(storeLocalEntry)",
+        "parameters": {
+          "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
+          "B": "Executed local bound-disposition branches.",
+          "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
+          "E": "1 when opposite local bounds prove exact draw and are promoted through storeExact, otherwise 0.",
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0."
+        },
+        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw; only that promoted exact value may reach the shared exact cache."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 186,
-    "decomposed": 186,
+    "units": 187,
+    "decomposed": 187,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11943,7 +11997,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "ecca6a46a535c7209c83ea22f6422577aa12cea0"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "657cf29d2bdf3b051d2777779523779badd9e09e"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
