@@ -12,8 +12,8 @@ import {
   storeConnect4RbaSharedExactCache32,
 } from './rba-connect4-shared-exact-cache.mjs';
 
-const CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  RESULT_STRIDE=4,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
+const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
+  RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),
   control=workerData.control,resultWords=workerData.resultWords,
@@ -116,6 +116,7 @@ function storeBound(src,hash,slot,value){
 }
 
 function negamax(depth,src,bi,n,mover,alpha,beta){
+  if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
   const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
@@ -151,6 +152,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
       const childN=basisSize[depth+1];
       connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
       value=negamax(depth+1,dst,ci,childN,mover^1,-beta,-alpha);
+      if(value===CANCELLED)return CANCELLED;
       value=-value;
     }
 
@@ -189,18 +191,21 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
 }
 
 const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3,
-  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,-2,2),
-  resultBase=index*RESULT_STRIDE,
-  value=terminal||relativeToAbsolute(relative,mover),
-  move=bestMove<0?-1:workerData.rootReflected?g.mirrorColumn[bestMove]:bestMove;
+  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,-2,2);
 
-Atomics.store(resultWords,resultBase,value);
-Atomics.store(resultWords,resultBase+1,relative);
-Atomics.store(resultWords,resultBase+2,move);
-Atomics.store(resultWords,resultBase+3,1);
+if(relative!==CANCELLED){
+  const resultBase=index*RESULT_STRIDE,
+    value=terminal||relativeToAbsolute(relative,mover),
+    move=bestMove<0?-1:workerData.rootReflected?g.mirrorColumn[bestMove]:bestMove;
 
-if(Atomics.compareExchange(control,CONTROL_WINNER,-1,index)===-1){
-  Atomics.store(control,CONTROL_DONE,1);
-  Atomics.add(control,CONTROL_WAKE,1);
-  Atomics.notify(control,CONTROL_WAKE);
+  Atomics.store(resultWords,resultBase,value);
+  Atomics.store(resultWords,resultBase+1,relative);
+  Atomics.store(resultWords,resultBase+2,move);
+  Atomics.store(resultWords,resultBase+3,1);
+
+  if(Atomics.compareExchange(control,CONTROL_WINNER,-1,index)===-1){
+    Atomics.store(control,CONTROL_DONE,1);
+    Atomics.add(control,CONTROL_WAKE,1);
+    Atomics.notify(control,CONTROL_WAKE);
+  }
 }
