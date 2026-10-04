@@ -168,16 +168,26 @@ function negamax(depth,n,mover,alpha,beta){
   }
 
   if(depth){
-    // Classify against the caller's original window. Bounds are local-only;
-    // only global q truth is admitted to the shared exact cache.
-    if(best>alphaOrig&&best<betaOrig)
-      storeExact(src,hash,slot,relativeToAbsolute(best,mover));
-    else if(best>=betaOrig){
-      if(best===1)storeExact(src,hash,slot,relativeToAbsolute(1,mover));
-      else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
+    // Classify against the caller's original window. Narrow-window exacts are
+    // retained locally; shared publication is reserved for full W/D/L-window
+    // proofs to avoid turning local bound reuse into excessive atomic traffic.
+    const shareExact=alphaOrig===-2&&betaOrig===2;
+    if(best>alphaOrig&&best<betaOrig){
+      const exact=relativeToAbsolute(best,mover);
+      if(shareExact)storeExact(src,hash,slot,exact);
+      else storeLocalEntry(slot,src,exact);
+    }else if(best>=betaOrig){
+      if(best===1){
+        const exact=relativeToAbsolute(1,mover);
+        if(shareExact)storeExact(src,hash,slot,exact);
+        else storeLocalEntry(slot,src,exact);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
     }else if(best<=alphaOrig){
-      if(best===-1)storeExact(src,hash,slot,relativeToAbsolute(-1,mover));
-      else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
+      if(best===-1){
+        const exact=relativeToAbsolute(-1,mover);
+        if(shareExact)storeExact(src,hash,slot,exact);
+        else storeLocalEntry(slot,src,exact);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
     }
   }
   return best;
