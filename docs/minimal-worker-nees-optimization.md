@@ -346,6 +346,24 @@ This does not prove that every future selective-sharing scheme is inferior; it p
 
 **Disposition:** ACTIVE EXPERIMENT pending same-VM development A/B and local i5 cycle qualification.
 
+## MW-005 development evidence — metric-free production path
+
+Same-VM Node 26 development A/B against the immediately previous metric-bearing MW-001B worker, six repeats per control:
+
+| Workers | Baseline mean | Metric-free mean | Delta |
+| --- | ---: | ---: | ---: |
+| 2 | 21.923 ms | 21.755 ms | -0.8% |
+| 4 | 29.320 ms | 28.840 ms | -1.6% |
+
+The harder 4-worker 7x6 controls improved:
+
+- rank-24 A: 27.915 -> 26.546 ms (**-4.9%**);
+- B: 27.470 -> 25.928 ms (**-5.6%**).
+
+The short 4x4-empty control regressed 2.7%, while 4x4-mid was flat. All 96 solves remained exact. The candidate returns `winnerMetrics:null` as intended.
+
+**Development disposition:** RETAIN pending target-hardware qualification. The mechanism removes three repeated E0 dependency chains and a minimal-mode shared metric buffer; the target i5 process-cycle/full-solve measurement remains authoritative.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
