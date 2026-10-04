@@ -489,6 +489,25 @@ The semantic elimination is therefore valid but the four-worker performance admi
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-004A development evidence — poll every fourth ply
+
+Ten-repeat same-VM A/B against per-node cooperative polling:
+
+| Workers | Per-node poll | Depth/4 poll | Delta |
+| --- | ---: | ---: | ---: |
+| 2 | 33.931 ms | 34.026 ms | +0.3% |
+| 4 | 47.862 ms | 46.206 ms | **-3.5%** |
+
+Four-worker 7x6 controls improved:
+
+- rank-24 A: **-8.4%**;
+- rank-28 A: **-5.4%**;
+- B: **-4.5%**.
+
+All 160 solves remained exact. Direct timeout/abort lifecycle controls remain part of CI.
+
+**Development disposition:** RETAIN as the current cancellation baseline, pending local i5 process-cycle qualification.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
