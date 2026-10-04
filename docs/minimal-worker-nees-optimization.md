@@ -378,6 +378,19 @@ The short 4x4-empty control regressed 2.7%, while 4x4-mid was flat. All 96 solve
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-006 development evidence — carried arena offsets
+
+Same-VM Node 26 A/B against the metric-free depth-derived-offset baseline, eight repeats per control:
+
+| Workers | Baseline mean | Carried-offset mean | Delta |
+| --- | ---: | ---: | ---: |
+| 2 | 23.068 ms | 22.101 ms | **-4.2%** |
+| 4 | 34.193 ms | 33.022 ms | **-3.4%** |
+
+The harder 7x6 controls improved approximately 7.7–8.4%. The 4-worker 4x4-empty control regressed 3.5%. All 96 solves remained exact.
+
+**Development disposition:** RETAIN pending target i5 generated-code/process-cycle qualification. The source and ledger now remove the two depth-derived arena multiplications from E0.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
