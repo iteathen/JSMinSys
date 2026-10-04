@@ -1,0 +1,79 @@
+name: Minimal Worker NEES MW001
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bench-minimal-mw001.yml
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact-only baseline
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 73de03943f16361d2a551bccf50c758c9225f84e
+          path: baseline
+      - name: Checkout local-bound candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: work/cpc-rebuild-20261004
+          path: candidate
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 26
+          check-latest: false
+      - name: Run same-runner MW-001 benchmark
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {performance} from 'node:perf_hooks';
+          import {pathToFileURL} from 'node:url';
+
+          async function load(base){
+            const geom=await import(pathToFileURL(process.cwd()+'/'+base+'/addons/rba-connect4-geometry.mjs'));
+            const host=await import(pathToFileURL(process.cwd()+'/'+base+'/addons/rba-connect4-lazy-smp-host.mjs'));
+            return {prepareConnect4RbaGeometry:geom.prepareConnect4RbaGeometry,run:host.runLazySmpConnect4Rba32};
+          }
+          const impl={baseline:await load('baseline'),candidate:await load('candidate')};
+          const fullA=[4,0,0,0,3,3,0,0,6,2,3,0,2,3,6,3,6,3,4,6,2,2,6,1,2,5,6,4];
+          const cases=[
+            {name:'4x4-empty',columns:4,rows:4,moves:[],repeats:3,timeoutMs:60000},
+            {name:'4x4-mid',columns:4,rows:4,moves:[0,1,0,1],repeats:5,timeoutMs:30000},
+            {name:'7x6-A-r24',columns:7,rows:6,moves:fullA.slice(0,24),repeats:2,timeoutMs:60000},
+            {name:'7x6-A-r28',columns:7,rows:6,moves:fullA,repeats:5,timeoutMs:30000},
+            {name:'7x6-B',columns:7,rows:6,moves:[2,0,5,3,6,3,5,2,3,3,3,5,0,5,0,0,1,6,1,4,3,4,2,6,6,0,6,4],repeats:5,timeoutMs:30000},
+          ];
+          const labels=['baseline','candidate'];
+          for(const c of cases){
+            const geometry=Object.fromEntries(labels.map(label=>[label,impl[label].prepareConnect4RbaGeometry({columns:c.columns,rows:c.rows})]));
+            for(let run=0;run<c.repeats;run++){
+              const order=run&1?['candidate','baseline']:['baseline','candidate'];
+              for(const label of order){
+                const t0=performance.now();
+                const result=await impl[label].run(c.moves,{
+                  geometry:geometry[label],workers:4,
+                  workerMode:'minimal',
+                  sharedCacheCapacity:65536,
+                  localCacheCapacity:65536,
+                  sharedSampleMask:0,
+                  timeoutMs:c.timeoutMs,
+                });
+                console.log('MW001 '+JSON.stringify({
+                  label,case:c.name,run,wallMs:performance.now()-t0,
+                  status:result.status,rootWdl:result.rootWdl,move:result.move,
+                  nodes:result.winnerMetrics?.nodes??null,
+                  cutoffs:result.winnerMetrics?.cutoffs??null,
+                  cacheHits:result.winnerMetrics?.cacheHits??null,
+                  sharedCacheHits:result.sharedCacheHits,
+                  sharedCacheStores:result.sharedCacheStores,
+                  sharedCacheStoreContention:result.sharedCacheStoreContention,
+                  workersUsed:result.workersUsed,
+                }));
+                if(result.status!=='EXACT')process.exitCode=1;
+              }
+            }
+          }
+          NODE
