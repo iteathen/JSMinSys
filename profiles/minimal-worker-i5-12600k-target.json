@@ -1,0 +1,57 @@
+{
+  "id": "minimal-worker-i5-12600k-10s-target-20261004",
+  "status": "active NEES-EXTREME optimization target",
+  "goal": {
+    "semantic": "exact standard 7x6 Connect Four solve from the empty board",
+    "wallTimeMsMax": 10000,
+    "priority": "minimum total machine cost; every repeated primitive E0/E1 operation remains eligible for cycle reduction"
+  },
+  "hardware": {
+    "cpu": "Intel Core i5-12600K",
+    "platform": "win32",
+    "physicalCores": 10,
+    "logicalProcessors": 16,
+    "selectedPCores": [0, 2, 4, 6],
+    "selectedCoreCount": 4,
+    "l2BytesPerSelectedCore": 1310720,
+    "targetsFile": "evidence/isomax-memory-affinity-20260928/targets.json"
+  },
+  "runtime": {
+    "baseline": "Node 26.x / V8 14.6 family",
+    "historicalMeasuredAlternative": "v27.0.0-nightly20260928b59840b593 / V8 14.6.202.34-node.36",
+    "policy": "Runtime version is an optimization dimension. Do not transplant AMD Zen 3 cycle constants to this Intel target. Requalify generated code and total cycles on the actual i5."
+  },
+  "solver": {
+    "api": "runLazySmpConnect4Rba32",
+    "workerMode": "minimal",
+    "geometry": {"columns": 7, "rows": 6},
+    "moves": [],
+    "workers": 4,
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 16777216,
+    "timeoutMs": 600000
+  },
+  "measurement": {
+    "wallClock": "performance.now() around the complete runLazySmpConnect4Rba32 call",
+    "processCycles": "tools/process-cycle-counter.mjs / QueryProcessCycleTime",
+    "affinityPreload": "tools/worker-affinity-preload.mjs",
+    "command": "node --experimental-ffi --import ./tools/worker-affinity-preload.mjs tools/bench-minimal-i5.mjs",
+    "requiredOutput": [
+      "runtime tuple",
+      "CPU/platform",
+      "wallMs",
+      "processCycles",
+      "status/rootWdl/move",
+      "shared cache counters",
+      "worker cleanup"
+    ]
+  },
+  "qualification": {
+    "governingUnit": "complete exact empty-board solve including worker startup, search and cleanup",
+    "cycleAuthority": "actual i5 process-cycle measurement plus current generated/runtime evidence where primitive lowering is load-bearing",
+    "githubRunnerRole": "development/regression evidence only",
+    "targetPass": "EXACT result and wallMs <= 10000 on the declared local target"
+  }
+}
