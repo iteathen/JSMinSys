@@ -117,7 +117,7 @@ function storeBound(src,hash,slot,value){
 
 function negamax(depth,src,bi,n,mover,alpha,beta){
   if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
-  const dst=src+g.keyWords,ci=bi+g.maxBasis,childDepth=depth+1,
+  const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
     slot=depth?(hash&localMask):0;
@@ -144,14 +144,14 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
 
     const term=connect4RbaCofactorKnownHeight(
       g,profile,words,src,basis,bi,n,column,height,
-      words,dst,basis,ci,coord.seen,basisSize,childDepth,coord.map,coord.inverse,
+      words,dst,basis,ci,coord.seen,basisSize,depth+1,coord.map,coord.inverse,
     );
     let value;
     if(term)value=relativeTerminal(term,mover);
     else{
-      const childN=basisSize[childDepth];
+      const childN=basisSize[depth+1];
       connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
-      value=negamax(childDepth,dst,ci,childN,mover^1,-beta,-alpha);
+      value=negamax(depth+1,dst,ci,childN,mover^1,-beta,-alpha);
       if(value===CANCELLED)return CANCELLED;
       value=-value;
     }
