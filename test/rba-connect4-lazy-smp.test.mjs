@@ -150,3 +150,22 @@ test('sharing-density masks preserve exact Lazy SMP results',async()=>{
     assert.equal(lazy.sharedSampleMask,sharedSampleMask);
   }
 });
+
+
+test('Lazy SMP move ordering is center-line distance only',async()=>{
+  const g=prepareConnect4RbaGeometry({
+    columns:3,
+    rows:3,
+    actionOrder:[0,2,1],
+  });
+  const lazy=await runLazySmpConnect4Rba32([],{
+    geometry:g,
+    workers:2,
+    sharedCacheCapacity:256,
+    localCacheCapacity:256,
+    timeoutMs:5000,
+  });
+  assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
+  assert.equal(lazy.rootWdl,0);
+  assert.equal(lazy.move,1,'worker must ignore geometry actionOrder and choose minimum center-line distance');
+});
