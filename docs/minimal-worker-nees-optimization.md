@@ -448,6 +448,20 @@ The production target is four workers on the local i5. The compact field packing
 
 **Disposition:** COSTED-OUT / REJECTED. Full-q `mixSpan32Locator32` is restored. Do not infer that fewer hash lanes are faster without accounting for identity packing and collision/locality effects.
 
+## MW-004 — eliminate recursive stop polling
+
+**Candidate cost:** one shared `Atomics.load(CONTROL_STOP)` executed on every visited node, plus `CANCELLED` sentinel propagation through recursive returns.
+
+**Causal role:** previously treated as COUPLED to cancellation/lifecycle. Inspection of `ManagedThreadSession` shows the host already owns teardown: winner, timeout, and abort all reach `closeManagedThreadSession32`, which sets stop/wake and calls `worker.terminate()` for every worker before joining exits.
+
+**Mechanism:** remove the per-node stop atomic and all `CANCELLED` propagation from the minimal worker. Timeout/abort semantics remain host-owned and are qualified directly.
+
+**Admission:** worker-local cooperative polling is duplicate lifecycle machinery when the host forcibly terminates worker threads at the governing boundary.
+
+**Falsifier:** reject if timeout/abort status, cleanup, or worker-exit guarantees regress; or if target complete-solve cost does not improve. A future persistent-worker execution model would cross the admission boundary and require requalification.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
