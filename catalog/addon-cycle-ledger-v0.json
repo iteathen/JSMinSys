@@ -11680,7 +11680,7 @@
           "TEST": "Cache, loop, legality, terminal, best, cutoff and exact-publication predicates; recursive stop polling is eliminated.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes, otherwise 0.",
-          "P": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "P": "1 when depth is divisible by eight and the cooperative stop atomic executes, otherwise 0.",
           "A": "Legal actions whose RBA cofactors are constructed.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
@@ -11688,7 +11688,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "MW-004A depth-gated cooperative cancellation: one depth-mask predicate per node; shared stop Atomics execute only at depths divisible by four. Host terminate+join remains the lifecycle backstop."
+        "note": "MW-004B candidate: one depth-mask predicate per node; shared stop Atomics execute only at depths divisible by eight. Host terminate+join remains the lifecycle backstop."
       },
       "status": "decomposed"
     },
@@ -11991,7 +11991,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "3efcb38e65018fcfb74b2cf10a4248b847f7efef"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "f2861b6c95761cc30d03c71f1f4bfa10f7394bc3"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
