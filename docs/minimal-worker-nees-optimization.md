@@ -462,6 +462,23 @@ The production target is four workers on the local i5. The compact field packing
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-004 full-elimination disposition — rejected
+
+Ten-repeat same-VM development A/B for removing recursive stop polling entirely:
+
+- 2 workers: -3.0% aggregate;
+- **4 workers: +3.3% aggregate regression**;
+- 4w 4x4 empty: +8.6%;
+- 4w rank-24 7x6: +1.4%;
+- 4w rank-28 A: -2.0%;
+- 4w B: +3.5%.
+
+All 160 solves remained exact and direct timeout/abort controls proved the host can terminate minimal workers without cooperative polling.
+
+The semantic elimination is therefore valid but the four-worker performance admission failed on the development surface. The per-node stop atomic and cancellation sentinel are restored.
+
+**Disposition:** full elimination COSTED-OUT / REJECTED for now. MW-004 remains UNVERIFIED-DEBT for cheaper sampled/depth-gated polling because the host-owned lifecycle proof still permits such experiments.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
