@@ -1,4 +1,4 @@
-name: Minimal Worker NEES MW004A
+name: Minimal Worker NEES MW004B
 
 on:
   pull_request:
@@ -11,12 +11,12 @@ jobs:
   bench:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout per-node poll baseline
+      - name: Checkout depth-4 poll baseline
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: 73eb9d7b483888d4cb970c6638b13e054383584d
+          ref: c064111e10fda746b2cab2ea916556956ea452c3
           path: baseline
-      - name: Checkout depth-gated candidate
+      - name: Checkout depth-8 poll candidate
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: work/cpc-rebuild-20261004
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 26
           check-latest: false
-      - name: Run same-runner MW004A benchmark
+      - name: Run same-runner MW004B benchmark
         shell: bash
         run: |
           node --input-type=module <<'NODE'
@@ -59,7 +59,7 @@ jobs:
                   sharedCacheCapacity:65536,localCacheCapacity:65536,
                   sharedSampleMask:0,timeoutMs:c.timeoutMs
                 });
-                console.log('MW004A '+JSON.stringify({
+                console.log('MW004B '+JSON.stringify({
                   label,case:c.name,workers,run,wallMs:performance.now()-t0,
                   status:result.status,rootWdl:result.rootWdl,move:result.move,
                   sharedCacheHits:result.sharedCacheHits,
