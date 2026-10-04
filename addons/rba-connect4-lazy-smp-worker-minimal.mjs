@@ -8,6 +8,7 @@ import {
   isCompactProfile8,
   compactSupportProfile8,
   compactTailProfile8,
+  mixCompactConnect4Rba8Locator32,
   probeConnect4RbaSharedExactCache32,
   storeConnect4RbaSharedExactCache32,
 } from './rba-connect4-shared-exact-cache.mjs';
@@ -119,7 +120,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
   const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
-    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
+    hash=depth?(localCompact?mixCompactConnect4Rba8Locator32(words,src):mixSpan32Locator32(words,src,g.keyWords)):0,
     slot=depth?(hash&localMask):0;
 
   if(depth){
