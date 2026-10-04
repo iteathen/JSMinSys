@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {prepareConnect4CpcScratch,evaluateConnect4Cpc32} from '../addons/cpc-connect4.mjs';
+import {prepareConnect4CpcScratch,evaluateConnect4Cpc32} from '../addons/ndc-connect4.mjs';
 const ledger=JSON.parse(readFileSync(new URL('../catalog/addon-cycle-ledger-v0.json',import.meta.url)));
 const count=(name,op,vars)=>{
  const unit=ledger.units.find(u=>u.name===name);
