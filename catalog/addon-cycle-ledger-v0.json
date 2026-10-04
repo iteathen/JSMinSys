@@ -11578,7 +11578,7 @@
       "operations": [
         {
           "op": "atomic.load.u32",
-          "count": 1
+          "count": "P"
         },
         {
           "op": "runtime.field.load",
@@ -11594,7 +11594,7 @@
         },
         {
           "op": "alu.and.u32",
-          "count": "AND"
+          "count": "AND+1"
         },
         {
           "op": "alu.xor.u32",
@@ -11666,7 +11666,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
+        "activeCycleExpression": "P*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11680,7 +11680,7 @@
           "TEST": "Cache, loop, legality, terminal, best, cutoff and exact-publication predicates; recursive stop polling is eliminated.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes, otherwise 0.",
-          "P": "1 for non-root nodes, otherwise 0.",
+          "P": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
           "A": "Legal actions whose RBA cofactors are constructed.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
@@ -11688,7 +11688,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Per-node stop Atomics restored after full elimination regressed the four-worker governing unit. MW-004 remains open for sampled/depth-gated alternatives."
+        "note": "MW-004A depth-gated cooperative cancellation: one depth-mask predicate per node; shared stop Atomics execute only at depths divisible by four. Host terminate+join remains the lifecycle backstop."
       },
       "status": "decomposed"
     },
@@ -11991,7 +11991,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e9da4a842e63ecf26e14af578ab4fa0bed202254"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "4ba260d3a73e29095e0a0333089004976837ec9b"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
