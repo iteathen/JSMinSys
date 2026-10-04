@@ -11,7 +11,12 @@
     "platform": "win32",
     "physicalCores": 10,
     "logicalProcessors": 16,
-    "selectedPCores": [0, 2, 4, 6],
+    "selectedPCores": [
+      0,
+      2,
+      4,
+      6
+    ],
     "selectedCoreCount": 4,
     "l2BytesPerSelectedCore": 1310720,
     "targetsFile": "evidence/isomax-memory-affinity-20260928/targets.json"
@@ -24,7 +29,10 @@
   "solver": {
     "api": "runLazySmpConnect4Rba32",
     "workerMode": "minimal",
-    "geometry": {"columns": 7, "rows": 6},
+    "geometry": {
+      "columns": 7,
+      "rows": 6
+    },
     "moves": [],
     "workers": 4,
     "rootFrontier": false,
@@ -52,6 +60,19 @@
     "governingUnit": "complete exact empty-board solve including worker startup, search and cleanup",
     "cycleAuthority": "actual i5 process-cycle measurement plus current generated/runtime evidence where primitive lowering is load-bearing",
     "githubRunnerRole": "development/regression evidence only",
-    "targetPass": "EXACT result and wallMs <= 10000 on the declared local target"
+    "targetPass": "EXACT result and wallMs <= 10000 on the declared local target",
+    "benchmarkHierarchy": [
+      "target i5-12600K complete empty-board solve",
+      "same-host complete empty-board development solve",
+      "trace-derived early/mid empty-board subtrees weighted by measured full-solve work",
+      "late/endgame fixtures for regression/correctness only"
+    ],
+    "nonRepresentativeForPromotion": [
+      "single-digit-node late positions",
+      "settled/near-terminal positions dominated by startup or teardown",
+      "legacy CPC/NDC instant-closure cases when evaluating minimal-worker search throughput",
+      "fixture averages that do not weight work by empty-board search contribution"
+    ],
+    "proxyAdmission": "A proxy performance suite must be derived from an actual empty-board solve trace or partial trace and must represent the early/mid subtrees that dominate measured nodes/cycles/time."
   }
 }
