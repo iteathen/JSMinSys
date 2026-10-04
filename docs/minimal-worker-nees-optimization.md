@@ -537,6 +537,21 @@ All 160 solves remained exact.
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-013 disposition — prepared geometry scalars rejected
+
+Ten-repeat same-VM A/B:
+
+- 2 workers: -3.4% aggregate;
+- **4 workers: +2.9% aggregate regression**;
+- 4w 4x4 empty: +6.1%;
+- 4w rank-24 7x6: +2.7%;
+- 4w rank-28 A: +3.1%;
+- 4w B: -1.3%.
+
+All 160 solves remained exact.
+
+**Disposition:** COSTED-OUT / REJECTED. Direct stable geometry field access is restored. The result is consistent with current V8 already optimizing these reads sufficiently; source-level scalarization is not a valid optimization claim here.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
