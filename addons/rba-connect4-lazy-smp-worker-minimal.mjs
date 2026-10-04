@@ -14,7 +14,7 @@ import {
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,METRIC_WIDTH=15,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
-  index=workerData.workerIndex,g=workerData.geometry,
+  index=workerData.workerIndex,workerCount=workerData.workerCount,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),
   control=workerData.control,resultWords=workerData.resultWords,
   metrics=new Float64Array(workerData.metricBuffer),
@@ -25,6 +25,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   centerOrder=new Uint32Array(g.columns),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
+  narrowShareMask=(workerCount&(workerCount-1))===0?workerCount-1:-1,
   localMask=workerData.localCacheCapacity-1,
   localCompact=isCompactProfile8(g,g.keyWords)?1:0,
   localStoredKeyWords=localCompact?8:g.keyWords,
@@ -102,6 +103,16 @@ function storeExact(src,hash,slot,value){
     storeConnect4RbaSharedExactCache32(shared,words,src,value,hash);
 }
 
+function storeNarrowExact(src,hash,slot,value){
+  storeLocalEntry(slot,src,value);
+  // For power-of-two Lazy-SMP worker counts, partition narrow-proof
+  // publication by hash so exactly one worker is eligible to share a q.
+  // Generic non-power-of-two execution falls back to worker 0 only.
+  if(!(hash&sharedSampleBits)&&
+     (narrowShareMask>=0?(hash&narrowShareMask)===index:index===0))
+    storeConnect4RbaSharedExactCache32(shared,words,src,value,hash);
+}
+
 function storeBound(src,hash,slot,value){
   const prior=localValues[slot];
   if(prior&&localKeyMatches(slot,src)){
@@ -175,18 +186,18 @@ function negamax(depth,n,mover,alpha,beta){
     if(best>alphaOrig&&best<betaOrig){
       const exact=relativeToAbsolute(best,mover);
       if(shareExact)storeExact(src,hash,slot,exact);
-      else storeLocalEntry(slot,src,exact);
+      else storeNarrowExact(src,hash,slot,exact);
     }else if(best>=betaOrig){
       if(best===1){
         const exact=relativeToAbsolute(1,mover);
         if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        else storeNarrowExact(src,hash,slot,exact);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
     }else if(best<=alphaOrig){
       if(best===-1){
         const exact=relativeToAbsolute(-1,mover);
         if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        else storeNarrowExact(src,hash,slot,exact);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
     }
   }
