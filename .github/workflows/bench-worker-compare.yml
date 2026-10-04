@@ -1,9 +1,9 @@
 name: Worker Compare Benchmark
 
 on:
-  push:
+  pull_request:
     branches:
-      - work/cpc-rebuild-20261004
+      - main
     paths:
       - .github/workflows/bench-worker-compare.yml
 
