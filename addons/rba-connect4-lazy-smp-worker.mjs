@@ -21,10 +21,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
   basisSize=new Uint32Array(g.cellCount+1),
   seen=new Uint32Array(g.shapeWordCount),
-  centerOrder=Uint32Array.from(
-    Array.from({length:g.columns},(_,column)=>column)
-      .sort((a,b)=>Math.abs((a<<1)-(g.columns-1))-Math.abs((b<<1)-(g.columns-1))||a-b),
-  ),
+  centerOrder=new Uint32Array(g.columns),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
@@ -32,6 +29,13 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   localStoredKeyWords=localCompact?8:g.keyWords,
   localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),
   localValues=new Uint8Array(workerData.localCacheCapacity);
+
+let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1;
+if(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}
+while(orderAt<g.columns){
+  if(left>=0)centerOrder[orderAt++]=left--;
+  if(right<g.columns)centerOrder[orderAt++]=right++;
+}
 
 words.set(workerData.root.words);
 basis.set(workerData.root.basis);
