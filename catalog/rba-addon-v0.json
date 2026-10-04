@@ -169,7 +169,10 @@
     },
     "minimal": {
       "module": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
-      "contract": "Exact canonical-RBA Negamax/alpha-beta only: neutral/gray-token quotient is inherited from RBA q, reflection canonicalization precedes TT identity, center-distance ordering is diversified only within equal-distance shells, and local/shared exact TT support is retained. No CPC, NDC, evaluator, heuristic scoring, restriction or interval layer."
+      "contract": "Exact canonical-RBA Negamax/alpha-beta only: neutral/gray-token quotient is inherited from RBA q, reflection canonicalization precedes TT identity, center-distance ordering is diversified only within equal-distance shells, and local/shared exact TT support is retained. No CPC, NDC, evaluator, heuristic scoring, restriction or interval layer.",
+      "neesOptimization": "active",
+      "neesOptimizationRecord": "docs/minimal-worker-nees-optimization.md",
+      "currentOptimizationUnit": "MW-001 local alpha/beta bound retention; MW-001B active, MW-001C selective narrow-proof sharing pending"
     },
     "selection": "runLazySmpConnect4Rba32({workerMode:'legacy'|'minimal'}); legacy is the compatibility default.",
     "incompatibilities": "minimal rejects behaviorMemory, rootFrontier, cpcFrontierResponse and cpcProjectedAdvisory rather than silently changing worker semantics."
