@@ -198,6 +198,47 @@ Treat this as **MW-001A**, causal role **COUPLED**, disposition **UNVERIFIED-DEB
 
 MW-001 is therefore strongly favorable development evidence but is **not yet closed/promoted**; MW-001A is part of the same coherent TT optimization unit.
 
+## MW-001A broad qualification evidence
+
+The local-only bound-derived draw variant was compared against the exact-only baseline across:
+
+- 13 maintained/harder controls (4x4 empty, five maintained 4x4 fixtures, rank-24 7x6, and six maintained late 7x6 fixtures);
+- 2-worker and 4-worker Lazy SMP;
+- three same-VM repeats per control;
+- identical Node 26 runtime, local/shared cache capacities and full-sharing policy.
+
+Results:
+
+| Worker count | Baseline mean | MW-001A mean | Wall delta | Winner-node delta |
+| --- | ---: | ---: | ---: | ---: |
+| 2 workers | 20.483 ms | 16.579 ms | **-19.1%** | **-90.7%** |
+| 4 workers | 27.984 ms | 22.408 ms | **-19.9%** | **-90.3%** |
+
+All 156 solves were exact with zero W/D/L disagreement.
+
+Observed per-control regressions remain visible:
+
+- 2w 7x6-C: +6.6% with only three searched nodes in both variants;
+- 4w 7x6-C: +9.7% with only three searched nodes in both variants;
+- 4w 7x6-B: +3.7% while winner-node work fell 26.3%;
+- 4w 7x6-F: +2.5% on an approximately single-digit-node solve.
+
+These are not erased as noise. They remain part of the regression surface until the coherent TT optimization is closed.
+
+### MW-001B — narrow-window exact publication pressure
+
+Even after bound-derived draw promotion became local-only, MW-001A still publishes many more shared exact entries than the baseline because narrow-window searches can prove domain-extreme values (`+1` or `-1`) exactly and currently send those exacts to the shared TT.
+
+Across the broad matrix, shared-store counts are frequently one to two orders of magnitude above the exact-only baseline. That publication is semantically legal but creates additional Atomics/coherence traffic and is the leading remaining coupled cost inside MW-001.
+
+**Causal role:** COUPLED to the local-bound search reduction and shared-TT composite.
+
+**Disposition:** UNVERIFIED-DEBT; next experiment.
+
+**Admission:** retain narrow-window extreme exact values in the worker-local TT, but reserve automatic shared publication for results whose caller requested the full W/D/L window. This preserves local subtree elimination while reducing cross-worker publication caused specifically by narrow-window proof reuse.
+
+**Falsifier:** reject the refinement if loss of cross-worker extreme-value reuse increases complete solve time or duplicate search enough to outweigh lower shared publication/coherence cost on the 2w/4w qualification surface.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
