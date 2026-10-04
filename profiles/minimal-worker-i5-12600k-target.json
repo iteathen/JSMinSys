@@ -73,6 +73,26 @@
       "legacy CPC/NDC instant-closure cases when evaluating minimal-worker search throughput",
       "fixture averages that do not weight work by empty-board search contribution"
     ],
-    "proxyAdmission": "A proxy performance suite must be derived from an actual empty-board solve trace or partial trace and must represent the early/mid subtrees that dominate measured nodes/cycles/time."
+    "proxyAdmission": "A proxy performance suite must be derived from an actual empty-board solve trace or partial trace and must represent the early/mid subtrees that dominate measured nodes/cycles/time.",
+    "priorFixturePerformanceClaims": "provisional for empty-board objective until confirmed by target full-solve or trace-derived representative bulk-search evidence"
+  },
+  "developmentEmptyBoardEvidence": {
+    "environment": "GitHub Actions ubuntu-24.04, Node 26.10.0; not target hardware",
+    "workerMode": "minimal",
+    "workers": 4,
+    "sharedCacheCapacity": 4194304,
+    "localCacheCapacity": 1048576,
+    "timeoutMs": 600000,
+    "observed": {
+      "status": "TIMEOUT",
+      "wallMs": 600011.585147,
+      "rootWdl": null,
+      "sharedCacheHits": 3,
+      "sharedCacheStores": 49,
+      "sharedCacheStoreContention": 1,
+      "cleanup": true,
+      "workersExited": 4
+    },
+    "interpretation": "Representative development full solve did not complete. Late/endgame fixture timing is regression evidence only; performance promotion requires target full solve or admitted trace-derived bulk-search proxies."
   }
 }
