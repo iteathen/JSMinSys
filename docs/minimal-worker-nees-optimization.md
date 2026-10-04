@@ -332,6 +332,20 @@ The source has been returned to MW-001B: local zero-threshold bounds, local narr
 
 This does not prove that every future selective-sharing scheme is inferior; it proves that this specific hash-partition mechanism failed its admission test and must not remain in the production hot path.
 
+## MW-005 — remove production E0 diagnostics
+
+**Candidate cost:** `nodes`, `cutoffs`, and `cacheHits` were incremented inside the minimal worker recurrence only to populate diagnostic `winnerMetrics`.
+
+**Causal role:** STANDALONE with respect to exact search semantics. The counters do not affect move legality, alpha/beta, TT identity, terminal results, publication or cancellation.
+
+**Mechanism:** the production minimal worker no longer increments those counters, no longer constructs a metric-buffer view, and no longer performs the three completion metric stores. The host does not allocate the metric SharedArrayBuffer for `workerMode:'minimal'`; `winnerMetrics` is `null` for that mode. Legacy and Behavior/Root-Frontier modes are unchanged.
+
+**Admission:** eliminate repeated non-semantic arithmetic/dependency chains from E0 and unnecessary shared allocation from the minimal governing unit.
+
+**Falsifier:** revert if complete-solve wall time/process cycles on the i5 do not improve or if any caller is shown to require those diagnostics as semantics. Development node counts may be obtained from historical/instrumented revisions; they are not allowed to tax the production recurrence.
+
+**Disposition:** ACTIVE EXPERIMENT pending same-VM development A/B and local i5 cycle qualification.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
