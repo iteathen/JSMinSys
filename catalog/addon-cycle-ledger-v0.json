@@ -11673,7 +11673,7 @@
         "parameters": {
           "F": "Geometry and worker-local state field reads outside subledgers.",
           "L": "Center-order, support-height and child-size reads.",
-          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications are eliminated from E0.",
+          "ADD": "One child-depth derivation per node, carried child arena offsets, loop increments and alpha/beta arithmetic; repeated depth+1 derivation at action sites is eliminated.",
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
@@ -11688,7 +11688,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Negamax carries key and basis arena offsets as recurrence state, eliminating two depth-derived multiplications per visited node. Semantics and TT/canonicalization policy are unchanged."
+        "note": "Negamax carries key/basis offsets and derives childDepth once per node. Repeated child-depth additions at cofactor, basis-size and recursive-call sites are removed."
       },
       "status": "decomposed"
     },
@@ -11991,7 +11991,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e9da4a842e63ecf26e14af578ab4fa0bed202254"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "98864a2149ad1cfaad10c86176dcc98543e2616d"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
