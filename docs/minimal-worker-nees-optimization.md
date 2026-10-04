@@ -137,6 +137,38 @@ Consequences:
 4. development proxies must move toward early/mid search roots representing substantial unresolved subtrees, preferably selected from an instrumented empty-board search;
 5. the sparse shared-exact activity observed in this timed-out run (3 hits / 49 stores) is a candidate structural signal, not yet a conclusion: it suggests the current full-window-only shared publication policy may provide little cross-worker reuse during the unresolved bulk search and therefore deserves representative profiling.
 
+## Early bulk-search development control
+
+The historical early search root after five center moves (`[3,3,3,3,3]`, human `44444`) was also tested with the current minimal worker on the GitHub Node 26 runner using the same 4-worker, 4,194,304 shared / 1,048,576 local TT development configuration.
+
+Result:
+
+```text
+status: TIMEOUT
+wallMs: 300012.162263
+rootWdl: unresolved
+sharedCacheHits: 2
+sharedCacheStores: 46
+sharedCacheStoreContention: 0
+cleanup: true
+workersExited: 4
+```
+
+This early-game control is materially closer to the target search regime than rank-24/endgame fixtures and still does not complete within five minutes on the development runner.
+
+### Structural implication for optimization priority
+
+The empty-board and rank-5 partial runs both show extremely sparse shared **exact** evidence during the unresolved bulk search:
+
+- empty board / 600 s: 3 shared hits, 49 shared stores;
+- rank-5 / 300 s: 2 shared hits, 46 shared stores.
+
+The counters do not measure private local-TT activity and therefore do not by themselves prove a particular replacement. They do establish that the existing **shared exact-only channel is scarcely participating during the representative unresolved search interval**.
+
+This promotes shared search-bound reuse to a first-class structural candidate. The local worker already proves globally valid canonical-q zero-threshold bounds (`>=0` / `<=0`) at high frequency; those facts are currently private. A concurrency-safe shared-bound design may reduce Lazy-SMP duplicate work far more than another isolated primitive rewrite.
+
+Any shared-bound experiment must preserve exact semantic-key validation, mover polarity, concurrent publication safety, and the distinction between a bound and exact W/D/L. It must be qualified on empty-board / early-bulk workload, not late fixtures.
+
 ## Baseline development evidence
 
 Same-runner GitHub Actions comparison on Node 26, four workers, 65,536-entry local/shared caches, 11 maintained 4x4/7x6 fixtures, five repeats each:
