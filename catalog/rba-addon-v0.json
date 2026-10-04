@@ -12,6 +12,7 @@
     "addons/rba-connect4-shared-exact-cache.mjs",
     "addons/rba-connect4-lazy-smp-host.mjs",
     "addons/rba-connect4-lazy-smp-worker.mjs",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
     "addons/connect4-rank-local-presearch.mjs"
   ],
   "geometryContract": {
@@ -43,7 +44,7 @@
       "CPC-first exact negamax/alpha-beta traversal",
       "optional four-front construction/query reference refinement",
       "RBA-native child preparation",
-      "Lazy SMP private worker searches sharing exact evidence only"
+      "Lazy SMP selectable private worker searches sharing exact evidence only"
     ],
     "excludes": [
       "physical-board reconstruction after ingress",
@@ -70,7 +71,8 @@
     "corrected rank-16+ standard-7x6 prefix A/B scan found zero interval/kind changes from the frontier-response extension",
     "forced-block and universal support-lift terminal-response closures match independent 4x4 exact oracles",
     "support-lift closure reduces the maintained unresolved standard-7x6 rank-28 control from 54 to 49 CPC-first alpha-beta nodes without another basis scan",
-    "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states"
+    "exhaustive 4x4 neutral-token quotient audit: every neutral-token equivalence collapses in RBA q, and RBA q is strictly coarser on nonterminal states",
+    "Lazy SMP legacy/default and minimal worker modes are both runtime-qualified; minimal matches exact W/D/L while preserving canonical RBA q cache identity"
   ],
   "specializationContract": {
     "selection": "cold initialization only",
@@ -158,5 +160,18 @@
       "dependency topology",
       "refcounted work lifetime"
     ]
+  },
+  "lazySmpWorkerModes": {
+    "default": "legacy",
+    "legacy": {
+      "module": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "contract": "Existing CPC/NDC-first alpha-beta worker. Retains Behavior/Root-Frontier compatibility and legacy CPC options."
+    },
+    "minimal": {
+      "module": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+      "contract": "Exact canonical-RBA Negamax/alpha-beta only: neutral/gray-token quotient is inherited from RBA q, reflection canonicalization precedes TT identity, center-distance ordering is diversified only within equal-distance shells, and local/shared exact TT support is retained. No CPC, NDC, evaluator, heuristic scoring, restriction or interval layer."
+    },
+    "selection": "runLazySmpConnect4Rba32({workerMode:'legacy'|'minimal'}); legacy is the compatibility default.",
+    "incompatibilities": "minimal rejects behaviorMemory, rootFrontier, cpcFrontierResponse and cpcProjectedAdvisory rather than silently changing worker semantics."
   }
 }
