@@ -15,32 +15,31 @@ import {
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
-  columns=g.columns,rows=g.rows,keyWords=g.keyWords,maxBasis=g.maxBasis,
   profile=prepareConnect4RbaExecutionProfile(g),
   control=workerData.control,resultWords=workerData.resultWords,
-  words=new Uint32Array((g.cellCount+1)*keyWords),
-  basis=new Uint32Array((g.cellCount+1)*maxBasis),
+  words=new Uint32Array((g.cellCount+1)*g.keyWords),
+  basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
   basisSize=new Uint32Array(g.cellCount+1),
   coord=prepareConnect4RbaCoordinateScratch(g),
-  centerOrder=new Uint32Array(columns),
+  centerOrder=new Uint32Array(g.columns),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
-  localCompact=isCompactProfile8(g,keyWords)?1:0,
-  localStoredKeyWords=localCompact?8:keyWords,
+  localCompact=isCompactProfile8(g,g.keyWords)?1:0,
+  localStoredKeyWords=localCompact?8:g.keyWords,
   localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),
   localValues=new Uint8Array(workerData.localCacheCapacity);
 
-let orderAt=0,left=(columns-1)>>1,right=columns>>1,pair=0;
+let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1,pair=0;
 if(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}
-while(orderAt<columns){
+while(orderAt<g.columns){
   const rightFirst=(index>>>pair)&1;
   if(rightFirst){
-    if(right<columns)centerOrder[orderAt++]=right++;
+    if(right<g.columns)centerOrder[orderAt++]=right++;
     if(left>=0)centerOrder[orderAt++]=left--;
   }else{
     if(left>=0)centerOrder[orderAt++]=left--;
-    if(right<columns)centerOrder[orderAt++]=right++;
+    if(right<g.columns)centerOrder[orderAt++]=right++;
   }
   pair+=1;
 }
@@ -69,7 +68,7 @@ function localKeyMatches(slot,src){
     localKeys[base+5]===words[src+11]&&
     localKeys[base+6]===words[src+12]&&
     localKeys[base+7]===compactTailProfile8(words,src);
-  for(let w=0;w<keyWords;w+=1)
+  for(let w=0;w<g.keyWords;w+=1)
     if(localKeys[base+w]!==words[src+w])return 0;
   return 1;
 }
@@ -82,7 +81,7 @@ function storeLocalEntry(slot,src,value){
     localKeys[base+3]=words[src+8];localKeys[base+4]=words[src+9];
     localKeys[base+5]=words[src+11];localKeys[base+6]=words[src+12];
     localKeys[base+7]=compactTailProfile8(words,src);
-  }else for(let w=0;w<keyWords;w+=1)localKeys[base+w]=words[src+w];
+  }else for(let w=0;w<g.keyWords;w+=1)localKeys[base+w]=words[src+w];
   localValues[slot]=value;
 }
 
@@ -118,9 +117,9 @@ function storeBound(src,hash,slot,value){
 
 function negamax(depth,src,bi,n,mover,alpha,beta){
   if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;
-  const dst=src+keyWords,ci=bi+maxBasis,
+  const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
-    hash=depth?mixSpan32Locator32(words,src,keyWords):0,
+    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
     slot=depth?(hash&localMask):0;
 
   if(depth){
@@ -138,10 +137,10 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   }
 
   let best=-2;
-  for(let oi=0;oi<columns;oi+=1){
+  for(let oi=0;oi<g.columns;oi+=1){
     const column=centerOrder[oi],
       height=words[src+column];
-    if(height>=rows)continue;
+    if(height>=g.rows)continue;
 
     const term=connect4RbaCofactorKnownHeight(
       g,profile,words,src,basis,bi,n,column,height,
