@@ -66,8 +66,9 @@ export async function runLazySmpConnect4Rba32(moves,{
     }),
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
-    metricBuffer=new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
-    metrics=new Float64Array(metricBuffer),
+    metricBuffer=workerMode===RBA_LAZY_SMP_WORKER_MINIMAL?null:
+      new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
+    metrics=metricBuffer===null?null:new Float64Array(metricBuffer),
     nodeCounterBuffer=rootFrontier?new SharedArrayBuffer(workers*64):null,
     timingBuffer=rootFrontier?new SharedArrayBuffer(workers*64):null,
     frontierMetricBuffer=rootFrontier?new SharedArrayBuffer(workers*32):null,
@@ -123,7 +124,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   for(let i=0;i<workers;i+=1)completedWorkers[i]=Atomics.load(resultWords,i*RESULT_STRIDE+3);
 
   let winnerMetrics=null;
-  if(exact){
+  if(exact&&metrics!==null){
     const base=winner*METRIC_WIDTH;
     winnerMetrics={
       nodes:metrics[base],
@@ -170,7 +171,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
-      control.byteLength+resultWords.byteLength+metricBuffer.byteLength+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+
+      control.byteLength+resultWords.byteLength+(metricBuffer===null?0:metricBuffer.byteLength)+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+
       (rootFrontier?nodeCounterBuffer.byteLength+timingBuffer.byteLength+frontierMetricBuffer.byteLength:0),
   };
 }
