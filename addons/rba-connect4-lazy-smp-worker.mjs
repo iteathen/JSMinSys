@@ -1,7 +1,8 @@
 import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
-import {connect4RbaCofactorKnownHeight} from './rba-connect4-coordinate.mjs';
+import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -20,7 +21,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   words=new Uint32Array((g.cellCount+1)*g.keyWords),
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
   basisSize=new Uint32Array(g.cellCount+1),
-  seen=new Uint32Array(g.shapeWordCount),
+  coord=prepareConnect4RbaCoordinateScratch(g),
   centerOrder=new Uint32Array(g.columns),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
@@ -123,12 +124,14 @@ function negamax(depth,n,mover,alpha,beta){
 
     const term=connect4RbaCofactorKnownHeight(
       g,profile,words,src,basis,bi,n,column,height,
-      words,dst,basis,ci,seen,basisSize,depth+1,
+      words,dst,basis,ci,coord.seen,basisSize,depth+1,coord.map,coord.inverse,
     );
     let value;
     if(term)value=relativeTerminal(term,mover);
     else{
-      value=negamax(depth+1,basisSize[depth+1],mover^1,-beta,-alpha);
+      const childN=basisSize[depth+1];
+      connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
+      value=negamax(depth+1,childN,mover^1,-beta,-alpha);
       if(value===CANCELLED)return CANCELLED;
       value=-value;
     }
