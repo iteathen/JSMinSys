@@ -6936,87 +6936,6 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
-      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
-      "name": "<module-main>",
-      "scope": "lazy-smp-worker-main",
-      "operations": [
-        {
-          "op": "runtime.module.bookkeeping",
-          "count": 1
-        },
-        {
-          "op": "runtime.typed_view.construct",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "prepareConnect4RbaAlphaBeta"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "solveConnect4RbaAlphaBeta"
-        },
-        {
-          "op": "memory.store.f64",
-          "count": 15
-        },
-        {
-          "op": "atomic.store.u32",
-          "count": 6
-        },
-        {
-          "op": "atomic.rmw.u32",
-          "count": 2
-        },
-        {
-          "op": "atomic.notify",
-          "count": 1
-        },
-        {
-          "op": "alu.imul.u32",
-          "count": 2
-        },
-        {
-          "op": "alu.add.u32",
-          "count": 17
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 25
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "attachConnect4RbaSharedExactCache32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "unbounded",
-        "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+CALL(prepareConnect4RbaAlphaBeta)+CALL(solveConnect4RbaAlphaBeta)+15*C(memory.store.f64)+6*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+2*C(alu.imul.u32)+17*C(alu.add.u32)+C(control.test.u32)+C(control.branch)+25*C(runtime.field.load) + C(runtime.field.load) + CALL(attachConnect4RbaSharedExactCache32)",
-        "unboundedTerms": [
-          "CALL(solveConnect4RbaAlphaBeta)"
-        ],
-        "note": "Each Lazy-SMP worker remains a private complete search. The cold worker configuration now forwards the host-selected deterministic sharing-density mask."
-      },
-      "status": "decomposed"
-    },
-    {
       "unit": "addons/worker-behavior.mjs#createWorkerBehavior32",
       "source": "addons/worker-behavior.mjs",
       "name": "createWorkerBehavior32",
@@ -11303,11 +11222,246 @@
         "note": "Win-only whole-reservoir response-pairing CPC. Conservative source-level symbolic envelope; no W/D/L interval, loss, draw, bound, restriction, fork, or threat-classification work is charged here."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#relativeTerminal",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "relativeTerminal",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*C(control.test.u32)+2*C(control.branch)",
+        "note": "Player-relative translation of an exact RBA terminal value only."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#relativeToAbsolute",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "relativeToAbsolute",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*C(control.test.u32)+2*C(control.branch)+C(alu.add.u32)+C(alu.sub.u32)",
+        "note": "Converts the final relative Negamax value to the existing absolute 1/2/3 host wire format; it is not an evaluator."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#negamax",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "negamax",
+      "scope": "lazy-smp-negamax-hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "connect4RbaCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "negamax"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(negamax)",
+        "unboundedTerms": [
+          "R*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Geometry and array property reads executed by this invocation outside subledgers.",
+          "L": "Typed-array reads for action order, support heights and child basis size.",
+          "MUL": "Depth/stride and action-order index multiplications executed by this invocation.",
+          "ADD": "Index increments, offsets and local arithmetic executed by this invocation.",
+          "XOR": "Mover inversion on recursive nonterminal edges.",
+          "SUB": "Negamax sign/window negations represented at source-operation level.",
+          "TEST": "Stop, loop, legality, terminal, cancellation, best-value and cutoff predicates.",
+          "BRANCH": "Executed source control selections and early returns.",
+          "A": "Legal actions whose RBA cofactors are constructed.",
+          "T": "Terminal child actions translated directly.",
+          "R": "Nonterminal child actions recursively searched."
+        },
+        "note": "Exact RBA Negamax/alpha-beta shell only. No CPC, NDC, live-line evaluator, heuristic evaluation, restriction mask or W/D/L interval layer is called."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 4
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "memory.store.f64",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 4
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "relativeToAbsolute"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+4*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+2*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "unboundedTerms": [
+          "N*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Worker-data, geometry, root and result-field reads outside helper subledgers.",
+          "S": "Root key/basis publication and basis-size/result-index state stores expressed as typed u32 stores.",
+          "MUL": "Worker/result/metric and RBA arena stride multiplications.",
+          "ADD": "Arena sizing, offsets and result indices.",
+          "TEST": "Root terminal, cancellation, move/reflection and winner predicates.",
+          "BRANCH": "Executed module-level control selections.",
+          "T": "1 for a terminal root, otherwise 0.",
+          "N": "1 for a nonterminal root, otherwise 0.",
+          "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0."
+        },
+        "note": "Minimal production worker: exact RBA Negamax plus result publication. CPC and evaluation hooks are intentionally absent."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 178,
-    "decomposed": 178,
+    "units": 181,
+    "decomposed": 181,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11419,7 +11573,7 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
     "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "2d9cccc1e999f64dad8505ef33664692020d532a",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
     "addons/rba-connect4-alphabeta-behavior.mjs": "3055d703a37be032dbf627b8f7f5c0b43eb0550d",
@@ -11433,7 +11587,7 @@
     "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be",
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
-    "addons/ndc-connect4.mjs": "30f2d0b0a0519063294d8ce2634ee82d0a76e744"
+    "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
