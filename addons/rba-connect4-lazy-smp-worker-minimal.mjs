@@ -116,7 +116,7 @@ function storeBound(src,hash,slot,value){
 }
 
 function negamax(depth,src,bi,n,mover,alpha,beta){
-  if(Atomics.load(control,CONTROL_STOP))return CANCELLED;
+  if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;
   const dst=src+g.keyWords,ci=bi+g.maxBasis,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
