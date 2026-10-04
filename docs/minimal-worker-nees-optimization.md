@@ -566,6 +566,21 @@ All 160 solves remained exact.
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-014 disposition — player-relative local exact tags rejected
+
+Ten-repeat same-VM A/B:
+
+- 2 workers: -0.2% aggregate;
+- **4 workers: +1.6% aggregate regression**;
+- 4w 4x4 empty: -1.8%;
+- 4w rank-24 7x6: +2.8%;
+- 4w rank-28 A: +2.4%;
+- 4w B: +4.6%.
+
+All 160 solves remained exact.
+
+**Disposition:** COSTED-OUT / REJECTED. Worker-local exact tags are restored to the shared absolute 1/2/3 encoding. Removing conversion calls did not lower four-worker total cost.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
