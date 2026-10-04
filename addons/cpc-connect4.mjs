@@ -30,27 +30,23 @@ export function connect4CpcTargetSupportDistance32(g,words,offset,targetCell){
 // Nothing else is classified. Failure to close is simply unresolved.
 export function evaluateConnect4CpcWin32(g,words,offset,basis,basisOffset,basisSize,controller){
   const meta=words[offset+g.metaOffset];
-  if((meta&3)||controller===((meta>>>2)&1)||g.columns>7)return 0;
+  if((meta&3)||controller===((meta>>>2)&1))return 0;
 
-  let pending=-1,p0a=-1,p0b=-1,p1a=-1,p1b=-1,p2a=-1,p2b=-1,pairs=0;
-  for(let column=0;column<g.columns;column+=1){
-    const height=words[offset+column],remaining=g.rows-height;
-    if(!(remaining&1))continue;
-    if(pending<0){pending=column;continue;}
-    const a=words[offset+pending]*g.columns+pending,
-      b=height*g.columns+column;
-    if(pairs===0){p0a=a;p0b=b;}
-    else if(pairs===1){p1a=a;p1b=b;}
-    else{p2a=a;p2b=b;}
-    pairs+=1;pending=-1;
-  }
-  if(pending>=0)return 0;
+  // Every odd column tail must have a mate. The actual pair endpoints are
+  // derived from the live frontiers only when an opponent residual needs them.
+  let odd=0;
+  for(let column=0;column<g.columns;column+=1)
+    odd^=(g.rows-words[offset+column])&1;
+  if(odd)return 0;
 
   const own=offset+(controller?g.p1Offset:g.p0Offset),
     opponent=offset+(controller?g.p0Offset:g.p1Offset),
     coordinateWords=g.coordWords;
 
-  // First require one controller residual that the response policy owns in full.
+  // The response policy must force at least one complete controller residual.
+  // Even tails: controller owns odd deltas above the current frontier.
+  // Odd tails: the frontier is cross-paired, then controller owns even deltas
+  // starting at delta 2.
   let guaranteed=0;
   for(let word=0;word<coordinateWords&&!guaranteed;word+=1){
     let bits=words[own+word]>>>0,indexBase=word<<5;
@@ -73,14 +69,16 @@ export function evaluateConnect4CpcWin32(g,words,offset,basis,basisOffset,basisS
   }
   if(!guaranteed)return 0;
 
-  // Every opponent residual must be hit by the same single response policy.
+  // The same response policy must deny every surviving opponent residual.
+  // A residual is denied by either one fixed controller response cell or both
+  // endpoints of one dynamic cross-frontier pair.
   for(let word=0;word<coordinateWords;word+=1){
     let bits=words[opponent+word]>>>0,indexBase=word<<5;
     while(bits){
       const i=indexBase+firstSetBitIndex32(bits);
       if(i>=basisSize)break;
       const id=basis[basisOffset+i],base=id*4,size=g.shapeSize[id];
-      let blocked=0,pairBits=0;
+      let blocked=0;
       for(let j=0;j<size;j+=1){
         const cell=g.shapeCells[base+j],column=g.cellColumn[cell],
           height=words[offset+column],delta=g.cellRow[cell]-height,
@@ -88,13 +86,28 @@ export function evaluateConnect4CpcWin32(g,words,offset,basis,basisOffset,basisS
         if(delta>=0&&((remaining&1)?(delta>=2&&(delta&1)===0):(delta&1)!==0)){
           blocked=1;break;
         }
-        if(pairs>0){
-          if(cell===p0a)pairBits|=1;else if(cell===p0b)pairBits|=2;
-          if(pairs>1){if(cell===p1a)pairBits|=4;else if(cell===p1b)pairBits|=8;}
-          if(pairs>2){if(cell===p2a)pairBits|=16;else if(cell===p2b)pairBits|=32;}
+      }
+
+      if(!blocked){
+        let pending=-1;
+        for(let column=0;column<g.columns&&!blocked;column+=1){
+          const height=words[offset+column];
+          if(!((g.rows-height)&1))continue;
+          if(pending<0){pending=column;continue;}
+          const a=words[offset+pending]*g.columns+pending,
+            b=height*g.columns+column;
+          let hasA=0,hasB=0;
+          for(let j=0;j<size;j+=1){
+            const cell=g.shapeCells[base+j];
+            if(cell===a)hasA=1;
+            else if(cell===b)hasB=1;
+          }
+          if(hasA&&hasB)blocked=1;
+          pending=-1;
         }
       }
-      if(!blocked&&!((pairBits&3)===3||(pairBits&12)===12||(pairBits&48)===48))return 0;
+
+      if(!blocked)return 0;
       bits=(bits&(bits-1))>>>0;
     }
   }
