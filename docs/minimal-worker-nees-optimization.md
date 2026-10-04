@@ -508,6 +508,21 @@ All 160 solves remained exact. Direct timeout/abort lifecycle controls remain pa
 
 **Development disposition:** RETAIN as the current cancellation baseline, pending local i5 process-cycle qualification.
 
+## MW-004B disposition — poll every eighth ply rejected
+
+Ten-repeat same-VM depth-4 versus depth-8 A/B:
+
+- 2 workers: -0.6% aggregate;
+- **4 workers: +3.4% aggregate regression**;
+- 4w 4x4 empty: +3.4%;
+- 4w rank-24 7x6: +5.8%;
+- 4w rank-28 A: +3.5%;
+- 4w B: +0.6%.
+
+All 160 solves remained exact.
+
+**Disposition:** COSTED-OUT / REJECTED. Depth-4 polling remains the current development optimum. Less frequent atomics did not imply lower total solve cost.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
