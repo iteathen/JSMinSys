@@ -418,6 +418,20 @@ The four-worker production target did not establish an enclosing win. The explic
 
 **Disposition:** COSTED-OUT / REJECTED. Do not reintroduce solely on the claim that fewer source additions must be faster.
 
+## MW-012 — compact 7x6 locator hash
+
+**Candidate cost:** every non-root standard-7x6 node used the generic `mixSpan32Locator32` over all 14 raw q words even though the exact cache already uses a qualified lossless eight-word compact semantic identity.
+
+**Mechanism:** hash the same eight compact semantic fields with the same mixer, unrolled. This removes six mixer lanes and loop control from the standard-7x6 locator. General geometries retain the full-span hash.
+
+**Semantic boundary:** the hash is a locator only. Cache equality remains authoritative and exact; collisions may change work but cannot change W/D/L.
+
+**Admission:** the compact representation is already qualified as lossless for standard 7x6, so equal semantic q values necessarily produce equal compact locator inputs.
+
+**Falsifier:** reject if compact field packing plus changed collision distribution outweighs the six removed mixer lanes at the complete-solve boundary. Target i5 cycles remain authoritative.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
