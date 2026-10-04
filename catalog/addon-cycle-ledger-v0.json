@@ -11671,7 +11671,7 @@
           "R*CALL(negamax)"
         ],
         "parameters": {
-          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "F": "Prepared profile/coordinate/cache state field reads only; columns/rows/keyWords/maxBasis are module-scope scalar bindings rather than repeated geometry-property reads.",
           "L": "Center-order, support-height and child-size reads.",
           "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006.",
           "AND": "Local TT slot mask applications.",
@@ -11688,7 +11688,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "MW-004A retained: one depth-mask predicate per node; shared stop Atomics execute only at depths divisible by four. MW-004B depth-8 polling was costed out."
+        "note": "MW-013 candidate prepares hot geometry scalar fields once at worker initialization; recurrence semantics are unchanged."
       },
       "status": "decomposed"
     },
@@ -11809,7 +11809,7 @@
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
           "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell."
         },
-        "note": "Metric-free minimal worker with cooperative cancellation sentinel restored; host still owns final terminate+join cleanup."
+        "note": "Minimal worker cold setup now copies columns/rows/keyWords/maxBasis into scalar bindings for recurrence use; this is an experimental V8-realization optimization."
       },
       "status": "decomposed"
     },
@@ -11991,7 +11991,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "3efcb38e65018fcfb74b2cf10a4248b847f7efef"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "03725519671f79e20f54c531171019032da9b3d6"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
