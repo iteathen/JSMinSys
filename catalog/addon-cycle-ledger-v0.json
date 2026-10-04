@@ -11659,12 +11659,17 @@
           "op": "runtime.call.subledger",
           "count": "BND",
           "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "LX",
+          "target": "storeLocalEntry"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)",
+        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11683,10 +11688,11 @@
           "A": "Legal actions whose RBA cofactors are constructed.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
-          "X": "Globally exact non-root results published to the local and sampled shared exact TTs.",
-          "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification."
+          "X": "Globally exact full-window non-root results published to the local and sampled shared exact TTs.",
+          "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
+          "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Exact RBA Negamax/alpha-beta over canonical RBA q with local zero-threshold bound retention. Neutral/gray-token ownership is erased by residual coordinates, child reflection is canonicalized before TT identity, move order is center-line distance, and only globally exact q values may enter the shared TT."
+        "note": "Exact RBA Negamax/alpha-beta over canonical RBA q with local zero-threshold bound retention. Narrow-window exact values remain local; automatic shared publication is reserved for full W/D/L-window exact results. Neutral/gray-token ownership is erased by residual coordinates and child reflection is canonicalized before TT identity."
       },
       "status": "decomposed"
     },
@@ -11997,7 +12003,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "bd3b8aeaa8dad565babb593e11d0519e9344bd9a"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "9861550bdd8680dc61273c35042d8f24c380d886"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
