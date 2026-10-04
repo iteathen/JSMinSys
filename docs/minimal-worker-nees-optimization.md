@@ -159,6 +159,45 @@ Reject or revise the experiment if any of the following occur:
 
 This experiment does not rely on claims that TypedArrays, branches, monomorphism, or fewer instructions are inherently faster. Its mechanism is structural: preserve already-proved search information to avoid re-solving equivalent canonical q states. Promotion depends on governing-unit measurement.
 
+## MW-001 development evidence — local bound retention
+
+The first implementation retains local-only zero-threshold alpha/beta bounds using tags `4/5`. Opposite local bounds for the same canonical q currently promote the q to exact draw; non-exact bound tags are prohibited from the shared exact cache.
+
+Correctness development checks are green, including a direct negative control that scans the shared cache and rejects any value above `3`.
+
+Same-VM baseline-versus-candidate measurements with identical Node 26 setup, cache capacities and move inputs:
+
+| Workers / control | Exact-only baseline | MW-001 candidate | Wall delta | Winner-node delta |
+| --- | ---: | ---: | ---: | ---: |
+| 2w 4x4 empty | 105.733 ms | 42.575 ms | -59.7% | -94.1% |
+| 2w 7x6 A rank 24 | 40.445 ms | 38.157 ms | -5.7% | -59.6% |
+| 2w 7x6 B late | 28.626 ms | 31.798 ms | **+11.1%** | +0.9% |
+| 4w 4x4 empty | 184.866 ms | 59.067 ms | -68.0% | -94.3% |
+| 4w 7x6 A rank 24 | 55.480 ms | 46.646 ms | -15.9% | -80.7% |
+| 4w 7x6 B late | 40.855 ms | 42.403 ms | **+3.8%** | -28.5% |
+
+Across these controls, the candidate remained exact with no W/D/L mismatch. Aggregate winner-node work fell about 93% for both 2-worker and 4-worker groups.
+
+### Newly exposed coupled cost: shared draw promotion
+
+MW-001 greatly increases useful local reuse, but the current opposite-bound merge path calls `storeExact(..., 2)`, which publishes the newly proved draw into the shared exact TT. On the 4-worker controls this increased mean shared stores approximately:
+
+- 4x4 empty: 29 -> 3,220;
+- 7x6 A rank 24: 18.7 -> 571.7;
+- 7x6 B late: 9.7 -> 214.
+
+This shared publication is semantically valid, but it is not automatically a favorable composite realization. It adds Atomics/coherence work and is a plausible explanation for the late-position regression where subtree elimination is small.
+
+Treat this as **MW-001A**, causal role **COUPLED**, disposition **UNVERIFIED-DEBT**.
+
+**Admission for refinement:** when opposite local bounds prove draw, retain exact draw in the worker-local TT but do not automatically publish that inferred draw to the shared TT. Ordinary globally exact search results remain shareable.
+
+**Mechanism:** preserve the large within-worker subtree elimination while reducing cross-worker atomic publication/coherence traffic.
+
+**Falsifier:** reject local-only draw promotion if the loss of cross-worker draw reuse increases complete solve time or duplicated nodes enough to outweigh the reduced shared publication traffic.
+
+MW-001 is therefore strongly favorable development evidence but is **not yet closed/promoted**; MW-001A is part of the same coherent TT optimization unit.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
