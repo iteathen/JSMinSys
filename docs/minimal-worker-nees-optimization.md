@@ -432,6 +432,22 @@ The four-worker production target did not establish an enclosing win. The explic
 
 **Disposition:** ACTIVE EXPERIMENT.
 
+## MW-012 disposition — compact locator rejected
+
+Ten-repeat same-VM standard-7x6 A/B:
+
+- 2 workers: -5.8% aggregate;
+- **4 workers: +1.1% aggregate regression**;
+- 4w rank-28 A: +5.2%;
+- 4w B: +6.5%;
+- 4w rank-24 A: -6.0%.
+
+All 160 solves remained exact.
+
+The production target is four workers on the local i5. The compact field packing/change in locator behavior did not establish a four-worker governing-unit win, despite six fewer mixer lanes.
+
+**Disposition:** COSTED-OUT / REJECTED. Full-q `mixSpan32Locator32` is restored. Do not infer that fewer hash lanes are faster without accounting for identity packing and collision/locality effects.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
