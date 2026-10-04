@@ -64,3 +64,15 @@ test('Negamax consumes CPC win closure as a player-relative exact win',()=>{
   assert.equal(result.value,1);
   assert.ok(result.metrics.cpcWins>0,result.metrics);
 });
+
+test('CPC reservoir proof has no arbitrary standard-width cap',()=>{
+  const g=prepareConnect4RbaGeometry({columns:8,rows:4,specializationBudgetBytes:0});
+  const words=new Uint32Array(g.keyWords);
+  const basis=new Uint32Array([8]); // singleton at row 1, column 0
+  words[g.metaOffset]=0;            // P0 to move; P1 is the response controller
+  words[g.p1Offset]=1;              // P1 residual {cell 8} is active
+  assert.equal(
+    evaluateConnect4CpcWin32(g,words,0,basis,0,1,1),
+    1,
+  );
+});
