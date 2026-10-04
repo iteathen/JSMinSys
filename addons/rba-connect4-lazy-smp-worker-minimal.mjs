@@ -13,7 +13,7 @@ import {
 } from './rba-connect4-shared-exact-cache.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
-  RESULT_STRIDE=4,METRIC_WIDTH=15,CANCELLED=-2,
+  RESULT_STRIDE=4,METRIC_WIDTH=15,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),
   control=workerData.control,resultWords=workerData.resultWords,
@@ -74,7 +74,7 @@ function localKeyMatches(slot,src){
   return 1;
 }
 
-function storeLocalExact(slot,src,value){
+function storeLocalEntry(slot,src,value){
   const base=slot*localStoredKeyWords;
   if(localCompact){
     localKeys[base]=words[src];localKeys[base+1]=words[src+1];
@@ -86,20 +86,32 @@ function storeLocalExact(slot,src,value){
   localValues[slot]=value;
 }
 
-function probeExact(src,hash,slot){
+function probeCache(src,hash,slot){
   const local=localValues[slot];
   if(local&&localKeyMatches(slot,src)){cacheHits+=1;return local;}
   if(!(hash&sharedSampleBits)){
     const value=probeConnect4RbaSharedExactCache32(shared,words,src,hash);
-    if(value){storeLocalExact(slot,src,value);cacheHits+=1;return value;}
+    if(value){storeLocalEntry(slot,src,value);cacheHits+=1;return value;}
   }
   return 0;
 }
 
 function storeExact(src,hash,slot,value){
-  storeLocalExact(slot,src,value);
+  storeLocalEntry(slot,src,value);
   if(!(hash&sharedSampleBits))
     storeConnect4RbaSharedExactCache32(shared,words,src,value,hash);
+}
+
+function storeBound(src,hash,slot,value){
+  const prior=localValues[slot];
+  if(prior&&localKeyMatches(slot,src)){
+    if(prior<=3||prior===value)return prior;
+    // The same canonical q has both >=0 and <=0, therefore exact draw.
+    storeExact(src,hash,slot,2);
+    return 2;
+  }
+  storeLocalEntry(slot,src,value);
+  return value;
 }
 
 function negamax(depth,n,mover,alpha,beta){
@@ -107,13 +119,22 @@ function negamax(depth,n,mover,alpha,beta){
   nodes+=1;
   const src=depth*g.keyWords,bi=depth*g.maxBasis,
     dst=src+g.keyWords,ci=bi+g.maxBasis,
-    fullWindow=alpha===-2&&beta===2,
+    alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
     slot=depth?(hash&localMask):0;
 
   if(depth){
-    const cached=probeExact(src,hash,slot);
-    if(cached)return relativeTerminal(cached,mover);
+    const cached=probeCache(src,hash,slot);
+    if(cached){
+      if(cached<=3)return relativeTerminal(cached,mover);
+      if(cached===LOCAL_LOWER0){
+        if(beta<=0){cutoffs+=1;return 0;}
+        if(alpha<0)alpha=0;
+      }else{
+        if(alpha>=0){cutoffs+=1;return 0;}
+        if(beta>0)beta=0;
+      }
+    }
   }
 
   let best=-2;
@@ -144,9 +165,19 @@ function negamax(depth,n,mover,alpha,beta){
     if(alpha>=beta){cutoffs+=1;break;}
   }
 
-  // Only full-window nodes publish into the exact TT. Narrow-window results
-  // remain alpha/beta bounds and never enter either cache.
-  if(depth&&fullWindow)storeExact(src,hash,slot,relativeToAbsolute(best,mover));
+  if(depth){
+    // Classify against the caller's original window. Bounds are local-only;
+    // only global q truth is admitted to the shared exact cache.
+    if(best>alphaOrig&&best<betaOrig)
+      storeExact(src,hash,slot,relativeToAbsolute(best,mover));
+    else if(best>=betaOrig){
+      if(best===1)storeExact(src,hash,slot,relativeToAbsolute(1,mover));
+      else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
+    }else if(best<=alphaOrig){
+      if(best===-1)storeExact(src,hash,slot,relativeToAbsolute(-1,mover));
+      else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
+    }
+  }
   return best;
 }
 
