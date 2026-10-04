@@ -243,3 +243,30 @@ test('Lazy SMP rejects unknown worker mode',async()=>{
     /invalid Lazy SMP worker mode/,
   );
 });
+
+
+test('minimal worker never publishes local bounds to shared exact cache',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4}),
+    root=connect4RbaFromMoves([0,1,0,1],{geometry:g,positionCode:false}),
+    geometry=shareConnect4RbaGeometry32(g),
+    workers=2,
+    control=new Int32Array(new SharedArrayBuffer(5*Int32Array.BYTES_PER_ELEMENT)),
+    resultWords=new Int32Array(new SharedArrayBuffer(workers*4*Int32Array.BYTES_PER_ELEMENT)),
+    metricBuffer=new SharedArrayBuffer(workers*15*Float64Array.BYTES_PER_ELEMENT),
+    sharedExactCache=createConnect4RbaSharedExactCache32({capacity:4096,keyWords:g.keyWords,geometry:g});
+  control[4]=-1;
+  const running=[];
+  for(let workerIndex=0;workerIndex<workers;workerIndex+=1)running.push(new Promise((resolve,reject)=>{
+    const worker=new Worker(new URL('../addons/rba-connect4-lazy-smp-worker-minimal.mjs',import.meta.url),{
+      workerData:{
+        control,resultWords,metricBuffer,workerIndex,workerCount:workers,
+        geometry,root,rootReflected:root.reflected,sharedExactCache,
+        localCacheCapacity:4096,sharedSampleMask:0,
+      },
+    });
+    worker.once('error',reject);
+    worker.once('exit',code=>code===0?resolve():reject(new Error('worker exit '+code)));
+  }));
+  await Promise.all(running);
+  for(const value of sharedExactCache.value)assert.ok(value<=3,'local-only bound leaked into shared exact cache');
+});
