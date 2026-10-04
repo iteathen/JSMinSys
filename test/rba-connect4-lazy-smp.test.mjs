@@ -14,7 +14,11 @@ import {
   storeConnect4RbaSharedExactCache32,
 } from '../addons/rba-connect4-shared-exact-cache.mjs';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
-import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
+import {
+  runLazySmpConnect4Rba32,
+  RBA_LAZY_SMP_WORKER_LEGACY,
+  RBA_LAZY_SMP_WORKER_MINIMAL,
+} from '../addons/rba-connect4-lazy-smp-host.mjs';
 
 test('shared exact cache publishes only fully committed exact rows',()=>{
   const cache=createConnect4RbaSharedExactCache32({capacity:8,keyWords:2}),
@@ -92,6 +96,7 @@ test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
     reflected:child.reflected,
   });
   assert.equal(childResult.value,serial.value,'diversified winner must still publish an optimal move');
+  assert.equal(lazy.workerMode,RBA_LAZY_SMP_WORKER_LEGACY);
   assert.equal(lazy.cleanup,true);
   assert.equal(lazy.workersExited,2);
   assert.equal(lazy.workersUsed,2);
@@ -175,10 +180,12 @@ test('Lazy SMP move ordering is center-line distance only',async()=>{
     sharedCacheCapacity:256,
     localCacheCapacity:256,
     timeoutMs:5000,
+    workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
   });
   assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
+  assert.equal(lazy.workerMode,RBA_LAZY_SMP_WORKER_MINIMAL);
   assert.equal(lazy.rootWdl,0);
-  assert.equal(lazy.move,1,'worker must ignore geometry actionOrder and choose minimum center-line distance');
+  assert.equal(lazy.move,1,'minimal worker must ignore geometry actionOrder and choose minimum center-line distance');
 });
 
 
@@ -194,7 +201,7 @@ test('Lazy SMP workers diversify only equal center-distance ties',async()=>{
       metricBuffer=new SharedArrayBuffer(workers*15*Float64Array.BYTES_PER_ELEMENT),
       sharedExactCache=createConnect4RbaSharedExactCache32({capacity:64,keyWords:g.keyWords,geometry:g});
     control[4]=-1;
-    const worker=new Worker(new URL('../addons/rba-connect4-lazy-smp-worker.mjs',import.meta.url),{
+    const worker=new Worker(new URL('../addons/rba-connect4-lazy-smp-worker-minimal.mjs',import.meta.url),{
       workerData:{
         control,resultWords,metricBuffer,workerIndex,workerCount:workers,
         geometry,root,rootReflected:root.reflected,sharedExactCache,
@@ -211,4 +218,28 @@ test('Lazy SMP workers diversify only equal center-distance ties',async()=>{
 
   assert.equal(await run(0),1);
   assert.equal(await run(1),2);
+});
+
+
+test('minimal Lazy SMP worker rejects legacy-only controls',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4});
+  for(const options of [
+    {rootFrontier:true},
+    {cpcFrontierResponse:true},
+    {cpcProjectedAdvisory:true},
+  ])await assert.rejects(
+    ()=>runLazySmpConnect4Rba32([0,1,0,1],{
+      geometry:g,workers:2,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+      timeoutMs:1000,...options,
+    }),
+    /does not support legacy behavior\/CPC options/,
+  );
+});
+
+test('Lazy SMP rejects unknown worker mode',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:4});
+  await assert.rejects(
+    ()=>runLazySmpConnect4Rba32([0,1,0,1],{geometry:g,workers:2,workerMode:'unknown',timeoutMs:1000}),
+    /invalid Lazy SMP worker mode/,
+  );
 });
