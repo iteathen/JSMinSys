@@ -11577,10 +11577,6 @@
       "scope": "lazy-smp-negamax-hot",
       "operations": [
         {
-          "op": "atomic.load.u32",
-          "count": 1
-        },
-        {
           "op": "runtime.field.load",
           "count": "F"
         },
@@ -11666,7 +11662,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
+        "activeCycleExpression": "F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11677,7 +11673,7 @@
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Stop, cache, loop, legality, terminal, cancellation, best, cutoff and exact-publication predicates.",
+          "TEST": "Cache, loop, legality, terminal, best, cutoff and exact-publication predicates; recursive stop polling is eliminated.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes, otherwise 0.",
           "P": "1 for non-root nodes, otherwise 0.",
@@ -11688,7 +11684,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Canonical-RBA Negamax uses the full-q locator; the compact eight-field hash experiment was costed out on the four-worker target."
+        "note": "Production minimal Negamax performs no per-node stop Atomics. ManagedThreadSession owns timeout/abort/winner teardown and forcibly terminates workers during close; search semantics and TT policy are unchanged."
       },
       "status": "decomposed"
     },
@@ -11802,14 +11798,14 @@
           "S": "Root key/basis publication, center-order construction and initial basis-size stores.",
           "MUL": "Worker/result, arena and local-TT allocation multiplications; no metric-base multiplication in minimal mode.",
           "ADD": "Arena sizing, center-shell ordering indices and result indices.",
-          "TEST": "Center-shell construction, root terminal, cancellation, move/reflection and winner predicates.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed.",
           "BRANCH": "Center-shell tie-direction construction and executed module-level control selections.",
           "T": "1 for a terminal root, otherwise 0.",
           "N": "1 for a nonterminal root, otherwise 0.",
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
           "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell."
         },
-        "note": "Metric-free minimal worker setup and completion. No metric view is constructed and no floating-point diagnostic stores occur in the production minimal path."
+        "note": "Minimal worker has no cooperative recursive cancellation path. The cold host lifecycle owns stop/error state and worker termination."
       },
       "status": "decomposed"
     },
@@ -11991,7 +11987,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e9da4a842e63ecf26e14af578ab4fa0bed202254"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "9501c8046620d38764577b8d2e140bc1264a4501"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
