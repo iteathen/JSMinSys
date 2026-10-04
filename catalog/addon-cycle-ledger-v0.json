@@ -11241,7 +11241,7 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "2*C(control.test.u32)+2*C(control.branch)",
-        "note": "Player-relative translation of an exact RBA terminal value only."
+        "note": "Player-relative translation of exact RBA terminal/TT values."
       },
       "status": "decomposed"
     },
@@ -11271,7 +11271,219 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "2*C(control.test.u32)+2*C(control.branch)+C(alu.add.u32)+C(alu.sub.u32)",
-        "note": "Converts the final relative Negamax value to the existing absolute 1/2/3 host wire format; it is not an evaluator."
+        "note": "Converts exact relative Negamax results to the existing absolute 1/2/3 cache/result wire format."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#localKeyMatches",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "localKeyMatches",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+C(alu.imul.u32)+A*C(alu.add.u32)+T*C(control.test.u32)+B*C(control.branch)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)",
+        "parameters": {
+          "F": "Worker-local TT geometry/table field reads.",
+          "L": "Local-key and current-state u32 reads.",
+          "A": "Key offsets and loop increments.",
+          "T": "Compact-profile and key-equality predicates.",
+          "B": "Compact/full-key control selections and mismatch returns.",
+          "C": "1 for compact 7x6 identity, otherwise 0."
+        },
+        "note": "Lossless local exact-TT identity check; no semantic evaluation."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#storeLocalExact",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "storeLocalExact",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+C(memory.store.u8)+C(alu.imul.u32)+A*C(alu.add.u32)+T*C(control.test.u32)+B*C(control.branch)+C*CALL(compactSupportProfile8)+C*CALL(compactTailProfile8)",
+        "parameters": {
+          "F": "Local TT/profile field reads.",
+          "L": "Current-state words read while publishing exact identity.",
+          "S": "Local exact-key words written.",
+          "A": "Key offsets and loop increments.",
+          "T": "Compact-profile/loop predicates.",
+          "B": "Compact/full-key control selections.",
+          "C": "1 for compact 7x6 identity, otherwise 0."
+        },
+        "note": "Worker-private exact-TT publication only."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#probeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "probeExact",
+      "scope": "lazy-smp-tt-probe",
+      "operations": [
+        {
+          "op": "memory.load.u8",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "K",
+          "target": "localKeyMatches"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "probeConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "storeLocalExact"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalExact)",
+        "parameters": {
+          "T": "Local-value, identity, sampling and shared-hit predicates.",
+          "B": "Early local-hit/shared-hit and sampling control selections.",
+          "K": "1 when a local slot is populated, otherwise 0.",
+          "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0."
+        },
+        "note": "Local-first exact TT probe with sampled shared fallback; shared hits are promoted locally."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker.mjs#storeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker.mjs",
+      "name": "storeExact",
+      "scope": "lazy-smp-tt-store",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeLocalExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeConnect4RbaSharedExactCache32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalExact)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "parameters": {
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
+        },
+        "note": "Publishes only already-proved exact values to local and sampled shared TTs."
       },
       "status": "decomposed"
     },
@@ -11302,6 +11514,10 @@
           "count": "ADD"
         },
         {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
           "op": "alu.xor.u32",
           "count": "XOR"
         },
@@ -11319,6 +11535,16 @@
         },
         {
           "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "probeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
           "count": "A",
           "target": "connect4RbaCofactorKnownHeight"
         },
@@ -11331,29 +11557,43 @@
           "op": "runtime.call.subledger",
           "count": "R",
           "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "storeExact"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(negamax)",
+        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeExact)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
         "parameters": {
-          "F": "Geometry and array property reads executed by this invocation outside subledgers.",
-          "L": "Typed-array reads for action order, support heights and child basis size.",
-          "MUL": "Depth/stride and action-order index multiplications executed by this invocation.",
-          "ADD": "Index increments, offsets and local arithmetic executed by this invocation.",
+          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "L": "Action-order, support-height and child-size reads.",
+          "MUL": "Depth/arena and action-order index multiplications.",
+          "ADD": "Offsets, loop increments and node/cutoff counters.",
+          "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Stop, loop, legality, terminal, cancellation, best-value and cutoff predicates.",
+          "TEST": "Stop, cache, loop, legality, terminal, cancellation, best, cutoff and exact-publication predicates.",
           "BRANCH": "Executed source control selections and early returns.",
+          "H": "1 for non-root nodes, otherwise 0.",
+          "P": "1 for non-root nodes, otherwise 0.",
           "A": "Legal actions whose RBA cofactors are constructed.",
-          "T": "Terminal child actions translated directly.",
-          "R": "Nonterminal child actions recursively searched."
+          "T": "Terminal child actions plus exact cache hits translated player-relatively.",
+          "R": "Nonterminal child actions recursively searched.",
+          "X": "1 only for non-root full-window nodes whose result is exact and is published to the TTs, otherwise 0."
         },
-        "note": "Exact RBA Negamax/alpha-beta shell only. No CPC, NDC, live-line evaluator, heuristic evaluation, restriction mask or W/D/L interval layer is called."
+        "note": "Exact RBA Negamax/alpha-beta with local-first and sampled shared exact TT. No CPC, NDC, evaluator, heuristic score, restriction mask or interval layer."
       },
       "status": "decomposed"
     },
@@ -11373,7 +11613,7 @@
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": 4
+          "count": 6
         },
         {
           "op": "runtime.field.load",
@@ -11385,7 +11625,7 @@
         },
         {
           "op": "memory.store.f64",
-          "count": 2
+          "count": 3
         },
         {
           "op": "alu.imul.u32",
@@ -11394,6 +11634,14 @@
         {
           "op": "alu.add.u32",
           "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
         },
         {
           "op": "control.test.u32",
@@ -11422,6 +11670,16 @@
         },
         {
           "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
           "count": "T",
           "target": "relativeTerminal"
         },
@@ -11439,14 +11697,14 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+4*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+2*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+3*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+C(alu.and.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
         "parameters": {
-          "F": "Worker-data, geometry, root and result-field reads outside helper subledgers.",
-          "S": "Root key/basis publication and basis-size/result-index state stores expressed as typed u32 stores.",
-          "MUL": "Worker/result/metric and RBA arena stride multiplications.",
+          "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers.",
+          "S": "Root key/basis publication and initial basis-size stores.",
+          "MUL": "Worker/result/metric, arena and local-TT allocation multiplications.",
           "ADD": "Arena sizing, offsets and result indices.",
           "TEST": "Root terminal, cancellation, move/reflection and winner predicates.",
           "BRANCH": "Executed module-level control selections.",
@@ -11454,14 +11712,14 @@
           "N": "1 for a nonterminal root, otherwise 0.",
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0."
         },
-        "note": "Minimal production worker: exact RBA Negamax plus result publication. CPC and evaluation hooks are intentionally absent."
+        "note": "Minimal production worker: exact RBA Negamax, local/shared exact TT, and result publication. CPC and evaluation hooks are intentionally absent."
       },
       "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 181,
-    "decomposed": 181,
+    "units": 185,
+    "decomposed": 185,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11573,7 +11831,7 @@
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
     "addons/rba-connect4-lazy-smp-host.mjs": "088eec3d2539982bdc7acb3f4d4537df60486c20",
-    "addons/rba-connect4-lazy-smp-worker.mjs": "2d9cccc1e999f64dad8505ef33664692020d532a",
+    "addons/rba-connect4-lazy-smp-worker.mjs": "11db2acefd443f624e1e5344e62d37232be2db97",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
     "addons/rba-connect4-alphabeta-behavior.mjs": "3055d703a37be032dbf627b8f7f5c0b43eb0550d",
