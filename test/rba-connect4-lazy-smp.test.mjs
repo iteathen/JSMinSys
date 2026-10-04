@@ -86,7 +86,12 @@ test('Lazy SMP is a separate 2+ worker exact execution option',async()=>{
     });
   assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
   assert.equal(lazy.rootWdl,serial.value-2);
-  assert.equal(lazy.move,serial.move);
+  const child=connect4RbaFromMoves([...moves,lazy.move],{geometry:g});
+  const childResult=solveConnect4RbaAlphaBeta(child,{
+    state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:4096}),
+    reflected:child.reflected,
+  });
+  assert.equal(childResult.value,serial.value,'diversified winner must still publish an optimal move');
   assert.equal(lazy.cleanup,true);
   assert.equal(lazy.workersExited,2);
   assert.equal(lazy.workersUsed,2);
@@ -126,7 +131,12 @@ test('Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position',async
     });
   assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
   assert.equal(lazy.rootWdl,serial.value-2);
-  assert.equal(lazy.move,serial.move);
+  const child=connect4RbaFromMoves([...moves,lazy.move],{geometry:g});
+  const childResult=solveConnect4RbaAlphaBeta(child,{
+    state:prepareConnect4RbaAlphaBeta({geometry:g,mode:RBA_AB_CPC_ONLY,cacheCapacity:65536}),
+    reflected:child.reflected,
+  });
+  assert.equal(childResult.value,serial.value,'diversified winner must still publish an optimal move');
   assert.equal(lazy.cleanup,true);
   assert.ok(lazy.sharedCacheStores>0);
 });
