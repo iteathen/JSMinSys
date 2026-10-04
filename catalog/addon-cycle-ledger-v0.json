@@ -11515,19 +11515,29 @@
           "op": "runtime.call.subledger",
           "count": "P",
           "target": "storeLocalEntry"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "E",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "E"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalEntry)",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalEntry)+E*CALL(relativeTerminal)+E*C(alu.add.u32)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
           "K": "1 when a local slot is populated, otherwise 0.",
           "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
-          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0."
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0.",
+          "E": "1 when shared exact fallback hits and absolute shared value is converted once to worker-local relative exact code, otherwise 0."
         },
-        "note": "Local-first TT probe. Local entries may be exact or local-only WDL bounds; shared fallback remains exact-only and shared hits are promoted locally."
+        "note": "Local exact tags are player-relative. Local hits require no absolute/relative conversion; shared exact hits cross the boundary once and are promoted as relative local tags."
       },
       "status": "decomposed"
     },
@@ -11558,15 +11568,24 @@
           "op": "runtime.call.subledger",
           "count": "S",
           "target": "storeConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCache32)+C(alu.add.u32)+S*CALL(relativeToAbsolute)",
         "parameters": {
-          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
+          "S": "1 when the full-window exact is admitted to shared publication; shared crossing converts relative value to absolute 1/2/3."
         },
-        "note": "Publishes only already-proved exact values to local and sampled shared TTs."
+        "note": "Stores worker-local exact as relative+2. Only the shared publication boundary converts to absolute 1/2/3."
       },
       "status": "decomposed"
     },
@@ -11578,7 +11597,7 @@
       "operations": [
         {
           "op": "atomic.load.u32",
-          "count": "P"
+          "count": "SP"
         },
         {
           "op": "runtime.field.load",
@@ -11619,7 +11638,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "P",
+          "count": "H",
           "target": "probeCache"
         },
         {
@@ -11636,11 +11655,6 @@
           "op": "runtime.call.subledger",
           "count": "R",
           "target": "negamax"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "X",
-          "target": "relativeToAbsolute"
         },
         {
           "op": "runtime.call.subledger",
@@ -11666,7 +11680,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "P*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11679,16 +11693,16 @@
           "SUB": "Negamax sign/window negations represented at source-operation level.",
           "TEST": "Cache, loop, legality, terminal, best, cutoff and exact-publication predicates; recursive stop polling is eliminated.",
           "BRANCH": "Executed source control selections and early returns.",
-          "H": "1 for non-root nodes, otherwise 0.",
-          "P": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "H": "1 for non-root nodes: q hash and local/shared TT probe execute; 0 at root.",
           "A": "Legal actions whose RBA cofactors are constructed.",
-          "T": "Terminal child actions plus exact cache hits translated player-relatively.",
+          "T": "Terminal child actions translated from absolute RBA terminal code to player-relative value.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
-          "X": "Globally exact full-window non-root results published to the local and sampled shared exact TTs.",
+          "X": "Globally exact full-window non-root results passed as player-relative values to storeExact; shared conversion is owned by that boundary.",
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
-          "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
+          "LX": "Globally exact narrow-window results stored directly as player-relative local tags.",
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0."
         },
-        "note": "MW-013 scalar-hoist experiment removed after four-worker regression; stable geometry object fields are consumed directly again."
+        "note": "MW-014 candidate: worker-local exact tags are player-relative; local hits and local-only exact stores avoid absolute/relative conversion. Shared and root boundaries retain absolute 1/2/3."
       },
       "status": "decomposed"
     },
@@ -11991,7 +12005,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "3efcb38e65018fcfb74b2cf10a4248b847f7efef"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "01567f86430e646bcd0e7d29dfe27c75dfbc3aac"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
