@@ -11663,13 +11663,13 @@
         {
           "op": "runtime.call.subledger",
           "count": "LX",
-          "target": "storeNarrowExact"
+          "target": "storeLocalEntry"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeNarrowExact)",
+        "activeCycleExpression": "C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+AND*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+P*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11690,9 +11690,9 @@
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
           "X": "Globally exact full-window non-root results published to the local and sampled shared exact TTs.",
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
-          "LX": "Globally exact narrow-window results retained locally and selectively shared by the prepared worker/hash partition."
+          "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Exact canonical-RBA Negamax/alpha-beta with local zero-threshold bounds. Full-window exacts share normally; narrow-window exacts use one eligible publisher per hash partition on power-of-two worker counts. Non-exact bounds remain local."
+        "note": "Exact canonical-RBA Negamax/alpha-beta with local zero-threshold bounds. Full-window exacts share normally; narrow-window exacts and non-exact bounds remain local."
       },
       "status": "decomposed"
     },
@@ -11872,53 +11872,11 @@
         "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT."
       },
       "status": "decomposed"
-    },
-    {
-      "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeNarrowExact",
-      "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
-      "name": "storeNarrowExact",
-      "scope": "lazy-smp-tt-store",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "count": 1,
-          "target": "storeLocalEntry"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "1+P"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "T"
-        },
-        {
-          "op": "control.branch",
-          "count": "B"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "CALL(storeLocalEntry)+(1+P)*C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+S*CALL(storeConnect4RbaSharedExactCache32)",
-        "parameters": {
-          "P": "1 on prepared power-of-two worker-count execution, otherwise 0.",
-          "T": "Shared-density and prepared publisher-eligibility predicates.",
-          "B": "Short-circuit branches controlling narrow exact shared publication.",
-          "S": "1 only when the current worker owns this q's narrow-proof publication partition and the shared sampling mask admits it."
-        },
-        "note": "Stores every narrow-window exact locally. Reuses the already-computed q hash to select one eligible shared publisher on power-of-two worker counts; no extra hash or modulo."
-      },
-      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 188,
-    "decomposed": 188,
+    "units": 187,
+    "decomposed": 187,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -12045,7 +12003,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "2f71f949affb7dd69050062e2d122e3c8ddb36ff"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "9861550bdd8680dc61273c35042d8f24c380d886"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
