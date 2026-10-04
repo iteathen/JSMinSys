@@ -6791,11 +6791,11 @@
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": 3
+          "count": "2+M"
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": 3
+          "count": "2+M"
         },
         {
           "op": "runtime.array.allocate",
@@ -6819,7 +6819,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "30*E"
+          "count": "30*E*M"
         },
         {
           "op": "runtime.object.allocate",
@@ -6916,7 +6916,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+3*C(memory.allocate.shared.bytes)+3*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6930,9 +6930,10 @@
           "HOST_SELECTION": "Memory length/index checks, cold URL selection and shared-byte accounting",
           "RF": "1 when rootFrontier selected; 0 otherwise",
           "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive",
-          "WORKER_MODE": "Cold selector: legacy (default) or minimal; minimal rejects legacy-only Behavior/CPC/Root-Frontier options."
+          "WORKER_MODE": "Cold selector: legacy (default) or minimal; minimal rejects legacy-only Behavior/CPC/Root-Frontier options.",
+          "M": "1 for legacy/behavior/frontier modes that allocate winner metrics; 0 for minimal mode."
         },
-        "note": "Cold Lazy-SMP host selects explicit legacy or minimal workers. Legacy remains the default and retains CPC/NDC alpha-beta plus Behavior/Root-Frontier compatibility; minimal selects canonical-RBA exact Negamax with no CPC/NDC/evaluator. Shared exact cache ownership and 2+ worker policy are unchanged."
+        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract."
       },
       "status": "decomposed"
     },
@@ -11677,7 +11678,7 @@
           "F": "Geometry and worker-local state field reads outside subledgers.",
           "L": "Center-order, support-height and child-size reads.",
           "MUL": "Depth/arena multiplications.",
-          "ADD": "Offsets, loop increments and node/cutoff counters.",
+          "ADD": "Arena offsets, loop increments and alpha/beta arithmetic; production minimal diagnostics no longer add node/cutoff/cache-hit counter dependencies.",
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
@@ -11692,7 +11693,7 @@
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
           "LX": "Globally exact narrow-window results retained worker-locally instead of automatically published to the shared TT."
         },
-        "note": "Exact canonical-RBA Negamax/alpha-beta with local zero-threshold bounds. Full-window exacts share normally; narrow-window exacts and non-exact bounds remain local."
+        "note": "Production minimal E0 contains no diagnostic node/cutoff/cache-hit counters. Exact canonical-RBA Negamax/alpha-beta retains local zero-threshold bounds, shares full-window exacts, and keeps narrow-window exacts local."
       },
       "status": "decomposed"
     },
@@ -11707,10 +11708,6 @@
           "count": 1
         },
         {
-          "op": "runtime.typed_view.construct",
-          "count": 1
-        },
-        {
           "op": "runtime.typed_array.allocate",
           "count": 6
         },
@@ -11721,10 +11718,6 @@
         {
           "op": "memory.store.u32",
           "count": "S"
-        },
-        {
-          "op": "memory.store.f64",
-          "count": 3
         },
         {
           "op": "alu.imul.u32",
@@ -11805,15 +11798,15 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+C(runtime.typed_view.construct)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+3*C(memory.store.f64)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
         "parameters": {
           "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers.",
           "S": "Root key/basis publication, center-order construction and initial basis-size stores.",
-          "MUL": "Worker/result/metric, arena and local-TT allocation multiplications.",
-          "ADD": "Arena sizing, center-shell ordering indices, offsets and result indices.",
+          "MUL": "Worker/result, arena and local-TT allocation multiplications; no metric-base multiplication in minimal mode.",
+          "ADD": "Arena sizing, center-shell ordering indices and result indices.",
           "TEST": "Center-shell construction, root terminal, cancellation, move/reflection and winner predicates.",
           "BRANCH": "Center-shell tie-direction construction and executed module-level control selections.",
           "T": "1 for a terminal root, otherwise 0.",
@@ -11821,7 +11814,7 @@
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
           "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell."
         },
-        "note": "Minimal production worker setup prepares canonical RBA scratch, local/shared TT state, center-distance order, and a cold narrow-proof sharing partition. No per-node modulo or worker-count computation is introduced."
+        "note": "Metric-free minimal worker setup and completion. No metric view is constructed and no floating-point diagnostic stores occur in the production minimal path."
       },
       "status": "decomposed"
     },
@@ -11987,7 +11980,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
-    "addons/rba-connect4-lazy-smp-host.mjs": "99912d6015d5af8b55f0002afb9a21dde7514706",
+    "addons/rba-connect4-lazy-smp-host.mjs": "b5268c319e2d1745cc698037ea581a1dfcf23745",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -12003,7 +11996,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "9861550bdd8680dc61273c35042d8f24c380d886"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "733990b41a228994a5bde849ed9dcab4b4bf78aa"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
