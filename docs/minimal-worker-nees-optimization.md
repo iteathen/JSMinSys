@@ -364,6 +364,20 @@ The short 4x4-empty control regressed 2.7%, while 4x4-mid was flat. All 96 solve
 
 **Development disposition:** RETAIN pending target-hardware qualification. The mechanism removes three repeated E0 dependency chains and a minimal-mode shared metric buffer; the target i5 process-cycle/full-solve measurement remains authoritative.
 
+## MW-006 — carry arena offsets through the recurrence
+
+**Candidate cost:** each visited node derived `src = depth * keyWords` and `basisOffset = depth * maxBasis`.
+
+**Causal role:** STANDALONE arithmetic inside the recurrence, subject to V8 register/argument effects.
+
+**Mechanism:** `negamax` now receives the already-known key/basis offsets from its parent and passes `dst`/`childBasis` directly to the child. This removes two depth-derived multiplications from every visited node.
+
+**Admission:** parent execution already computes the exact child offsets, so re-deriving them from depth is duplicate work.
+
+**Falsifier:** extra recurrence arguments may increase register pressure, stack traffic, call-frame cost, or inhibit optimization. Reject unless complete solve time/process cycles improve on the target; GitHub same-runner timing is development evidence only.
+
+**Disposition:** ACTIVE EXPERIMENT.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
