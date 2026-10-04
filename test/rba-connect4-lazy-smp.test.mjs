@@ -1,6 +1,7 @@
 import test from 'node:test';
+import {Worker} from 'node:worker_threads';
 import assert from 'node:assert/strict';
-import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
+import {prepareConnect4RbaGeometry,shareConnect4RbaGeometry32} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {
   prepareConnect4RbaAlphaBeta,
@@ -168,4 +169,36 @@ test('Lazy SMP move ordering is center-line distance only',async()=>{
   assert.equal(lazy.status,'EXACT',JSON.stringify(lazy));
   assert.equal(lazy.rootWdl,0);
   assert.equal(lazy.move,1,'worker must ignore geometry actionOrder and choose minimum center-line distance');
+});
+
+
+test('Lazy SMP workers diversify only equal center-distance ties',async()=>{
+  const g=prepareConnect4RbaGeometry({columns:4,rows:1}),
+    root=connect4RbaFromMoves([],{geometry:g,positionCode:false}),
+    geometry=shareConnect4RbaGeometry32(g);
+
+  async function run(workerIndex){
+    const workers=2,
+      control=new Int32Array(new SharedArrayBuffer(5*Int32Array.BYTES_PER_ELEMENT)),
+      resultWords=new Int32Array(new SharedArrayBuffer(workers*4*Int32Array.BYTES_PER_ELEMENT)),
+      metricBuffer=new SharedArrayBuffer(workers*15*Float64Array.BYTES_PER_ELEMENT),
+      sharedExactCache=createConnect4RbaSharedExactCache32({capacity:64,keyWords:g.keyWords,geometry:g});
+    control[4]=-1;
+    const worker=new Worker(new URL('../addons/rba-connect4-lazy-smp-worker.mjs',import.meta.url),{
+      workerData:{
+        control,resultWords,metricBuffer,workerIndex,workerCount:workers,
+        geometry,root,rootReflected:root.reflected,sharedExactCache,
+        localCacheCapacity:64,sharedSampleMask:0,
+      },
+    });
+    await new Promise((resolve,reject)=>{
+      worker.once('error',reject);
+      worker.once('exit',code=>code===0?resolve():reject(new Error('worker exit '+code)));
+    });
+    assert.equal(resultWords[workerIndex*4],2);
+    return resultWords[workerIndex*4+2];
+  }
+
+  assert.equal(await run(0),1);
+  assert.equal(await run(1),2);
 });
