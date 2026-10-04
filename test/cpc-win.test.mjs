@@ -54,7 +54,7 @@ test('CPC does not promote a proved no-win bound into a win',()=>{
 
 test('Negamax consumes CPC win closure as a player-relative exact win',()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6});
-  const q=connect4RbaFromMoves(moves('24447434'),{geometry:g});
+  const q=connect4RbaFromMoves(moves('2444743'),{geometry:g});
   const state=prepareConnect4RbaAlphaBeta({
     geometry:g,
     mode:RBA_AB_CPC_ONLY,
