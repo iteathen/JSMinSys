@@ -239,6 +239,42 @@ Across the broad matrix, shared-store counts are frequently one to two orders of
 
 **Falsifier:** reject the refinement if loss of cross-worker extreme-value reuse increases complete solve time or duplicate search enough to outweigh lower shared publication/coherence cost on the 2w/4w qualification surface.
 
+## MW-001B development evidence — narrow exacts local
+
+MW-001B kept globally exact narrow-window results worker-local and reserved automatic shared publication for full W/D/L-window results.
+
+Same-VM three-way development check (exact-only baseline vs MW-001A vs MW-001B), 2w/4w:
+
+| Workers | Baseline mean | MW-001A mean | MW-001B mean | B vs A | B vs baseline |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2 | 38.521 ms | 25.320 ms | 24.505 ms | **-3.2%** | **-36.4%** |
+| 4 | 54.220 ms | 34.228 ms | 32.857 ms | **-4.0%** | **-39.4%** |
+
+Mean shared stores fell:
+
+- 2w: 728.1 -> 9.4 (**-98.7%**) from MW-001A to MW-001B;
+- 4w: 959.2 -> 12.6 (**-98.7%**).
+
+All 72 solves remained exact with no W/D/L disagreement.
+
+This establishes that unconditional shared publication of narrow-window exacts was a known avoidable cost on the tested composite: it produced large atomic/coherence traffic without lowering the governing-unit mean.
+
+However, MW-001B is **not yet promotable as the final sharing policy**. The targeted 4-worker 7x6-B control regressed about **19.4%** against the exact-only baseline even though the aggregate improved. This is evidence that some cross-worker narrow-proof reuse is load-bearing for at least one search shape.
+
+### MW-001C — selective narrow-proof sharing
+
+**Candidate cost:** the all-or-nothing choice between publishing every narrow-window exact and publishing none.
+
+**Causal role:** COUPLED to Lazy-SMP diversification and shared-TT reuse.
+
+**Disposition:** UNVERIFIED-DEBT; next experiment.
+
+**Candidate mechanism:** retain every narrow-window exact locally, but admit a bounded deterministic subset to the shared exact TT (for example, a designated publisher worker or a separately qualified hash-sampling policy). Full-window exact publication remains unchanged.
+
+**Admission:** MW-001A proves that narrow-proof sharing can reduce duplicated search, while MW-001B proves that sharing all such proofs creates excessive atomic/coherence work. A bounded selective policy is admitted only if it preserves the large local-bound subtree reduction while recovering the 4-worker regression without reintroducing the shared-store explosion.
+
+**Falsifier:** reject any selector whose complete-solve performance fails to beat the better of MW-001A/MW-001B on the regression surface, or whose benefit depends only on a proxy counter rather than governing-unit elapsed cost.
+
 ## Qualification boundary for the first optimization unit
 
 The first coherent unit will not be promoted from node counts alone. Before closure it must include:
