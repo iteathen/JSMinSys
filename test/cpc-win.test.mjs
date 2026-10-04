@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
+import {prepareConnect4RbaAlphaBeta,solveConnect4RbaAlphaBeta,RBA_AB_CPC_ONLY} from '../addons/rba-connect4-alphabeta.mjs';
 import * as cpc from '../addons/cpc-connect4.mjs';
 const {evaluateConnect4CpcWin32}=cpc;
 
@@ -49,4 +50,17 @@ test('CPC does not promote a proved no-win bound into a win',()=>{
     evaluateConnect4CpcWin32(g,q.words,0,q.basis,0,q.basis.length,1),
     0,
   );
+});
+
+test('Negamax consumes CPC win closure as a player-relative exact win',()=>{
+  const g=prepareConnect4RbaGeometry({columns:7,rows:6});
+  const q=connect4RbaFromMoves(moves('24447434'),{geometry:g});
+  const state=prepareConnect4RbaAlphaBeta({
+    geometry:g,
+    mode:RBA_AB_CPC_ONLY,
+    cacheCapacity:65536,
+  });
+  const result=solveConnect4RbaAlphaBeta(q,{state,reflected:q.reflected});
+  assert.equal(result.value,1);
+  assert.ok(result.metrics.cpcWins>0,result.metrics);
 });
