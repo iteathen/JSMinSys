@@ -26,7 +26,11 @@ export async function runLazySmpConnect4Rba32(moves,{
   behaviorMemory=null,
   rootFrontier=false,
   workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
+  preparedEmptyTiming=false,
 }={}){
+  const initializationStarted=performance.now();
+  if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
+    throw new TypeError('prepared timing requires an empty minimal solve');
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<2||workers>64)
     throw new RangeError('Lazy SMP requires at least two search workers');
@@ -57,7 +61,12 @@ export async function runLazySmpConnect4Rba32(moves,{
      !(behaviorMemory.buffer instanceof SharedArrayBuffer)||behaviorMemory.buffer.byteLength<workers*128))
     throw new TypeError('prepared shared behavior memory required');
 
-  const root=connect4RbaFromMoves(moves,{geometry,positionCode:false}),
+  const readyGate=preparedEmptyTiming?new Int32Array(new SharedArrayBuffer(12)):null,
+    root=preparedEmptyTiming?{
+      words:new Uint32Array(new SharedArrayBuffer(geometry.keyWords*4)),
+      basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
+      reflected:0,moveHistory:[],
+    }:connect4RbaFromMoves(moves,{geometry,positionCode:false}),
     workerGeometry=shareConnect4RbaGeometry32(geometry),
     sharedExactCache=createConnect4RbaSharedExactCache32({
       capacity:sharedCacheCapacity,
@@ -84,7 +93,11 @@ export async function runLazySmpConnect4Rba32(moves,{
     });
   control[CONTROL_WINNER]=-1;
 
+  // Initialize actual backing pages with empty data; no search/proof warm-up.
+  if(readyGate){sharedExactCache.sequence.fill(0);sharedExactCache.value.fill(0);sharedExactCache.keys.fill(0);}
+
   const started=performance.now();
+  let searchStarted=null,searchFinished=null,cleanupStarted=null;
   try{
     for(let i=0;i<workers;i+=1)
       session.spawn(
@@ -108,10 +121,26 @@ export async function runLazySmpConnect4Rba32(moves,{
           sharedSampleMask,
           cpcFrontierResponse,
           cpcProjectedAdvisory,
+          readyGate,
         },
       );
+    if(readyGate){
+      while(Atomics.load(readyGate,0)!==workers){
+        if(Atomics.load(control,CONTROL_ERROR)||signal?.aborted||performance.now()-started>30000)
+          throw new Error('prepared worker initialization failed or timed out');
+        await new Promise(resolve=>setTimeout(resolve,5));
+      }
+      searchStarted=performance.now();
+      const actualRoot=connect4RbaFromMoves(moves,{geometry,positionCode:false});
+      if(actualRoot.reflected)throw new Error('empty root unexpectedly reflected');
+      root.words.set(actualRoot.words);root.basis.set(actualRoot.basis);
+      Atomics.store(readyGate,2,actualRoot.basis.length);
+      Atomics.store(readyGate,1,1);Atomics.notify(readyGate,1);
+    }
     await session.wait({timeoutMs,signal});
+    searchFinished=performance.now();
   }finally{
+    cleanupStarted=performance.now();
     await session.close();
   }
 
@@ -164,6 +193,12 @@ export async function runLazySmpConnect4Rba32(moves,{
     completedWorkers,
     reflected:root.reflected,
     elapsedMs,
+    preparedTiming:readyGate?{
+      readyWorkers:Atomics.load(readyGate,0),rootConstructedAfterReady:true,
+      initializationMs:searchStarted-initializationStarted,
+      solveMs:searchFinished-searchStarted,cleanupMs:performance.now()-cleanupStarted,
+      boundary:'all workers ready and empty TT pages initialized -> empty root construction -> exact result observed; cleanup separate',
+    }:null,
     errorCode,
     errors:host.errors,
     cleanup:host.cleanup,

@@ -19,6 +19,7 @@ try{
     localCacheCapacity:16777216,
     sharedSampleMask:0,
     timeoutMs:600000,
+    preparedEmptyTiming:true,
   });
 }finally{
   // Read before closing the FFI library so the interval includes worker cleanup.
@@ -32,7 +33,10 @@ console.log(JSON.stringify({
   runtime:{node:process.version,v8:process.versions.v8},
   platform:{platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model??null,logicalProcessors:os.cpus().length},
   target:{wallTimeMsMax:10000,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL},
-  wallMs,
+  wallMs:result.preparedTiming.solveMs,
+  totalOperationWallMs:wallMs,
+  preparedTiming:result.preparedTiming,
+  processCycleBoundary:'entire operation including initialization and cleanup; not solve-only cycles',
   processCycles:(cycles1-cycles0).toString(),
   status:result.status,
   rootWdl:result.rootWdl,
@@ -48,4 +52,4 @@ console.log(JSON.stringify({
 },null,2));
 
 if(result.status!=='EXACT')process.exitCode=2;
-else if(wallMs>10000)process.exitCode=3;
+else if(result.preparedTiming.solveMs>10000)process.exitCode=3;

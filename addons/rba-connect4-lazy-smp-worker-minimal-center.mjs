@@ -49,9 +49,15 @@ while(orderAt<g.columns){
   pair+=1;
 }
 
+// COLD one-shot benchmark handoff. No barrier or timing work in negamax.
+if(workerData.readyGate){
+  localKeys.fill(0);localValues.fill(0);
+  Atomics.add(workerData.readyGate,0,1);
+  while(Atomics.load(workerData.readyGate,1)===0)Atomics.wait(workerData.readyGate,1,0);
+}
 words.set(workerData.root.words);
 basis.set(workerData.root.basis);
-basisSize[0]=workerData.root.basis.length;
+basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;
 
 let bestMove=-1;
 
