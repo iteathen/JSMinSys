@@ -3,11 +3,10 @@ import {connect4RbaBasisFromSupport} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {emitSortedSetBitsAt32} from '../src/basis32.mjs';
 
-export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=false,withReflection=false,withTransitions=false){
+export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=false,withReflection=false){
   if(!Number.isSafeInteger(budgetBytes)||budgetBytes<0)throw new RangeError('invalid support-plan budget');
   if(typeof withClosures!=='boolean')throw new TypeError('invalid support closure mode');
   if(typeof withReflection!=='boolean'||(withReflection&&!withClosures))throw new TypeError('reflection plan requires closures');
-  if(typeof withTransitions!=='boolean'||(withTransitions&&!withClosures))throw new TypeError('transitions require closures');
   const radix=g.rows+1;
   let profiles=1;
   for(let c=0;c<g.columns;c++){
@@ -20,11 +19,8 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     LocalIndex=g.maxBasis<=256?Uint8Array:g.maxBasis<=65536?Uint16Array:Uint32Array,
     closureElements=withClosures?basisElements*g.coordWords:0,
     reflectionBytes=withReflection?basisElements*LocalIndex.BYTES_PER_ELEMENT+profiles*4:0,
-    TransitionIndex=g.maxBasis<=255?Uint8Array:g.maxBasis<=65535?Uint16Array:Uint32Array,
-    prefixBytes=withTransitions?(profiles+1)*4:0;
-  let transitionElements=0,
-    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes+prefixBytes;
-  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff||(withTransitions&&profiles+1>0xffffffff))return null;
+    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes;
+  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff)return null;
   const basis=new Id(new SharedArrayBuffer(basisElements*Id.BYTES_PER_ELEMENT)),
     sizes=new Size(new SharedArrayBuffer(profiles*Size.BYTES_PER_ELEMENT)),
     membership=new Uint32Array(new SharedArrayBuffer(maskElements*4)),
@@ -48,93 +44,15 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     }
     sizes[index]=emitSortedSetBitsAt32(membership,maskBase,g.shapeWordCount,basis,index*g.maxBasis);
   }
-  // Exact packed-row capacity depends on rule-derived sizes. The initial
-  // admission covers all fixed tables plus offsets. Recheck before allocating
-  // variable records; failure publishes no partial plan or lazy work.
-  const transitionOffsets=withTransitions?new Uint32Array(new SharedArrayBuffer(prefixBytes)):null;
-  if(withTransitions){
-    for(let handle=0;handle<profiles;handle++){
-      transitionElements+=sizes[handle]*g.columns*2;
-      if(!Number.isSafeInteger(transitionElements)||transitionElements>0xffffffff)return null;
-      transitionOffsets[handle+1]=transitionElements;
-    }
-    bytes+=transitionElements*TransitionIndex.BYTES_PER_ELEMENT;
-    if(!Number.isSafeInteger(bytes)||bytes>budgetBytes)return null;
-  }
   const closures=withClosures?new Uint32Array(new SharedArrayBuffer(closureElements*4)):null;
+  if(withClosures)compileSupportClosures32(g,basis,sizes,membership,closures,profiles);
   const mirrorMap=withReflection?new LocalIndex(new SharedArrayBuffer(basisElements*LocalIndex.BYTES_PER_ELEMENT)):null,
     mirrorProfiles=withReflection?new Uint32Array(new SharedArrayBuffer(profiles*4)):null;
-  const transitions=withTransitions?new TransitionIndex(new SharedArrayBuffer(transitionElements*TransitionIndex.BYTES_PER_ELEMENT)):null,
-    transitionDead=TransitionIndex.BYTES_PER_ELEMENT===1?255:TransitionIndex.BYTES_PER_ELEMENT===2?65535:0xffffffff;
-  if(withTransitions)transitions.fill(transitionDead);
-  if(withClosures)compileSupportTransforms32(g,profile,basis,sizes,membership,strides,closures,mirrorMap,mirrorProfiles,transitionOffsets,transitions,profiles,radix);
+  if(withReflection)compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix);
   // Membership is a compile-time dependency only once closure rows exist.
   // No runtime consumer needs the intermediate table in the closure kernel.
   return Object.freeze({basis,sizes,membership:withClosures?null:membership,strides,profiles,
-    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles,transitions,transitionDead,transitionOffsets});
-}
-
-// COLD: one current-child inverse serves closure, the mirrored parent's
-// permutation and every legal predecessor transition. No owners or outcomes.
-// The separate builders below remain independently executable audit references.
-export function compileSupportTransforms32(g,profile,basis,sizes,membership,strides,closures,mirrorMap,mirrorProfiles,transitionOffsets,transitions,profiles,radix){
-  const inverse=new Uint32Array(g.shapeCount),heights=new Uint32Array(g.columns),
-    offsets=g.supersetWordOffsets,words=g.supersetWords,masks=g.supersetMasks,
-    C=g.columns,M=g.maxBasis,Z=g.coordWords,S=g.shapeWordCount;
-  for(let handle=0;handle<profiles;handle++){
-    const base=handle*M,maskBase=handle*S,n=sizes[handle];
-    for(let i=0;i<n;i++)inverse[basis[base+i]]=i;
-    for(let i=0;i<n;i++){
-      const image=basis[base+i],row=(base+i)*Z;
-      closures[row+(i>>>5)]|=1<<(i&31);
-      for(let at=offsets[image],end=offsets[image+1];at<end;at++){
-        const word=words[at],shapeBase=word<<5;
-        let bits=masks[at]&membership[maskBase+word];
-        while(bits){const bit=bits&-bits,j=inverse[shapeBase+31-Math.clz32(bit)];
-          closures[row+(j>>>5)]|=1<<(j&31);bits^=bit;}
-      }
-    }
-    if(!mirrorMap&&!transitions)continue;
-    let digits=handle,mirrored=0;
-    for(let c=0;c<C;c++){
-      const height=digits%radix;digits=Math.floor(digits/radix);
-      heights[c]=height;if(mirrorMap)mirrored+=height*strides[C-1-c];
-    }
-    if(mirrorMap){
-      // Publish the MIRRORED parent row: its reflected IDs belong to this
-      // current child's basis, whose inverse was just built once above.
-      mirrorProfiles[mirrored]=handle;
-      const parentBase=mirrored*M;
-      for(let i=0;i<n;i++)mirrorMap[parentBase+i]=inverse[g.reflect[basis[parentBase+i]]];
-    }
-    if(transitions)for(let c=0;c<C;c++){
-      const height=heights[c];if(height===0)continue;
-      const parent=handle-strides[c],parentBase=parent*M,
-        row=transitionOffsets[parent]+c*sizes[parent]*2,
-        remove=profile.prepareRemove(g,(height-1)*C+c);
-      for(let i=0,pn=sizes[parent];i<pn;i++){
-        const id=basis[parentBase+i],image=profile.removePrepared(g,id,remove);
-        if(image<0||image===0xffffffff)continue;
-        transitions[row+2*i]=inverse[image];transitions[row+2*i+1]=image===id?1:0;
-      }
-    }
-  }
-}
-
-export function compileSupportTransitions32(g,profile,basis,sizes,strides,transitionOffsets,transitions,profiles,radix){
-  const inverse=new Uint32Array(g.shapeCount);
-  for(let handle=0;handle<profiles;handle++)for(let c=0;c<g.columns;c++){
-    const height=Math.floor(handle/strides[c])%radix;if(height===g.rows)continue;
-    const child=handle+strides[c],parentBase=handle*g.maxBasis,childBase=child*g.maxBasis,
-      row=transitionOffsets[handle]+c*sizes[handle]*2,remove=profile.prepareRemove(g,height*g.columns+c);
-    for(let j=0,n=sizes[child];j<n;j++)inverse[basis[childBase+j]]=j;
-    for(let i=0,n=sizes[handle];i<n;i++){
-      const id=basis[parentBase+i],image=profile.removePrepared(g,id,remove);
-      if(image<0||image===0xffffffff)continue;
-      // The child support basis contains each surviving parent residual image.
-      transitions[row+2*i]=inverse[image];transitions[row+2*i+1]=image===id?1:0;
-    }
-  }
+    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles});
 }
 
 export function compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix){
@@ -191,18 +109,6 @@ export function loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,indexO
   for(let c=0;c<g.columns;c++)index+=target[dst+c]*plan.strides[c];
   const n=plan.sizes[index],base=index*g.maxBasis;
   for(let i=0;i<n;i++){const id=plan.basis[base+i];childBasis[ci+i]=id;childIndex[id]=i;}
-  indexOut[0]=index;
-  return n;
-}
-
-// Complete transition plans supersede both removal and inverse construction.
-// Scratch ABI retained, but seen/inverse are not runtime dependencies here.
-export function loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,indexOut){
-  const plan=g.supportBasisPlans;
-  let index=0;
-  for(let c=0;c<g.columns;c++)index+=target[dst+c]*plan.strides[c];
-  const n=plan.sizes[index],base=index*g.maxBasis;
-  for(let i=0;i<n;i++)childBasis[ci+i]=plan.basis[base+i];
   indexOut[0]=index;
   return n;
 }
