@@ -10242,8 +10242,8 @@
       "status": "decomposed"
     },
     {
-      "unit": "addons/rba-connect4-alphabeta.mjs#prepareConnect4MoveOrderPacking32",
-      "source": "addons/rba-connect4-alphabeta.mjs",
+      "unit": "addons/connect4-live-line-order.mjs#prepareConnect4MoveOrderPacking32",
+      "source": "addons/connect4-live-line-order.mjs",
       "name": "prepareConnect4MoveOrderPacking32",
       "scope": "cold-move-order-packing",
       "operations": [
@@ -11684,21 +11684,45 @@
           "op": "runtime.call.subledger",
           "count": "LA",
           "target": "connect4RbaExposesOpponentWin"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*PK",
+          "target": "orderConnect4LiveLinePacked32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*(1-PK)",
+          "target": "orderConnect4LiveLineGeneral32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*LK",
+          "target": "advanceConnect4LiveLineState3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-LK)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "R"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
         "parameters": {
           "F": "Geometry and worker-local state field reads outside subledgers.",
-          "L": "Center-order, support-height and child-size reads.",
-          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006.",
-          "AND": "Local TT slot mask applications.",
-          "XOR": "Mover inversion on recursive nonterminal edges.",
+          "L": "Center-order, support-height and child-size reads. Includes move-row and optional reflection-table reads.",
+          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006. Includes carried live/order child offsets and physical landing address.",
+          "AND": "Local TT slot mask applications. Includes decoding packed move columns.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes physical/canonical orientation transport.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
           "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection.",
           "BRANCH": "Executed source control selections and early returns.",
@@ -11714,9 +11738,12 @@
           "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
           "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
           "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector.",
-          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor."
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "O": "Nodes ordering unrestricted legal moves; forced response skips sorting.",
+          "PK": "Cold-selected packed versus general move-row layout.",
+          "LK": "Cold-selected three-word versus general live-state update."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged."
       },
       "status": "decomposed"
     },
@@ -11816,17 +11843,22 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "prepareConnect4RbaCoordinateScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineOrder32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
         "parameters": {
-          "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers. Includes cold removal-table availability read.",
+          "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers. Includes cold removal-table availability read. Includes cold prepared live/order aliases.",
           "S": "Root key/basis publication, center-order construction and initial basis-size stores.",
           "MUL": "Worker/result, arena and local-TT allocation multiplications; no metric-base multiplication in minimal mode.",
           "ADD": "Arena sizing, center-shell ordering indices and result indices.",
@@ -12227,11 +12259,354 @@
         "note": "Legal nonwinning landing precondition. Only opponent singleton directly above landing, no allocations or width mask. Exact child-loss proof avoids cofactor/canonicalization/recursive probe."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#advanceConnect4LiveLineState3x32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "advanceConnect4LiveLineState3x32",
+      "scope": "live-line-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 3
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": 9
+        },
+        {
+          "op": "memory.store.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 3
+        },
+        {
+          "op": "alu.not.u32",
+          "count": 3
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "1*C(runtime.field.load)+3*C(alu.imul.u32)+1*C(alu.sub.u32)+A*C(alu.add.u32)+9*C(memory.load.u32)+6*C(memory.store.u32)+3*C(alu.and.u32)+3*C(alu.not.u32)",
+        "parameters": {
+          "A": "Index address additions in six source/destination and three through references; constant-zero additions may fold, emitted instruction counts not asserted."
+        },
+        "note": "Three-word prepared specialization recovered from the prior optimized package. Same-frame/disjoint update, no allocation/iteration/config test. Costs included in whole-solve timing."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-evaluator.mjs#evaluateConnect4LiveLineSpan32",
+      "source": "addons/connect4-live-line-evaluator.mjs",
+      "name": "evaluateConnect4LiveLineSpan32",
+      "scope": "live-line-hot",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": "2*N"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "4*N"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "N+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "N+1"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "popcount32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "2*N*C(memory.load.u32)+4*N*C(alu.add.u32)+N*C(alu.and.u32)+N+1*C(control.test.u32)+N+1*C(control.branch)+N*CALL(popcount32)",
+        "parameters": {
+          "N": "Prepared line-word count, including zero for geometries without winning lines."
+        },
+        "note": "General prepared-offset scoring counterpart to existing three-word interface."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-order.mjs#prepareConnect4LiveLineOrder32",
+      "source": "addons/connect4-live-line-order.mjs",
+      "name": "prepareConnect4LiveLineOrder32",
+      "scope": "cold-live-order",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "3+G"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*M"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "I"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineEvaluator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4MoveOrderPacking32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M*K",
+          "target": "advanceConnect4LiveLineState3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "M*(1-K)",
+          "target": "advanceConnect4LiveLineState32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+3+G*C(runtime.typed_array.allocate)+1*C(runtime.object.allocate)+2*M*C(memory.load.u32)+M*C(memory.store.u32)+A*C(alu.add.u32)+I*C(alu.imul.u32)+M*C(alu.and.u32)+T*C(control.test.u32)+T*C(control.branch)+1*CALL(prepareConnect4LiveLineEvaluator32)+1*CALL(prepareConnect4MoveOrderPacking32)+1*CALL(resetConnect4LiveLineState32)+M*K*CALL(advanceConnect4LiveLineState3x32)+M*(1-K)*CALL(advanceConnect4LiveLineState32)",
+        "parameters": {
+          "F": "Cold geometry/profile/packing/root reads.",
+          "G": "1 when unpacked fallback needs a scores arena.",
+          "M": "Actual root-history length; zero at empty board.",
+          "A": "Level/height/root-loop increments and cell address sums.",
+          "I": "Arena lengths and root cell multiplications.",
+          "T": "Cold profile selections, root replay loop and packing predicate.",
+          "K": "1 when prepared profile word count is three; selected once."
+        },
+        "note": "All geometry, scratch, kernel selection and root replay happen before recursive search. No prior solved input."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-order.mjs#orderConnect4LiveLinePacked32",
+      "source": "addons/connect4-live-line-order.mjs",
+      "name": "orderConnect4LiveLinePacked32",
+      "scope": "live-order-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SH"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SR"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "OR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*K",
+          "target": "evaluateConnect4LiveLine3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*(1-K)",
+          "target": "evaluateConnect4LiveLineSpan32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+B*C(alu.sub.u32)+M*C(alu.imul.u32)+SH*C(alu.shl.u32)+SR*C(alu.shr.u32)+OR*C(alu.or.u32)+T*C(control.test.u32)+T*C(control.branch)+N*K*CALL(evaluateConnect4LiveLine3x32)+N*(1-K)*CALL(evaluateConnect4LiveLineSpan32)",
+        "parameters": {
+          "F": "Profile/geometry/arena/score-kernel fields bound once before the action loop.",
+          "L": "Center order/support, optional reflected column and insertion-row reads.",
+          "S": "Packed entry writes or general score+column writes including shifts.",
+          "A": "Action/row/scoring address additions and increments.",
+          "B": "Insertion-position decrements.",
+          "M": "Player offset once and physical-cell/through offsets per legal action.",
+          "SH": "N score shifts for packed variant, zero for general.",
+          "SR": "Unsigned packed conversions, zero for general.",
+          "OR": "N score/column joins for packed variant, zero for general.",
+          "T": "Legal action, orientation, insertion and loop predicates.",
+          "N": "Legal landings scored.",
+          "K": "1 for three-word scoring, cold-selected; no hot profile test."
+        },
+        "note": "Stable descending current-player live-line incidence. All legal moves retained; no allocation or diagnostics. Loop invariants hoisted before the scoring loop."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-live-line-order.mjs#orderConnect4LiveLineGeneral32",
+      "source": "addons/connect4-live-line-order.mjs",
+      "name": "orderConnect4LiveLineGeneral32",
+      "scope": "live-order-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SH"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SR"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "OR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*K",
+          "target": "evaluateConnect4LiveLine3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N*(1-K)",
+          "target": "evaluateConnect4LiveLineSpan32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+S*C(memory.store.u32)+A*C(alu.add.u32)+B*C(alu.sub.u32)+M*C(alu.imul.u32)+SH*C(alu.shl.u32)+SR*C(alu.shr.u32)+OR*C(alu.or.u32)+T*C(control.test.u32)+T*C(control.branch)+N*K*CALL(evaluateConnect4LiveLine3x32)+N*(1-K)*CALL(evaluateConnect4LiveLineSpan32)",
+        "parameters": {
+          "F": "Profile/geometry/arena/score-kernel fields bound once before the action loop.",
+          "L": "Center order/support, optional reflected column and insertion-row reads.",
+          "S": "Packed entry writes or general score+column writes including shifts.",
+          "A": "Action/row/scoring address additions and increments.",
+          "B": "Insertion-position decrements.",
+          "M": "Player offset once and physical-cell/through offsets per legal action.",
+          "SH": "N score shifts for packed variant, zero for general.",
+          "SR": "Unsigned packed conversions, zero for general.",
+          "OR": "N score/column joins for packed variant, zero for general.",
+          "T": "Legal action, orientation, insertion and loop predicates.",
+          "N": "Legal landings scored.",
+          "K": "1 for three-word scoring, cold-selected; no hot profile test."
+        },
+        "note": "Stable descending current-player live-line incidence. All legal moves retained; no allocation or diagnostics. Loop invariants hoisted before the scoring loop."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 192,
-    "decomposed": 192,
+    "units": 197,
+    "decomposed": 197,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -12332,13 +12707,13 @@
   },
   "decomposedSourceBlobs": {
     "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
-    "addons/rba-connect4-alphabeta.mjs": "e1a20346f72bb09158e14681be594f7e79943b53",
+    "addons/rba-connect4-alphabeta.mjs": "a40536e47fe319625bc4ac23da7afa9a410b44b6",
     "addons/cpc-connect4.mjs": "6a0131e174a768458242f316f3d8a0c55a4be7e6",
     "addons/rba-connect4-coordinate.mjs": "60b1a31858d501772200843c84952326224af84d",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
-    "addons/connect4-live-line-evaluator.mjs": "d8cf245fd14916a17dec1bd48b4a8c8be1ae5a4c",
+    "addons/connect4-live-line-evaluator.mjs": "b9bf66a91df2a35880516404f3180af40ffa179c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
@@ -12358,8 +12733,9 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "4e0f612de551e3bf826dd6bf4b98ccae98a7f186",
-    "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "142588cf907cddd12a874f138600fbe7ff3c0b89",
+    "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
+    "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

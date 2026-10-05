@@ -1,3 +1,4 @@
+import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
 import {connect4RbaDenseCofactorKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
@@ -46,6 +47,11 @@ while(orderAt<g.columns){
   }
   pair+=1;
 }
+
+const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
+  liveWords=live.profile.stateWords,liveState=live.state,
+  liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
+  moveOrder=live.ordered,moveOrderMask=live.mask;
 
 words.set(workerData.root.words);
 basis.set(workerData.root.basis);
@@ -118,9 +124,10 @@ function storeBound(src,hash,slot,value){
   return value;
 }
 
-function negamax(depth,src,bi,n,mover,alpha,beta){
+function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){
   if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;
   const dst=src+g.keyWords,ci=bi+g.maxBasis,
+    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
     slot=depth?(hash&localMask):0;
@@ -156,10 +163,10 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     return -1;
   }
 
-  const actionCount=forced>=0?1:g.columns;
+  const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);
   let best=-2;
   for(let oi=0;oi<actionCount;oi+=1){
-    const column=forced>=0?forced:centerOrder[oi],
+    const column=forced>=0?forced:(moveOrder[orderRow+oi]&moveOrderMask),
       height=words[src+column];
     if(height>=g.rows)continue;
 
@@ -172,9 +179,11 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     let value;
     if(term)value=relativeTerminal(term,mover);
     else{
-      const childN=basisSize[depth+1];
-      connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
-      value=negamax(depth+1,dst,ci,childN,mover^1,-beta,-alpha);
+      const childN=basisSize[depth+1],
+        childReflected=connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord),
+        physicalColumn=orientation?g.mirrorColumn[column]:column;
+      advanceLive(liveProfile,liveState,liveOffset,mover,height*g.columns+physicalColumn,liveState,childLiveOffset);
+      value=negamax(depth+1,dst,ci,childN,mover^1,orientation^childReflected,childLiveOffset,childOrderRow,-beta,-alpha);
       if(value===CANCELLED)return CANCELLED;
       value=-value;
     }
@@ -209,7 +218,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
 }
 
 const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3,
-  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,-2,2);
+  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,workerData.rootReflected,0,0,-2,2);
 
 if(relative!==CANCELLED){
   const resultBase=index*RESULT_STRIDE,

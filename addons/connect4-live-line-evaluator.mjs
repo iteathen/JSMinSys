@@ -14,7 +14,7 @@ export function prepareConnect4LiveLineEvaluator32(g){
      !Number.isSafeInteger(g.columns)||g.columns<1||
      !Number.isSafeInteger(g.rows)||g.rows<1||
      !Number.isSafeInteger(g.cellCount)||g.cellCount<1||
-     !Number.isSafeInteger(g.lineCount)||g.lineCount<1||
+     !Number.isSafeInteger(g.lineCount)||g.lineCount<0||
      !(g.lineColumn instanceof Uint32Array)||
      !(g.lineRow instanceof Uint32Array))
     throw new TypeError('prepared Connect4 geometry required');
@@ -100,4 +100,23 @@ export function evaluateConnect4LiveLine3x32(
     state[playerOffset+1]&through[throughOffset+1],
     state[playerOffset+2]&through[throughOffset+2],
   );
+}
+
+// Prepared three-word specialization; select once at initialization.
+export function advanceConnect4LiveLineState3x32(profile,source,sourceOffset,mover,cell,target,targetOffset){
+  const through=profile.through,throughBase=cell*3,ownBase=mover*3,blockedBase=(1-mover)*3;
+  target[targetOffset+ownBase+0]=source[sourceOffset+ownBase+0];
+  target[targetOffset+blockedBase+0]=source[sourceOffset+blockedBase+0]&~through[throughBase+0];
+  target[targetOffset+ownBase+1]=source[sourceOffset+ownBase+1];
+  target[targetOffset+blockedBase+1]=source[sourceOffset+blockedBase+1]&~through[throughBase+1];
+  target[targetOffset+ownBase+2]=source[sourceOffset+ownBase+2];
+  target[targetOffset+blockedBase+2]=source[sourceOffset+blockedBase+2]&~through[throughBase+2];
+  return target;
+}
+
+// General counterpart to the prepared-offset three-word scoring interface.
+export function evaluateConnect4LiveLineSpan32(through,throughOffset,state,playerOffset,wordCount){
+  let score=0;
+  for(let w=0;w<wordCount;w+=1)score+=popcount32(state[playerOffset+w]&through[throughOffset+w]);
+  return score;
 }

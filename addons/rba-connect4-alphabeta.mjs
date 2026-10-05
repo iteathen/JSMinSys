@@ -1,3 +1,4 @@
+import {prepareConnect4MoveOrderPacking32} from './connect4-live-line-order.mjs';
 import {mixSpan32Locator32,publishSpan32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
@@ -13,13 +14,6 @@ export const RBA_AB_CPC_FOUR_FRONT=1;
 const MOVE_SCORE_NONE=-2147483648;
 const RBA_CACHE_LOWER0=4,RBA_CACHE_UPPER0=5;
 
-function prepareConnect4MoveOrderPacking32(columns,lineCount){
-  let shift=0,stride=1;
-  while(stride<columns&&shift<31){stride*=2;shift+=1;}
-  return shift<31&&lineCount<=(0xffffffff>>>shift)
-    ?{shift,mask:stride-1}
-    :{shift:-1,mask:0xffffffff};
-}
 
 export function createConnect4RbaExactCache32({capacity=65536,keyWords,geometry=null}={}){
   if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
