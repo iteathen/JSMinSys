@@ -297,7 +297,7 @@ test('minimal timeout is host-terminated without recursive polling',async()=>{
   assert.equal(result.workersExited,2);
 });
 
-test('minimal abort is host-terminated without recursive polling',async()=>{
+test('pre-aborted minimal call allocates no workers',async()=>{
   const g=prepareConnect4RbaGeometry({columns:7,rows:6}),
     controller=new AbortController();
   controller.abort();
@@ -308,7 +308,9 @@ test('minimal abort is host-terminated without recursive polling',async()=>{
   });
   assert.equal(result.status,'INTERRUPTED',JSON.stringify(result));
   assert.equal(result.cleanup,true);
-  assert.equal(result.workersExited,2);
+  assert.equal(result.workersExited,0);
+  assert.equal(result.workersUsed,0);
+  assert.equal(result.requestedWorkers,2);
 });
 
 

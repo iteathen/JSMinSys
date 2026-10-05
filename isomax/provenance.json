@@ -3,11 +3,24 @@
   "sourceRepository": "https://github.com/iteathen/JSMinSys",
   "sourceCommit": "ab628f21fa8c989aa7fc1bc416b23ed126f82b93",
   "measuredRuntimeCommit": "8713baa11148a7723043d8c434ffb77343a96253",
+  "coldCorrections": {
+    "manifest": "cold-corrections.json",
+    "sha256": "683db7153daee5677cf0dfe7f5150ea51941981e253c0893fa9e0dd31cd006bb",
+    "performanceQualification": "historical measurements apply to the frozen source; corrections have correctness qualification only"
+  },
   "normalization": "UTF-8 with CRLF normalized to LF; SHA-256",
   "files": {
     "LICENSE": {
       "source": "LICENSE",
       "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+    },
+    "README.md": {
+      "source": "package-authored",
+      "sha256": "48226b6ffb3ed20134d38a707b9d299abb12f953fba2fd00db41c72a13d7350f"
+    },
+    "cold-corrections.json": {
+      "source": "package-authored",
+      "sha256": "683db7153daee5677cf0dfe7f5150ea51941981e253c0893fa9e0dd31cd006bb"
     },
     "evidence/CLAIM_AUDIT.md": {
       "source": "experiments/isomax-structural-cost/CLAIM_AUDIT.md",
@@ -28,6 +41,10 @@
     "evidence/PLAN.md": {
       "source": "experiments/isomax-structural-cost/PLAN.md",
       "sha256": "8aa80840f4b872d8b89f5583cb95b5445d9ce6f4ed7e15cd0c5454d872a1e7f0"
+    },
+    "evidence/README.md": {
+      "source": "package-authored",
+      "sha256": "a139c8e2e7feab703b984d50e92705da4c174c3683532ed441b78ce941c77300"
     },
     "evidence/benchmark-7x5/REPORT.md": {
       "source": "evidence/isomax-library-native-7x5-20261002/REPORT.md",
@@ -1265,9 +1282,27 @@
       "source": "evidence/isomax-tt-init-confirm-20261002/samples.jsonl",
       "sha256": "db6881fc0a168b6b8bba5020420b0f5d6f923df43ab3f78f261a2b9fdcd4ddb3"
     },
+    "example.mjs": {
+      "source": "package-authored",
+      "sha256": "2cadf732030faa8aef8702b5451a4d1a9cce0322042fa3903eda30864293f9f9"
+    },
+    "index.mjs": {
+      "source": "package-authored",
+      "sha256": "201f179942af57c01ecd05f37d7bfe2a21e1bedf4e0fef689a57bf4057aa474a"
+    },
+    "package.json": {
+      "source": "package-authored",
+      "sha256": "8a2ba50a47ae719110fcfa41f5dceddfde44f6ed44bf132d42fe41f21133c0eb"
+    },
+    "profile.json": {
+      "source": "package-authored",
+      "sha256": "487675ecaf9fd2d5a4d89395f55f35c761a227e88c7bf7173aff37b8c1c0ec6a"
+    },
     "runtime/addons/branch-manager-host.mjs": {
       "source": "addons/branch-manager-host.mjs",
-      "sha256": "ae9f76f43677852e5da2855cde7e2d4ceea321a21995e0312b1c6a665b48d052"
+      "sha256": "8136e2998230386556cc9afebd81efb8130ffa5bcbb7582081902094bdebfae3",
+      "sourceSha256": "ae9f76f43677852e5da2855cde7e2d4ceea321a21995e0312b1c6a665b48d052",
+      "correction": "A01-A02-managed-session-and-active-close"
     },
     "runtime/addons/connect4-live-line-evaluator.mjs": {
       "source": "addons/connect4-live-line-evaluator.mjs",
@@ -1275,7 +1310,14 @@
     },
     "runtime/addons/connect4-rank-local-presearch.mjs": {
       "source": "addons/connect4-rank-local-presearch.mjs",
-      "sha256": "f3bfd946a3f624e0a56b6982c86985bf03a5833fa085eebbefa5fd3cdbf8f190"
+      "sha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25",
+      "sourceSha256": "f3bfd946a3f624e0a56b6982c86985bf03a5833fa085eebbefa5fd3cdbf8f190",
+      "correction": "A05-indexed-move-history"
+    },
+    "runtime/addons/rba-connect4-cache-capacity.mjs": {
+      "source": "cold-correction addition",
+      "sha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e",
+      "correction": "A03-native-capacity-validation"
     },
     "runtime/addons/rba-connect4-coordinate-dense.mjs": {
       "source": "addons/rba-connect4-coordinate-dense.mjs",
@@ -1339,7 +1381,9 @@
     },
     "runtime/experiments/isomax-lean/host.mjs": {
       "source": "experiments/isomax-lean/host.mjs",
-      "sha256": "6d8b52a75261c8a810198f7545cd3e990423353a15d22633d520efe1da388e3a"
+      "sha256": "157fec6d9a7c1677a78d52e3d9055c86b15ac86ca75f51f8b0b2e169b1411403",
+      "sourceSha256": "6d8b52a75261c8a810198f7545cd3e990423353a15d22633d520efe1da388e3a",
+      "correction": "A03-A06-prepared-host"
     },
     "runtime/experiments/isomax-lean/live-profile.mjs": {
       "source": "experiments/isomax-lean/live-profile.mjs",
@@ -1347,7 +1391,9 @@
     },
     "runtime/experiments/isomax-lean/shared-cache.mjs": {
       "source": "experiments/isomax-lean/shared-cache.mjs",
-      "sha256": "a6b33afe59164165a5618de27d2f07b8757bf30b74f97e12827e156440793974"
+      "sha256": "c9d0f61df90fd422fd043388c7b7f9ad77babdb016977e628cf9ef1d388a4563",
+      "sourceSha256": "a6b33afe59164165a5618de27d2f07b8757bf30b74f97e12827e156440793974",
+      "correction": "A03-native-shared-cache-view"
     },
     "runtime/experiments/isomax-lean/solver-dense.mjs": {
       "source": "experiments/isomax-lean/solver-dense.mjs",
@@ -1391,43 +1437,63 @@
     },
     "runtime/experiments/isomax-lean/worker-dense.mjs": {
       "source": "experiments/isomax-lean/worker-dense.mjs",
-      "sha256": "00387713eeecfbc3779d1e671c2da6bd033676e81cec6ea1b3d883198251076e"
+      "sha256": "d399e5a2b09e1679707e5f1652e2daf9431403d96a110ae726d199b12203dd11",
+      "sourceSha256": "00387713eeecfbc3779d1e671c2da6bd033676e81cec6ea1b3d883198251076e",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-dense.mjs": {
       "source": "experiments/isomax-lean/worker-general-dense.mjs",
-      "sha256": "2d42ff46d7c8a3e0bb73a165ff0c9829ff01cf88f7cf82c2472b299c8675bc39"
+      "sha256": "aabf02b70c0ab71a67604281d3313f1e1fd064ea18deadca15580a06108d8e4c",
+      "sourceSha256": "2d42ff46d7c8a3e0bb73a165ff0c9829ff01cf88f7cf82c2472b299c8675bc39",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-unpacked-dense.mjs": {
       "source": "experiments/isomax-lean/worker-general-unpacked-dense.mjs",
-      "sha256": "400342164c9500e6c4f27e920b333982df57ea479a0835c86ea64573cbd7f8b7"
+      "sha256": "5abfbc04e8a9f56332d4c7faac3dede270ba81e604980879f75474c06136fcc0",
+      "sourceSha256": "400342164c9500e6c4f27e920b333982df57ea479a0835c86ea64573cbd7f8b7",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-unpacked.mjs": {
       "source": "experiments/isomax-lean/worker-general-unpacked.mjs",
-      "sha256": "f29f983d85e30cf57037029333a11568b60bb8ffc429167b8d4fa6e3328aac63"
+      "sha256": "61eb1bce67af01043c22fe24d0bb0b95116ccc1809f81dd29ce275a76edb8b9f",
+      "sourceSha256": "f29f983d85e30cf57037029333a11568b60bb8ffc429167b8d4fa6e3328aac63",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-wide-dense.mjs": {
       "source": "experiments/isomax-lean/worker-general-wide-dense.mjs",
-      "sha256": "7915f853dd4935ddcda2f57655a79d6718dcd4baf0126f2d4b639e45ba0e8b90"
+      "sha256": "72ea7540f04c2fd7a645d61b5a7406ee3076e35578ea77c5ff49f972efbb5469",
+      "sourceSha256": "7915f853dd4935ddcda2f57655a79d6718dcd4baf0126f2d4b639e45ba0e8b90",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-wide-unpacked-dense.mjs": {
       "source": "experiments/isomax-lean/worker-general-wide-unpacked-dense.mjs",
-      "sha256": "244fb375ac9e32dee70b9cf8c0d6e595ad35dda009e33c256567d24af308f0fd"
+      "sha256": "22513343bf8b5dcdbf5a53dd8df3c1afd70c7bb63f24b8d0191e54ce14239018",
+      "sourceSha256": "244fb375ac9e32dee70b9cf8c0d6e595ad35dda009e33c256567d24af308f0fd",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-wide-unpacked.mjs": {
       "source": "experiments/isomax-lean/worker-general-wide-unpacked.mjs",
-      "sha256": "9a4f75c6b5826c9f8c51a245d404c584f4d9f05c9e52ea8c28fda06aaab25b82"
+      "sha256": "208de6926466df5d34dea9340a874ae05448d336fe34040a62307908d315d4d9",
+      "sourceSha256": "9a4f75c6b5826c9f8c51a245d404c584f4d9f05c9e52ea8c28fda06aaab25b82",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general-wide.mjs": {
       "source": "experiments/isomax-lean/worker-general-wide.mjs",
-      "sha256": "921dfca6594b83338a0c51608c2af0bb05ab18ccb8538dde833109af193a70d2"
+      "sha256": "5993883613d24e7971a30daab246dcd8b96c4a6cfe4332b97aa8f2e65f28a9c0",
+      "sourceSha256": "921dfca6594b83338a0c51608c2af0bb05ab18ccb8538dde833109af193a70d2",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker-general.mjs": {
       "source": "experiments/isomax-lean/worker-general.mjs",
-      "sha256": "167c40e0fbf76639c07f3243daf444663e59e18be31a89546215f46aa600d5ea"
+      "sha256": "85383013c903a762c43c92124afb9217572c543d30ac6cecd9fc1263c0ba3be8",
+      "sourceSha256": "167c40e0fbf76639c07f3243daf444663e59e18be31a89546215f46aa600d5ea",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/experiments/isomax-lean/worker.mjs": {
       "source": "experiments/isomax-lean/worker.mjs",
-      "sha256": "be0ce10a9709f8804f04477e877d7bf90f40f25aa45d6dfddfd1258f1d92117c"
+      "sha256": "a399579be168f292db887c889629da1fc4caf97010020ebc869111190e61b6fa",
+      "sourceSha256": "be0ce10a9709f8804f04477e877d7bf90f40f25aa45d6dfddfd1258f1d92117c",
+      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/src/basis32.mjs": {
       "source": "src/basis32.mjs",
@@ -1464,6 +1530,34 @@
     "targets.json": {
       "source": "evidence/isomax-memory-affinity-20260928/targets.json",
       "sha256": "1447f09c35bd01d309a57586b397460a95ea7efcad9a24cdfa2a4f34a0e9e0b5"
+    },
+    "test/cofactor.test.mjs": {
+      "source": "package-authored",
+      "sha256": "e87d4484294d9f84e02403267812fe31e4a54afdb78674681df36de77c6257e1"
+    },
+    "test/geometry-cofactor.test.mjs": {
+      "source": "package-authored",
+      "sha256": "308b859e0b809e249afb36fe7483c3dd4f61e0ae59c94c124941b9227f15c39c"
+    },
+    "test/input-contract.test.mjs": {
+      "source": "package-authored",
+      "sha256": "32f04fda021c40446d106e2a84911d62d92565a3f7de38fea81daccc949c824a"
+    },
+    "test/package-verification.test.mjs": {
+      "source": "package-authored",
+      "sha256": "ac98df03fba44945898e94564312cbd69989627aa67d20d9be05577d2de0d40a"
+    },
+    "test/prepared.test.mjs": {
+      "source": "package-authored",
+      "sha256": "a4d3a0cd35c695fd849c6ef761e14cba4a97c39fb8715dfc6458140e692d83f6"
+    },
+    "test/smoke.test.mjs": {
+      "source": "package-authored",
+      "sha256": "f327874bb0c5ce2076d1b5194132cc03b27140e4837e93d6e1ece8bb6ca4b0d2"
+    },
+    "verify.mjs": {
+      "source": "package-authored",
+      "sha256": "b78550f68afebe7bd53b116e65f98cc8d056d748dd178417ba49842aff4337a8"
     }
   }
 }

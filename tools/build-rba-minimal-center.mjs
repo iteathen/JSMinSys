@@ -5,12 +5,15 @@ const input=new URL('../addons/rba-connect4-lazy-smp-worker-minimal.mjs',import.
 let s=readFileSync(input,'utf8').replaceAll('\r\n','\n');
 function once(a,b){assert.equal(s.split(a).length,2,'template changed: '+a);s=s.replace(a,b);}
 once("import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';\n",'');
-once(`const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
+once("import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';\n",'');
+once(`const live=prepareConnect4LiveLineOrder32(g,centerOrder,[]),
   liveWords=live.profile.stateWords,liveState=live.state,
   liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
-  moveOrder=live.ordered,moveOrderMask=live.mask;
+  moveOrder=live.ordered,moveOrderMask=live.mask,
+  rootHeights=new Uint32Array(g.columns);
 
 `,'');
+once("resetConnect4LiveLineState32(liveProfile,liveState,0);\nconst history=workerData.root.moveHistory,\n  historyLength=workerData.readyGate?Atomics.load(workerData.readyGate,4):history.length;\nfor(let i=0;i<historyLength;i+=1){\n  const c=history[i],cell=rootHeights[c]*g.columns+c;\n  advanceLive(liveProfile,liveState,0,i&1,cell,liveState,0);rootHeights[c]+=1;\n}\n",'');
 once('function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){','function negamax(depth,src,bi,n,mover,alpha,beta){');
 once('    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,\n','');
 once('const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);','const actionCount=forced>=0?1:g.columns;');

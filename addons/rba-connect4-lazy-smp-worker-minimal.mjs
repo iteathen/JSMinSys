@@ -1,5 +1,6 @@
 import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
+import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';
 import {prepareConnect4CpcWin32,evaluateConnect4PreparedCpcWin32} from './connect4-cpc-prepared-win.mjs';
 import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
@@ -51,10 +52,11 @@ while(orderAt<g.columns){
   pair+=1;
 }
 
-const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
+const live=prepareConnect4LiveLineOrder32(g,centerOrder,[]),
   liveWords=live.profile.stateWords,liveState=live.state,
   liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
-  moveOrder=live.ordered,moveOrderMask=live.mask;
+  moveOrder=live.ordered,moveOrderMask=live.mask,
+  rootHeights=new Uint32Array(g.columns);
 
 // COLD one-shot benchmark handoff. No barrier or timing work in negamax.
 if(workerData.readyGate){
@@ -65,6 +67,14 @@ if(workerData.readyGate){
 words.set(workerData.root.words);
 basis.set(workerData.root.basis);
 basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;
+if(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);
+resetConnect4LiveLineState32(liveProfile,liveState,0);
+const history=workerData.root.moveHistory,
+  historyLength=workerData.readyGate?Atomics.load(workerData.readyGate,4):history.length;
+for(let i=0;i<historyLength;i+=1){
+  const c=history[i],cell=rootHeights[c]*g.columns+c;
+  advanceLive(liveProfile,liveState,0,i&1,cell,liveState,0);rootHeights[c]+=1;
+}
 
 let bestMove=-1;
 

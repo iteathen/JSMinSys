@@ -2,9 +2,12 @@ import {performance} from 'node:perf_hooks';
 import {createManagedThreadSession32,sharedViewBytes32} from './branch-manager-host.mjs';
 import {connect4RbaFromMoves} from './rba-connect4-ingress.mjs';
 import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
-import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
+import {createConnect4RbaSharedExactCache32,isCompactProfile8} from './rba-connect4-shared-exact-cache.mjs';
+import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from './worker-behavior.mjs';
 import {encodeRootFrontier32} from './worker-root-frontier.mjs';
+import {prepareLazySmpConnect4Rba32} from './rba-connect4-prepared-session-host.mjs';
+export {prepareLazySmpConnect4Rba32} from './rba-connect4-prepared-session-host.mjs';
 
 export const RBA_LAZY_SMP_WORKER_LEGACY='legacy';
 export const RBA_LAZY_SMP_WORKER_MINIMAL='minimal';
@@ -34,12 +37,9 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isInteger(workers)||workers<2||workers>64)
     throw new RangeError('Lazy SMP requires at least two search workers');
-  if(!Number.isInteger(sharedCacheCapacity)||sharedCacheCapacity<1||
-     (sharedCacheCapacity&(sharedCacheCapacity-1)))
-    throw new RangeError('invalid Lazy SMP shared cache capacity');
-  if(!Number.isInteger(localCacheCapacity)||localCacheCapacity<1||
-     (localCacheCapacity&(localCacheCapacity-1)))
-    throw new RangeError('invalid Lazy SMP local cache capacity');
+  const cacheKeyWords=isCompactProfile8(geometry,geometry.keyWords)?8:geometry.keyWords;
+  validateConnect4CacheCapacity32(sharedCacheCapacity,cacheKeyWords);
+  validateConnect4CacheCapacity32(localCacheCapacity,cacheKeyWords);
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))
     throw new RangeError('invalid Lazy SMP shared sample mask');
@@ -51,6 +51,11 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL&&
      (rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory))
     throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
+  if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL){
+    const prepared=await prepareLazySmpConnect4Rba32({geometry,workers,sharedCacheCapacity,
+      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode});
+    try{return await prepared.solve(moves);}finally{await prepared.close();}
+  }
   if(rootFrontier){
     if(behaviorMemory!==null)throw new TypeError('rootFrontier owns initial behavior memory');
     behaviorMemory=createWorkerBehaviorMemory32(workers);

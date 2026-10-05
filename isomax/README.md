@@ -9,8 +9,9 @@ This packages the qualified solver with prepared closure masks, a 32-byte shared
 TT, four deep workers, and initialization-selected board dimensions. Every admitted
 board size selects dense or sparse removal before search. Containment masks and
 prepared coordinate kernels now belong to the canonical RBA support libraries.
-7x5 uses the optimized path too; there is no 7x6-only closure fallback. Runtime modules are copied without
-rewriting, bundling, minification, or hot-loop changes. There are no third-party
+7x5 uses the optimized path too; there is no 7x6-only closure fallback. The runtime
+retains its frozen source with explicit cold input/lifecycle corrections recorded
+in `cold-corrections.json`; search kernels are unchanged. There are no third-party
 runtime dependencies. Keep the whole folder together; worker modules load by URL.
 
 ## Files you need
@@ -22,7 +23,7 @@ runtime dependencies. Keep the whole folder together; worker modules load by URL
 | [example.mjs](example.mjs) | Empty board → computed structural prefix → one exact search |
 | [evidence/README.md](evidence/README.md) | Benchmark results and qualification |
 | [provenance.json](provenance.json) | Exact upstream revisions and file checksums |
-| [dist/](dist/) | Ready-to-transfer candidate archive and SHA-256 |
+| [dist/](dist/) | Historical rc.3 archives before the cold audit corrections |
 | `runtime/` | Private, self-contained dependencies; no manual assembly needed |
 
 ## Run
@@ -39,10 +40,12 @@ node --test test/*.test.mjs
 node example.mjs
 ```
 
-The example uses the measured large-memory profile: **4 GiB shared TT plus
+The example uses the historical large-memory profile: **4 GiB shared TT plus
 576 MiB per worker**, about 6.36 GiB observed peak process RSS on the measured
 Windows host. It computes the opening; it does not store `44444` as a premise.
-There is one structural phase and one search, not a full self-play game.
+It awaits initialization of all four workers and empty tables, then times one
+structural phase and one search. Initialization and cleanup are recorded
+separately; this new timing boundary is not the historical measurement boundary.
 Running the example normally does not pin workers or reproduce benchmark timing.
 
 For the measured Windows affinity, use the recorded Node nightly and set these
@@ -88,17 +91,33 @@ Treat its `CERTIFIED`/`UNRESOLVED` result as the existing structural layer's
 contract. The five-move standard opening is bounded research evidence, not a
 universal Connect Four theorem or permission to unseal formula holdouts.
 
+For application initialization, call `await prepareLazySmpConnect4Rba32({geometry,
+...options})`. It returns a one-shot application with `solve(moves)`, `close()` and
+`state()`. All workers are ready and empty TT pages are initialized before it
+returns. Compute the structural prefix after that boundary, then call `solve`.
+Always close a prepared application that is left idle. `solve` closes it after
+the single search, including invalid-root, interrupted and failed paths. The
+solve deadline starts when `solve` is called; initialization has its own
+`initializationTimeoutMs` option (default 120000 ms).
+
 All workers are deep. Alternative CPC options and `rootFrontier:true` are
 rejected. Node counts and TT statistics are intentionally unavailable; no hot
-reporting has been restored. The host prepares/spawns workers for each invocation
-and closes them afterward; this package does not claim a persistent worker pool.
+reporting has been restored. `runLazySmpConnect4Rba32` remains a convenience
+wrapper that prepares an application and invokes its single solve. The prepared
+application is one-shot; it does not claim a reusable worker pool.
 
 ## Preservation and future publication
 
-`provenance.json` records the exact source and measured runtime commits and binds
-each module to its source checksum. `node prepare.mjs --check` reproduces the source comparison in
+`provenance.json` retains the exact historical source and measured runtime commits,
+locks required public files and records the applied cold correction manifest.
+`node prepare.mjs --check` reproduces the frozen source plus those corrections in
 the full repository with that Git history available. It is a maintainer tool,
 not needed by users of the extracted package.
+
+The historical timing in `profile.json` and the evidence folder belongs to the
+frozen measured runtime. The corrected package has correctness qualification;
+its performance has not been remeasured. Existing `dist/` archives retain the
+historical package and do not contain these corrections.
 
 The archive is made locally with `npm pack`; this does **not** publish it.
 Extract it anywhere and run verification/tests from the extracted `package/`

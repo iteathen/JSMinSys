@@ -22,7 +22,7 @@
     "targetsFile": "evidence/isomax-memory-affinity-20260928/targets.json"
   },
   "runtime": {
-    "baseline": "Node 26.x / V8 14.6 family",
+    "baseline": "v27.0.0-nightly20260928b59840b593 / V8 14.6.202.34-node.36",
     "historicalMeasuredAlternative": "v27.0.0-nightly20260928b59840b593 / V8 14.6.202.34-node.36",
     "policy": "Runtime version is an optimization dimension. Do not transplant AMD Zen 3 cycle constants to this Intel target. Requalify generated code and total cycles on the actual i5."
   },
@@ -38,11 +38,11 @@
     "rootFrontier": false,
     "sharedSampleMask": 0,
     "sharedCacheCapacity": 134217728,
-    "localCacheCapacity": 16777216,
+    "localCacheCapacity": 33554432,
     "timeoutMs": 600000
   },
   "measurement": {
-    "wallClock": "performance.now() around the complete runLazySmpConnect4Rba32 call",
+    "wallClock": "all workers ready and TT pages initialized -> empty root constructed -> exact result observed; initialization and cleanup separate",
     "processCycles": "tools/process-cycle-counter.mjs / QueryProcessCycleTime",
     "affinityPreload": "tools/worker-affinity-preload.mjs",
     "command": "node --experimental-ffi --import ./tools/worker-affinity-preload.mjs tools/bench-minimal-i5.mjs",
@@ -57,7 +57,7 @@
     ]
   },
   "qualification": {
-    "governingUnit": "complete exact empty-board solve including worker startup, search and cleanup",
+    "governingUnit": "complete exact empty-board solve from initialized ready application; position-specific construction included",
     "cycleAuthority": "actual i5 process-cycle measurement plus current generated/runtime evidence where primitive lowering is load-bearing",
     "githubRunnerRole": "development/regression evidence only",
     "targetPass": "EXACT result and wallMs <= 10000 on the declared local target",
@@ -94,5 +94,12 @@
       "workersExited": 4
     },
     "interpretation": "Representative development full solve did not complete. Late/endgame fixture timing is regression evidence only; performance promotion requires target full solve or admitted trace-derived bulk-search proxies."
+  },
+  "retainedLocalhostAuthority": {
+    "historical": "evidence/minimal-worker-localhost-20261004/C15-RESULT.md",
+    "fresh": "evidence/minimal-worker-localhost-20261004/a-fix-baseline-01",
+    "sharedPayloadBytes": 5368709120,
+    "privatePayloadBytesPerWorker": 1107296256,
+    "note": "Descriptive profile only; recover actual invocation/raw evidence before benchmarking."
   }
 }

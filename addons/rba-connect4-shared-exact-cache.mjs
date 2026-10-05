@@ -1,4 +1,5 @@
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
+import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 
 export function isCompactProfile8(geometry,keyWords){
   return geometry!==null&&geometry!==undefined&&
@@ -16,13 +17,13 @@ export function compactTailProfile8(words,offset){
 }
 
 export function createConnect4RbaSharedExactCache32({capacity=65536,keyWords,geometry=null}={}){
-  if(!Number.isInteger(capacity)||capacity<1||(capacity&(capacity-1))||
-     !Number.isInteger(keyWords)||keyWords<1)
+  if(!Number.isSafeInteger(keyWords)||keyWords<1)
     throw new RangeError('invalid shared exact cache');
   if(geometry!==null&&geometry!==undefined&&geometry.keyWords!==keyWords)
     throw new RangeError('shared exact cache/profile mismatch');
   const compact8=isCompactProfile8(geometry,keyWords)?1:0,
     storedKeyWords=compact8?8:keyWords;
+  validateConnect4CacheCapacity32(capacity,storedKeyWords);
   return {
     mask:capacity-1,
     keyWords,

@@ -1,5 +1,9 @@
 # rc.3 canonical-library evidence
 
+This evidence measures the historical frozen runtime. The current package applies
+explicit cold audit corrections; these have correctness qualification only and
+do not change the historical runtime identity or establish new timing results.
+
 The canonical-library correction measured **5.45% slower on 7×6** and
 **11.31% faster on 7×5** than rc.2 in separate matched comparisons:
 

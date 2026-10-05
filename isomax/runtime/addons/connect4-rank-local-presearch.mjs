@@ -8,8 +8,10 @@ export function evaluateConnect4RankLocalLanding32(moves,{geometry}={}){
   if(!geometry||!Number.isSafeInteger(geometry.columns)||!Number.isSafeInteger(geometry.rows)||
      !Number.isSafeInteger(geometry.lineCount)||!geometry.lineColumn||!geometry.lineRow)
     throw new TypeError('prepared Connect4 RBA geometry required');
-  if(!Array.isArray(moves)&&!ArrayBuffer.isView(moves))
+  if((!Array.isArray(moves)&&!ArrayBuffer.isView(moves))||!Number.isSafeInteger(moves.length))
     throw new TypeError('move history must be an array or typed array');
+  if(moves.length<0||moves.length>geometry.cellCount)
+    throw new RangeError('invalid rank-local move history length');
 
   const g=geometry,columns=g.columns,rows=g.rows,
     heights=new Uint32Array(columns),

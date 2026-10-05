@@ -60,6 +60,7 @@ if(workerData.readyGate){
 words.set(workerData.root.words);
 basis.set(workerData.root.basis);
 basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;
+if(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);
 
 let bestMove=-1;
 

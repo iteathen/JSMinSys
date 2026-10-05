@@ -76,6 +76,7 @@ export class ManagedThreadSession {
     this.poll=null;
     this.abortSignal=null;
     this.abortHandler=null;
+    this.waitResolve=null;
   }
 
   fail(code){
@@ -143,6 +144,9 @@ export async function waitManagedThreadSession32(
       || !Number.isFinite(pollMs) || pollMs <= 0) {
     throw new RangeError('invalid managed session wait');
   }
+  if (pollMs > 2147483647) {
+    throw new RangeError('managed session pollMs must be <= 2147483647');
+  }
 
   const abort = () => failManagedThreadSession32(session, session.cancelledCode);
   session.abortSignal = signal ?? null;
@@ -153,10 +157,31 @@ export async function waitManagedThreadSession32(
 
   try {
     await new Promise((resolve) => {
-      session.timer = setTimeout(() => {
+      session.waitResolve = resolve;
+      if (Atomics.load(session.control, session.stopIndex)
+          || Atomics.load(session.control, session.doneIndex)) {
+        resolve();
+        return;
+      }
+      const startedAt = performance.now();
+      const deadline = () => {
+        // DONE may be published after the last poll but before this callback.
+        if (Atomics.load(session.control, session.stopIndex)
+            || Atomics.load(session.control, session.doneIndex)) {
+          resolve();
+          return;
+        }
+        const remaining = timeoutMs - (performance.now() - startedAt);
+        if (remaining > 0) {
+          // Node clamps overflowing delays to 1ms. Only cold host callbacks
+          // measure elapsed time and rearm bounded chunks for long deadlines.
+          session.timer = setTimeout(deadline, Math.min(Math.ceil(remaining), 2147483647));
+          return;
+        }
         failManagedThreadSession32(session, session.deadlineCode);
         resolve();
-      }, timeoutMs);
+      };
+      session.timer = setTimeout(deadline, Math.min(Math.ceil(timeoutMs), 2147483647));
       session.poll = setInterval(() => {
         if (Atomics.load(session.control, session.stopIndex)
             || Atomics.load(session.control, session.doneIndex)) resolve();
@@ -170,6 +195,7 @@ export async function waitManagedThreadSession32(
     signal?.removeEventListener('abort', abort);
     session.abortSignal = null;
     session.abortHandler = null;
+    session.waitResolve = null;
   }
 
   return Atomics.load(session.control, session.errorIndex);
@@ -184,6 +210,8 @@ export async function closeManagedThreadSession32(session) {
   Atomics.store(session.control, session.stopIndex, 1);
   Atomics.add(session.control, session.wakeIndex, 1);
   Atomics.notify(session.control, session.wakeIndex);
+  // Clearing the polling handles must also settle an in-flight wait.
+  session.waitResolve?.();
 
   await Promise.allSettled(session.threads.map((worker) => worker.terminate()));
   await Promise.all(session.exits);

@@ -5,7 +5,7 @@ import {runLazySmpConnect4Rba32,RBA_LAZY_SMP_WORKER_MINIMAL} from '../addons/rba
 import {processCycleCounter} from './process-cycle-counter.mjs';
 
 const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??134217728),
-  localCacheCapacity=Number(process.env.JMS_BENCH_LOCAL_CAPACITY??16777216),
+  localCacheCapacity=Number(process.env.JMS_BENCH_LOCAL_CAPACITY??33554432),
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),
