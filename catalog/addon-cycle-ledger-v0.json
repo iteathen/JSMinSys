@@ -17454,38 +17454,20 @@
         {
           "op": "control.branch",
           "count": 1
-        },
-        {
-          "op": "runtime.callback",
-          "count": "JOIN_PUB",
-          "target": "sharedStore"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "D"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "D"
-        },
-        {
-          "op": "control.branch",
-          "count": "D"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+D*CALL(storeLocalEntry)+S*CALL(storeLocalEntry)+PUB*CALL(transportConnect4ZeroBound32)+PUB*CALLBACK(sharedStore)+PUB*C(memory.load.u32)+PUB*C(alu.shr.u32)+PUB*C(alu.and.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)+D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)",
+        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+D*CALL(storeLocalEntry)+S*CALL(storeLocalEntry)+PUB*CALL(transportConnect4ZeroBound32)+PUB*CALLBACK(sharedStore)+PUB*C(memory.load.u32)+PUB*C(alu.shr.u32)+PUB*C(alu.and.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
           "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
           "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
           "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
-          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication.",
-          "JOIN_PUB": "1 only when opposite same-key zero bounds join as exact draw and unchanged sampling admits publication;0 otherwise."
+          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication."
         },
-        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw. C22 generated proof pool publishes the previously private exact-draw join. Tag2 is absolute/gauge-invariant, so no extra gauge decode; exact-only default worker remains unchanged. No reporting/allocation or new replacement policy."
+        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw."
       },
       "status": "decomposed"
     },
@@ -18187,38 +18169,20 @@
         {
           "op": "control.branch",
           "count": 1
-        },
-        {
-          "op": "runtime.callback",
-          "count": "JOIN_PUB",
-          "target": "sharedStore"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "D"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "D"
-        },
-        {
-          "op": "control.branch",
-          "count": "D"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+D*CALL(storeLocalEntry)+S*CALL(storeLocalEntry)+PUB*CALL(transportConnect4ZeroBound32)+PUB*CALLBACK(sharedStore)+PUB*C(memory.load.u32)+PUB*C(alu.shr.u32)+PUB*C(alu.and.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)+D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)",
+        "expression": "C(memory.load.u8)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+D*CALL(storeLocalEntry)+S*CALL(storeLocalEntry)+PUB*CALL(transportConnect4ZeroBound32)+PUB*CALLBACK(sharedStore)+PUB*C(memory.load.u32)+PUB*C(alu.shr.u32)+PUB*C(alu.and.u32)+C(alu.and.u32)+C(control.test.u32)+C(control.branch)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
           "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
           "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
           "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
-          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication.",
-          "JOIN_PUB": "1 only when opposite same-key zero bounds join as exact draw and unchanged sampling admits publication;0 otherwise."
+          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication."
         },
-        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw. C22 generated proof pool publishes the previously private exact-draw join. Tag2 is absolute/gauge-invariant, so no extra gauge decode; exact-only default worker remains unchanged. No reporting/allocation or new replacement policy."
+        "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw."
       },
       "status": "decomposed"
     },
@@ -19118,8 +19082,8 @@
     "addons/rba-connect4-prepared-session-host.mjs": "83b40dde75002c5facf9fc8eeb03c44b49a1669e",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
-    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "09a3ca8d72180340dad22459e6e67afc5eba4c07",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "dc55151065f1cf9084985ccee488d50637714f27",
+    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "7dc22b435fcb30ed967f16f02c44eb0d2f769d2d",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "af9dfbb827a3ba0d6a822790ac4798fb7577971e",
     "addons/rba-connect4-support-basis-plan.mjs": "7438d71fcdc2c1a2721a5a4283125e0917a0be86",
     "addons/rba-connect4-coordinate-support-prepared.mjs": "318322b414eac1827dc233f01c230e852173c076",
     "addons/rba-connect4-coordinate-support-dense.mjs": "7358488a080f03c612954dbe5e9b9622925efce3"
