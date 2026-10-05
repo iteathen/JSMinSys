@@ -1,0 +1,79 @@
+{
+  "node": "v27.0.0-nightly20260928b59840b593",
+  "v8": "14.6.202.34-node.36",
+  "rows": [
+    {
+      "case": "already-completed-session",
+      "trial": 0,
+      "doneBeforeWait": true,
+      "errorCode": 102,
+      "state": {
+        "errorCode": 102,
+        "stopped": true,
+        "done": true,
+        "workerCount": 0,
+        "workersExited": 0,
+        "cleanup": true,
+        "errors": []
+      }
+    },
+    {
+      "case": "already-completed-session",
+      "trial": 1,
+      "doneBeforeWait": true,
+      "errorCode": 102,
+      "state": {
+        "errorCode": 102,
+        "stopped": true,
+        "done": true,
+        "workerCount": 0,
+        "workersExited": 0,
+        "cleanup": true,
+        "errors": []
+      }
+    },
+    {
+      "case": "already-completed-session",
+      "trial": 2,
+      "doneBeforeWait": true,
+      "errorCode": 102,
+      "state": {
+        "errorCode": 102,
+        "stopped": true,
+        "done": true,
+        "workerCount": 0,
+        "workersExited": 0,
+        "cleanup": true,
+        "errors": []
+      }
+    },
+    {
+      "case": "invalid-capacity-with-no-real-allocation",
+      "capacity": 4294967297,
+      "integer": true,
+      "bitwisePowerTest": 0,
+      "allocatedBytes": 17179869188,
+      "error": "AUDIT_ALLOCATION_BLOCKED"
+    },
+    {
+      "case": "invalid-capacity-with-no-real-allocation",
+      "capacity": 4294967298,
+      "integer": true,
+      "bitwisePowerTest": 0,
+      "allocatedBytes": 17179869192,
+      "error": "AUDIT_ALLOCATION_BLOCKED"
+    },
+    {
+      "case": "invalid-capacity-with-no-real-allocation",
+      "capacity": 9007199254740992,
+      "integer": true,
+      "bitwisePowerTest": 0,
+      "allocatedBytes": 36028797018963970,
+      "error": "AUDIT_ALLOCATION_BLOCKED"
+    },
+    {
+      "case": "pre-aborted-prepared-empty",
+      "exception": "prepared worker initialization failed or timed out"
+    }
+  ]
+}

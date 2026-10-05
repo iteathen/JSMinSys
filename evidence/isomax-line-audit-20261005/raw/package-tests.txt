@@ -1,0 +1,28 @@
+✔ prepared: cofactors match every legal child along deterministic walks and reflected gauges (410.6863ms)
+✔ prepared: excludes absent supersets even when inverse scratch points to a matching stale tail (15.7931ms)
+✔ prepared: preserves both players first wins and full-board draw/win precedence (9.3998ms)
+✔ dense: cofactors match every legal child along deterministic walks and reflected gauges (209.7764ms)
+✔ dense: excludes absent supersets even when inverse scratch points to a matching stale tail (7.5396ms)
+✔ dense: preserves both players first wins and full-board draw/win precedence (7.728ms)
+✔ optional and generated prepared/dense cofactors match independent physical residuals (416.3144ms)
+✔ dense kernel uses the cold removal table directly and preserves last-cell terminal precedence (17.0526ms)
+✔ prepared module canonicalization exports retain selectedSet and offset behavior (28.7967ms)
+✔ prepared-only canonicalization matches the optional API without selected-set work (23.7294ms)
+Verified 365 locked files; all runtime imports stay inside this package.
+✔ packaged calculator computes five moves and all seven controls (13.1141ms)
+✔ standard board with sparse initialization keeps a valid worker path (304.2041ms)
+✔ standalone 7x6 actual workers (260.2709ms)
+✔ standalone 7x5 actual workers (129.8945ms)
+✔ standalone 4x4 actual workers (44.0052ms)
+✔ standalone 4x5 actual workers (46.6075ms)
+✔ standalone 33x1 actual workers (40.8197ms)
+✔ standalone 1x1 actual workers (37.2524ms)
+✔ 7x5 selects optimized library kernels under both preparation budgets (201.9079ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1313.0844

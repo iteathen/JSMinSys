@@ -1,0 +1,236 @@
+{
+  "kind": "isomax-line-audit-v1",
+  "date": "2026-10-05",
+  "evidence_class": "INTERNAL-QUALIFICATION",
+  "repository": "iteathen/JSMinSys",
+  "branch": "work/cpc-rebuild-20261004",
+  "source_commit": "919f887d7214f48eb0926caf611f985db4720025",
+  "source_tree": "6e37ff0d337a8604a81b21c23810d866cddd526c",
+  "origin_branch": "919f887d7214f48eb0926caf611f985db4720025",
+  "origin_main": "1b843981ba7d68c118656dad1a6c7591453e7686",
+  "production_sources_changed": false,
+  "runtime": {
+    "platform": "win32",
+    "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+    "cpu": "Intel Core i5-12600K",
+    "v8": "14.6.202.34-node.36",
+    "sha256": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "arch": "x64",
+    "test_affinity": "ordinary OS placement; not performance qualification"
+  },
+  "retained_performance_configuration": {
+    "workers": 4,
+    "shared_bytes": 5368709120,
+    "rlc": false,
+    "jit_inline_limit": 600,
+    "authority": "evidence/minimal-worker-localhost-20261004/C15-RESULT.md",
+    "jit_cumulative_inline_limit": 2400,
+    "sharedSampleMask": 0,
+    "private_bytes_per_worker": 1107296256,
+    "process_affinity_mask": 85,
+    "rootFrontier": false,
+    "policies": [
+      "center",
+      "live",
+      "center",
+      "live"
+    ],
+    "shared_entries": 134217728,
+    "private_entries_per_worker": 33554432,
+    "measured_in_this_audit": false,
+    "logical_cpus": [
+      0,
+      2,
+      4,
+      6
+    ]
+  },
+  "findings": [
+    {
+      "priority": "P2",
+      "id": "A01",
+      "category": "lifecycle defect",
+      "reproduced": true
+    },
+    {
+      "priority": "P2",
+      "id": "A02",
+      "category": "deadline validation defect",
+      "reproduced": true
+    },
+    {
+      "priority": "P2",
+      "id": "A03",
+      "category": "capacity validation defect",
+      "real_large_allocations": false,
+      "reproduced": true
+    },
+    {
+      "priority": "P2",
+      "id": "A04",
+      "category": "package verification gap",
+      "reproduced": true
+    },
+    {
+      "priority": "P3",
+      "id": "A05",
+      "category": "DataView history validation defect",
+      "reproduced": true
+    },
+    {
+      "id": "A06",
+      "category": "application lifecycle requirement gap",
+      "confirmed_by": "static control flow; current optional ready gate tests pass"
+    },
+    {
+      "code_change_was_deliberate": true,
+      "id": "A07",
+      "category": "stale historical policy prose",
+      "confirmed_by": "source, git blame, share-exact-01 evidence"
+    },
+    {
+      "id": "A08",
+      "category": "implementation and configuration difference",
+      "performance_effect": "UNQUALIFIED",
+      "confirmed_by": "current separate arrays versus packaged interleaved layout"
+    }
+  ],
+  "checks": {
+    "generated_commands": [
+      "node tools/build-rba-minimal-center.mjs --check",
+      "node tools/build-rba-uncounted-cache.mjs --check",
+      "node tools/build-rba-coordinate-kernels.mjs --check",
+      "node tools/build-cpc-target-kernel.mjs --check"
+    ],
+    "package_tests": {
+      "command": "node --test isomax/test/cofactor.test.mjs isomax/test/geometry-cofactor.test.mjs isomax/test/smoke.test.mjs",
+      "failed": 0,
+      "passed": 19,
+      "raw": "raw/package-tests.txt"
+    },
+    "current_tests": {
+      "command": "node --test test/branch-manager-host.test.mjs test/managed-thread-session-class.test.mjs test/rba-connect4-lazy-smp.test.mjs test/rba-prepared-empty-timing.test.mjs test/rba-prepared-cofactor.test.mjs test/rba-cofactor-absorption.test.mjs test/rba-uncounted-cache.test.mjs test/cpc-prepared-win.test.mjs test/cpc-target-win.test.mjs test/connect4-live-line-evaluator.test.mjs",
+      "failed": 0,
+      "passed": 42,
+      "raw": "raw/current-tests.txt"
+    },
+    "transition_physical_oracle": {
+      "late_positive_certificates": 18,
+      "raw": "raw/transition-results.json",
+      "position_codes": 8508,
+      "children": 21022,
+      "states": 4356
+    },
+    "worker_physical_oracle": {
+      "cases": 26,
+      "memo_nodes": 1340,
+      "raw": "raw/worker-results.json",
+      "workers": 4,
+      "oracle_after_return": true
+    },
+    "package_physical_oracle": {
+      "cases": 12,
+      "raw": "raw/package-kernels.jsonl",
+      "oracle_after_return": true
+    },
+    "catalog": {
+      "command": "node tools/verify-catalog.mjs",
+      "deferred": 0,
+      "sealed_functions": 298,
+      "passed": true,
+      "addon_units": 213
+    }
+  },
+  "identity_hashes": {
+    "addons/rba-connect4-lazy-smp-host.mjs": "234c3200a87dd1ad2a1f1f3700e0c47ee13a605a7d37192ba12f6b5069ba1580",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "8f77858733bb2225f7a8ea35cce091830b62a9a621420a7f53e7531690fa44b5",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "4b28134515c5cf0718db822eb930631970b4f38354866ad411411324c022f27a",
+    "addons/rba-connect4-shared-exact-cache.mjs": "dba87ace22454054e8e00a2fdcea3cb245f705dd17ff88a446f05def2e841fe1",
+    "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "d3cdf4efa3515a9e740cf16ff487d9430f221ac1987ba9cb76a53201c1a3f648",
+    "addons/branch-manager-host.mjs": "4e4e439a4f33f9f65cd5001caabdce5f614f0a797f1d499807a14d9bf14df385",
+    "addons/branch-manager.mjs": "530627368149a56e80554afa6c71edc02212aa74701d7317dfcc9647815907c2",
+    "addons/worker.mjs": "8f366228f0d67a19bb24a1434dc2b363d1b6f54ef8b5c99a4e86e144f51a1d2b",
+    "addons/worker-affinity.mjs": "10f4d5509f26c184774b472f2fd4b6aae1c9f58de9e2e8bda0911acd03a15168",
+    "addons/rba-connect4-geometry.mjs": "ad9fa0252e565c36f82a4e04ce480a59ca148bb541f60d2080aed363008c737e",
+    "addons/rba-connect4-ingress.mjs": "b49f231c61a6fdf945868b919fcd0c8e52f61633cd0dd48e04d6a1bc0bf7e319",
+    "addons/rba-connect4-coordinate.mjs": "4773544171467a17f559ec3f72278da75f7306e1e9619e1e8cc7027306768fcc",
+    "addons/rba-connect4-coordinate-prepared.mjs": "3e81aedf91320e211a7c74b8175e77ddaa429034275287907764080e9b35b415",
+    "addons/rba-connect4-coordinate-dense.mjs": "d7b7fb2d6369c74f6ce341d64de5df27c8c71798ac6ef164d431c42eef81ec1c",
+    "addons/rba-connect4-profile.mjs": "31c2248f9f4f70c6711eb75d2364022044c57a596ebb7078538e56f5f9070284",
+    "addons/connect4-live-line-order.mjs": "1070bbce728a5245af8bc1a03f5943726d70f332ea3253c9c63568f5e3626cee",
+    "addons/connect4-live-line-evaluator.mjs": "94609f645d5988b15d0aece8f087701329f2ea15e8f19f7e89128e4660483b75",
+    "addons/connect4-cpc-prepared-win.mjs": "ce84aaeda7ef1965e887b30e7ad45eb6eeb43f489e2add2e4b2436725faab458",
+    "addons/connect4-cpc-target-win.mjs": "92f1848b7530c6045ec7a355bdce9852713486e45f0d7a7f6a11cb0acc80a6c7",
+    "addons/connect4-cpc-target-dense-win.mjs": "f100b0ff794c6cb0f5234feea6827c02036ed92cb3e6f2998e28f529271536dd",
+    "addons/connect4-rank-local-presearch.mjs": "8e3d78990bd980fc97c1e364f37cf780799ca13272e1cf1f096f4225d2064e5d",
+    "src/worker32.mjs": "59402bc281d3c6120bb8ec6e54547a7ff500268b1bba7f85a591f4a784740416",
+    "src/widekey32.mjs": "aacb43018b55912359b0352b73017f71fe176d508efe822f2677b37d493a29b4",
+    "src/basis32.mjs": "5cdaf99d2c5c45055a5bca9958d56df3a215a17bfc7b4ec8a2184d5257cb3fde",
+    "src/word32.mjs": "1e5366d8b24943c0d17311b174ca83274063267e494ca8f004b8577c8a279098",
+    "src/word64x32.mjs": "f7ca1906945d3779ac8c406e820bf6e5d49ac40f4848e857642558cdbfd303cc",
+    "tools/bench-minimal-i5.mjs": "862310f267add3ae5e277f29c2becdfffbd80524d541ae64cd142e7777ec8760",
+    "tools/worker-affinity-preload.mjs": "c76141300339725c9a8d8f6b3447c3934ab3ee14597bb81531e5e2705219a400",
+    "tools/build-rba-minimal-center.mjs": "18e3d992c9ab1127d8e79ee0540cb32f58d059f7d0a2b8aae7a3bd0f340f62d3",
+    "tools/build-rba-uncounted-cache.mjs": "6d14dabe54c70fee45d10177db1d528cefd3c9cadaaa88504d7a38cd05f3688d",
+    "tools/build-rba-coordinate-kernels.mjs": "a20e438256df22f5f3bd97ffebad4ee089f5d657765978d289d5227bc5953032",
+    "tools/build-cpc-target-kernel.mjs": "9aec4d5043b4a0c627b7256f3f1180482cda9d46e0138e3632d0b3f908d045aa",
+    "isomax/index.mjs": "9af6b98a2125bccee84c58b09b272e0d4f8f58951c2484fdeb86f7d153c27d32",
+    "isomax/package.json": "2114c0770482f1338c4853a8ddca01498613933301389e7974f98714763f6996",
+    "isomax/profile.json": "17091425c794b85be367dd354d5b512175e0ea73778e6c5b5881eb68b1a01329",
+    "isomax/provenance.json": "0a0d92a92031013cc57bd6b6667b70dae0c0f24f95af19f96e11d5f40112f003",
+    "isomax/verify.mjs": "17a1a2f940ddd1bb03734906b0df2e2d22edc79e53003e06a091adcd7ce413d1",
+    "isomax/prepare.mjs": "a03e748feae97b0c8893426415c8a3f18e1e6d5d970651e5fc37312d8f74ccf9",
+    "isomax/example.mjs": "2e80cba89e7efc10d8b3f62ab28e3b6143d8db69f088fb513fdafd6bfd828427",
+    "isomax/runtime/addons/branch-manager-host.mjs": "4e4e439a4f33f9f65cd5001caabdce5f614f0a797f1d499807a14d9bf14df385",
+    "isomax/runtime/addons/connect4-live-line-evaluator.mjs": "b949d659afa1e986e124cfa4930da972850dba060eec218e33f27be46863a495",
+    "isomax/runtime/addons/connect4-rank-local-presearch.mjs": "8e3d78990bd980fc97c1e364f37cf780799ca13272e1cf1f096f4225d2064e5d",
+    "isomax/runtime/addons/rba-connect4-coordinate-dense.mjs": "d54890c9c6ad940fc9c5c49af60ae54770d0393f81557319940d957829baf5ee",
+    "isomax/runtime/addons/rba-connect4-coordinate-prepared.mjs": "50dd1630dcf70f675920ae6dd74f6bcfd253ab6f80a17533ccc4b6bb70070460",
+    "isomax/runtime/addons/rba-connect4-coordinate.mjs": "3014a382e37fde49141f4135bb70382cafbb1796e4b3ab7d1a9905dbacdf46b0",
+    "isomax/runtime/addons/rba-connect4-geometry.mjs": "ad9fa0252e565c36f82a4e04ce480a59ca148bb541f60d2080aed363008c737e",
+    "isomax/runtime/addons/rba-connect4-ingress.mjs": "b49f231c61a6fdf945868b919fcd0c8e52f61633cd0dd48e04d6a1bc0bf7e319",
+    "isomax/runtime/addons/rba-connect4-profile.mjs": "31c2248f9f4f70c6711eb75d2364022044c57a596ebb7078538e56f5f9070284",
+    "isomax/runtime/addons/worker-affinity.mjs": "10f4d5509f26c184774b472f2fd4b6aae1c9f58de9e2e8bda0911acd03a15168",
+    "isomax/runtime/addons/worker-behavior-search.mjs": "cff6efa38c4b4b8c965341066f85c0662b3b4ea9190aa78d36078a94d3551157",
+    "isomax/runtime/addons/worker-behavior.mjs": "9ce70c6be554977e49bcad8e67fdb6940e576d5440bf31bcfb8ea1f93135fe5b",
+    "isomax/runtime/addons/worker.mjs": "8f366228f0d67a19bb24a1434dc2b363d1b6f54ef8b5c99a4e86e144f51a1d2b",
+    "isomax/runtime/experiments/isomax-lean/cpc-general.mjs": "73ca5e109f6bdf72c471cf45c9a4d0a5c070aea2f933cd608b081b2972027b54",
+    "isomax/runtime/experiments/isomax-lean/cpc-wide.mjs": "a52933ce7418412c31f1d58cb694ee8ed941014bedfb44b42e4de24d626fc0ae",
+    "isomax/runtime/experiments/isomax-lean/cpc.mjs": "f05071d70b39304680f7adf8a67485ffb51a7aa2a12efebe244b275a6db8d2a4",
+    "isomax/runtime/experiments/isomax-lean/execution-profile.mjs": "fc3945a4cb6cab9abd5becbb8009283c93ec58ed4458246238fd3dc6397dffa4",
+    "isomax/runtime/experiments/isomax-lean/fixed-ops.mjs": "b272b9c262a40a0f15b7552783f5b0e25ad384d87245671fe4c0a7857ecf4f0c",
+    "isomax/runtime/experiments/isomax-lean/host.mjs": "04503472ee550609729face9c8cd0e618cbcb4063c242b4a39743a54ba1fc1d1",
+    "isomax/runtime/experiments/isomax-lean/live-profile.mjs": "a9b4d3f34c782b4ba5821e6c79f871e7dc23b0371e4b3a5442160fd9fa24f06e",
+    "isomax/runtime/experiments/isomax-lean/shared-cache.mjs": "ee4fbe4501f17e62e5c8e5df462f855b2ae0654e171be66b2f164325aa38d1c0",
+    "isomax/runtime/experiments/isomax-lean/solver-dense.mjs": "436ea134a03529bbda424cf656759098b901a569c6809660d77822b6624e8764",
+    "isomax/runtime/experiments/isomax-lean/solver-general-dense.mjs": "b334a434d9f3523a1f1eb9f9456673bf4410741d0bf0807c77a58c5f97c42b9b",
+    "isomax/runtime/experiments/isomax-lean/solver-general-unpacked-dense.mjs": "545931049b74a2a3345a2c2c2ef32e3f07d623f672c2d2368b0b9ab06d348852",
+    "isomax/runtime/experiments/isomax-lean/solver-general-unpacked.mjs": "91b628718ebaca5ba478771cb23308efd536e9e7dce05287cea359cb20f7128e",
+    "isomax/runtime/experiments/isomax-lean/solver-general-wide-dense.mjs": "39cf83a264e1c9d50548280518796da91ec80c64b1bb278251a96cbc9d2b7d94",
+    "isomax/runtime/experiments/isomax-lean/solver-general-wide-unpacked-dense.mjs": "121df6721aa886928757e18557acf484df562a869d66ef6cd48cce0b239ea198",
+    "isomax/runtime/experiments/isomax-lean/solver-general-wide-unpacked.mjs": "c19d5dcd4e6483160b40a58f9c0fda35bd34fe06bd9470b66f32475ede680436",
+    "isomax/runtime/experiments/isomax-lean/solver-general-wide.mjs": "c37852ed2c4053d6df9d606c4ba5f7d0e67e7954ed49e6c04bd67b96553cf133",
+    "isomax/runtime/experiments/isomax-lean/solver-general.mjs": "50f14cbb46494f9dee8d6ba78ec254487ae63ce32e33e45adb64d74592d1f5f8",
+    "isomax/runtime/experiments/isomax-lean/solver.mjs": "e9f703b4c506fb153a36e9d49e9e0c80be77e65c32f99dcc9b63d3d681cc2795",
+    "isomax/runtime/experiments/isomax-lean/worker-dense.mjs": "89b161b87518476953eae3e34abf3278700563abcd882178eb173c74db1116f7",
+    "isomax/runtime/experiments/isomax-lean/worker-general-dense.mjs": "75adc866e8fa27c9173eb53c3e60b1cc3a2605948bb2238167b9a378c18b5dc2",
+    "isomax/runtime/experiments/isomax-lean/worker-general-unpacked-dense.mjs": "2c0bb27eaa76412cbe3de17d93e3a9436192eabc2224067f78fe1195caa5b2e2",
+    "isomax/runtime/experiments/isomax-lean/worker-general-unpacked.mjs": "78b0a5a48eae4ab35c59dfaf7b1ff4ffb76758a9969700ade4e302f1fc7992ae",
+    "isomax/runtime/experiments/isomax-lean/worker-general-wide-dense.mjs": "a97d247c49446c926028f6e9532ad3c90acb5337cc6d9eafa6a9bbaf94d5769f",
+    "isomax/runtime/experiments/isomax-lean/worker-general-wide-unpacked-dense.mjs": "961b96d91f3932200ab19d819d20f452417a21c01b5ee7f3c1c8bb329027346a",
+    "isomax/runtime/experiments/isomax-lean/worker-general-wide-unpacked.mjs": "fb6c8b33af3479b9f15c2b216f4f83d9191a6578acacfc57113168d06b7c5bf2",
+    "isomax/runtime/experiments/isomax-lean/worker-general-wide.mjs": "b05c4d8d6ee0af438f0a5157ccd60fadc23008d23e155c7754c03daa7f2381eb",
+    "isomax/runtime/experiments/isomax-lean/worker-general.mjs": "00e29f8f733828f90b541c8138b87d78512e3dd74184cf21357b4b6ececc3eec",
+    "isomax/runtime/experiments/isomax-lean/worker.mjs": "9c030393b845e82ce524a9b55bb869fb242707d055c0252cbcc0690d9b467d6a",
+    "isomax/runtime/src/basis32.mjs": "5cdaf99d2c5c45055a5bca9958d56df3a215a17bfc7b4ec8a2184d5257cb3fde",
+    "isomax/runtime/src/relational32.mjs": "1583d5f1a296c78316ddc56e5d0dcb5590e4829a2241ba2533158ddc984cf87d",
+    "isomax/runtime/src/search32.mjs": "e7d406163549ebbba6c6c959c3fcdd518d9741e73ff21f530473e325b7276336",
+    "isomax/runtime/src/widekey32.mjs": "aacb43018b55912359b0352b73017f71fe176d508efe822f2677b37d493a29b4",
+    "isomax/runtime/src/word32.mjs": "1e5366d8b24943c0d17311b174ca83274063267e494ca8f004b8577c8a279098",
+    "isomax/runtime/src/word64x32.mjs": "f7ca1906945d3779ac8c406e820bf6e5d49ac40f4848e857642558cdbfd303cc",
+    "isomax/runtime/src/worker-behavior32.mjs": "c6802017780a123729ca8463d4a1a151b16b3ef5bb17ee939d52d607a5dac8b1",
+    "isomax/runtime/tools/worker-affinity-preload.mjs": "c76141300339725c9a8d8f6b3447c3934ab3ee14597bb81531e5e2705219a400"
+  },
+  "coverage_limit": "Hashes are identities, not a claim that every hashed file or every repository file was independently reviewed. See REPORT.md for line-by-line scope."
+}
