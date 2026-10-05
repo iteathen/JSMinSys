@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[string]$SourceRun='c4ideas-c26-01',[ValidateSet('','split','native')][string]$PrivateLayout='',[switch]$Inlining,[switch]$CpuProfile)
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[string]$SourceRun='c4ideas-c26-01',[ValidateSet('','split','native')][string]$PrivateLayout='',[string[]]$NodeFlags=@(),[switch]$Inlining,[switch]$CpuProfile)
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -8,6 +8,7 @@ if(Test-Path "$runDir/measurement.json"){throw 'Run already exists'}
 New-Item -ItemType Directory -Force -Path "$runDir/temp","$runDir/affinity" | Out-Null
 $config=Get-Content "evidence/minimal-worker-localhost-20261004/$SourceRun/invocation.json" -Raw | ConvertFrom-Json
 $config.upstream_commit=git rev-parse HEAD
+if($NodeFlags.Count){$config.arguments=@($NodeFlags)+@($config.arguments | Where-Object {$_ -notmatch '^--max-inlined-bytecode-size(=|-cumulative=)'})}
 if($PrivateLayout){$config.environment | Add-Member -NotePropertyName JMS_BENCH_LOCAL_TT_LAYOUT -NotePropertyValue $PrivateLayout -Force}
 $config.arguments[-1]="$repo/evidence/c4-inspired-optimization-20261005/probes/diagnostic.mjs"
 if($Inlining){$config.arguments=@('--trace-turbo-inlining')+@($config.arguments)}
