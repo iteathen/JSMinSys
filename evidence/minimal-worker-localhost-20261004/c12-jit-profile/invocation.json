@@ -1,0 +1,38 @@
+{
+  "mode": "run",
+  "solver": "isomax",
+  "upstream_commit": "9f1dda4191c20766e68276089ff51005f796999c",
+  "executable_hash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+  "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+  "arguments": [
+    "--cpu-prof",
+    "--cpu-prof-dir=C:/r/minimal-worker-localhost-20261004/c12-jit-profile",
+    "--max-inlined-bytecode-size=600",
+    "--max-inlined-bytecode-size-cumulative=2400",
+    "--import",
+    "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+    "--experimental-ffi",
+    "--import",
+    "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+    "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/profile.mjs"
+  ],
+  "cwd": "C:/r/jsminsys-cpc-rebuild-20261004",
+  "environment": {
+    "SystemRoot": "C:\\WINDOWS",
+    "WINDIR": "C:\\WINDOWS",
+    "PATH": "C:\\WINDOWS\\System32",
+    "TEMP": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/temp",
+    "TMP": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/temp",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SystemDrive": "C:",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+    "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+    "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/affinity"
+  },
+  "affinityMask": 85,
+  "timeoutMs": 60000,
+  "stdout": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/stdout.json",
+  "stderr": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/stderr.txt",
+  "measurement": "C:/r/minimal-worker-localhost-20261004/c12-jit-profile/measurement.json"
+}
