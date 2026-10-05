@@ -1,0 +1,5 @@
+# c4-inspired localhost results
+
+Baseline two complete unchanged runs: 150218.1352 / 150608.1853 ms; 2104473657043 / 2106019717081 whole-operation process cycles. Mean 150413.16025 ms / 2105246687062 cycles. Both EXACT +1/c4, four ready workers, four clean exits, verified CPUs0/2/4/6. Same preserved capacities/runtime and primary prepared-empty interval as PLAN.md.
+
+C17 first at c0b3f40: 128881.766 ms / 1806518562977 cycles, EXACT +1/c4, clean4, verified affinity; peakRSS8844824576 bytes. 14.32% lower wall and 14.19% lower cycles than baseline mean. PROVISIONAL pending repeat. No exact-only default-worker changes; explicit sharedProofBounds selects generated proof workers in a homogeneous pool. Initial direct edit failed the existing exact-only publication regression; corrected isolation preserves that contract, then27 focused tests and26 independent physical-minimax cases passed. Entry size, capacities, canonical-q equality and atomic protocol unchanged. First result is not a10s solve or a statistical claim.
