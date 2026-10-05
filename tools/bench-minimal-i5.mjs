@@ -4,7 +4,9 @@ import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {runLazySmpConnect4Rba32,RBA_LAZY_SMP_WORKER_MINIMAL} from '../addons/rba-connect4-lazy-smp-host.mjs';
 import {processCycleCounter} from './process-cycle-counter.mjs';
 
-const geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
+const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??134217728),
+  localCacheCapacity=Number(process.env.JMS_BENCH_LOCAL_CAPACITY??16777216),
+  geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),
   t0=performance.now();
@@ -15,8 +17,8 @@ try{
     geometry,
     workers:4,
     workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
-    sharedCacheCapacity:134217728,
-    localCacheCapacity:16777216,
+    sharedCacheCapacity,
+    localCacheCapacity,
     sharedSampleMask:0,
     timeoutMs:600000,
     preparedEmptyTiming:true,
@@ -33,6 +35,7 @@ console.log(JSON.stringify({
   runtime:{node:process.version,v8:process.versions.v8},
   platform:{platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model??null,logicalProcessors:os.cpus().length},
   target:{wallTimeMsMax:10000,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL},
+  configuration:{sharedCacheCapacity,localCacheCapacity,sharedTtBytes:sharedCacheCapacity*40,privateTtBytesPerWorker:localCacheCapacity*33,workers:4,rootFrontier:false,sharedSampleMask:0,policies:["center","live","center","live"]},
   wallMs:result.preparedTiming.solveMs,
   totalOperationWallMs:wallMs,
   preparedTiming:result.preparedTiming,
