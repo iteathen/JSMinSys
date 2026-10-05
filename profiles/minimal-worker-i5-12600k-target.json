@@ -39,13 +39,14 @@
     "sharedSampleMask": 0,
     "sharedCacheCapacity": 134217728,
     "localCacheCapacity": 33554432,
-    "timeoutMs": 600000
+    "timeoutMs": 600000,
+    "sharedCacheLayout": "auto"
   },
   "measurement": {
     "wallClock": "all workers ready and TT pages initialized -> empty root constructed -> exact result observed; initialization and cleanup separate",
     "processCycles": "tools/process-cycle-counter.mjs / QueryProcessCycleTime",
     "affinityPreload": "tools/worker-affinity-preload.mjs",
-    "command": "node --experimental-ffi --import ./tools/worker-affinity-preload.mjs tools/bench-minimal-i5.mjs",
+    "command": "powershell evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name <fresh-name> (pinned actual runtime/affinity/inline flags)",
     "requiredOutput": [
       "runtime tuple",
       "CPU/platform",
@@ -97,9 +98,9 @@
   },
   "retainedLocalhostAuthority": {
     "historical": "evidence/minimal-worker-localhost-20261004/C15-RESULT.md",
-    "fresh": "evidence/minimal-worker-localhost-20261004/a-fix-baseline-01",
-    "sharedPayloadBytes": 5368709120,
+    "fresh": "evidence/isomax-line-audit-fixes-20261005/PERFORMANCE.json",
+    "sharedPayloadBytes": 4294967296,
     "privatePayloadBytesPerWorker": 1107296256,
-    "note": "Descriptive profile only; recover actual invocation/raw evidence before benchmarking."
+    "note": "Entry counts unchanged; standard 7x6 native layout qualified by two matched localhost pairs. Generic geometry retains previous split storage. Recover raw invocation rather than inferring performance configuration from this descriptive profile."
   }
 }

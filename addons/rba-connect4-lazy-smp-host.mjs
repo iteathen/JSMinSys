@@ -30,7 +30,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   rootFrontier=false,
   workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
   preparedEmptyTiming=false,
-  sharedCacheLayout='split40',
+  sharedCacheLayout='auto',
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
@@ -57,6 +57,7 @@ export async function runLazySmpConnect4Rba32(moves,{
       localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout});
     try{return await prepared.solve(moves);}finally{await prepared.close();}
   }
+  if(sharedCacheLayout==='auto')sharedCacheLayout='split40';
   if(sharedCacheLayout!=='split40')throw new TypeError('native shared TT requires minimal workers');
   if(rootFrontier){
     if(behaviorMemory!==null)throw new TypeError('rootFrontier owns initial behavior memory');

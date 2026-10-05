@@ -1,0 +1,52 @@
+{
+  "auditCommit": "5954a8c8fe069fec1067fbeefb6840065aa19ef4",
+  "issues": {
+    "A01_completion_deadline": "FIXED: initial and deadline terminal observations; later abort also preserves observed DONE",
+    "A02_long_deadline": "FIXED: monotonic bounded timer chunks; oversized polling interval rejected",
+    "A03_capacity": "FIXED: safe bounded powers and largest native view validated before backing allocation",
+    "A04_package_verification": "FIXED: public/config/metadata/tests and dependency closure locked; frozen source plus explicit hashed cold overlays reproduces",
+    "A05_rank_local_input": "FIXED: non-indexed DataView and invalid/oversized histories rejected",
+    "A06_worker_initialization": "FIXED: minimal and packaged convenience solves await all workers; explicit prepared one-shot API places worker/TT allocation at application initialization",
+    "A07_sharing_ledger": "FIXED: current deliberate exact-sharing semantics documented; no sharing-policy rollback",
+    "A08_missing_native_layout": "RETAINED: qualified standard7x6 shared native32; generic and oversized native-view capacities retain prior split storage automatically"
+  },
+  "additionalReviewCorrections": [
+    "Closing an active wait now settles its pending promise",
+    "READY package cancellation automatically joins idle workers",
+    "Already-cancelled package initialization rejects before large allocations",
+    "Terminal cleanup detaches cancellation and preserves exact result",
+    "Frozen-source binding test authenticates independent hashes without requiring Git history"
+  ],
+  "performance": {
+    "matchedControlRuns": 2,
+    "matchedNativeRuns": 2,
+    "controlMeanMs": 160174.3853,
+    "nativeMeanMs": 150065.8667,
+    "wallReductionPercent": 6.3109457739245585,
+    "cycleReductionPercent": 6.191323668732352,
+    "minimumNativePeakRssBytes": 8841793536,
+    "maximumNativePeakRssBytes": 8848183296,
+    "allSixFullRunsExact": true,
+    "allSixFullRunsClean": true,
+    "target10SecondsAchieved": false,
+    "qualification": "Bounded internal localhost qualification; no statistical or universal guarantee"
+  },
+  "validation": {
+    "rootTestsPassed": 259,
+    "packageSourceTestsPassed": 42,
+    "extractedPackageTestsPassed": 42,
+    "independentPhysicalWorkerCasesPerLayout": 26,
+    "independentChildTransitions": 21022,
+    "catalogAddonUnits": 244,
+    "catalogSealedFunctions": 298,
+    "packageLockedFiles": 380,
+    "ci": "Pre-existing stale legacy behavior-generator check remains; relevant local generated/catalog/regression/package checks pass"
+  },
+  "unqualifiedTargets": [
+    "Repeated basis reconstruction",
+    "Repeated reflection",
+    "Repeated live-state updates"
+  ],
+  "publication": "Active research branch only; no main merge or package publication",
+  "holdouts": "EW-RS-059 formula holdouts remain sealed"
+}

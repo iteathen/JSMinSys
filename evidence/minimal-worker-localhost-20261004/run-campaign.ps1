@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('split40','native')][string]$CacheLayout='split40',[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('auto','split40','native')][string]$CacheLayout='auto',[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo

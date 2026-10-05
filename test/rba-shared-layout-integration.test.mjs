@@ -46,3 +46,12 @@ test('both layout owners clean up idle, active and aborted applications',async()
     assert.equal(result.status,'INTERRUPTED');assert.equal(result.workersExited,4);
   }
 });
+test('automatic layout uses qualified 7x6 storage and preserves generic storage',async()=>{
+  for(const [columns,rows,expected,bytes] of [[7,6,'native',32],[7,5,'split40',56],[3,3,'split40',24]]){
+    const geometry=prepareConnect4RbaGeometry({columns,rows});
+    const result=await runLazySmpConnect4Rba32(columns===3?[]:[3,0,3,0,3,1],{
+      geometry,workers:4,workerMode:'minimal',sharedCacheCapacity:256,localCacheCapacity:256,timeoutMs:5000});
+    assert.equal(result.status,'EXACT');assert.equal(result.sharedCacheLayout,expected);
+    assert.equal(result.sharedTtEntryBytes,bytes);assert.equal(result.workersExited,4);
+  }
+});

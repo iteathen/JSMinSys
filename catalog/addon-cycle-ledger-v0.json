@@ -640,6 +640,13 @@
         "name": "NATIVE_ACCESS_LOWERING_COST(path,runtime,indexDomain)"
       },
       "note": "Explicit unqualified lowering debt: native view type/bounds/index guards, receiver/argument checks, boxing, call-frame effects and deoptimizations. Not a proxy for omitted source body. Source operations are decomposed separately."
+    },
+    "runtime.layout.auto.select": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "AUTO_LAYOUT_SELECT_COST(autoRequested,compact,capacity)"
+      },
+      "note": "Cold-only layout request string comparison, branch and reached Boolean/capacity comparison plus local assignment. Includes JS lowering; not priced as numeric hot comparison."
     }
   },
   "units": [
@@ -7140,12 +7147,16 @@
         {
           "op": "runtime.error.throw",
           "count": "BAD_LEGACY_LAYOUT"
+        },
+        {
+          "op": "runtime.layout.auto.select",
+          "count": "LEGACY"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2)*C(runtime.integer.check)+C(runtime.number.finite.check)+C(runtime.timer.read)+(VALID_TEST)*C(control.test.u32)+(VALID_BRANCH)*C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(MINIMAL)*CALL(prepareLazySmpConnect4Rba32)+(MINIMAL)*CALL(solvePreparedConnect4Search32)+(MINIMAL)*CALL(closePreparedConnect4Search32)+(3*MINIMAL)*C(runtime.promise.await)+(LEGACY*(3))*C(alu.and.u32)+(LEGACY*(1))*CALL(connect4RbaFromMoves)+(LEGACY*(1))*CALL(shareConnect4RbaGeometry32)+(LEGACY*(1))*CALL(createConnect4RbaSharedExactCache32)+(LEGACY*(1))*CALL(createManagedThreadSession32)+(LEGACY*(W))*CALL(ManagedThreadSession.spawn)+(LEGACY*(1))*CALL(ManagedThreadSession.wait)+(LEGACY*(1))*CALL(ManagedThreadSession.close)+(LEGACY*(1))*CALL(ManagedThreadSession.state)+(LEGACY*(2))*CALL(sharedViewBytes32)+(LEGACY*(2+M))*C(memory.allocate.shared.bytes)+(LEGACY*(2+M))*C(runtime.typed_view.construct)+(LEGACY*(1))*C(runtime.array.allocate)+(LEGACY*(W))*C(runtime.url.construct)+(LEGACY*(2))*C(runtime.timer.read)+(LEGACY*(1))*C(atomic.store.u32)+(LEGACY*(5+W+3*M))*C(atomic.load.u32)+(LEGACY*(30*E*M))*C(memory.load.u32)+(LEGACY*(2+E))*C(runtime.object.allocate)+(LEGACY*(5+4*W+E))*C(alu.imul.u32)+(LEGACY*(3+W))*C(alu.add.u32)+(LEGACY*(1))*C(runtime.field.store)+(LEGACY*(2*F))*C(runtime.instanceof.check)+(LEGACY*(2*F))*C(runtime.field.load)+(LEGACY*(3+3*F))*C(control.branch)+(LEGACY*(2*W))*C(runtime.field.store)+(LEGACY*(X))*C(runtime.error.throw)+(LEGACY*(RF))*CALL(createWorkerBehaviorMemory32)+(LEGACY*(RF*W))*CALL(publishWorkerBehavior32)+(LEGACY*(RF*W))*CALL(encodeRootFrontier32)+(LEGACY*(3*RF))*C(memory.allocate.shared.bytes)+(LEGACY*(1+3*RF*W))*C(runtime.typed_view.construct)+(LEGACY*(3*RF+RF*W))*C(runtime.array.from)+(LEGACY*(3*W))*C(runtime.field.store)+(LEGACY*(3))*C(control.test.u32)+(LEGACY*(3))*C(control.branch)+(LEGACY*(3*PT))*C(runtime.typed_array.fill)+(LEGACY*(3*PT))*C(memory.allocate.shared.bytes)+(LEGACY*(3*PT))*C(runtime.typed_view.construct)+(LEGACY*(PT_TIMER))*C(runtime.timer.read)+(LEGACY*(PT_LOAD))*C(atomic.load.u32)+(LEGACY*(2*PT))*C(atomic.store.u32)+(LEGACY*(PT))*C(atomic.notify)+(LEGACY*(2*PT))*C(runtime.array.copy)+(LEGACY*(PT_POLL))*C(runtime.host.bookkeeping)+(LEGACY)*C(control.test.u32)+(LEGACY)*C(control.branch)+(BAD_LEGACY_LAYOUT)*C(runtime.error.throw)",
+        "activeCycleExpression": "(2)*C(runtime.integer.check)+C(runtime.number.finite.check)+C(runtime.timer.read)+(VALID_TEST)*C(control.test.u32)+(VALID_BRANCH)*C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(MINIMAL)*CALL(prepareLazySmpConnect4Rba32)+(MINIMAL)*CALL(solvePreparedConnect4Search32)+(MINIMAL)*CALL(closePreparedConnect4Search32)+(3*MINIMAL)*C(runtime.promise.await)+(LEGACY*(3))*C(alu.and.u32)+(LEGACY*(1))*CALL(connect4RbaFromMoves)+(LEGACY*(1))*CALL(shareConnect4RbaGeometry32)+(LEGACY*(1))*CALL(createConnect4RbaSharedExactCache32)+(LEGACY*(1))*CALL(createManagedThreadSession32)+(LEGACY*(W))*CALL(ManagedThreadSession.spawn)+(LEGACY*(1))*CALL(ManagedThreadSession.wait)+(LEGACY*(1))*CALL(ManagedThreadSession.close)+(LEGACY*(1))*CALL(ManagedThreadSession.state)+(LEGACY*(2))*CALL(sharedViewBytes32)+(LEGACY*(2+M))*C(memory.allocate.shared.bytes)+(LEGACY*(2+M))*C(runtime.typed_view.construct)+(LEGACY*(1))*C(runtime.array.allocate)+(LEGACY*(W))*C(runtime.url.construct)+(LEGACY*(2))*C(runtime.timer.read)+(LEGACY*(1))*C(atomic.store.u32)+(LEGACY*(5+W+3*M))*C(atomic.load.u32)+(LEGACY*(30*E*M))*C(memory.load.u32)+(LEGACY*(2+E))*C(runtime.object.allocate)+(LEGACY*(5+4*W+E))*C(alu.imul.u32)+(LEGACY*(3+W))*C(alu.add.u32)+(LEGACY*(1))*C(runtime.field.store)+(LEGACY*(2*F))*C(runtime.instanceof.check)+(LEGACY*(2*F))*C(runtime.field.load)+(LEGACY*(3+3*F))*C(control.branch)+(LEGACY*(2*W))*C(runtime.field.store)+(LEGACY*(X))*C(runtime.error.throw)+(LEGACY*(RF))*CALL(createWorkerBehaviorMemory32)+(LEGACY*(RF*W))*CALL(publishWorkerBehavior32)+(LEGACY*(RF*W))*CALL(encodeRootFrontier32)+(LEGACY*(3*RF))*C(memory.allocate.shared.bytes)+(LEGACY*(1+3*RF*W))*C(runtime.typed_view.construct)+(LEGACY*(3*RF+RF*W))*C(runtime.array.from)+(LEGACY*(3*W))*C(runtime.field.store)+(LEGACY*(3))*C(control.test.u32)+(LEGACY*(3))*C(control.branch)+(LEGACY*(3*PT))*C(runtime.typed_array.fill)+(LEGACY*(3*PT))*C(memory.allocate.shared.bytes)+(LEGACY*(3*PT))*C(runtime.typed_view.construct)+(LEGACY*(PT_TIMER))*C(runtime.timer.read)+(LEGACY*(PT_LOAD))*C(atomic.load.u32)+(LEGACY*(2*PT))*C(atomic.store.u32)+(LEGACY*(PT))*C(atomic.notify)+(LEGACY*(2*PT))*C(runtime.array.copy)+(LEGACY*(PT_POLL))*C(runtime.host.bookkeeping)+(LEGACY)*C(control.test.u32)+(LEGACY)*C(control.branch)+(BAD_LEGACY_LAYOUT)*C(runtime.error.throw)+(LEGACY)*C(runtime.layout.auto.select)",
         "unboundedTerms": [
           "CALL(prepareLazySmpConnect4Rba32)",
           "CALL(solvePreparedConnect4Search32)",
@@ -7173,7 +7184,7 @@
           "VALID_BRANCH": "executed branches for common validation; both capacity checks use common owner",
           "BAD_LEGACY_LAYOUT": "1 when a legacy request selects non-split40 layout; rejection before legacy backing allocation"
         },
-        "note": "Common cold validation selects prepared minimal composition or the existing decomposed legacy/frontier host path. Removed legacy capacity predicates are replaced by two validateConnect4CacheCapacity32 calls. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Forward sharedCacheLayout to minimal preparation; legacy rejects native choice in cold host."
+        "note": "Common cold validation selects prepared minimal composition or the existing decomposed legacy/frontier host path. Removed legacy capacity predicates are replaced by two validateConnect4CacheCapacity32 calls. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Forward sharedCacheLayout to minimal preparation; legacy rejects native choice in cold host. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage."
       },
       "status": "decomposed"
     },
@@ -14628,12 +14639,16 @@
         {
           "op": "control.branch",
           "count": "LAYOUT_BRANCH"
+        },
+        {
+          "op": "runtime.layout.auto.select",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)",
+        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)",
         "unboundedTerms": [
           "C(runtime.promise.await)",
           "CALL(ManagedThreadSession.spawn)"
@@ -14655,10 +14670,10 @@
           "ITER": "Readiness loop body executions including the optional deadline-expiring iteration; Q excludes that final untimed iteration",
           "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
           "LAYOUT_FIELDS": "Reached descriptor kind/heightStride/entryWords reads;3 split/native selection guard operands and selected stride fields",
-          "LAYOUT_TEST": "Reached sharedCacheLayout guard operands,kind/stride ternary tests,constructor choice and fill-path test",
+          "LAYOUT_TEST": "Reached sharedCacheLayout guard operands,kind/stride ternary tests,constructor choice and fill-path test; excludes automatic selection charged separately",
           "LAYOUT_BRANCH": "Executed branches corresponding to those cold selection predicates"
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage."
       },
       "status": "decomposed"
     },
@@ -16651,7 +16666,7 @@
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 91
+    "localExtensionOperations": 92
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -16758,7 +16773,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2e6b09787864b4cc22748174cb71295e243467ee",
-    "addons/rba-connect4-lazy-smp-host.mjs": "57fa267dec6777521c0f65662edb33eca0522884",
+    "addons/rba-connect4-lazy-smp-host.mjs": "0470582302f86a95251f1a4b82a1c2e38d53231e",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -16782,8 +16797,8 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "c252001eb9e918c38dd1601d98ac017e63da33a9",
-    "addons/rba-connect4-shared-exact-cache-layout.mjs": "0dd317872306237f1f683e5f909884e03dec4e4f"
+    "addons/rba-connect4-prepared-session-host.mjs": "75ef8f0d6a91bef817e39922539ef7f2f2f6e318",
+    "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

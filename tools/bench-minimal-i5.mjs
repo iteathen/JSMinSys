@@ -6,7 +6,7 @@ import {processCycleCounter} from './process-cycle-counter.mjs';
 
 const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??134217728),
   localCacheCapacity=Number(process.env.JMS_BENCH_LOCAL_CAPACITY??33554432),
-  sharedCacheLayout=process.env.JMS_BENCH_TT_LAYOUT??'split40',
+  sharedCacheLayout=process.env.JMS_BENCH_TT_LAYOUT??'auto',
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),

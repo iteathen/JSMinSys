@@ -1,4 +1,4 @@
-// Candidate only. Frozen native-field layout; consumer access selected once cold.
+// Native-field exact TT support; layout and consumer access selected once cold.
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 export function isCompactLayoutProfile8(geometry,keyWords){
