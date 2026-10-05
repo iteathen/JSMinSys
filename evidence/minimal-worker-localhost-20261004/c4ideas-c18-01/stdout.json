@@ -1,0 +1,64 @@
+{
+  "kind": "minimal-worker-i5-12600k-prepared-empty-solve-v2",
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36"
+  },
+  "platform": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "logicalProcessors": 16
+  },
+  "target": {
+    "wallTimeMsMax": 10000,
+    "workers": 4,
+    "workerMode": "minimal"
+  },
+  "configuration": {
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 33554432,
+    "sharedProofBounds": true,
+    "sharedCacheLayout": "native",
+    "sharedTtEntryBytes": 32,
+    "sharedTtBytes": 4294967296,
+    "privateTtBytesPerWorker": 1107296256,
+    "workers": 4,
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "policies": [
+      "center",
+      "live",
+      "center",
+      "live"
+    ]
+  },
+  "wallMs": 130421.99210000002,
+  "totalOperationWallMs": 131492.2829,
+  "preparedTiming": {
+    "readyWorkers": 4,
+    "rootConstructedAfterReady": true,
+    "initializationMs": 1023.5702000000001,
+    "solveMs": 130421.99210000002,
+    "cleanupMs": 45.709600000001956,
+    "boundary": "all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate"
+  },
+  "processCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+  "processCycles": "1828432895188",
+  "status": "EXACT",
+  "rootWdl": 1,
+  "move": 3,
+  "winner": 1,
+  "completedWorkers": [
+    0,
+    1,
+    1,
+    1
+  ],
+  "sharedCacheHits": null,
+  "sharedCacheStores": null,
+  "sharedCacheStoreContention": null,
+  "cleanup": true,
+  "workersExited": 4,
+  "errorCode": 0
+}
