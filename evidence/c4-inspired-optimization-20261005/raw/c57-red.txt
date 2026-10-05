@@ -1,0 +1,184 @@
+✖ rba-connect4-lazy-smp-worker-minimal intersects CPC response bounds soundly with every original window (60.8239ms)
+✖ rba-connect4-lazy-smp-worker-minimal-local32 intersects CPC response bounds soundly with every original window (50.5441ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs intersects CPC response bounds soundly with every original window (45.3764ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 intersects CPC response bounds soundly with every original window (45.9331ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center intersects CPC response bounds soundly with every original window (45.459ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 intersects CPC response bounds soundly with every original window (44.5316ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs intersects CPC response bounds soundly with every original window (41.1979ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 intersects CPC response bounds soundly with every original window (43.2165ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 446.516
+
+✖ failing tests:
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal intersects CPC response bounds soundly with every original window (60.8239ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-local32 intersects CPC response bounds soundly with every original window (50.5441ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs intersects CPC response bounds soundly with every original window (45.3764ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 intersects CPC response bounds soundly with every original window (45.9331ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-center intersects CPC response bounds soundly with every original window (45.459ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 intersects CPC response bounds soundly with every original window (44.5316ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs intersects CPC response bounds soundly with every original window (41.1979ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpc-response-window.test.mjs:9:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 intersects CPC response bounds soundly with every original window (43.2165ms)
+  AssertionError [ERR_ASSERTION]: previous NONLOSS or WIN excludes current pair WIN
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-response-window.test.mjs:37:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
