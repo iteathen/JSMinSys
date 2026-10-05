@@ -170,6 +170,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
 
   // One common legal policy: WIN or a one-sided NONLOSS for previous mover.
   const response=evaluateConnect4PreparedCpcResponse32(cpc,words,src,basis,bi,n,mover^1);
+  if(response===2&&depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0);return 0;}
   if(response===1||
      evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
     if(depth)storeExact(src,hash,slot,mover?3:1);
@@ -181,7 +182,6 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   }
 
   if(response===2){
-    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0);return 0;}
     if(beta>0)beta=0;
   }
 

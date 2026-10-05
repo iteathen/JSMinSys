@@ -9,12 +9,13 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
  test(name+' intersects CPC response bounds soundly with every original window',()=>{
   const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8'),start=source.indexOf('function negamax('),end=source.indexOf('\nconst meta=',start);
   assert.ok(start>=0&&end>start);let cases=0;
-  for(const mover of [0,1])for(const response of [0,1,2])for(const truth of [-1,0,1]){
-   if(response===1&&truth!==-1||response===2&&truth>0)continue;
+  for(const mover of [0,1])for(const response of [0,1,2])for(const truth of [-1,0,1])for(const target of [false,true]){
+    if(response===1&&truth!==-1||response===2&&truth>0)continue;
+    if(target&&truth!==-1)continue;
    for(const cached of [0,4,5]){
     if(cached===4&&truth<0||cached===5&&truth>0)continue;
     for(const depth of [0,1])for(const alpha of [-2,-1,0,1])for(const beta of [-1,0,1,2])if(alpha<beta){
-     let constructed=0;
+     let constructed=0,targetCalls=0;
      const context={Atomics,control:new Int32Array(new SharedArrayBuffer(4)),CONTROL_STOP:0,CANCELLED:-2,LOCAL_LOWER0:4,LOCAL_UPPER0:5,
       forbidden:new Uint32Array(4),forbiddenWords:1,g:{keyWords:14,maxBasis:64,columns:1,rows:1},words:new Uint32Array(64),basis:new Uint32Array(128),localMask:3,
       centerOrder:[0],bestMove:-1,liveWords:3,live:{},moveOrder:new Uint32Array(1),moveOrderMask:7,
@@ -22,7 +23,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
       mixSpan32Locator32:()=>0,probeCache:()=>cached,
       storeExact:(_s,_h,_slot,v)=>assert.equal(v,truth===0?2:mover===0?truth+2:2-truth),
       storeBound:(_s,_h,_slot,v)=>assert.ok(v===4?truth>=0:truth<=0),
-      collectSingletons:()=>-1,evaluatePairHub:()=>-1,evaluateConnect4PreparedCpcResponse32:()=>response,evaluateTargetCpc:()=>false,
+      collectSingletons:()=>-1,evaluatePairHub:()=>-1,evaluateConnect4PreparedCpcResponse32:()=>response,evaluateTargetCpc:()=>{targetCalls++;return target;},
       orderLive:()=>1,
       connect4RbaCofactorKnownHeight:()=>{constructed++;return truth===0?2:mover===0?truth+2:2-truth;},
       relativeTerminal:(v,p)=>v===2?0:v===(p?1:3)?1:-1,
@@ -33,6 +34,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      else assert.equal(value,truth);
      if(depth===0)assert.equal(context.bestMove,0,'root must produce a legal witness');
      if(response===1||response===2&&depth&&alpha>=0)assert.equal(constructed,0,'certified cutoff must not construct a child');
+     if(response===2&&depth&&alpha>=0&&cached===0)assert.equal(targetCalls,0,'sufficient upper bound must skip stronger target proof');
      cases++;
     }
    }
