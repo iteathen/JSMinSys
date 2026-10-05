@@ -1,4 +1,4 @@
-import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
+import {prepareConnect4StagedLiveLineOrder32,beginConnect4StagedLiveLineOrder32} from './connect4-staged-live-line-order.mjs';
 import {connect4RbaDenseCofactorKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
@@ -48,7 +48,7 @@ while(orderAt<g.columns){
   pair+=1;
 }
 
-const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
+const live=prepareConnect4StagedLiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
   liveWords=live.profile.stateWords,liveState=live.state,
   liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
   moveOrder=live.ordered,moveOrderMask=live.mask;
@@ -163,7 +163,7 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     return -1;
   }
 
-  const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);
+  let actionCount=forced>=0?1:beginConnect4StagedLiveLineOrder32(live,words,src,orderRow);
   let best=-2;
   for(let oi=0;oi<actionCount;oi+=1){
     const column=forced>=0?forced:(moveOrder[orderRow+oi]&moveOrderMask),
@@ -194,6 +194,7 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     }
     if(value>alpha)alpha=value;
     if(best===1||alpha>=beta){break;}
+    if(forced<0&&oi===0)actionCount+=orderLive(live,words,src,mover,orientation,liveOffset,orderRow+1,column);
   }
 
   if(depth){

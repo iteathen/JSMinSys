@@ -3,6 +3,37 @@ import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import * as liveApi from '../addons/connect4-live-line-evaluator.mjs';
 const orderApi=await import('../addons/connect4-live-line-order.mjs').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
+const stagedApi=await import('../addons/connect4-staged-live-line-order.mjs').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
+
+test('staged exploration emits a cheap first move and each remaining legal move once',()=>{
+  assert.equal(typeof stagedApi.prepareConnect4StagedLiveLineOrder32,'function');
+  for(const [W,H] of [[7,6],[7,5],[4,4],[3,3],[33,4]]){
+    const g=prepareConnect4RbaGeometry({columns:W,rows:H});
+    const ties=Uint32Array.from(Array.from({length:W},(_,i)=>i).sort((a,b)=>Math.abs(a-(W-1)/2)-Math.abs(b-(W-1)/2)||b-a));
+    const o=stagedApi.prepareConnect4StagedLiveLineOrder32(g,ties,[]);
+    const general={...o,scores:new Uint32Array((g.cellCount+1)*W)};
+    const words=new Uint32Array(g.keyWords),row=W;
+    // Successively fill the preferred columns, including the one-legal and full cases.
+    for(let filled=0;filled<=W;filled++){
+      if(filled)words[ties[filled-1]]=H;
+      const savedScore=o.score;o.score=()=>{throw Error('first tier must not score');};
+      const firstCount=stagedApi.beginConnect4StagedLiveLineOrder32(o,words,0,row);
+      o.score=savedScore;
+      assert.equal(firstCount,filled<W?1:0);
+      if(!firstCount)continue;
+      const first=o.ordered[row];assert.equal(first,ties[filled]);
+      for(const orientation of [0,1])for(const mover of [0,1]){
+        const total=orderApi.orderConnect4LiveLineGeneral32(general,words,0,mover,orientation,0,0);
+        const expected=Array.from(general.ordered.subarray(0,total)).filter(c=>c!==first);
+        const rest=o.order(o,words,0,mover,orientation,0,row+1,first);
+        assert.deepEqual(Array.from(o.ordered.subarray(row+1,row+1+rest),x=>x&o.mask),expected);
+        assert.equal(rest+1,W-filled);
+        const restGeneral=stagedApi.orderConnect4StagedLiveLineGeneral32(general,words,0,mover,orientation,0,row+1,first);
+        assert.deepEqual(Array.from(general.ordered.subarray(row+1,row+1+restGeneral)),expected);
+      }
+    }
+  }
+});
 
 test('three-word live update matches general update in-place and disjoint',()=>{
   assert.equal(typeof liveApi.advanceConnect4LiveLineState3x32,'function');

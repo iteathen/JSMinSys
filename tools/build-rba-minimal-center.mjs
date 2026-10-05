@@ -4,8 +4,8 @@ import {readFileSync,writeFileSync} from 'node:fs';
 const input=new URL('../addons/rba-connect4-lazy-smp-worker-minimal.mjs',import.meta.url),output=new URL('../addons/rba-connect4-lazy-smp-worker-minimal-center.mjs',import.meta.url);
 let s=readFileSync(input,'utf8').replaceAll('\r\n','\n');
 function once(a,b){assert.equal(s.split(a).length,2,'template changed: '+a);s=s.replace(a,b);}
-once("import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';\n",'');
-once(`const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
+once("import {prepareConnect4StagedLiveLineOrder32,beginConnect4StagedLiveLineOrder32} from './connect4-staged-live-line-order.mjs';\n",'');
+once(`const live=prepareConnect4StagedLiveLineOrder32(g,centerOrder,workerData.root.moveHistory),
   liveWords=live.profile.stateWords,liveState=live.state,
   liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
   moveOrder=live.ordered,moveOrderMask=live.mask;
@@ -13,7 +13,8 @@ once(`const live=prepareConnect4LiveLineOrder32(g,centerOrder,workerData.root.mo
 `,'');
 once('function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){','function negamax(depth,src,bi,n,mover,alpha,beta){');
 once('    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,\n','');
-once('const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);','const actionCount=forced>=0?1:g.columns;');
+once('let actionCount=forced>=0?1:beginConnect4StagedLiveLineOrder32(live,words,src,orderRow);','const actionCount=forced>=0?1:g.columns;');
+once('    if(forced<0&&oi===0)actionCount+=orderLive(live,words,src,mover,orientation,liveOffset,orderRow+1,column);\n','');
 once('const column=forced>=0?forced:(moveOrder[orderRow+oi]&moveOrderMask),','const column=forced>=0?forced:centerOrder[oi],');
 once(`      const childN=basisSize[depth+1],
         childReflected=connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord),
