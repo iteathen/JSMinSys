@@ -1,0 +1,29 @@
+✔ shared exact cache publishes only fully committed exact rows (0.9581ms)
+✔ shared exact known-hash path retains full-key validation (0.1273ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (8.9626ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.8717ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (38.0409ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (8.2779ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (34.5256ms)
+✔ sharing-density masks preserve exact Lazy SMP results (246.1413ms)
+✔ Lazy SMP move ordering is center-line distance only (19.6684ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (40.8924ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.9361ms)
+✔ Lazy SMP rejects unknown worker mode (1.2953ms)
+✔ minimal worker never publishes local bounds to shared exact cache (27.0633ms)
+✔ minimal worker omits hot diagnostic counters (24.5962ms)
+✔ minimal timeout is host-terminated without recursive polling (13.1973ms)
+✔ minimal abort is host-terminated without recursive polling (12.9495ms)
+✔ minimal four-worker search returns after an immediate winning center move (28.3849ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (197.0828ms)
+✔ RBA immediate winning column matches physical rules across dimensions and frames (74.7211ms)
+✔ three-word live update matches general update in-place and disjoint (21.2433ms)
+✔ live-line ordering equals physical line counts across frames and dimensions (23.1864ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 783.3637
