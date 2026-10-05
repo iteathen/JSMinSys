@@ -1,0 +1,9 @@
+# C15c: sole-helper changed-word publication
+
+Freeze before implementation. C15b completed two exact/clean full solves:153224.7031ms/2501301967571cycles and151492.8719ms/2482767896768cycles. Mean152358.7875ms/2492034932169.5cycles: still above no-helper machine cost (2215612741292cycles), so NOT RETAINED. Producer path/settings unchanged from C15; observed wall benefit remains small.
+
+Next isolated change: after existing exact full-key/value duplicate guard, acquire odd sequence as before, compare each destination payload word with the queued word, and atomically store only changed words. Same for value. Always finish even sequence after any nonduplicate publication. The helper is sole writer; unchanged words already have the desired value. Search readers retain atomic payload/seqlock checks. No relaxed writes, no new encoding, no hash-only equality, no new search-worker work. Compact8 explicitly unrolled, generic loops over prepared width.
+
+Motivation: distinct residual identities may share support/zero coordinate words. Avoid repeated locked stores, not just duplicate whole entries. Additional comparisons are helper-side and must be charged; benefit is not assumed.
+
+Qualification: test-only interception of Atomics.store verifies unchanged key/value words cause no writes, single-field changes write exactly their changed stored word, and value-only change writes only value. Restore instrumentation before concurrent/solver tests; never import instrumentation into benchmark runtime. Rerun correlated concurrency, all-field mutation and independent physical oracle. Repeated full ready-empty timings with same memory/JIT/affinity; compare cycles against no-helper control, not just C15b. No promotion on wall alone. If this family remains costly, remove it from active source and retain raw evidence/history.
