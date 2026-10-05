@@ -287,6 +287,18 @@ if(experiment==='C17'){
   const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
   u.cycleCount.note+=' C30B uses one native profile-offset read plus playedColumn*n*2 instead of padded row products. n is the validated parent-frame count; no hot size lookup or decoding. ADD/control symbols reflect this address expression.';
  }
+}else if(experiment==='C27'){
+ for(const u of ledger.units.filter(u=>u.source.endsWith('-local32.mjs')&&u.name==='<module-main>')){
+  for(const o of u.operations){
+   if(o.op==='runtime.typed_array.allocate')o.count-=2;
+   if(o.op==='runtime.typed_array.fill')o.count='PT';
+  }
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+  u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  u.cycleCount.note+=' C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged.';
+ }
+ const prep=ledger.units.find(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32');
+ append(prep,{op:'runtime.call.subledger',target:'validateConnect4CacheCapacity32',count:'LOCAL_NATIVE'},'LOCAL_NATIVE*CALL(validateConnect4CacheCapacity32)',{LOCAL_NATIVE:'1 only if requested native and geometry compact;0 on generic split fallback.'},'C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation.');
 }else if(experiment==='C35'){
  const src='addons/rba-connect4-support-basis-plan.mjs';
  const operations=[

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('auto','split40','native')][string]$CacheLayout='auto',[switch]$SharedProofBounds,[UInt64]$SupportPlanBudget=0,[switch]$SupportClosures,[switch]$SupportReflection,[switch]$SupportTransitions,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('auto','split40','native')][string]$CacheLayout='auto',[ValidateSet('split','native')][string]$PrivateLayout='split',[switch]$SharedProofBounds,[UInt64]$SupportPlanBudget=0,[switch]$SupportClosures,[switch]$SupportReflection,[switch]$SupportTransitions,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -13,6 +13,7 @@ if($NodeFlags.Count){$config.arguments=@($NodeFlags)+@('--import','file:///C:/r/
 if($SharedCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_SHARED_CAPACITY -NotePropertyValue ([string]$SharedCapacity) -Force}
 if($LocalCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_LOCAL_CAPACITY -NotePropertyValue ([string]$LocalCapacity) -Force}
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_TT_LAYOUT -NotePropertyValue $CacheLayout -Force
+$config.environment | Add-Member -NotePropertyName JMS_BENCH_LOCAL_TT_LAYOUT -NotePropertyValue $PrivateLayout -Force
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SHARED_PROOF_BOUNDS -NotePropertyValue ([string][int][bool]$SharedProofBounds) -Force
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SUPPORT_PLAN_BUDGET -NotePropertyValue ([string]$SupportPlanBudget) -Force
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SUPPORT_CLOSURES -NotePropertyValue ([string][int][bool]$SupportClosures) -Force
