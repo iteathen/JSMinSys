@@ -2,9 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
+import * as coordinate from '../addons/rba-connect4-coordinate.mjs';
 import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from '../addons/rba-connect4-coordinate.mjs';
 
 test('RBA immediate winning column matches physical rules across dimensions and frames',()=>{
+  assert.equal(typeof coordinate.connect4RbaExposesOpponentWin,'function');
+  let exposed=0,exposureChecks=0;
   let seed=74219,checked=0,winning=0;
   const random=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)%n;};
   for(const [columns,rows] of [[7,6],[7,5],[4,4],[3,3]]){
@@ -44,6 +47,17 @@ test('RBA immediate winning column matches physical rules across dimensions and 
         assert.deepEqual(words.subarray(offset),q.words);
         assert.deepEqual(basis.subarray(bi),q.basis);
         if(!expected.length){
+          for(const c of legal){
+            const r=heights[c];let loses=false;
+            if(r+1<rows){
+              cells[r*columns+c]=mover;cells[(r+1)*columns+c]=mover^1;
+              loses=wins(c,r+1,mover^1);
+              cells[r*columns+c]=-1;cells[(r+1)*columns+c]=-1;
+            }
+            const canonical=q.reflected?columns-1-c:c;
+            assert.equal(coordinate.connect4RbaExposesOpponentWin(geometry,words,offset,basis,bi,q.basis.length,mover,canonical,r),loses?1:0);
+            exposureChecks++;if(loses)exposed++;
+          }
           const forced=connect4RbaForcedResponseColumn(geometry,words,offset,basis,bi,q.basis.length,mover);
           if(opponentThreats.length>1)assert.equal(forced,-2);
           else if(opponentThreats.length===1)assert.equal(q.reflected?columns-1-forced:forced,opponentThreats[0]);
@@ -57,5 +71,5 @@ test('RBA immediate winning column matches physical rules across dimensions and 
     }
   }
   assert.ok(checked>1000);
-  assert.ok(winning>0);
+  assert.ok(winning>0);assert.ok(exposureChecks>1000);assert.ok(exposed>0);
 });

@@ -11679,12 +11679,17 @@
           "op": "runtime.call.subledger",
           "count": "A*(1-KD)",
           "target": "connect4RbaPreparedCofactorKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "LA",
+          "target": "connect4RbaExposesOpponentWin"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11695,11 +11700,11 @@
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes: q hash and local/shared TT probe execute; 0 at root.",
-          "A": "Legal actions whose RBA cofactors are constructed.",
-          "T": "Terminal child actions plus exact cache hits translated player-relatively.",
+          "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
+          "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
@@ -11708,9 +11713,10 @@
           "I": "1 for a non-root immediate-win proof published to the existing exact TT path; 0 otherwise.",
           "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
           "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
-          "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector."
+          "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector.",
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged."
       },
       "status": "decomposed"
     },
@@ -12160,11 +12166,72 @@
         "note": "Direct-mapped shared exact publication retains sequence CAS/value semantics. Compact standard compact profile publishes eight exact identity words instead of fourteen; compatibility geometries publish full keyWords. Contended stores remain safely droppable cache writes. Generated uncounted variant removes only reporting atomics. Required key/value/sequence synchronization retained. No hot reporting counter or statistics-selection branch."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaExposesOpponentWin",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaExposesOpponentWin",
+      "scope": "rba-coordinate-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "R"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "N"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+A*C(alu.add.u32)+M*C(alu.imul.u32)+R*C(alu.shr.u32)+S*C(alu.shl.u32)+N*C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)",
+        "parameters": {
+          "F": "Geometry rows, columns and selected opponent coordinate offset.",
+          "L": "Binary-search basis reads, final equality read and possible coordinate word read.",
+          "A": "Cell calculation, binary-search midpoint/increment and offsets.",
+          "M": "1 cell-row multiplication if headroom exists, otherwise 0.",
+          "R": "Midpoint shifts and selected coordinate-word shift.",
+          "S": "Coordinate bit selection if singleton exists.",
+          "N": "Coordinate mask and bit-index mask.",
+          "T": "Headroom, binary-search and singleton/active predicates.",
+          "B": "Executed branches, including early returns."
+        },
+        "note": "Legal nonwinning landing precondition. Only opponent singleton directly above landing, no allocations or width mask. Exact child-loss proof avoids cofactor/canonicalization/recursive probe."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 191,
-    "decomposed": 191,
+    "units": 192,
+    "decomposed": 192,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -12267,7 +12334,7 @@
     "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
     "addons/rba-connect4-alphabeta.mjs": "e1a20346f72bb09158e14681be594f7e79943b53",
     "addons/cpc-connect4.mjs": "6a0131e174a768458242f316f3d8a0c55a4be7e6",
-    "addons/rba-connect4-coordinate.mjs": "6a04232d242984af7e6a236054ccc82902f53c98",
+    "addons/rba-connect4-coordinate.mjs": "60b1a31858d501772200843c84952326224af84d",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
@@ -12291,7 +12358,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e994fcef0fafc4a100ea0a6b258cf5bf96126a5a",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "4e0f612de551e3bf826dd6bf4b98ccae98a7f186",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de"
   },
   "isomaxLocalKernel": {

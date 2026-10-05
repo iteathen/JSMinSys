@@ -38,6 +38,19 @@ export function connect4RbaForcedResponseColumn(g,words,offset,basis,bi,n,mover)
   return forced;
 }
 
+// Legal landing after ruling out mover immediate wins. If its next cell is
+// an opponent singleton, filling this landing exposes an unblocked win.
+// No other line can be blocked by the landing: this residual has only one cell.
+export function connect4RbaExposesOpponentWin(g,words,offset,basis,bi,n,mover,column,height){
+  if(height+1>=g.rows)return 0;
+  const cell=(height+1)*g.columns+column;
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<cell)lo=mid+1;else hi=mid;}
+  if(lo===n||basis[bi+lo]!==cell)return 0;
+  const opponent=offset+(mover?g.p0Offset:g.p1Offset);
+  return (words[opponent+(lo>>>5)]&(1<<(lo&31)))!==0?1:0;
+}
+
 export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffset,seen){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
   for(let line=0;line<g.lineCount;line+=1){

@@ -4,7 +4,7 @@ import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
+import {connect4RbaExposesOpponentWin,connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -163,7 +163,9 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
       height=words[src+column];
     if(height>=g.rows)continue;
 
-    const term=connect4RbaCofactorKnownHeight(
+    // An exposed opponent singleton proves this child loses without building it.
+    const term=connect4RbaExposesOpponentWin(g,words,src,basis,bi,n,mover,column,height)
+      ?(mover?3:1):connect4RbaCofactorKnownHeight(
       g,profile,words,src,basis,bi,n,column,height,
       words,dst,basis,ci,coord.seen,basisSize,depth+1,coord.map,coord.inverse,
     );
