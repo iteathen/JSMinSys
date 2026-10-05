@@ -6919,16 +6919,12 @@
         {
           "op": "control.branch",
           "count": 3
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "WMIN"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(5+W+3*M)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+3*C(control.test.u32)+3*C(control.branch)+WMIN*C(alu.and.u32)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(5+W+3*M)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+3*C(control.test.u32)+3*C(control.branch)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6943,10 +6939,9 @@
           "RF": "1 when rootFrontier selected; 0 otherwise",
           "FRONTIER_HOST": "Cold type validation, worker URL selection, descriptor/counter setup and joined result materialization; index/arithmetic/field costs remain profile-sensitive",
           "WORKER_MODE": "Cold selector: legacy (default) or minimal; minimal rejects legacy-only Behavior/CPC/Root-Frontier options.",
-          "M": "1 for legacy/behavior/frontier modes that allocate winner metrics; 0 for minimal mode.",
-          "WMIN": "Minimal worker spawns whose index selects the cold move-order policy."
+          "M": "1 for legacy/behavior/frontier modes that allocate winner metrics; 0 for minimal mode."
         },
-        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data. C07 initialization selects center variant for even worker indices and live-line variant for odd indices. Four workers remain deep; no hot policy branch."
+        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data. C07 initialization selects center variant for even worker indices and live-line variant for odd indices. Four workers remain deep; no hot policy branch. C07b replaces parity selection with worker-index==3: only worker3 uses live ordering; all other indices center."
       },
       "status": "decomposed"
     },
@@ -13297,7 +13292,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
-    "addons/rba-connect4-lazy-smp-host.mjs": "3966182ec29f821e23e138263b3980a53b0c4ee7",
+    "addons/rba-connect4-lazy-smp-host.mjs": "4334e1f603e452417d941efadceaa104a9de937f",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",

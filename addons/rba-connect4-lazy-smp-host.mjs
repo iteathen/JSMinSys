@@ -89,7 +89,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     for(let i=0;i<workers;i+=1)
       session.spawn(
         new URL(rootFrontier?'./rba-connect4-lazy-smp-worker-frontier.mjs':behaviorMemory!==null?'./rba-connect4-lazy-smp-worker-behavior.mjs':
-          workerMode===RBA_LAZY_SMP_WORKER_MINIMAL?((i&1)===0?'./rba-connect4-lazy-smp-worker-minimal-center.mjs':'./rba-connect4-lazy-smp-worker-minimal.mjs'):'./rba-connect4-lazy-smp-worker.mjs',import.meta.url),
+          workerMode===RBA_LAZY_SMP_WORKER_MINIMAL?(i!==3?'./rba-connect4-lazy-smp-worker-minimal-center.mjs':'./rba-connect4-lazy-smp-worker-minimal.mjs'):'./rba-connect4-lazy-smp-worker.mjs',import.meta.url),
         {
           control,
           resultWords,

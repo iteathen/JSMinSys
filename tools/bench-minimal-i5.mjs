@@ -37,6 +37,8 @@ console.log(JSON.stringify({
   status:result.status,
   rootWdl:result.rootWdl,
   move:result.move,
+  winner:result.winner,
+  completedWorkers:result.completedWorkers,
   sharedCacheHits:result.sharedCacheHits,
   sharedCacheStores:result.sharedCacheStores,
   sharedCacheStoreContention:result.sharedCacheStoreContention,
