@@ -35,6 +35,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   supportBasisPlanBudgetBytes=0,
   supportClosurePlan=false,supportReflectionPlan=false,
   localCacheLayout='split',
+  resourceBounds=false,
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
@@ -55,6 +56,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new RangeError('invalid Lazy SMP worker mode');
   if(typeof sharedProofBounds!=='boolean'||(sharedProofBounds&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
     throw new TypeError('shared proof bounds require a homogeneous minimal pool');
+  if(typeof resourceBounds!=='boolean'||(resourceBounds&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))throw new TypeError('resource bounds require minimal workers');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0||(supportBasisPlanBudgetBytes&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
     throw new TypeError('support plans require minimal workers and a nonnegative budget');
   if(typeof supportClosurePlan!=='boolean'||(supportClosurePlan&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))throw new TypeError('support closures require minimal workers');
@@ -65,7 +67,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL){
     const prepared=await prepareLazySmpConnect4Rba32({geometry,workers,sharedCacheCapacity,
-      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout,sharedProofBounds,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan,localCacheLayout});
+      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout,sharedProofBounds,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan,localCacheLayout,resourceBounds});
     try{return await prepared.solve(moves);}finally{await prepared.close();}
   }
   if(sharedCacheLayout==='auto')sharedCacheLayout='split40';

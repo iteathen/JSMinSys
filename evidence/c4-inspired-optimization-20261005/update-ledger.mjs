@@ -362,6 +362,62 @@ if(experiment==='C17'){
  const prep=ledger.units.find(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32');
  append(prep,call('prepareSupportBasisPlansWorker32','AUX'),'AUX*CALL(prepareSupportBasisPlansWorker32)+AUX*C(runtime.promise.await)',{AUX:'1 for explicit offload target only; synchronous support-plan subledger count is0 on this path.'},'C36 optional cold compiler is fully joined before creating four search workers. Search-ready/empty-root/timeout/TT semantics unchanged; extra source validations and property stores included in existing symbolic FIELD/STORE/TEST/BRANCH path counts.');
  prep.operations.push({op:'runtime.promise.await',count:'AUX'});
+}else if(experiment==='C48'){
+ const helper='addons/rba-connect4-resource-bounds.mjs';
+ function add(name,operations,parameters,note){ledger.units.push({unit:helper+'#'+name,source:helper,name,scope:'monotone-resource-certificate',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});}
+ add('deriveConnect4RbaResourceFlags32',[
+  {op:'runtime.field.load',count:'FIELD'},{op:'memory.load.u32',count:'1+2*W'},
+  {op:'alu.and.u32',count:1},{op:'alu.or.u32',count:'2*W+NT'},
+  {op:'alu.add.u32',count:'5*W+1'},{op:'control.test.u32',count:'1+NT*(W+3)'},{op:'control.branch',count:'1+NT*(W+3)'}],
+  {NT:'1 only for valid nonterminal metadata,0 for guarded physical terminal.',W:'NT*configured coordinate words.',FIELD:'Actual geometry field loads including span loop bounds.'},
+  'Rules only: same-owner activity is necessary for every projected bit; singleton wins require that channel. Physical terminal guard prevents converting cleared winning endpoints into draw proofs. Flags4/8 are fixed-owner nonwin certificates, not terminal metadata. No allocations/outcomes/hints/reporting.');
+ add('wrapConnect4ResourceCofactor32',[{op:'runtime.function.allocate',count:1}],{},'COLD captures selected ordinary cofactor once; function/closure environment allocation included, no recursive allocation.');
+ add('resourceCofactor',[{op:'runtime.callback',count:1,target:'cofactor'},{op:'runtime.call.subledger',count:'NT',target:'deriveConnect4RbaResourceFlags32'},{op:'control.test.u32',count:1},{op:'control.branch',count:1}],{NT:'1 only when ordinary cofactor returns nonterminal0.'},'HOT generic fallback preserves every physical cofactor field/terminal and attaches only current-q resource bits. Fixed ABI; no rest/apply arrays.');
+ for(const kind of ['dense','prepared']){
+  const base='addons/rba-connect4-coordinate-closure-'+kind+'.mjs',generated=base.replace('closure-','closure-resource-');
+  for(const old of ledger.units.filter(u=>u.source===base)){
+   const u=structuredClone(old);u.source=generated;u.name=u.name.replace('Cofactor','ResourceCofactor');u.unit=generated+'#'+u.name;
+   if(u.name.includes('3Resource')){
+    const loads=u.operations.find(o=>o.op==='memory.load.u32');
+    if(!loads.count.includes('+P+2*U'))throw Error('C48 source target-load ledger changed');
+    loads.count=loads.count.replace('+P+2*U','+3*U');
+    u.operations=u.operations.filter(o=>!(o.op==='runtime.call.subledger'&&o.target==='applySupportClosure3x32'));
+    u.operations.find(o=>o.op==='alu.or.u32').count+='+3*OWNER_U+5*K';
+    u.operations.find(o=>o.op==='control.test.u32').count+='+2*K';
+    u.operations.find(o=>o.op==='control.branch').count+='+2*K';
+    Object.assign(u.cycleCount.parameters,{Z:'Exactly3; six terminal clears or six final nonterminal stores, never both.',P:'Local accumulator absorption tests, no interim target-memory loads.',OWNER_U:'Sum of write0+write1 over U expansions,3local ORs per owner.',TEST:'Projection source predicates including local-word selection and owner expansion, excluding separately counted2*K final resource tests.',BRANCH:'Projection source selections excluding final2*K resource ternaries.'});
+    u.cycleCount.note+=' C48 three-word local accumulators share absorption, expansion and empty-owner proof;5*K final ORs and2*K tests create flags. Source addresses/field/control symbols reflect this body; register/spill/inlining debt is unqualified until actual JIT/full solve. Physical terminal metadata/order unchanged.';
+   }else{
+    u.operations.push({op:'runtime.call.subledger',count:'K',target:'deriveConnect4RbaResourceFlags32'});
+    u.cycleCount.note+=' C48 span companion scans finished valid nonterminal output only, through resource subledger. Same physical tensor/basis/terminal semantics.';
+   }
+   const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+   u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+   ledger.units.push(u);
+  }
+ }
+ for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
+  const base='addons/rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'')+'.mjs',generated=base.replace('.mjs','-resources.mjs');
+  for(const old of ledger.units.filter(u=>u.source===base)){
+   const u=structuredClone(old);u.source=generated;u.unit=generated+'#'+u.name;
+   if(u.name==='negamax'){
+    append(u,{op:'alu.and.u32',count:'2+TERM_MASK'},'(2+TERM_MASK)*C(alu.and.u32)+RTEST*C(control.test.u32)+RBRANCH*C(control.branch)',
+     {TERM_MASK:'One physical terminal mask per child, plus one only on actual physical-terminal decode.',RTEST:'Actual source resource/mover/alpha/beta/depth/empty-child predicates, including two mover ternaries per entry.',RBRANCH:'Actual source new selections/short circuits. Child both-empty bypasses all canonical/live/recursive calls; original counts apply only where those calls occur.'},
+     'C48 original window captured BEFORE current-resource bounds; early zero cuts are sound bounds. Root retains ordered legal witness. Terminal masks never change q metadata; no solved labels or telemetry. Resource child status passed as scalar, no arrays/allocations. Actual optimizer cost remains measured.');
+    u.operations.push({op:'control.test.u32',count:'RTEST'},{op:'control.branch',count:'RBRANCH'});
+   }
+   if(u.name==='<module-main>'){
+    append(u,{op:'runtime.call.subledger',count:'NO_CL',target:'wrapConnect4ResourceCofactor32'},'NO_CL*CALL(wrapConnect4ResourceCofactor32)+ROOT_SEARCH*CALL(deriveConnect4RbaResourceFlags32)+SELECT*C(control.test.u32)+SELECT*C(control.branch)',
+     {NO_CL:'1 only without complete closure plan.',ROOT_SEARCH:'1 only for nonterminal root not already immediate-win resolved.',SELECT:'Cold choice between direct companion and wrapped fallback.'},'C48 selected companion ABI once at init; no cold factory in recurrence. FIELD includes new optional closure-property read. Root input certificate is current-run position work.');
+    u.operations.push({op:'runtime.call.subledger',count:'ROOT_SEARCH',target:'deriveConnect4RbaResourceFlags32'},{op:'control.test.u32',count:'SELECT'},{op:'control.branch',count:'SELECT'});
+   }
+   ledger.units.push(u);
+  }
+ }
+ const prep=ledger.units.find(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32');
+ append(prep,{op:'control.test.u32',count:1},'C(control.test.u32)+C(control.branch)',{},'C48 COLD resource boolean validation and worker-URL selection; existing FIELD/STORE/TEST/BRANCH path symbols include the additional result field and URL ternary. Defaults remain ordinary workers.');prep.operations.push({op:'control.branch',count:1});
+ const host=ledger.units.find(u=>u.source==='addons/rba-connect4-lazy-smp-host.mjs'&&u.name==='runLazySmpConnect4Rba32');
+ append(host,{op:'control.test.u32',count:'RES_TEST'},'RES_TEST*C(control.test.u32)+RES_BRANCH*C(control.branch)',{RES_TEST:'Actual new resource type/pool guards.',RES_BRANCH:'Their source selections/short circuits.'},'C48 COLD homogeneous minimal option validation/forwarding only, no legacy algorithm or node changes.');host.operations.push({op:'control.branch',count:'RES_BRANCH'});
 }else if(experiment==='C39'){
  for(const u of ledger.units.filter(u=>sources.includes(u.source)&&u.name.includes('3Cofactor'))){
   const loads=u.operations.find(o=>o.op==='memory.load.u32');

@@ -8,6 +8,9 @@ import {connect4RbaClosureDense3CofactorKnownHeight as dense3,connect4RbaClosure
 import {connect4RbaClosurePrepared3CofactorKnownHeight as sparse3,connect4RbaClosurePreparedSpanCofactorKnownHeight as sparseSpan} from '../addons/rba-connect4-coordinate-closure-prepared.mjs';
 import {connect4RbaSupportCanonicalize as plannedCanonical} from '../addons/rba-connect4-coordinate-support-reflection.mjs';
 import {prepareSupportBasisPlans32} from '../addons/rba-connect4-support-basis-plan.mjs';
+import {wrapConnect4ResourceCofactor32} from '../addons/rba-connect4-resource-bounds.mjs';
+import {connect4RbaClosureDense3ResourceCofactorKnownHeight as resourceDense3,connect4RbaClosureDenseSpanResourceCofactorKnownHeight as resourceDenseSpan} from '../addons/rba-connect4-coordinate-closure-resource-dense.mjs';
+import {connect4RbaClosurePrepared3ResourceCofactorKnownHeight as resourceSparse3,connect4RbaClosurePreparedSpanResourceCofactorKnownHeight as resourceSparseSpan} from '../addons/rba-connect4-coordinate-closure-resource-prepared.mjs';
 
 test('fast physical transitions and canonical reflection across all100 dimensions1..10',()=>{
  let seed=784129,states=0,children=0,geometries=0,plans=0;
@@ -42,11 +45,26 @@ test('fast physical transitions and canonical reflection across all100 dimension
     const fns=[prepared];
     if(g.supportBasisPlans){fns.push(sparseSpan);if(g.removeByCell!==null)fns.push(denseSpan);
      if(g.coordWords===3){fns.push(sparse3);if(g.removeByCell!==null)fns.push(dense3);}}
+    const resourceFns=new Set();
+    // Holdouts retain physical-transition coverage, with no resource-value
+    // certificate replay. No search/minimax outcomes are queried anywhere here.
+    if(!((W===3&&H===6)||(W===5&&H===3))){
+     if(g.supportBasisPlans){resourceFns.add(resourceSparseSpan);if(g.removeByCell!==null)resourceFns.add(resourceDenseSpan);
+      if(g.coordWords===3){resourceFns.add(resourceSparse3);if(g.removeByCell!==null)resourceFns.add(resourceDense3);}}
+     else resourceFns.add(wrapConnect4ResourceCofactor32(prepared));
+     fns.push(...resourceFns);
+    }
     for(const c of legal){const child=encode([...moves,c]);
      for(const fn of fns){
       const out=new Uint32Array(g.keyWords),outBasis=new Uint32Array(g.maxBasis),sc=scratch(g);sc.inverse.fill(0xffffffff);sc.seen.fill(0xdeadbeef);
       const term=fn(g,p,q.words,0,q.basis,0,q.basis.length,c,expected.h[c],out,0,outBasis,0,sc.seen,sc.size,0,sc.map,sc.inverse);
-      assert.equal(term,child.words[g.metaOffset]&3);assert.deepEqual(out,child.words,`${W}x${H} ${fn.name}`);assert.deepEqual(outBasis.slice(0,sc.size[0]),child.basis);children++;
+      const physical=child.words[g.metaOffset]&3;
+      assert.equal(resourceFns.has(fn)?term&3:term,physical);
+      if(resourceFns.has(fn)){
+       const flags=physical?0:(child.words.slice(g.p0Offset,g.p1Offset).every(x=>x===0)?4:0)|(child.words.slice(g.p1Offset).every(x=>x===0)?8:0);
+       assert.equal(term&12,flags);
+      }
+      assert.deepEqual(out,child.words,`${W}x${H} ${fn.name}`);assert.deepEqual(outBasis.slice(0,sc.size[0]),child.basis);children++;
      }
     }
     moves.push(legal[trial?random(legal.length):0]);
