@@ -1,0 +1,95 @@
+{
+  "kind": "minimal-worker-i5-12600k-prepared-empty-solve-v2",
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36"
+  },
+  "platform": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "logicalProcessors": 16
+  },
+  "target": {
+    "wallTimeMsMax": 10000,
+    "workers": 4,
+    "workerMode": "minimal"
+  },
+  "configuration": {
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 33554432,
+    "sharedProofBounds": true,
+    "sharedCacheLayout": "native",
+    "sharedTtEntryBytes": 32,
+    "sharedTtBytes": 4294967296,
+    "privateTtBytesPerWorker": 1107296256,
+    "supportBasisPlanBudgetBytes": 1073741824,
+    "supportBasisPlanBytes": 856484748,
+    "supportBasisPlanProfiles": 823543,
+    "workers": 4,
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "policies": [
+      "center",
+      "live",
+      "center",
+      "live"
+    ]
+  },
+  "supportClosurePlan": true,
+  "supportReflectionPlan": true,
+  "supportPlanWorkingBytes": 922368188,
+  "supportPreparation": {
+    "target": {
+      "group": 0,
+      "processor": 12
+    },
+    "selected": {
+      "group": 0,
+      "processor": 12,
+      "core": 6,
+      "efficiency": 0,
+      "l2Bytes": 2097152
+    },
+    "actual": {
+      "group": 0,
+      "processor": 12,
+      "mask": "4096",
+      "previousGroup": 0,
+      "previousMask": "4181"
+    },
+    "threadId": 1,
+    "compileMs": 2028.0496999999998,
+    "workerExited": true,
+    "exitCode": 0,
+    "totalPreparationMs": 2057.1471
+  },
+  "wallMs": 87765.3827,
+  "totalOperationWallMs": 91019.3772,
+  "preparedTiming": {
+    "readyWorkers": 4,
+    "rootConstructedAfterReady": true,
+    "initializationMs": 3170.3817,
+    "solveMs": 87765.3827,
+    "cleanupMs": 82.27629999999772,
+    "boundary": "all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate"
+  },
+  "processCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+  "processCycles": "1235403871998",
+  "status": "EXACT",
+  "rootWdl": 1,
+  "move": 3,
+  "winner": 3,
+  "completedWorkers": [
+    0,
+    1,
+    1,
+    1
+  ],
+  "sharedCacheHits": null,
+  "sharedCacheStores": null,
+  "sharedCacheStoreContention": null,
+  "cleanup": true,
+  "workersExited": 4,
+  "errorCode": 0
+}
