@@ -1,0 +1,17 @@
+✔ abort during joined exact-result cleanup cannot replace DONE (52.2788ms)
+✔ application preparation allocates all four workers but performs no search (47.9859ms)
+✔ closing an idle prepared application joins workers without a solve (43.0936ms)
+✔ ordinary minimal API also waits for every worker before search (49.4353ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.6483ms)
+✔ closing an active prepared search resolves its result and joins every worker (60.6904ms)
+✔ concurrent proof writers cannot associate another key with a bound (61.9857ms)
+✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.3212ms)
+✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (9.8442ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 322.2349

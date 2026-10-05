@@ -152,6 +152,49 @@ if(experiment==='C17'){
    ledger.units.push(copy);
   }
  }
+}else if(experiment==='C23'){
+ const source='addons/rba-connect4-support-basis-plan.mjs',call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
+ function unit(name,operations,parameters,note){ledger.units.push({unit:source+'#'+name,source,name,scope:'support-closure-plan',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});}
+ unit('compileSupportClosures32',[
+  {op:'runtime.typed_array.allocate',count:1},{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.native_index',count:'ID'},{op:'memory.load.u32',count:'L32'},{op:'memory.store.u32',count:'S32'},
+  {op:'runtime.number.multiply',count:'MUL'},{op:'alu.add.u32',count:'ADD'},{op:'alu.sub.u32',count:'SUB'},
+  {op:'alu.and.u32',count:'H'},{op:'alu.or.u32',count:'N+V'},{op:'alu.shl.u32',count:'N+H+V'},
+  {op:'alu.shr.u32',count:'N+V'},{op:'alu.clz.u32',count:'V'},{op:'alu.xor.u32',count:'V'},
+  {op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'}],
+  {N:'Sum of all prepared basis sizes.',H:'Total strict-superset group intersections.',V:'Current-membership set bits enumerated.',ID:'Size/basis/group-word native view loads.',L32:'Offsets, membership, inverse and closure read-modify-write loads.',S32:'Inverse plus closure publications.',FIELD:'All cold geometry properties/loop bounds.',MUL:'Profile row/mask/closure address multiplications.',ADD:'All address/loop/index additions.',SUB:'Isolated-bit extraction and clz index subtraction.',TEST:'Loop and condition predicates.',BRANCH:'Source control selections.'},
+  'COLD geometry/support-only compilation. Inverse IDs are licensed only by current-membership intersection. All immutable self+superset rows completed before workers start. No outcomes/hints. Whole-operation cycles include this cost; locality/compiler debt remains measured by full runs.');
+ unit('loadSupportClosureBasis32',[
+  {op:'runtime.field.load',count:'FIELD'},{op:'memory.load.u32',count:'2*C'},
+  {op:'memory.load.native_index',count:'1+N'},{op:'memory.store.u32',count:'N+1'},
+  {op:'runtime.number.multiply',count:'C+1'},{op:'alu.add.u32',count:'4*C+3*N'},
+  {op:'control.test.u32',count:'C+N+2'},{op:'control.branch',count:'C+N+2'}],
+  {C:'Configured columns.',N:'Child basis IDs copied.',FIELD:'All plan/geometry/view properties and loop bounds.'},
+  'HOT exact support handle, basis copy and one handle write to existing scratch. Membership copying is removed; seen untouched. No allocation/decoder/layout selection.');
+ for(const three of [false,true])unit(three?'applySupportClosure3x32':'applySupportClosureSpan32',[
+  {op:'memory.load.u32',count:three?'3+3*OWN':'Z+Z*OWN'},
+  {op:'memory.store.u32',count:three?'3*OWN':'Z*OWN'},
+  {op:'alu.or.u32',count:three?'3*OWN':'Z*OWN'},
+  {op:'alu.add.u32',count:three?'6+4*OWN':'Z*(3+2*OWN)'},
+  {op:'control.test.u32',count:three?'2':'3*Z+1'},
+  {op:'control.branch',count:three?'2':'3*Z+1'}],
+  {Z:'Configured coordinate word count.',OWN:'write0+write1; at least one at projection call,0 permitted by standalone helper.'},
+  'HOT cold-selected direct OR; closure words loaded once and reused for both owners. Three-word precondition enforced by initialization selection. No reporting/allocation or hot dimension dispatch.');
+ const prep=ledger.units.find(u=>u.source===source&&u.name==='prepareSupportBasisPlans32');
+ append(prep,call('compileSupportClosures32','CL'),'CL*CALL(compileSupportClosures32)+CL*C(memory.allocate.shared.bytes)+CL*C(runtime.typed_view.construct)+EXTRA*C(control.test.u32)+EXTRA*C(control.branch)',{CL:'1 if a complete closure plan is admitted;0 otherwise.',EXTRA:'New closure boolean/budget checks and optional allocation/export branches.'},'C23 cold working budget includes membership and closures; runtime exports no intermediate membership. Retained bytes exclude abandoned membership backing, workingBytes separately records construction payload; GC release time is not assumed.');
+ prep.operations.push({op:'memory.allocate.shared.bytes',count:'CL'},{op:'runtime.typed_view.construct',count:'CL'},{op:'control.test.u32',count:'EXTRA'},{op:'control.branch',count:'EXTRA'});
+ for(const dense of [false,true])for(const three of [false,true]){
+  const kind=dense?'Dense':'Prepared',base='addons/rba-connect4-coordinate-support-'+(dense?'dense':'prepared')+'.mjs',generated=base.replace('coordinate-support','coordinate-closure');
+  for(const old of ledger.units.filter(u=>u.source===base&&u.name.includes('KnownHeight'))){
+   const copy=structuredClone(old);copy.source=generated;copy.name=copy.name.replace('Support'+kind,'Closure'+kind+(three?'3':'Span'));copy.unit=generated+'#'+copy.name;
+   for(const o of copy.operations){if(o.op==='runtime.call.subledger'&&o.target==='loadSupportBasis32')o.target='loadSupportClosureBasis32';o.count=String(o.count).replace(/\b(H|V|E|O)\b/g,'0');}
+   const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+   copy.cycleCount[key]=copy.cycleCount[key].replaceAll('CALL(loadSupportBasis32)','CALL(loadSupportClosureBasis32)').replace(/\b(H|V|E|O)\b/g,'0');
+   Object.assign(copy.cycleCount.parameters,{H:'Zero: no hot superset groups.',V:'Zero: no hot superset traversal.',E:'Zero: self publication included in closure helper.',O:'Zero: supersets published in closure helper.',Q:'J: only surviving image inverse lookup.',RS:'Zero: removed scratch carries handle only.',HANDLE:'K: one scratch handle read and two closure-base multiplies.',CLOSE_ADDR:'U: one closure-row multiplication and addition.'});
+   append(copy,call(three?'applySupportClosure3x32':'applySupportClosureSpan32','U'),`U*CALL(${three?'applySupportClosure3x32':'applySupportClosureSpan32'})+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)`,{},'C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference.');
+   copy.operations.push({op:'memory.load.u32',count:'HANDLE'},{op:'runtime.number.multiply',count:'2*HANDLE+CLOSE_ADDR'},{op:'alu.add.u32',count:'CLOSE_ADDR'});ledger.units.push(copy);
+  }
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

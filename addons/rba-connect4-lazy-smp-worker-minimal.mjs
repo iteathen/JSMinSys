@@ -1,4 +1,6 @@
 import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';
+import {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-dense.mjs';
+import {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';
 import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';
 import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
@@ -25,7 +27,9 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
     targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
-  connect4RbaCofactorKnownHeight=g.supportBasisPlans?(g.removeByCell!==null
+  connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null
+    ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)
+    :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null
     ?connect4RbaSupportDenseCofactorNonWinningKnownHeight:connect4RbaSupportPreparedCofactorNonWinningKnownHeight):g.removeByCell!==null
     ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,
   control=workerData.control,resultWords=workerData.resultWords,
