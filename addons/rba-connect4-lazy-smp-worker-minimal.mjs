@@ -2,7 +2,7 @@ import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -143,9 +143,20 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     return 1;
   }
 
+  const forced=connect4RbaForcedResponseColumn(g,words,src,basis,bi,n,mover);
+  if(forced===-2){
+    if(depth)storeExact(src,hash,slot,mover?3:1);
+    else for(let oi=0;oi<g.columns;oi+=1){
+      const column=centerOrder[oi];
+      if(words[src+column]<g.rows){bestMove=column;break;}
+    }
+    return -1;
+  }
+
+  const actionCount=forced>=0?1:g.columns;
   let best=-2;
-  for(let oi=0;oi<g.columns;oi+=1){
-    const column=centerOrder[oi],
+  for(let oi=0;oi<actionCount;oi+=1){
+    const column=forced>=0?forced:centerOrder[oi],
       height=words[src+column];
     if(height>=g.rows)continue;
 

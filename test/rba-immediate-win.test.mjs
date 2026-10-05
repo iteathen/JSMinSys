@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
-import {connect4RbaImmediateWinningColumn} from '../addons/rba-connect4-coordinate.mjs';
+import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from '../addons/rba-connect4-coordinate.mjs';
 
 test('RBA immediate winning column matches physical rules across dimensions and frames',()=>{
   let seed=74219,checked=0,winning=0;
@@ -24,10 +24,12 @@ test('RBA immediate winning column matches physical rules across dimensions and 
         return false;
       }
       while(moves.length<cells.length){
-        const mover=moves.length&1,legal=[],expected=[];
+        const mover=moves.length&1,legal=[],expected=[],opponentThreats=[];
         for(let c=0;c<columns;c++)if(heights[c]<rows){
           legal.push(c);const r=heights[c];cells[r*columns+c]=mover;
           if(wins(c,r,mover))expected.push(c);
+          cells[r*columns+c]=mover^1;
+          if(wins(c,r,mover^1))opponentThreats.push(c);
           cells[r*columns+c]=-1;
         }
         const q=connect4RbaFromMoves(moves,{geometry,positionCode:false}),offset=5,bi=3;
@@ -41,6 +43,12 @@ test('RBA immediate winning column matches physical rules across dimensions and 
         }else assert.equal(column,-1);
         assert.deepEqual(words.subarray(offset),q.words);
         assert.deepEqual(basis.subarray(bi),q.basis);
+        if(!expected.length){
+          const forced=connect4RbaForcedResponseColumn(geometry,words,offset,basis,bi,q.basis.length,mover);
+          if(opponentThreats.length>1)assert.equal(forced,-2);
+          else if(opponentThreats.length===1)assert.equal(q.reflected?columns-1-forced:forced,opponentThreats[0]);
+          else assert.equal(forced,-1);
+        }
         checked++;
         const c=legal[random(legal.length)],r=heights[c]++;
         cells[r*columns+c]=mover;moves.push(c);

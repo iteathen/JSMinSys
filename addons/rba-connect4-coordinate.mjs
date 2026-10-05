@@ -20,6 +20,24 @@ export function connect4RbaImmediateWinningColumn(g,words,offset,basis,bi,n,move
   return -1;
 }
 
+// Requires no immediate mover win. One opponent frontier singleton must be
+// blocked; two distinct frontier singletons cannot both be blocked by one move.
+// Return forced current-frame column, -1 unrestricted, or -2 proved loss.
+export function connect4RbaForcedResponseColumn(g,words,offset,basis,bi,n,mover){
+  const opponent=offset+(mover?g.p0Offset:g.p1Offset);
+  let forced=-1;
+  for(let i=0;i<n;i+=1){
+    const cell=basis[bi+i];
+    if(cell>=g.pairShapeStart)break;
+    if(!(words[opponent+(i>>>5)]&(1<<(i&31))))continue;
+    const column=g.cellColumn[cell];
+    if(words[offset+column]!==g.cellRow[cell])continue;
+    if(forced>=0)return -2;
+    forced=column;
+  }
+  return forced;
+}
+
 export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffset,seen){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
   for(let line=0;line<g.lineCount;line+=1){
