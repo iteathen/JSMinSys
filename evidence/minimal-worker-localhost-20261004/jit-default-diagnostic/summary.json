@@ -1,0 +1,42 @@
+{
+  "kind": "diagnostic-only-v8-tiering",
+  "source": "649925e",
+  "durationSafetyMs": 20000,
+  "performanceQualified": false,
+  "result": "deliberate TIMEOUT; all four workers cleaned up",
+  "deoptimizationCounts": [
+    {
+      "Count": 1,
+      "Name": "connect4RbaDenseCofactorNonWinningKnownHeight: Insufficient type feedback for binary operation"
+    },
+    {
+      "Count": 1,
+      "Name": "evaluateConnect4CpcTargetDenseWin32: lost precision"
+    },
+    {
+      "Count": 3,
+      "Name": "evaluateConnect4PreparedCpcWin32: Insufficient type feedback for generic keyed access"
+    },
+    {
+      "Count": 1,
+      "Name": "listOnTimeout: wrong map"
+    },
+    {
+      "Count": 1,
+      "Name": "percolateDown: Insufficient type feedback for generic named access"
+    },
+    {
+      "Count": 1,
+      "Name": "prepareConnect4RbaGeometry: Insufficient type feedback for binary operation"
+    },
+    {
+      "Count": 1,
+      "Name": "probeConnect4RbaSharedExactCacheUncounted32: not a Smi"
+    },
+    {
+      "Count": 1,
+      "Name": "processTimers: Insufficient type feedback for call"
+    }
+  ],
+  "interpretation": "No sustained deoptimization loop observed in this short trace; no full-run absence claim. Large helpers rejected from inlining by bytecode limit. Probe/store bytecode measured separately at505/507 vs default460."
+}
