@@ -14494,11 +14494,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "OK*K"
+          "count": "OK*(2*K+1)+CHKEY"
         },
         {
           "op": "atomic.store.u32",
-          "count": "OK*(K+3)"
+          "count": "2*OK+CHKEY+CHVALUE"
         },
         {
           "op": "memory.load.u32",
@@ -14515,11 +14515,23 @@
         {
           "op": "alu.add.u32",
           "count": "DA"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "OK*(K+1)"
+        },
+        {
+          "op": "control.branch",
+          "count": "OK*(K+1)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "PA"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(F)*C(runtime.field.load)+(EVEN+OK)*C(alu.shr.u32)+(EVEN)*C(runtime.number.multiply)+(EVEN+15*OK)*C(alu.add.u32)+(OK*K)*C(memory.load.u32)+(OK*(K+3))*C(atomic.store.u32)+(DL)*C(memory.load.u32)+(DT)*C(control.test.u32)+(DB)*C(control.branch)+(DA)*C(alu.add.u32)",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(F)*C(runtime.field.load)+(EVEN+OK)*C(alu.shr.u32)+(EVEN)*C(runtime.number.multiply)+(EVEN+15*OK)*C(alu.add.u32)+(OK*(2*K+1)+CHKEY)*C(memory.load.u32)+(2*OK+CHKEY+CHVALUE)*C(atomic.store.u32)+(DL)*C(memory.load.u32)+(DT)*C(control.test.u32)+(DB)*C(control.branch)+(DA)*C(alu.add.u32)+(OK*(K+1))*C(control.test.u32)+(OK*(K+1))*C(control.branch)+(PA)*C(alu.add.u32)",
         "parameters": {
           "K": "eight compact exact key words",
           "OK": "one when even sequence accepted AND full key/value is not already present",
@@ -14528,9 +14540,12 @@
           "DL": "ordinary shared/queue word reads in short-circuit duplicate comparison",
           "DT": "executed duplicate tests",
           "DB": "executed duplicate branches",
-          "DA": "duplicate comparison address/loop increments"
+          "DA": "duplicate comparison address/loop increments",
+          "CHKEY": "changed key words atomically written, zero through OK*K",
+          "CHVALUE": "one if exact value changes, otherwise zero",
+          "PA": "executed payload comparison/write address arithmetic"
         },
-        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention. C15b: sole helper compares full stable key/value before writes. Ordinary reads have no concurrent writer; search readers remain seqlock protected. Duplicate return leaves sequence/value/key untouched."
+        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention. C15b: sole helper compares full stable key/value before writes. Ordinary reads have no concurrent writer; search readers remain seqlock protected. Duplicate return leaves sequence/value/key untouched. C15c: compare every payload word after odd sequence; atomically store only changed words/value. Final even sequence remains mandatory. All comparisons charged on helper, none added to search producers."
       },
       "status": "decomposed"
     },
@@ -14574,11 +14589,11 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "OK*K"
+          "count": "OK*(2*K+1)+CHKEY"
         },
         {
           "op": "atomic.store.u32",
-          "count": "OK*(K+3)"
+          "count": "2*OK+CHKEY+CHVALUE"
         },
         {
           "op": "memory.load.u32",
@@ -14595,11 +14610,23 @@
         {
           "op": "alu.add.u32",
           "count": "DA"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "OK*(K+1)"
+        },
+        {
+          "op": "control.branch",
+          "count": "OK*(K+1)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "PA"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1+OK*(K+1))*C(control.test.u32)+(1+OK*(K+1))*C(control.branch)+(F)*C(runtime.field.load)+(EVEN+OK)*C(alu.shr.u32)+(EVEN)*C(runtime.number.multiply)+(EVEN+OK*(1+3*K))*C(alu.add.u32)+(OK*K)*C(memory.load.u32)+(OK*(K+3))*C(atomic.store.u32)+(DL)*C(memory.load.u32)+(DT)*C(control.test.u32)+(DB)*C(control.branch)+(DA)*C(alu.add.u32)",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1+OK*(K+1))*C(control.test.u32)+(1+OK*(K+1))*C(control.branch)+(F)*C(runtime.field.load)+(EVEN+OK)*C(alu.shr.u32)+(EVEN)*C(runtime.number.multiply)+(EVEN+OK*(1+3*K))*C(alu.add.u32)+(OK*(2*K+1)+CHKEY)*C(memory.load.u32)+(2*OK+CHKEY+CHVALUE)*C(atomic.store.u32)+(DL)*C(memory.load.u32)+(DT)*C(control.test.u32)+(DB)*C(control.branch)+(DA)*C(alu.add.u32)+(OK*(K+1))*C(control.test.u32)+(OK*(K+1))*C(control.branch)+(PA)*C(alu.add.u32)",
         "parameters": {
           "K": "general stored key words",
           "OK": "one when even sequence accepted AND full key/value is not already present",
@@ -14608,9 +14635,12 @@
           "DL": "ordinary shared/queue word reads in short-circuit duplicate comparison",
           "DT": "executed duplicate tests",
           "DB": "executed duplicate branches",
-          "DA": "duplicate comparison address/loop increments"
+          "DA": "duplicate comparison address/loop increments",
+          "CHKEY": "changed key words atomically written, zero through OK*K",
+          "CHVALUE": "one if exact value changes, otherwise zero",
+          "PA": "executed payload comparison/write address arithmetic"
         },
-        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention. C15b: sole helper compares full stable key/value before writes. Ordinary reads have no concurrent writer; search readers remain seqlock protected. Duplicate return leaves sequence/value/key untouched."
+        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention. C15b: sole helper compares full stable key/value before writes. Ordinary reads have no concurrent writer; search readers remain seqlock protected. Duplicate return leaves sequence/value/key untouched. C15c: compare every payload word after odd sequence; atomically store only changed words/value. Final even sequence remains mandatory. All comparisons charged on helper, none added to search producers."
       },
       "status": "decomposed"
     },
@@ -15005,7 +15035,7 @@
     "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
-    "addons/rba-connect4-async-publication.mjs": "7773c597043f5c899ff081c41c85b8b3a51535a7",
+    "addons/rba-connect4-async-publication.mjs": "dc795ce19f530ec0e91378c693b5e87c165b50ad",
     "addons/rba-connect4-exact-publisher-worker.mjs": "e8b6ddc31bb6f3270642c5604dfbaa6f9701f102"
   },
   "isomaxLocalKernel": {

@@ -69,11 +69,16 @@ function publishAsyncPacked8(cache,source,at,slot,value){
      keys[base+4]===source[at+4]&&keys[base+5]===source[at+5]&&
      keys[base+6]===source[at+6]&&keys[base+7]===source[at+7])return;
   Atomics.store(cache.sequence,slot,odd);
-  Atomics.store(keys,base,source[at]);Atomics.store(keys,base+1,source[at+1]);
-  Atomics.store(keys,base+2,source[at+2]);Atomics.store(keys,base+3,source[at+3]);
-  Atomics.store(keys,base+4,source[at+4]);Atomics.store(keys,base+5,source[at+5]);
-  Atomics.store(keys,base+6,source[at+6]);Atomics.store(keys,base+7,source[at+7]);
-  Atomics.store(cache.value,slot,value);Atomics.store(cache.sequence,slot,(odd+1)>>>0);
+  if(keys[base]!==source[at])Atomics.store(keys,base,source[at]);
+  if(keys[base+1]!==source[at+1])Atomics.store(keys,base+1,source[at+1]);
+  if(keys[base+2]!==source[at+2])Atomics.store(keys,base+2,source[at+2]);
+  if(keys[base+3]!==source[at+3])Atomics.store(keys,base+3,source[at+3]);
+  if(keys[base+4]!==source[at+4])Atomics.store(keys,base+4,source[at+4]);
+  if(keys[base+5]!==source[at+5])Atomics.store(keys,base+5,source[at+5]);
+  if(keys[base+6]!==source[at+6])Atomics.store(keys,base+6,source[at+6]);
+  if(keys[base+7]!==source[at+7])Atomics.store(keys,base+7,source[at+7]);
+  if(cache.value[slot]!==value)Atomics.store(cache.value,slot,value);
+  Atomics.store(cache.sequence,slot,(odd+1)>>>0);
 }
 
 function publishAsyncPackedSpan(cache,source,at,slot,value){
@@ -84,8 +89,10 @@ function publishAsyncPackedSpan(cache,source,at,slot,value){
     if(i===cache.storedKeyWords)return;
   }
   Atomics.store(cache.sequence,slot,odd);
-  for(let i=0;i<cache.storedKeyWords;i+=1)Atomics.store(keys,base+i,source[at+i]);
-  Atomics.store(cache.value,slot,value);Atomics.store(cache.sequence,slot,(odd+1)>>>0);
+  for(let i=0;i<cache.storedKeyWords;i+=1)
+    if(keys[base+i]!==source[at+i])Atomics.store(keys,base+i,source[at+i]);
+  if(cache.value[slot]!==value)Atomics.store(cache.value,slot,value);
+  Atomics.store(cache.sequence,slot,(odd+1)>>>0);
 }
 
 export function prepareAsyncExactConsumer32(queue,cache){

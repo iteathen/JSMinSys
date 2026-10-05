@@ -75,6 +75,24 @@ test('four-search-worker prepared solve initializes and cleans up an idle or act
   }
 });
 
+test('sole helper atomically writes only changed payload words',()=>{
+  for(const [columns,rows] of [[7,6],[7,5]]){
+    const geometry=prepareConnect4RbaGeometry({columns,rows}),cache=createConnect4RbaSharedExactCache32({capacity:4,keyWords:geometry.keyWords,geometry}),
+      q=createAsyncExactPublication32(cache,1,{capacity:4,batch:1}).queues[0],p=prepareAsyncExactProducer32(q),c=prepareAsyncExactConsumer32(q,cache),
+      key=fillAsyncTestKey(new Uint32Array(geometry.keyWords),33,2,cache.compact8);
+    const original=Atomics.store;let keyWrites=0,valueWrites=0;
+    try{
+      Atomics.store=(a,i,v)=>{if(a===cache.keys)keyWrites++;if(a===cache.value)valueWrites++;return original(a,i,v);};
+      const send=value=>{keyWrites=valueWrites=0;p.enqueue(p,key,0,value,1);drainAsyncExactBatch32(c);};
+      send(3);assert.equal(probe(cache,key,0,1),3);
+      for(let index=0;index<key.length;index++){
+        key[index]^=1;send(3);assert.equal(keyWrites,1);assert.equal(valueWrites,0);assert.equal(probe(cache,key,0,1),3);
+      }
+      send(2);assert.equal(keyWrites,0);assert.equal(valueWrites,1);assert.equal(probe(cache,key,0,1),2);
+    }finally{Atomics.store=original;}
+  }
+});
+
 test('concurrent producers and a sole publisher never expose a mixed exact row',async()=>{
   for(const [columns,rows] of [[7,6],[7,5]]){
     const g=prepareConnect4RbaGeometry({columns,rows}),cache=createConnect4RbaSharedExactCache32({capacity:32,keyWords:g.keyWords,geometry:g}),
