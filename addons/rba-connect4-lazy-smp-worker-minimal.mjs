@@ -2,7 +2,7 @@ import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize} from './rba-connect4-coordinate.mjs';
+import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -134,6 +134,13 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
         if(beta>0)beta=0;
       }
     }
+  }
+
+  const winningColumn=connect4RbaImmediateWinningColumn(g,words,src,basis,bi,n,mover);
+  if(winningColumn>=0){
+    if(depth)storeExact(src,hash,slot,mover?1:3);
+    else bestMove=winningColumn;
+    return 1;
   }
 
   let best=-2;

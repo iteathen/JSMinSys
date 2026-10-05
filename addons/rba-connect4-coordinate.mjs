@@ -6,6 +6,20 @@ export function connect4RbaTerminal(g,words,offset){return words[offset+g.metaOf
 export function connect4RbaRank(g,words,offset){return words[offset+g.metaOffset]>>>2;}
 export function connect4RbaPlayer(g,words,offset){return (words[offset+g.metaOffset]>>>2)&1;}
 
+// Nonterminal q only. Singleton residuals precede larger shapes in the basis.
+// Return a playable mover singleton in the current frame, or -1; no child build.
+export function connect4RbaImmediateWinningColumn(g,words,offset,basis,bi,n,mover){
+  const own=offset+(mover?g.p1Offset:g.p0Offset);
+  for(let i=0;i<n;i+=1){
+    const cell=basis[bi+i];
+    if(cell>=g.pairShapeStart)break;
+    if(!(words[own+(i>>>5)]&(1<<(i&31))))continue;
+    const column=g.cellColumn[cell];
+    if(words[offset+column]===g.cellRow[cell])return column;
+  }
+  return -1;
+}
+
 export function connect4RbaBasisFromSupport(g,support,supportOffset,out,outOffset,seen){
   for(let w=0;w<g.shapeWordCount;w+=1)seen[w]=0;
   for(let line=0;line<g.lineCount;line+=1){

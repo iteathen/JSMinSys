@@ -11639,7 +11639,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "X",
+          "count": "X+I",
           "target": "storeExact"
         },
         {
@@ -11656,12 +11656,17 @@
           "op": "runtime.call.subledger",
           "count": "X",
           "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "W",
+          "target": "connect4RbaImmediateWinningColumn"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11672,7 +11677,7 @@
           "AND": "Local TT slot mask applications.",
           "XOR": "Mover inversion on recursive nonterminal edges.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes: q hash and local/shared TT probe execute; 0 at root.",
           "A": "Legal actions whose RBA cofactors are constructed.",
@@ -11680,9 +11685,11 @@
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
-          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0."
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "W": "Immediate-win scans reached after cache/stop exits, before any child construction.",
+          "I": "1 for a non-root immediate-win proof published to the existing exact TT path; 0 otherwise."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter."
       },
       "status": "decomposed"
     },
@@ -11854,11 +11861,65 @@
         "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-coordinate.mjs#connect4RbaImmediateWinningColumn",
+      "source": "addons/rba-connect4-coordinate.mjs",
+      "name": "connect4RbaImmediateWinningColumn",
+      "scope": "local-negamax-immediate-terminal",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+S*C(alu.shr.u32)+S*C(alu.shl.u32)+2*S*C(alu.and.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)",
+        "parameters": {
+          "F": "Executed geometry field reads: selected player offset, singleton boundary and cell coordinate arrays.",
+          "L": "Basis IDs, mover coordinate words, active singleton column/row and support-height reads.",
+          "ADD": "Executed offset/index additions and loop increments.",
+          "S": "Singleton coordinate-bit tests reached; excludes the first nonsingleton basis entry.",
+          "TEST": "Mover selection, loop bound, singleton-boundary, active-bit and frontier-equality predicates.",
+          "BRANCH": "Executed selections, loop control, early break/continue and winning return."
+        },
+        "note": "Nonterminal q only; scan ends at the first larger residual or the first playable mover singleton. No allocation, child construction, board reconstruction, or outcome data. Dimension-derived tables prepared at initialization. Costs are symbolic source-operation accounting, not measured cycle savings."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 187,
-    "decomposed": 187,
+    "units": 188,
+    "decomposed": 188,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -11961,7 +12022,7 @@
     "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
     "addons/rba-connect4-alphabeta.mjs": "e1a20346f72bb09158e14681be594f7e79943b53",
     "addons/cpc-connect4.mjs": "6a0131e174a768458242f316f3d8a0c55a4be7e6",
-    "addons/rba-connect4-coordinate.mjs": "8d30f8cfba0f1690d611b45b030682a6cd7a376b",
+    "addons/rba-connect4-coordinate.mjs": "da6a29c90986683a0a04a0cd2f8900129534a56b",
     "addons/branch-manager-host.mjs": "1583d0c8b427ca63d64ad613d5d168c98707fd6d",
     "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
@@ -11985,7 +12046,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "79c2d71166af7742004823b34b2151d632f3ba9c"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "4b026d4aaf9f1426f9db597a7028f21807c755a6"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

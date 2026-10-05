@@ -322,3 +322,20 @@ test('minimal four-worker search returns after an immediate winning center move'
   assert.equal(result.cleanup,true);
   assert.equal(result.workersExited,4);
 });
+
+
+test('minimal four-worker search finds an off-center immediate win before descending',async()=>{
+  for(const rows of [6,5])for(const sequence of ['141412','4141213','747476','4747675']){
+    const geometry=prepareConnect4RbaGeometry({columns:7,rows});
+    const moves=[...sequence].map(c=>Number(c)-1);
+    const result=await runLazySmpConnect4Rba32(moves,{
+      geometry,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+      sharedCacheCapacity:16384,localCacheCapacity:16384,timeoutMs:5000,
+    });
+    assert.equal(result.status,'EXACT',sequence+' '+JSON.stringify(result));
+    assert.equal(result.rootWdl,moves.length%2?-1:1,sequence);
+    assert.equal(result.move,sequence.startsWith('7')||sequence.startsWith('47')?6:0,sequence);
+    assert.equal(result.cleanup,true);
+    assert.equal(result.workersExited,4);
+  }
+});
