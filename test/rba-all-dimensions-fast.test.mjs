@@ -6,6 +6,7 @@ import {connect4RbaFromMoves as ingress} from '../addons/rba-connect4-ingress.mj
 import {connect4RbaPreparedCofactorKnownHeight as prepared,connect4RbaPreparedCanonicalize as canonical} from '../addons/rba-connect4-coordinate-prepared.mjs';
 import {connect4RbaClosureDense3CofactorKnownHeight as dense3,connect4RbaClosureDenseSpanCofactorKnownHeight as denseSpan} from '../addons/rba-connect4-coordinate-closure-dense.mjs';
 import {connect4RbaClosurePrepared3CofactorKnownHeight as sparse3,connect4RbaClosurePreparedSpanCofactorKnownHeight as sparseSpan} from '../addons/rba-connect4-coordinate-closure-prepared.mjs';
+import {connect4RbaSupportCanonicalize as plannedCanonical} from '../addons/rba-connect4-coordinate-support-reflection.mjs';
 import {prepareSupportBasisPlans32} from '../addons/rba-connect4-support-basis-plan.mjs';
 
 test('fast physical transitions and canonical reflection across all100 dimensions1..10',()=>{
@@ -13,7 +14,7 @@ test('fast physical transitions and canonical reflection across all100 dimension
  const random=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)%n;};
  for(let W=1;W<=10;W++)for(let H=1;H<=10;H++){
   const g=geom({columns:W,rows:H}),p=profile(g),lines=[],catalog=new Map();
-  g.supportBasisPlans=prepareSupportBasisPlans32(g,8*2**20,true);geometries++;if(g.supportBasisPlans)plans++;
+  g.supportBasisPlans=prepareSupportBasisPlans32(g,8*2**20,true,true);geometries++;if(g.supportBasisPlans)plans++;
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)for(const [dx,dy] of [[1,0],[0,1],[1,1],[1,-1]])if(x+3*dx<W&&y+3*dy>=0&&y+3*dy<H)lines.push(Array.from({length:4},(_,i)=>(y+i*dy)*W+x+i*dx).sort((a,b)=>a-b));
   for(let id=0;id<g.shapeCount;id++)catalog.set(Array.from(g.shapeCells.slice(id*4,id*4+g.shapeSize[id])).join(','),id);
  function encode(moves){
@@ -34,7 +35,9 @@ test('fast physical transitions and canonical reflection across all100 dimension
     assert.deepEqual(q.words,expected.words,`${W}x${H} ingress`);assert.deepEqual(q.basis,expected.basis);
     if(expected.words[g.metaOffset]&3)break;
     const legal=Array.from({length:W},(_,c)=>c).filter(c=>expected.h[c]<H);
-    const cw=q.words.slice(),cb=q.basis.slice(),ref=canonical(g,p,cw,0,cb,0,cb.length,scratch(g)),mirror=encode(moves.map(c=>W-1-c));
+    const cw=q.words.slice(),cb=q.basis.slice(),sc=scratch(g);
+    if(g.supportBasisPlans){let handle=0;for(let c=0;c<W;c++)handle+=q.words[c]*g.supportBasisPlans.strides[c];sc.map[0]=handle;}
+    const ref=(g.supportBasisPlans?plannedCanonical:canonical)(g,p,cw,0,cb,0,cb.length,sc),mirror=encode(moves.map(c=>W-1-c));
     assert.deepEqual(cw,ref?mirror.words:q.words);assert.deepEqual(cb,ref?mirror.basis:q.basis);
     const fns=[prepared];
     if(g.supportBasisPlans){fns.push(sparseSpan);if(g.removeByCell!==null)fns.push(denseSpan);

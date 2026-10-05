@@ -1,0 +1,23 @@
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"seed":70368301,"solvedOutcomesQueried":false}
+✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (4044.9112ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (63.0619ms)
+✔ application preparation allocates all four workers but performs no search (48.4035ms)
+✔ closing an idle prepared application joins workers without a solve (41.897ms)
+✔ ordinary minimal API also waits for every worker before search (49.199ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (1.2726ms)
+✔ closing an active prepared search resolves its result and joins every worker (74.327ms)
+✔ closure-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (3335.8776ms)
+✔ four-worker host admits a complete closure plan or falls back cold without changing exact semantics (94.9718ms)
+✔ closure basis loading builds exact inverse in the same pass without clearing unrelated scratch (7.0845ms)
+{"checks":582,"ties":36,"reflections":266}
+✔ cofactor handle drives exact reflection with owner ties, offsets and poisoned unused scratch (1767.2941ms)
+✔ four-worker reflection plan has cold budget fallback and clean exact result (97.0757ms)
+✔ support reflection maps equal physical cell reflection and form an involution on every small profile (286.6142ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4125.4561

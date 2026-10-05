@@ -15,11 +15,12 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
   if(typeof supportClosurePlan!=='boolean')throw new TypeError('invalid support closure mode');
+  if(typeof supportReflectionPlan!=='boolean'||(supportReflectionPlan&&!supportClosurePlan))throw new TypeError('reflection requires support closures');
   if(typeof sharedProofBounds!=='boolean')throw new TypeError('sharedProofBounds must be boolean');
   if(workerMode!=='minimal'||rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory)
     throw new TypeError('prepared application requires minimal workers without legacy options');
@@ -38,7 +39,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0||!Number.isFinite(initializationTimeoutMs)||initializationTimeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
-  if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan)};
+  if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
@@ -77,7 +78,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
       sharedProofBounds,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
-      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
+      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),

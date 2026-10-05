@@ -220,6 +220,31 @@ if(experiment==='C17'){
   u.cycleCount.parameters.N='All parent basis slots tested; owner words loaded per slot. A/J/U retain active-path meanings.';
   u.cycleCount.note+=' C25 retests original linear traversal under complete closures. No union extraction/clz/xor; inactive slots still pay two owner loads/tests. Tail bits beyond n cannot enter. FIELD/control/address symbols are actual executed counts of this linear source.';
  }
+}else if(experiment==='C26'){
+ const src='addons/rba-connect4-support-basis-plan.mjs',kernel='addons/rba-connect4-coordinate-support-reflection.mjs',call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
+ function unit(source,name,operations,parameters,note){ledger.units.push({unit:source+'#'+name,source,name,scope:'support-reflection-plan',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});}
+ unit(src,'compileSupportReflection32',[
+  {op:'runtime.typed_array.allocate',count:1},{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.u32',count:'2*P*C+N'},{op:'memory.load.native_index',count:'P+2*N'},
+  {op:'memory.store.u32',count:'P+N'},{op:'memory.store.native_index',count:'N'},
+  {op:'runtime.number.divide',count:'P*C'},{op:'runtime.math.floor',count:'P*C'},{op:'runtime.number.remainder',count:'P*C'},
+  {op:'runtime.number.multiply',count:'P*C+2*P'},{op:'alu.add.u32',count:'ADD'},{op:'alu.sub.u32',count:'2*P*C'},
+  {op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'}],
+  {P:'Every support profile, including unreachable supports.',C:'Configured columns.',N:'Sum of profile basis lengths.',FIELD:'Executed geometry properties and loop limits.',ADD:'Loop/index/row additions.',TEST:'All loop predicates.',BRANCH:'Source control selections.'},
+  'COLD geometry-only support-reflection bijection licenses current inverse lookups. Native local-index width chosen from maxBasis before allocation. Whole-operation cycles include preparation; no owner/value/TT data.');
+ const prep=ledger.units.find(u=>u.source===src&&u.name==='prepareSupportBasisPlans32');
+ append(prep,call('compileSupportReflection32','REF'),'REF*CALL(compileSupportReflection32)+2*REF*C(memory.allocate.shared.bytes)+2*REF*C(runtime.typed_view.construct)+EXTRA_REF*C(control.test.u32)+EXTRA_REF*C(control.branch)',{REF:'1 if complete reflection plan admitted;0 otherwise.',EXTRA_REF:'Additional width/bool/budget/reflection allocation selections.'},'C26 complete native permutation/handle arrays are included in cold working/admission/retained bytes. No lazy filling, owner labels or skipped preparation debt.');
+ prep.operations.push({op:'memory.allocate.shared.bytes',count:'2*REF'},{op:'runtime.typed_view.construct',count:'2*REF'},{op:'control.test.u32',count:'EXTRA_REF'},{op:'control.branch',count:'EXTRA_REF'});
+ const old=ledger.units.find(u=>u.name==='comparePreparedReflectedSupport');
+ const compare=structuredClone(old);compare.source=kernel;compare.name='compareSupportPlanReflectedSupport';compare.unit=kernel+'#'+compare.name;ledger.units.push(compare);
+ unit(kernel,'connect4RbaSupportCanonicalize',[
+  call('compareSupportPlanReflectedSupport'),{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.u32',count:'K+T+SEL*(C+2)'},{op:'memory.load.native_index',count:'SEL*N'},
+  {op:'memory.store.u32',count:'SEL*(C+1+N)'},{op:'runtime.number.multiply',count:'K+SEL'},
+  {op:'alu.add.u32',count:'ADD'},{op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'},
+  {op:'runtime.callback',count:'K',target:'permuteCoordinates'},call('publishSpan32','SEL')],
+  {K:'1 if support comparison does not early-return;0 otherwise.',SEL:'1 only if reflection actually selected.',C:'Configured columns.',N:'Current basis size.',T:'Executed owner tie-break loads, including equality and final ordering comparison.',FIELD:'Actual geometry/plan/scratch properties, including loop bounds.',ADD:'Executed row/frame/loop additions.',TEST:'All predicates, loops and short-circuit tie-break checks.',BRANCH:'Actual source control selections.'},
+  'HOT complete-plan precondition; consumes exact child handle in existing scratch written by cofactor. Removes reflected basis emission, inverse and map reconstruction entirely. Same support-first/owner-tie comparison, coordinate permutation and physical action transporter. Calls same profile-specific permutation with native map and nonzero row offset. No allocation/metadata reporting/hot geometry or mode dispatch. Native-view polymorphism and actual inlining remain full-run/JIT debt.');
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

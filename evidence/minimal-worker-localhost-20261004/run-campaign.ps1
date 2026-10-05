@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('auto','split40','native')][string]$CacheLayout='auto',[switch]$SharedProofBounds,[UInt64]$SupportPlanBudget=0,[switch]$SupportClosures,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[ValidateSet('auto','split40','native')][string]$CacheLayout='auto',[switch]$SharedProofBounds,[UInt64]$SupportPlanBudget=0,[switch]$SupportClosures,[switch]$SupportReflection,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -16,6 +16,7 @@ $config.environment | Add-Member -NotePropertyName JMS_BENCH_TT_LAYOUT -NoteProp
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SHARED_PROOF_BOUNDS -NotePropertyValue ([string][int][bool]$SharedProofBounds) -Force
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SUPPORT_PLAN_BUDGET -NotePropertyValue ([string]$SupportPlanBudget) -Force
 $config.environment | Add-Member -NotePropertyName JMS_BENCH_SUPPORT_CLOSURES -NotePropertyValue ([string][int][bool]$SupportClosures) -Force
+$config.environment | Add-Member -NotePropertyName JMS_BENCH_SUPPORT_REFLECTION -NotePropertyValue ([string][int][bool]$SupportReflection) -Force
 $config.environment.TEMP="$runDir/temp"
 $config.environment.TMP="$runDir/temp"
 $config.environment.JMS_WORKER_AFFINITY_REPORT="$runDir/affinity"

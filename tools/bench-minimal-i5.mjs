@@ -10,6 +10,7 @@ const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??13421772
   sharedProofBounds=process.env.JMS_BENCH_SHARED_PROOF_BOUNDS==='1',
   supportBasisPlanBudgetBytes=Number(process.env.JMS_BENCH_SUPPORT_PLAN_BUDGET??0),
   supportClosurePlan=process.env.JMS_BENCH_SUPPORT_CLOSURES==='1',
+  supportReflectionPlan=process.env.JMS_BENCH_SUPPORT_REFLECTION==='1',
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),
@@ -28,6 +29,7 @@ try{
     sharedProofBounds,
     supportBasisPlanBudgetBytes,
     supportClosurePlan,
+    supportReflectionPlan,
     timeoutMs:600000,
     preparedEmptyTiming:true,
   });
@@ -45,6 +47,7 @@ console.log(JSON.stringify({
   target:{wallTimeMsMax:10000,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL},
   configuration:{sharedCacheCapacity,localCacheCapacity,sharedProofBounds:result.sharedProofBounds,sharedCacheLayout:result.sharedCacheLayout,sharedTtEntryBytes:result.sharedTtEntryBytes,sharedTtBytes:sharedCacheCapacity*result.sharedTtEntryBytes,privateTtBytesPerWorker:localCacheCapacity*33,supportBasisPlanBudgetBytes,supportBasisPlanBytes:result.supportBasisPlanBytes,supportBasisPlanProfiles:result.supportBasisPlanProfiles,workers:4,rootFrontier:false,sharedSampleMask:0,policies:["center","live","center","live"]},
   supportClosurePlan:result.supportClosurePlan,
+  supportReflectionPlan:result.supportReflectionPlan,
   supportPlanWorkingBytes:result.supportPlanWorkingBytes,
   wallMs:result.preparedTiming.solveMs,
   totalOperationWallMs:wallMs,
