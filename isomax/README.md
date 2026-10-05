@@ -97,7 +97,10 @@ For application initialization, call `await prepareLazySmpConnect4Rba32({geometr
 returns. Compute the structural prefix after that boundary, then call `solve`.
 Always close a prepared application that is left idle. `solve` closes it after
 the single search, including invalid-root, interrupted and failed paths. The
-solve deadline starts when `solve` is called; initialization has its own
+configured abort signal also closes an idle READY application automatically;
+its subsequent single `solve` returns an interrupted result. An already aborted
+signal rejects preparation before any worker or shared-table allocation.
+The solve deadline starts when `solve` is called; initialization has its own
 `initializationTimeoutMs` option (default 120000 ms).
 
 All workers are deep. Alternative CPC options and `rootFrontier:true` are

@@ -5,6 +5,7 @@ import {connect4RbaFromMoves} from './rba-connect4-ingress.mjs';
 import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32,isCompactProfile8} from './rba-connect4-shared-exact-cache.mjs';
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
+import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './rba-connect4-shared-exact-cache-layout.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -13,14 +14,18 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='split40'}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(workerMode!=='minimal'||rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory)
     throw new TypeError('prepared application requires minimal workers without legacy options');
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
   const keyWords=isCompactProfile8(geometry,geometry.keyWords)?8:geometry.keyWords;
-  validateConnect4CacheCapacity32(sharedCacheCapacity,keyWords);
+  if(sharedCacheLayout!=='split40'&&sharedCacheLayout!=='native')throw new RangeError('invalid shared TT layout');
+  const layout=sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
+    sharedStride=layout===null?keyWords:layout.kind==='compact32'?16:
+      layout.kind==='direct'?layout.heightStride:layout.entryWords;
+  validateConnect4CacheCapacity32(sharedCacheCapacity,sharedStride);
   validateConnect4CacheCapacity32(localCacheCapacity,keyWords);
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');
@@ -38,6 +43,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
 
   async function closePreparedConnect4Search32(){
     if(closePromise)return closePromise;
+    signal?.removeEventListener('abort',abortPreparedConnect4Search32);
     if(started&&!Atomics.load(control,DONE)&&!Atomics.load(control,ERROR))session.fail(CANCELLED);
     closed=true;cleanupStarted=performance.now();
     Atomics.store(readyGate,1,-1);Atomics.notify(readyGate,1);
@@ -45,7 +51,10 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     await closePromise;cleanupFinished=performance.now();
     signal?.removeEventListener('abort',abortPreparedConnect4Search32);
   }
-  function abortPreparedConnect4Search32(){session.fail(CANCELLED);void closePreparedConnect4Search32();}
+  function abortPreparedConnect4Search32(){
+    if(Atomics.load(control,DONE))return;
+    session.fail(CANCELLED);void closePreparedConnect4Search32();
+  }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
     searchStarted:started,closed};}
   function materializePreparedConnect4SearchResult32(reflected=0){
@@ -57,6 +66,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       nodeCounts:null,workerTiming:null,frontierMetrics:null,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
       sharedSampleMask,workerMode:'minimal',
+      sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),
@@ -67,7 +77,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
         boundary:'all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate'},
       errorCode,errors:host.errors,cleanup:host.cleanup,workersExited:host.workersExited,
       requestedWorkers:workers,workersUsed:session.threads.length,
-      sharedBytes:(shared===null?0:sharedViewBytes32(shared))+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+
+      sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):shared.entries.byteLength+shared.stats.byteLength)+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+
         control.byteLength+resultWords.byteLength+readyGate.byteLength+
         (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
   }
@@ -97,8 +107,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
     workerGeometry=shareConnect4RbaGeometry32(geometry);
-    shared=createConnect4RbaSharedExactCache32({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry});
-    shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);
+    shared=(layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry});
+    if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
+    else shared.entries.fill(0);
     for(let i=0;i<workers;i+=1)session.spawn(new URL(i&1?'./rba-connect4-lazy-smp-worker-minimal.mjs':
       './rba-connect4-lazy-smp-worker-minimal-center.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,

@@ -30,6 +30,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   rootFrontier=false,
   workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
   preparedEmptyTiming=false,
+  sharedCacheLayout='split40',
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
@@ -53,9 +54,10 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL){
     const prepared=await prepareLazySmpConnect4Rba32({geometry,workers,sharedCacheCapacity,
-      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode});
+      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout});
     try{return await prepared.solve(moves);}finally{await prepared.close();}
   }
+  if(sharedCacheLayout!=='split40')throw new TypeError('native shared TT requires minimal workers');
   if(rootFrontier){
     if(behaviorMemory!==null)throw new TypeError('rootFrontier owns initial behavior memory');
     behaviorMemory=createWorkerBehaviorMemory32(workers);

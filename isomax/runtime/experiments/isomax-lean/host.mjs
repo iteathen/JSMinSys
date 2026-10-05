@@ -38,6 +38,8 @@ export async function prepareLazySmpConnect4Rba32({
   if(rootFrontier)throw RangeError('lean profile is deep only');
   if(sharedSampleMask!==0)throw RangeError('lean profile requires sample mask zero');
   if(cpcFrontierResponse||cpcProjectedAdvisory)throw RangeError('lean profile requires baseline CPC');
+  // An already cancelled application must not allocate/touch the large profile.
+  if(signal?.aborted)throw new Error('worker initialization aborted');
   if(behaviorMemory===null)behaviorMemory=createWorkerBehaviorMemory32(workers);
   if(!(behaviorMemory instanceof WebAssembly.Memory)||!(behaviorMemory.buffer instanceof SharedArrayBuffer)||behaviorMemory.buffer.byteLength<workers*128)
     throw new TypeError('prepared shared behavior memory required');
@@ -52,11 +54,13 @@ export async function prepareLazySmpConnect4Rba32({
       wakeIndex:CONTROL_WAKE,workerDiedCode:HOST_WORKER_DIED,deadlineCode:HOST_DEADLINE,cancelledCode:HOST_CANCELLED});
   control[CONTROL_WINNER]=-1;
   sharedExactCache.entries.fill(0);
-  let readyWorkers=0,phase='INITIALIZING',searchStarted=false,closePromise,cleanupMs=0;
+  let readyWorkers=0,phase='INITIALIZING',searchStarted=false,closePromise,cleanupMs=0,
+    abortOwner=null,idleAborted=false;
   const close=()=>{
     if(!closePromise){
       if(phase==='SEARCHING'&&!Atomics.load(control,CONTROL_DONE)&&!Atomics.load(control,CONTROL_STOP))session.fail(HOST_CANCELLED);
       phase='CLOSED';const start=performance.now();
+      if(abortOwner)signal?.removeEventListener('abort',abortOwner);
       closePromise=session.close().then(()=>{cleanupMs=performance.now()-start;});
     }
     return closePromise;
@@ -90,21 +94,30 @@ export async function prepareLazySmpConnect4Rba32({
     });
   }catch(error){await close();throw error;}
   phase='READY';const initializationMs=performance.now()-initializationStarted;
+  // This application retains cancellation ownership while READY and SEARCHING.
+  // A terminal result wins over a later abort, including during worker cleanup.
+  abortOwner=()=>{
+    if(phase==='CLOSED'||Atomics.load(control,CONTROL_DONE))return;
+    session.fail(HOST_CANCELLED);
+    if(phase==='READY'){idleAborted=true;void close();}
+  };
+  signal?.addEventListener('abort',abortOwner,{once:true});
+  if(signal?.aborted)abortOwner();
   return {
     state:()=>({...session.state(),phase,readyWorkers,searchStarted,initializationMs,cleanupMs}),close,
     async solve(moves){
-      if(phase!=='READY')throw new Error('prepared IsoMax application is one-shot and must be ready');
-      phase='SEARCHING';searchStarted=true;
+      if(searchStarted||(phase!=='READY'&&!idleAborted))throw new Error('prepared IsoMax application is one-shot and must be ready');
+      if(!idleAborted)phase='SEARCHING';searchStarted=true;
       const started=performance.now();let root,solveElapsedMs;
       try{
-        if(signal?.aborted)session.fail(HOST_CANCELLED);
+        if(signal?.aborted&&!Atomics.load(control,CONTROL_DONE))session.fail(HOST_CANCELLED);
         if(!session.state().errorCode){
           root=connect4RbaFromMoves(moves,{geometry,positionCode:false});
           for(const worker of session.threads)worker.postMessage(root);
         }
         const remaining=timeoutMs-(performance.now()-started);
         if(remaining<=0&&!Atomics.load(control,CONTROL_DONE))session.fail(HOST_DEADLINE);
-        await session.wait({timeoutMs:Math.max(1,remaining),signal});solveElapsedMs=performance.now()-started;
+        await session.wait({timeoutMs:Math.max(1,remaining)});solveElapsedMs=performance.now()-started;
       }finally{await close();}
       const host=session.state(),winner=Atomics.load(control,CONTROL_WINNER),errorCode=host.errorCode,
         exact=!errorCode&&Atomics.load(control,CONTROL_DONE)===1&&winner>=0;

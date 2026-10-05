@@ -5,14 +5,14 @@
   "nodeVersion": "v27.0.0-nightly20260928b59840b593",
   "historicalSourceCommit": "ab628f21fa8c989aa7fc1bc416b23ed126f82b93",
   "historicalMeasuredRuntimeCommit": "8713baa11148a7723043d8c434ffb77343a96253",
-  "coldCorrectionManifestSha256": "683db7153daee5677cf0dfe7f5150ea51941981e253c0893fa9e0dd31cd006bb",
+  "coldCorrectionManifestSha256": "c7a39690f1c087b88aa599f2176649f2a545ef5f37cbac6a1260ccb80252aae8",
   "unchangedHistoricalLockedFiles": 351,
   "lockedFiles": 380,
   "runtimeModules": 50,
   "coldCorrectedModules": 14,
   "archive": {
     "filename": "iteathen-isomax-0.1.0-rc.3.tgz",
-    "sha256": "26c9dd200fce5cec53e6c4fa38e018224a77deaf1ddaeb9a74dcdc142b6f8195",
+    "sha256": "85f20724e39d80bcdf8ccfff0e005ec6699714d72f69770510c28be80a00e120",
     "entryCount": 381,
     "retention": "Disposable qualification archive; historical checked-in dist archives were preserved",
     "prohibitedBinaryOrBookPaths": [],
@@ -21,10 +21,18 @@
   "checks": {
     "prepareAndFrozenSourcePlusOverlayCheck": "passed",
     "extractedPackageVerify": "passed",
-    "extractedPackageTests": {"tests": 39, "passed": 39, "failed": 0},
+    "extractedPackageTests": {
+      "tests": 42,
+      "passed": 42,
+      "failed": 0
+    },
     "packageNamePublicApiAndProfileExports": "passed",
-    "sourcePackageTestsPlusRlcAndFrozenArchiveGuards": {"tests": 43, "passed": 43, "failed": 0},
-    "diffWhitespace": "passed"
+    "diffWhitespace": "passed",
+    "sourcePackageTests": {
+      "passed": 42,
+      "tests": 42,
+      "failed": 0
+    }
   },
   "coverage": [
     "All original package transition, geometry and small-cache worker tests",
@@ -33,7 +41,10 @@
     "Unsupported capacity and native view lengths reject before allocation",
     "Four workers READY with no search before solve, idle and active close, abort and invalid-root cleanup",
     "Nonempty original and reflected 7x6 and 7x5 roots",
-    "Long solve timeout without Node timer overflow"
+    "Long solve timeout without Node timer overflow",
+    "READY abort automatically exits workers without a solve",
+    "Abort during terminal cleanup preserves DONE",
+    "Pre-aborted initialization rejects before behavior/shared allocation"
   ],
   "libraryBindingGuardCorrection": "The old guard compared the frozen package against active research support files. Active coordinate helpers had already evolved independently; the guard now checks the declared immutable source tree plus explicit cold overlays, retaining canonical imports and general-geometry checks. No package hot source was repinned.",
   "limits": "No benchmark, performance requalification, full empty-board solve, exhaustive correctness proof, opening book, solved cache, or sealed formula holdout outcome was used. Historical timings remain attached to the historical measured runtime."

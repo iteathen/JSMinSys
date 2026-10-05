@@ -2,9 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as host from '../addons/rba-connect4-lazy-smp-host.mjs';
 import {prepareConnect4RbaGeometry} from '../addons/rba-connect4-geometry.mjs';
+import {ManagedThreadSession} from '../addons/branch-manager-host.mjs';
 
 const options=()=>({geometry:prepareConnect4RbaGeometry({columns:4,rows:3}),workers:4,
   workerMode:'minimal',sharedCacheCapacity:4096,localCacheCapacity:4096,timeoutMs:10000});
+
+test('abort during joined exact-result cleanup cannot replace DONE',async()=>{
+  const original=ManagedThreadSession.prototype.close;
+  let entered,release;
+  const closed=new Promise(resolve=>{entered=resolve;}),gate=new Promise(resolve=>{release=resolve;});
+  ManagedThreadSession.prototype.close=async function(){await original.call(this);entered();await gate;};
+  const controller=new AbortController();let prepared;
+  try{
+    prepared=await host.prepareLazySmpConnect4Rba32({...options(),
+      geometry:prepareConnect4RbaGeometry({columns:1,rows:1}),signal:controller.signal});
+    const pending=prepared.solve([]);await closed;
+    assert.equal(prepared.state().done,true);controller.abort();release();
+    const result=await pending;assert.equal(result.status,'EXACT');assert.equal(result.rootWdl,0);
+    assert.equal(result.errorCode,0);assert.equal(result.workersExited,4);
+  }finally{release();if(prepared)await prepared.close();ManagedThreadSession.prototype.close=original;}
+});
 
 test('application preparation allocates all four workers but performs no search',async()=>{
   assert.equal(typeof host.prepareLazySmpConnect4Rba32,'function');

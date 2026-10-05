@@ -148,11 +148,14 @@ export async function waitManagedThreadSession32(
     throw new RangeError('managed session pollMs must be <= 2147483647');
   }
 
-  const abort = () => failManagedThreadSession32(session, session.cancelledCode);
+  const abort = () => {
+    if (!Atomics.load(session.control, session.doneIndex))
+      failManagedThreadSession32(session, session.cancelledCode);
+  };
   session.abortSignal = signal ?? null;
   session.abortHandler = abort;
 
-  if (signal?.aborted) abort();
+  if (signal?.aborted) failManagedThreadSession32(session, session.cancelledCode);
   signal?.addEventListener('abort', abort, { once: true });
 
   try {

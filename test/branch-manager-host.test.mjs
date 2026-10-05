@@ -22,6 +22,13 @@ function session(codes={died:5,deadline:6,cancelled:7}) {
   });
 }
 
+test('future cancellation preserves completion published before its callback',async()=>{
+  const s=session(),controller=new AbortController();
+  const pending=s.wait({timeoutMs:2000,signal:controller.signal});
+  Atomics.store(s.control,1,1);controller.abort();
+  assert.equal(await pending,0);await s.close();
+});
+
 test('file-worker argv filter removes only input-type mode',()=>{
   assert.deepEqual(filterFileWorkerExecArgv32(['--trace-warnings','--input-type=module','--no-warnings']),['--trace-warnings','--no-warnings']);
   assert.deepEqual(filterFileWorkerExecArgv32(['--input-type','module','--trace-warnings']),['--trace-warnings']);

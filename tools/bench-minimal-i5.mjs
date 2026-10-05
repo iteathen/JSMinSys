@@ -6,6 +6,7 @@ import {processCycleCounter} from './process-cycle-counter.mjs';
 
 const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??134217728),
   localCacheCapacity=Number(process.env.JMS_BENCH_LOCAL_CAPACITY??33554432),
+  sharedCacheLayout=process.env.JMS_BENCH_TT_LAYOUT??'split40',
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),
@@ -20,6 +21,7 @@ try{
     sharedCacheCapacity,
     localCacheCapacity,
     sharedSampleMask:0,
+    sharedCacheLayout,
     timeoutMs:600000,
     preparedEmptyTiming:true,
   });
@@ -35,7 +37,7 @@ console.log(JSON.stringify({
   runtime:{node:process.version,v8:process.versions.v8},
   platform:{platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model??null,logicalProcessors:os.cpus().length},
   target:{wallTimeMsMax:10000,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL},
-  configuration:{sharedCacheCapacity,localCacheCapacity,sharedTtBytes:sharedCacheCapacity*40,privateTtBytesPerWorker:localCacheCapacity*33,workers:4,rootFrontier:false,sharedSampleMask:0,policies:["center","live","center","live"]},
+  configuration:{sharedCacheCapacity,localCacheCapacity,sharedCacheLayout:result.sharedCacheLayout,sharedTtEntryBytes:result.sharedTtEntryBytes,sharedTtBytes:sharedCacheCapacity*result.sharedTtEntryBytes,privateTtBytesPerWorker:localCacheCapacity*33,workers:4,rootFrontier:false,sharedSampleMask:0,policies:["center","live","center","live"]},
   wallMs:result.preparedTiming.solveMs,
   totalOperationWallMs:wallMs,
   preparedTiming:result.preparedTiming,

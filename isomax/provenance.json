@@ -5,7 +5,7 @@
   "measuredRuntimeCommit": "8713baa11148a7723043d8c434ffb77343a96253",
   "coldCorrections": {
     "manifest": "cold-corrections.json",
-    "sha256": "683db7153daee5677cf0dfe7f5150ea51941981e253c0893fa9e0dd31cd006bb",
+    "sha256": "c7a39690f1c087b88aa599f2176649f2a545ef5f37cbac6a1260ccb80252aae8",
     "performanceQualification": "historical measurements apply to the frozen source; corrections have correctness qualification only"
   },
   "normalization": "UTF-8 with CRLF normalized to LF; SHA-256",
@@ -16,11 +16,11 @@
     },
     "README.md": {
       "source": "package-authored",
-      "sha256": "48226b6ffb3ed20134d38a707b9d299abb12f953fba2fd00db41c72a13d7350f"
+      "sha256": "0e2fea42a9b03f9b031755337984c518aab8496a7f214f0b34eab24e7aa3e8f9"
     },
     "cold-corrections.json": {
       "source": "package-authored",
-      "sha256": "683db7153daee5677cf0dfe7f5150ea51941981e253c0893fa9e0dd31cd006bb"
+      "sha256": "c7a39690f1c087b88aa599f2176649f2a545ef5f37cbac6a1260ccb80252aae8"
     },
     "evidence/CLAIM_AUDIT.md": {
       "source": "experiments/isomax-structural-cost/CLAIM_AUDIT.md",
@@ -1300,9 +1300,9 @@
     },
     "runtime/addons/branch-manager-host.mjs": {
       "source": "addons/branch-manager-host.mjs",
-      "sha256": "8136e2998230386556cc9afebd81efb8130ffa5bcbb7582081902094bdebfae3",
+      "sha256": "d663f828a91d69133820e30c13de7ac1e5988fb7816570c045ffaf20f56cfb13",
       "sourceSha256": "ae9f76f43677852e5da2855cde7e2d4ceea321a21995e0312b1c6a665b48d052",
-      "correction": "A01-A02-managed-session-and-active-close"
+      "correction": "A01-A02-managed-session-and-terminal-abort"
     },
     "runtime/addons/connect4-live-line-evaluator.mjs": {
       "source": "addons/connect4-live-line-evaluator.mjs",
@@ -1381,9 +1381,9 @@
     },
     "runtime/experiments/isomax-lean/host.mjs": {
       "source": "experiments/isomax-lean/host.mjs",
-      "sha256": "157fec6d9a7c1677a78d52e3d9055c86b15ac86ca75f51f8b0b2e169b1411403",
+      "sha256": "08bb206cbb38cb3c8add939a1587d04c766f36f3e82d15b8a73c86d46898d663",
       "sourceSha256": "6d8b52a75261c8a810198f7545cd3e990423353a15d22633d520efe1da388e3a",
-      "correction": "A03-A06-prepared-host"
+      "correction": "A03-A06-prepared-host-and-abort-ownership"
     },
     "runtime/experiments/isomax-lean/live-profile.mjs": {
       "source": "experiments/isomax-lean/live-profile.mjs",
@@ -1549,7 +1549,7 @@
     },
     "test/prepared.test.mjs": {
       "source": "package-authored",
-      "sha256": "a4d3a0cd35c695fd849c6ef761e14cba4a97c39fb8715dfc6458140e692d83f6"
+      "sha256": "641700d0d04984302b2d8656fe2e15db69571040a4f0647ec0d5fb760eda0dc8"
     },
     "test/smoke.test.mjs": {
       "source": "package-authored",

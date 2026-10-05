@@ -1,0 +1,46 @@
+✖ future cancellation preserves completion published before its callback (3.7605ms)
+✔ file-worker argv filter removes only input-type mode (1.5444ms)
+✔ managed host completes, joins, and reports cleanup (14.1928ms)
+✔ managed host deadline fails closed and wakes a waiting worker (39.3655ms)
+✔ managed host cancellation and explicit failure preserve first error (13.8893ms)
+✔ unexpected worker exit fails the session (15.267ms)
+✔ metric and shared-byte helpers stay numeric and caller-owned (0.3242ms)
+✔ managed wait preserves completion published before waiting (0.2159ms)
+✔ managed deadline observes completion published between polls (0.9556ms)
+✔ managed wait supports deadlines beyond the Node timer limit (90.8196ms)
+✔ managed long deadline uses elapsed time after a delayed chunk (0.8141ms)
+✔ managed long deadline waits for the remaining chunk before failing (0.2415ms)
+✔ managed wait rejects poll intervals beyond the Node timer limit (0.4848ms)
+✔ managed long deadline cancellation clears the rearmed chunk (0.2783ms)
+✔ already-aborted cancellation keeps precedence over completed work (0.0861ms)
+✔ managed wait returns an existing failure and removes abort listeners (0.0784ms)
+✔ managed host joins workers after a thrown worker failure (13.6676ms)
+✔ closing an active managed wait settles it after publishing stop (0.3284ms)
+✔ closing an active cancelled wait preserves first error and joins workers (4.8805ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 259.3269
+
+✖ failing tests:
+
+test at test\branch-manager-host.test.mjs:25:1
+✖ future cancellation preserves completion published before its callback (3.7605ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  7 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/branch-manager-host.test.mjs:29:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

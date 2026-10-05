@@ -16,6 +16,7 @@ import {
   compactTailProfile8,
 } from './rba-connect4-shared-exact-cache.mjs';
 import {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';
+import {attachConnect4RbaSharedLayoutCache32,prepareSharedCacheAccess} from './rba-connect4-shared-exact-cache-layout.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
@@ -30,7 +31,11 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   basisSize=new Uint32Array(g.cellCount+1),
   coord=prepareConnect4RbaCoordinateScratch(g),
   centerOrder=new Uint32Array(g.columns),
-  shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
+  shared=workerData.sharedExactCache.layout?attachConnect4RbaSharedLayoutCache32(workerData.sharedExactCache):
+    attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
+  sharedAccess=shared.layout?prepareSharedCacheAccess(shared):null,
+  sharedProbe=sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,
+  sharedStore=sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
   localCompact=isCompactProfile8(g,g.keyWords)?1:0,
@@ -117,7 +122,7 @@ function probeCache(src,hash,slot){
   const local=localValues[slot];
   if(local&&localKeyMatches(slot,src)){return local;}
   if(!(hash&sharedSampleBits)){
-    const value=probeConnect4RbaSharedExactCacheUncounted32(shared,words,src,hash);
+    const value=sharedProbe(shared,words,src,hash);
     if(value){storeLocalEntry(slot,src,value);return value;}
   }
   return 0;
@@ -126,7 +131,7 @@ function probeCache(src,hash,slot){
 function storeExact(src,hash,slot,value){
   storeLocalEntry(slot,src,value);
   if(!(hash&sharedSampleBits))
-    storeConnect4RbaSharedExactCacheUncounted32(shared,words,src,value,hash);
+    sharedStore(shared,words,src,value,hash);
 }
 
 function storeBound(src,hash,slot,value){

@@ -577,6 +577,69 @@
         "name": "FUNCTION_ALLOC_COST(runtimeState)"
       },
       "note": "Cold closure allocation; captures and GC/runtime state are profile-sensitive. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+    },
+    "atomic.load.u16": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_LOAD_U16_COST"
+      },
+      "note": "Native Uint16 atomic read. Coherence/cache/target lowering dependent; not priced by uint32 source count."
+    },
+    "atomic.store.u16": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_STORE_U16_COST"
+      },
+      "note": "Native Uint16 atomic publication. Disjoint byte ranges under existing uint32 seqlock."
+    },
+    "atomic.load.native_height": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_LOAD_HEIGHT_COST(heightBytes)"
+      },
+      "note": "Selected native Uint8/16/32 field, fixed for prepared cache. Ledger selection only; no runtime dispatch."
+    },
+    "atomic.store.native_height": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ATOMIC_STORE_HEIGHT_COST(heightBytes)"
+      },
+      "note": "Selected native Uint8/16/32 field, fixed for prepared cache. Not a codec."
+    },
+    "runtime.object.freeze": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "OBJECT_FREEZE_COST(fieldCount,objectState)"
+      },
+      "note": "Cold freeze. Structured clone loses frozen state; attachment freezes validated descriptor again."
+    },
+    "runtime.array.includes": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ARRAY_INCLUDES_COST(length,needle)"
+      },
+      "note": "Cold short membership checks, includes array allocation separately."
+    },
+    "runtime.number.divide": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "NUMBER_DIVIDE_COST"
+      },
+      "note": "Cold Math.ceil/address alignment numerical division. No asserted IDIV lowering."
+    },
+    "runtime.number.remainder": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "NUMBER_REMAINDER_COST"
+      },
+      "note": "Cold native-coordinate count parity validation."
+    },
+    "runtime.native.access.lowering": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "NATIVE_ACCESS_LOWERING_COST(path,runtime,indexDomain)"
+      },
+      "note": "Explicit unqualified lowering debt: native view type/bounds/index guards, receiver/argument checks, boxing, call-frame effects and deoptimizations. Not a proxy for omitted source body. Source operations are decomposed separately."
     }
   },
   "units": [
@@ -588,18 +651,33 @@
       "operations": [
         {
           "op": "runtime.field.load",
-          "count": 2
+          "count": "2+FAIL"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "FAIL",
           "target": "failManagedThreadSession32"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "2*C(runtime.field.load)+CALL(failManagedThreadSession32)",
-        "note": "Cancellation callback closes over managed session."
+        "expression": "(2+FAIL)*C(runtime.field.load)+C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(FAIL)*CALL(failManagedThreadSession32)",
+        "note": "Future abort callback respects observed completion; initial already-aborted signal remains a separate unconditional first-error failure. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified.",
+        "parameters": {
+          "FAIL": "1 when future abort observes DONE false;0 after DONE publication"
+        }
       },
       "status": "decomposed"
     },
@@ -1058,7 +1136,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "A",
+          "count": "FUTURE_ABORT",
           "target": "abort"
         },
         {
@@ -1105,12 +1183,21 @@
         {
           "op": "runtime.timer.clear",
           "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "INITIAL_ABORT",
+          "target": "failManagedThreadSession32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "INITIAL_ABORT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2)*C(runtime.number.finite.check)+(WT)*C(control.test.u32)+(WB)*C(control.branch)+(4+2*(1+ID+P+PD))*C(runtime.field.load)+(8+2*ACTIVE)*C(runtime.field.store)+(2+2*ACTIVE)*C(runtime.function.allocate)+(A)*CALL(abort)+(2*SIG)*C(runtime.event.listener)+C(runtime.promise.construct)+C(runtime.promise.await)+(2+ID+P+PD)*C(atomic.load.u32)+(ACTIVE)*C(runtime.timer.read)+(ACTIVE)*C(runtime.math.ceil)+(ACTIVE)*C(runtime.math.min)+(2*ACTIVE)*C(runtime.timer.set)+(D)*CALL(deadline)+(INITIAL+PT)*C(runtime.promise.resolve)+(2)*C(runtime.timer.clear)",
+        "activeCycleExpression": "(2)*C(runtime.number.finite.check)+(WT)*C(control.test.u32)+(WB)*C(control.branch)+(4+2*(1+ID+P+PD))*C(runtime.field.load)+(8+2*ACTIVE)*C(runtime.field.store)+(2+2*ACTIVE)*C(runtime.function.allocate)+(FUTURE_ABORT)*CALL(abort)+(2*SIG)*C(runtime.event.listener)+C(runtime.promise.construct)+C(runtime.promise.await)+(2+ID+P+PD)*C(atomic.load.u32)+(ACTIVE)*C(runtime.timer.read)+(ACTIVE)*C(runtime.math.ceil)+(ACTIVE)*C(runtime.math.min)+(2*ACTIVE)*C(runtime.timer.set)+(D)*CALL(deadline)+(INITIAL+PT)*C(runtime.promise.resolve)+(2)*C(runtime.timer.clear)+(INITIAL_ABORT)*CALL(failManagedThreadSession32)+(INITIAL_ABORT)*C(runtime.field.load)",
         "unboundedTerms": [
           "C(runtime.promise.await)"
         ],
@@ -1124,8 +1211,9 @@
           "WT": "executed source predicate tests: validation, signal/nullish guards, initial terminal snapshot and poll predicates",
           "WB": "executed branches over those predicates; short-circuit operands count only when reached",
           "SIG": "1 when AbortSignal supplied; listener installed and removed",
-          "A": "abort callback invocations before/during wait",
-          "D": "bounded-chunk deadline callbacks; body counted in deadline"
+          "D": "bounded-chunk deadline callbacks; body counted in deadline",
+          "FUTURE_ABORT": "Abort event invocations after listener registration; DONE-aware callback subledger",
+          "INITIAL_ABORT": "1 when input signal is already aborted; direct failure retains existing precedence over prepublished DONE"
         },
         "note": "Wait owns initial terminal arbitration, listener setup, pending resolver, polling and final cleanup. Timer/interval allocation is skipped for terminal state. Deadline callback has a separate ledger; no clock reads occur in poll callbacks. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
       },
@@ -7040,12 +7128,24 @@
         {
           "op": "runtime.host.bookkeeping",
           "count": "LEGACY*(PT_POLL)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "LEGACY"
+        },
+        {
+          "op": "control.branch",
+          "count": "LEGACY"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "BAD_LEGACY_LAYOUT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2)*C(runtime.integer.check)+C(runtime.number.finite.check)+C(runtime.timer.read)+(VALID_TEST)*C(control.test.u32)+(VALID_BRANCH)*C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(MINIMAL)*CALL(prepareLazySmpConnect4Rba32)+(MINIMAL)*CALL(solvePreparedConnect4Search32)+(MINIMAL)*CALL(closePreparedConnect4Search32)+(3*MINIMAL)*C(runtime.promise.await)+(LEGACY*(3))*C(alu.and.u32)+(LEGACY*(1))*CALL(connect4RbaFromMoves)+(LEGACY*(1))*CALL(shareConnect4RbaGeometry32)+(LEGACY*(1))*CALL(createConnect4RbaSharedExactCache32)+(LEGACY*(1))*CALL(createManagedThreadSession32)+(LEGACY*(W))*CALL(ManagedThreadSession.spawn)+(LEGACY*(1))*CALL(ManagedThreadSession.wait)+(LEGACY*(1))*CALL(ManagedThreadSession.close)+(LEGACY*(1))*CALL(ManagedThreadSession.state)+(LEGACY*(2))*CALL(sharedViewBytes32)+(LEGACY*(2+M))*C(memory.allocate.shared.bytes)+(LEGACY*(2+M))*C(runtime.typed_view.construct)+(LEGACY*(1))*C(runtime.array.allocate)+(LEGACY*(W))*C(runtime.url.construct)+(LEGACY*(2))*C(runtime.timer.read)+(LEGACY*(1))*C(atomic.store.u32)+(LEGACY*(5+W+3*M))*C(atomic.load.u32)+(LEGACY*(30*E*M))*C(memory.load.u32)+(LEGACY*(2+E))*C(runtime.object.allocate)+(LEGACY*(5+4*W+E))*C(alu.imul.u32)+(LEGACY*(3+W))*C(alu.add.u32)+(LEGACY*(1))*C(runtime.field.store)+(LEGACY*(2*F))*C(runtime.instanceof.check)+(LEGACY*(2*F))*C(runtime.field.load)+(LEGACY*(3+3*F))*C(control.branch)+(LEGACY*(2*W))*C(runtime.field.store)+(LEGACY*(X))*C(runtime.error.throw)+(LEGACY*(RF))*CALL(createWorkerBehaviorMemory32)+(LEGACY*(RF*W))*CALL(publishWorkerBehavior32)+(LEGACY*(RF*W))*CALL(encodeRootFrontier32)+(LEGACY*(3*RF))*C(memory.allocate.shared.bytes)+(LEGACY*(1+3*RF*W))*C(runtime.typed_view.construct)+(LEGACY*(3*RF+RF*W))*C(runtime.array.from)+(LEGACY*(3*W))*C(runtime.field.store)+(LEGACY*(3))*C(control.test.u32)+(LEGACY*(3))*C(control.branch)+(LEGACY*(3*PT))*C(runtime.typed_array.fill)+(LEGACY*(3*PT))*C(memory.allocate.shared.bytes)+(LEGACY*(3*PT))*C(runtime.typed_view.construct)+(LEGACY*(PT_TIMER))*C(runtime.timer.read)+(LEGACY*(PT_LOAD))*C(atomic.load.u32)+(LEGACY*(2*PT))*C(atomic.store.u32)+(LEGACY*(PT))*C(atomic.notify)+(LEGACY*(2*PT))*C(runtime.array.copy)+(LEGACY*(PT_POLL))*C(runtime.host.bookkeeping)",
+        "activeCycleExpression": "(2)*C(runtime.integer.check)+C(runtime.number.finite.check)+C(runtime.timer.read)+(VALID_TEST)*C(control.test.u32)+(VALID_BRANCH)*C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(MINIMAL)*CALL(prepareLazySmpConnect4Rba32)+(MINIMAL)*CALL(solvePreparedConnect4Search32)+(MINIMAL)*CALL(closePreparedConnect4Search32)+(3*MINIMAL)*C(runtime.promise.await)+(LEGACY*(3))*C(alu.and.u32)+(LEGACY*(1))*CALL(connect4RbaFromMoves)+(LEGACY*(1))*CALL(shareConnect4RbaGeometry32)+(LEGACY*(1))*CALL(createConnect4RbaSharedExactCache32)+(LEGACY*(1))*CALL(createManagedThreadSession32)+(LEGACY*(W))*CALL(ManagedThreadSession.spawn)+(LEGACY*(1))*CALL(ManagedThreadSession.wait)+(LEGACY*(1))*CALL(ManagedThreadSession.close)+(LEGACY*(1))*CALL(ManagedThreadSession.state)+(LEGACY*(2))*CALL(sharedViewBytes32)+(LEGACY*(2+M))*C(memory.allocate.shared.bytes)+(LEGACY*(2+M))*C(runtime.typed_view.construct)+(LEGACY*(1))*C(runtime.array.allocate)+(LEGACY*(W))*C(runtime.url.construct)+(LEGACY*(2))*C(runtime.timer.read)+(LEGACY*(1))*C(atomic.store.u32)+(LEGACY*(5+W+3*M))*C(atomic.load.u32)+(LEGACY*(30*E*M))*C(memory.load.u32)+(LEGACY*(2+E))*C(runtime.object.allocate)+(LEGACY*(5+4*W+E))*C(alu.imul.u32)+(LEGACY*(3+W))*C(alu.add.u32)+(LEGACY*(1))*C(runtime.field.store)+(LEGACY*(2*F))*C(runtime.instanceof.check)+(LEGACY*(2*F))*C(runtime.field.load)+(LEGACY*(3+3*F))*C(control.branch)+(LEGACY*(2*W))*C(runtime.field.store)+(LEGACY*(X))*C(runtime.error.throw)+(LEGACY*(RF))*CALL(createWorkerBehaviorMemory32)+(LEGACY*(RF*W))*CALL(publishWorkerBehavior32)+(LEGACY*(RF*W))*CALL(encodeRootFrontier32)+(LEGACY*(3*RF))*C(memory.allocate.shared.bytes)+(LEGACY*(1+3*RF*W))*C(runtime.typed_view.construct)+(LEGACY*(3*RF+RF*W))*C(runtime.array.from)+(LEGACY*(3*W))*C(runtime.field.store)+(LEGACY*(3))*C(control.test.u32)+(LEGACY*(3))*C(control.branch)+(LEGACY*(3*PT))*C(runtime.typed_array.fill)+(LEGACY*(3*PT))*C(memory.allocate.shared.bytes)+(LEGACY*(3*PT))*C(runtime.typed_view.construct)+(LEGACY*(PT_TIMER))*C(runtime.timer.read)+(LEGACY*(PT_LOAD))*C(atomic.load.u32)+(LEGACY*(2*PT))*C(atomic.store.u32)+(LEGACY*(PT))*C(atomic.notify)+(LEGACY*(2*PT))*C(runtime.array.copy)+(LEGACY*(PT_POLL))*C(runtime.host.bookkeeping)+(LEGACY)*C(control.test.u32)+(LEGACY)*C(control.branch)+(BAD_LEGACY_LAYOUT)*C(runtime.error.throw)",
         "unboundedTerms": [
           "CALL(prepareLazySmpConnect4Rba32)",
           "CALL(solvePreparedConnect4Search32)",
@@ -7070,9 +7170,10 @@
           "LEGACY": "1 for legacy/frontier modes, 0 for minimal",
           "MINIMAL": "1-LEGACY: delegates allocation,readiness,root creation and solve to prepared owner",
           "VALID_TEST": "executed common geometry/worker/cache-mask/timeout/rootFrontier/worker-mode/preparedEmptyTiming and legacy-option source predicates",
-          "VALID_BRANCH": "executed branches for common validation; both capacity checks use common owner"
+          "VALID_BRANCH": "executed branches for common validation; both capacity checks use common owner",
+          "BAD_LEGACY_LAYOUT": "1 when a legacy request selects non-split40 layout; rejection before legacy backing allocation"
         },
-        "note": "Common cold validation selects prepared minimal composition or the existing decomposed legacy/frontier host path. Removed legacy capacity predicates are replaced by two validateConnect4CacheCapacity32 calls. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "Common cold validation selects prepared minimal composition or the existing decomposed legacy/frontier host path. Removed legacy capacity predicates are replaced by two validateConnect4CacheCapacity32 calls. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Forward sharedCacheLayout to minimal preparation; legacy rejects native choice in cold host."
       },
       "status": "decomposed"
     },
@@ -11667,9 +11768,9 @@
           "target": "localKeyMatches"
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "count": "S",
-          "target": "probeConnect4RbaSharedExactCacheUncounted32"
+          "target": "sharedProbe"
         },
         {
           "op": "runtime.call.subledger",
@@ -11679,7 +11780,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCacheUncounted32)+P*CALL(storeLocalEntry)",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -11687,7 +11788,7 @@
           "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
           "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0."
         },
-        "note": "Local-first TT probe with absolute 1/2/3 exact tags. Shared fallback remains exact-only and shared hits are promoted locally."
+        "note": "Local-first TT probe with absolute 1/2/3 exact tags. Shared fallback remains exact-only and shared hits are promoted locally. Shared invocation follows the cold-bound sharedProbe alias. Concrete alternatives recorded in isomaxSystemCycleGraph.callbackTargets; dispatch/call-frame lowering remains symbolic and unqualified."
       },
       "status": "decomposed"
     },
@@ -11715,18 +11816,18 @@
           "target": "storeLocalEntry"
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCacheUncounted32"
+          "target": "sharedStore"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCacheUncounted32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
         },
-        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs."
+        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs. Shared invocation follows the cold-bound sharedStore alias. Concrete alternatives recorded in isomaxSystemCycleGraph.callbackTargets; dispatch/call-frame lowering remains symbolic and unqualified."
       },
       "status": "decomposed"
     },
@@ -11976,7 +12077,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-NATIVE",
           "target": "attachConnect4RbaSharedExactCache32"
         },
         {
@@ -12114,12 +12215,34 @@
           "op": "runtime.call.subledger",
           "target": "advanceConnect4LiveLineState3x32",
           "count": "H*LIVE3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NATIVE",
+          "target": "attachConnect4RbaSharedLayoutCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NATIVE",
+          "target": "prepareSharedCacheAccess"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "3+2*NATIVE"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+C(runtime.array.allocate)+CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+C(runtime.array.allocate)+CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -12141,9 +12264,10 @@
           "PT_WAIT": "cold blocking wait calls",
           "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
           "H": "Actual moveHistory length handed off after readiness, not allocated typed-array capacity; one live advance per root move",
-          "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0"
+          "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
       },
       "status": "decomposed"
     },
@@ -13078,9 +13202,9 @@
           "target": "localKeyMatches"
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "count": "S",
-          "target": "probeConnect4RbaSharedExactCacheUncounted32"
+          "target": "sharedProbe"
         },
         {
           "op": "runtime.call.subledger",
@@ -13090,7 +13214,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCacheUncounted32)+P*CALL(storeLocalEntry)",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -13098,7 +13222,7 @@
           "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
           "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0."
         },
-        "note": "Local-first TT probe with absolute 1/2/3 exact tags. Shared fallback remains exact-only and shared hits are promoted locally."
+        "note": "Local-first TT probe with absolute 1/2/3 exact tags. Shared fallback remains exact-only and shared hits are promoted locally. Shared invocation follows the cold-bound sharedProbe alias. Concrete alternatives recorded in isomaxSystemCycleGraph.callbackTargets; dispatch/call-frame lowering remains symbolic and unqualified."
       },
       "status": "decomposed"
     },
@@ -13126,18 +13250,18 @@
           "target": "storeLocalEntry"
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCacheUncounted32"
+          "target": "sharedStore"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCacheUncounted32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
         },
-        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs."
+        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs. Shared invocation follows the cold-bound sharedStore alias. Concrete alternatives recorded in isomaxSystemCycleGraph.callbackTargets; dispatch/call-frame lowering remains symbolic and unqualified."
       },
       "status": "decomposed"
     },
@@ -13360,7 +13484,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "1-NATIVE",
           "target": "attachConnect4RbaSharedExactCache32"
         },
         {
@@ -13442,12 +13566,34 @@
         {
           "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NATIVE",
+          "target": "attachConnect4RbaSharedLayoutCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NATIVE",
+          "target": "prepareSharedCacheAccess"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "3+2*NATIVE"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13467,9 +13613,10 @@
           "PT_TIMER": "cold timer reads",
           "PT_LOAD": "cold readiness/start loads",
           "PT_WAIT": "cold blocking wait calls",
-          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work"
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
       },
       "status": "decomposed"
     },
@@ -14393,12 +14540,12 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "INIT",
+          "count": "INIT*(1-NATIVE)",
           "target": "createConnect4RbaSharedExactCache32"
         },
         {
           "op": "runtime.typed_array.fill",
-          "count": "3*INIT"
+          "count": "INIT*(3-2*NATIVE)"
         },
         {
           "op": "runtime.url.construct",
@@ -14459,12 +14606,34 @@
         {
           "op": "runtime.error.throw",
           "count": "X"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NATIVE",
+          "target": "prepareSharedCacheLayout"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "INIT*NATIVE",
+          "target": "createConnect4RbaSharedLayoutCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "LAYOUT_FIELDS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "LAYOUT_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "LAYOUT_BRANCH"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT)*CALL(createConnect4RbaSharedExactCache32)+(3*INIT)*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)",
+        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)",
         "unboundedTerms": [
           "C(runtime.promise.await)",
           "CALL(ManagedThreadSession.spawn)"
@@ -14483,9 +14652,13 @@
           "EXP": "1 on initialization deadline failure, else 0",
           "CLOSE": "close calls from pre-abort/failure/closed/catch paths",
           "X": "1 when invalid configuration/error is thrown",
-          "ITER": "Readiness loop body executions including the optional deadline-expiring iteration; Q excludes that final untimed iteration"
+          "ITER": "Readiness loop body executions including the optional deadline-expiring iteration; Q excludes that final untimed iteration",
+          "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
+          "LAYOUT_FIELDS": "Reached descriptor kind/heightStride/entryWords reads;3 split/native selection guard operands and selected stride fields",
+          "LAYOUT_TEST": "Reached sharedCacheLayout guard operands,kind/stride ternary tests,constructor choice and fill-path test",
+          "LAYOUT_BRANCH": "Executed branches corresponding to those cold selection predicates"
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
       },
       "status": "decomposed"
     },
@@ -14535,13 +14708,13 @@
         },
         {
           "op": "runtime.event.listener",
-          "count": "NEW*SIG"
+          "count": "2*NEW*SIG"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1+NEW*(3+DL))*C(control.test.u32)+(1+NEW*(3+DL))*C(control.branch)+(NEW*(STARTED+DL))*C(atomic.load.u32)+(CANCEL)*CALL(ManagedThreadSession.fail)+(2*NEW)*C(runtime.timer.read)+(NEW)*C(atomic.store.u32)+(NEW)*C(atomic.notify)+(NEW)*CALL(ManagedThreadSession.close)+(NEW)*C(runtime.promise.await)+(NEW*SIG)*C(runtime.event.listener)",
+        "activeCycleExpression": "(1+NEW*(3+DL))*C(control.test.u32)+(1+NEW*(3+DL))*C(control.branch)+(NEW*(STARTED+DL))*C(atomic.load.u32)+(CANCEL)*CALL(ManagedThreadSession.fail)+(2*NEW)*C(runtime.timer.read)+(NEW)*C(atomic.store.u32)+(NEW)*C(atomic.notify)+(NEW)*CALL(ManagedThreadSession.close)+(NEW)*C(runtime.promise.await)+(2*NEW*SIG)*C(runtime.event.listener)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.close)",
           "C(runtime.promise.await)"
@@ -14553,7 +14726,7 @@
           "CANCEL": "1 when active incomplete solve has no prior error",
           "SIG": "1 when signal supplied"
         },
-        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Listener detached at close entry before asynchronous joining; post-join repeated removal remains explicitly counted and harmless."
       },
       "status": "decomposed"
     },
@@ -14564,25 +14737,39 @@
       "scope": "cold-prepared-host",
       "operations": [
         {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "LIVE",
           "target": "ManagedThreadSession.fail"
         },
         {
           "op": "runtime.call.subledger",
-          "count": 1,
+          "count": "LIVE",
           "target": "closePreparedConnect4Search32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "CALL(ManagedThreadSession.fail)+CALL(closePreparedConnect4Search32)",
+        "activeCycleExpression": "C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(LIVE)*CALL(ManagedThreadSession.fail)+(LIVE)*CALL(closePreparedConnect4Search32)",
         "unboundedTerms": [
           "CALL(closePreparedConnect4Search32)"
         ],
-        "parameters": {},
-        "note": "Abort acquires existing first-error cancellation code and requests asynchronous cleanup. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "parameters": {
+          "LIVE": "1 when DONE is not yet published; completed result ignores future abort"
+        },
+        "note": "Abort acquires existing first-error cancellation code and requests asynchronous cleanup. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. DONE observed before cancellation preserves exact completion; listener removed at close beginning."
       },
       "status": "decomposed"
     },
@@ -14665,7 +14852,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "HAS_SHARED+HAS_GEOMETRY",
+          "count": "HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY",
           "target": "sharedViewBytes32"
         },
         {
@@ -14683,11 +14870,31 @@
         {
           "op": "alu.add.u32",
           "count": "BYTE_ADDS"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "4*HAS_SHARED*NATIVE+ENTRY_FIELD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "1-NATIVE"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1-NATIVE+HAS_SHARED*NATIVE"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+C(runtime.array.from)+C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(W+EXACT)*C(alu.add.u32)+(HAS_SHARED+HAS_GEOMETRY)*CALL(sharedViewBytes32)+(RESULT_FIELDS+BYTE_FIELDS)*C(runtime.field.load)+(RT)*C(control.test.u32)+(RT)*C(control.branch)+(BYTE_ADDS)*C(alu.add.u32)",
+        "expression": "CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+C(runtime.array.from)+C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(W+EXACT)*C(alu.add.u32)+(HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY)*CALL(sharedViewBytes32)+(RESULT_FIELDS+BYTE_FIELDS)*C(runtime.field.load)+(RT)*C(control.test.u32)+(RT)*C(control.branch)+(BYTE_ADDS)*C(alu.add.u32)+(4*HAS_SHARED*NATIVE+ENTRY_FIELD)*C(runtime.field.load)+(1-NATIVE)*C(runtime.number.multiply)+(1-NATIVE+HAS_SHARED*NATIVE)*C(alu.add.u32)+(3)*C(control.test.u32)+(3)*C(control.branch)",
         "parameters": {
           "W": "requested worker count; completedWorkers loads one result lane per worker",
           "EXACT": "1 when DONE,winner,error snapshot qualifies exact result",
@@ -14703,9 +14910,11 @@
           "BYTE_FIELDS": "byteLength reads for control,result,ready and allocated root views",
           "BYTE_ADDS": "executed additions combining owned shared storage byte counts",
           "RT": "executed exact/status/nullish/timing/root-presence predicates",
-          "RESULT_DONE": "0/1 DONE load after the error-code short circuit"
+          "RESULT_DONE": "0/1 DONE load after the error-code short circuit",
+          "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
+          "ENTRY_FIELD": "1 native descriptor.entryBytes load; split default derives (keyWords+2)*4"
         },
-        "note": "Materialize exact/interrupted/timeout/failed status only after cleanup; unavailable hot metrics stay null. Array callback costs are included per worker. No source-work or hardware-cycle claim is inferred. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
+        "note": "Materialize exact/interrupted/timeout/failed status only after cleanup; unavailable hot metrics stay null. Array callback costs are included per worker. No source-work or hardware-cycle claim is inferred. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native sharedBytes sums entries.byteLength+stats.byteLength once and excludes aliased halves/heights views; split40 uses sharedViewBytes32 over disjoint views. Entry-size label and layout label are cold result fields."
       },
       "status": "decomposed"
     },
@@ -14837,15 +15046,1612 @@
         "note": "Finish awaits cached join before exposing the result. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#isCompactLayoutProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "isCompactLayoutProfile8",
+      "scope": "cold-lazy-smp-cache-profile",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "Q"
+        },
+        {
+          "op": "control.branch",
+          "count": "Q"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "F*C(runtime.field.load)+Q*C(control.test.u32)+Q*C(control.branch)",
+        "parameters": {
+          "F": "geometry property loads reached before short-circuit, 0..8",
+          "Q": "guard/equality conditions evaluated before return, 1..11"
+        },
+        "note": "Cold standard-standard compact profile compact-layout guard. Geometry/key-width/layout equality is explicit; unsupported geometry falls back to full shared identity. Exact source helper copied with unique name; no new encoding. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#compactLayoutSupportProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "compactLayoutSupportProfile8",
+      "scope": "hot-lazy-smp-cache-identity-pack",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 6
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 5
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 5
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "6*C(memory.load.u32)+6*C(alu.add.u32)+5*C(alu.shl.u32)+C(alu.and.u32)+5*C(alu.or.u32)+C(alu.shr.u32)",
+        "note": "Exact standard compact profile compact support field: heights 2..6 plus terminal bits. Rank is omitted because legal-q rank equals support-height sum. Exact source helper copied with unique name; no new encoding. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#compactLayoutTailProfile8",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "compactLayoutTailProfile8",
+      "scope": "hot-lazy-smp-cache-identity-pack",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "2*C(memory.load.u32)+2*C(alu.add.u32)+2*C(alu.and.u32)+C(alu.shl.u32)+C(alu.or.u32)+C(alu.shr.u32)",
+        "note": "Exact standard compact profile packed coordinate tails: five semantic bits from each player's final coordinate word; padding is nonsemantic and omitted. Exact source helper copied with unique name; no new encoding. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#prepareSharedCacheLayout",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "prepareSharedCacheLayout",
+      "scope": "cold-layout-prepare",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "IC",
+          "note": "Number.isSafeInteger/integer predicates executed on cold path."
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FS"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "OA"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "ERR"
+        },
+        {
+          "op": "runtime.math.ceil",
+          "count": "CEIL"
+        },
+        {
+          "op": "runtime.number.divide",
+          "count": "DIV"
+        },
+        {
+          "op": "runtime.object.freeze",
+          "count": "FREEZE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "COMPACT_CHECK",
+          "target": "isCompactLayoutProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(IC)*C(runtime.integer.check)+(FS)*C(runtime.field.store)+(OA)*C(runtime.object.allocate)+(ERR)*C(runtime.error.throw)+(CEIL)*C(runtime.math.ceil)+(DIV)*C(runtime.number.divide)+(FREEZE)*C(runtime.object.freeze)+(COMPACT_CHECK)*CALL(isCompactLayoutProfile8)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "IC": "Safe-integer checks reached before failure/success.",
+          "FS": "Executed layout object-field initialization.",
+          "OA": "One valid selected descriptor, or error-path construction counted by throw.",
+          "ERR": "1 when rejected; otherwise0.",
+          "CEIL": "0 compact/fullspan;2 generic direct success.",
+          "DIV": "0 compact/fullspan;5 generic direct success (coordinate alignment, entry alignment, entryWords, native heightStride, native heightOffset). Earlier invalid paths retain only reached divisions.",
+          "FREEZE": "1 valid descriptor;0 before rejected descriptor.",
+          "COMPACT_CHECK": "1 valid geometry reaches compact-profile decision;0 no-geometry/earlier failure."
+        },
+        "note": "Cold fullspan/compact/direct selection. Include every reached descriptor initialization and checked geometry field. Allocation/field validation/ceil/freeze costs are symbolic; no host-time exclusion makes them zero. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "createConnect4RbaSharedLayoutCache32",
+      "scope": "cold-shared-layout-factory",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "IC",
+          "note": "Number.isSafeInteger/integer predicates executed on cold path."
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FS"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "OA"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "ERR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareSharedCacheLayout"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "VALIDATE",
+          "target": "validateConnect4CacheCapacity32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTACH",
+          "target": "attachConnect4RbaSharedLayoutCache32"
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": "ALLOC"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "VIEW"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(IC)*C(runtime.integer.check)+(FS)*C(runtime.field.store)+(OA)*C(runtime.object.allocate)+(ERR)*C(runtime.error.throw)+(1)*CALL(prepareSharedCacheLayout)+(VALIDATE)*CALL(validateConnect4CacheCapacity32)+(ATTACH)*CALL(attachConnect4RbaSharedLayoutCache32)+(ALLOC)*C(memory.allocate.shared.bytes)+(VIEW)*C(runtime.typed_view.construct)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "VALIDATE": "1 after prepared descriptor;0 earlier rejection.",
+          "ATTACH": "1 when cache/backings constructed;0 prior rejection.",
+          "ALLOC": "2 valid backings: capacity*entryBytes and12 stats bytes; total allocated bytes named BYTES.",
+          "BYTES": "capacity*entryBytes+12; allocation cost is not inferred as constant2 cycles.",
+          "VIEW": "2 initial Uint32 views, before attach alias construction."
+        },
+        "note": "Largest view stride16 on compact, entryBytes/heightBytes direct, entryWords fullspan. Capacity validator owns power-of-two/u32 view limits; byte product is safe-integer checked here. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "attachConnect4RbaSharedLayoutCache32",
+      "scope": "cold-shared-layout-attach",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.integer.check",
+          "count": "IC",
+          "note": "Number.isSafeInteger/integer predicates executed on cold path."
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FS"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "OA"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "ERR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "VALIDATE",
+          "target": "validateConnect4CacheCapacity32"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": "ARRAY"
+        },
+        {
+          "op": "runtime.array.includes",
+          "count": "INCLUDES"
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": "INSTANCEOF"
+        },
+        {
+          "op": "runtime.number.divide",
+          "count": "DIV"
+        },
+        {
+          "op": "runtime.number.remainder",
+          "count": "REM"
+        },
+        {
+          "op": "runtime.math.ceil",
+          "count": "CEIL"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "VIEW"
+        },
+        {
+          "op": "runtime.constructor.dispatch",
+          "count": "TYPE"
+        },
+        {
+          "op": "runtime.object.freeze",
+          "count": "FREEZE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(IC)*C(runtime.integer.check)+(FS)*C(runtime.field.store)+(OA)*C(runtime.object.allocate)+(ERR)*C(runtime.error.throw)+(VALIDATE)*CALL(validateConnect4CacheCapacity32)+(ARRAY)*C(runtime.array.allocate)+(INCLUDES)*C(runtime.array.includes)+(INSTANCEOF)*C(runtime.instanceof.check)+(DIV)*C(runtime.number.divide)+(REM)*C(runtime.number.remainder)+(CEIL)*C(runtime.math.ceil)+(VIEW)*C(runtime.typed_view.construct)+(TYPE)*C(runtime.constructor.dispatch)+(FREEZE)*C(runtime.object.freeze)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "VALIDATE": "1 after descriptor validated.",
+          "ARRAY": "1 kind membership array; additional1 direct-width membership array when reached.",
+          "INCLUDES": "Executed cold membership queries.",
+          "INSTANCEOF": "Backing/view guards reached (up to2).",
+          "DIV": "Executed descriptor validation/address divisions, including heightStride, heightOffset, coordinateOffset, entry alignment and expected Uint32 length.",
+          "REM": "1 direct coordinateWords parity test reached;0 others.",
+          "CEIL": "2 on fully reached direct validation,0 other layouts.",
+          "VIEW": "R+N: R=1 truncated entry view repaired, N=1 compact/direct alias reattached (0 fullspan).",
+          "TYPE": "Native height constructor selection only on direct.",
+          "FREEZE": "1 on successful attachment."
+        },
+        "note": "No copying/resize/table growth. Validate exact descriptor offsets/widths to prevent atomic overlap, require backing span, repair only entry-view header, rebuild aliases and freeze descriptor. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#prepareSharedCacheAccess",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "prepareSharedCacheAccess",
+      "scope": "cold-layout-access-bind",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "1+O"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+O)*C(runtime.object.allocate)+(2)*C(runtime.field.store)",
+        "parameters": {
+          "F": "Layout-kind and selected function reads; counted flag selects one variant once.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Reached kind/counting tests.",
+          "BRANCH": "Reached cold selections.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "O": "1 when default options object constructed because second argument is omitted/undefined, otherwise0. Returned accessor-pair object separately counted1."
+        },
+        "note": "Returns one probe/store pair for worker lifetime; uncounted variants have no reporting access or branch. Accessor invocation/call-site lowering remains charged in caller/callee graph. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeConnect4RbaSharedLayoutCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeConnect4RbaSharedLayoutCache32",
+      "scope": "public-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-KH",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "probeCompactSharedCacheCounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "probeDirectSharedCacheCounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "probeFullSpanSharedCacheCounted32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1-KH)*CALL(mixSpan32Locator32)+(C)*CALL(probeCompactSharedCacheCounted32)+(D)*CALL(probeDirectSharedCacheCounted32)+(R)*CALL(probeFullSpanSharedCacheCounted32)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "KH": "1 caller supplies full-q locator;0 helper computes it.",
+          "C": "1 compact selected else0.",
+          "D": "1 direct selected else0.",
+          "R": "1 fullspan selected else0. C+D+R=1 on valid cache."
+        },
+        "note": "Compatibility support API optional-hash wrapper. Runtime layout dispatch charged here; minimal worker must consume cold-bound implementation, not this wrapper. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeConnect4RbaSharedLayoutCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeConnect4RbaSharedLayoutCache32",
+      "scope": "public-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-KH",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C",
+          "target": "storeCompactSharedCacheCounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "storeDirectSharedCacheCounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "storeFullSpanSharedCacheCounted32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1-KH)*CALL(mixSpan32Locator32)+(C)*CALL(storeCompactSharedCacheCounted32)+(D)*CALL(storeDirectSharedCacheCounted32)+(R)*CALL(storeFullSpanSharedCacheCounted32)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "KH": "1 caller supplies full-q locator;0 helper computes it.",
+          "C": "1 compact selected else0.",
+          "D": "1 direct selected else0.",
+          "R": "1 fullspan selected else0. C+D+R=1 on valid cache."
+        },
+        "note": "Compatibility support API optional-hash wrapper. Runtime layout dispatch charged here; minimal worker must consume cold-bound implementation, not this wrapper. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeCompactSharedCache32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K32+Q"
+        },
+        {
+          "op": "atomic.load.u16",
+          "count": "K16+Q"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "RAW"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactLayoutSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactLayoutTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+K32+Q)*C(atomic.load.u32)+(K16+Q)*C(atomic.load.u16)+(RAW)*C(memory.load.u32)+(CS)*CALL(compactLayoutSupportProfile8)+(CT)*CALL(compactLayoutTailProfile8)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+P: record index always; halfword index only after live/even sequence.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K32": "Number of reached support/full-coordinate atomic comparisons (0..5).",
+          "K16": "Number of reached first-two-height/tail atomic comparisons (0..3).",
+          "RAW": "Reached raw q comparisons: prefix heights and four coordinates (0..6). Packed helper loads counted inside helpers.",
+          "CS": "1 packed support comparison reached;0 otherwise.",
+          "CT": "1 packed tail comparison reached;0 otherwise."
+        },
+        "note": "Uncounted Compact seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeCompactSharedCache32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "6*S"
+        },
+        {
+          "op": "atomic.store.u16",
+          "count": "4*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "compactLayoutSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "compactLayoutTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(6*S)*C(atomic.store.u32)+(4*S)*C(atomic.store.u16)+(6*S)*C(memory.load.u32)+(S)*CALL(compactLayoutSupportProfile8)+(S)*CALL(compactLayoutTailProfile8)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+S: record always; halfword index only after successful ownership.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write."
+        },
+        "note": "Uncounted Compact seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeDirectSharedCache32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+P+K+2*Q"
+        },
+        {
+          "op": "atomic.load.native_height",
+          "count": "H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "P+H+K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+P+K+2*Q)*C(atomic.load.u32)+(H)*C(atomic.load.native_height)+(P+H+K)*C(memory.load.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+P: record stride always; native-height stride after live/even sequence.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "H": "Number of height fields compared (0..columns), width fixed by heightBytes.",
+          "K": "Number of full coordinate fields compared (0..coordinateWords)."
+        },
+        "note": "Uncounted Direct seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeDirectSharedCache32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(3+K)"
+        },
+        {
+          "op": "atomic.store.native_height",
+          "count": "S*H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S*(1+H+K)"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(S*(3+K))*C(atomic.store.u32)+(S*H)*C(atomic.store.native_height)+(S*(1+H+K))*C(memory.load.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+S: record always; native-height stride after ownership.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "H": "Prepared columns, unscaled; multiply by S exactly once.",
+          "K": "Prepared coordinateWords, unscaled; multiply by S exactly once."
+        },
+        "note": "Uncounted Direct seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeFullSpanSharedCache32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K+2*Q"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+K+2*Q)*C(atomic.load.u32)+(K)*C(memory.load.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": 1,
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K": "Number of full q words compared (0..keyWords)."
+        },
+        "note": "Uncounted FullSpan seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCache32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeFullSpanSharedCache32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(K+2)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S*K"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(S*(K+2))*C(atomic.store.u32)+(S*K)*C(memory.load.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": 1,
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K": "Prepared keyWords, unscaled; multiply by S exactly once."
+        },
+        "note": "Uncounted FullSpan seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeCompactSharedCacheCounted32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K32+Q"
+        },
+        {
+          "op": "atomic.load.u16",
+          "count": "K16+Q"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "RAW"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactLayoutSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactLayoutTailProfile8"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "E",
+          "note": "Hit statistics only after committed exact value."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+K32+Q)*C(atomic.load.u32)+(K16+Q)*C(atomic.load.u16)+(RAW)*C(memory.load.u32)+(CS)*CALL(compactLayoutSupportProfile8)+(CT)*CALL(compactLayoutTailProfile8)+(E)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+P: record index always; halfword index only after live/even sequence.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K32": "Number of reached support/full-coordinate atomic comparisons (0..5).",
+          "K16": "Number of reached first-two-height/tail atomic comparisons (0..3).",
+          "RAW": "Reached raw q comparisons: prefix heights and four coordinates (0..6). Packed helper loads counted inside helpers.",
+          "CS": "1 packed support comparison reached;0 otherwise.",
+          "CT": "1 packed tail comparison reached;0 otherwise."
+        },
+        "note": "Counted Compact seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeCompactSharedCacheCounted32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "6*S"
+        },
+        {
+          "op": "atomic.store.u16",
+          "count": "4*S"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6*S"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "compactLayoutSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "compactLayoutTailProfile8"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 1,
+          "note": "Exactly one reporting add: success store count or contention count. Ownership CAS accounted separately."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(6*S)*C(atomic.store.u32)+(4*S)*C(atomic.store.u16)+(6*S)*C(memory.load.u32)+(S)*CALL(compactLayoutSupportProfile8)+(S)*CALL(compactLayoutTailProfile8)+(1)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+S: record always; halfword index only after successful ownership.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write."
+        },
+        "note": "Counted Compact seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeDirectSharedCacheCounted32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+P+K+2*Q"
+        },
+        {
+          "op": "atomic.load.native_height",
+          "count": "H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "P+H+K"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "E",
+          "note": "Hit statistics only after committed exact value."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+P+K+2*Q)*C(atomic.load.u32)+(H)*C(atomic.load.native_height)+(P+H+K)*C(memory.load.u32)+(E)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+P: record stride always; native-height stride after live/even sequence.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "H": "Number of height fields compared (0..columns), width fixed by heightBytes.",
+          "K": "Number of full coordinate fields compared (0..coordinateWords)."
+        },
+        "note": "Counted Direct seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeDirectSharedCacheCounted32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(3+K)"
+        },
+        {
+          "op": "atomic.store.native_height",
+          "count": "S*H"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S*(1+H+K)"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 1,
+          "note": "Exactly one reporting add: success store count or contention count. Ownership CAS accounted separately."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(S*(3+K))*C(atomic.store.u32)+(S*H)*C(atomic.store.native_height)+(S*(1+H+K))*C(memory.load.u32)+(1)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": "1+S: record always; native-height stride after ownership.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "H": "Prepared columns, unscaled; multiply by S exactly once.",
+          "K": "Prepared coordinateWords, unscaled; multiply by S exactly once."
+        },
+        "note": "Counted Direct seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "probeFullSpanSharedCacheCounted32",
+      "scope": "hot-layout-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K+2*Q"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "K"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "E",
+          "note": "Hit statistics only after committed exact value."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1+K+2*Q)*C(atomic.load.u32)+(K)*C(memory.load.u32)+(E)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": 1,
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K": "Number of full q words compared (0..keyWords)."
+        },
+        "note": "Counted FullSpan seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCacheCounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "storeFullSpanSharedCacheCounted32",
+      "scope": "hot-layout-cache-store",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "GUARD"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A",
+          "note": "Ownership compareExchange; successful or failed CAS still costs one attempted RMW."
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(K+2)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "S*K"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 1,
+          "note": "Exactly one reporting add: success store count or contention count. Ownership CAS accounted separately."
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(F)*C(runtime.field.load)+(ADD)*C(alu.add.u32)+(MUL)*C(runtime.number.multiply)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(GUARD)*C(runtime.native.access.lowering)+(1)*C(atomic.load.u32)+(A)*C(atomic.rmw.u32)+(S*(K+2))*C(atomic.store.u32)+(S*K)*C(memory.load.u32)+(1)*C(atomic.rmw.u32)",
+        "parameters": {
+          "F": "Executed cache/layout/native-view/receiver property reads. q/native element loads and called helper internals counted separately, never again as fields.",
+          "ADD": "Executed scalar offset/index additions and loop increments outside helpers.",
+          "MUL": 1,
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
+          "P": "1 sequence start passes nonempty/even check;0 early miss.",
+          "Q": "1 all key fields match and value/final sequence loads reached;0 earlier mismatch. Q does not imply committed hit.",
+          "E": "1 final sequence stable/even and value nonzero;0 otherwise.",
+          "A": "1 even sequence reaches ownership CAS;0 already odd.",
+          "S": "1 ownership CAS succeeds and key/value publication executes;0 safely dropped write.",
+          "K": "Prepared keyWords, unscaled; multiply by S exactly once."
+        },
+        "note": "Counted FullSpan seqlock accessor. Known full-q hash required; no hash recomputation or runtime layout dispatch. Sequence zero/wrap/busy and droppable CAS semantics inherited. Counts cover reached source operations; target cycles remain symbolic. Standard full-equality probe11 atomic loads; committed store1 load+1 CAS+10 stores. No allocation/reporting in uncounted path. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#<module-main>",
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "name": "<module-main>",
+      "scope": "cold-module-initialization",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1)*C(runtime.module.bookkeeping)",
+        "parameters": {
+          "F": "Executed property/field reads, including cache/layout and native view access. Callee internals excluded.",
+          "ADD": "Executed scalar offset/index additions and loop increments; excludes subledger internals.",
+          "MUL": "Executed index/stride multiplications; JS guards/boxing/lowering remain explicit debt.",
+          "AND": "Executed mask and sequence-parity operations; excludes subledger internals.",
+          "TEST": "Executed source predicates, comparisons and short-circuit terms; excludes callee internals.",
+          "BRANCH": "Executed control selections/loop tests/early returns, excludes callee internals.",
+          "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero."
+        },
+        "note": "ESM import/function-declaration initialization; imported module initializations remain their own source owners. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 222,
-    "decomposed": 222,
+    "units": 244,
+    "decomposed": 244,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 82
+    "localExtensionOperations": 91
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -14945,14 +16751,14 @@
     "addons/rba-connect4-alphabeta.mjs": "a40536e47fe319625bc4ac23da7afa9a410b44b6",
     "addons/cpc-connect4.mjs": "6a0131e174a768458242f316f3d8a0c55a4be7e6",
     "addons/rba-connect4-coordinate.mjs": "60b1a31858d501772200843c84952326224af84d",
-    "addons/branch-manager-host.mjs": "e083caadc17aac0dd1c81a5a8c408820a2ec58cc",
+    "addons/branch-manager-host.mjs": "eff05e3fc04ab65c05d55e4803de7dff5de05e72",
     "addons/rba-connect4-profile.mjs": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
     "addons/rba-connect4-front.mjs": "4455a463dd20828852e0abd9ecd151d2880dc704",
     "addons/connect4-live-line-evaluator.mjs": "b9bf66a91df2a35880516404f3180af40ffa179c",
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2e6b09787864b4cc22748174cb71295e243467ee",
-    "addons/rba-connect4-lazy-smp-host.mjs": "a564d0a99573536eec3b04fa9c51c5dea47f4dc7",
+    "addons/rba-connect4-lazy-smp-host.mjs": "57fa267dec6777521c0f65662edb33eca0522884",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -14968,15 +16774,16 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "595b53bb5f05f2ff2dee022f70833d6a8fe869c9",
     "addons/rba-connect4-coordinate-dense.mjs": "29c080c4a7998d5451d7bf919a87ae027b4ab200",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e78614ceb17c66fd05aa26b0b73fd2bb43eb968b",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "30b8ed2b6b07d1a1222b4a994e02d5b873520b8e",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "b037620f82f7d67f61db2239337d8e59c8089e17",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "4a08bc571ed7bc10106ed2c7027d557d874da374",
     "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "f187582831c82621a161a30d26e4d2422904dda8"
+    "addons/rba-connect4-prepared-session-host.mjs": "c252001eb9e918c38dd1601d98ac017e63da33a9",
+    "addons/rba-connect4-shared-exact-cache-layout.mjs": "0dd317872306237f1f683e5f909884e03dec4e4f"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -15107,6 +16914,18 @@
       "productJoin": [
         "addons/rba-connect4-profile.mjs#product6",
         "addons/rba-connect4-profile.mjs#productSpan"
+      ],
+      "sharedProbe": [
+        "addons/rba-connect4-shared-exact-cache-uncounted.mjs#probeConnect4RbaSharedExactCacheUncounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCache32"
+      ],
+      "sharedStore": [
+        "addons/rba-connect4-shared-exact-cache-uncounted.mjs#storeConnect4RbaSharedExactCacheUncounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCache32"
       ]
     },
     "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback."
