@@ -6941,7 +6941,7 @@
           "WORKER_MODE": "Cold selector: legacy (default) or minimal; minimal rejects legacy-only Behavior/CPC/Root-Frontier options.",
           "M": "1 for legacy/behavior/frontier modes that allocate winner metrics; 0 for minimal mode."
         },
-        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data. C07 initialization selects center variant for even worker indices and live-line variant for odd indices. Four workers remain deep; no hot policy branch. C07b replaces parity selection with worker-index==3: only worker3 uses live ordering; all other indices center."
+        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data. C07c initialization selects center for worker0 and live-line for all other indices; four-worker primary has one center and three live, all deep. No hot policy branch."
       },
       "status": "decomposed"
     },
@@ -13292,7 +13292,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
-    "addons/rba-connect4-lazy-smp-host.mjs": "4334e1f603e452417d941efadceaa104a9de937f",
+    "addons/rba-connect4-lazy-smp-host.mjs": "a19adce76898dc1adf9cc35082658b0e834bc24b",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
