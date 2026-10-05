@@ -1,0 +1,528 @@
+{
+  "kind": "C15-localhost-complete-empty-solve-comparison",
+  "sourceRestoredTo": "a566296",
+  "timingBoundary": "all reusable initialization complete -> construct actual empty root -> exact result; cycles include initialization and cleanup across all threads",
+  "configuration": {
+    "sharedEntries": 134217728,
+    "privateEntriesPerWorker": 33554432,
+    "searchWorkers": 4,
+    "policies": [
+      "center",
+      "live",
+      "center",
+      "live"
+    ],
+    "searchCpus": [
+      0,
+      2,
+      4,
+      6
+    ],
+    "helperCpu": 12,
+    "helperQueueBytes": 10486276
+  },
+  "limitations": [
+    "Small run counts; no statistical or universal performance claim.",
+    "Native node/shared counters intentionally absent.",
+    "Raw external-wrapper performance_conclusion_allowed flag is inherited metadata; current localhost warrant governs this separately authorized experiment.",
+    "E-core parent hypothesis not falsified by these publication implementations."
+  ],
+  "summaries": {
+    "control": {
+      "runs": 2,
+      "meanWallMs": 155763.38495,
+      "meanEntireOperationCycles": 2213133586948,
+      "meanCpuMs": 600570.3125,
+      "maxPeakRssBytes": 9917480960,
+      "wallChangePercent": 0,
+      "cycleChangePercent": 0,
+      "disposition": "RETAINED"
+    },
+    "idle": {
+      "runs": 1,
+      "meanWallMs": 155613.9262,
+      "meanEntireOperationCycles": 2213038085536,
+      "meanCpuMs": 599640.625,
+      "maxPeakRssBytes": 9939578880,
+      "wallChangePercent": -0.09595242813194016,
+      "cycleChangePercent": -0.004315212265681989,
+      "disposition": "CONTROL_ONLY"
+    },
+    "async": {
+      "runs": 2,
+      "meanWallMs": 153872.0439,
+      "meanEntireOperationCycles": 2577904217653,
+      "meanCpuMs": 698921.875,
+      "maxPeakRssBytes": 9935953920,
+      "wallChangePercent": -1.214239823182539,
+      "cycleChangePercent": 16.48208824158841,
+      "disposition": "NOT_RETAINED_TOTAL_COST"
+    },
+    "dedup": {
+      "runs": 2,
+      "meanWallMs": 152358.78749999998,
+      "meanEntireOperationCycles": 2492034932169.5,
+      "meanCpuMs": 677929.6875,
+      "maxPeakRssBytes": 9940156416,
+      "wallChangePercent": -2.185749527138814,
+      "cycleChangePercent": 12.602101692655431,
+      "disposition": "NOT_RETAINED_TOTAL_COST"
+    },
+    "changedWords": {
+      "runs": 2,
+      "meanWallMs": 152277.299,
+      "meanEntireOperationCycles": 2440736143518.5,
+      "meanCpuMs": 658687.5,
+      "maxPeakRssBytes": 9940594688,
+      "wallChangePercent": -2.2380650954131776,
+      "cycleChangePercent": 10.284176152437908,
+      "disposition": "NOT_RETAINED_TOTAL_COST"
+    }
+  },
+  "runs": [
+    {
+      "name": "c15-off-01",
+      "group": "control",
+      "sourceCommit": "43447f916cd745f2f21375bf27d8f4c4908a74c8",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15-off-01/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15-off-01/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15-off-01/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 155753.8021,
+      "initializationMs": 1113.8405,
+      "cleanupMs": 49.33309999998892,
+      "entireOperationCycles": "2215612741292",
+      "cpuMs": 600281.25,
+      "peakRssBytes": 9914032128,
+      "affinity": [
+        0,
+        2,
+        4,
+        6
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15-restored-control-02",
+      "group": "control",
+      "sourceCommit": "828040165f500f2138e42ed410d688f243556cd0",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15-restored-control-02/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15-restored-control-02/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15-restored-control-02/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 155772.9678,
+      "initializationMs": 1187.5269,
+      "cleanupMs": 49.12870000000112,
+      "entireOperationCycles": "2210654432604",
+      "cpuMs": 600859.375,
+      "peakRssBytes": 9917480960,
+      "affinity": [
+        0,
+        2,
+        4,
+        6
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15-idle-01",
+      "group": "idle",
+      "sourceCommit": "789fa55cedf643ee12fcd2500c2c2f1ac4b3cb17",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15-idle-01/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15-idle-01/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15-idle-01/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "idle",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 155613.9262,
+      "initializationMs": 1133.0229,
+      "cleanupMs": 50.02400000000489,
+      "entireOperationCycles": "2213038085536",
+      "cpuMs": 599640.625,
+      "peakRssBytes": 9939578880,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15-async-01",
+      "group": "async",
+      "sourceCommit": "52795c2773bf7ae007cbf5254d1be851cd62136c",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15-async-01/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15-async-01/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15-async-01/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 154405.0351,
+      "initializationMs": 1246.0221000000001,
+      "cleanupMs": 48.57249999998021,
+      "entireOperationCycles": "2585470345484",
+      "cpuMs": 701234.375,
+      "peakRssBytes": 9935953920,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15-async-02",
+      "group": "async",
+      "sourceCommit": "797153d79c61f41160e2f5b3b2853c095995b407",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15-async-02/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15-async-02/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15-async-02/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 153339.0527,
+      "initializationMs": 1169.6702,
+      "cleanupMs": 52.36559999999008,
+      "entireOperationCycles": "2570338089822",
+      "cpuMs": 696609.375,
+      "peakRssBytes": 9933508608,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15b-dedup-01",
+      "group": "dedup",
+      "sourceCommit": "031d6430f0fc1a6c1311aeadd8390ce2a724f612",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-01/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-01/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-01/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 153224.70309999998,
+      "initializationMs": 1129.3448,
+      "cleanupMs": 54.83069999999134,
+      "entireOperationCycles": "2501301967571",
+      "cpuMs": 683109.375,
+      "peakRssBytes": 9940156416,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15b-dedup-02",
+      "group": "dedup",
+      "sourceCommit": "f444015b2f334c914f010debaa89b5914da44c45",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-02/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-02/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15b-dedup-02/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 151492.8719,
+      "initializationMs": 1168.1785,
+      "cleanupMs": 52.70670000000973,
+      "entireOperationCycles": "2482767896768",
+      "cpuMs": 672750,
+      "peakRssBytes": 9937661952,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15c-delta-01",
+      "group": "changedWords",
+      "sourceCommit": "0647166c1db32e09f3afceb1fb5fa26b01b09d9c",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15c-delta-01/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15c-delta-01/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15c-delta-01/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 151672.06900000002,
+      "initializationMs": 1143.5891,
+      "cleanupMs": 49.603599999973085,
+      "entireOperationCycles": "2433880531448",
+      "cpuMs": 653562.5,
+      "peakRssBytes": 9939247104,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    },
+    {
+      "name": "c15c-delta-02",
+      "group": "changedWords",
+      "sourceCommit": "fc1171fd888bd694b4bc9fd1d220d6aafeffc24e",
+      "exactCommand": {
+        "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+        "arguments": [
+          "--max-inlined-bytecode-size=600",
+          "--max-inlined-bytecode-size-cumulative=2400",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
+          "--experimental-ffi",
+          "--import",
+          "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs",
+          "C:/r/jsminsys-cpc-rebuild-20261004/tools/bench-minimal-i5.mjs"
+        ],
+        "environment": {
+          "SystemRoot": "C:\\WINDOWS",
+          "WINDIR": "C:\\WINDOWS",
+          "PATH": "C:\\WINDOWS\\System32",
+          "TEMP": "C:/r/minimal-worker-localhost-20261004/c15c-delta-02/temp",
+          "TMP": "C:/r/minimal-worker-localhost-20261004/c15c-delta-02/temp",
+          "LANG": "C",
+          "LC_ALL": "C",
+          "SystemDrive": "C:",
+          "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+          "JMS_WORKER_AFFINITY_FILE": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
+          "JMS_WORKER_AFFINITY_REPORT": "C:/r/minimal-worker-localhost-20261004/c15c-delta-02/affinity",
+          "JMS_BENCH_LOCAL_CAPACITY": "33554432",
+          "JMS_BENCH_PUBLICATION_MODE": "async",
+          "JMS_MAINTENANCE_AFFINITY_FILE": "C:/r/jsminsys-cpc-rebuild-20261004/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json"
+        }
+      },
+      "runtimeHash": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+      "wallMs": 152882.52899999998,
+      "initializationMs": 1160.3263,
+      "cleanupMs": 51.12160000001313,
+      "entireOperationCycles": "2447591755589",
+      "cpuMs": 663812.5,
+      "peakRssBytes": 9940594688,
+      "affinity": [
+        0,
+        2,
+        4,
+        6,
+        12
+      ],
+      "status": "EXACT_OVER_10S_TARGET",
+      "cleanup": true
+    }
+  ]
+}

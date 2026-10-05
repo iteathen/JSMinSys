@@ -1,6 +1,6 @@
 # E-core asynchronous publication: not retained
 
-The optional-offload idea is sound, but these three implementations do not improve the governing total-machine-cost objective. All eight initial complete empty-board solves returned EXACT +1 / c4, with no error, verified search affinity0/2/4/6, and clean worker exits. Helper controls/variants additionally obtained E-coreCPU12 and five exits. No RLC or supplied opening. Ninth final restored control follows separately to check drift.
+The optional-offload idea is sound, but these three implementations do not improve the governing total-machine-cost objective. All nine complete empty-board solves returned EXACT +1 / c4, with no error, verified search affinity0/2/4/6, and clean worker exits. Helper controls/variants additionally obtained E-coreCPU12 and five exits. No RLC or supplied opening.
 
 | Configuration | Full runs | Mean ready-empty solve ms | Mean entire-operation cycles |
 |---|---:|---:|---:|
@@ -9,6 +9,9 @@ The optional-offload idea is sound, but these three implementations do not impro
 | C15 async publication | 2 | 153872.0439 | 2577904217653 |
 | C15b helper full-entry dedup | 2 | 152358.7875 | 2492034932169.5 |
 | C15c changed-word atomic stores | 2 | 152277.2990 | 2440736143518.5 |
+| Restored retained source, mask85 | 1 | 155772.9678 | 2210654432604 |
+
+Final restored control source8280401: initialization1187.5269ms, cleanup49.1287ms, peakRSS9917480960bytes; four clean exits, affinity verified. Primary wall differs by only0.0192s from initial control, with about0.22% lower cycles. No material temporal drift that explains away the helper cycle penalty. Active solver/addons/tools/catalog/tests/runner match a566296 exactly. All22 restored applicable regression tests, catalog213-unit check and generated-center check pass. Offline summarize-c15.mjs checks every run's configuration/affinity/cleanup before generating C15-COMPARISON.json; post-return expected values are never solver input.
 
 C15c is about2.23% faster than the initial no-helper control, at10.16% more cycles. Dedup/changed-word variants reduce helper cost but do not eliminate the unfavorable total-cost trade. No <=10s result. Small wall differences are bounded observations, not statistical/universal speed claims.
 
