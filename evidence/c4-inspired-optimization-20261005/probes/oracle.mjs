@@ -2,7 +2,7 @@ import {writeFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry} from '../../../addons/rba-connect4-geometry.mjs';
 import {connect4RbaFromMoves} from '../../../addons/rba-connect4-ingress.mjs';
 import {runLazySmpConnect4Rba32 as runRaw} from '../../../addons/rba-connect4-lazy-smp-host.mjs';
-const runLazySmpConnect4Rba32=(moves,options)=>runRaw(moves,{...options,localCacheLayout:process.env.C4_IDEAS_LOCAL??'split'});
+const runLazySmpConnect4Rba32=(moves,options)=>runRaw(moves,{...options,supportBasisPlanBudgetBytes:Number(process.env.C4_IDEAS_PLANS??0)});
 import {mixSpan32Locator32} from '../../../src/widekey32.mjs';
 let seed=1729;
 const next=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return seed>>>0;};

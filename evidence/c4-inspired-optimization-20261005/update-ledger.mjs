@@ -102,7 +102,64 @@ if(experiment==='C17'){
    ledger.units.push(copy);
   }
  }
+}else if(experiment==='C21'){
+ ledger.localOperationExtensions['runtime.math.floor']={cost:{kind:'symbolic',name:'NUMBER_FLOOR_COST(profile,lowering)'},note:'Cold nonnegative support digit division rounding; no per-node use.'};
+ function unit(source,name,operations,parameters,note){
+  ledger.units.push({unit:source+'#'+name,source,name,scope:'support-basis-plan',status:'decomposed',operations,
+   cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});
+ }
+ const source='addons/rba-connect4-support-basis-plan.mjs',call=(target,count=1)=>({op:'runtime.call.subledger',count,target});
+ unit(source,'prepareSupportBasisPlans32',[
+  {op:'runtime.number.safe_integer.check',count:'CHECK'},{op:'runtime.error.throw',count:'BAD'},
+  {op:'runtime.field.load',count:'FIELD'},{op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'},
+  {op:'runtime.number.multiply',count:'MUL'},{op:'runtime.number.divide',count:'DIV'},{op:'runtime.math.floor',count:'DIV'},
+  {op:'runtime.number.remainder',count:'REM'},{op:'alu.add.u32',count:'ADD'},{op:'alu.sub.u32',count:'SUB'},
+  {op:'memory.allocate.shared.bytes',count:'4*ADMIT'},{op:'runtime.typed_view.construct',count:'4*ADMIT'},
+  {op:'runtime.typed_array.allocate',count:'2*ADMIT'},{op:'runtime.object.allocate',count:'ADMIT'},
+  {op:'runtime.object.freeze',count:'ADMIT'},{op:'runtime.field.store',count:'7*ADMIT'},
+  {op:'memory.load.u32',count:'LOAD32'},{op:'memory.load.native_index',count:'LOADID'},
+  {op:'memory.store.u32',count:'STORE32'},{op:'memory.store.native_index',count:'P'},
+  {op:'alu.and.u32',count:'IMAGE'},{op:'alu.or.u32',count:'IMAGE'},{op:'alu.shl.u32',count:'IMAGE'},
+  {op:'alu.shr.u32',count:'IMAGE'},
+  call('prepareConnect4RbaExecutionProfile','ADMIT'),call('connect4RbaBasisFromSupport','ADMIT'),
+  call('emitSortedSetBitsAt32','P-ADMIT'),{op:'runtime.callback',count:'P-ADMIT',target:'prepareRemove'},
+  {op:'runtime.callback',count:'VISIT',target:'removePrepared'},{op:'runtime.array.copy',count:'ADMIT'}],
+  {ADMIT:'0 on cold budget/index fallback;1 on admitted plan.',P:'Admitted support profile count, including root;0 on fallback.',VISIT:'Sum of parent basis sizes traversed while preparing non-root profiles.',IMAGE:'Surviving nonempty residual images.',LOADID:'Native basis/size loads along preparation paths; width selected from geometry.',LOAD32:'Strides and mask read-modify-write loads.',STORE32:'Strides/membership writes, excluding sorted emission subledger.',CHECK:'Executed input/index/byte safe-integer checks.',BAD:'1 on invalid budget; allocation not reached.',FIELD:'Executed property loads, including width/budget checks.',TEST:'Executed predicates/loop checks/short-circuit conditions.',BRANCH:'Executed source control selections.',MUL:'Executed allocation/row/stride/cell/address multiplications.',DIV:'Executed nonnegative integer division then Math.floor while decoding the chosen nonzero support digit.',REM:'Executed remainder for support digit decoding.',ADD:'Executed numeric/address additions.',SUB:'Executed predecessor/landing subtractions.',INDEX_BYTES:'Basis IDs use1/2/4 bytes and sizes1/2/4 bytes based on geometry; no hot dispatch.'},
+  'COLD rule-only preparation covers every support, including unreachable profiles. All allocation checked against budget/native indices before backing-store creation. Every profile completed before publication. No outcomes, moves, TT rows or runtime learning persisted. Preparation debt measured in initialization and whole-operation cycles.');
+ unit(source,'loadSupportBasis32',[{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.u32',count:'2*C+W'},{op:'memory.load.native_index',count:'1+N'},
+  {op:'memory.store.u32',count:'N+W'},{op:'runtime.number.multiply',count:'C+2'},
+  {op:'alu.add.u32',count:'ADD'},{op:'control.test.u32',count:'C+N+W+3'},
+  {op:'control.branch',count:'C+N+W+3'}],
+  {C:'Configured columns summed into the injective mixed-radix handle.',N:'Copied child basis size.',W:'Geometry shape-word count.',FIELD:'Executed geometry/plan/view properties including loop conditions; compiler hoisting not assumed.',ADD:'Address/loop/handle additions:4*C+3*N+3*W.',INDEX_BYTES:'Size/ID view widths selected cold; memory.load.native_index includes native width.'},
+  'HOT reads immutable plan arrays and copies exact basis/membership into existing scratch. Source canonical support selects the canonical frame; no physical-column transporter is discarded. No allocation, mutation of plans or decoder dispatch.');
+ for(const dense of [false,true]){
+  const kind=dense?'Dense':'Prepared',base='addons/rba-connect4-coordinate-'+(dense?'dense':'prepared')+'.mjs',generated=base.replace('coordinate-','coordinate-support-');
+  for(const old of ledger.units.filter(u=>u.source===base&&u.name.includes('Cofactor')&&u.name.includes('KnownHeight'))){
+   const copy=structuredClone(old);copy.source=generated;copy.name=copy.name.replace('connect4Rba'+kind,'connect4RbaSupport'+kind);copy.unit=generated+'#'+copy.name;
+   for(const o of copy.operations)if(o.op==='runtime.call.subledger'&&o.target==='connect4Rba'+kind+'CofactorBasis')o.target='loadSupportBasis32';
+   const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+   copy.cycleCount[key]=copy.cycleCount[key].replaceAll('CALL(connect4Rba'+kind+'CofactorBasis)','CALL(loadSupportBasis32)');
+   if(dense){
+    copy.operations.push({op:'runtime.number.multiply',count:'K'},{op:'alu.add.u32',count:'A'});
+    copy.cycleCount[key]+='+K*C(runtime.number.multiply)+A*C(alu.add.u32)';
+   }else{
+    copy.operations.push({op:'runtime.callback',count:'K',target:'prepareRemove'},{op:'runtime.callback',count:'A',target:'removePrepared'});
+    copy.cycleCount[key]+='+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)';
+    copy.cycleCount.parameters.RS='Zero: removal callback replaces saved removed[] loads.';
+   }
+   copy.cycleCount.note+=' C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged.';
+   ledger.units.push(copy);
+  }
+ }
 }else if(experiment!=='HASH')throw Error('unknown experiment');
+if(ledger.units.some(u=>u.source==='addons/rba-connect4-support-basis-plan.mjs')){
+ ledger.localOperationExtensions['runtime.math.floor']={cost:{kind:'symbolic',name:'NUMBER_FLOOR_COST(profile,lowering)'},note:'Cold nonnegative support digit division rounding; no per-node use.'};
+ for(const u of ledger.units.filter(u=>u.source==='addons/rba-connect4-support-basis-plan.mjs')){
+  for(const o of u.operations)if(o.op==='runtime.number.modulo')o.op='runtime.number.remainder';
+  u.cycleCount.expression=u.cycleCount.expression.replaceAll('runtime.number.modulo','runtime.number.remainder');
+ }
+}
 for(const source of sources){
  const s=readFileSync(source,'utf8').replaceAll('\r\n','\n');
  ledger.decomposedSourceBlobs[source]=createHash('sha1').update('blob '+Buffer.byteLength(s)+'\0').update(s).digest('hex');
