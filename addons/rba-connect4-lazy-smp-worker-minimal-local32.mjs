@@ -171,11 +171,9 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     return -1;
   }
 
-  // A forced response follows the exact child path. Broader certificates may
-  // prune that path, but are not required for its correctness.
   // A positive certificate proves the previous mover wins. Zero is unresolved.
-  if(forced<0&&(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
-     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1))){
+  if(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
+     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
     if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];

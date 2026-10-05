@@ -11999,20 +11999,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -12044,7 +12036,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -13417,20 +13409,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -13459,7 +13443,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -17121,20 +17105,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -17166,7 +17142,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -17905,20 +17881,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -17947,7 +17915,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -21041,20 +21009,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -21086,7 +21046,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -21750,20 +21710,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -21795,7 +21747,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -22449,20 +22401,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -22491,7 +22435,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -23073,20 +23017,12 @@
           "op": "runtime.call.subledger",
           "target": "evaluateConnect4CpcTargetGeneralWin32",
           "count": "TG"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)+C(control.test.u32)+C(control.branch)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -23115,7 +23051,7 @@
           "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
           "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. C18 runs whole/target certificates only when forced<0; forced legal responses retain normal transition/reflection/window/terminal path. CP/TD/TG now count only branching nodes."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
       "status": "decomposed"
     },
@@ -23538,10 +23474,10 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d8ed2bc15d4014d7be99267eaf8f43a3db9e029f",
     "addons/rba-connect4-coordinate-dense.mjs": "73f09433ab1b34f2c89bad55669bf7f940a17ed0",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "52359b964740969a3cbbe18842ce89ce8345b8af",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "c5d6227b394582de3f0f062b3e910de6a181ac56",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "7f13c8d09a356b7e7c3670b67c9435959a08d814",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "51f68f4681b990fd51d66a3e73814f23d76a1564",
     "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
@@ -23549,8 +23485,8 @@
     "addons/rba-connect4-prepared-session-host.mjs": "326f7b605aeb473560ddcebac4196a237c476d19",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
-    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "68f99ab622095fa82ffb5107599999791bcd0b2a",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "ae73fc857de74253331e0d068427443582f33151",
+    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "5cd57bee72ba2d71e22f332488a2a933a4373f6e",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "eb453ea7ae35af0a1c13cf6e21491fb967c3a8a8",
     "addons/rba-connect4-support-basis-plan.mjs": "8252059ae2bb302a03086943c62777ec58954808",
     "addons/rba-connect4-coordinate-support-prepared.mjs": "318322b414eac1827dc233f01c230e852173c076",
     "addons/rba-connect4-coordinate-support-dense.mjs": "7358488a080f03c612954dbe5e9b9622925efce3",
@@ -23558,10 +23494,10 @@
     "addons/rba-connect4-coordinate-closure-prepared.mjs": "7079b896963f8a8508a3507d2828e41fc9d18c07",
     "addons/rba-connect4-coordinate-support-reflection.mjs": "f89e79453dd108cd0ad19583888293bf8b70defd",
     "addons/rba-connect4-local-native-proof-cache.mjs": "51a24ce7a2565269c26df2ca59755d6ad15c437b",
-    "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs": "a0b8daade6e0fa97a34bbc794c663286f13ad8c5",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": "c00df01346fa83b1d1b5d8c10821bd7a57f62796",
-    "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": "308ea92e4ea8e1e12e170a230ad819e132a16af4",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": "c60ef24161fef8bbd89945afe30a9786b124e0ae"
+    "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs": "7a033b495ad8a2f7464decdc883715ba12b70ae3",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": "3eb4e138ae8c771c631d4a3d3392858d091609eb",
+    "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": "ed791982dca3acf69a8266efba6b13bd1de856a6",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": "a8ffa683d17777629693eb567cf11dc0c3d2a2ba"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
