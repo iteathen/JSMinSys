@@ -161,7 +161,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
       if(depth===0)bestMove=column;
     }
     if(value>alpha)alpha=value;
-    if(alpha>=beta){break;}
+    if(best===1||alpha>=beta){break;}
   }
 
   if(depth){

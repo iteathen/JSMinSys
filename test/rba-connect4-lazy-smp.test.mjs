@@ -307,3 +307,18 @@ test('minimal abort is host-terminated without recursive polling',async()=>{
   assert.equal(result.cleanup,true);
   assert.equal(result.workersExited,2);
 });
+
+
+test('minimal four-worker search returns after an immediate winning center move',async()=>{
+  const geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
+  // Player zero has three center tokens; the next center move wins vertically.
+  const result=await runLazySmpConnect4Rba32([3,0,3,0,3,1],{
+    geometry,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL,
+    sharedCacheCapacity:1024,localCacheCapacity:1024,timeoutMs:5000,
+  });
+  assert.equal(result.status,'EXACT',JSON.stringify(result));
+  assert.equal(result.rootWdl,1);
+  assert.equal(result.move,3);
+  assert.equal(result.cleanup,true);
+  assert.equal(result.workersExited,4);
+});
