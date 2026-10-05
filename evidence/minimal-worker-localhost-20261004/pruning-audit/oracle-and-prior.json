@@ -1,0 +1,879 @@
+{
+  "purpose": "Small-cache correctness/pathology controls only, not production timing",
+  "late": [
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "65146574264624371524463231737323117",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        1,
+        4,
+        5
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 4,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 22.397199999999998,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 18,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "4752647221412266145114415723357655",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        2
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 2,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.0548,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 7,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "51367247731551226215317561425673363",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        1,
+        3
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 3,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.013000000000005,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 12,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "2121455227325544264166464311556617",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        2
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 2,
+        "winner": 3,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "reflected": 1,
+        "elapsedMs": 20.595499999999987,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 5,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "13264747651363245124611537561335522",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        1,
+        3,
+        5,
+        6
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 3,
+        "winner": 2,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.235500000000002,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 6,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "2751643221633177261577537153563526",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        1,
+        3
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 3,
+        "winner": 2,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 19.263500000000022,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 17,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "46556155314316725646576473112233124",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        1,
+        6
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 1,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 22,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 18.911800000000028,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 38,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        6
+      ],
+      "sequence": "5472242767313315634634773545475511",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        1
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 1,
+        "winner": 1,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 18.787699999999973,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2365542
+      },
+      "oracleVisits": 14,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "7542461661545224734273231761",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        4,
+        6
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 4,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.14399999999995,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 26,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "267632545773143635374474126",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        0,
+        4,
+        5
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 4,
+        "winner": 3,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "reflected": 0,
+        "elapsedMs": 19.19870000000003,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 103,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "3435432767626642277637342545",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        4
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 4,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 18.1515,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 12,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "727243434612744535376567632",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        4
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 4,
+        "winner": 3,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "reflected": 0,
+        "elapsedMs": 19.968999999999994,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 67,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "1242764367227136156635253771",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        2,
+        3,
+        4
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 3,
+        "winner": 0,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reflected": 0,
+        "elapsedMs": 19.203100000000006,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 31,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "344262534417566133717471132",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        1,
+        4
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 4,
+        "winner": 3,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.382600000000025,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 8,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "5432251446762475273361565131",
+      "expectedAbsolute": 1,
+      "expectedBestMoves": [
+        1,
+        3,
+        5
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 3,
+        "winner": 1,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 0,
+        "sharedCacheStores": 0,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reflected": 1,
+        "elapsedMs": 19.094899999999996,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 20,
+      "passed": true
+    },
+    {
+      "geometry": [
+        7,
+        5
+      ],
+      "sequence": "135762447735234235532724516",
+      "expectedAbsolute": -1,
+      "expectedBestMoves": [
+        3
+      ],
+      "actual": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 3,
+        "winner": 1,
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": null,
+        "frontierMetrics": null,
+        "sharedCacheHits": 1,
+        "sharedCacheStores": 27,
+        "sharedCacheStoreContention": 0,
+        "sharedSampleMask": 0,
+        "workerMode": "minimal",
+        "completedWorkers": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "reflected": 0,
+        "elapsedMs": 18.988800000000026,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 1910627
+      },
+      "oracleVisits": 380,
+      "passed": true
+    }
+  ],
+  "prior": [
+    {
+      "sequence": "414142",
+      "result": {
+        "status": "EXACT",
+        "rootWdl": 1,
+        "move": 3,
+        "winner": 2,
+        "executionProfile": {
+          "kind": "standard",
+          "worker": "./worker-dense.mjs",
+          "solver": "./solver-dense.mjs",
+          "packed": true,
+          "wide": false
+        },
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": [
+          [
+            635.7667,
+            636.3031
+          ],
+          [
+            635.6865,
+            636.2567
+          ],
+          [
+            635.6518,
+            636.1903
+          ],
+          [
+            635.6608,
+            0
+          ]
+        ],
+        "frontierMetrics": null,
+        "sharedCacheHits": null,
+        "sharedCacheStores": null,
+        "sharedCacheStoreContention": null,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          1,
+          1,
+          1,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 114.6531,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2300250
+      }
+    },
+    {
+      "sequence": "141412",
+      "result": {
+        "status": "TIMEOUT",
+        "rootWdl": null,
+        "move": -1,
+        "winner": -1,
+        "executionProfile": {
+          "kind": "standard",
+          "worker": "./worker-dense.mjs",
+          "solver": "./solver-dense.mjs",
+          "packed": true,
+          "wide": false
+        },
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": [
+          [
+            664.959,
+            0
+          ],
+          [
+            665.0334,
+            0
+          ],
+          [
+            664.832,
+            0
+          ],
+          [
+            664.8345,
+            0
+          ]
+        ],
+        "frontierMetrics": null,
+        "sharedCacheHits": null,
+        "sharedCacheStores": null,
+        "sharedCacheStoreContention": null,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 1516.7016000000003,
+        "errorCode": 102,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2300250
+      }
+    },
+    {
+      "sequence": "4141213",
+      "result": {
+        "status": "EXACT",
+        "rootWdl": -1,
+        "move": 0,
+        "winner": 0,
+        "executionProfile": {
+          "kind": "standard",
+          "worker": "./worker-dense.mjs",
+          "solver": "./solver-dense.mjs",
+          "packed": true,
+          "wide": false
+        },
+        "winnerMetrics": null,
+        "nodeCounts": null,
+        "workerTiming": [
+          [
+            2181.2164,
+            2182.2506
+          ],
+          [
+            2181.4892,
+            0
+          ],
+          [
+            2182.1408,
+            0
+          ],
+          [
+            2181.714,
+            0
+          ]
+        ],
+        "frontierMetrics": null,
+        "sharedCacheHits": null,
+        "sharedCacheStores": null,
+        "sharedCacheStoreContention": null,
+        "sharedSampleMask": 0,
+        "completedWorkers": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "reflected": 1,
+        "elapsedMs": 27.51810000000023,
+        "errorCode": 0,
+        "errors": [],
+        "cleanup": true,
+        "workersExited": 4,
+        "requestedWorkers": 4,
+        "workersUsed": 4,
+        "sharedBytes": 2300250
+      }
+    }
+  ]
+}
