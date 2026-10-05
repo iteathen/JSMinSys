@@ -36,13 +36,20 @@ Preallocate worker-private frames for support handles/bucket bases and at most
 objects. Native u32record: exact handle+1, threshold tag, full P0/P1 coordinate
 words. Stride=2+2*coordWords; standard3-word record32bytes,2records/bucket,
 32768buckets,2MiB/worker. Choose largest power-of-two bucket count fitting2MiB
-at actual coordinate span at initialization; no literal7x6 fork. Never shrink
+at actual coordinate span at initialization; no literal7x6 fork. Cold-select a
+generated native3 predicate/save path from the general-span authority, with
+prefix and tail guards preserving all0..96validcounts. This is an optimized
+realization of the same map/budget/replacement rules, not a new theorem or an
+outcome-selected geometry exception. Never shrink
 the retained exact/private/shared TT budgets to hide this added memory.
 
 Locate bucket with fixed imul(handle^(handle>>>16),0x9e3779b1)&mask. Root support
 handle computed once after readiness from actual current support; root remains
 uncached. Derive child handle/base once after cofactor/canonicalization, carry
-per-depth native frames. Query only after exact TT misses, before tactical work.
+per-depth native frames. Query only when the existing probeCache returns0,
+before tactical work; valid existing exact OR zero-bound hits skip the added
+tier. This fixed schedule avoids additional comparisons on cache hits, rather
+than opportunistically querying again after a partial bound.
 Actual offsets/counts and unused coordinate tails must be valid or masked by
 the exact row count. No signed equality shortcut for bit31: use subset&~superset
 equal0. Empty normalized residual ideals are valid, not missing data.

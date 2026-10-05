@@ -21,6 +21,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
       centerOrder:[0],bestMove:-1,liveWords:3,live:{},moveOrder:new Uint32Array(1),moveOrderMask:7,
       coord:{seen:new Uint32Array(64),map:new Uint32Array(64),inverse:new Uint32Array(64)},basisSize:new Uint32Array(4),profile:{},cpc:{},targetCpc:{},
       mixSpan32Locator32:()=>0,probeCache:()=>cached,
+      frontProbe:()=>0,frontChild:()=>{},
       storeExact:(_s,_h,_slot,v)=>assert.equal(v,truth===0?2:mover===0?truth+2:2-truth),
       storeBound:(_s,_h,_slot,v)=>assert.ok(v===4?truth>=0:truth<=0),
       collectSingletons:()=>-1,evaluatePairHub:()=>{pairCalls++;return -1;},evaluateConnect4PreparedCpcResponse32:()=>response,evaluateTargetCpc:()=>{targetCalls++;return target;},

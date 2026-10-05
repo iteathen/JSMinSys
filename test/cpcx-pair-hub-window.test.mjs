@@ -22,6 +22,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      centerOrder:[0],bestMove:-1,liveWords:3,live:{},moveOrder:new Uint32Array(1),moveOrderMask:7,
      coord:{seen:new Uint32Array(64),map:new Uint32Array(64),inverse:new Uint32Array(64)},basisSize:new Uint32Array(4),profile:{},cpc:{},targetCpc:{},
      mixSpan32Locator32:()=>0,probeCache:()=>cached,
+     frontProbe:()=>0,frontChild:()=>{},
      storeExact:(_src,_hash,_slot,value)=>assert.equal(value,truth===0?2:mover===0?truth+2:2-truth,'no unwarranted exact cache entry'),
      storeBound:(_src,_hash,_slot,value)=>assert.ok(value===4?truth>=0:truth<=0,'sound stored zero bound'),
      evaluatePairHub:()=>fork?0:-1,collectSingletons:()=>-1,evaluateConnect4PreparedCpcResponse32:()=>0,evaluateTargetCpc:()=>false,

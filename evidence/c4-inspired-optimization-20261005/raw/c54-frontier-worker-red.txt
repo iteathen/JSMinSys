@@ -1,0 +1,432 @@
+✖ rba-connect4-lazy-smp-worker-minimal consumes residual frontier tags with sound windows and root exclusion (6.2689ms)
+✖ rba-connect4-lazy-smp-worker-minimal forwards current-run stores and exact draw joins to the same frame (1.5236ms)
+✖ rba-connect4-lazy-smp-worker-minimal-local32 consumes residual frontier tags with sound windows and root exclusion (3.6242ms)
+✖ rba-connect4-lazy-smp-worker-minimal-local32 forwards current-run stores and exact draw joins to the same frame (0.8978ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs consumes residual frontier tags with sound windows and root exclusion (3.1898ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs forwards current-run stores and exact draw joins to the same frame (0.7612ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (4.1143ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 forwards current-run stores and exact draw joins to the same frame (0.8963ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center consumes residual frontier tags with sound windows and root exclusion (4.0706ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center forwards current-run stores and exact draw joins to the same frame (0.8489ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 consumes residual frontier tags with sound windows and root exclusion (3.3459ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 forwards current-run stores and exact draw joins to the same frame (0.7956ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs consumes residual frontier tags with sound windows and root exclusion (4.6294ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs forwards current-run stores and exact draw joins to the same frame (0.9259ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (3.6184ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (0.7886ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 0
+ℹ fail 16
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 124.687
+
+✖ failing tests:
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal consumes residual frontier tags with sound windows and root exclusion (6.2689ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal forwards current-run stores and exact draw joins to the same frame (1.5236ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-local32 consumes residual frontier tags with sound windows and root exclusion (3.6242ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-local32 forwards current-run stores and exact draw joins to the same frame (0.8978ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs consumes residual frontier tags with sound windows and root exclusion (3.1898ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs forwards current-run stores and exact draw joins to the same frame (0.7612ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (4.1143ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 forwards current-run stores and exact draw joins to the same frame (0.8963ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-center consumes residual frontier tags with sound windows and root exclusion (4.0706ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-center forwards current-run stores and exact draw joins to the same frame (0.8489ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 consumes residual frontier tags with sound windows and root exclusion (3.3459ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 forwards current-run stores and exact draw joins to the same frame (0.7956ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs consumes residual frontier tags with sound windows and root exclusion (4.6294ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs forwards current-run stores and exact draw joins to the same frame (0.9259ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:8:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (3.6184ms)
+  AssertionError [ERR_ASSERTION]: query only non-root after cache miss
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:28:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\residual-frontier-worker.test.mjs:39:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (0.7886ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   {
+  -     d: 2,
+  -     m: 0,
+  -     s: 0,
+  -     v: 3
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/residual-frontier-worker.test.mjs:45:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { s: 0, d: 2, v: 3, m: 0 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
