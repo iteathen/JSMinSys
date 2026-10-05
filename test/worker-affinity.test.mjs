@@ -26,3 +26,9 @@ test('malformed topology never silently supplies a placement',()=>{
  assert.equal(typeof affinity.parseWindowsTopology,'function');
  for(const b of [Buffer.alloc(8),fixture().subarray(0,47)])assert.throws(()=>affinity.parseWindowsTopology(b));
 });
+test('maintenance target requires the efficiency class without weakening search-worker validation',()=>{
+ const t=affinity.parseWindowsTopology(fixture());
+ assert.equal(affinity.validateEfficiencyTarget(t,{group:0,processor:2}).efficiency,0);
+ assert.throws(()=>affinity.validateEfficiencyTarget(t,{group:0,processor:0}));
+ assert.throws(()=>affinity.validateWorkerTargets(t,[{group:0,processor:2}],1));
+});

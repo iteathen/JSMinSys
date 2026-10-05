@@ -6955,12 +6955,34 @@
         {
           "op": "runtime.host.bookkeeping",
           "count": "PT_POLL"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "createAsyncExactPublication32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "ManagedThreadSession.spawn"
+        },
+        {
+          "op": "runtime.url.construct",
+          "count": "H"
+        },
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": "HP"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "HR"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(5+W+3*M)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+3*C(control.test.u32)+3*C(control.branch)+(3*PT)*C(runtime.typed_array.fill)+(3*PT)*C(memory.allocate.shared.bytes)+(3*PT)*C(runtime.typed_view.construct)+(PT_TIMER)*C(runtime.timer.read)+(PT_LOAD)*C(atomic.load.u32)+(2*PT)*C(atomic.store.u32)+(PT)*C(atomic.notify)+(2*PT)*C(runtime.array.copy)+(PT_POLL)*C(runtime.host.bookkeeping)",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(5+W+3*M)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+3*C(control.test.u32)+3*C(control.branch)+(3*PT)*C(runtime.typed_array.fill)+(3*PT)*C(memory.allocate.shared.bytes)+(3*PT)*C(runtime.typed_view.construct)+(PT_TIMER)*C(runtime.timer.read)+(PT_LOAD)*C(atomic.load.u32)+(2*PT)*C(atomic.store.u32)+(PT)*C(atomic.notify)+(2*PT)*C(runtime.array.copy)+(PT_POLL)*C(runtime.host.bookkeeping)+(H)*CALL(createAsyncExactPublication32)+(H)*CALL(ManagedThreadSession.spawn)+(H)*C(runtime.url.construct)+(HP)*C(runtime.host.bookkeeping)+(HR)*C(atomic.load.u32)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6980,7 +7002,10 @@
           "PT_TIMER": "cold timer reads",
           "PT_LOAD": "cold readiness/start loads",
           "PT_WAIT": "cold blocking wait calls",
-          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work"
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "H": "one for idle or async helper mode, zero for off",
+          "HP": "cold publication option validation, queue workerData selection, readiness and result bookkeeping",
+          "HR": "helper readiness acquire loads"
         },
         "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data. C07 initialization selects center for even worker indices and live-line for odd indices; four-worker primary has two center and two live, all deep. No hot policy branch."
       },
@@ -11605,17 +11630,30 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "S",
+          "count": "D",
           "target": "storeConnect4RbaSharedExactCacheUncounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q8",
+          "target": "enqueueAsyncExact8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "QN",
+          "target": "enqueueAsyncExactSpan"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCacheUncounted32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+D*CALL(storeConnect4RbaSharedExactCacheUncounted32)+(Q8)*CALL(enqueueAsyncExact8)+(QN)*CALL(enqueueAsyncExactSpan)",
         "parameters": {
-          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "D": "S when direct publication selected, otherwise zero",
+          "Q8": "S when async compact publication selected, otherwise zero",
+          "QN": "S when async general publication selected, otherwise zero"
         },
-        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs."
+        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs. D+Q8+QN=S. Cold-selected function/context; private exact store and sample guard unchanged."
       },
       "status": "decomposed"
     },
@@ -11932,12 +11970,29 @@
           "op": "runtime.call.subledger",
           "target": "prepareConnect4CpcTargetWin32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ASYNC",
+          "target": "prepareAsyncExactProducer32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(ASYNC)*CALL(prepareAsyncExactProducer32)+(4)*C(runtime.field.load)+(2)*C(control.test.u32)+(2)*C(control.branch)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -11957,7 +12012,8 @@
           "PT_TIMER": "cold timer reads",
           "PT_LOAD": "cold readiness/start loads",
           "PT_WAIT": "cold blocking wait calls",
-          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work"
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "ASYNC": "one in async mode only; publication function/context selected cold"
         },
         "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result."
       },
@@ -12943,17 +12999,30 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "S",
+          "count": "D",
           "target": "storeConnect4RbaSharedExactCacheUncounted32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "Q8",
+          "target": "enqueueAsyncExact8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "QN",
+          "target": "enqueueAsyncExactSpan"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCacheUncounted32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+D*CALL(storeConnect4RbaSharedExactCacheUncounted32)+(Q8)*CALL(enqueueAsyncExact8)+(QN)*CALL(enqueueAsyncExactSpan)",
         "parameters": {
-          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "D": "S when direct publication selected, otherwise zero",
+          "Q8": "S when async compact publication selected, otherwise zero",
+          "QN": "S when async general publication selected, otherwise zero"
         },
-        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs."
+        "note": "Publishes absolute exact 1/2/3 values to local and sampled shared TTs. D+Q8+QN=S. Cold-selected function/context; private exact store and sample guard unchanged."
       },
       "status": "decomposed"
     },
@@ -13238,12 +13307,29 @@
           "op": "runtime.call.subledger",
           "target": "prepareConnect4CpcTargetWin32",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ASYNC",
+          "target": "prepareAsyncExactProducer32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(ASYNC)*CALL(prepareAsyncExactProducer32)+(4)*C(runtime.field.load)+(2)*C(control.test.u32)+(2)*C(control.branch)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13263,7 +13349,8 @@
           "PT_TIMER": "cold timer reads",
           "PT_LOAD": "cold readiness/start loads",
           "PT_WAIT": "cold blocking wait calls",
-          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work"
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "ASYNC": "one in async mode only; publication function/context selected cold"
         },
         "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result."
       },
@@ -13993,11 +14080,756 @@
         "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#createAsyncExactPublication32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "createAsyncExactPublication32",
+      "scope": "cold-queue-allocation",
+      "operations": [
+        {
+          "op": "runtime.integer.check",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+3*W"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "2*W"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "X"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "memory.allocate.shared.bytes",
+          "count": "2*W+1"
+        },
+        {
+          "op": "runtime.typed_view.construct",
+          "count": "2*W+1"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "2*W"
+        },
+        {
+          "op": "runtime.array.push",
+          "count": "W"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "W+1"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(3)*C(runtime.integer.check)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(2)*C(alu.and.u32)+(2)*C(alu.sub.u32)+(1+3*W)*C(alu.add.u32)+(2*W)*C(runtime.number.multiply)+(F)*C(runtime.field.load)+(X)*C(runtime.error.throw)+(1)*C(runtime.array.allocate)+(2*W+1)*C(memory.allocate.shared.bytes)+(2*W+1)*C(runtime.typed_view.construct)+(2*W)*C(runtime.typed_array.fill)+(W)*C(runtime.array.push)+(W+1)*C(runtime.object.allocate)",
+        "parameters": {
+          "W": "search worker count",
+          "TEST": "executed validation and loop tests",
+          "BRANCH": "executed validation and loop branches",
+          "F": "cache and queue-byte field reads",
+          "X": "one only for invalid input"
+        },
+        "note": "Queues allocated and zero-touched before root timing; two 64-byte cursor regions per producer."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#prepareAsyncExactProducer32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "prepareAsyncExactProducer32",
+      "scope": "cold-queue-specialization",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "FIELDS+1"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FIELDS+4"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.object.allocate)+(FIELDS+1)*C(runtime.field.load)+(FIELDS+4)*C(runtime.field.store)+(1)*C(control.test.u32)+(1)*C(control.branch)",
+        "parameters": {
+          "FIELDS": "queue fields copied by object spread"
+        },
+        "note": "Select compact8/general function once before recurrence."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#prepareAsyncExactConsumer32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "prepareAsyncExactConsumer32",
+      "scope": "cold-queue-specialization",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "FIELDS+1"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FIELDS+3"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.object.allocate)+(FIELDS+1)*C(runtime.field.load)+(FIELDS+3)*C(runtime.field.store)+(1)*C(control.test.u32)+(1)*C(control.branch)",
+        "parameters": {
+          "FIELDS": "queue fields copied by object spread"
+        },
+        "note": "Select compact8/general function once before recurrence."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#reserveAsyncExactRecord32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "reserveAsyncExactRecord32",
+      "scope": "hot-producer-reserve",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "2*OPEN"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+CHECK"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+CHECK"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "CHECK"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "2*CHECK"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "CHECK"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "OPEN"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "OPEN"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(2*OPEN)*C(runtime.field.store)+(1+CHECK)*C(control.test.u32)+(1+CHECK)*C(control.branch)+(CHECK)*C(atomic.load.u32)+(2*CHECK)*C(alu.sub.u32)+(CHECK)*C(alu.shr.u32)+(OPEN)*C(alu.and.u32)+(OPEN)*C(runtime.number.multiply)",
+        "parameters": {
+          "CHECK": "one when no partially filled batch",
+          "OPEN": "one when a new batch has room",
+          "F": "executed producer field reads, including returned offset"
+        },
+        "note": "Unsigned distance and capacity<=2^30 preserve wrap safety; full queue drops optional publication. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#commitAsyncExactRecord32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "commitAsyncExactRecord32",
+      "scope": "hot-producer-commit",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "2+DONE"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "1+DONE"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "DONE"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "DONE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(2+DONE)*C(runtime.field.store)+(1+DONE)*C(alu.add.u32)+(1)*C(alu.sub.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(DONE)*C(alu.shr.u32)+(DONE)*C(atomic.store.u32)",
+        "parameters": {
+          "DONE": "one only for final record of a batch",
+          "F": "executed producer field reads"
+        },
+        "note": "Release only completed batch. No producer notify. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#enqueueAsyncExact8",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "enqueueAsyncExact8",
+      "scope": "hot-producer-compact-snapshot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "reserveAsyncExactRecord32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "OK"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6*OK"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "10*OK"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "15*OK"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "OK",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "OK",
+          "target": "compactTailProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "OK",
+          "target": "commitAsyncExactRecord32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*CALL(reserveAsyncExactRecord32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(OK)*C(runtime.field.load)+(6*OK)*C(memory.load.u32)+(10*OK)*C(memory.store.u32)+(15*OK)*C(alu.add.u32)+(OK)*CALL(compactSupportProfile8)+(OK)*CALL(compactTailProfile8)+(OK)*CALL(commitAsyncExactRecord32)",
+        "parameters": {
+          "OK": "one if queue reserve succeeds, otherwise zero"
+        },
+        "note": "Six direct source words and two exact compact profiles form stable snapshot; hash/value plus eight key words. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#enqueueAsyncExactSpan",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "enqueueAsyncExactSpan",
+      "scope": "hot-producer-general-snapshot",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "reserveAsyncExactRecord32"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+OK*(K+1)"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+OK*(K+1)"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "OK*(K+2)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "OK*K"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "OK*(K+2)"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "OK*(1+4*K)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "OK",
+          "target": "commitAsyncExactRecord32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*CALL(reserveAsyncExactRecord32)+(1+OK*(K+1))*C(control.test.u32)+(1+OK*(K+1))*C(control.branch)+(OK*(K+2))*C(runtime.field.load)+(OK*K)*C(memory.load.u32)+(OK*(K+2))*C(memory.store.u32)+(OK*(1+4*K))*C(alu.add.u32)+(OK)*CALL(commitAsyncExactRecord32)",
+        "parameters": {
+          "OK": "one if reserve succeeds",
+          "K": "full general key words"
+        },
+        "note": "Direct key-word copying; no encoding. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#publishAsyncPacked8",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "publishAsyncPacked8",
+      "scope": "hot-helper-seqlock-publication",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1"
+        },
+        {
+          "op": "control.branch",
+          "count": "1"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*OK"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "OK"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "16*OK"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "OK*K"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "OK*(K+3)"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(F)*C(runtime.field.load)+(2*OK)*C(alu.shr.u32)+(OK)*C(runtime.number.multiply)+(16*OK)*C(alu.add.u32)+(OK*K)*C(memory.load.u32)+(OK*(K+3))*C(atomic.store.u32)",
+        "parameters": {
+          "K": "eight compact exact key words",
+          "OK": "one for even sequence accepted",
+          "F": "executed cache field reads"
+        },
+        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#publishAsyncPackedSpan",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "publishAsyncPackedSpan",
+      "scope": "hot-helper-seqlock-publication",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+OK*(K+1)"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+OK*(K+1)"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "2*OK"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "OK"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "OK*(2+3*K)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "OK*K"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "OK*(K+3)"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.and.u32)+(1+OK*(K+1))*C(control.test.u32)+(1+OK*(K+1))*C(control.branch)+(F)*C(runtime.field.load)+(2*OK)*C(alu.shr.u32)+(OK)*C(runtime.number.multiply)+(OK*(2+3*K))*C(alu.add.u32)+(OK*K)*C(memory.load.u32)+(OK*(K+3))*C(atomic.store.u32)",
+        "parameters": {
+          "K": "general stored key words",
+          "OK": "one for even sequence accepted",
+          "F": "executed cache field reads"
+        },
+        "note": "Sole writer after cold host mode selection; retains atomic payload and odd/even sequence protocol. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#drainAsyncExactBatch32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "drainAsyncExactBatch32",
+      "scope": "hot-helper-drain",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+READY*(B+1)"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+READY*(B+1)"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "READY"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "READY*(B+1)"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "READY"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "READY*(3*B+1)"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "READY"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*READY*B"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "READY"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P8",
+          "target": "publishAsyncPacked8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PN",
+          "target": "publishAsyncPackedSpan"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1+READY*(B+1))*C(control.test.u32)+(1+READY*(B+1))*C(control.branch)+(F)*C(runtime.field.load)+(READY)*C(runtime.field.store)+(READY*(B+1))*C(alu.and.u32)+(READY)*C(runtime.number.multiply)+(READY*(3*B+1))*C(alu.add.u32)+(READY)*C(alu.shr.u32)+(2*READY*B)*C(memory.load.u32)+(READY)*C(atomic.store.u32)+(P8)*CALL(publishAsyncPacked8)+(PN)*CALL(publishAsyncPackedSpan)",
+        "parameters": {
+          "READY": "one when a full batch is published by producer",
+          "B": "batch size",
+          "F": "executed consumer/cache field reads",
+          "P8": "READY*B for compact mode, otherwise zero",
+          "PN": "READY*B for general mode, otherwise zero"
+        },
+        "note": "P8+PN=READY*B. Acquire batch, publish immutable snapshots, then release consumed cursor. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-async-publication.mjs#runAsyncExactPublisher32",
+      "source": "addons/rba-connect4-async-publication.mjs",
+      "name": "runAsyncExactPublisher32",
+      "scope": "helper-event-loop",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "PASSES+1"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "DRAINS"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "DRAINS"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "DRAINS"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "WAITS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "DRAINS",
+          "target": "drainAsyncExactBatch32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(PASSES+1)*C(atomic.load.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(F)*C(runtime.field.load)+(DRAINS)*C(memory.load.u32)+(DRAINS)*C(alu.add.u32)+(DRAINS)*C(alu.or.u32)+(WAITS)*C(atomic.wait)+(DRAINS)*CALL(drainAsyncExactBatch32)",
+        "parameters": {
+          "PASSES": "completed helper passes before stop",
+          "TEST": "loop/idle/work predicates",
+          "BRANCH": "executed branches",
+          "F": "consumer length reads",
+          "DRAINS": "queue visits (zero in idle control)",
+          "WAITS": "one-millisecond waits when no completed batch"
+        },
+        "note": "Unbounded by solver cost; no producer wake overhead. No allocation, clock, wake notification or statistics. Cost vocabulary is symbolic, not an i5 prediction; measured complete localhost solve decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-exact-publisher-worker.mjs#<module-main>",
+      "source": "addons/rba-connect4-exact-publisher-worker.mjs",
+      "name": "<module-main>",
+      "scope": "cold-helper-entry",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.array.push",
+          "count": "W"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "POLL"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachConnect4RbaSharedExactCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "W",
+          "target": "prepareAsyncExactConsumer32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "runAsyncExactPublisher32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.module.bookkeeping)+(1)*C(runtime.array.allocate)+(F)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(W)*C(runtime.array.push)+(1)*C(atomic.store.u32)+(POLL)*C(atomic.load.u32)+(WAIT)*C(atomic.wait)+(1)*CALL(attachConnect4RbaSharedExactCache32)+(W)*CALL(prepareAsyncExactConsumer32)+(1)*CALL(runAsyncExactPublisher32)",
+        "parameters": {
+          "W": "producer queue count",
+          "F": "executed workerData/queue reads",
+          "TEST": "mode and ready-gate tests",
+          "BRANCH": "executed gate branches",
+          "POLL": "start-gate acquire polls",
+          "WAIT": "start-gate blocking waits"
+        },
+        "note": "All context setup before helper ready publication; immutable consumers during solve."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker-affinity.mjs#validateEfficiencyTarget",
+      "source": "addons/worker-affinity.mjs",
+      "name": "validateEfficiencyTarget",
+      "scope": "cold-affinity-validation",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "X"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "targetForProcessor"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.affinity)+(1)*C(runtime.array.allocate)+(F)*C(runtime.field.load)+(2)*C(control.test.u32)+(2)*C(control.branch)+(X)*C(runtime.error.throw)+(1)*CALL(targetForProcessor)",
+        "parameters": {
+          "F": "core class/target field reads",
+          "X": "one when class or selected target is invalid"
+        },
+        "note": "Cold topology map/min/max; require heterogeneous topology and minimum-efficiency class."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 213,
-    "decomposed": 213,
+    "units": 226,
+    "decomposed": 226,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -14108,7 +14940,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
-    "addons/rba-connect4-lazy-smp-host.mjs": "ee0c85c7053f6c4e5ca16ee76bd8eeca7c888d87",
+    "addons/rba-connect4-lazy-smp-host.mjs": "907bbce4d9cac53185bc9f0a37203d9f9c83d1d9",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -14118,19 +14950,21 @@
     "addons/rba-connect4-frontier.mjs": "cf7be5a337a164d0a402a4b72c9a8632292a0757",
     "addons/worker-root-frontier.mjs": "a16badbe95dc1c078c7293f1e0af61e63b85e10f",
     "addons/rba-connect4-lazy-smp-worker-frontier.mjs": "0a604bfc3b9257ebe2cc80bc3534aaa43dcac70a",
-    "addons/worker-affinity.mjs": "cf7a9ed5f67921c39001dd0cb0e2a28d2870a3ab",
-    "tools/worker-affinity-preload.mjs": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
+    "addons/worker-affinity.mjs": "ed80981b72d94f6b6135dec5cd32080b02a78d2b",
+    "tools/worker-affinity-preload.mjs": "836228ce6b678ebaa160aca5d259b8f8af642e41",
     "addons/connect4-rank-local-presearch.mjs": "b8aeb9683685d13cc4a97fbd62781e9631a003be",
     "addons/rba-connect4-coordinate-prepared.mjs": "595b53bb5f05f2ff2dee022f70833d6a8fe869c9",
     "addons/rba-connect4-coordinate-dense.mjs": "29c080c4a7998d5451d7bf919a87ae027b4ab200",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "982afd1cdd93c8e81e736ba6dbf88e87ac95c60b",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "b54b83c8b4575f5c3e9b01063c62435590a71376",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "206c7820372a76c15ab913dd4fc3536d01e66784",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "e1e07e08e143f39164150ab9f63757e8c06854aa",
     "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
-    "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e"
+    "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
+    "addons/rba-connect4-async-publication.mjs": "d15d7a1959d024edc8b6489f92efd3687058c5a0",
+    "addons/rba-connect4-exact-publisher-worker.mjs": "e8b6ddc31bb6f3270642c5604dfbaa6f9701f102"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
@@ -14231,7 +15065,8 @@
       "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
       "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
       "addons/rba-connect4-lazy-smp-worker-behavior.mjs#<module-main>",
-      "addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>"
+      "addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>",
+      "addons/rba-connect4-exact-publisher-worker.mjs#<module-main>"
     ],
     "callbackTargets": {
       "prepareRemove": [

@@ -1,0 +1,36 @@
+✔ batched proof transport preserves exact keys, frame snapshots and full-queue nonblocking behavior (15.6589ms)
+✔ queue cursors wrap without exposing uncommitted data or overwriting unread batches (0.314ms)
+✔ four-search-worker prepared solve initializes and cleans up an idle or active helper (150.1681ms)
+✔ concurrent producers and a sole publisher never expose a mixed exact row (70.7745ms)
+✔ publisher participates in timeout cleanup and invalid modes cannot silently run (20.0856ms)
+✔ shared exact cache publishes only fully committed exact rows (0.8902ms)
+✔ shared exact known-hash path retains full-key validation (0.1174ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (9.0974ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.9575ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (49.612ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (7.777ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (45.5886ms)
+✔ sharing-density masks preserve exact Lazy SMP results (266.5896ms)
+✔ Lazy SMP move ordering is center-line distance only (23.3372ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (46.4564ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.9049ms)
+✔ Lazy SMP rejects unknown worker mode (1.2796ms)
+✔ minimal worker never publishes local bounds to shared exact cache (29.8266ms)
+✔ minimal worker omits hot diagnostic counters (25.2715ms)
+✔ minimal timeout is host-terminated without recursive polling (12.8142ms)
+✔ minimal abort is host-terminated without recursive polling (13.1599ms)
+✔ minimal four-worker search returns after an immediate winning center move (30.4172ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (228.7761ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (93.3147ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (1.2967ms)
+✔ performance targets distinguish SMT siblings, efficiency classes and processor groups (1.9645ms)
+✔ malformed topology never silently supplies a placement (0.2072ms)
+✔ maintenance target requires the efficiency class without weakening search-worker validation (6.0638ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 907.5932

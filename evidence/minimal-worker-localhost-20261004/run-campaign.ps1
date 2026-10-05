@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'))
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=33554432,[string[]]$NodeFlags=@('--max-inlined-bytecode-size=600','--max-inlined-bytecode-size-cumulative=2400'),[ValidateSet('off','idle','async')][string]$PublicationMode='off')
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -12,6 +12,11 @@ $config.upstream_commit=(git rev-parse HEAD)
 if($NodeFlags.Count){$config.arguments=@($NodeFlags)+@('--import','file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs')+@($config.arguments)}
 if($SharedCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_SHARED_CAPACITY -NotePropertyValue ([string]$SharedCapacity) -Force}
 if($LocalCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_LOCAL_CAPACITY -NotePropertyValue ([string]$LocalCapacity) -Force}
+if($PublicationMode -ne 'off'){
+  $config.affinityMask=4181
+  $config.environment | Add-Member -NotePropertyName JMS_BENCH_PUBLICATION_MODE -NotePropertyValue $PublicationMode -Force
+  $config.environment | Add-Member -NotePropertyName JMS_MAINTENANCE_AFFINITY_FILE -NotePropertyValue "$repo/evidence/minimal-worker-localhost-20261004/maintenance-preflight/target.json" -Force
+}
 $config.environment.TEMP="$runDir/temp"
 $config.environment.TMP="$runDir/temp"
 $config.environment.JMS_WORKER_AFFINITY_REPORT="$runDir/affinity"

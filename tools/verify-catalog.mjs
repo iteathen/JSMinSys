@@ -208,6 +208,7 @@ for (const name of readdirSync('addons').filter((name) => name.endsWith('.mjs'))
 declaredAddonUnits.add('addons/rba-connect4-lazy-smp-worker.mjs#<module-main>');
 declaredAddonUnits.add('addons/rba-connect4-lazy-smp-worker-behavior.mjs#<module-main>');
 declaredAddonUnits.add('addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>');
+declaredAddonUnits.add('addons/rba-connect4-exact-publisher-worker.mjs#<module-main>');
 
 for (const unit of declaredAddonUnits) {
   assert.ok(addonUnits.has(unit), `add-on function/module missing cycle ledger: ${unit}`);
@@ -224,6 +225,8 @@ assert.equal(
 );
 
 const requiredDetailedSources = new Set([
+  'addons/rba-connect4-async-publication.mjs',
+  'addons/rba-connect4-exact-publisher-worker.mjs',
   'addons/rba-connect4-alphabeta.mjs',
   'addons/rba-connect4-lazy-smp-host.mjs',
   'addons/rba-connect4-lazy-smp-worker.mjs',

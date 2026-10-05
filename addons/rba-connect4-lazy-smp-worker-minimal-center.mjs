@@ -15,6 +15,7 @@ import {
   compactTailProfile8,
 } from './rba-connect4-shared-exact-cache.mjs';
 import {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';
+import {prepareAsyncExactProducer32} from './rba-connect4-async-publication.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
@@ -30,6 +31,8 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   coord=prepareConnect4RbaCoordinateScratch(g),
   centerOrder=new Uint32Array(g.columns),
   shared=attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
+  publication=workerData.publicationQueue?prepareAsyncExactProducer32(workerData.publicationQueue):shared,
+  publishShared=workerData.publicationQueue?publication.enqueue:storeConnect4RbaSharedExactCacheUncounted32,
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
   localCompact=isCompactProfile8(g,g.keyWords)?1:0,
@@ -111,7 +114,7 @@ function probeCache(src,hash,slot){
 function storeExact(src,hash,slot,value){
   storeLocalEntry(slot,src,value);
   if(!(hash&sharedSampleBits))
-    storeConnect4RbaSharedExactCacheUncounted32(shared,words,src,value,hash);
+    publishShared(publication,words,src,value,hash);
 }
 
 function storeBound(src,hash,slot,value){
