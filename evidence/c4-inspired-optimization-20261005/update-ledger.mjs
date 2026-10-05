@@ -62,10 +62,51 @@ if(experiment==='C17'){
   Object.assign(u.cycleCount.parameters,{N:'Active parent basis bits visited in increasing index order, bounded by n; zero on terminal paths.',W:'ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.'});
   u.cycleCount.note+=' C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings.';
  }
-}else throw Error('unknown experiment');
+}else if(experiment==='C20'){
+ ledger.localOperationExtensions['memory.allocate.private.bytes']={cost:{kind:'symbolic',name:'PRIVATE_ARRAY_BUFFER_ALLOC(bytes,pageState,gcState)'},note:'Cold private backing-store allocation/zeroing; actual page costs are not fixed.'};
+ function unit(source,name,operations,parameters,note){
+  ledger.units.push({unit:source+'#'+name,source,name,scope:'private-native-proof-cache',status:'decomposed',operations,
+   cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});
+ }
+ const src='addons/rba-connect4-local-native-proof-cache.mjs',call=(target,count=1)=>({op:'runtime.call.subledger',count,target});
+ unit(src,'createLocalNativeProofCache32',[call('isCompactProfile8'),call('validateConnect4CacheCapacity32'),
+  {op:'runtime.field.load',count:1},{op:'control.test.u32',count:1},{op:'control.branch',count:1},{op:'runtime.error.throw',count:'BAD'},
+  {op:'runtime.number.multiply',count:1},{op:'memory.allocate.private.bytes',count:1},{op:'runtime.typed_view.construct',count:2},
+  {op:'runtime.object.allocate',count:1},{op:'runtime.field.store',count:2}],{BAD:'1 on invalid geometry; valid path allocates exactly capacity*32 bytes and two aliased views.'},'COLD native compact-profile-only private allocation. Host selects unchanged split fallback for other dimensions. No atomics or hot allocation.');
+ unit(src,'localNativeProofKeyMatches32',[{op:'runtime.field.load',count:2},{op:'runtime.number.multiply',count:2},
+  {op:'memory.load.native_index',count:'HALF'},{op:'memory.load.u32',count:'KEY+SOURCE'},
+  {op:'alu.add.u32',count:'ADD'},{op:'control.test.u32',count:'FIELD'},{op:'control.branch',count:'FIELD-1'},
+  call('compactSupportProfile8','SUPPORT'),call('compactTailProfile8','TAIL')],
+  {HALF:'Reached halfword loads: at most3.',KEY:'Reached record uint32 identity loads: at most5.',SOURCE:'Reached direct source loads: at most6, excludes callee loads.',ADD:'Executed offset/record address additions, at most14.',FIELD:'Reached equality predicates among eight exact fields.',SUPPORT:'1 if support comparison reached.',TAIL:'1 if tail comparison reached.',INDEX_BYTES:'2 for halfword fields; native-index vocabulary is width-sensitive.'},'HOT short-circuit equality on unchanged injective compact identity. No decoder, rank or token labels added. Actual inlining/cache line/alignment/bounds guards remain measured-machine debt.');
+ unit(src,'storeLocalNativeProofEntry32',[{op:'runtime.field.load',count:2},{op:'runtime.number.multiply',count:2},
+  {op:'memory.load.u32',count:6},{op:'memory.store.u32',count:6},{op:'memory.store.native_index',count:3},
+  {op:'alu.add.u32',count:14},call('compactSupportProfile8'),call('compactTailProfile8')],{INDEX_BYTES:'2 for native halfwords.'},'HOT private publication writes eight identity fields then native uint32 tag. Same replacement/bounds semantics, no concurrency protocol needed for one owning worker.');
+ for(const center of [false,true])for(const proof of [false,true]){
+  const base='addons/rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proof?'-proofs':'')+'.mjs',generated=base.replace('.mjs','-local32.mjs');
+  for(const old of ledger.units.filter(u=>u.source===base)){
+   const copy=structuredClone(old);copy.source=generated;copy.unit=generated+'#'+old.unit.split('#')[1];
+   if(copy.name==='localKeyMatches'||copy.name==='storeLocalEntry'){
+    const target=copy.name==='localKeyMatches'?'localNativeProofKeyMatches32':'storeLocalNativeProofEntry32';
+    copy.operations=[call(target)];copy.cycleCount={kind:'expression',expression:'CALL('+target+')',parameters:{},note:'C20 monomorphic private-native library call; the wrapper retains worker API. Compiler inlining is not assumed free.'};
+   }else if(copy.name==='probeCache'||copy.name==='storeBound'){
+    for(const o of copy.operations)if(o.op==='memory.load.u8')o.op='memory.load.u32';
+    const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+    copy.cycleCount[key]=copy.cycleCount[key].replaceAll('C(memory.load.u8)','C(memory.load.u32)')+'+C(runtime.number.multiply)';
+    copy.operations.push({op:'runtime.number.multiply',count:1});
+    copy.cycleCount.note+=' C20 native tag at slot*8; exact/bound logic and shared protocol unchanged.';
+   }else if(copy.name.includes('main')){
+    copy.cycleCount.note+=' C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost.';
+    copy.operations.push(call('createLocalNativeProofCache32'));
+    const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';copy.cycleCount[key]+='+CALL(createLocalNativeProofCache32)';
+   }
+   ledger.units.push(copy);
+  }
+ }
+}else if(experiment!=='HASH')throw Error('unknown experiment');
 for(const source of sources){
  const s=readFileSync(source,'utf8').replaceAll('\r\n','\n');
  ledger.decomposedSourceBlobs[source]=createHash('sha1').update('blob '+Buffer.byteLength(s)+'\0').update(s).digest('hex');
 }
 ledger.summary.units=ledger.units.length;
+ledger.summary.localExtensionOperations=Object.keys(ledger.localOperationExtensions).length;
 writeFileSync(path,JSON.stringify(ledger,null,2)+'\n');

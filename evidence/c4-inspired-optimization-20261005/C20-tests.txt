@@ -1,0 +1,38 @@
+✔ shared exact cache publishes only fully committed exact rows (0.8939ms)
+✔ shared exact known-hash path retains full-key validation (0.1312ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (9.983ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.9049ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (48.4883ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (11.0008ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (47.952ms)
+✔ sharing-density masks preserve exact Lazy SMP results (282.1867ms)
+✔ Lazy SMP move ordering is center-line distance only (39.236ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (47.5655ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.3228ms)
+✔ Lazy SMP rejects unknown worker mode (0.5156ms)
+✔ minimal worker never publishes local bounds to shared exact cache (31.6427ms)
+✔ minimal worker omits hot diagnostic counters (28.2382ms)
+✔ minimal timeout is host-terminated without recursive polling (61.8724ms)
+✔ pre-aborted minimal call allocates no workers (3.6528ms)
+✔ minimal four-worker search returns after an immediate winning center move (42.5376ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (277.8734ms)
+✔ private native proof records allocate cold and preserve all exact compact key lanes (10.057ms)
+✔ private native allocation refuses unsupported profiles and invalid capacities before allocation (22.7718ms)
+✔ private layout is selected cold for the geometry and all four workers agree on exact results (301.304ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (51.7874ms)
+✔ application preparation allocates all four workers but performs no search (45.1004ms)
+✔ closing an idle prepared application joins workers without a solve (43.4875ms)
+✔ ordinary minimal API also waits for every worker before search (48.3276ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (1.0765ms)
+✔ closing an active prepared search resolves its result and joins every worker (73.667ms)
+✔ concurrent proof writers cannot associate another key with a bound (76.6126ms)
+✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.3514ms)
+✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (9.9977ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1014.9146
