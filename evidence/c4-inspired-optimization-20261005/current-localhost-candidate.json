@@ -1,8 +1,8 @@
 {
   "kind": "retained-localhost-candidate-configuration",
-  "updatedAt": "2026-10-05T13:30:18.8980846-07:00",
+  "updatedAt": "2026-10-05T13:46:43.2893373-07:00",
   "branch": "work/cpc-rebuild-20261004",
-  "latestMeasuredSourceCommit": "e0081014643bce93024bf1e6ef2cb892bf0649f8",
+  "latestMeasuredSourceCommit": "d990593915f0ee3d69ef50320f5abc22fbc72c51",
   "sourceConfigurationChanges": [
     "C17 zero bounds",
     "C19 union projection",
@@ -11,7 +11,8 @@
     "C24 fused inverse",
     "C26 reflection",
     "C27 native private32 memory retention",
-    "J04 1200/4800 JIT limits"
+    "J04 1200/4800 JIT limits",
+    "C40 private512MiB memory retention"
   ],
   "runtime": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
   "runtimeSha256": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
@@ -38,14 +39,14 @@
   ],
   "configuration": {
     "sharedCacheCapacity": 134217728,
-    "localCacheCapacity": 33554432,
+    "localCacheCapacity": 16777216,
     "sharedProofBounds": true,
     "sharedCacheLayout": "native",
     "sharedTtEntryBytes": 32,
     "sharedTtBytes": 4294967296,
     "localCacheLayout": "native",
     "privateTtEntryBytes": 32,
-    "privateTtBytesPerWorker": 1073741824,
+    "privateTtBytesPerWorker": 536870912,
     "supportBasisPlanBudgetBytes": 1073741824,
     "supportBasisPlanBytes": 856484748,
     "supportBasisPlanProfiles": 823543,
@@ -62,12 +63,12 @@
   "primaryBoundary": "all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate",
   "secondaryCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
   "authorityRuns": [
-    "c4ideas-j04-no-c39-01",
-    "c4ideas-j04-no-c39-02"
+    "c4ideas-c40-01",
+    "c4ideas-c40-02"
   ],
-  "primaryMeanMs": 81687.74815,
+  "primaryMeanMs": 81188.46625,
   "goalMs": 10000,
   "goalMet": false,
-  "command": "./evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name NEW-NAME -SharedProofBounds -SupportPlanBudget 1073741824 -SupportClosures -SupportReflection -PrivateLayout native -NodeFlags @('--max-inlined-bytecode-size=1200','--max-inlined-bytecode-size-cumulative=4800')",
-  "notes": "Measured raw evidence governs; launcher historical defaults are not the retained command. Init/cleanup secondary. C28/C39 discarded. No RLC/book/solved inputs."
+  "command": "./evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name NEW-NAME -LocalCapacity 16777216 -SharedProofBounds -SupportPlanBudget 1073741824 -SupportClosures -SupportReflection -PrivateLayout native -NodeFlags @('--max-inlined-bytecode-size=1200','--max-inlined-bytecode-size-cumulative=4800')",
+  "notes": "Measured raw evidence governs; launcher historical defaults are not the retained command. Init/cleanup secondary. C28/C39 discarded. C40 memory saving is qualified; its speed delta is not. No RLC/book/solved inputs."
 }
