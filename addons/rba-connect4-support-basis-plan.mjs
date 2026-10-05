@@ -21,9 +21,10 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     closureElements=withClosures?basisElements*g.coordWords:0,
     reflectionBytes=withReflection?basisElements*LocalIndex.BYTES_PER_ELEMENT+profiles*4:0,
     TransitionIndex=g.maxBasis<=255?Uint8Array:g.maxBasis<=65535?Uint16Array:Uint32Array,
-    transitionElements=withTransitions?basisElements*g.columns*2:0,
-    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes+transitionElements*TransitionIndex.BYTES_PER_ELEMENT;
-  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff||transitionElements>0xffffffff)return null;
+    prefixBytes=withTransitions?(profiles+1)*4:0;
+  let transitionElements=0,
+    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes+prefixBytes;
+  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff||(withTransitions&&profiles+1>0xffffffff))return null;
   const basis=new Id(new SharedArrayBuffer(basisElements*Id.BYTES_PER_ELEMENT)),
     sizes=new Size(new SharedArrayBuffer(profiles*Size.BYTES_PER_ELEMENT)),
     membership=new Uint32Array(new SharedArrayBuffer(maskElements*4)),
@@ -47,6 +48,19 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     }
     sizes[index]=emitSortedSetBitsAt32(membership,maskBase,g.shapeWordCount,basis,index*g.maxBasis);
   }
+  // Exact packed-row capacity depends on rule-derived sizes. The initial
+  // admission covers all fixed tables plus offsets. Recheck before allocating
+  // variable records; failure publishes no partial plan or lazy work.
+  const transitionOffsets=withTransitions?new Uint32Array(new SharedArrayBuffer(prefixBytes)):null;
+  if(withTransitions){
+    for(let handle=0;handle<profiles;handle++){
+      transitionElements+=sizes[handle]*g.columns*2;
+      if(!Number.isSafeInteger(transitionElements)||transitionElements>0xffffffff)return null;
+      transitionOffsets[handle+1]=transitionElements;
+    }
+    bytes+=transitionElements*TransitionIndex.BYTES_PER_ELEMENT;
+    if(!Number.isSafeInteger(bytes)||bytes>budgetBytes)return null;
+  }
   const closures=withClosures?new Uint32Array(new SharedArrayBuffer(closureElements*4)):null;
   if(withClosures)compileSupportClosures32(g,basis,sizes,membership,closures,profiles);
   const mirrorMap=withReflection?new LocalIndex(new SharedArrayBuffer(basisElements*LocalIndex.BYTES_PER_ELEMENT)):null,
@@ -54,19 +68,19 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
   if(withReflection)compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix);
   const transitions=withTransitions?new TransitionIndex(new SharedArrayBuffer(transitionElements*TransitionIndex.BYTES_PER_ELEMENT)):null,
     transitionDead=TransitionIndex.BYTES_PER_ELEMENT===1?255:TransitionIndex.BYTES_PER_ELEMENT===2?65535:0xffffffff;
-  if(withTransitions){transitions.fill(transitionDead);compileSupportTransitions32(g,profile,basis,sizes,strides,transitions,transitionDead,profiles,radix);}
+  if(withTransitions){transitions.fill(transitionDead);compileSupportTransitions32(g,profile,basis,sizes,strides,transitionOffsets,transitions,profiles,radix);}
   // Membership is a compile-time dependency only once closure rows exist.
   // No runtime consumer needs the intermediate table in the closure kernel.
   return Object.freeze({basis,sizes,membership:withClosures?null:membership,strides,profiles,
-    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles,transitions,transitionDead});
+    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles,transitions,transitionDead,transitionOffsets});
 }
 
-export function compileSupportTransitions32(g,profile,basis,sizes,strides,transitions,dead,profiles,radix){
+export function compileSupportTransitions32(g,profile,basis,sizes,strides,transitionOffsets,transitions,profiles,radix){
   const inverse=new Uint32Array(g.shapeCount);
   for(let handle=0;handle<profiles;handle++)for(let c=0;c<g.columns;c++){
     const height=Math.floor(handle/strides[c])%radix;if(height===g.rows)continue;
     const child=handle+strides[c],parentBase=handle*g.maxBasis,childBase=child*g.maxBasis,
-      row=(handle*g.columns+c)*g.maxBasis*2,remove=profile.prepareRemove(g,height*g.columns+c);
+      row=transitionOffsets[handle]+c*sizes[handle]*2,remove=profile.prepareRemove(g,height*g.columns+c);
     for(let j=0,n=sizes[child];j<n;j++)inverse[basis[childBase+j]]=j;
     for(let i=0,n=sizes[handle];i<n;i++){
       const id=basis[parentBase+i],image=profile.removePrepared(g,id,remove);

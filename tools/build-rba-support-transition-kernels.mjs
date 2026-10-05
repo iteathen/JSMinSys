@@ -16,7 +16,7 @@ for(const nonWinning of [false,true])for(const three of [false,true]){
  function once(a,b){assert.equal(s.split(a).length,2,a);s=s.replace(a,b);}
  once('loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex)','loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed)');
  once('const remove=cell*g.shapeCount,removal=g.removeByCell,',
-  'const plan=g.supportBasisPlans,handle=removed[0],\n    transitionBase=((handle-plan.strides[column])*g.columns+column)*g.maxBasis*2,transitions=plan.transitions,dead=plan.transitionDead,');
+  'const plan=g.supportBasisPlans,handle=removed[0],\n    transitionBase=plan.transitionOffsets[handle-plan.strides[column]]+column*n*2,transitions=plan.transitions,dead=plan.transitionDead,');
  once('closureBase=removed[0]*g.maxBasis*g.coordWords','closureBase=handle*g.maxBasis*g.coordWords');
  once('const id=basis[bi+i],raw=removal[remove+id],\n      image=raw===0xffffffff?-1:raw;\n    if(image<0)continue;',
   'const record=transitionBase+(i<<1),image=transitions[record];\n    if(image===dead)continue;\n    const survives=transitions[record+1];');

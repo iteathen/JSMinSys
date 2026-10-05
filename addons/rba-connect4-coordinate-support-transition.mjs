@@ -21,7 +21,7 @@ export function connect4RbaTransitionSpanCofactorKnownHeight(g,profile,source,sr
   const cn=loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
 
   const plan=g.supportBasisPlans,handle=removed[0],
-    transitionBase=((handle-plan.strides[column])*g.columns+column)*g.maxBasis*2,transitions=plan.transitions,dead=plan.transitionDead,
+    transitionBase=plan.transitionOffsets[handle-plan.strides[column]]+column*n*2,transitions=plan.transitions,dead=plan.transitionDead,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=handle*g.maxBasis*g.coordWords;
@@ -82,7 +82,7 @@ export function connect4RbaTransition3CofactorKnownHeight(g,profile,source,src,b
   const cn=loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
 
   const plan=g.supportBasisPlans,handle=removed[0],
-    transitionBase=((handle-plan.strides[column])*g.columns+column)*g.maxBasis*2,transitions=plan.transitions,dead=plan.transitionDead,
+    transitionBase=plan.transitionOffsets[handle-plan.strides[column]]+column*n*2,transitions=plan.transitions,dead=plan.transitionDead,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=handle*g.maxBasis*g.coordWords;
@@ -135,7 +135,7 @@ export function connect4RbaTransitionSpanCofactorNonWinningKnownHeight(g,profile
   const cn=loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
 
   const plan=g.supportBasisPlans,handle=removed[0],
-    transitionBase=((handle-plan.strides[column])*g.columns+column)*g.maxBasis*2,transitions=plan.transitions,dead=plan.transitionDead,
+    transitionBase=plan.transitionOffsets[handle-plan.strides[column]]+column*n*2,transitions=plan.transitions,dead=plan.transitionDead,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=handle*g.maxBasis*g.coordWords;
@@ -188,7 +188,7 @@ export function connect4RbaTransition3CofactorNonWinningKnownHeight(g,profile,so
   const cn=loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
 
   const plan=g.supportBasisPlans,handle=removed[0],
-    transitionBase=((handle-plan.strides[column])*g.columns+column)*g.maxBasis*2,transitions=plan.transitions,dead=plan.transitionDead,
+    transitionBase=plan.transitionOffsets[handle-plan.strides[column]]+column*n*2,transitions=plan.transitions,dead=plan.transitionDead,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=handle*g.maxBasis*g.coordWords;

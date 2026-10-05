@@ -275,6 +275,18 @@ if(experiment==='C17'){
   Object.assign(copy.cycleCount.parameters,{A:'Active parent bits reaching one direct native transition-index read.',LIVE:'Nondead transitions reaching the direct survival-field read.',Q:'Zero: no runtime inverse lookup.',RS:'Zero: no saved removal lookup.'});
   copy.cycleCount.note+=' C30 one merged direct native record replaces parent basis-ID, dense removal and inverse reads; cold-generated family independent of dense/sparse geometry. No index/value decode. Active tail/survival and pre-write absorbed closure remain. FIELD/ADD/TEST/BRANCH are actual executed source counts in this shorter body.';ledger.units.push(copy);
  }
+}else if(experiment==='C30B'){
+ const prep=ledger.units.find(u=>u.name==='prepareSupportBasisPlans32');
+ append(prep,{op:'memory.load.native_index',count:'TR*P'},'TR*P*C(memory.load.native_index)+TR*P*C(memory.store.u32)+TR*P*C(runtime.number.multiply)+TR*C(memory.allocate.shared.bytes)+TR*C(runtime.typed_view.construct)',{P:'Admitted support profiles; prefix scans every rule-derived size before record allocation.'},'C30B two-stage admission first covers fixed tables+offsets, then exact record count before variable record/closure/reflection allocation. A rejected second-stage plan can leave unreachable basis buffers until GC; no partial plan published and no release-time promise. Existing cold CHECK/MUL/ADD/TEST/BRANCH symbols include new budget/prefix loops.');
+ prep.operations.push({op:'memory.store.u32',count:'TR*P'},{op:'runtime.number.multiply',count:'TR*P'},{op:'memory.allocate.shared.bytes',count:'TR'},{op:'runtime.typed_view.construct',count:'TR'});
+ for(const o of prep.operations)if(o.op==='runtime.field.store')o.count='14*ADMIT';
+ const compiler=ledger.units.find(u=>u.name==='compileSupportTransitions32');compiler.cycleCount.note+=' C30B current-row native prefix and size loads included in LOAD32/LOADID; row products use actual n. No padded records initialized or compiled.';
+ for(const u of ledger.units.filter(u=>u.source==='addons/rba-connect4-coordinate-support-transition.mjs')){
+  u.operations.push({op:'memory.load.u32',count:'K'});
+  for(const o of u.operations)if(o.op==='runtime.number.multiply'&&o.count==='2*K')o.count='K';
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  u.cycleCount.note+=' C30B uses one native profile-offset read plus playedColumn*n*2 instead of padded row products. n is the validated parent-frame count; no hot size lookup or decoding. ADD/control symbols reflect this address expression.';
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',
