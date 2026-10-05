@@ -25,3 +25,5 @@ Use targeted correctness tests per coherent change, independent board oracle on 
 ## Decisions/results
 
 Campaign opened; no candidate yet performance-qualified. Immediate-win correction and exact-sharing fixes are inherited baseline, not assumed speed optimizations. Source inventory has known diagnostics and tactical omissions; NEES CF-001 and CONC-003 motivate C01/C02, but each remains subject to full-solve qualification.
+
+C01 first measurement at 6ed0002: EXACT +1/c4 in 359908.4178 ms, 5113920690345 cycles, vs inherited 596690.8619 ms / 8514663685787 cycles. About 39.7% wall and 39.9% cycle reduction; repeat pending, PROVISIONAL. Twenty-one targeted tests and sixteen independent post-solve oracle comparisons passed. Candidate adds no hot allocation and leaves memory/runtime/affinity fixed. Added queue candidate: both residual channels empty implies exact draw before child search (separate from forced-response change).
