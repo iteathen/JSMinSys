@@ -4,18 +4,12 @@
 import {isMainThread,workerData} from 'node:worker_threads';
 if(!isMainThread&&process.env.JMS_WORKER_AFFINITY_FILE){
  const {readFileSync,writeFileSync}=await import('node:fs');
- const {queryWindowsTopology,validateWorkerTargets,validateEfficiencyTarget,bindCurrentThread}=await import('../addons/worker-affinity.mjs');
+ const {queryWindowsTopology,validateWorkerTargets,bindCurrentThread}=await import('../addons/worker-affinity.mjs');
  const requested=JSON.parse(readFileSync(process.env.JMS_WORKER_AFFINITY_FILE,'utf8'));
  const index=workerData?.workerIndex;
- const maintenance=workerData?.maintenanceRole==='shared-exact-publisher';
- if(!Number.isInteger(index)||index<0||index>=(requested.length+(maintenance?1:0)))throw Error('worker affinity index missing');
- const topology=await queryWindowsTopology(),targets=validateWorkerTargets(topology,requested,requested.length);
- let target=targets[index];
- if(maintenance){
-  if(index!==requested.length||!process.env.JMS_MAINTENANCE_AFFINITY_FILE)throw Error('maintenance affinity target missing');
-  target=validateEfficiencyTarget(topology,JSON.parse(readFileSync(process.env.JMS_MAINTENANCE_AFFINITY_FILE,'utf8')));
- }
- const actual=await bindCurrentThread(target);
+ if(!Number.isInteger(index)||index<0||index>=requested.length)throw Error('worker affinity index missing');
+ const targets=validateWorkerTargets(await queryWindowsTopology(),requested,requested.length);
+ const actual=await bindCurrentThread(targets[index]);
  if(!process.env.JMS_WORKER_AFFINITY_REPORT)throw Error('worker affinity report path required');
- writeFileSync(process.env.JMS_WORKER_AFFINITY_REPORT+'-'+index+'.json',JSON.stringify({index,target,actual,maintenance,beforeSolverInitialization:true})+'\n',{flag:'wx'});
+ writeFileSync(process.env.JMS_WORKER_AFFINITY_REPORT+'-'+index+'.json',JSON.stringify({index,target:targets[index],actual,beforeSolverInitialization:true})+'\n',{flag:'wx'});
 }

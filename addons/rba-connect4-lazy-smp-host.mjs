@@ -5,7 +5,6 @@ import {shareConnect4RbaGeometry32} from './rba-connect4-geometry.mjs';
 import {createConnect4RbaSharedExactCache32} from './rba-connect4-shared-exact-cache.mjs';
 import {createWorkerBehaviorMemory32,publishWorkerBehavior32} from './worker-behavior.mjs';
 import {encodeRootFrontier32} from './worker-root-frontier.mjs';
-import {createAsyncExactPublication32} from './rba-connect4-async-publication.mjs';
 
 export const RBA_LAZY_SMP_WORKER_LEGACY='legacy';
 export const RBA_LAZY_SMP_WORKER_MINIMAL='minimal';
@@ -28,17 +27,11 @@ export async function runLazySmpConnect4Rba32(moves,{
   rootFrontier=false,
   workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
   preparedEmptyTiming=false,
-  publicationMode='off',
-  publicationCapacity=65536,
-  publicationBatch=32,
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
     throw new TypeError('prepared timing requires an empty minimal solve');
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  if(!['off','idle','async'].includes(publicationMode)||
-     (publicationMode!=='off'&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
-    throw new TypeError('asynchronous publication requires minimal workers and a valid mode');
   if(!Number.isInteger(workers)||workers<2||workers>64)
     throw new RangeError('Lazy SMP requires at least two search workers');
   if(!Number.isInteger(sharedCacheCapacity)||sharedCacheCapacity<1||
@@ -81,7 +74,6 @@ export async function runLazySmpConnect4Rba32(moves,{
       geometry,
     }),
     control=new Int32Array(new SharedArrayBuffer(CONTROL_WORDS*Int32Array.BYTES_PER_ELEMENT)),
-    publication=publicationMode==='off'?null:createAsyncExactPublication32(sharedExactCache,workers,{capacity:publicationCapacity,batch:publicationBatch}),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*RESULT_STRIDE*Int32Array.BYTES_PER_ELEMENT)),
     metricBuffer=workerMode===RBA_LAZY_SMP_WORKER_MINIMAL?null:
       new SharedArrayBuffer(workers*METRIC_WIDTH*Float64Array.BYTES_PER_ELEMENT),
@@ -107,9 +99,6 @@ export async function runLazySmpConnect4Rba32(moves,{
   const started=performance.now();
   let searchStarted=null,searchFinished=null,cleanupStarted=null;
   try{
-    if(publication)session.spawn(new URL('./rba-connect4-exact-publisher-worker.mjs',import.meta.url),{
-      workerIndex:workers,maintenanceRole:'shared-exact-publisher',publicationMode,publication,sharedExactCache,control,readyGate,
-    });
     for(let i=0;i<workers;i+=1)
       session.spawn(
         new URL(rootFrontier?'./rba-connect4-lazy-smp-worker-frontier.mjs':behaviorMemory!==null?'./rba-connect4-lazy-smp-worker-behavior.mjs':
@@ -133,11 +122,10 @@ export async function runLazySmpConnect4Rba32(moves,{
           cpcFrontierResponse,
           cpcProjectedAdvisory,
           readyGate,
-          publicationQueue:publicationMode==='async'?publication.queues[i]:null,
         },
       );
     if(readyGate){
-      while(Atomics.load(readyGate,0)!==workers||(publication&&!Atomics.load(publication.ready,0))){
+      while(Atomics.load(readyGate,0)!==workers){
         if(Atomics.load(control,CONTROL_ERROR)||signal?.aborted||performance.now()-started>30000)
           throw new Error('prepared worker initialization failed or timed out');
         await new Promise(resolve=>setTimeout(resolve,5));
@@ -207,7 +195,6 @@ export async function runLazySmpConnect4Rba32(moves,{
     elapsedMs,
     preparedTiming:readyGate?{
       readyWorkers:Atomics.load(readyGate,0),rootConstructedAfterReady:true,
-      readyMaintenanceWorkers:publication?Atomics.load(publication.ready,0):0,
       initializationMs:searchStarted-initializationStarted,
       solveMs:searchFinished-searchStarted,cleanupMs:performance.now()-cleanupStarted,
       boundary:'all workers ready and empty TT pages initialized -> empty root construction -> exact result observed; cleanup separate',
@@ -216,13 +203,10 @@ export async function runLazySmpConnect4Rba32(moves,{
     errors:host.errors,
     cleanup:host.cleanup,
     workersExited:host.workersExited,
-    maintenanceWorkers:publication?1:0,
-    publicationMode,
-    publicationQueueBytes:publication?publication.bytes:0,
     requestedWorkers:workers,
     workersUsed:workers,
     sharedBytes:sharedViewBytes32(sharedExactCache)+sharedViewBytes32(workerGeometry)+
       control.byteLength+resultWords.byteLength+(metricBuffer===null?0:metricBuffer.byteLength)+(behaviorMemory===null?0:behaviorMemory.buffer.byteLength)+
-      (rootFrontier?nodeCounterBuffer.byteLength+timingBuffer.byteLength+frontierMetricBuffer.byteLength:0)+(publication?publication.bytes:0),
+      (rootFrontier?nodeCounterBuffer.byteLength+timingBuffer.byteLength+frontierMetricBuffer.byteLength:0),
   };
 }

@@ -46,13 +46,6 @@ export function validateWorkerTargets(topology,targets,count){
  }
  return selected;
 }
-export function validateEfficiencyTarget(topology,target){
- const classes=topology.cores.map(c=>c.efficiency),min=Math.min(...classes),max=Math.max(...classes);
- if(min===max)throw Error('heterogeneous efficiency-core class not identified');
- const actual=targetForProcessor(topology,target.group,target.processor);
- if(actual.efficiency!==min)throw Error('maintenance target is not in efficiency-core class');
- return actual;
-}
 export function selectPerformanceTargets(topology,count){
  const max=Math.max(...topology.cores.map(c=>c.efficiency)),targets=[];
  for(const c of topology.cores){
