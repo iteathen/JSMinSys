@@ -18,8 +18,8 @@ export function connect4RbaClosureDenseSpanCofactorKnownHeight(g,profile,source,
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex);sizes[sizeIndex]=cn;
+
   const remove=cell*g.shapeCount,removal=g.removeByCell,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
@@ -78,8 +78,8 @@ export function connect4RbaClosureDense3CofactorKnownHeight(g,profile,source,src
   }
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex);sizes[sizeIndex]=cn;
+
   const remove=cell*g.shapeCount,removal=g.removeByCell,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
@@ -130,8 +130,8 @@ export function connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight(g,profi
 
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex);sizes[sizeIndex]=cn;
+
   const remove=cell*g.shapeCount,removal=g.removeByCell,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
@@ -182,8 +182,8 @@ export function connect4RbaClosureDense3CofactorNonWinningKnownHeight(g,profile,
 
   if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
 
-  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
-  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+  const cn=loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex);sizes[sizeIndex]=cn;
+
   const remove=cell*g.shapeCount,removal=g.removeByCell,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,

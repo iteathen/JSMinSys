@@ -1,0 +1,30 @@
+✖ closure basis loading builds exact inverse in the same pass without clearing unrelated scratch (5.2082ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 81.2606
+
+✖ failing tests:
+
+test at test\rba-support-fused-inverse.test.mjs:6:1
+✖ closure basis loading builds exact inverse in the same pass without clearing unrelated scratch (5.2082ms)
+  AssertionError [ERR_ASSERTION]: loader must publish current inverse, not leave a second traversal
+  
+  4294967295 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-support-fused-inverse.test.mjs:15:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4294967295,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

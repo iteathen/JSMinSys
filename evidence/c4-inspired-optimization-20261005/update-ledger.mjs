@@ -195,6 +195,17 @@ if(experiment==='C17'){
    copy.operations.push({op:'memory.load.u32',count:'HANDLE'},{op:'runtime.number.multiply',count:'2*HANDLE+CLOSE_ADDR'},{op:'alu.add.u32',count:'CLOSE_ADDR'});ledger.units.push(copy);
   }
  }
+}else if(experiment==='C24'){
+ const load=ledger.units.find(u=>u.name==='loadSupportClosureBasis32');
+ for(const o of load.operations)if(o.op==='memory.store.u32')o.count='2*N+1';
+ load.cycleCount.expression=load.cycleCount.expression.replace('(N+1)*C(memory.store.u32)','(2*N+1)*C(memory.store.u32)');
+ load.cycleCount.note+=' C24 writes the current inverse with each copied ID; stale unrelated slots are neither cleared nor treated as membership.';
+ for(const u of ledger.units.filter(u=>u.source.includes('coordinate-closure-'))){
+  for(const o of u.operations)o.count=String(o.count).replace(/\bM\b/g,'0');
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]=u.cycleCount[key].replace(/\bM\b/g,'0');
+  u.cycleCount.parameters.M='Zero: inverse construction fused into basis-copy subledger.';
+  u.cycleCount.note+=' C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations.';
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',
