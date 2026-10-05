@@ -206,6 +206,20 @@ if(experiment==='C17'){
   u.cycleCount.parameters.M='Zero: inverse construction fused into basis-copy subledger.';
   u.cycleCount.note+=' C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations.';
  }
+}else if(experiment==='C25'){
+ for(const u of ledger.units.filter(u=>u.source.includes('coordinate-closure-'))){
+  for(const o of u.operations){
+   if(o.op==='memory.load.u32')o.count=String(o.count).replace('2*W','2*N');
+   if(o.op==='alu.clz.u32'||o.op==='alu.xor.u32')o.count='0';
+   if(o.op==='alu.and.u32')o.count=String(o.count).replace('3*N','2*N');
+   if(o.op==='alu.shr.u32')o.count+=' +N';
+  }
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+  u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  u.cycleCount.parameters.W='Zero: linear basis scan has no owner-union outer word loop.';
+  u.cycleCount.parameters.N='All parent basis slots tested; owner words loaded per slot. A/J/U retain active-path meanings.';
+  u.cycleCount.note+=' C25 retests original linear traversal under complete closures. No union extraction/clz/xor; inactive slots still pay two owner loads/tests. Tail bits beyond n cannot enter. FIELD/control/address symbols are actual executed counts of this linear source.';
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

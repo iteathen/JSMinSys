@@ -18,6 +18,11 @@ for(const dense of [false,true]){
   const start=s.indexOf('    if(write0)target[p0Target+targetWord]|=targetMask;'),loop=s.indexOf('    for(let at=',start),open=s.indexOf('{',loop),end=closeBrace(s,open);
   assert.ok(start>0&&loop>start&&open>loop);
   s=s.slice(0,start)+'    '+(three?'applySupportClosure3x32':'applySupportClosureSpan32')+'(closures,closureBase+lo*g.coordWords,g.coordWords,target,p0Target,p1Target,write0,write1);'+s.slice(end);
+  // C25 coupled retest: original increasing basis-slot traversal.
+  const activeStart=s.indexOf('  const activeWords='),imageStart=s.indexOf('    const id=basis[bi+i]',activeStart);
+  assert.ok(activeStart>0&&imageStart>activeStart);
+  s=s.slice(0,activeStart)+'  for(let i=0;i<n;i+=1){\n    const sourceWord=i>>>5,sourceMask=1<<(i&31),\n      active0=source[p0Source+sourceWord]&sourceMask,active1=source[p1Source+sourceWord]&sourceMask;\n    if(!active0&&!active1)continue;\n'+s.slice(imageStart);
+  once('  }\n  }\n  return 0;','  }\n  return 0;');
   text+='export '+s.replace(name,'connect4RbaClosure'+kind+(three?'3':'Span')+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight')+'\n';
  }
  const output=new URL('../addons/rba-connect4-coordinate-closure-'+(dense?'dense':'prepared')+'.mjs',import.meta.url);

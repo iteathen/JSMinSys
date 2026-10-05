@@ -24,16 +24,10 @@ export function connect4RbaClosurePreparedSpanCofactorKnownHeight(g,profile,sour
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=removed[0]*g.maxBasis*g.coordWords;
-  const activeWords=(n+31)>>>5;
-  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
-    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
-    let active=owner0|owner1;
-    // The prior slot loop ignored every bit beyond n, including poisoned tails.
-    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
-    while(active){
-    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
-      active0=owner0&sourceMask,active1=owner1&sourceMask;
-    active^=sourceMask;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,active1=source[p1Source+sourceWord]&sourceMask;
+    if(!active0&&!active1)continue;
     const id=basis[bi+i],raw=profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -56,7 +50,6 @@ export function connect4RbaClosurePreparedSpanCofactorKnownHeight(g,profile,sour
     write1=write1&&!(target[p1Target+targetWord]&targetMask);
     if(!write0&&!write1)continue;
     applySupportClosureSpan32(closures,closureBase+lo*g.coordWords,g.coordWords,target,p0Target,p1Target,write0,write1);
-  }
   }
   return 0;
 }
@@ -84,16 +77,10 @@ export function connect4RbaClosurePrepared3CofactorKnownHeight(g,profile,source,
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=removed[0]*g.maxBasis*g.coordWords;
-  const activeWords=(n+31)>>>5;
-  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
-    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
-    let active=owner0|owner1;
-    // The prior slot loop ignored every bit beyond n, including poisoned tails.
-    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
-    while(active){
-    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
-      active0=owner0&sourceMask,active1=owner1&sourceMask;
-    active^=sourceMask;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,active1=source[p1Source+sourceWord]&sourceMask;
+    if(!active0&&!active1)continue;
     const id=basis[bi+i],raw=profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -117,7 +104,6 @@ export function connect4RbaClosurePrepared3CofactorKnownHeight(g,profile,source,
     if(!write0&&!write1)continue;
     applySupportClosure3x32(closures,closureBase+lo*g.coordWords,g.coordWords,target,p0Target,p1Target,write0,write1);
   }
-  }
   return 0;
 }
 export function connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
@@ -136,16 +122,10 @@ export function connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight(g,pr
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=removed[0]*g.maxBasis*g.coordWords;
-  const activeWords=(n+31)>>>5;
-  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
-    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
-    let active=owner0|owner1;
-    // The prior slot loop ignored every bit beyond n, including poisoned tails.
-    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
-    while(active){
-    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
-      active0=owner0&sourceMask,active1=owner1&sourceMask;
-    active^=sourceMask;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,active1=source[p1Source+sourceWord]&sourceMask;
+    if(!active0&&!active1)continue;
     const id=basis[bi+i],raw=profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -169,7 +149,6 @@ export function connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight(g,pr
     if(!write0&&!write1)continue;
     applySupportClosureSpan32(closures,closureBase+lo*g.coordWords,g.coordWords,target,p0Target,p1Target,write0,write1);
   }
-  }
   return 0;
 }
 export function connect4RbaClosurePrepared3CofactorNonWinningKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
@@ -188,16 +167,10 @@ export function connect4RbaClosurePrepared3CofactorNonWinningKnownHeight(g,profi
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     closures=g.supportBasisPlans.closures,closureBase=removed[0]*g.maxBasis*g.coordWords;
-  const activeWords=(n+31)>>>5;
-  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
-    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
-    let active=owner0|owner1;
-    // The prior slot loop ignored every bit beyond n, including poisoned tails.
-    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
-    while(active){
-    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
-      active0=owner0&sourceMask,active1=owner1&sourceMask;
-    active^=sourceMask;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,active1=source[p1Source+sourceWord]&sourceMask;
+    if(!active0&&!active1)continue;
     const id=basis[bi+i],raw=profile.removePrepared(g,id,remove),
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -220,7 +193,6 @@ export function connect4RbaClosurePrepared3CofactorNonWinningKnownHeight(g,profi
     write1=write1&&!(target[p1Target+targetWord]&targetMask);
     if(!write0&&!write1)continue;
     applySupportClosure3x32(closures,closureBase+lo*g.coordWords,g.coordWords,target,p0Target,p1Target,write0,write1);
-  }
   }
   return 0;
 }
