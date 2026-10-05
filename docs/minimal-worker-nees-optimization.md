@@ -74,6 +74,16 @@ For changes that affect recurrence, TT identity, canonicalization, move traversa
 
 A single-worker helper or local microbenchmark is explanatory evidence only because worker races and the shared TT can change which worker wins and how much duplicated work is performed.
 
+The owner's primary <=10,000 ms goal uses the prepared-empty interval: all
+workers, tables and position-independent geometry preparation are ready,
+then the empty root is constructed and solved until the exact result is
+observed. Position-dependent work after readiness is included. Initialization
+and cleanup are separate secondary goals; their duration must not veto an
+improvement in the primary solve interval. Record both boundaries explicitly.
+Whole-operation process cycles include initialization and cleanup unless the
+measurement actually isolates them; do not label them solve-only cycles or
+subtract a nominal clock-rate estimate.
+
 ## Benchmark representativeness policy
 
 The optimization target is **not** late-game or isolated fixture latency. It is the complete exact empty-board 7x6 solve. Benchmark authority therefore follows this hierarchy:
