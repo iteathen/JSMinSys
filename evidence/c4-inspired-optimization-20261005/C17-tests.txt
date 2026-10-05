@@ -1,0 +1,35 @@
+✔ shared exact cache publishes only fully committed exact rows (0.9054ms)
+✔ shared exact known-hash path retains full-key validation (0.1202ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (10.5497ms)
+✔ non-7x6 shared exact cache retains full-key identity (1.1383ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (58.8508ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (10.6966ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (54.3067ms)
+✔ sharing-density masks preserve exact Lazy SMP results (358.2714ms)
+✔ Lazy SMP move ordering is center-line distance only (40.5935ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (67.8194ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.9626ms)
+✔ Lazy SMP rejects unknown worker mode (1.3123ms)
+✔ minimal worker never publishes local bounds to shared exact cache (40.0918ms)
+✔ minimal worker omits hot diagnostic counters (47.9236ms)
+✔ minimal timeout is host-terminated without recursive polling (59.0462ms)
+✔ pre-aborted minimal call allocates no workers (3.7543ms)
+✔ minimal four-worker search returns after an immediate winning center move (45.3079ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (371.7626ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (57.7504ms)
+✔ application preparation allocates all four workers but performs no search (62.4587ms)
+✔ closing an idle prepared application joins workers without a solve (57.5285ms)
+✔ ordinary minimal API also waits for every worker before search (47.9599ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.8688ms)
+✔ closing an active prepared search resolves its result and joins every worker (74.1147ms)
+✔ concurrent proof writers cannot associate another key with a bound (100.5545ms)
+✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.3103ms)
+✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (9.9173ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1256.1664

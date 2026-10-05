@@ -31,6 +31,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   workerMode=RBA_LAZY_SMP_WORKER_LEGACY,
   preparedEmptyTiming=false,
   sharedCacheLayout='auto',
+  sharedProofBounds=false,
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
@@ -49,12 +50,14 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(typeof rootFrontier!=='boolean')throw new TypeError('rootFrontier must be boolean');
   if(workerMode!==RBA_LAZY_SMP_WORKER_LEGACY&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL)
     throw new RangeError('invalid Lazy SMP worker mode');
+  if(typeof sharedProofBounds!=='boolean'||(sharedProofBounds&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
+    throw new TypeError('shared proof bounds require a homogeneous minimal pool');
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL&&
      (rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory))
     throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL){
     const prepared=await prepareLazySmpConnect4Rba32({geometry,workers,sharedCacheCapacity,
-      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout});
+      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout,sharedProofBounds});
     try{return await prepared.solve(moves);}finally{await prepared.close();}
   }
   if(sharedCacheLayout==='auto')sharedCacheLayout='split40';

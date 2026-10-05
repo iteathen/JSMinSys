@@ -14,9 +14,10 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto'}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
+  if(typeof sharedProofBounds!=='boolean')throw new TypeError('sharedProofBounds must be boolean');
   if(workerMode!=='minimal'||rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory)
     throw new TypeError('prepared application requires minimal workers without legacy options');
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
@@ -70,6 +71,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
       sharedSampleMask,workerMode:'minimal',
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
+      sharedProofBounds,
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),
@@ -111,10 +113,12 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
     workerGeometry=shareConnect4RbaGeometry32(geometry);
     shared=(layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry});
+    if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else shared.entries.fill(0);
-    for(let i=0;i<workers;i+=1)session.spawn(new URL(i&1?'./rba-connect4-lazy-smp-worker-minimal.mjs':
-      './rba-connect4-lazy-smp-worker-minimal-center.mjs',import.meta.url),{
+    for(let i=0;i<workers;i+=1)session.spawn(new URL(sharedProofBounds?
+      (i&1?'./rba-connect4-lazy-smp-worker-minimal-proofs.mjs':'./rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs'):
+      (i&1?'./rba-connect4-lazy-smp-worker-minimal.mjs':'./rba-connect4-lazy-smp-worker-minimal-center.mjs'),import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
       root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate});
     while(Atomics.load(readyGate,0)!==workers&&!closed&&!Atomics.load(control,ERROR)){
