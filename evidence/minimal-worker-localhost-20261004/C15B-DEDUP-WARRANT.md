@@ -1,0 +1,9 @@
+# C15b: helper-side exact duplicate publication elimination
+
+Frozen after completed C15 pair, before changing helper source. C15 remains NOT RETAINED for total-machine-cost objective: mean153872.0439ms/2577904217653 cycles; control A155753.8021ms/2215612741292, B155613.9262ms/2213038085536. About1.2% lower wall at16.3% higher cycles than A. All exact+1/c4, clean4 or5, recorded affinity. No10s claim. Raw evidence preserves candidate; default mode remains off.
+
+Follow-up tests whether the sole helper can eliminate work instead of merely relocating it. Before acquiring its odd sequence, compare an occupied even slot's full stored key and exact value with the queued snapshot. If identical, skip all shared writes. Only the helper writes the shared table in async mode, so its ordinary payload reads cannot race another writer. Readers remain atomic/seqlock-protected, and different-key or different-value records retain the original publication protocol. No hash-only acceptance, no bounds, no new data, no eviction or remapping.
+
+Search workers, producer queues, batch size/capacity, polling, topology, memory settings and JIT stay unchanged. Compact8 helper uses explicit field comparisons; general helper loops over initialization-defined stored-key width. No hot reporting, allocation or clocks. Compare against C15 for mechanism and no-helper A/retained M02 for promotion. Do not silently retain C15 overhead if the family fails total-cost qualification.
+
+Validation: same-key/same-value keeps sequence unchanged; same slot/different key and same key/different value publish normally. Repeat correlated concurrent-key tests, independent compact/general physical-board oracle, source/catalog/generated checks. Repeat full localhost solves; helper process cycles count. Rejection of this realization does not reject optional asynchronous work generally.
