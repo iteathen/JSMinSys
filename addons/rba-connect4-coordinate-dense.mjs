@@ -84,3 +84,68 @@ export function connect4RbaDenseCofactorKnownHeight(g,profile,source,src,basis,b
   return 0;
 }
 export {connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
+
+// PRECONDITION: the chosen legal move cannot win immediately.
+// Caller owns this proof; the general entry point above retains win tests.
+export function connect4RbaDenseCofactorNonWinningKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
+  const meta=source[src+g.metaOffset],rank=meta>>>2,
+    cell=height*g.columns+column,player=rank&1;
+  for(let c=0;c<g.columns;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+g.metaOffset]=(rank+1)<<2;
+  for(let w=0;w<2*g.coordWords;w+=1)target[dst+g.p0Offset+w]=0;
+  sizes[sizeIndex]=0;
+
+  if(rank+1===g.cellCount){target[dst+g.metaOffset]=((rank+1)<<2)|2;return 2;}
+
+  const cn=connect4RbaDenseCofactorBasis(g,profile,basis,bi,n,cell,childBasis,ci,seen,removed);sizes[sizeIndex]=cn;
+  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;
+  const
+    p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
+    p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
+    offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
+  for(let i=0;i<n;i+=1){
+    const sourceWord=i>>>5,sourceMask=1<<(i&31),
+      active0=source[p0Source+sourceWord]&sourceMask,
+      active1=source[p1Source+sourceWord]&sourceMask;
+    if(!(active0|active1))continue;
+    const id=basis[bi+i],raw=removed[i],
+      image=raw===0xffffffff?-1:raw;
+    if(image<0)continue;
+    let write0=(active0!==0)&&(player===0||image===id),
+      write1=(active1!==0)&&(player===1||image===id);
+    if(!write0&&!write1)continue;
+
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    lo=childIndex[image];
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
+    if(write0)target[p0Target+targetWord]|=targetMask;
+    if(write1)target[p1Target+targetWord]|=targetMask;
+
+    for(let at=offsets[image],end=offsets[image+1];at<end;at+=1){
+      const word=words[at],shapeBase=word<<5;let bits=masks[at]&seen[word];
+      // The intersection contains only current child-basis IDs. Stale inverse
+      // entries cannot enter this path. Do not mutate the shared seen scratch.
+      while(bits){
+        const bit=bits&-bits,id=shapeBase+(31-Math.clz32(bit));
+        let j;
+        j=childIndex[id];
+        targetWord=j>>>5;targetMask=1<<(j&31);
+        if(write0)target[p0Target+targetWord]|=targetMask;
+        if(write1)target[p1Target+targetWord]|=targetMask;
+        bits^=bit;
+      }
+    }
+  }
+  return 0;
+}

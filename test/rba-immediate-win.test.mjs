@@ -7,7 +7,7 @@ import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from 
 
 test('RBA immediate winning column matches physical rules across dimensions and frames',()=>{
   assert.equal(typeof coordinate.connect4RbaExposesOpponentWin,'function');
-  let exposed=0,exposureChecks=0;
+  let exposed=0,exposureChecks=0,recursiveChildChecks=0;
   let seed=74219,checked=0,winning=0;
   const random=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)%n;};
   for(const [columns,rows] of [[7,6],[7,5],[4,4],[3,3]]){
@@ -57,6 +57,15 @@ test('RBA immediate winning column matches physical rules across dimensions and 
             const canonical=q.reflected?columns-1-c:c;
             assert.equal(coordinate.connect4RbaExposesOpponentWin(geometry,words,offset,basis,bi,q.basis.length,mover,canonical,r),loses?1:0);
             exposureChecks++;if(loses)exposed++;
+            if(!loses&&opponentThreats.length<=1&&(!opponentThreats.length||opponentThreats[0]===c)){
+              cells[r*columns+c]=mover;heights[c]++;
+              for(let reply=0;reply<columns;reply++)if(heights[reply]<rows){
+                const rr=heights[reply];cells[rr*columns+reply]=mover^1;
+                assert.equal(wins(reply,rr,mover^1),false,JSON.stringify({columns,rows,moves,c,reply}));
+                cells[rr*columns+reply]=-1;recursiveChildChecks++;
+              }
+              heights[c]--;cells[r*columns+c]=-1;
+            }
           }
           const forced=connect4RbaForcedResponseColumn(geometry,words,offset,basis,bi,q.basis.length,mover);
           if(opponentThreats.length>1)assert.equal(forced,-2);
@@ -72,4 +81,6 @@ test('RBA immediate winning column matches physical rules across dimensions and 
   }
   assert.ok(checked>1000);
   assert.ok(winning>0);assert.ok(exposureChecks>1000);assert.ok(exposed>0);
+  assert.ok(recursiveChildChecks>1000);
+  console.log(JSON.stringify({kind:'physical-propagated-no-immediate-win',recursiveChildChecks}));
 });

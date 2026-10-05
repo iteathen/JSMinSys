@@ -1,7 +1,7 @@
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
 import {prepareConnect4CpcWin32,evaluateConnect4PreparedCpcWin32} from './connect4-cpc-prepared-win.mjs';
-import {connect4RbaDenseCofactorKnownHeight} from './rba-connect4-coordinate-dense.mjs';
-import {connect4RbaPreparedCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
+import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
+import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
@@ -20,7 +20,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
   connect4RbaCofactorKnownHeight=g.removeByCell!==null
-    ?connect4RbaDenseCofactorKnownHeight:connect4RbaPreparedCofactorKnownHeight,
+    ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,
   control=workerData.control,resultWords=workerData.resultWords,
   words=new Uint32Array((g.cellCount+1)*g.keyWords),
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
@@ -147,13 +147,8 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     }
   }
 
-  const winningColumn=connect4RbaImmediateWinningColumn(g,words,src,basis,bi,n,mover);
-  if(winningColumn>=0){
-    if(depth)storeExact(src,hash,slot,mover?1:3);
-    else bestMove=winningColumn;
-    return 1;
-  }
-
+  // Root excludes immediate wins once. C01/C05 ensure every recursed child
+  // also has no immediate mover win; cofactor uses that proved precondition.
   const forced=connect4RbaForcedResponseColumn(g,words,src,basis,bi,n,mover);
   if(forced===-2){
     if(depth)storeExact(src,hash,slot,mover?3:1);
@@ -228,8 +223,14 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
   return best;
 }
 
-const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3,
-  relative=terminal?relativeTerminal(terminal,mover):negamax(0,0,0,basisSize[0],mover,workerData.rootReflected,0,0,-2,2);
+const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3;
+let relative;
+if(terminal)relative=relativeTerminal(terminal,mover);
+else{
+  const winningColumn=connect4RbaImmediateWinningColumn(g,words,0,basis,0,basisSize[0],mover);
+  if(winningColumn>=0){bestMove=winningColumn;relative=1;}
+  else relative=negamax(0,0,0,basisSize[0],mover,workerData.rootReflected,0,0,-2,2);
+}
 
 if(relative!==CANCELLED){
   const resultBase=index*RESULT_STRIDE,

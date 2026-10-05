@@ -6,6 +6,28 @@ import {connect4RbaFromMoves} from '../addons/rba-connect4-ingress.mjs';
 import {connect4RbaCofactorKnownHeight as optional,connect4RbaCanonicalize as canonicalize} from '../addons/rba-connect4-coordinate.mjs';
 import {connect4RbaPreparedCofactorKnownHeight as prepared,connect4RbaCanonicalize as preparedCanonicalize,connect4RbaPreparedCanonicalize as preparedOnlyCanonicalize} from '../addons/rba-connect4-coordinate-prepared.mjs';
 import {connect4RbaDenseCofactorKnownHeight as dense,connect4RbaCanonicalize as denseCanonicalize,connect4RbaPreparedCanonicalize as denseOnlyCanonicalize} from '../addons/rba-connect4-coordinate-dense.mjs';
+import * as preparedApi from '../addons/rba-connect4-coordinate-prepared.mjs';
+import * as denseApi from '../addons/rba-connect4-coordinate-dense.mjs';
+
+test('nonwinning prepared cofactors match physical transitions under the explicit precondition',()=>{
+  const pn=preparedApi.connect4RbaPreparedCofactorNonWinningKnownHeight,dn=denseApi.connect4RbaDenseCofactorNonWinningKnownHeight;
+  assert.equal(typeof pn,'function');assert.equal(typeof dn,'function');let checked=0,draws=0;
+  for(const budget of [0,2097152])for(const [columns,rows] of [[7,6],[7,5],[4,4],[3,3],[33,4],[4,33]]){
+    const g=prepareConnect4RbaGeometry({columns,rows,specializationBudgetBytes:budget}),p=prepareConnect4RbaExecutionProfile(g),oracle=oracleGeometry(g);
+    const history=columns===3?[0,1,2,0,1,2,0,1]:[0,1,0,1,2,1,2];
+    for(let length=0;length<=history.length;length++)for(const reflected of [false,true]){
+      const moves=history.slice(0,length).map(c=>reflected?columns-1-c:c),q=connect4RbaFromMoves(moves,{geometry:g,canonical:false});
+      if(q.words[g.metaOffset]&3)continue;
+      for(let c=0;c<columns;c++)if(q.words[c]<rows){
+        const expected=physicalChild(g,oracle,moves,c);if(expected.term===1||expected.term===3)continue;
+        for(const fn of g.removeByCell===null?[pn]:[pn,dn]){
+          assert.deepEqual(apply(g,p,fn,q,c),expected);checked++;if(expected.term===2)draws++;
+        }
+      }
+    }
+  }
+  assert.ok(checked>1000);assert.ok(draws>0);
+});
 
 function oracleGeometry(g){
   const shapes=new Map();
