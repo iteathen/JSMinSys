@@ -1,0 +1,39 @@
+✔ matching masks admit a nonadjacent policy but reject incompatible per-threat policies (14.0595ms)
+{"kind":"cpc-exhaustive-small-physical-policy","checked":32280,"positive":272}
+{"kind":"cpc-general-physical-policy","checked":7666,"positive":34}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (69.2772ms)
+✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (144.7566ms)
+✔ prepared CPC preserves literal policy across general geometry, frames and support (396.585ms)
+{"kind":"cpc-exhaustive-small-physical-policy","checked":32280,"positive":272}
+{"kind":"cpc-general-physical-policy","checked":7666,"positive":34}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (77.5034ms)
+✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (141.3776ms)
+✔ prepared CPC preserves literal policy across general geometry, frames and support (328.3478ms)
+✔ shared exact cache publishes only fully committed exact rows (1.3869ms)
+✔ shared exact known-hash path retains full-key validation (0.2115ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (14.6784ms)
+✔ non-7x6 shared exact cache retains full-key identity (1.5498ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (74.9378ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (8.5584ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (50.5313ms)
+✔ sharing-density masks preserve exact Lazy SMP results (348.0159ms)
+✔ Lazy SMP move ordering is center-line distance only (32.4693ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (62.3825ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (2.0001ms)
+✔ Lazy SMP rejects unknown worker mode (1.3117ms)
+✔ minimal worker never publishes local bounds to shared exact cache (39.4622ms)
+✔ minimal worker omits hot diagnostic counters (36.5401ms)
+✔ minimal timeout is host-terminated without recursive polling (21.318ms)
+✔ minimal abort is host-terminated without recursive polling (20.9333ms)
+✔ minimal four-worker search returns after an immediate winning center move (40.1689ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (319.3903ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (132.3452ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (0.8176ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1205.8742
