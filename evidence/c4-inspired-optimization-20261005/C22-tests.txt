@@ -1,0 +1,37 @@
+✔ shared exact cache publishes only fully committed exact rows (0.9958ms)
+✔ shared exact known-hash path retains full-key validation (0.1301ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (9.3975ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.8975ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (46.2428ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (7.8213ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (41.246ms)
+✔ sharing-density masks preserve exact Lazy SMP results (265.1409ms)
+✔ Lazy SMP move ordering is center-line distance only (38.7314ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (50.1772ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.8987ms)
+✔ Lazy SMP rejects unknown worker mode (1.2928ms)
+✔ minimal worker never publishes local bounds to shared exact cache (32.3567ms)
+✔ minimal worker omits hot diagnostic counters (38.1921ms)
+✔ minimal timeout is host-terminated without recursive polling (60.937ms)
+✔ pre-aborted minimal call allocates no workers (3.5865ms)
+✔ minimal four-worker search returns after an immediate winning center move (42.4519ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (346.2758ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (57.3313ms)
+✔ application preparation allocates all four workers but performs no search (48.2025ms)
+✔ closing an idle prepared application joins workers without a solve (43.6393ms)
+✔ ordinary minimal API also waits for every worker before search (47.7445ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.6605ms)
+✔ closing an active prepared search resolves its result and joins every worker (59.7402ms)
+✔ proof workers publish same-key opposite zero-bound joins as exact draw in both owner gauges (14.5416ms)
+✔ proof joins respect shared sampling and key mismatch never becomes an exact join (2.1457ms)
+✔ concurrent proof writers cannot associate another key with a bound (66.3819ms)
+✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.4668ms)
+✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (10.8721ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1071.8684

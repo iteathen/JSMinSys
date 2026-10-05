@@ -152,6 +152,13 @@ if(experiment==='C17'){
    ledger.units.push(copy);
   }
  }
+}else if(experiment==='C22'){
+ for(const u of workers.filter(u=>u.name==='storeBound')){
+  append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',
+   {JOIN_PUB:'1 only when opposite same-key zero bounds join as exact draw and unchanged sampling admits publication;0 otherwise.'},
+   'C22 generated proof pool publishes the previously private exact-draw join. Tag2 is absolute/gauge-invariant, so no extra gauge decode; exact-only default worker remains unchanged. No reporting/allocation or new replacement policy.');
+  u.operations.push({op:'alu.and.u32',count:'D'},{op:'control.test.u32',count:'D'},{op:'control.branch',count:'D'});
+ }
 }else if(experiment!=='HASH')throw Error('unknown experiment');
 if(ledger.units.some(u=>u.source==='addons/rba-connect4-support-basis-plan.mjs')){
  ledger.localOperationExtensions['runtime.math.floor']={cost:{kind:'symbolic',name:'NUMBER_FLOOR_COST(profile,lowering)'},note:'Cold nonnegative support digit division rounding; no per-node use.'};

@@ -144,9 +144,9 @@ function storeBound(src,hash,slot,value){
   if(prior&&localKeyMatches(slot,src)){
     if(prior<=3||prior===value)return prior;
     // The same canonical q has both >=0 and <=0, therefore exact draw.
-    // Keep this inferred draw worker-local; shared publication is reserved for
-    // exact values produced by the ordinary search result path.
+    // This same-key joined draw is exact and can be shared in the proof pool.
     storeLocalEntry(slot,src,2);
+    if(!(hash&sharedSampleBits))sharedStore(shared,words,src,2,hash);
     return 2;
   }
   storeLocalEntry(slot,src,value);

@@ -9,6 +9,10 @@ for(const center of [false,true]){
    "import {prepareSharedProofCacheAccess,transportConnect4ZeroBound32} from './rba-connect4-shared-proof-cache.mjs';\n"+s;
  once('sharedAccess=shared.layout?prepareSharedCacheAccess(shared):null,','sharedAccess=prepareSharedProofCacheAccess(shared),');
  once('const value=sharedProbe(shared,words,src,hash);','const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash),(words[src+g.metaOffset]>>>2)&1);');
+ once('    storeLocalEntry(slot,src,2);\n    return 2;',
+  '    storeLocalEntry(slot,src,2);\n    if(!(hash&sharedSampleBits))sharedStore(shared,words,src,2,hash);\n    return 2;');
+ once('    // Keep this inferred draw worker-local; shared publication is reserved for\n    // exact values produced by the ordinary search result path.',
+  '    // This same-key joined draw is exact and can be shared in the proof pool.');
  once('  storeLocalEntry(slot,src,value);\n  return value;\n}',
   '  storeLocalEntry(slot,src,value);\n  if(!(hash&sharedSampleBits))\n    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,(words[src+g.metaOffset]>>>2)&1),hash);\n  return value;\n}');
  const output=new URL('../addons/'+base+'-proofs.mjs',import.meta.url);
