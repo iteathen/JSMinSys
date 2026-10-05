@@ -1,0 +1,46 @@
+{
+  "kind": "minimal-worker-i5-12600k-prepared-empty-solve-v2",
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36"
+  },
+  "platform": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "logicalProcessors": 16
+  },
+  "target": {
+    "wallTimeMsMax": 10000,
+    "workers": 4,
+    "workerMode": "minimal"
+  },
+  "wallMs": 162153.655,
+  "totalOperationWallMs": 163362.5783,
+  "preparedTiming": {
+    "readyWorkers": 4,
+    "rootConstructedAfterReady": true,
+    "initializationMs": 1157.4196000000002,
+    "solveMs": 162153.655,
+    "cleanupMs": 51.1190999999817,
+    "boundary": "all workers ready and empty TT pages initialized -> empty root construction -> exact result observed; cleanup separate"
+  },
+  "processCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+  "processCycles": "2303044826470",
+  "status": "EXACT",
+  "rootWdl": 1,
+  "move": 3,
+  "winner": 3,
+  "completedWorkers": [
+    0,
+    1,
+    1,
+    1
+  ],
+  "sharedCacheHits": null,
+  "sharedCacheStores": null,
+  "sharedCacheStoreContention": null,
+  "cleanup": true,
+  "workersExited": 4,
+  "errorCode": 0
+}
