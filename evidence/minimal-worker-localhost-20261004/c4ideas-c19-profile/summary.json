@@ -1,0 +1,227 @@
+{
+  "kind": "diagnostic-only-20-second-early-search-sampled-profile",
+  "sourceCommit": "b16896515f8dd143f68919a19711ca85a21242f5",
+  "workers": 4,
+  "flatSelfSamples": 7720,
+  "limitations": "Early-search only; sampled/inlined attribution approximate, includes startup. Not full-workload cost fractions or performance authority.",
+  "files": [
+    {
+      "file": "CPU.20261005.110933.21516.1.002.cpuprofile",
+      "sha256": "32538e316a95de4eed8d168cc5642bbd9f7846892ec5cdacad2d41a6b1cbec19"
+    },
+    {
+      "file": "CPU.20261005.110933.21516.2.004.cpuprofile",
+      "sha256": "1ff11bdac0c069b51900fa9361f07daec773e9ab22653a7be5a8b36ff9f772a1"
+    },
+    {
+      "file": "CPU.20261005.110933.21516.3.005.cpuprofile",
+      "sha256": "d4d5c45d4688ee1cde5184706a42f2443272928a9a2ee2ec088b9ccbcaa4ca4e"
+    },
+    {
+      "file": "CPU.20261005.110933.21516.4.003.cpuprofile",
+      "sha256": "119f0c8a8c7c45cc3f054679ed5fd69e674ee997aedf69f8f3b580b87c886b2a"
+    }
+  ],
+  "top": [
+    {
+      "frame": "connect4RbaDenseCofactorNonWinningKnownHeight @ rba-connect4-coordinate-dense.mjs",
+      "samples": 2620,
+      "percent": 33.93782383419689
+    },
+    {
+      "frame": "emitSortedSetBits32 @ basis32.mjs",
+      "samples": 794,
+      "percent": 10.284974093264248
+    },
+    {
+      "frame": "connect4RbaDenseCofactorBasis @ rba-connect4-coordinate-dense.mjs",
+      "samples": 658,
+      "percent": 8.523316062176166
+    },
+    {
+      "frame": "probeCompactSharedCache32 @ rba-connect4-shared-exact-cache-layout.mjs",
+      "samples": 458,
+      "percent": 5.932642487046632
+    },
+    {
+      "frame": "probeCache @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 383,
+      "percent": 4.961139896373057
+    },
+    {
+      "frame": "storeCompactSharedCache32 @ rba-connect4-shared-exact-cache-layout.mjs",
+      "samples": 351,
+      "percent": 4.546632124352332
+    },
+    {
+      "frame": " @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 266,
+      "percent": 3.4455958549222796
+    },
+    {
+      "frame": "evaluateConnect4CpcTargetDenseWin32 @ connect4-cpc-target-dense-win.mjs",
+      "samples": 252,
+      "percent": 3.2642487046632125
+    },
+    {
+      "frame": " @ rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "samples": 206,
+      "percent": 2.66839378238342
+    },
+    {
+      "frame": "probeCache @ rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "samples": 203,
+      "percent": 2.6295336787564767
+    },
+    {
+      "frame": "negamax @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 182,
+      "percent": 2.3575129533678756
+    },
+    {
+      "frame": "evaluateConnect4PreparedCpcWin32 @ connect4-cpc-prepared-win.mjs",
+      "samples": 145,
+      "percent": 1.878238341968912
+    },
+    {
+      "frame": "storeLocalEntry @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 134,
+      "percent": 1.7357512953367875
+    },
+    {
+      "frame": "localKeyMatches @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 128,
+      "percent": 1.6580310880829014
+    },
+    {
+      "frame": "negamax @ rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "samples": 117,
+      "percent": 1.5155440414507773
+    },
+    {
+      "frame": "connect4RbaExposesOpponentWin @ rba-connect4-coordinate.mjs",
+      "samples": 115,
+      "percent": 1.4896373056994818
+    },
+    {
+      "frame": "storeLocalEntry @ rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "samples": 112,
+      "percent": 1.450777202072539
+    },
+    {
+      "frame": "mixSpan32Locator32 @ widekey32.mjs",
+      "samples": 108,
+      "percent": 1.3989637305699483
+    },
+    {
+      "frame": "permutePair3 @ rba-connect4-profile.mjs",
+      "samples": 69,
+      "percent": 0.8937823834196891
+    },
+    {
+      "frame": "connect4RbaForcedResponseColumn @ rba-connect4-coordinate.mjs",
+      "samples": 69,
+      "percent": 0.8937823834196891
+    },
+    {
+      "frame": "localKeyMatches @ rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "samples": 65,
+      "percent": 0.8419689119170984
+    },
+    {
+      "frame": "connect4RbaPreparedCanonicalize @ rba-connect4-coordinate-prepared.mjs",
+      "samples": 58,
+      "percent": 0.7512953367875648
+    },
+    {
+      "frame": "orderConnect4LiveLinePacked32 @ connect4-live-line-order.mjs",
+      "samples": 38,
+      "percent": 0.49222797927461137
+    },
+    {
+      "frame": "comparePreparedReflectedSupport @ rba-connect4-coordinate-prepared.mjs",
+      "samples": 24,
+      "percent": 0.31088082901554404
+    },
+    {
+      "frame": "(garbage collector) @ ",
+      "samples": 21,
+      "percent": 0.27202072538860106
+    },
+    {
+      "frame": "publishSpan32 @ widekey32.mjs",
+      "samples": 17,
+      "percent": 0.22020725388601037
+    },
+    {
+      "frame": "compactSupportProfile8 @ rba-connect4-shared-exact-cache.mjs",
+      "samples": 12,
+      "percent": 0.15544041450777202
+    },
+    {
+      "frame": "popcount3x32 @ word64x32.mjs",
+      "samples": 11,
+      "percent": 0.14248704663212436
+    },
+    {
+      "frame": "firstSetBitIndex32 @ word32.mjs",
+      "samples": 9,
+      "percent": 0.11658031088082901
+    },
+    {
+      "frame": "compactTailProfile8 @ rba-connect4-shared-exact-cache.mjs",
+      "samples": 8,
+      "percent": 0.10362694300518134
+    },
+    {
+      "frame": "advanceConnect4LiveLineState3x32 @ connect4-live-line-evaluator.mjs",
+      "samples": 8,
+      "percent": 0.10362694300518134
+    },
+    {
+      "frame": "lstat @ ",
+      "samples": 7,
+      "percent": 0.09067357512953368
+    },
+    {
+      "frame": "storeBound @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 7,
+      "percent": 0.09067357512953368
+    },
+    {
+      "frame": "compactLayoutSupportProfile8 @ rba-connect4-shared-exact-cache-layout.mjs",
+      "samples": 7,
+      "percent": 0.09067357512953368
+    },
+    {
+      "frame": "evaluateConnect4LiveLine3x32 @ connect4-live-line-evaluator.mjs",
+      "samples": 6,
+      "percent": 0.07772020725388601
+    },
+    {
+      "frame": "(idle) @ ",
+      "samples": 5,
+      "percent": 0.06476683937823834
+    },
+    {
+      "frame": "open @ ",
+      "samples": 5,
+      "percent": 0.06476683937823834
+    },
+    {
+      "frame": "internalModuleStat @ ",
+      "samples": 4,
+      "percent": 0.05181347150259067
+    },
+    {
+      "frame": " @ event_target",
+      "samples": 3,
+      "percent": 0.038860103626943004
+    },
+    {
+      "frame": "relativeToAbsolute @ rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "samples": 3,
+      "percent": 0.038860103626943004
+    }
+  ]
+}
