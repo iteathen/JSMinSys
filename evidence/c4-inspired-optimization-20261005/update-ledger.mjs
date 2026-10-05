@@ -362,6 +362,25 @@ if(experiment==='C17'){
  const prep=ledger.units.find(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32');
  append(prep,call('prepareSupportBasisPlansWorker32','AUX'),'AUX*CALL(prepareSupportBasisPlansWorker32)+AUX*C(runtime.promise.await)',{AUX:'1 for explicit offload target only; synchronous support-plan subledger count is0 on this path.'},'C36 optional cold compiler is fully joined before creating four search workers. Search-ready/empty-root/timeout/TT semantics unchanged; extra source validations and property stores included in existing symbolic FIELD/STORE/TEST/BRANCH path counts.');
  prep.operations.push({op:'runtime.promise.await',count:'AUX'});
+}else if(experiment==='C39'){
+ for(const u of ledger.units.filter(u=>sources.includes(u.source)&&u.name.includes('3Cofactor'))){
+  const loads=u.operations.find(o=>o.op==='memory.load.u32');
+  if(!loads.count.includes('+P+2*U'))throw Error('C39 prior target-load ledger changed');
+  loads.count=loads.count.replace('+P+2*U','+3*U');
+  u.operations=u.operations.filter(o=>!(o.op==='runtime.call.subledger'&&o.target==='applySupportClosure3x32'));
+  u.operations.find(o=>o.op==='alu.or.u32').count+=' +3*OWNER_U';
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+  u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  Object.assign(u.cycleCount.parameters,{
+   Z:'Exactly3 on this cold-selected family. Six owner stores once on each return: terminal clear or final nonterminal commit; no initial nonterminal clear.',
+   P:'Local owner absorption bit tests actually evaluated; zero target-memory loads. Each reaches one or two target-word selection predicates, counted in TEST/BRANCH.',
+   OWNER_U:'Sum of write0+write1 across U completed local closures; three local ORs per surviving owner.',
+   ADD:'Executed source additions excluding separately counted closure-base/row CLOSE_ADDR; includes inline closure offsets and final owner commit addresses.',
+   TEST:'Executed source predicates including local word selections, short-circuit absorption, loop exits and the two closure owner branches per U.',
+   BRANCH:'Actual source control selections including local word ternaries and terminal-only clear loops; lowering/spills are not assumed.'
+  });
+  u.cycleCount.note+=' C39 exact three-word local accumulation merges absorption and expansion. Removes interim target-memory loads/stores and closure call; closure masks still load3*U. Six final owner stores replace the initial six clears on nonterminal paths; terminal clear contract unchanged. Addresses/control are actual path symbols. Added live locals and register spills/guards/bytecode remain JIT/full-solve measured debt, not assumed Intel savings. Span units unchanged.';
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

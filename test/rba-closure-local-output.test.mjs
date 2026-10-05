@@ -12,10 +12,12 @@ test('three-word closures commit each owner lane once without reading interim ou
  const g=prepareConnect4RbaGeometry({columns:7,rows:6}),p=prepareConnect4RbaExecutionProfile(g);
  assert.equal(g.coordWords,3);
  g.supportBasisPlans=prepareSupportBasisPlans32(g,1024*2**20,true,true);
- let nonterminal=0,wins=0;
- for(const moves of [[],[0,1,0,1,0,2]]){
+ let nonterminal=0,wins=0,draws=0;
+ // Physical regression fixture only; never linked into solver runtime.
+ const gray40=[5,6,6,2,5,3,3,3,5,3,6,5,5,5,6,3,2,2,2,1,3,6,2,6,2,1,0,0,4,4,1,4,4,0,1,1,0,1,4,0];
+ for(const moves of [[],[0,1,0,1,0,2],[...gray40,0]]){
   const q=connect4RbaFromMoves(moves,{geometry:g,canonical:false});
-  for(const column of [0,3,6]){
+  for(const column of [0,3,4,6].filter(c=>q.words[c]<g.rows)){
    function apply(fn,instrument){
     const dst=5,ci=3,target=new Uint32Array(g.keyWords+10).fill(0xa5a5a5a5),
      childBasis=new Uint32Array(g.maxBasis+6).fill(0xffffffff),s=prepareConnect4RbaCoordinateScratch(g),sizes=new Uint32Array(2),
@@ -38,8 +40,8 @@ test('three-word closures commit each owner lane once without reading interim ou
     assert.equal(actual.reads,0,'absorption must use local owner accumulators');
     assert.deepEqual(Array.from(actual.counts),[1,1,1,1,1,1],'single final commit or terminal clear');
    }
-   if(expected.term===3)wins++;else nonterminal++;
+   if(expected.term===3)wins++;else if(expected.term===2)draws++;else nonterminal++;
   }
  }
- assert.ok(nonterminal>0&&wins>0);
+ assert.ok(nonterminal>0&&wins>0&&draws>0);
 });
