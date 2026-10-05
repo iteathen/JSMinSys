@@ -7,7 +7,6 @@ import {createConnect4RbaSharedExactCache32,isCompactProfile8} from './rba-conne
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './rba-connect4-shared-exact-cache-layout.mjs';
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
-import {prepareSupportBasisPlansWorker32} from './rba-connect4-support-plan-host.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -16,7 +15,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,supportPlanWorkerTarget=null}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
@@ -40,15 +39,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0||!Number.isFinite(initializationTimeoutMs)||initializationTimeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
-  let supportPreparation=null;
-  if(supportPlanWorkerTarget!==null&&!supportBasisPlanBudgetBytes)throw new TypeError('support-worker requires a plan budget');
-  if(supportBasisPlanBudgetBytes&&!signal?.aborted){
-    if(supportPlanWorkerTarget===null)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
-    else{
-      const compiled=await prepareSupportBasisPlansWorker32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan,{target:supportPlanWorkerTarget,timeoutMs:initializationTimeoutMs,signal});
-      geometry={...geometry,supportBasisPlans:compiled.plan};supportPreparation=compiled.execution;
-    }
-  }
+  if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
@@ -87,7 +78,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
       sharedProofBounds,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
-      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,supportPreparation,
+      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),

@@ -654,27 +654,6 @@
         "name": "NUMBER_FLOOR_COST(profile,lowering)"
       },
       "note": "Cold nonnegative support digit division rounding; no per-node use."
-    },
-    "runtime.math.max": {
-      "cost": {
-        "kind": "symbolic",
-        "name": "NUMBER_MAX_COST"
-      },
-      "note": "Cold topology efficiency maximum over discovered cores. C36 included in initialization/whole-operation measurement, no hot use or assumed Intel latency."
-    },
-    "runtime.array.map": {
-      "cost": {
-        "kind": "symbolic",
-        "name": "ARRAY_MAP_COST"
-      },
-      "note": "Cold topology efficiency extraction; count includes callback/array traversal profile, actual field operations remain visible. C36 included in initialization/whole-operation measurement, no hot use or assumed Intel latency."
-    },
-    "runtime.worker.postMessage": {
-      "cost": {
-        "kind": "symbolic",
-        "name": "WORKER_MESSAGE_COST"
-      },
-      "note": "Cold structured-clone handoff; SAB storage shared, view/geometry metadata and any nonshared input arrays incur actual clone work. C36 included in initialization/whole-operation measurement, no hot use or assumed Intel latency."
     }
   },
   "units": [
@@ -14676,21 +14655,12 @@
         {
           "op": "runtime.layout.auto.select",
           "count": 1
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "prepareSupportBasisPlansWorker32",
-          "count": "AUX"
-        },
-        {
-          "op": "runtime.promise.await",
-          "count": "AUX"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+AUX*CALL(prepareSupportBasisPlansWorker32)+AUX*C(runtime.promise.await)",
+        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+C(alu.and.u32)+(1+W)*C(alu.add.u32)+CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+C(memory.store.u32)+CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)",
         "unboundedTerms": [
           "C(runtime.promise.await)",
           "CALL(ManagedThreadSession.spawn)"
@@ -14713,10 +14683,9 @@
           "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
           "LAYOUT_FIELDS": "Reached descriptor kind/heightStride/entryWords reads;3 split/native selection guard operands and selected stride fields",
           "LAYOUT_TEST": "Reached sharedCacheLayout guard operands,kind/stride ternary tests,constructor choice and fill-path test; excludes automatic selection charged separately",
-          "LAYOUT_BRANCH": "Executed branches corresponding to those cold selection predicates",
-          "AUX": "1 for explicit offload target only; synchronous support-plan subledger count is0 on this path."
+          "LAYOUT_BRANCH": "Executed branches corresponding to those cold selection predicates"
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C36 optional cold compiler is fully joined before creating four search workers. Search-ready/empty-root/timeout/TT semantics unchanged; extra source validations and property stores included in existing symbolic FIELD/STORE/TEST/BRANCH path counts."
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage."
       },
       "status": "decomposed"
     },
@@ -20523,366 +20492,15 @@
         },
         "note": "HOT complete-plan precondition; consumes exact child handle in existing scratch written by cofactor. Removes reflected basis emission, inverse and map reconstruction entirely. Same support-first/owner-tie comparison, coordinate permutation and physical action transporter. Calls same profile-specific permutation with native map and nonzero row offset. No allocation/metadata reporting/hot geometry or mode dispatch. Native-view polymorphism and actual inlining remain full-run/JIT debt."
       }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-host.mjs#filterSupportWorkerExecArgv32",
-      "source": "addons/rba-connect4-support-plan-host.mjs",
-      "name": "filterSupportWorkerExecArgv32",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "target": "filterFileWorkerExecArgv32",
-          "count": 1
-        },
-        {
-          "op": "runtime.url.construct",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "FIELD"
-        },
-        {
-          "op": "runtime.array.slice",
-          "count": "REM"
-        },
-        {
-          "op": "runtime.array.push",
-          "count": "TAIL"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "TEST"
-        },
-        {
-          "op": "control.branch",
-          "count": "BRANCH"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "ADD"
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(1)*CALL(filterFileWorkerExecArgv32)+(1)*C(runtime.url.construct)+(FIELD)*C(runtime.field.load)+(REM)*C(runtime.array.slice)+(TAIL)*C(runtime.array.push)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(ADD)*C(alu.add.u32)",
-        "parameters": {
-          "REM": "1 only if exact search-affinity preload removed.",
-          "TAIL": "Arguments copied after removal.",
-          "FIELD": "Executed source length/index/URL fields.",
-          "TEST": "Executed match/loop/selection predicates.",
-          "BRANCH": "Executed source control selections.",
-          "ADD": "Executed argument scan increments."
-        },
-        "note": "COLD preserves undefined native Worker inheritance when no flag changes needed; otherwise existing file-worker filter plus exact auxiliary-affinity removal. Search worker flags/preload unchanged."
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-host.mjs#prepareSupportBasisPlansWorker32",
-      "source": "addons/rba-connect4-support-plan-host.mjs",
-      "name": "prepareSupportBasisPlansWorker32",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "target": "filterSupportWorkerExecArgv32",
-          "count": 1
-        },
-        {
-          "op": "runtime.worker.construct",
-          "count": 1
-        },
-        {
-          "op": "runtime.timer.read",
-          "count": 2
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": 3
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 12
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "FIELD"
-        },
-        {
-          "op": "runtime.number.finite.check",
-          "count": 1
-        },
-        {
-          "op": "control.test.u32",
-          "count": "TEST"
-        },
-        {
-          "op": "control.branch",
-          "count": "BRANCH"
-        },
-        {
-          "op": "runtime.function.allocate",
-          "count": 6
-        },
-        {
-          "op": "runtime.promise.construct",
-          "count": 1
-        },
-        {
-          "op": "runtime.promise.await",
-          "count": "1+TERM"
-        },
-        {
-          "op": "runtime.event.listener",
-          "count": "3+2*SIG"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "supportPreparationDeadline",
-          "count": 1
-        },
-        {
-          "op": "runtime.timer.clear",
-          "count": 1
-        },
-        {
-          "op": "runtime.worker.terminate",
-          "count": "TERM"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": 1
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(1)*CALL(filterSupportWorkerExecArgv32)+(1)*C(runtime.worker.construct)+(2)*C(runtime.timer.read)+(3)*C(runtime.object.allocate)+(12)*C(runtime.field.store)+(FIELD)*C(runtime.field.load)+(1)*C(runtime.number.finite.check)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(6)*C(runtime.function.allocate)+(1)*C(runtime.promise.construct)+(1+TERM)*C(runtime.promise.await)+(3+2*SIG)*C(runtime.event.listener)+(1)*CALL(supportPreparationDeadline)+(1)*C(runtime.timer.clear)+(TERM)*C(runtime.worker.terminate)+(1)*C(alu.sub.u32)",
-        "parameters": {
-          "TERM": "1 if outstanding worker needs final termination;0 after joined exit.",
-          "SIG": "1 if signal supplied.",
-          "FIELD": "Actual executed validation/options/event/result fields.",
-          "TEST": "Actual validation/exit/error/cleanup predicates.",
-          "BRANCH": "Actual source selections."
-        },
-        "note": "COLD one-shot auxiliary compiler; data closure contains geometry/budget/bools/target only. Completion resolves only after exit; failures/cancellation propagate, never silent fallback. Include worker startup/IPC/compilation/join in whole-operation cycles; no hot work changes. Closure captures/profile runtime costs remain symbolic."
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-host.mjs#abortSupportPreparation",
-      "source": "addons/rba-connect4-support-plan-host.mjs",
-      "name": "abortSupportPreparation",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": "ERR"
-        },
-        {
-          "op": "runtime.worker.terminate",
-          "count": 1
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(1)*C(control.test.u32)+(1)*C(control.branch)+(ERR)*C(runtime.object.allocate)+(1)*C(runtime.worker.terminate)",
-        "parameters": {
-          "ERR": "1 if first failure requires an Error,else0."
-        },
-        "note": "COLD signal callback only; no search cancellation/polling change."
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-host.mjs#supportPreparationDeadline",
-      "source": "addons/rba-connect4-support-plan-host.mjs",
-      "name": "supportPreparationDeadline",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.timer.read",
-          "count": 1
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 2
-        },
-        {
-          "op": "control.branch",
-          "count": 2
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": "ERR"
-        },
-        {
-          "op": "runtime.worker.terminate",
-          "count": "EXPIRED"
-        },
-        {
-          "op": "runtime.math.min",
-          "count": "1-EXPIRED"
-        },
-        {
-          "op": "runtime.timer.set",
-          "count": "1-EXPIRED"
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(1)*C(runtime.timer.read)+(2)*C(alu.sub.u32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(ERR)*C(runtime.object.allocate)+(EXPIRED)*C(runtime.worker.terminate)+(1-EXPIRED)*C(runtime.math.min)+(1-EXPIRED)*C(runtime.timer.set)",
-        "parameters": {
-          "ERR": "1 if expiry is first failure.",
-          "EXPIRED": "1 only at monotonic deadline,else0."
-        },
-        "note": "COLD segmented long deadline avoids Node signed32 timer clamp; abort/expiry terminates auxiliary before handoff."
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-worker.mjs#compilePreparedSupportPlanWorker32",
-      "source": "addons/rba-connect4-support-plan-worker.mjs",
-      "name": "compilePreparedSupportPlanWorker32",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "target": "queryWindowsTopology",
-          "count": "PIN"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "targetForProcessor",
-          "count": "PIN"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "bindCurrentThread",
-          "count": "PIN"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "target": "prepareSupportBasisPlans32",
-          "count": 1
-        },
-        {
-          "op": "runtime.timer.read",
-          "count": 2
-        },
-        {
-          "op": "runtime.math.min",
-          "count": "PIN"
-        },
-        {
-          "op": "runtime.math.max",
-          "count": "PIN"
-        },
-        {
-          "op": "runtime.array.map",
-          "count": "2*PIN"
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": 2
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 8
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "FIELD"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "TEST"
-        },
-        {
-          "op": "control.branch",
-          "count": "BRANCH"
-        },
-        {
-          "op": "runtime.promise.await",
-          "count": "2*PIN"
-        },
-        {
-          "op": "alu.sub.u32",
-          "count": 1
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(PIN)*CALL(queryWindowsTopology)+(PIN)*CALL(targetForProcessor)+(PIN)*CALL(bindCurrentThread)+(1)*CALL(prepareSupportBasisPlans32)+(2)*C(runtime.timer.read)+(PIN)*C(runtime.math.min)+(PIN)*C(runtime.math.max)+(2*PIN)*C(runtime.array.map)+(2)*C(runtime.object.allocate)+(8)*C(runtime.field.store)+(FIELD)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(2*PIN)*C(runtime.promise.await)+(1)*C(alu.sub.u32)",
-        "parameters": {
-          "PIN": "1 only for explicit target.",
-          "FIELD": "Executed topology efficiency/target/result accesses.",
-          "TEST": "Actual E-core guard/select predicates.",
-          "BRANCH": "Actual source selections."
-        },
-        "note": "COLD verified OS minimum efficiency class plus exact affinity; no guessed core mapping, solver, token owners, TT state or solved labels. Geometry compiler unchanged. Portable unaffinitized helper exists for correctness only, not a fallback for pinned benchmark."
-      }
-    },
-    {
-      "unit": "addons/rba-connect4-support-plan-worker.mjs#<module-main>",
-      "source": "addons/rba-connect4-support-plan-worker.mjs",
-      "name": "<module-main>",
-      "scope": "cold-auxiliary-support-preparation",
-      "status": "decomposed",
-      "operations": [
-        {
-          "op": "runtime.call.subledger",
-          "target": "compilePreparedSupportPlanWorker32",
-          "count": "WORKER"
-        },
-        {
-          "op": "runtime.promise.await",
-          "count": "WORKER"
-        },
-        {
-          "op": "runtime.worker.postMessage",
-          "count": "WORKER"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        }
-      ],
-      "cycleCount": {
-        "kind": "symbolic",
-        "expression": "(WORKER)*CALL(compilePreparedSupportPlanWorker32)+(WORKER)*C(runtime.promise.await)+(WORKER)*C(runtime.worker.postMessage)+(1)*C(control.test.u32)+(1)*C(control.branch)",
-        "parameters": {
-          "WORKER": "1 only in auxiliary Worker with parentPort,0 for ordinary module inspection."
-        },
-        "note": "COLD sends completed immutable SAB plan once then exits; no runtime loop, reporting counter or search activity."
-      }
     }
   ],
   "summary": {
-    "units": 291,
+    "units": 285,
     "decomposed": 244,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 96
+    "localExtensionOperations": 93
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -20989,7 +20607,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "2e6b09787864b4cc22748174cb71295e243467ee",
-    "addons/rba-connect4-lazy-smp-host.mjs": "db7f70aa2213b18b8bdb80190b6ab15973c9b136",
+    "addons/rba-connect4-lazy-smp-host.mjs": "d44ee429724f890f8c0a5cbe143c8e446945abf5",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -21013,7 +20631,7 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "385e253b2f117ac3926dac2b02c901a1f4380f7e",
+    "addons/rba-connect4-prepared-session-host.mjs": "1d77017962e0fbdcff34eb5f691c6d7e0a165c4c",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "5cd57bee72ba2d71e22f332488a2a933a4373f6e",
@@ -21023,9 +20641,7 @@
     "addons/rba-connect4-coordinate-support-dense.mjs": "7358488a080f03c612954dbe5e9b9622925efce3",
     "addons/rba-connect4-coordinate-closure-dense.mjs": "9992f6aae9161fa437a8ce9342e5f5c7606f8033",
     "addons/rba-connect4-coordinate-closure-prepared.mjs": "7079b896963f8a8508a3507d2828e41fc9d18c07",
-    "addons/rba-connect4-coordinate-support-reflection.mjs": "f89e79453dd108cd0ad19583888293bf8b70defd",
-    "addons/rba-connect4-support-plan-host.mjs": "9f6ceb8e8a60c0d805cc208188fb2e3f22e4243b",
-    "addons/rba-connect4-support-plan-worker.mjs": "8c2c503b25a8b0a178b9684f1c95544bfb0cdda0"
+    "addons/rba-connect4-coordinate-support-reflection.mjs": "f89e79453dd108cd0ad19583888293bf8b70defd"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
