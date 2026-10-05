@@ -44,8 +44,23 @@ if(experiment==='C17'){
  }
 }else if(experiment==='C19'){
  for(const u of ledger.units.filter(u=>sources.includes(u.source)&&u.name.includes('Cofactor')&&u.name.includes('KnownHeight'))){
-  append(u,{op:'alu.clz.u32',count:'ACTIVE'},'ACTIVE*C(alu.clz.u32)+ACTIVE*C(alu.sub.u32)+ACTIVE*C(alu.xor.u32)+ACTIVE*C(alu.and.u32)',{ACTIVE:'Visited set bits of union of owner coordinates, bounded by n; no inactive-slot projection loads. Union-word scan bounded by ceil(n/32).'},'C19 union-bit traversal preserves ascending parent slot order and closure absorption; existing symbolic loop parameters reflect active visits plus word scan, not a claimed Intel saving.');
-  u.operations.push({op:'alu.sub.u32',count:'ACTIVE'},{op:'alu.xor.u32',count:'ACTIVE'},{op:'alu.and.u32',count:'ACTIVE'});
+  // N now counts only active visits. Owner words are loaded once per W;
+  // source-mask extraction adds unary negation, xor and clz to each N.
+  const replacements=new Map([
+   ['memory.load.u32',c=>c.replace('2*N','2*W')],
+   ['alu.and.u32',c=>c+'+K'],
+   ['alu.shr.u32',c=>c.replace('+N','')+'+2*K'],
+   ['alu.or.u32',c=>c.replace('N+','W+')],
+   ['alu.xor.u32',c=>c+'+N'],['alu.clz.u32',c=>c+'+N']
+  ]);
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';
+  for(const op of u.operations)if(replacements.has(op.op)){
+   const before=String(op.count),after=replacements.get(op.op)(before);
+   u.cycleCount[key]=u.cycleCount[key].replace(`(${before})*C(${op.op})`,`(${after})*C(${op.op})`);
+   op.count=after;
+  }
+  Object.assign(u.cycleCount.parameters,{N:'Active parent basis bits visited in increasing index order, bounded by n; zero on terminal paths.',W:'ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.'});
+  u.cycleCount.note+=' C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings.';
  }
 }else throw Error('unknown experiment');
 for(const source of sources){

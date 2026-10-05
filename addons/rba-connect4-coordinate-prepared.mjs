@@ -37,11 +37,16 @@ export function connect4RbaPreparedCofactorKnownHeight(g,profile,source,src,basi
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
-  for(let i=0;i<n;i+=1){
-    const sourceWord=i>>>5,sourceMask=1<<(i&31),
-      active0=source[p0Source+sourceWord]&sourceMask,
-      active1=source[p1Source+sourceWord]&sourceMask;
-    if(!(active0|active1))continue;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
     const id=basis[bi+i],raw=removed[i],
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -80,6 +85,7 @@ export function connect4RbaPreparedCofactorKnownHeight(g,profile,source,src,basi
         bits^=bit;
       }
     }
+  }
   }
   return 0;
 }
@@ -138,11 +144,16 @@ export function connect4RbaPreparedCofactorNonWinningKnownHeight(g,profile,sourc
     p0Source=src+g.p0Offset,p1Source=src+g.p1Offset,
     p0Target=dst+g.p0Offset,p1Target=dst+g.p1Offset,
     offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;
-  for(let i=0;i<n;i+=1){
-    const sourceWord=i>>>5,sourceMask=1<<(i&31),
-      active0=source[p0Source+sourceWord]&sourceMask,
-      active1=source[p1Source+sourceWord]&sourceMask;
-    if(!(active0|active1))continue;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
     const id=basis[bi+i],raw=removed[i],
       image=raw===0xffffffff?-1:raw;
     if(image<0)continue;
@@ -181,6 +192,7 @@ export function connect4RbaPreparedCofactorNonWinningKnownHeight(g,profile,sourc
         bits^=bit;
       }
     }
+  }
   }
   return 0;
 }

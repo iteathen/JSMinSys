@@ -168,8 +168,8 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   }
 
   // A positive certificate proves the previous mover wins. Zero is unresolved.
-  if(forced<0&&(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
-     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1))){
+  if(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
+     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
     if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
