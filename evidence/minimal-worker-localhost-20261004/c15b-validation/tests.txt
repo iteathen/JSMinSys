@@ -1,0 +1,37 @@
+✔ batched proof transport preserves exact keys, frame snapshots and full-queue nonblocking behavior (14.7762ms)
+✔ queue cursors wrap without exposing uncommitted data or overwriting unread batches (0.2811ms)
+✔ sole publisher skips only identical full-key and exact-value records (7.3948ms)
+✔ four-search-worker prepared solve initializes and cleans up an idle or active helper (146.3247ms)
+✔ concurrent producers and a sole publisher never expose a mixed exact row (73.8039ms)
+✔ publisher participates in timeout cleanup and invalid modes cannot silently run (22.1895ms)
+✔ shared exact cache publishes only fully committed exact rows (1.0215ms)
+✔ shared exact known-hash path retains full-key validation (0.1404ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (9.2414ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.93ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (48.7304ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (10.1393ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (46.885ms)
+✔ sharing-density masks preserve exact Lazy SMP results (272.5702ms)
+✔ Lazy SMP move ordering is center-line distance only (23.3435ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (47.2675ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.1747ms)
+✔ Lazy SMP rejects unknown worker mode (0.4775ms)
+✔ minimal worker never publishes local bounds to shared exact cache (30.2947ms)
+✔ minimal worker omits hot diagnostic counters (27.254ms)
+✔ minimal timeout is host-terminated without recursive polling (9.9197ms)
+✔ minimal abort is host-terminated without recursive polling (13.1323ms)
+✔ minimal four-worker search returns after an immediate winning center move (32.7623ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (231.0054ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (83.8899ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (0.7711ms)
+✔ performance targets distinguish SMT siblings, efficiency classes and processor groups (2.0006ms)
+✔ malformed topology never silently supplies a placement (0.1751ms)
+✔ maintenance target requires the efficiency class without weakening search-worker validation (0.7368ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 918.2697

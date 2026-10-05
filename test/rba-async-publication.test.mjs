@@ -46,6 +46,23 @@ test('queue cursors wrap without exposing uncommitted data or overwriting unread
   assert.throws(()=>createAsyncExactPublication32(cache,1,{capacity:4,batch:3}));
 });
 
+test('sole publisher skips only identical full-key and exact-value records',()=>{
+  for(const [columns,rows] of [[7,6],[7,5]]){
+    const geometry=prepareConnect4RbaGeometry({columns,rows}),cache=createConnect4RbaSharedExactCache32({capacity:4,keyWords:geometry.keyWords,geometry}),
+      q=createAsyncExactPublication32(cache,1,{capacity:4,batch:1}).queues[0],p=prepareAsyncExactProducer32(q),c=prepareAsyncExactConsumer32(q,cache),
+      key=fillAsyncTestKey(new Uint32Array(geometry.keyWords),12,1,cache.compact8);
+    const send=value=>{p.enqueue(p,key,0,value,1);drainAsyncExactBatch32(c);};
+    send(3);const first=cache.sequence[1];assert.ok(first>0);
+    send(3);assert.equal(cache.sequence[1],first,'identical proof needs no seqlock/write');
+    send(2);assert.equal(cache.sequence[1],first+2,'different value cannot be skipped');assert.equal(probe(cache,key,0,1),2);
+    for(let index=0;index<key.length;index++){
+      key[index]^=1;const before=cache.sequence[1];send(2);
+      assert.equal(cache.sequence[1],before+2,'every changed stored field must be published');assert.equal(probe(cache,key,0,1),2);
+      send(2);assert.equal(cache.sequence[1],before+2);
+    }
+  }
+});
+
 test('four-search-worker prepared solve initializes and cleans up an idle or active helper',async()=>{
   const geometry=prepareConnect4RbaGeometry({columns:4,rows:3}),options={geometry,workers:4,workerMode:'minimal',sharedCacheCapacity:4096,localCacheCapacity:4096,timeoutMs:10000,preparedEmptyTiming:true};
   const control=await runLazySmpConnect4Rba32([],options);
