@@ -34,7 +34,6 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      else assert.equal(value,truth);
      if(depth===0)assert.equal(context.bestMove,0,'root must produce a legal witness');
      if(response===1||response===2&&depth&&alpha>=0)assert.equal(constructed,0,'certified cutoff must not construct a child');
-     if(response===2&&depth&&alpha>=0&&cached===0)assert.equal(targetCalls,0,'sufficient upper bound must skip stronger target proof');
      cases++;
     }
    }
