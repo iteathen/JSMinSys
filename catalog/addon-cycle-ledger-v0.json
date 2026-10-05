@@ -11632,8 +11632,8 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "A",
-          "target": "connect4RbaCofactorKnownHeight"
+          "count": "A*KD",
+          "target": "connect4RbaDenseCofactorKnownHeight"
         },
         {
           "op": "runtime.call.subledger",
@@ -11653,7 +11653,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "R",
-          "target": "connect4RbaCanonicalize"
+          "target": "connect4RbaPreparedCanonicalize"
         },
         {
           "op": "runtime.call.subledger",
@@ -11674,12 +11674,17 @@
           "op": "runtime.call.subledger",
           "count": "Q",
           "target": "connect4RbaForcedResponseColumn"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A*(1-KD)",
+          "target": "connect4RbaPreparedCofactorKnownHeight"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11702,9 +11707,10 @@
           "W": "Immediate-win scans reached after cache/stop exits, before any child construction.",
           "I": "1 for a non-root immediate-win proof published to the existing exact TT path; 0 otherwise.",
           "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
-          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise."
+          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
+          "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data."
       },
       "status": "decomposed"
     },
@@ -11814,12 +11820,12 @@
           "N*CALL(negamax)"
         ],
         "parameters": {
-          "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers.",
+          "F": "Worker-data, geometry, root, TT and result-field reads outside helper subledgers. Includes cold removal-table availability read.",
           "S": "Root key/basis publication, center-order construction and initial basis-size stores.",
           "MUL": "Worker/result, arena and local-TT allocation multiplications; no metric-base multiplication in minimal mode.",
           "ADD": "Arena sizing, center-shell ordering indices and result indices.",
-          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed.",
-          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate.",
+          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections. Includes one cold kernel selection.",
           "T": "1 for a terminal root, otherwise 0.",
           "N": "1 for a nonterminal root, otherwise 0.",
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
@@ -12285,7 +12291,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "bbf33c91b68860b10cae7026891068c8485f6c4b",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "e994fcef0fafc4a100ea0a6b258cf5bf96126a5a",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de"
   },
   "isomaxLocalKernel": {

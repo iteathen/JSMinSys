@@ -1,0 +1,33 @@
+✔ shared exact cache publishes only fully committed exact rows (1.34ms)
+✔ shared exact known-hash path retains full-key validation (0.1443ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (8.7916ms)
+✔ non-7x6 shared exact cache retains full-key identity (0.8606ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (37.5027ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (8.3631ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (35.5082ms)
+✔ sharing-density masks preserve exact Lazy SMP results (266.3734ms)
+✔ Lazy SMP move ordering is center-line distance only (19.2584ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (36.3519ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (2.3574ms)
+✔ Lazy SMP rejects unknown worker mode (1.2997ms)
+✔ minimal worker never publishes local bounds to shared exact cache (26.1002ms)
+✔ minimal worker omits hot diagnostic counters (22.1177ms)
+✔ minimal timeout is host-terminated without recursive polling (12.749ms)
+✔ minimal abort is host-terminated without recursive polling (13.3946ms)
+✔ minimal four-worker search returns after an immediate winning center move (26.7414ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (193.8513ms)
+✔ optional and generated prepared/dense cofactors match independent physical residuals (227.2466ms)
+✔ dense kernel uses the cold removal table directly and preserves last-cell terminal precedence (11.1738ms)
+✔ prepared module canonicalization exports retain selectedSet and offset behavior (18.9006ms)
+✔ prepared-only canonicalization matches the optional API without selected-set work (12.2574ms)
+✔ prepared grouped supersets are exact across configured geometry and global word 255 (229.9448ms)
+✔ public cofactors preserve optional scratch, seen offsets, physical residuals and terminal ordering (57.7581ms)
+✔ last-cell singleton wins still precede full-board draws (1.3837ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 792.7281

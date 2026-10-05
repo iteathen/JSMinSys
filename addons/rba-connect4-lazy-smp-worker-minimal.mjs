@@ -1,8 +1,10 @@
+import {connect4RbaDenseCofactorKnownHeight} from './rba-connect4-coordinate-dense.mjs';
+import {connect4RbaPreparedCofactorKnownHeight,connect4RbaPreparedCanonicalize as connect4RbaCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaCofactorKnownHeight,connect4RbaCanonicalize,connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
+import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -15,6 +17,8 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),
+  connect4RbaCofactorKnownHeight=g.removeByCell!==null
+    ?connect4RbaDenseCofactorKnownHeight:connect4RbaPreparedCofactorKnownHeight,
   control=workerData.control,resultWords=workerData.resultWords,
   words=new Uint32Array((g.cellCount+1)*g.keyWords),
   basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
