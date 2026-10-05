@@ -11,8 +11,7 @@ for(const dense of [false,true]){
   const name='connect4RbaSupport'+kind+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight';
   let s=extract(authority,name);
   function once(a,b){assert.equal(s.split(a).length,2,a);s=s.replace(a,b);}
-  once('loadSupportBasis32(g,target,dst,childBasis,ci,seen)','loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed,childIndex)');
-  once('  for(let j=0;j<cn;j+=1)childIndex[childBasis[ci+j]]=j;','');
+  once('loadSupportBasis32(g,target,dst,childBasis,ci,seen)','loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,removed)');
   once('offsets=profile.supersetWordOffsets,words=profile.supersetWords,masks=profile.supersetMasks;',
    'closures=g.supportBasisPlans.closures,closureBase=removed[0]*g.maxBasis*g.coordWords;');
   const start=s.indexOf('    if(write0)target[p0Target+targetWord]|=targetMask;'),loop=s.indexOf('    for(let at=',start),open=s.indexOf('{',loop),end=closeBrace(s,open);

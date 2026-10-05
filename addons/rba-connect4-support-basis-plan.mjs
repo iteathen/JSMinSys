@@ -83,12 +83,12 @@ export function loadSupportBasis32(g,target,dst,childBasis,ci,seen){
 
 // Closure-only kernel: membership copying has become dead work. Keep the
 // existing scratch ABI, but seen is no longer an output/dependency on this path.
-export function loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,indexOut,childIndex){
+export function loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,indexOut){
   const plan=g.supportBasisPlans;
   let index=0;
   for(let c=0;c<g.columns;c++)index+=target[dst+c]*plan.strides[c];
   const n=plan.sizes[index],base=index*g.maxBasis;
-  for(let i=0;i<n;i++){const id=plan.basis[base+i];childBasis[ci+i]=id;childIndex[id]=i;}
+  for(let i=0;i<n;i++)childBasis[ci+i]=plan.basis[base+i];
   indexOut[0]=index;
   return n;
 }
