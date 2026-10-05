@@ -1,8 +1,8 @@
 {
   "kind": "retained-localhost-candidate-configuration",
-  "updatedAt": "2026-10-05T13:46:43.2893373-07:00",
+  "updatedAt": "2026-10-05T14:38:04.7887782-07:00",
   "branch": "work/cpc-rebuild-20261004",
-  "latestMeasuredSourceCommit": "d990593915f0ee3d69ef50320f5abc22fbc72c51",
+  "latestMeasuredSourceCommit": "2ce5b41ec6e4f17b613cdd01899fa4716f9453db",
   "sourceConfigurationChanges": [
     "C17 zero bounds",
     "C19 union projection",
@@ -11,8 +11,8 @@
     "C24 fused inverse",
     "C26 reflection",
     "C27 native private32 memory retention",
-    "J04 1200/4800 JIT limits",
-    "C40 private512MiB memory retention"
+    "C40 private512MiB memory retention",
+    "J05 2400/9600 JIT limits on ordinary kernel"
   ],
   "runtime": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
   "runtimeSha256": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
@@ -28,8 +28,8 @@
   ],
   "affinityFile": "C:\\r\\c4-external-build-final-20261004\\runtime\\isomax\\isomax\\targets.json",
   "nodeArguments": [
-    "--max-inlined-bytecode-size=1200",
-    "--max-inlined-bytecode-size-cumulative=4800",
+    "--max-inlined-bytecode-size=2400",
+    "--max-inlined-bytecode-size-cumulative=9600",
     "--import",
     "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs",
     "--experimental-ffi",
@@ -63,12 +63,12 @@
   "primaryBoundary": "all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate",
   "secondaryCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
   "authorityRuns": [
-    "c4ideas-c40-01",
-    "c4ideas-c40-02"
+    "c4ideas-j05-ablation-01",
+    "c4ideas-j05-ablation-02"
   ],
-  "primaryMeanMs": 81188.46625,
+  "primaryMeanMs": 79853.00435,
   "goalMs": 10000,
   "goalMet": false,
-  "command": "./evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name NEW-NAME -LocalCapacity 16777216 -SharedProofBounds -SupportPlanBudget 1073741824 -SupportClosures -SupportReflection -PrivateLayout native -NodeFlags @('--max-inlined-bytecode-size=1200','--max-inlined-bytecode-size-cumulative=4800')",
-  "notes": "Measured raw evidence governs; launcher historical defaults are not the retained command. Init/cleanup secondary. C28/C39 discarded. C40 memory saving is qualified; its speed delta is not. No RLC/book/solved inputs."
+  "command": "./evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name NEW-NAME -LocalCapacity 16777216 -SharedProofBounds -SupportPlanBudget 1073741824 -SupportClosures -SupportReflection -PrivateLayout native -NodeFlags @('--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600')",
+  "notes": "Measured raw evidence governs. Init/cleanup secondary. C28/C39/C48 discarded; C48 prototype/history/evidence preserved. C40 memory saving qualified, speed delta unqualified. J05 retained on ordinary kernel after interaction ablation. No RLC/book/solved inputs."
 }

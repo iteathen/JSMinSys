@@ -1,0 +1,16 @@
+✔ prepared empty solve waits for all four workers and preserves the exact result (101.3351ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (1.1706ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (54.8308ms)
+✔ application preparation allocates all four workers but performs no search (47.8871ms)
+✔ closing an idle prepared application joins workers without a solve (40.0925ms)
+✔ ordinary minimal API also waits for every worker before search (48.0747ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.8058ms)
+✔ closing an active prepared search resolves its result and joins every worker (60.0008ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 349.1473

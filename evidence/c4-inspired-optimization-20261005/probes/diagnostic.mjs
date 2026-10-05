@@ -4,7 +4,6 @@ import {runLazySmpConnect4Rba32} from '../../../addons/rba-connect4-lazy-smp-hos
 const result=await runLazySmpConnect4Rba32([],{
  geometry:prepareConnect4RbaGeometry({columns:7,rows:6}),workers:4,workerMode:'minimal',
  sharedCacheCapacity:Number(process.env.JMS_BENCH_SHARED_CAPACITY??134217728),localCacheCapacity:Number(process.env.JMS_BENCH_LOCAL_CAPACITY??33554432),sharedProofBounds:true,
- resourceBounds:process.env.JMS_BENCH_RESOURCE_BOUNDS==='1',
  localCacheLayout:process.env.JMS_BENCH_LOCAL_TT_LAYOUT??'split',
  supportBasisPlanBudgetBytes:Number(process.env.JMS_BENCH_SUPPORT_PLAN_BUDGET??0),
  supportClosurePlan:process.env.JMS_BENCH_SUPPORT_CLOSURES==='1',supportReflectionPlan:process.env.JMS_BENCH_SUPPORT_REFLECTION==='1',sharedSampleMask:0,

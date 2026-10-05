@@ -10,8 +10,6 @@ import {connect4RbaClosureDenseSpanCofactorKnownHeight as dense,connect4RbaClosu
 import {connect4RbaClosureDense3CofactorKnownHeight as dense3,connect4RbaClosureDense3CofactorNonWinningKnownHeight as dense3NonWinning} from '../addons/rba-connect4-coordinate-closure-dense.mjs';
 import {connect4RbaClosurePrepared3CofactorKnownHeight as sparse3,connect4RbaClosurePrepared3CofactorNonWinningKnownHeight as sparse3NonWinning} from '../addons/rba-connect4-coordinate-closure-prepared.mjs';
 import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
-import * as resourceDense from '../addons/rba-connect4-coordinate-closure-resource-dense.mjs';
-import * as resourcePrepared from '../addons/rba-connect4-coordinate-closure-resource-prepared.mjs';
 
 test('closure-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering',()=>{
  let checks=0,draws=0,wins=0;
@@ -35,16 +33,6 @@ test('closure-planned cofactors preserve original projection, reflection frames,
     const expected=apply(normal);
     for(const fn of g.removeByCell===null?[sparse]:[sparse,dense,...(g.coordWords===3?[sparse3,dense3]:[])]){assert.deepEqual(apply(fn),expected);checks++;}
     if(![1,3].includes(expected.term))for(const fn of g.removeByCell===null?[sparseNonWinning]:[sparseNonWinning,denseNonWinning,...(g.coordWords===3?[sparse3NonWinning,dense3NonWinning]:[])]){assert.deepEqual(apply(fn),expected);checks++;}
-    for(const [kind,module] of [['Dense',resourceDense],['Prepared',resourcePrepared]]){
-     if(kind==='Dense'&&g.removeByCell===null)continue;
-     for(const wordKind of g.coordWords===3?['3','Span']:['Span'])for(const nonWinning of [false,true]){
-      if(nonWinning&&[1,3].includes(expected.term))continue;
-      const fn=module['connect4RbaClosure'+kind+wordKind+'ResourceCofactor'+(nonWinning?'NonWinning':'')+'KnownHeight'],result=apply(fn),flags=result.term&12;
-      result.term&=3;assert.deepEqual(result,expected);
-      const expectedFlags=expected.term?0:(expected.words.slice(g.p0Offset,g.p1Offset).every(v=>v===0)?4:0)|(expected.words.slice(g.p1Offset).every(v=>v===0)?8:0);
-      assert.equal(flags,expectedFlags);checks++;
-     }
-    }
     if(expected.term===2)draws++;if([1,3].includes(expected.term))wins++;
    }
   }
