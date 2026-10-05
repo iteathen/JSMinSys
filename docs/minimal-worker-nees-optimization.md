@@ -23,7 +23,7 @@ The minimal worker must compute the exact finite-game W/D/L value and publish an
 - worker cancellation/lifecycle behavior;
 - the existing host result wire values and Lazy-SMP 2+ worker execution contract.
 
-CPC, NDC, live-line evaluation, heuristic move scoring, restriction masks and interval semantics are intentionally outside this worker.
+At this document's original baseline, CPC, NDC, live-line evaluation, heuristic move scoring, restriction masks and interval semantics were outside this worker. Current owner-authorized localhost experiments and retained decisions are in `evidence/minimal-worker-localhost-20261004/OPTIMIZATION_CAMPAIGN.md`. That live campaign also owns the recovered actual memory/runtime configuration; the old target profile must not substitute for it. C07 retains mixed center/live policies; C10 separately tests a guarded win-only CPC certificate with no legacy NDC import.
 
 ## Execution classes
 

@@ -11647,7 +11647,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "X+I+D",
+          "count": "X+I+D+CW",
           "target": "storeExact"
         },
         {
@@ -11708,23 +11708,28 @@
         {
           "op": "alu.imul.u32",
           "count": "R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcWin32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
         "parameters": {
           "F": "Geometry and worker-local state field reads outside subledgers.",
-          "L": "Center-order, support-height and child-size reads. Includes move-row and optional reflection-table reads.",
-          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006. Includes carried live/order child offsets and physical landing address.",
+          "L": "Center-order, support-height and child-size reads. Includes move-row and optional reflection-table reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006. Includes carried live/order child offsets and physical landing address. Includes root witness scan after CPC loss.",
           "AND": "Local TT slot mask applications. Includes decoding packed move columns.",
-          "XOR": "Mover inversion on recursive nonterminal edges. Includes physical/canonical orientation transport.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes physical/canonical orientation transport. Includes controller=mover XOR1 for certificate calls.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes: q hash and local/shared TT probe execute; 0 at root.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
@@ -11741,9 +11746,11 @@
           "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
           "O": "Nodes ordering unrestricted legal moves; forced response skips sorting.",
           "PK": "Cold-selected packed versus general move-row layout.",
-          "LK": "Cold-selected three-word versus general live-state update."
+          "LK": "Cold-selected three-word versus general live-state update.",
+          "CP": "Nodes reaching the guarded certificate after immediate/dual-threat checks.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported."
       },
       "status": "decomposed"
     },
@@ -11848,12 +11855,17 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "prepareConnect4LiveLineOrder32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcWin32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -11869,7 +11881,7 @@
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
           "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell."
         },
-        "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling."
+        "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence."
       },
       "status": "decomposed"
     },
@@ -12936,7 +12948,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "X+I+D",
+          "count": "X+I+D+CW",
           "target": "storeExact"
         },
         {
@@ -12973,23 +12985,28 @@
           "op": "runtime.call.subledger",
           "count": "LA",
           "target": "connect4RbaExposesOpponentWin"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcWin32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+I+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+W*CALL(connect4RbaImmediateWinningColumn)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
         "parameters": {
           "F": "Geometry and worker-local state field reads outside subledgers.",
-          "L": "Center-order, support-height and child-size reads.",
-          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006.",
+          "L": "Center-order, support-height and child-size reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Carried child arena offsets, loop increments and alpha/beta arithmetic; key/basis depth multiplications remain eliminated by MW-006. Includes root witness scan after CPC loss.",
           "AND": "Local TT slot mask applications.",
-          "XOR": "Mover inversion on recursive nonterminal edges.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes controller=mover XOR1 for certificate calls.",
           "SUB": "Negamax sign/window negations represented at source-operation level.",
-          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes immediate-win result, depth and absolute-owner selection. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
           "BRANCH": "Executed source control selections and early returns.",
           "H": "1 for non-root nodes: q hash and local/shared TT probe execute; 0 at root.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
@@ -13003,9 +13020,11 @@
           "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
           "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
           "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector.",
-          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor."
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "CP": "Nodes reaching the guarded certificate after immediate/dual-threat checks.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported."
       },
       "status": "decomposed"
     },
@@ -13105,12 +13124,17 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "prepareConnect4RbaCoordinateScratch"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcWin32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4CpcWin32)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13126,7 +13150,7 @@
           "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
           "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell."
         },
-        "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling."
+        "note": "Metric-free minimal worker with MW-001B local TT policy, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence."
       },
       "status": "decomposed"
     },
@@ -13177,11 +13201,164 @@
         "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-prepared-win.mjs#prepareConnect4CpcWin32",
+      "source": "addons/connect4-cpc-prepared-win.mjs",
+      "name": "prepareConnect4CpcWin32",
+      "scope": "cold-cpc-win",
+      "operations": [
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 5
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "2*R"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "2*S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "C"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "C"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(5)*C(runtime.typed_array.allocate)+(1)*C(runtime.object.allocate)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(2*R)*C(memory.store.u32)+(2*S)*C(memory.store.u8)+(A)*C(alu.add.u32)+(M)*C(alu.imul.u32)+(C)*C(alu.xor.u32)+(C)*C(alu.and.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)",
+        "parameters": {
+          "F": "Cold geometry/shape/cell field reads.",
+          "L": "Shape cardinalities, shape cells, rows and eligible columns.",
+          "R": "Cells with row parity opposite board height.",
+          "S": "Geometry shape count.",
+          "A": "Initialization loop increments and fixed stride addresses.",
+          "M": "Array sizing and per-shape base addresses.",
+          "C": "Total cells visited across all shapes.",
+          "T": "Loop, row-parity and all-cells-eligible predicates."
+        },
+        "note": "Geometry-only tables and reusable partner scratch. Standard 625-shape geometry allocates 34*625+4*7=21278 bytes per worker plus one small object. No new runtime theorem or board-size cap."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-prepared-win.mjs#evaluateConnect4PreparedCpcWin32",
+      "source": "addons/connect4-cpc-prepared-win.mjs",
+      "name": "evaluateConnect4PreparedCpcWin32",
+      "scope": "cpc-win-hot",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L32"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "L8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "B"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SHR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "firstSetBitIndex32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(B)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)+(N)*CALL(firstSetBitIndex32)",
+        "parameters": {
+          "F": "Geometry/profile table aliases loaded once on each reached phase.",
+          "L32": "Meta, coordinate words, basis IDs, prepared rows/columns, support heights, shape cells/rows/columns and partner loads.",
+          "L8": "Candidate eligibility and response-count loads for visited shapes.",
+          "S": "W partner clears plus two stores per odd frontier pair, only after an own fixed-response residual is found.",
+          "A": "Word/shape/cell/pair loop increments and offset additions.",
+          "B": "Remaining-rank parity subtraction, odd-tail height subtraction, set-bit clear subtraction.",
+          "M": "Visited shape stride-four bases.",
+          "AND": "Meta/side/remaining parity guards, tail parity and active-bit clears.",
+          "SHL": "Coordinate word index bases.",
+          "SHR": "Meta/rank and unsigned coordinate conversions.",
+          "T": "Guards, loops, fixed-response availability, pairing, certificate early exits.",
+          "N": "Active coordinate memberships actually examined."
+        },
+        "note": "Win-only guarded whole-reservoir pairing certificate. No allocation, counters, recursion or oracle. Fixed-response geometry precomputed; dynamic support remains required. Unknown memory/JIT/call-frame costs remain symbolic; actual full solve governs."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 206,
-    "decomposed": 206,
+    "units": 208,
+    "decomposed": 208,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -13308,10 +13485,11 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "142588cf907cddd12a874f138600fbe7ff3c0b89",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "4e0290d6e55db206c11686c7cf0fe0777e4bcf33",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "b2a1b70311b46fae56439c1f6b5ad1799260337e"
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "bde9c19652c6f7b5039b95c1ae7f33db5a3fad8f",
+    "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
