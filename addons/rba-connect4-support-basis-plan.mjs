@@ -62,17 +62,63 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     if(!Number.isSafeInteger(bytes)||bytes>budgetBytes)return null;
   }
   const closures=withClosures?new Uint32Array(new SharedArrayBuffer(closureElements*4)):null;
-  if(withClosures)compileSupportClosures32(g,basis,sizes,membership,closures,profiles);
   const mirrorMap=withReflection?new LocalIndex(new SharedArrayBuffer(basisElements*LocalIndex.BYTES_PER_ELEMENT)):null,
     mirrorProfiles=withReflection?new Uint32Array(new SharedArrayBuffer(profiles*4)):null;
-  if(withReflection)compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix);
   const transitions=withTransitions?new TransitionIndex(new SharedArrayBuffer(transitionElements*TransitionIndex.BYTES_PER_ELEMENT)):null,
     transitionDead=TransitionIndex.BYTES_PER_ELEMENT===1?255:TransitionIndex.BYTES_PER_ELEMENT===2?65535:0xffffffff;
-  if(withTransitions){transitions.fill(transitionDead);compileSupportTransitions32(g,profile,basis,sizes,strides,transitionOffsets,transitions,profiles,radix);}
+  if(withTransitions)transitions.fill(transitionDead);
+  if(withClosures)compileSupportTransforms32(g,profile,basis,sizes,membership,strides,closures,mirrorMap,mirrorProfiles,transitionOffsets,transitions,profiles,radix);
   // Membership is a compile-time dependency only once closure rows exist.
   // No runtime consumer needs the intermediate table in the closure kernel.
   return Object.freeze({basis,sizes,membership:withClosures?null:membership,strides,profiles,
     bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles,transitions,transitionDead,transitionOffsets});
+}
+
+// COLD: one current-child inverse serves closure, the mirrored parent's
+// permutation and every legal predecessor transition. No owners or outcomes.
+// The separate builders below remain independently executable audit references.
+export function compileSupportTransforms32(g,profile,basis,sizes,membership,strides,closures,mirrorMap,mirrorProfiles,transitionOffsets,transitions,profiles,radix){
+  const inverse=new Uint32Array(g.shapeCount),heights=new Uint32Array(g.columns),
+    offsets=g.supersetWordOffsets,words=g.supersetWords,masks=g.supersetMasks,
+    C=g.columns,M=g.maxBasis,Z=g.coordWords,S=g.shapeWordCount;
+  for(let handle=0;handle<profiles;handle++){
+    const base=handle*M,maskBase=handle*S,n=sizes[handle];
+    for(let i=0;i<n;i++)inverse[basis[base+i]]=i;
+    for(let i=0;i<n;i++){
+      const image=basis[base+i],row=(base+i)*Z;
+      closures[row+(i>>>5)]|=1<<(i&31);
+      for(let at=offsets[image],end=offsets[image+1];at<end;at++){
+        const word=words[at],shapeBase=word<<5;
+        let bits=masks[at]&membership[maskBase+word];
+        while(bits){const bit=bits&-bits,j=inverse[shapeBase+31-Math.clz32(bit)];
+          closures[row+(j>>>5)]|=1<<(j&31);bits^=bit;}
+      }
+    }
+    if(!mirrorMap&&!transitions)continue;
+    let digits=handle,mirrored=0;
+    for(let c=0;c<C;c++){
+      const height=digits%radix;digits=Math.floor(digits/radix);
+      heights[c]=height;if(mirrorMap)mirrored+=height*strides[C-1-c];
+    }
+    if(mirrorMap){
+      // Publish the MIRRORED parent row: its reflected IDs belong to this
+      // current child's basis, whose inverse was just built once above.
+      mirrorProfiles[mirrored]=handle;
+      const parentBase=mirrored*M;
+      for(let i=0;i<n;i++)mirrorMap[parentBase+i]=inverse[g.reflect[basis[parentBase+i]]];
+    }
+    if(transitions)for(let c=0;c<C;c++){
+      const height=heights[c];if(height===0)continue;
+      const parent=handle-strides[c],parentBase=parent*M,
+        row=transitionOffsets[parent]+c*sizes[parent]*2,
+        remove=profile.prepareRemove(g,(height-1)*C+c);
+      for(let i=0,pn=sizes[parent];i<pn;i++){
+        const id=basis[parentBase+i],image=profile.removePrepared(g,id,remove);
+        if(image<0||image===0xffffffff)continue;
+        transitions[row+2*i]=inverse[image];transitions[row+2*i+1]=image===id?1:0;
+      }
+    }
+  }
 }
 
 export function compileSupportTransitions32(g,profile,basis,sizes,strides,transitionOffsets,transitions,profiles,radix){

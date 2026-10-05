@@ -287,6 +287,28 @@ if(experiment==='C17'){
   const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]=u.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
   u.cycleCount.note+=' C30B uses one native profile-offset read plus playedColumn*n*2 instead of padded row products. n is the validated parent-frame count; no hot size lookup or decoding. ADD/control symbols reflect this address expression.';
  }
+}else if(experiment==='C35'){
+ const src='addons/rba-connect4-support-basis-plan.mjs';
+ const operations=[
+  {op:'runtime.typed_array.allocate',count:2},{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.native_index',count:'LOADID'},{op:'memory.load.u32',count:'LOAD32'},
+  {op:'memory.store.u32',count:'N+H+REF*P+STOREC'},
+  {op:'memory.store.native_index',count:'REF*N+2*LIVE'},
+  {op:'runtime.callback',target:'prepareRemove',count:'E'},
+  {op:'runtime.callback',target:'removePrepared',count:'A'},
+  {op:'runtime.number.divide',count:'H'},{op:'runtime.math.floor',count:'H'},
+  {op:'runtime.number.remainder',count:'H'},{op:'runtime.number.multiply',count:'MUL'},
+  {op:'alu.and.u32',count:'AND'},{op:'alu.or.u32',count:'OR'},
+  {op:'alu.shl.u32',count:'SHL'},{op:'alu.shr.u32',count:'SHR'},
+  {op:'alu.clz.u32',count:'B'},{op:'alu.xor.u32',count:'B'},
+  {op:'alu.sub.u32',count:'SUB'},{op:'alu.add.u32',count:'ADD'},
+  {op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'}];
+ ledger.units.push({unit:src+'#compileSupportTransforms32',source:src,name:'compileSupportTransforms32',scope:'cold-combined-support-transforms',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+'),parameters:{P:'All support profiles.',N:'Sum of current basis lengths; inverse filled exactly once per profile.',H:'P*columns only if reflection or transitions enabled, else0.',REF:'1 if reflection table requested, else0.',E:'Legal predecessor/child column edges if transitions requested, else0.',A:'Parent slots visited along E.',LIVE:'Nondead transition images.',B:'Matched superset membership bits.',STOREC:'Self+matched superset closure stores.',LOADID:'Executed sizes/basis/map/transition native-index loads.',LOAD32:'Executed inverse/superset/membership/stride loads.',FIELD:'Executed properties, including callback lookup.',MUL:'Executed row/landing/reflection products.',AND:'Executed mask/membership operations.',OR:'Closure writes.',SHL:'Word-base/self/closure shifts.',SHR:'Coordinate word shifts.',SUB:'Reflection/landing/predecessor/bit-index subtractions.',ADD:'All executed frame/row/loop additions.',TEST:'Every executed guard and loop predicate.',BRANCH:'Every executed source selection.'},note:'C35 COLD combined compiler amortizes one current-child inverse across closure, mirrored-parent permutation and all legal predecessor transitions. Each table is byte-identical to the independently callable separate reference builders. Two scratch arrays once per compilation, no hot instrumentation/allocation. Include preparation debt in whole-operation cycles.'}});
+ const prep=ledger.units.find(u=>u.name==='prepareSupportBasisPlans32');
+ prep.operations=prep.operations.filter(o=>!(o.op==='runtime.call.subledger'&&['compileSupportClosures32','compileSupportReflection32','compileSupportTransitions32'].includes(o.target)));
+ prep.operations.push({op:'runtime.call.subledger',target:'compileSupportTransforms32',count:'CL'});
+ prep.cycleCount.expression=prep.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:`C(${o.op})`)).join('+');
+ prep.cycleCount.note+=' C35 runtime preparation calls only the combined transform compiler when closures admitted; separate builder subledgers are audit-reference-only. Table allocation and complete budget admission unchanged.';
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',
