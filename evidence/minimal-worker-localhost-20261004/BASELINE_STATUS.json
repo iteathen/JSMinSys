@@ -1,7 +1,7 @@
 {
-  "status": "UNCHANGED_BASELINE_REPEAT_IN_PROGRESS",
+  "status": "UNCHANGED_BASELINE_RECORDED_TWO_CENSORED_RUNS",
   "solverSourceCommit": "b2518a606055a91abd95e390c54154234bff66bd",
-  "completedObservations": 1,
+  "completedObservations": 2,
   "observations": [
     {
       "directory": "baseline-01",
@@ -19,9 +19,26 @@
       "cleanup": true,
       "workersExited": 4,
       "allFourAffinitiesVerified": true
+    },
+    {
+      "directory": "baseline-02",
+      "status": "TIMEOUT",
+      "wallMs": 600091.7001,
+      "externalWallMs": 600214.8981,
+      "processCycles": "8581784607918",
+      "cpuMs": 2328250.0,
+      "peakRssBytes": 2858455040,
+      "rootWdl": null,
+      "move": -1,
+      "sharedCacheHits": 11,
+      "sharedCacheStores": 53,
+      "sharedCacheStoreContention": 0,
+      "cleanup": true,
+      "workersExited": 4,
+      "allFourAffinitiesVerified": true
     }
   ],
   "completedSolveTime": null,
   "performanceQualified": false,
-  "note": "One unchanged localhost observation reached the existing ten-minute safety deadline. No solve result or optimization verdict is inferred. A second identical-source/configuration cold run is in progress."
+  "note": "Two identical-source/configuration fresh-process localhost runs reached the existing ten-minute safety deadline. Neither is a completed solve. Cycles differ by about 0.074 percent for these censored intervals; that is not completed-solve timing dispersion. No optimization is performance-qualified. Catalog and 18 relevant search/lifecycle tests pass."
 }
