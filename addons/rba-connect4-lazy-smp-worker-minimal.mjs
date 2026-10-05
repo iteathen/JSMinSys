@@ -165,25 +165,20 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   }
 
   if(depth){
-    // Classify against the caller's original window. Narrow-window exacts are
-    // retained locally; shared publication is reserved for full W/D/L-window
-    // proofs to avoid turning local bound reuse into excessive atomic traffic.
-    const shareExact=alphaOrig===-2&&betaOrig===2;
+    // Classify against the caller's original window. Share proven exact values;
+    // non-exact zero-threshold bounds remain worker-local.
     if(best>alphaOrig&&best<betaOrig){
       const exact=relativeToAbsolute(best,mover);
-      if(shareExact)storeExact(src,hash,slot,exact);
-      else storeLocalEntry(slot,src,exact);
+      storeExact(src,hash,slot,exact);
     }else if(best>=betaOrig){
       if(best===1){
         const exact=relativeToAbsolute(1,mover);
-        if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        storeExact(src,hash,slot,exact);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
     }else if(best<=alphaOrig){
       if(best===-1){
         const exact=relativeToAbsolute(-1,mover);
-        if(shareExact)storeExact(src,hash,slot,exact);
-        else storeLocalEntry(slot,src,exact);
+        storeExact(src,hash,slot,exact);
       }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
     }
   }

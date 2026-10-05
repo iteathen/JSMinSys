@@ -11654,11 +11654,6 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "LX",
-          "target": "storeLocalEntry"
-        },
-        {
-          "op": "runtime.call.subledger",
           "count": "X",
           "target": "relativeToAbsolute"
         }
@@ -11666,7 +11661,7 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)+LX*CALL(storeLocalEntry)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*CALL(connect4RbaCofactorKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+X*CALL(storeExact)+BND*CALL(storeBound)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11683,9 +11678,8 @@
           "A": "Legal actions whose RBA cofactors are constructed.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively.",
           "R": "Nonterminal child actions reflection-canonicalized and recursively searched.",
-          "X": "Globally exact full-window non-root results converted to absolute 1/2/3 and published to local/shared exact TTs.",
+          "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Local-only zero-threshold alpha/beta bound publications after non-exact window classification.",
-          "LX": "Globally exact narrow-window results converted to absolute 1/2/3 and retained worker-locally.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0."
         },
         "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected."
@@ -11991,7 +11985,7 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "ec228b185e7070a3fbe83c0a11400e475f6adc98"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "79c2d71166af7742004823b34b2151d632f3ba9c"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
