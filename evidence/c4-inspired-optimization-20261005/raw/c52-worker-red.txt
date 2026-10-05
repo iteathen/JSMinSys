@@ -1,0 +1,200 @@
+✖ rba-connect4-lazy-smp-worker-minimal keeps early pair-hub wins as exact certificates in every window (41.5387ms)
+✖ rba-connect4-lazy-smp-worker-minimal-local32 keeps early pair-hub wins as exact certificates in every window (38.7143ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs keeps early pair-hub wins as exact certificates in every window (32.4737ms)
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 keeps early pair-hub wins as exact certificates in every window (33.8133ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center keeps early pair-hub wins as exact certificates in every window (35.9171ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 keeps early pair-hub wins as exact certificates in every window (35.2663ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs keeps early pair-hub wins as exact certificates in every window (34.941ms)
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (30.8967ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 352.6975
+
+✖ failing tests:
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal keeps early pair-hub wins as exact certificates in every window (41.5387ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:55:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:53)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-local32 keeps early pair-hub wins as exact certificates in every window (38.7143ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:55:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:53)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs keeps early pair-hub wins as exact certificates in every window (32.4737ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:55:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:53)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-proofs-local32 keeps early pair-hub wins as exact certificates in every window (33.8133ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:55:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:53)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-center keeps early pair-hub wins as exact certificates in every window (35.9171ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:54:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-local32 keeps early pair-hub wins as exact certificates in every window (35.2663ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:54:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs keeps early pair-hub wins as exact certificates in every window (34.941ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:54:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\cpcx-pair-hub-window.test.mjs:10:2
+✖ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (30.8967ms)
+  AssertionError [ERR_ASSERTION]: certified pair hub must avoid child construction
+  
+  true !== false
+  
+      at connect4RbaCofactorKnownHeight (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:29:49)
+      at negamax (evalmachine.<anonymous>:54:20)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpcx-pair-hub-window.test.mjs:33:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

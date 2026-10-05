@@ -12034,12 +12034,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -12055,7 +12082,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -12073,9 +12100,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -12304,12 +12335,21 @@
         {
           "op": "control.branch",
           "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+C(runtime.array.allocate)+CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -12334,7 +12374,7 @@
           "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -13483,12 +13523,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -13504,7 +13571,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -13519,9 +13586,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -13694,12 +13765,21 @@
         {
           "op": "control.branch",
           "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13722,7 +13802,7 @@
           "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -17218,12 +17298,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -17239,7 +17346,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -17257,9 +17364,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -17488,12 +17599,21 @@
         {
           "op": "control.branch",
           "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+C(runtime.array.allocate)+CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(7)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -17518,7 +17638,7 @@
           "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -18033,12 +18153,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -18054,7 +18201,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -18069,9 +18216,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -18244,12 +18395,21 @@
         {
           "op": "control.branch",
           "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+C(control.test.u32)+C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(6)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -18272,7 +18432,7 @@
           "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -21200,12 +21360,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -21221,7 +21408,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -21239,9 +21426,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -21475,12 +21666,21 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "createLocalNativeProofCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(5)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(5)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -21505,7 +21705,7 @@
           "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -21940,12 +22140,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -21961,7 +22188,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -21979,9 +22206,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -22215,12 +22446,21 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "createLocalNativeProofCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(5)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(5)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -22245,7 +22485,7 @@
           "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -22670,12 +22910,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -22691,7 +22958,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -22706,9 +22973,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -22886,12 +23157,21 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "createLocalNativeProofCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -22914,7 +23194,7 @@
           "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -23325,12 +23605,39 @@
           "op": "runtime.call.subledger",
           "target": "connect4RbaSupportCanonicalize",
           "count": "R*MIRROR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)",
+        "activeCycleExpression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(Q)*CALL(connect4RbaForcedResponseColumn)+(LA)*CALL(connect4RbaExposesOpponentWin)+(CP)*CALL(evaluateConnect4PreparedCpcWin32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(A*(1-SB)*(1-KD))*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*(1-KD))*CALL(connect4RbaSupportPreparedCofactorNonWinningKnownHeight)+(A*(1-SB)*KD)*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+(A*SB*(1-CL)*KD)*CALL(connect4RbaSupportDenseCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*(1-THREE))*CALL(connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)+(A*CL*(1-KD)*THREE)*CALL(connect4RbaClosurePrepared3CofactorNonWinningKnownHeight)+(A*CL*KD*(1-THREE))*CALL(connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)+(A*CL*KD*THREE)*CALL(connect4RbaClosureDense3CofactorNonWinningKnownHeight)+(R*(1-MIRROR))*CALL(connect4RbaPreparedCanonicalize)+(R*MIRROR)*CALL(connect4RbaSupportCanonicalize)+(TACT)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -23346,7 +23653,7 @@
           "H": "1 only for a non-root node surviving cooperative stop.",
           "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
           "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
-          "R": "Nonterminal child actions requiring canonicalization and recursive search.",
+          "R": "Ordinary nonterminal recursive children; none execute after C52 certificate return.",
           "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
           "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
           "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
@@ -23361,9 +23668,13 @@
           "SB": "Cold complete support-basis plan binding0/1.",
           "CL": "Cold complete closure binding0/1; implies SB.",
           "THREE": "Cold coordWords===3 binding0/1, independent of literal board dimensions.",
-          "MIRROR": "Cold complete support-reflection binding0/1."
+          "MIRROR": "Cold complete support-reflection binding0/1.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication."
         },
-        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy."
+        "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins. Offline binding audit: cofactor and canonicalizer costs now explicitly name actual cold-selected ordinary/support/closure/reflection callees. No hot selector is introduced. Resource fallback delegates to the qualified ordinary cofactor named by its cold capture. This replaces stale pre-C21/C26 call targets; does not alter code or reverse sharing policy. C52current-mover WIN is current-rule proof, before CPC/order/child construction; all windows admit exact certified truth and root action. Existing q/hash/cache gauge unchanged."
       },
       "status": "decomposed"
     },
@@ -23541,12 +23852,21 @@
           "op": "runtime.call.subledger",
           "count": 1,
           "target": "createLocalNativeProofCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)",
+        "activeCycleExpression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1-NATIVE)*CALL(attachConnect4RbaSharedExactCache32)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareConnect4RbaCoordinateScratch)+(1)*CALL(prepareConnect4CpcWin32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NATIVE)*CALL(attachConnect4RbaSharedLayoutCache32)+(NATIVE)*CALL(prepareSharedCacheAccess)+(3+2*NATIVE)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createLocalNativeProofCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -23569,7 +23889,7 @@
           "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
           "NATIVE": "1 when workerData cache has native layout descriptor;0 split40"
         },
-        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged."
+        "note": "Metric-free minimal worker with retained e3ecc exact sharing (including narrow-window domain-extreme exact proofs), with local lower/upper bounds private, MW-006 carried arena offsets, and MW-004A depth-4 stop polling. C10 prepares all CPC geometry/scratch once before recurrence. C11 root immediate win is handled once before recurrence, setting the existing root witness/result. Cold ready-gate release now transports root reflection; live worker rebuilds root state after release from actual history length. Recursive kernel unchanged. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Cache attachment and probe/store function aliases selected once before readiness. Both exact protocols use prebound uncounted access; per-node layout dispatch/reporting is absent. C20 private cache allocation uses createLocalNativeProofCache32; warm-up fills one backing view rather than separate keys/values. Cold allocation and page warming remain included in operation cost. C27 metadata correction: old key/value typed allocations are replaced, not added to native helper allocation. Page warming touches one entries view, not two. FIELD/MUL/control symbols exclude replaced private setup already counted by createLocalNativeProofCache32. Current structural cofactor/canonicalization remains unchanged. C52pair profile and selected find method bound once before readiness; no per-node factory or plan allocation."
       },
       "status": "decomposed"
     },
@@ -23655,10 +23975,229 @@
         "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw. C20 native tag at slot*8; exact/bound logic and shared protocol unchanged."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpcx-pair-hub.mjs#prepareConnect4CpcxPairHub32",
+      "source": "addons/connect4-cpcx-pair-hub.mjs",
+      "name": "prepareConnect4CpcxPairHub32",
+      "scope": "cold-cpcx-plan",
+      "operations": [
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.function.allocate",
+          "count": 2
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 4
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 3
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "6*P"
+        },
+        {
+          "op": "memory.store.native_index",
+          "count": "4*P"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "2*P"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "T"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(3)*C(runtime.typed_array.allocate)+(2)*C(runtime.function.allocate)+(1)*C(runtime.object.allocate)+(F)*C(runtime.field.load)+(4)*C(runtime.field.store)+(3)*C(runtime.number.multiply)+(6*P)*C(memory.load.u32)+(4*P)*C(memory.store.native_index)+(A)*C(alu.add.u32)+(S)*C(alu.sub.u32)+(2*P)*C(alu.imul.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)",
+        "parameters": {
+          "P": "tripleShapeStart-pairShapeStart, rule-only pair count.",
+          "F": "Cold geometry/native constructor/view byte-length reads.",
+          "A": "Initialization addresses/increments.",
+          "S": "Native extent/base/dimension subtraction.",
+          "T": "Integer dimension maximum, width selections and pair loop predicates."
+        },
+        "note": "Three arrays and two closures prepared before ready. Native width1/2/4 chosen once, no encode/decode or solved data. Per-worker pair table4*P*fieldBytes and scratch5*columns bytes; cold constructor lowering remains target qualification debt."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpcx-pair-hub.mjs#addSpoke",
+      "source": "addons/connect4-cpcx-pair-hub.mjs",
+      "name": "addSpoke",
+      "scope": "cpcx-pair-hot",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": "HEIGHT+FIRST"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "COUNT"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "WRITE_COUNT"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "WRITE_FIRST"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(HEIGHT+FIRST)*C(memory.load.u32)+(COUNT)*C(memory.load.u8)+(WRITE_COUNT)*C(memory.store.u8)+(WRITE_FIRST)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)",
+        "parameters": {
+          "HEIGHT": "0..2 height reads reached after forced-column guard.",
+          "FIRST": "First-completion-column read only after count is nonzero.",
+          "COUNT": "Count admission/zero tests.",
+          "WRITE_COUNT": "0 or1 saturated scratch update.",
+          "WRITE_FIRST": "1 only on first valid spoke for a trigger.",
+          "ADD": "Support/frame addresses and same-column lift.",
+          "TEST": "Actually reached short-circuit/height/count/duplicate predicates.",
+          "BRANCH": "Actually reached conditional branches."
+        },
+        "note": "Caller supplies exact legal support. Column dedup is physical completion dedup after the trigger. Uint32 firstColumn supports full native index domain; count0 guards stale entries. No allocation/counters/recursion."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpcx-pair-hub.mjs#findConnect4CpcxPairHub32",
+      "source": "addons/connect4-cpcx-pair-hub.mjs",
+      "name": "findConnect4CpcxPairHub32",
+      "scope": "cpcx-pair-hot",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": "SOURCE+BASIS+HEIGHT"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "4*PAIRS"
+        },
+        {
+          "op": "memory.store.u8",
+          "count": "RESET+FAIL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "BITS"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SHR"
+        },
+        {
+          "op": "alu.clz.u32",
+          "count": "BITS"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "PAIRS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SPOKES",
+          "target": "addSpoke"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CHECKS",
+          "target": "connect4RbaExposesOpponentWin"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(SOURCE+BASIS+HEIGHT)*C(memory.load.u32)+(4*PAIRS)*C(memory.load.native_index)+(RESET+FAIL)*C(memory.store.u8)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(BITS)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(BITS)*C(alu.clz.u32)+(PAIRS)*C(alu.imul.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(SPOKES)*CALL(addSpoke)+(CHECKS)*CALL(connect4RbaExposesOpponentWin)",
+        "parameters": {
+          "SOURCE": "Active mover coordinate words loaded.",
+          "BASIS": "Early basis predicates and actual active slot IDs.",
+          "HEIGHT": "Candidate C05 height read.",
+          "PAIRS": "Active pair IDs actually reached before return.",
+          "RESET": "columns only when cardinality preguard passes.",
+          "FAIL": "Triggers failing C05, at most once each per call.",
+          "ADD": "Actual source/slot/plan/reset address and loop arithmetic.",
+          "SUB": "Extent, low-bit and plan-origin arithmetic.",
+          "AND": "Low-bit extraction and poisoned-tail mask.",
+          "BITS": "Active coordinate bits examined, including singleton skips/triple stopping.",
+          "SHL": "Word index base and tail operations.",
+          "SHR": "Coordinate span and tail mask.",
+          "TEST": "Reached early/cardinality/loop/candidate/guard predicates.",
+          "BRANCH": "Actual short-circuit/loop branches.",
+          "SPOKES": "At most2*PAIRS, shortened by positive first endpoint.",
+          "CHECKS": "Saturated unique trigger candidates passed to C05."
+        },
+        "note": "Captured geometry/native plans, reusable worker-local scratch. No allocation, reports, child preparation or generic prototype dispatcher. Actual register/bounds/native-access/inlining costs require optimized diagnostics and whole solve. Table index is direct native field, not packed identity."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 324,
+    "units": 327,
     "decomposed": 244,
     "legacySymbolicVisible": 0,
     "missing": 0,
@@ -23786,10 +24325,10 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d8ed2bc15d4014d7be99267eaf8f43a3db9e029f",
     "addons/rba-connect4-coordinate-dense.mjs": "73f09433ab1b34f2c89bad55669bf7f940a17ed0",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "c5d6227b394582de3f0f062b3e910de6a181ac56",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "b9ef9cd5527f1b02938ad4c4bf5ead09d6eeed09",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "51f68f4681b990fd51d66a3e73814f23d76a1564",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "f8093f0ff73e58b5f18f62a6c36e8a2bf0d8efe2",
     "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
@@ -23797,8 +24336,8 @@
     "addons/rba-connect4-prepared-session-host.mjs": "326f7b605aeb473560ddcebac4196a237c476d19",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
-    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "5cd57bee72ba2d71e22f332488a2a933a4373f6e",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "eb453ea7ae35af0a1c13cf6e21491fb967c3a8a8",
+    "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "9806fbddbd55ab961c5d0d470ef140688fb1ea1b",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "f0a70ec0b28b51e3e5f0995dab8a66f656dc8587",
     "addons/rba-connect4-support-basis-plan.mjs": "8252059ae2bb302a03086943c62777ec58954808",
     "addons/rba-connect4-coordinate-support-prepared.mjs": "318322b414eac1827dc233f01c230e852173c076",
     "addons/rba-connect4-coordinate-support-dense.mjs": "7358488a080f03c612954dbe5e9b9622925efce3",
@@ -23806,10 +24345,11 @@
     "addons/rba-connect4-coordinate-closure-prepared.mjs": "7079b896963f8a8508a3507d2828e41fc9d18c07",
     "addons/rba-connect4-coordinate-support-reflection.mjs": "f89e79453dd108cd0ad19583888293bf8b70defd",
     "addons/rba-connect4-local-native-proof-cache.mjs": "51a24ce7a2565269c26df2ca59755d6ad15c437b",
-    "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs": "7a033b495ad8a2f7464decdc883715ba12b70ae3",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": "3eb4e138ae8c771c631d4a3d3392858d091609eb",
-    "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": "ed791982dca3acf69a8266efba6b13bd1de856a6",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": "a8ffa683d17777629693eb567cf11dc0c3d2a2ba"
+    "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs": "5f10debe7dd76509671065d232287d231f440ec2",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": "2886f8a34e6dcee69144d7b51e4e91cf53f2b9f1",
+    "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": "b2fcf17120c46dbf9bc608140b0ae6661c3414b8",
+    "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": "c7f451f6c8a0f50d8331d2d2f82d3e8451b2dafa",
+    "addons/connect4-cpcx-pair-hub.mjs": "572fe38c5a9c0d5aa064221e200e4575694f0ba6"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
