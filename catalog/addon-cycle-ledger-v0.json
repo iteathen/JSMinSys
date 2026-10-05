@@ -24414,23 +24414,44 @@
         {
           "op": "runtime.field.load",
           "count": "CTX"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "GUARDS"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "GUARDS"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "GUARDS"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*GUARDS"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "GUARDS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(HEIGHT+FIRST)*C(memory.load.u32)+(COUNT)*C(memory.load.u8)+(WRITE_COUNT)*C(memory.store.u8)+(WRITE_FIRST)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(CTX)*C(runtime.field.load)",
+        "expression": "(HEIGHT+FIRST)*C(memory.load.u32)+(COUNT)*C(memory.load.u8)+(WRITE_COUNT)*C(memory.store.u8)+(WRITE_FIRST)*C(memory.store.u32)+(ADD)*C(alu.add.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(CTX)*C(runtime.field.load)+(GUARDS)*C(memory.load.u32)+(GUARDS)*C(alu.shr.u32)+(GUARDS)*C(alu.shl.u32)+(2*GUARDS)*C(alu.and.u32)+(GUARDS)*C(alu.add.u32)",
         "parameters": {
           "HEIGHT": "0..2 height reads reached after forced-column guard.",
           "FIRST": "First-completion-column read only after count is nonzero.",
-          "COUNT": "Count admission/zero tests.",
-          "WRITE_COUNT": "0 or1 saturated scratch update.",
+          "COUNT": "One Boolean seen read only after exact mask exclusion.",
+          "WRITE_COUNT": "Only first valid spoke writes1; no count2 or failed255 writes.",
           "WRITE_FIRST": "1 only on first valid spoke for a trigger.",
           "ADD": "Support/frame addresses and same-column lift.",
-          "TEST": "Actually reached short-circuit/height/count/duplicate predicates.",
+          "TEST": "Reached forced/support/mask/seen/duplicate tests; no obsolete failed-count comparison.",
           "BRANCH": "Actually reached conditional branches.",
-          "CTX": "Actually reached scratch context-slot loads."
+          "CTX": "Actually reached scratch context-slot loads.",
+          "GUARDS": "Only accessible compatible spokes consult current forbidden mask before any seen/first storage."
         },
-        "note": "Caller supplies exact legal support. Column dedup is physical completion dedup after the trigger. Uint32 firstColumn supports full native index domain; count0 guards stale entries. No allocation/counters/recursion."
+        "note": "Caller supplies exact legal support. Column dedup is physical completion dedup after the trigger. Uint32 firstColumn supports full native index domain; count0 guards stale entries. No allocation/counters/recursion. C55absorbed failed-trigger guard moves mask read here, ahead of bookkeeping; must charge all reached GUARDS rather than rare old positive candidates. No runtime reporting."
       },
       "status": "decomposed"
     },
@@ -24442,7 +24463,7 @@
       "operations": [
         {
           "op": "memory.load.u32",
-          "count": "SOURCE+BASIS+CHECKS"
+          "count": "SOURCE+BASIS"
         },
         {
           "op": "memory.load.native_index",
@@ -24450,7 +24471,7 @@
         },
         {
           "op": "memory.store.u8",
-          "count": "RESET+FAIL"
+          "count": "RESET"
         },
         {
           "op": "alu.add.u32",
@@ -24498,44 +24519,30 @@
           "target": "addSpoke"
         },
         {
-          "op": "alu.shr.u32",
-          "count": "CHECKS"
-        },
-        {
-          "op": "alu.shl.u32",
-          "count": "CHECKS"
-        },
-        {
-          "op": "alu.and.u32",
-          "count": "2*CHECKS"
-        },
-        {
           "op": "runtime.field.load",
           "count": "CTX"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(SOURCE+BASIS+CHECKS)*C(memory.load.u32)+(4*PAIRS)*C(memory.load.native_index)+(RESET+FAIL)*C(memory.store.u8)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(BITS)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(BITS)*C(alu.clz.u32)+(PAIRS)*C(alu.imul.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(SPOKES)*CALL(addSpoke)+(CHECKS)*C(alu.shr.u32)+(CHECKS)*C(alu.shl.u32)+(2*CHECKS)*C(alu.and.u32)+(CTX)*C(runtime.field.load)",
+        "expression": "(SOURCE+BASIS)*C(memory.load.u32)+(4*PAIRS)*C(memory.load.native_index)+(RESET)*C(memory.store.u8)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(BITS)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(BITS)*C(alu.clz.u32)+(PAIRS)*C(alu.imul.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(SPOKES)*CALL(addSpoke)+(CTX)*C(runtime.field.load)",
         "parameters": {
           "SOURCE": "Active mover coordinate words loaded.",
           "BASIS": "Early basis predicates and actual active slot IDs.",
           "PAIRS": "Active pair IDs actually reached before return.",
           "RESET": "columns only when cardinality preguard passes.",
-          "FAIL": "Triggers failing C05, at most once each per call.",
           "ADD": "Actual source/slot/plan/reset address and loop arithmetic.",
           "SUB": "Extent, low-bit and plan-origin arithmetic.",
           "AND": "Low-bit extraction and poisoned-tail mask.",
           "BITS": "Active coordinate bits examined, including singleton skips/triple stopping.",
           "SHL": "Word index base and tail operations.",
           "SHR": "Coordinate span and tail mask.",
-          "TEST": "Reached early/cardinality/loop/candidate/guard predicates.",
+          "TEST": "Reached cardinality/loop/candidate predicates; positive candidate returns immediately without a late guard.",
           "BRANCH": "Actual short-circuit/loop branches.",
           "SPOKES": "At most2*PAIRS, shortened by positive first endpoint.",
-          "CHECKS": "Positive unique trigger candidates reading current frame forbidden bit instead of C05binary search.",
           "CTX": "Actually reached captured context-slot loads; optimizer may hoist/eliminate after inlining, not assumed free."
         },
-        "note": "Captured geometry/native plans, reusable worker-local scratch. No allocation, reports, child preparation or generic prototype dispatcher. Actual register/bounds/native-access/inlining costs require optimized diagnostics and whole solve. Table index is direct native field, not packed identity. C53C05predicate supplied by current exact singleton collector, frame-specific across recursion. No child dependency, no per-candidate binary search. Captured context-slot loading is explicitly charged; source-only preload does not imply free registers."
+        "note": "Captured geometry/native plans, reusable worker-local scratch. No allocation, reports, child preparation or generic prototype dispatcher. Actual register/bounds/native-access/inlining costs require optimized diagnostics and whole solve. Table index is direct native field, not packed identity. C53C05predicate supplied by current exact singleton collector, frame-specific across recursion. No child dependency, no per-candidate binary search. Captured context-slot loading is explicitly charged; source-only preload does not imply free registers. C55finder no longer stores failed sentinel or repeats known mask on positives; unchanged per-call seen reset remains charged. addSpoke owns every early mask access."
       },
       "status": "decomposed"
     },
@@ -24846,7 +24853,7 @@
     "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": "1013fb222af9c23db9f46caa3e768fbab4905bab",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": "b11efa53c68ba985825ae39dabd29493e959039c",
     "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": "a3a5eccef1c2b7b81b6dffc766fdebda6a9c1fb0",
-    "addons/connect4-cpcx-pair-hub.mjs": "611930a44f971d675e77d70ed306321151bf94ee",
+    "addons/connect4-cpcx-pair-hub.mjs": "41847a2cfaa72d066efa00cc33aa02142077452b",
     "addons/connect4-cpc-prepared-response.mjs": "2260dd2924712ff59556a0aa2f30a684ac62c8fe"
   },
   "isomaxLocalKernel": {

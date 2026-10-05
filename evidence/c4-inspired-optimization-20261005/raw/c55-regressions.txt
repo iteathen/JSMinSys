@@ -1,0 +1,21 @@
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"seed":70368301,"solvedOutcomesQueried":false}
+✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (4049.0691ms)
+✔ private native proof records allocate cold and preserve all exact compact key lanes (13.0824ms)
+✔ private native allocation refuses unsupported profiles and invalid capacities before allocation (30.6692ms)
+✔ private layout is selected cold for the geometry and all four workers agree on exact results (369.5543ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (131.9395ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (1.1958ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (65.4344ms)
+✔ application preparation allocates all four workers but performs no search (76.7714ms)
+✔ closing an idle prepared application joins workers without a solve (58.8069ms)
+✔ ordinary minimal API also waits for every worker before search (63.5848ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.7799ms)
+✔ closing an active prepared search resolves its result and joins every worker (75.8228ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4136.8293
