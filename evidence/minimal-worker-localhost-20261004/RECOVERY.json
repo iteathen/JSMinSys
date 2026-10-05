@@ -1,0 +1,66 @@
+{
+  "campaign": "minimal-worker-localhost-requalification-20261004",
+  "source": {
+    "repository": "iteathen/JSMinSys",
+    "branch": "work/cpc-rebuild-20261004",
+    "baselineSha": "b2518a606055a91abd95e390c54154234bff66bd",
+    "remoteSha": "b2518a606055a91abd95e390c54154234bff66bd",
+    "mainSha": "1b843981ba7d68c118656dad1a6c7591453e7686",
+    "mainDivergence": "0 behind, 175 ahead",
+    "localRecovery": "No prior local branch found in recovered JSMinSys worktree registry; created tracking worktree from fetched remote without source edits"
+  },
+  "configurationAuthority": {
+    "successfulRun": "C:/r/c4-external-20261004/research/benchmarks/c4-0011-external-20261004/campaign-20261004-pass1/isomax/invocation.json",
+    "result": "same directory/summary.json",
+    "priorSourceSha": "1b843981ba7d68c118656dad1a6c7591453e7686",
+    "priorWallMs": 34664.4054,
+    "priorScope": "computed structural prefix followed by search; NOT the minimal empty-root baseline"
+  },
+  "solver": {
+    "geometry": {
+      "rows": 6,
+      "columns": 7
+    },
+    "moves": [],
+    "workers": 4,
+    "workerMode": "minimal",
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 16777216,
+    "sharedEntryBytes": 40,
+    "localEntryBytes": 33,
+    "sharedTtBytes": 5368709120,
+    "privateTtBytesPerWorker": 553648128,
+    "privateTtMiBPerWorker": 528,
+    "totalTtPayloadBytes": 7583301632,
+    "timeoutMs": 600000
+  },
+  "launch": {
+    "node": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+    "flags": [
+      "--experimental-ffi",
+      "--import",
+      "file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/worker-affinity-preload.mjs"
+    ],
+    "entry": "tools/bench-minimal-i5.mjs",
+    "memoryFlags": [],
+    "processAffinityMask": 85,
+    "workerProcessors": [
+      0,
+      2,
+      4,
+      6
+    ],
+    "targets": "C:/r/c4-external-build-final-20261004/runtime/isomax/isomax/targets.json",
+    "externalDeadlineMs": 650000
+  },
+  "deviations": [
+    "Current minimal-worker code and direct empty root are the requested subject; no RLC/CPC/NDC/live-line scoring is introduced.",
+    "Entry counts unchanged. Current branch layout is 40B shared and 33B local versus prior package 32B shared and 36B local. Bytes therefore differ; no capacity adjustment.",
+    "Existing current-branch launcher has 600000ms internal safety ceiling versus old package 300000ms. Kept launcher unchanged; safety ceiling is not a performance result.",
+    "Launch paths and output/temp destinations changed to isolated checkout/campaign; environment policy, affinity, executable, and flags preserved."
+  ],
+  "baselineRule": "Start with two sequential fresh-process unchanged runs. If exact, add third for dispersion. If both censored, report repeatable censoring, not solve-time median or noise qualification.",
+  "optimizationRule": "All implemented accepted/rejected changes require locality-qualified retest. One isolated candidate at a time. Full-solve timing/cycles govern; censored pairs remain UNQUALIFIED. No fresh candidate before unchanged baseline recorded."
+}
