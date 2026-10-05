@@ -8,9 +8,8 @@ import {
   isCompactProfile8,
   compactSupportProfile8,
   compactTailProfile8,
-  probeConnect4RbaSharedExactCache32,
-  storeConnect4RbaSharedExactCache32,
 } from './rba-connect4-shared-exact-cache.mjs';
+import {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';
 
 const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
@@ -89,7 +88,7 @@ function probeCache(src,hash,slot){
   const local=localValues[slot];
   if(local&&localKeyMatches(slot,src)){return local;}
   if(!(hash&sharedSampleBits)){
-    const value=probeConnect4RbaSharedExactCache32(shared,words,src,hash);
+    const value=probeConnect4RbaSharedExactCacheUncounted32(shared,words,src,hash);
     if(value){storeLocalEntry(slot,src,value);return value;}
   }
   return 0;
@@ -98,7 +97,7 @@ function probeCache(src,hash,slot){
 function storeExact(src,hash,slot,value){
   storeLocalEntry(slot,src,value);
   if(!(hash&sharedSampleBits))
-    storeConnect4RbaSharedExactCache32(shared,words,src,value,hash);
+    storeConnect4RbaSharedExactCacheUncounted32(shared,words,src,value,hash);
 }
 
 function storeBound(src,hash,slot,value){

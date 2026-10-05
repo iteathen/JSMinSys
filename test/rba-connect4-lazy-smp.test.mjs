@@ -280,6 +280,9 @@ test('minimal worker omits hot diagnostic counters',async()=>{
     });
   assert.equal(result.status,'EXACT',JSON.stringify(result));
   assert.equal(result.winnerMetrics,null);
+  assert.equal(result.sharedCacheHits,null);
+  assert.equal(result.sharedCacheStores,null);
+  assert.equal(result.sharedCacheStoreContention,null);
 });
 
 

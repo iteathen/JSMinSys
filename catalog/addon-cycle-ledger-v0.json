@@ -6815,7 +6815,7 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": "8+W"
+          "count": "5+W+3*M"
         },
         {
           "op": "memory.load.u32",
@@ -6911,12 +6911,20 @@
         {
           "op": "runtime.field.store",
           "count": "3*W"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 3
+        },
+        {
+          "op": "control.branch",
+          "count": 3
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(8+W)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST",
+        "activeCycleExpression": "C(runtime.host.bookkeeping)+3*C(runtime.integer.check)+12*C(control.test.u32)+5*C(control.branch)+2*C(alu.and.u32)+CALL(connect4RbaFromMoves)+CALL(shareConnect4RbaGeometry32)+CALL(createConnect4RbaSharedExactCache32)+CALL(createManagedThreadSession32)+W*CALL(ManagedThreadSession.spawn)+CALL(ManagedThreadSession.wait)+CALL(ManagedThreadSession.close)+CALL(ManagedThreadSession.state)+2*CALL(sharedViewBytes32)+(2+M)*C(memory.allocate.shared.bytes)+(2+M)*C(runtime.typed_view.construct)+C(runtime.array.allocate)+W*C(runtime.url.construct)+2*C(runtime.timer.read)+C(atomic.store.u32)+(5+W+3*M)*C(atomic.load.u32)+30*E*M*C(memory.load.u32)+(2+E)*C(runtime.object.allocate)+(5+4*W+E)*C(alu.imul.u32)+(3+W)*C(alu.add.u32)+C(runtime.integer.check)+4*C(control.test.u32)+C(control.branch)+C(alu.and.u32)+C(alu.add.u32)+W*C(runtime.field.load)+C(runtime.field.store)+2*F*(C(runtime.instanceof.check)+C(runtime.field.load))+(3+3*F)*C(control.branch)+2*W*C(runtime.field.store)+X*C(runtime.error.throw)+HOST_SELECTION+(RF)*CALL(createWorkerBehaviorMemory32)+(RF*W)*CALL(publishWorkerBehavior32)+(RF*W)*CALL(encodeRootFrontier32)+(3*RF)*C(memory.allocate.shared.bytes)+(1+3*RF*W)*C(runtime.typed_view.construct)+(3*RF+RF*W)*C(runtime.array.from)+(3*W)*C(runtime.field.store)+FRONTIER_HOST+3*C(control.test.u32)+3*C(control.branch)",
         "unboundedTerms": [
           "CALL(ManagedThreadSession.spawn)",
           "CALL(ManagedThreadSession.wait)",
@@ -6933,7 +6941,7 @@
           "WORKER_MODE": "Cold selector: legacy (default) or minimal; minimal rejects legacy-only Behavior/CPC/Root-Frontier options.",
           "M": "1 for legacy/behavior/frontier modes that allocate winner metrics; 0 for minimal mode."
         },
-        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract."
+        "note": "Cold Lazy-SMP host omits the metric SharedArrayBuffer/view entirely for minimal mode; legacy/default and behavior/frontier modes retain their metric contract. Minimal cache reporting is disabled: return null for unavailable hits/stores/contention; do not materialize zero as measured data."
       },
       "status": "decomposed"
     },
@@ -11509,7 +11517,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "probeConnect4RbaSharedExactCache32"
+          "target": "probeConnect4RbaSharedExactCacheUncounted32"
         },
         {
           "op": "runtime.call.subledger",
@@ -11519,7 +11527,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCache32)+P*CALL(storeLocalEntry)",
+        "expression": "C(memory.load.u8)+C(alu.and.u32)+T*C(control.test.u32)+B*C(control.branch)+K*CALL(localKeyMatches)+S*CALL(probeConnect4RbaSharedExactCacheUncounted32)+P*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -11557,12 +11565,12 @@
         {
           "op": "runtime.call.subledger",
           "count": "S",
-          "target": "storeConnect4RbaSharedExactCache32"
+          "target": "storeConnect4RbaSharedExactCacheUncounted32"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCache32)",
+        "expression": "C(alu.and.u32)+C(control.test.u32)+C(control.branch)+CALL(storeLocalEntry)+S*CALL(storeConnect4RbaSharedExactCacheUncounted32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0."
         },
@@ -11976,11 +11984,181 @@
         "note": "Requires no mover immediate win. Scalar forced column / unrestricted / loss result from opponent singleton prefix. No allocation, no mask-width limit. Two playable singleton cells occupy distinct columns; one move cannot block both. Costs remain symbolic."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-uncounted.mjs#probeConnect4RbaSharedExactCacheUncounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-uncounted.mjs",
+      "name": "probeConnect4RbaSharedExactCacheUncounted32",
+      "scope": "hot-lazy-smp-cache-probe",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-KH",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "1+K+2*E"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "(1-C)*K+C*R"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*K"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+K+3*E"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+K+E"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CS",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CT",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+F*C(runtime.field.load)+(1+K+2*E)*C(atomic.load.u32)+((1-C)*K+C*R)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+2*K*C(alu.add.u32)+(4+K+3*E)*C(control.test.u32)+(3+K+E)*C(control.branch)+C(control.test.u32)+C(control.branch)+CS*CALL(compactSupportProfile8)+CT*CALL(compactTailProfile8)",
+        "parameters": {
+          "KH": "1 when caller supplies the already-computed full-q locator hash; 0 when helper computes it",
+          "C": "1 on guarded compact standard-7x6 path; 0 on full-key compatibility path",
+          "K": "shared stored-key words atomically compared before mismatch/full equality (<=8 when C=1, <=keyWords otherwise)",
+          "R": "raw q words directly loaded by reached compact comparisons (0..6); pack-helper q loads are accounted in CS/CT",
+          "CS": "1 when compact comparison reaches packed-support field; 0 otherwise",
+          "CT": "1 when compact comparison reaches packed-tail field; 0 otherwise",
+          "E": "1 when sequence/key/value validation yields a committed exact hit; 0 otherwise",
+          "F": "Executed cache/keys/sequence/value and geometry-encoding field reads; no reporting/statistics field access."
+        },
+        "note": "Seqlock shared exact probe. Compact standard compact profile preserves raw first-two-height mismatch prefix, then compares exact packed support/coordinate identity. Full-q equality remains exact by qualified lossless encoding; final sequence validation is unchanged. Generated uncounted variant removes only reporting atomics. Required key/value/sequence synchronization retained. No hot reporting counter or statistics-selection branch."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-shared-exact-cache-uncounted.mjs#storeConnect4RbaSharedExactCacheUncounted32",
+      "source": "addons/rba-connect4-shared-exact-cache-uncounted.mjs",
+      "name": "storeConnect4RbaSharedExactCacheUncounted32",
+      "scope": "hot-lazy-smp-cache-store",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": "1-KH",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "A"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": "S*(K+2)"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "(1-C)*K+C*R"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 2
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2+2*K"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "4+S"
+        },
+        {
+          "op": "control.branch",
+          "count": "3+S"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "control.branch",
+          "count": 1,
+          "note": "knownHash===undefined selection"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C*S",
+          "target": "compactSupportProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "C*S",
+          "target": "compactTailProfile8"
+        }
+      ],
+      "cycleCount": {
+        "kind": "expression",
+        "expression": "(1-KH)*CALL(mixSpan32Locator32)+F*C(runtime.field.load)+C(atomic.load.u32)+A*C(atomic.rmw.u32)+S*(K+2)*C(atomic.store.u32)+((1-C)*K+C*R)*C(memory.load.u32)+2*C(alu.and.u32)+C(alu.imul.u32)+(2+2*K)*C(alu.add.u32)+(4+S)*C(control.test.u32)+(3+S)*C(control.branch)+C(control.test.u32)+C(control.branch)+C*S*CALL(compactSupportProfile8)+C*S*CALL(compactTailProfile8)",
+        "parameters": {
+          "KH": "1 when caller supplies the already-computed full-q locator hash; 0 when helper computes it",
+          "C": "1 on guarded compact standard-7x6 path; 0 on full-key compatibility path",
+          "S": "1 after successful sequence-slot ownership; 0 on early contention return",
+          "X": "1 when contention accounting Atomics.add executes; 0 on successful ownership",
+          "K": "shared key words atomically published: S*8 on compact 7x6; S*keyWords on compatibility path",
+          "R": "raw q words directly loaded for compact publication (6 when C*S=1); pack-helper q loads are accounted by subledgers",
+          "A": "1 when sequence was even and entry-lock compareExchange was attempted; 0 on already-locked entry.",
+          "F": "Executed cache/keys/sequence/value and geometry-encoding field reads; no reporting/statistics field access."
+        },
+        "note": "Direct-mapped shared exact publication retains sequence CAS/value semantics. Compact standard compact profile publishes eight exact identity words instead of fourteen; compatibility geometries publish full keyWords. Contended stores remain safely droppable cache writes. Generated uncounted variant removes only reporting atomics. Required key/value/sequence synchronization retained. No hot reporting counter or statistics-selection branch."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 189,
-    "decomposed": 189,
+    "units": 191,
+    "decomposed": 191,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -12091,7 +12269,7 @@
     "addons/worker.mjs": "71fac29da515a982afc4271fac533a9889fffaa5",
     "addons/branch-manager.mjs": "0332613bdb9824a8916cad30f3464b7999ccfadc",
     "addons/rba-connect4-shared-exact-cache.mjs": "059562c5c59c47c6458041fa442fc7f53cc3cec3",
-    "addons/rba-connect4-lazy-smp-host.mjs": "b5268c319e2d1745cc698037ea581a1dfcf23745",
+    "addons/rba-connect4-lazy-smp-host.mjs": "d82444c659eca0e56d709494a84ea56b6651458b",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
     "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
@@ -12107,7 +12285,8 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "d32db5090ca89084547bbd9ec479bf90deab2624",
     "addons/rba-connect4-coordinate-dense.mjs": "12ff5e4d0f70a7c29cbdc919911c75c828a16f39",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "aabf51219c5c51e6ae20494ee38154bea12029fa"
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "bbf33c91b68860b10cae7026891068c8485f6c4b",
+    "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
