@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=0)
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[UInt64]$SharedCapacity=0,[UInt64]$LocalCapacity=0,[string[]]$NodeFlags=@())
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -9,6 +9,7 @@ if(Test-Path "$runDir/measurement.json"){throw 'Run already exists'}
 New-Item -ItemType Directory -Force -Path "$runDir/temp","$runDir/affinity" | Out-Null
 $config=Get-Content evidence/minimal-worker-localhost-20261004/immediate-win-01/invocation.json -Raw | ConvertFrom-Json
 $config.upstream_commit=(git rev-parse HEAD)
+if($NodeFlags.Count){$config.arguments=@($NodeFlags)+@('--import','file:///C:/r/jsminsys-cpc-rebuild-20261004/tools/benchmark-v8-startup-preload.mjs')+@($config.arguments)}
 if($SharedCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_SHARED_CAPACITY -NotePropertyValue ([string]$SharedCapacity) -Force}
 if($LocalCapacity){$config.environment | Add-Member -NotePropertyName JMS_BENCH_LOCAL_CAPACITY -NotePropertyValue ([string]$LocalCapacity) -Force}
 $config.environment.TEMP="$runDir/temp"
