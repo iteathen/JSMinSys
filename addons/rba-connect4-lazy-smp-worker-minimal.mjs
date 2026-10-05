@@ -4,7 +4,7 @@ import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
+import {connect4RbaNoLiveResiduals,connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -137,6 +137,15 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
         if(beta>0)beta=0;
       }
     }
+  }
+
+  if(connect4RbaNoLiveResiduals(g,words,src)){
+    if(depth)storeExact(src,hash,slot,2);
+    else for(let oi=0;oi<g.columns;oi+=1){
+      const column=centerOrder[oi];
+      if(words[src+column]<g.rows){bestMove=column;break;}
+    }
+    return 0;
   }
 
   const winningColumn=connect4RbaImmediateWinningColumn(g,words,src,basis,bi,n,mover);

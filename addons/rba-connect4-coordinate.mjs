@@ -6,6 +6,14 @@ export function connect4RbaTerminal(g,words,offset){return words[offset+g.metaOf
 export function connect4RbaRank(g,words,offset){return words[offset+g.metaOffset]>>>2;}
 export function connect4RbaPlayer(g,words,offset){return (words[offset+g.metaOffset]>>>2)&1;}
 
+// Nonterminal q only. A blocked winning line can never revive without capture.
+// Coordinates are contiguous; first nonzero proves some live residual remains.
+export function connect4RbaNoLiveResiduals(g,words,offset){
+  const start=offset+g.p0Offset,end=start+2*g.coordWords;
+  for(let at=start;at<end;at+=1)if(words[at])return 0;
+  return 1;
+}
+
 // Nonterminal q only. Singleton residuals precede larger shapes in the basis.
 // Return a playable mover singleton in the current frame, or -1; no child build.
 export function connect4RbaImmediateWinningColumn(g,words,offset,basis,bi,n,mover){
