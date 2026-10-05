@@ -22,7 +22,40 @@ for(const nonWinning of [false,true])for(const three of [false,true]){
   'const record=transitionBase+(i<<1),image=transitions[record];\n    if(image===dead)continue;\n    const survives=transitions[record+1];');
  assert.equal(s.split('image===id').length,3);s=s.replaceAll('image===id','survives!==0');
  once('lo=childIndex[image];','lo=image;');
- text+='export '+s.replace(old,old.replace('ClosureDense','Transition'))+'\n';
+ const name=old.replace('ClosureDense','Transition'),general=s.replace(old,name);
+ text+='export '+general+'\n';
+ // C32: bind immutable execution context once. Generated from the same
+ // authoritative projection; no eval, hot wrapper or dimension dispatch.
+ let bound=general;
+ const fields={columns:'COLUMNS',coordWords:'COORD_WORDS',metaOffset:'META_OFFSET',
+  p0Offset:'P0_OFFSET',p1Offset:'P1_OFFSET',cellCount:'CELL_COUNT',maxBasis:'MAX_BASIS'};
+ for(const [field,capture] of Object.entries(fields))bound=bound.replaceAll('g.'+field,capture);
+ bound=bound.replace('loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,removed)',
+  'loadBoundSupportTransitionBasis(target,dst,childBasis,ci,removed)');
+ bound=bound.replace('const plan=g.supportBasisPlans,handle=removed[0],','const handle=removed[0],');
+ bound=bound.replaceAll('plan.transitionOffsets','TRANSITION_OFFSETS').replaceAll('plan.strides','STRIDES')
+  .replaceAll('plan.transitions','TRANSITIONS').replaceAll('plan.transitionDead','TRANSITION_DEAD')
+  .replaceAll('g.supportBasisPlans.closures','CLOSURES');
+ bound=bound.replace('function '+name+'(','function '+name+'Bound(');
+ assert.ok(!bound.includes('g.')&&!bound.includes('plan.'));
+ const factory='prepare'+name[0].toUpperCase()+name.slice(1);
+ text+=`export function ${factory}(g){
+  const plan=g.supportBasisPlans;
+  if(!plan?.transitions)throw new TypeError('complete transition plan required');
+  const COLUMNS=g.columns,COORD_WORDS=g.coordWords,META_OFFSET=g.metaOffset,
+    P0_OFFSET=g.p0Offset,P1_OFFSET=g.p1Offset,CELL_COUNT=g.cellCount,MAX_BASIS=g.maxBasis,
+    STRIDES=plan.strides,BASIS=plan.basis,SIZES=plan.sizes,CLOSURES=plan.closures,
+    TRANSITION_OFFSETS=plan.transitionOffsets,TRANSITIONS=plan.transitions,TRANSITION_DEAD=plan.transitionDead;
+  function loadBoundSupportTransitionBasis(target,dst,childBasis,ci,indexOut){
+    let handle=0;
+    for(let c=0;c<COLUMNS;c++)handle+=target[dst+c]*STRIDES[c];
+    const n=SIZES[handle],base=handle*MAX_BASIS;
+    for(let i=0;i<n;i++)childBasis[ci+i]=BASIS[base+i];
+    indexOut[0]=handle;return n;
+  }
+  return ${bound};
+}
+`;
 }
 const output=new URL('../addons/rba-connect4-coordinate-support-transition.mjs',import.meta.url);
 if(process.argv.includes('--check'))assert.equal(readFileSync(output,'utf8').replaceAll('\r\n','\n'),text);

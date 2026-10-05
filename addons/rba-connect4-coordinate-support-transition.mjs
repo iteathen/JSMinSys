@@ -61,6 +61,82 @@ export function connect4RbaTransitionSpanCofactorKnownHeight(g,profile,source,sr
   }
   return 0;
 }
+export function prepareConnect4RbaTransitionSpanCofactorKnownHeight(g){
+  const plan=g.supportBasisPlans;
+  if(!plan?.transitions)throw new TypeError('complete transition plan required');
+  const COLUMNS=g.columns,COORD_WORDS=g.coordWords,META_OFFSET=g.metaOffset,
+    P0_OFFSET=g.p0Offset,P1_OFFSET=g.p1Offset,CELL_COUNT=g.cellCount,MAX_BASIS=g.maxBasis,
+    STRIDES=plan.strides,BASIS=plan.basis,SIZES=plan.sizes,CLOSURES=plan.closures,
+    TRANSITION_OFFSETS=plan.transitionOffsets,TRANSITIONS=plan.transitions,TRANSITION_DEAD=plan.transitionDead;
+  function loadBoundSupportTransitionBasis(target,dst,childBasis,ci,indexOut){
+    let handle=0;
+    for(let c=0;c<COLUMNS;c++)handle+=target[dst+c]*STRIDES[c];
+    const n=SIZES[handle],base=handle*MAX_BASIS;
+    for(let i=0;i<n;i++)childBasis[ci+i]=BASIS[base+i];
+    indexOut[0]=handle;return n;
+  }
+  return function connect4RbaTransitionSpanCofactorKnownHeightBound(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
+  const meta=source[src+META_OFFSET],rank=meta>>>2,
+    cell=height*COLUMNS+column,player=rank&1;
+  for(let c=0;c<COLUMNS;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+META_OFFSET]=(rank+1)<<2;
+  for(let w=0;w<2*COORD_WORDS;w+=1)target[dst+P0_OFFSET+w]=0;
+  sizes[sizeIndex]=0;
+
+  // Every physical cell is a singleton residual whenever winning geometry
+  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
+  const singleton=cell,coord=src+(player?P1_OFFSET:P0_OFFSET);
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+    const value=player?1:3;target[dst+META_OFFSET]=((rank+1)<<2)|value;return value;
+  }
+  if(rank+1===CELL_COUNT){target[dst+META_OFFSET]=((rank+1)<<2)|2;return 2;}
+
+  const cn=loadBoundSupportTransitionBasis(target,dst,childBasis,ci,removed);sizes[sizeIndex]=cn;
+
+  const handle=removed[0],
+    transitionBase=TRANSITION_OFFSETS[handle-STRIDES[column]]+column*n*2,transitions=TRANSITIONS,dead=TRANSITION_DEAD,
+    p0Source=src+P0_OFFSET,p1Source=src+P1_OFFSET,
+    p0Target=dst+P0_OFFSET,p1Target=dst+P1_OFFSET,
+    closures=CLOSURES,closureBase=handle*MAX_BASIS*COORD_WORDS;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
+    const record=transitionBase+(i<<1),image=transitions[record];
+    if(image===dead)continue;
+    const survives=transitions[record+1];
+    let write0=(active0!==0)&&(player===0||survives!==0),
+      write1=(active1!==0)&&(player===1||survives!==0);
+    if(!write0&&!write1)continue;
+
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    lo=image;
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
+    applySupportClosureSpan32(closures,closureBase+lo*COORD_WORDS,COORD_WORDS,target,p0Target,p1Target,write0,write1);
+  }
+  }
+  return 0;
+};
+}
 export function connect4RbaTransition3CofactorKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
@@ -122,6 +198,82 @@ export function connect4RbaTransition3CofactorKnownHeight(g,profile,source,src,b
   }
   return 0;
 }
+export function prepareConnect4RbaTransition3CofactorKnownHeight(g){
+  const plan=g.supportBasisPlans;
+  if(!plan?.transitions)throw new TypeError('complete transition plan required');
+  const COLUMNS=g.columns,COORD_WORDS=g.coordWords,META_OFFSET=g.metaOffset,
+    P0_OFFSET=g.p0Offset,P1_OFFSET=g.p1Offset,CELL_COUNT=g.cellCount,MAX_BASIS=g.maxBasis,
+    STRIDES=plan.strides,BASIS=plan.basis,SIZES=plan.sizes,CLOSURES=plan.closures,
+    TRANSITION_OFFSETS=plan.transitionOffsets,TRANSITIONS=plan.transitions,TRANSITION_DEAD=plan.transitionDead;
+  function loadBoundSupportTransitionBasis(target,dst,childBasis,ci,indexOut){
+    let handle=0;
+    for(let c=0;c<COLUMNS;c++)handle+=target[dst+c]*STRIDES[c];
+    const n=SIZES[handle],base=handle*MAX_BASIS;
+    for(let i=0;i<n;i++)childBasis[ci+i]=BASIS[base+i];
+    indexOut[0]=handle;return n;
+  }
+  return function connect4RbaTransition3CofactorKnownHeightBound(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
+  const meta=source[src+META_OFFSET],rank=meta>>>2,
+    cell=height*COLUMNS+column,player=rank&1;
+  for(let c=0;c<COLUMNS;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+META_OFFSET]=(rank+1)<<2;
+  for(let w=0;w<2*COORD_WORDS;w+=1)target[dst+P0_OFFSET+w]=0;
+  sizes[sizeIndex]=0;
+
+  // Every physical cell is a singleton residual whenever winning geometry
+  // exists. Shape ordering is cardinality then cell id, so singleton id=cell.
+  const singleton=cell,coord=src+(player?P1_OFFSET:P0_OFFSET);
+  let lo=0,hi=n;
+  while(lo<hi){const mid=(lo+hi)>>>1;if(basis[bi+mid]<singleton)lo=mid+1;else hi=mid;}
+  if(lo<n&&basis[bi+lo]===singleton&&(source[coord+(lo>>>5)]&(1<<(lo&31)))){
+    const value=player?1:3;target[dst+META_OFFSET]=((rank+1)<<2)|value;return value;
+  }
+  if(rank+1===CELL_COUNT){target[dst+META_OFFSET]=((rank+1)<<2)|2;return 2;}
+
+  const cn=loadBoundSupportTransitionBasis(target,dst,childBasis,ci,removed);sizes[sizeIndex]=cn;
+
+  const handle=removed[0],
+    transitionBase=TRANSITION_OFFSETS[handle-STRIDES[column]]+column*n*2,transitions=TRANSITIONS,dead=TRANSITION_DEAD,
+    p0Source=src+P0_OFFSET,p1Source=src+P1_OFFSET,
+    p0Target=dst+P0_OFFSET,p1Target=dst+P1_OFFSET,
+    closures=CLOSURES,closureBase=handle*MAX_BASIS*COORD_WORDS;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
+    const record=transitionBase+(i<<1),image=transitions[record];
+    if(image===dead)continue;
+    const survives=transitions[record+1];
+    let write0=(active0!==0)&&(player===0||survives!==0),
+      write1=(active1!==0)&&(player===1||survives!==0);
+    if(!write0&&!write1)continue;
+
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    lo=image;
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
+    applySupportClosure3x32(closures,closureBase+lo*COORD_WORDS,COORD_WORDS,target,p0Target,p1Target,write0,write1);
+  }
+  }
+  return 0;
+};
+}
 export function connect4RbaTransitionSpanCofactorNonWinningKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
@@ -175,6 +327,74 @@ export function connect4RbaTransitionSpanCofactorNonWinningKnownHeight(g,profile
   }
   return 0;
 }
+export function prepareConnect4RbaTransitionSpanCofactorNonWinningKnownHeight(g){
+  const plan=g.supportBasisPlans;
+  if(!plan?.transitions)throw new TypeError('complete transition plan required');
+  const COLUMNS=g.columns,COORD_WORDS=g.coordWords,META_OFFSET=g.metaOffset,
+    P0_OFFSET=g.p0Offset,P1_OFFSET=g.p1Offset,CELL_COUNT=g.cellCount,MAX_BASIS=g.maxBasis,
+    STRIDES=plan.strides,BASIS=plan.basis,SIZES=plan.sizes,CLOSURES=plan.closures,
+    TRANSITION_OFFSETS=plan.transitionOffsets,TRANSITIONS=plan.transitions,TRANSITION_DEAD=plan.transitionDead;
+  function loadBoundSupportTransitionBasis(target,dst,childBasis,ci,indexOut){
+    let handle=0;
+    for(let c=0;c<COLUMNS;c++)handle+=target[dst+c]*STRIDES[c];
+    const n=SIZES[handle],base=handle*MAX_BASIS;
+    for(let i=0;i<n;i++)childBasis[ci+i]=BASIS[base+i];
+    indexOut[0]=handle;return n;
+  }
+  return function connect4RbaTransitionSpanCofactorNonWinningKnownHeightBound(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
+  const meta=source[src+META_OFFSET],rank=meta>>>2,
+    cell=height*COLUMNS+column,player=rank&1;
+  for(let c=0;c<COLUMNS;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+META_OFFSET]=(rank+1)<<2;
+  for(let w=0;w<2*COORD_WORDS;w+=1)target[dst+P0_OFFSET+w]=0;
+  sizes[sizeIndex]=0;
+
+  if(rank+1===CELL_COUNT){target[dst+META_OFFSET]=((rank+1)<<2)|2;return 2;}
+
+  const cn=loadBoundSupportTransitionBasis(target,dst,childBasis,ci,removed);sizes[sizeIndex]=cn;
+
+  const handle=removed[0],
+    transitionBase=TRANSITION_OFFSETS[handle-STRIDES[column]]+column*n*2,transitions=TRANSITIONS,dead=TRANSITION_DEAD,
+    p0Source=src+P0_OFFSET,p1Source=src+P1_OFFSET,
+    p0Target=dst+P0_OFFSET,p1Target=dst+P1_OFFSET,
+    closures=CLOSURES,closureBase=handle*MAX_BASIS*COORD_WORDS;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
+    const record=transitionBase+(i<<1),image=transitions[record];
+    if(image===dead)continue;
+    const survives=transitions[record+1];
+    let write0=(active0!==0)&&(player===0||survives!==0),
+      write1=(active1!==0)&&(player===1||survives!==0);
+    if(!write0&&!write1)continue;
+
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    lo=image;
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
+    applySupportClosureSpan32(closures,closureBase+lo*COORD_WORDS,COORD_WORDS,target,p0Target,p1Target,write0,write1);
+  }
+  }
+  return 0;
+};
+}
 export function connect4RbaTransition3CofactorNonWinningKnownHeight(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
   const meta=source[src+g.metaOffset],rank=meta>>>2,
     cell=height*g.columns+column,player=rank&1;
@@ -227,4 +447,72 @@ export function connect4RbaTransition3CofactorNonWinningKnownHeight(g,profile,so
   }
   }
   return 0;
+}
+export function prepareConnect4RbaTransition3CofactorNonWinningKnownHeight(g){
+  const plan=g.supportBasisPlans;
+  if(!plan?.transitions)throw new TypeError('complete transition plan required');
+  const COLUMNS=g.columns,COORD_WORDS=g.coordWords,META_OFFSET=g.metaOffset,
+    P0_OFFSET=g.p0Offset,P1_OFFSET=g.p1Offset,CELL_COUNT=g.cellCount,MAX_BASIS=g.maxBasis,
+    STRIDES=plan.strides,BASIS=plan.basis,SIZES=plan.sizes,CLOSURES=plan.closures,
+    TRANSITION_OFFSETS=plan.transitionOffsets,TRANSITIONS=plan.transitions,TRANSITION_DEAD=plan.transitionDead;
+  function loadBoundSupportTransitionBasis(target,dst,childBasis,ci,indexOut){
+    let handle=0;
+    for(let c=0;c<COLUMNS;c++)handle+=target[dst+c]*STRIDES[c];
+    const n=SIZES[handle],base=handle*MAX_BASIS;
+    for(let i=0;i<n;i++)childBasis[ci+i]=BASIS[base+i];
+    indexOut[0]=handle;return n;
+  }
+  return function connect4RbaTransition3CofactorNonWinningKnownHeightBound(g,profile,source,src,basis,bi,n,column,height,target,dst,childBasis,ci,seen,sizes,sizeIndex,removed,childIndex){
+  const meta=source[src+META_OFFSET],rank=meta>>>2,
+    cell=height*COLUMNS+column,player=rank&1;
+  for(let c=0;c<COLUMNS;c+=1)target[dst+c]=source[src+c];
+  target[dst+column]=height+1;target[dst+META_OFFSET]=(rank+1)<<2;
+  for(let w=0;w<2*COORD_WORDS;w+=1)target[dst+P0_OFFSET+w]=0;
+  sizes[sizeIndex]=0;
+
+  if(rank+1===CELL_COUNT){target[dst+META_OFFSET]=((rank+1)<<2)|2;return 2;}
+
+  const cn=loadBoundSupportTransitionBasis(target,dst,childBasis,ci,removed);sizes[sizeIndex]=cn;
+
+  const handle=removed[0],
+    transitionBase=TRANSITION_OFFSETS[handle-STRIDES[column]]+column*n*2,transitions=TRANSITIONS,dead=TRANSITION_DEAD,
+    p0Source=src+P0_OFFSET,p1Source=src+P1_OFFSET,
+    p0Target=dst+P0_OFFSET,p1Target=dst+P1_OFFSET,
+    closures=CLOSURES,closureBase=handle*MAX_BASIS*COORD_WORDS;
+  const activeWords=(n+31)>>>5;
+  for(let sourceWord=0;sourceWord<activeWords;sourceWord+=1){
+    const owner0=source[p0Source+sourceWord],owner1=source[p1Source+sourceWord];
+    let active=owner0|owner1;
+    // The prior slot loop ignored every bit beyond n, including poisoned tails.
+    if(sourceWord+1===activeWords)active&=0xffffffff>>>((-n)&31);
+    while(active){
+    const sourceMask=active&-active,i=(sourceWord<<5)+31-Math.clz32(sourceMask),
+      active0=owner0&sourceMask,active1=owner1&sourceMask;
+    active^=sourceMask;
+    const record=transitionBase+(i<<1),image=transitions[record];
+    if(image===dead)continue;
+    const survives=transitions[record+1];
+    let write0=(active0!==0)&&(player===0||survives!==0),
+      write1=(active1!==0)&&(player===1||survives!==0);
+    if(!write0&&!write1)continue;
+
+    // Both coordinates share the same residual image whenever they survive.
+    // Locate and expand it once, then publish the resulting upset bits into
+    // whichever player coordinates are active.
+    let lo;
+    lo=image;
+    let targetWord=lo>>>5,targetMask=1<<(lo&31);
+    // HOT CONTRACT: each prior insertion completed its upward closure in this
+    // same child basis. An existing image bit therefore absorbs its entire
+    // expansion. Test each surviving player independently, BEFORE writing the
+    // current image; no additional state/allocation or cross-player inference.
+    // Preserve this proof guard and comment when changing the hot path.
+    write0=write0&&!(target[p0Target+targetWord]&targetMask);
+    write1=write1&&!(target[p1Target+targetWord]&targetMask);
+    if(!write0&&!write1)continue;
+    applySupportClosure3x32(closures,closureBase+lo*COORD_WORDS,COORD_WORDS,target,p0Target,p1Target,write0,write1);
+  }
+  }
+  return 0;
+};
 }

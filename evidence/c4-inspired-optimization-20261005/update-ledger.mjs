@@ -309,6 +309,34 @@ if(experiment==='C17'){
  prep.operations.push({op:'runtime.call.subledger',target:'compileSupportTransforms32',count:'CL'});
  prep.cycleCount.expression=prep.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:`C(${o.op})`)).join('+');
  prep.cycleCount.note+=' C35 runtime preparation calls only the combined transform compiler when closures admitted; separate builder subledgers are audit-reference-only. Table allocation and complete budget admission unchanged.';
+}else if(experiment==='C32'){
+ const src='addons/rba-connect4-coordinate-support-transition.mjs';
+ ledger.localOperationExtensions['runtime.context.load']={cost:{kind:'symbolic',name:'CONTEXT_LOAD_COST(profile,lowering)'},note:'Captured immutable initialization field use; may optimize to registers/constants, actual lowering qualified by separate JIT/full solve.'};
+ ledger.localOperationExtensions['runtime.context.store']={cost:{kind:'symbolic',name:'CONTEXT_STORE_COST(profile,lowering)'},note:'Cold immutable factory capture publication.'};
+ const loader=structuredClone(ledger.units.find(u=>u.name==='loadSupportTransitionBasis32'));
+ loader.source=src;loader.name='loadBoundSupportTransitionBasis';loader.unit=src+'#'+loader.name;
+ for(const o of loader.operations)if(o.op==='runtime.field.load'){o.op='runtime.context.load';o.count='CTX';}
+ loader.cycleCount.parameters.CTX='Executed captured columns/strides/sizes/maxBasis/basis uses, including loop limits; no geometry/plan property lookup.';
+ loader.cycleCount.expression=loader.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:`C(${o.op})`)).join('+');
+ loader.cycleCount.note+=' C32 generated context-specific helper allocated once cold; no hot wrapper/geometry read, same native row/copy operations.';ledger.units.push(loader);
+ for(const old of ledger.units.filter(u=>u.source===src&&u.name.startsWith('connect4RbaTransition')&&!u.name.endsWith('Bound'))){
+  const copy=structuredClone(old);copy.name+='Bound';copy.unit=src+'#'+copy.name;
+  for(const o of copy.operations){
+   if(o.op==='runtime.call.subledger'&&o.target==='loadSupportTransitionBasis32')o.target='loadBoundSupportTransitionBasis';
+   if(o.op==='runtime.field.load'){o.op='runtime.context.load';o.count='CTX';}
+  }
+  const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';copy.cycleCount[key]=copy.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  copy.cycleCount.parameters.CTX='Executed immutable captured field uses, including loop limits; no g/plan/profile property in this body. Math.clz32 implementation remains separately qualified.';
+  copy.cycleCount.note+=' C32 same authoritative body with invariant geometry/plan context captured cold; ABI g/profile arguments retained but unused. JIT/context access costs are not presumed free.';ledger.units.push(copy);
+  const name='prepare'+old.name[0].toUpperCase()+old.name.slice(1),operations=[{op:'runtime.field.load',count:16},{op:'control.test.u32',count:2},{op:'control.branch',count:1},{op:'runtime.function.allocate',count:2},{op:'runtime.context.store',count:14}];
+  ledger.units.push({unit:src+'#'+name,source:src,name,scope:'cold-bound-transition-factory',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*C(${o.op})`).join('+'),parameters:{},note:'C32 COLD valid admitted-plan path: one geometry plan load, plan guard, seven geometry and seven plan captures, two closures once per worker. Invalid precondition throws before search. Whole-operation timing includes worker preparation.'}});
+ }
+ for(const u of workers.filter(u=>u.name==='<module-main>')){
+  u.operations.push({op:'runtime.callback',target:'selectedTransitionFactory',count:'TR_BIND'});
+  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]+='+TR_BIND*CALLBACK(selectedTransitionFactory)';
+  u.cycleCount.parameters.TR_BIND='1 only if complete transition plan admitted;0 on unchanged fallback.';
+  u.cycleCount.note+=' C32 cold selection calls the selected three/span nonwinning factory once; no hot factory/dispatch/allocation.';
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

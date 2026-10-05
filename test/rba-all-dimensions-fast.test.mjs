@@ -1,4 +1,5 @@
 import {connect4RbaTransition3CofactorKnownHeight as transition3,connect4RbaTransitionSpanCofactorKnownHeight as transitionSpan} from '../addons/rba-connect4-coordinate-support-transition.mjs';
+import {prepareConnect4RbaTransition3CofactorKnownHeight as bind3,prepareConnect4RbaTransitionSpanCofactorKnownHeight as bindSpan} from '../addons/rba-connect4-coordinate-support-transition.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry as geom,prepareConnect4RbaCoordinateScratch as scratch} from '../addons/rba-connect4-geometry.mjs';
@@ -16,6 +17,7 @@ test('fast physical transitions and canonical reflection across all100 dimension
  for(let W=1;W<=10;W++)for(let H=1;H<=10;H++){
   const g=geom({columns:W,rows:H}),p=profile(g),lines=[],catalog=new Map();
   g.supportBasisPlans=prepareSupportBasisPlans32(g,8*2**20,true,true,true);geometries++;if(g.supportBasisPlans)plans++;
+  const bound=g.supportBasisPlans?bindSpan(g):null,bound3=g.supportBasisPlans&&g.coordWords===3?bind3(g):null;
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)for(const [dx,dy] of [[1,0],[0,1],[1,1],[1,-1]])if(x+3*dx<W&&y+3*dy>=0&&y+3*dy<H)lines.push(Array.from({length:4},(_,i)=>(y+i*dy)*W+x+i*dx).sort((a,b)=>a-b));
   for(let id=0;id<g.shapeCount;id++)catalog.set(Array.from(g.shapeCells.slice(id*4,id*4+g.shapeSize[id])).join(','),id);
  function encode(moves){
@@ -41,7 +43,7 @@ test('fast physical transitions and canonical reflection across all100 dimension
     const ref=(g.supportBasisPlans?plannedCanonical:canonical)(g,p,cw,0,cb,0,cb.length,sc),mirror=encode(moves.map(c=>W-1-c));
     assert.deepEqual(cw,ref?mirror.words:q.words);assert.deepEqual(cb,ref?mirror.basis:q.basis);
     const fns=[prepared];
-    if(g.supportBasisPlans){fns.push(transitionSpan);if(g.coordWords===3)fns.push(transition3);fns.push(sparseSpan);if(g.removeByCell!==null)fns.push(denseSpan);
+    if(g.supportBasisPlans){fns.push(transitionSpan,bound);if(g.coordWords===3)fns.push(transition3,bound3);fns.push(sparseSpan);if(g.removeByCell!==null)fns.push(denseSpan);
      if(g.coordWords===3){fns.push(sparse3);if(g.removeByCell!==null)fns.push(dense3);}}
     for(const c of legal){const child=encode([...moves,c]);
      for(const fn of fns){
