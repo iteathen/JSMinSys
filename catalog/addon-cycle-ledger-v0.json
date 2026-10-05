@@ -11749,12 +11749,22 @@
           "op": "runtime.call.subledger",
           "count": "CP",
           "target": "evaluateConnect4PreparedCpcWin32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+O*PK*CALL(orderConnect4LiveLinePacked32)+O*(1-PK)*CALL(orderConnect4LiveLineGeneral32)+R*LK*CALL(advanceConnect4LiveLineState3x32)+R*(1-LK)*CALL(advanceConnect4LiveLineState32)+R*C(alu.imul.u32)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -11782,7 +11792,9 @@
           "PK": "Cold-selected packed versus general move-row layout.",
           "LK": "Cold-selected three-word versus general live-state update.",
           "CP": "Nodes reaching the guarded certificate after immediate/dual-threat checks.",
-          "CW": "Positive non-root CPC certificates published as an exact previous-mover win."
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
+          "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
         "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C06 advisory live-line ordering maintains physical masks in preallocated depth frames. Expanded recurrence arguments/call-frame cost is runtime-dependent and measured, not assumed free; TT key/exact semantics unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
@@ -11915,12 +11927,17 @@
         {
           "op": "atomic.wait",
           "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4LiveLineOrder32)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13046,12 +13063,22 @@
           "op": "runtime.call.subledger",
           "count": "CP",
           "target": "evaluateConnect4PreparedCpcWin32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)",
+        "activeCycleExpression": "SP*C(atomic.load.u32)+F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+XOR*C(alu.xor.u32)+SUB*C(alu.sub.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+H*CALL(mixSpan32Locator32)+H*CALL(probeCache)+A*KD*CALL(connect4RbaDenseCofactorNonWinningKnownHeight)+A*(1-KD)*CALL(connect4RbaPreparedCofactorNonWinningKnownHeight)+T*CALL(relativeTerminal)+R*CALL(connect4RbaPreparedCanonicalize)+R*CALL(negamax)+X*CALL(relativeToAbsolute)+(X+D+CW)*CALL(storeExact)+BND*CALL(storeBound)+Q*CALL(connect4RbaForcedResponseColumn)+LA*CALL(connect4RbaExposesOpponentWin)+CP*CALL(evaluateConnect4PreparedCpcWin32)+TD*CALL(evaluateConnect4CpcTargetDenseWin32)+TG*CALL(evaluateConnect4CpcTargetGeneralWin32)",
         "unboundedTerms": [
           "R*CALL(negamax)"
         ],
@@ -13076,7 +13103,9 @@
           "KD": "1 when initialization selects the dense geometry removal table, otherwise 0. No hot selector.",
           "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
           "CP": "Nodes reaching the guarded certificate after immediate/dual-threat checks.",
-          "CW": "Positive non-root CPC certificates published as an exact previous-mover win."
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved",
+          "TG": "Reached target certificate calls for the cold-selected profile, only after whole-reservoir certificate is unresolved"
         },
         "note": "MW-014 relative local exact encoding was costed out. Worker-local and shared exact entries use the same absolute 1/2/3 encoding; SP/H ledger variables remain corrected. Immediate-win proof returns before child descent; root bestMove is in the current canonical frame and uses the existing root reflection transporter. C01 explicit rule-derived tree restriction: sole opponent winning column is mandatory unless mover can win first. Root proved loss retains an optimal legal center-first action. C03 selects existing prepared scratch-only kernels at initialization; dimensions remain geometry data. C05 exact child-loss scope from already maintained RBA residuals; original best/alpha and root legal-action handling unchanged. C10 isolated owner-authorized CPC experiment: positive certificate proves prior-mover win; unresolved is ignored. Root current-player loss retains any legal witness. No legacy NDC imported. C11 replaces per-node immediate-win testing by an inductive caller precondition: root check, C01 frontier blocking, C05 exposed-threat rejection. No recursive own-immediate scan or child-cofactor win test remains. General game/cofactor APIs still detect wins."
       },
@@ -13204,12 +13233,17 @@
         {
           "op": "atomic.wait",
           "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)",
+        "activeCycleExpression": "C(runtime.module.bookkeeping)+6*C(runtime.typed_array.allocate)+F*C(runtime.field.load)+S*C(memory.store.u32)+MUL*C(alu.imul.u32)+ADD*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+PAIR*C(alu.shr.u32)+C(alu.shl.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)+4*C(atomic.store.u32)+2*C(atomic.rmw.u32)+C(atomic.notify)+CALL(prepareConnect4RbaExecutionProfile)+CALL(prepareConnect4RbaCoordinateScratch)+CALL(attachConnect4RbaSharedExactCache32)+CALL(isCompactProfile8)+T*CALL(relativeTerminal)+N*CALL(negamax)+A*CALL(relativeToAbsolute)+CALL(prepareConnect4CpcWin32)+IW*CALL(connect4RbaImmediateWinningColumn)+(2*PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+CALL(prepareConnect4CpcTargetWin32)",
         "unboundedTerms": [
           "N*CALL(negamax)"
         ],
@@ -13645,11 +13679,325 @@
         "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-target-win.mjs#prepareConnect4CpcTargetWin32",
+      "source": "addons/connect4-cpc-target-win.mjs",
+      "name": "prepareConnect4CpcTargetWin32",
+      "scope": "cold-geometry-preparation",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "L8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "OR"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SHR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": "TA"
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": "AA"
+        },
+        {
+          "op": "runtime.array.push",
+          "count": "AP"
+        },
+        {
+          "op": "runtime.array.copy",
+          "count": "COPY"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FS"
+        },
+        {
+          "op": "runtime.host.bookkeeping",
+          "count": "HOST"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "PF"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": "1"
+        },
+        {
+          "op": "memory.store.native_index",
+          "count": "BS"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(TA)*C(runtime.typed_array.allocate)+(AA)*C(runtime.array.allocate)+(AP)*C(runtime.array.push)+(COPY)*C(runtime.array.copy)+(FS)*C(runtime.field.store)+(HOST)*C(runtime.host.bookkeeping)+PF*C(runtime.typed_array.fill)+1*C(runtime.object.allocate)+BS*C(memory.store.native_index)",
+        "parameters": {
+          "F": "Executed runtime.field.load operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L8": "Executed memory.load.u8 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "S": "Executed memory.store.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "A": "Executed alu.add.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SUB": "Executed alu.sub.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "M": "Executed alu.imul.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "AND": "Executed alu.and.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "OR": "Executed alu.or.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "XOR": "Executed alu.xor.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHL": "Executed alu.shl.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHR": "Executed alu.shr.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "TEST": "Executed control.test.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "BRANCH": "Executed control.branch operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "TA": "Executed runtime.typed_array.allocate operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "AA": "Executed runtime.array.allocate operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "AP": "Executed runtime.array.push operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "COPY": "Executed runtime.array.copy operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "FS": "Executed runtime.field.store operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "HOST": "Executed runtime.host.bookkeeping operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "PF": "one upper-row table initialization when dense plan is admitted",
+          "BS": "Uint8 response/column mask writes during geometry preparation"
+        },
+        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-target-win.mjs#evaluateConnect4CpcTargetGeneralWin32",
+      "source": "addons/connect4-cpc-target-win.mjs",
+      "name": "evaluateConnect4CpcTargetGeneralWin32",
+      "scope": "hot-guarded-cpc",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "L8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "OR"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SHR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CALLS0",
+          "target": "firstSetBitIndex32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+CALLS0*CALL(firstSetBitIndex32)",
+        "parameters": {
+          "F": "Executed runtime.field.load operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L8": "Executed memory.load.u8 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "S": "Executed memory.store.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "A": "Executed alu.add.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SUB": "Executed alu.sub.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "M": "Executed alu.imul.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "AND": "Executed alu.and.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "OR": "Executed alu.or.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "XOR": "Executed alu.xor.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHL": "Executed alu.shl.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHR": "Executed alu.shr.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "TEST": "Executed control.test.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "BRANCH": "Executed control.branch operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "CALLS0": "Actual calls to firstSetBitIndex32"
+        },
+        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-target-dense-win.mjs#evaluateConnect4CpcTargetDenseWin32",
+      "source": "addons/connect4-cpc-target-dense-win.mjs",
+      "name": "evaluateConnect4CpcTargetDenseWin32",
+      "scope": "hot-guarded-cpc",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "memory.load.u8",
+          "count": "L8"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "M"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND"
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "OR"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "SHL"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "SHR"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CALLS0",
+          "target": "firstSetBitIndex32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+CALLS0*CALL(firstSetBitIndex32)",
+        "parameters": {
+          "F": "Executed runtime.field.load operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L8": "Executed memory.load.u8 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "S": "Executed memory.store.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "A": "Executed alu.add.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SUB": "Executed alu.sub.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "M": "Executed alu.imul.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "AND": "Executed alu.and.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "OR": "Executed alu.or.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "XOR": "Executed alu.xor.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHL": "Executed alu.shl.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "SHR": "Executed alu.shr.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "TEST": "Executed control.test.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "BRANCH": "Executed control.branch operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "CALLS0": "Actual calls to firstSetBitIndex32"
+        },
+        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 210,
-    "decomposed": 210,
+    "units": 213,
+    "decomposed": 213,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -13776,11 +14124,13 @@
     "addons/rba-connect4-coordinate-prepared.mjs": "595b53bb5f05f2ff2dee022f70833d6a8fe869c9",
     "addons/rba-connect4-coordinate-dense.mjs": "29c080c4a7998d5451d7bf919a87ae027b4ab200",
     "addons/ndc-connect4.mjs": "bb1c5c777a8421712dc17fa5e1dfc335e6ce3364",
-    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "6c8d6700fdbf11a124ce6f2cea76c6c75719b4a5",
+    "addons/rba-connect4-lazy-smp-worker-minimal.mjs": "982afd1cdd93c8e81e736ba6dbf88e87ac95c60b",
     "addons/rba-connect4-shared-exact-cache-uncounted.mjs": "e9accae8957321eb304c638ab4731a7f614123de",
     "addons/connect4-live-line-order.mjs": "8f5636abe507fb87d2c391448800c00f93d28486",
-    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "5f30ffd834554246786196b82ba1e40c872be70d",
-    "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca"
+    "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": "206c7820372a76c15ab913dd4fc3536d01e66784",
+    "addons/connect4-cpc-prepared-win.mjs": "86a9febf524b18fd4f10563aaf8637778b162bca",
+    "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
+    "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

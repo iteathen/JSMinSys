@@ -1,0 +1,37 @@
+{"kind":"cpc-exhaustive-small-physical-policy","checked":32280,"positive":272}
+{"kind":"cpc-general-physical-policy","checked":7666,"positive":34}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (58.7257ms)
+✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (147.338ms)
+✔ prepared CPC preserves literal policy across general geometry, frames and support (330.0813ms)
+{"kind":"cpc-target-exhaustive-small-physical-policy","checked":32280,"positive":240,"added":144}
+{"kind":"cpc-target-general-physical-policy","checked":8754,"positive":58,"added":40}
+✔ target-reservoir CPC equals literal guarded policy and physical exact game on bounded carriers (183.4191ms)
+✔ target-reservoir CPC preserves literal policy across general geometry, frames and support (958.7804ms)
+✔ shared exact cache publishes only fully committed exact rows (0.9519ms)
+✔ shared exact known-hash path retains full-key validation (0.14ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (10.421ms)
+✔ non-7x6 shared exact cache retains full-key identity (1.4735ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (64.231ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (9.8275ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (50.3414ms)
+✔ sharing-density masks preserve exact Lazy SMP results (341.0119ms)
+✔ Lazy SMP move ordering is center-line distance only (33.7274ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (63.3441ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (1.9507ms)
+✔ Lazy SMP rejects unknown worker mode (1.3096ms)
+✔ minimal worker never publishes local bounds to shared exact cache (38.3928ms)
+✔ minimal worker omits hot diagnostic counters (33.6807ms)
+✔ minimal timeout is host-terminated without recursive polling (20.0484ms)
+✔ minimal abort is host-terminated without recursive polling (21.6667ms)
+✔ minimal four-worker search returns after an immediate winning center move (37.9499ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (318.7778ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (108.5177ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (0.857ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1243.496

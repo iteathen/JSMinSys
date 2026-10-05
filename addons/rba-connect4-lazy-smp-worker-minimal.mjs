@@ -1,3 +1,4 @@
+import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
 import {prepareConnect4CpcWin32,evaluateConnect4PreparedCpcWin32} from './connect4-cpc-prepared-win.mjs';
 import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
@@ -19,6 +20,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
+    targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
   connect4RbaCofactorKnownHeight=g.removeByCell!==null
     ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,
   control=workerData.control,resultWords=workerData.resultWords,
@@ -166,7 +168,8 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
   }
 
   // A positive certificate proves the previous mover wins. Zero is unresolved.
-  if(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)){
+  if(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
+     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
     if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
