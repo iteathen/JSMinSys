@@ -15,7 +15,7 @@ import {workerData} from 'node:worker_threads';
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
-import {connect4RbaExposesOpponentWin,connect4RbaImmediateWinningColumn,connect4RbaForcedResponseColumn} from './rba-connect4-coordinate.mjs';
+import {connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';
 import {
   attachConnect4RbaSharedExactCache32,
   isCompactProfile8,
@@ -30,7 +30,8 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
     targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
-    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,
+    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,
+    forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,
   connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null
     ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)
     :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null
@@ -172,7 +173,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
 
   // Root excludes immediate wins once. C01/C05 ensure every recursed child
   // also has no immediate mover win; cofactor uses that proved precondition.
-  const forced=connect4RbaForcedResponseColumn(g,words,src,basis,bi,n,mover);
+  const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,forbiddenBase);
   if(forced===-2){
     if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
@@ -183,7 +184,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   }
 
   // Current mover has two distinct playable demands and no counterterminal.
-  const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced);
+  const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
   if(fork>=0){
     if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover));
     else bestMove=fork;
@@ -209,7 +210,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     if(height>=g.rows)continue;
 
     // An exposed opponent singleton proves this child loses without building it.
-    const term=connect4RbaExposesOpponentWin(g,words,src,basis,bi,n,mover,column,height)
+    const term=forbidden[forbiddenBase+(column>>>5)]&(1<<(column&31))
       ?(mover?3:1):connect4RbaCofactorKnownHeight(
       g,profile,words,src,basis,bi,n,column,height,
       words,dst,basis,ci,coord.seen,basisSize,depth+1,coord.map,coord.inverse,

@@ -8,33 +8,33 @@ test('CPCX pair hub prepares native endpoint fields without a board-size fork',(
   assert.equal(typeof api.prepareConnect4CpcxPairHub32,'function');
   for(const [columns,bytes] of [[7,1],[257,2],[65537,4]]){
     // Synthetic prepared geometry isolates field widths, not game outcomes.
-    const g={columns,rows:1,coordWords:1,p0Offset:columns+1,p1Offset:columns+2,
+    const g={columns,rows:1,cellCount:2,coordWords:1,p0Offset:columns+1,p1Offset:columns+2,
       pairShapeStart:0,tripleShapeStart:2,shapeCells:Uint32Array.of(0,1,0,0,0,2,0,0),
       cellColumn:Uint32Array.of(0,columns-1,1),cellRow:Uint32Array.of(0,0,0)};
     const p=api.prepareConnect4CpcxPairHub32(g),words=new Uint32Array(columns+3),basis=Uint32Array.of(0,1);
     assert.equal(p.fieldBytes,bytes);words[g.p0Offset]=3;
-    assert.equal(p.find(words,0,basis,0,2,0,-1),0);
-    assert.equal(p.find(words,0,basis,0,2,0,1),-1,'forced blocker cannot be ignored');
+    assert.equal((p.collect(words,0,basis,0,2,0,0),p.find(words,0,basis,0,2,0,-1,0)),0);
+    assert.equal((p.collect(words,0,basis,0,2,0,0),p.find(words,0,basis,0,2,0,1,0)),-1,'forced blocker cannot be ignored');
     words[g.p0Offset]=1;
-    assert.equal(p.find(words,0,basis,0,2,0,-1),-1,'scratch must reset');
-    assert.equal(p.find(words,0,basis,0,0,0,-1),-1,'poisoned bits outside empty basis ignored');
+    assert.equal((p.collect(words,0,basis,0,2,0,0),p.find(words,0,basis,0,2,0,-1,0)),-1,'scratch must reset');
+    assert.equal((p.collect(words,0,basis,0,0,0,0),p.find(words,0,basis,0,0,0,0,-1,0)),-1,'poisoned bits outside empty basis ignored');
   }
 });
 
 test('pair hub rejects duplicate demands, unsupported completion and exposed counterwin',()=>{
   assert.equal(typeof api.prepareConnect4CpcxPairHub32,'function');
-  const g={columns:3,rows:2,coordWords:1,p0Offset:4,p1Offset:5,pairShapeStart:6,tripleShapeStart:8,
+  const g={columns:3,rows:2,cellCount:6,coordWords:1,p0Offset:4,p1Offset:5,pairShapeStart:6,tripleShapeStart:8,
     shapeCells:new Uint32Array(32),cellColumn:Uint32Array.of(0,1,2,0,1,2),cellRow:Uint32Array.of(0,0,0,1,1,1)};
   g.shapeCells.set([0,1,0,0,0,2,0,0],24);
   const source=Uint32Array.of(0,0,0,0,6,1),basis=Uint32Array.of(3,6,7),p=api.prepareConnect4CpcxPairHub32(g);
-  assert.equal(p.find(source,0,basis,0,3,0,-1),-1,'opponent singleton above hub supersedes fork');
-  source[5]=0;assert.equal(p.find(source,0,basis,0,3,0,-1),0);
+  assert.equal((p.collect(source,0,basis,0,3,0,0),p.find(source,0,basis,0,3,0,-1,0)),-1,'opponent singleton above hub supersedes fork');
+  source[5]=0;assert.equal((p.collect(source,0,basis,0,3,0,0),p.find(source,0,basis,0,3,0,-1,0)),0);
   g.shapeCells[28+1]=1;
   const duplicate=api.prepareConnect4CpcxPairHub32(g);
-  assert.equal(duplicate.find(source,0,basis,0,3,0,-1),-1,'two descriptions of one completion are one demand');
+  assert.equal((duplicate.collect(source,0,basis,0,3,0,0),duplicate.find(source,0,basis,0,3,0,-1,0)),-1,'two descriptions of one completion are one demand');
   g.shapeCells[28+1]=5;
   const hidden=api.prepareConnect4CpcxPairHub32(g);
-  assert.equal(hidden.find(source,0,basis,0,3,0,-1),-1,'unsupported second completion cannot consume a response');
+  assert.equal((hidden.collect(source,0,basis,0,3,0,0),hidden.find(source,0,basis,0,3,0,-1,0)),-1,'unsupported second completion cannot consume a response');
 });
 
 function board(W,H){
@@ -89,7 +89,8 @@ test('CPCX pair hub positives pass independent physical reply proofs and general
             const n=q.basis.length,aw=(n+31)>>>5;
             if(aw&&(n&31))source[2+(mover?g.p1Offset:g.p0Offset)+aw-1]|=0xffffffff<<(n&31);
             const before=Array.from(source),basisBefore=Array.from(basis),fc=q.reflected&&forced>=0?W-1-forced:forced;
-            const found=p.find(source,2,basis,3,n,mover,fc),physical=q.reflected&&found>=0?W-1-found:found;
+            assert.equal(p.collect(source,2,basis,3,n,mover,0),fc);
+            const found=p.find(source,2,basis,3,n,mover,fc,0),physical=q.reflected&&found>=0?W-1-found:found;
             assert.deepEqual(Array.from(source),before);assert.deepEqual(Array.from(basis),basisBefore);
             if(literal.length){literalPositive++;assert.ok(found>=0,'literal pair hub must be admitted');}
             if(found>=0){
@@ -117,3 +118,4 @@ test('CPCX pair hub positives pass independent physical reply proofs and general
   assert.ok(checked>1000);assert.ok(positive>0);assert.ok(literalPositive>0);assert.ok(forcedCases>0);
   console.log(JSON.stringify({kind:'cpcx-pair-hub-physical-proof',checked,positive,literalPositive,forcedCases,seed}));
 });
+
