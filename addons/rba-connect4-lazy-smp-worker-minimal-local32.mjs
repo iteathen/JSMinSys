@@ -9,7 +9,8 @@ import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connec
 import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
 import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';
-import {prepareConnect4CpcWin32,evaluateConnect4PreparedCpcWin32} from './connect4-cpc-prepared-win.mjs';
+import {prepareConnect4CpcWin32} from './connect4-cpc-prepared-win.mjs';
+import {evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-prepared-response.mjs';
 import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
@@ -182,8 +183,9 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     return 1;
   }
 
-  // A positive certificate proves the previous mover wins. Zero is unresolved.
-  if(evaluateConnect4PreparedCpcWin32(cpc,words,src,basis,bi,n,mover^1)||
+  // One common legal policy: WIN or a one-sided NONLOSS for previous mover.
+  const response=evaluateConnect4PreparedCpcResponse32(cpc,words,src,basis,bi,n,mover^1);
+  if(response===1||
      evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
     if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
@@ -191,6 +193,11 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
       if(words[src+column]<g.rows){bestMove=column;break;}
     }
     return -1;
+  }
+
+  if(response===2){
+    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0);return 0;}
+    if(beta>0)beta=0;
   }
 
   const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);

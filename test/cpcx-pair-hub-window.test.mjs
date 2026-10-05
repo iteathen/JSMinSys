@@ -24,7 +24,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      mixSpan32Locator32:()=>0,probeCache:()=>cached,
      storeExact:(_src,_hash,_slot,value)=>assert.equal(value,truth===0?2:mover===0?truth+2:2-truth,'no unwarranted exact cache entry'),
      storeBound:(_src,_hash,_slot,value)=>assert.ok(value===4?truth>=0:truth<=0,'sound stored zero bound'),
-     evaluatePairHub:()=>fork?0:-1,collectSingletons:()=>-1,evaluateConnect4PreparedCpcWin32:()=>false,evaluateTargetCpc:()=>false,
+     evaluatePairHub:()=>fork?0:-1,collectSingletons:()=>-1,evaluateConnect4PreparedCpcResponse32:()=>0,evaluateTargetCpc:()=>false,
      orderLive:()=>1,connect4RbaExposesOpponentWin:()=>false,
      connect4RbaCofactorKnownHeight:()=>{assert.equal(fork,false,'certified pair hub must avoid child construction');return truth===0?2:mover===0?truth+2:2-truth;},
      relativeTerminal:(code,player)=>code===2?0:code===(player?1:3)?1:-1,
