@@ -245,6 +245,36 @@ if(experiment==='C17'){
   {op:'runtime.callback',count:'K',target:'permuteCoordinates'},call('publishSpan32','SEL')],
   {K:'1 if support comparison does not early-return;0 otherwise.',SEL:'1 only if reflection actually selected.',C:'Configured columns.',N:'Current basis size.',T:'Executed owner tie-break loads, including equality and final ordering comparison.',FIELD:'Actual geometry/plan/scratch properties, including loop bounds.',ADD:'Executed row/frame/loop additions.',TEST:'All predicates, loops and short-circuit tie-break checks.',BRANCH:'Actual source control selections.'},
   'HOT complete-plan precondition; consumes exact child handle in existing scratch written by cofactor. Removes reflected basis emission, inverse and map reconstruction entirely. Same support-first/owner-tie comparison, coordinate permutation and physical action transporter. Calls same profile-specific permutation with native map and nonzero row offset. No allocation/metadata reporting/hot geometry or mode dispatch. Native-view polymorphism and actual inlining remain full-run/JIT debt.');
+}else if(experiment==='C30'){
+ const src='addons/rba-connect4-support-basis-plan.mjs',kernel='addons/rba-connect4-coordinate-support-transition.mjs',call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
+ function unit(source,name,operations,parameters,note){ledger.units.push({unit:source+'#'+name,source,name,scope:'support-transition-plan',status:'decomposed',operations,cycleCount:{kind:'symbolic',expression:operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+'),parameters,note}});}
+ unit(src,'compileSupportTransitions32',[
+  {op:'runtime.typed_array.allocate',count:1},{op:'runtime.field.load',count:'FIELD'},
+  {op:'memory.load.u32',count:'LOAD32'},{op:'memory.load.native_index',count:'LOADID'},
+  {op:'memory.store.u32',count:'INVERSE'},{op:'memory.store.native_index',count:'2*IMAGE'},
+  {op:'runtime.number.divide',count:'P*C'},{op:'runtime.math.floor',count:'P*C'},{op:'runtime.number.remainder',count:'P*C'},
+  {op:'runtime.number.multiply',count:'MUL'},{op:'alu.add.u32',count:'ADD'},
+  {op:'control.test.u32',count:'TEST'},{op:'control.branch',count:'BRANCH'},
+  {op:'runtime.callback',count:'LEGAL',target:'prepareRemove'},{op:'runtime.callback',count:'VISIT',target:'removePrepared'}],
+  {P:'All support profiles.',C:'Configured columns.',LEGAL:'Legal support/column pairs.',VISIT:'Parent basis slots in legal rows.',INVERSE:'Total child basis slots visited over legal rows.',IMAGE:'Surviving nonempty images written as direct native fields.',LOADID:'Size and basis native reads.',LOAD32:'Strides and licensed inverse reads.',FIELD:'All properties and loop bounds.',MUL:'All row/landing/record address products.',ADD:'Loop/index/address additions.',TEST:'Predicates and loops.',BRANCH:'Source control selections.'},
+  'COLD complete geometry-only transitions, including unreachable supports. Direct native index and survival fields have no hot decode. Membership licensing is physical residual cofactor into exact child support basis. All cost paid before readiness and in whole-operation cycles.');
+ const oldLoad=ledger.units.find(u=>u.name==='loadSupportClosureBasis32'),load=structuredClone(oldLoad);load.source=src;load.name='loadSupportTransitionBasis32';load.unit=src+'#'+load.name;
+ for(const o of load.operations)if(o.op==='memory.store.u32')o.count='N+1';load.cycleCount.expression=load.cycleCount.expression.replace('(2*N+1)*C(memory.store.u32)','(N+1)*C(memory.store.u32)');load.cycleCount.note='C30 HOT basis-only copy/handle publication. Membership, inverse and removal scratch are not computed or consumed. No allocation/clearing; complete table precondition.';ledger.units.push(load);
+ const prep=ledger.units.find(u=>u.source===src&&u.name==='prepareSupportBasisPlans32');
+ append(prep,call('compileSupportTransitions32','TR'),'TR*CALL(compileSupportTransitions32)+TR*C(memory.allocate.shared.bytes)+TR*C(runtime.typed_view.construct)+FILL*C(memory.store.native_index)+EXTRA_TR*C(control.test.u32)+EXTRA_TR*C(control.branch)',{TR:'1 if complete transition plan admitted;0 otherwise.',FILL:'Entire native transition view length initialized to dead sentinel; no deferred pages/table fill.',EXTRA_TR:'Extra bool/width/element/budget/admission branches.'},'C30 transition storage included in working/retained bytes; native1/2/4 width chosen cold with disjoint sentinel. Whole-operation cycles include compilation and full sentinel fill.');
+ prep.operations.push({op:'memory.allocate.shared.bytes',count:'TR'},{op:'runtime.typed_view.construct',count:'TR'},{op:'memory.store.native_index',count:'FILL'},{op:'control.test.u32',count:'EXTRA_TR'},{op:'control.branch',count:'EXTRA_TR'});
+ for(const old of ledger.units.filter(u=>u.source==='addons/rba-connect4-coordinate-closure-dense.mjs')){
+  const copy=structuredClone(old);copy.source=kernel;copy.name=copy.name.replace('ClosureDense','Transition');copy.unit=kernel+'#'+copy.name;
+  for(const o of copy.operations){
+   if(o.op==='runtime.call.subledger'&&o.target==='loadSupportClosureBasis32')o.target='loadSupportTransitionBasis32';
+   o.count=String(o.count).replace(/\b(A|Q|RS)\b/g,'0');
+   if(o.op==='memory.load.native_index')o.count='A+LIVE';
+  }
+  copy.operations.push({op:'memory.load.u32',count:'K'},{op:'runtime.number.multiply',count:'2*K'},{op:'alu.sub.u32',count:'K'},{op:'alu.shl.u32',count:'A'});
+  const key=copy.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';copy.cycleCount[key]=copy.operations.map(o=>`(${o.count})*`+(o.op==='runtime.call.subledger'?`CALL(${o.target})`:o.op==='runtime.callback'?`CALLBACK(${o.target})`:`C(${o.op})`)).join('+');
+  Object.assign(copy.cycleCount.parameters,{A:'Active parent bits reaching one direct native transition-index read.',LIVE:'Nondead transitions reaching the direct survival-field read.',Q:'Zero: no runtime inverse lookup.',RS:'Zero: no saved removal lookup.'});
+  copy.cycleCount.note+=' C30 one merged direct native record replaces parent basis-ID, dense removal and inverse reads; cold-generated family independent of dense/sparse geometry. No index/value decode. Active tail/survival and pre-write absorbed closure remain. FIELD/ADD/TEST/BRANCH are actual executed source counts in this shorter body.';ledger.units.push(copy);
+ }
 }else if(experiment==='C22'){
  for(const u of workers.filter(u=>u.name==='storeBound')){
   append(u,{op:'runtime.callback',count:'JOIN_PUB',target:'sharedStore'},'D*C(alu.and.u32)+D*C(control.test.u32)+D*C(control.branch)+JOIN_PUB*CALLBACK(sharedStore)',

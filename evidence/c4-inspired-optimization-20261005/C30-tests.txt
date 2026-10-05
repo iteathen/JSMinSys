@@ -1,0 +1,24 @@
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":24338,"plans":55,"seed":70368301,"solvedOutcomesQueried":false}
+✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (4019.9697ms)
+✔ cofactor ignores non-basis coordinate tail bits and preserves empty owner channels (29.8221ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (66.7409ms)
+✔ application preparation allocates all four workers but performs no search (62.581ms)
+✔ closing an idle prepared application joins workers without a solve (55.5794ms)
+✔ ordinary minimal API also waits for every worker before search (49.1338ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.6998ms)
+✔ closing an active prepared search resolves its result and joins every worker (74.2757ms)
+{"checks":582,"ties":36,"reflections":266}
+✔ cofactor handle drives exact reflection with owner ties, offsets and poisoned unused scratch (1745.6205ms)
+✔ four-worker reflection plan has cold budget fallback and clean exact result (88.0922ms)
+✔ transition-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (11096.6992ms)
+✔ four-worker host admits a complete transition plan or falls back cold without changing exact semantics (84.676ms)
+{"checks":1449369,"dead":41299}
+✔ direct transition records reproduce physical removal and owner survival for all small supports (407.6704ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11428.1322

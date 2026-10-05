@@ -3,10 +3,11 @@ import {connect4RbaBasisFromSupport} from './rba-connect4-coordinate.mjs';
 import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
 import {emitSortedSetBitsAt32} from '../src/basis32.mjs';
 
-export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=false,withReflection=false){
+export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=false,withReflection=false,withTransitions=false){
   if(!Number.isSafeInteger(budgetBytes)||budgetBytes<0)throw new RangeError('invalid support-plan budget');
   if(typeof withClosures!=='boolean')throw new TypeError('invalid support closure mode');
   if(typeof withReflection!=='boolean'||(withReflection&&!withClosures))throw new TypeError('reflection plan requires closures');
+  if(typeof withTransitions!=='boolean'||(withTransitions&&!withClosures))throw new TypeError('transitions require closures');
   const radix=g.rows+1;
   let profiles=1;
   for(let c=0;c<g.columns;c++){
@@ -19,8 +20,10 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
     LocalIndex=g.maxBasis<=256?Uint8Array:g.maxBasis<=65536?Uint16Array:Uint32Array,
     closureElements=withClosures?basisElements*g.coordWords:0,
     reflectionBytes=withReflection?basisElements*LocalIndex.BYTES_PER_ELEMENT+profiles*4:0,
-    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes;
-  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff)return null;
+    TransitionIndex=g.maxBasis<=255?Uint8Array:g.maxBasis<=65535?Uint16Array:Uint32Array,
+    transitionElements=withTransitions?basisElements*g.columns*2:0,
+    bytes=basisElements*Id.BYTES_PER_ELEMENT+maskElements*4+profiles*Size.BYTES_PER_ELEMENT+g.columns*4+closureElements*4+reflectionBytes+transitionElements*TransitionIndex.BYTES_PER_ELEMENT;
+  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||basisElements>0xffffffff||maskElements>0xffffffff||closureElements>0xffffffff||transitionElements>0xffffffff)return null;
   const basis=new Id(new SharedArrayBuffer(basisElements*Id.BYTES_PER_ELEMENT)),
     sizes=new Size(new SharedArrayBuffer(profiles*Size.BYTES_PER_ELEMENT)),
     membership=new Uint32Array(new SharedArrayBuffer(maskElements*4)),
@@ -49,10 +52,29 @@ export function prepareSupportBasisPlans32(g,budgetBytes=256*2**20,withClosures=
   const mirrorMap=withReflection?new LocalIndex(new SharedArrayBuffer(basisElements*LocalIndex.BYTES_PER_ELEMENT)):null,
     mirrorProfiles=withReflection?new Uint32Array(new SharedArrayBuffer(profiles*4)):null;
   if(withReflection)compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix);
+  const transitions=withTransitions?new TransitionIndex(new SharedArrayBuffer(transitionElements*TransitionIndex.BYTES_PER_ELEMENT)):null,
+    transitionDead=TransitionIndex.BYTES_PER_ELEMENT===1?255:TransitionIndex.BYTES_PER_ELEMENT===2?65535:0xffffffff;
+  if(withTransitions){transitions.fill(transitionDead);compileSupportTransitions32(g,profile,basis,sizes,strides,transitions,transitionDead,profiles,radix);}
   // Membership is a compile-time dependency only once closure rows exist.
   // No runtime consumer needs the intermediate table in the closure kernel.
   return Object.freeze({basis,sizes,membership:withClosures?null:membership,strides,profiles,
-    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles});
+    bytes:withClosures?bytes-maskElements*4:bytes,workingBytes:bytes,radix,closures,mirrorMap,mirrorProfiles,transitions,transitionDead});
+}
+
+export function compileSupportTransitions32(g,profile,basis,sizes,strides,transitions,dead,profiles,radix){
+  const inverse=new Uint32Array(g.shapeCount);
+  for(let handle=0;handle<profiles;handle++)for(let c=0;c<g.columns;c++){
+    const height=Math.floor(handle/strides[c])%radix;if(height===g.rows)continue;
+    const child=handle+strides[c],parentBase=handle*g.maxBasis,childBase=child*g.maxBasis,
+      row=(handle*g.columns+c)*g.maxBasis*2,remove=profile.prepareRemove(g,height*g.columns+c);
+    for(let j=0,n=sizes[child];j<n;j++)inverse[basis[childBase+j]]=j;
+    for(let i=0,n=sizes[handle];i<n;i++){
+      const id=basis[parentBase+i],image=profile.removePrepared(g,id,remove);
+      if(image<0||image===0xffffffff)continue;
+      // The child support basis contains each surviving parent residual image.
+      transitions[row+2*i]=inverse[image];transitions[row+2*i+1]=image===id?1:0;
+    }
+  }
 }
 
 export function compileSupportReflection32(g,basis,sizes,strides,mirrorMap,mirrorProfiles,profiles,radix){
@@ -109,6 +131,18 @@ export function loadSupportClosureBasis32(g,target,dst,childBasis,ci,seen,indexO
   for(let c=0;c<g.columns;c++)index+=target[dst+c]*plan.strides[c];
   const n=plan.sizes[index],base=index*g.maxBasis;
   for(let i=0;i<n;i++){const id=plan.basis[base+i];childBasis[ci+i]=id;childIndex[id]=i;}
+  indexOut[0]=index;
+  return n;
+}
+
+// Complete transition plans supersede both removal and inverse construction.
+// Scratch ABI retained, but seen/inverse are not runtime dependencies here.
+export function loadSupportTransitionBasis32(g,target,dst,childBasis,ci,seen,indexOut){
+  const plan=g.supportBasisPlans;
+  let index=0;
+  for(let c=0;c<g.columns;c++)index+=target[dst+c]*plan.strides[c];
+  const n=plan.sizes[index],base=index*g.maxBasis;
+  for(let i=0;i<n;i++)childBasis[ci+i]=plan.basis[base+i];
   indexOut[0]=index;
   return n;
 }

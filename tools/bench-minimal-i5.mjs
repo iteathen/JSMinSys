@@ -11,6 +11,7 @@ const sharedCacheCapacity=Number(process.env.JMS_BENCH_SHARED_CAPACITY??13421772
   supportBasisPlanBudgetBytes=Number(process.env.JMS_BENCH_SUPPORT_PLAN_BUDGET??0),
   supportClosurePlan=process.env.JMS_BENCH_SUPPORT_CLOSURES==='1',
   supportReflectionPlan=process.env.JMS_BENCH_SUPPORT_REFLECTION==='1',
+  supportTransitionPlan=process.env.JMS_BENCH_SUPPORT_TRANSITIONS==='1',
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),
   counter=await processCycleCounter(),
   cycles0=counter.read(),
@@ -30,6 +31,7 @@ try{
     supportBasisPlanBudgetBytes,
     supportClosurePlan,
     supportReflectionPlan,
+    supportTransitionPlan,
     timeoutMs:600000,
     preparedEmptyTiming:true,
   });
@@ -48,6 +50,7 @@ console.log(JSON.stringify({
   configuration:{sharedCacheCapacity,localCacheCapacity,sharedProofBounds:result.sharedProofBounds,sharedCacheLayout:result.sharedCacheLayout,sharedTtEntryBytes:result.sharedTtEntryBytes,sharedTtBytes:sharedCacheCapacity*result.sharedTtEntryBytes,privateTtBytesPerWorker:localCacheCapacity*33,supportBasisPlanBudgetBytes,supportBasisPlanBytes:result.supportBasisPlanBytes,supportBasisPlanProfiles:result.supportBasisPlanProfiles,workers:4,rootFrontier:false,sharedSampleMask:0,policies:["center","live","center","live"]},
   supportClosurePlan:result.supportClosurePlan,
   supportReflectionPlan:result.supportReflectionPlan,
+  supportTransitionPlan:result.supportTransitionPlan,
   supportPlanWorkingBytes:result.supportPlanWorkingBytes,
   wallMs:result.preparedTiming.solveMs,
   totalOperationWallMs:wallMs,
