@@ -1,0 +1,17 @@
+# C16 draft: immutable support-state plan handles
+
+Status: design only; not implemented or qualified. Freeze before any candidate replay. Refresh retained-kernel CPU profile before admission.
+
+Repeated cost: reconstructing the same geometry/support-derived child basis, inverse shape index and upward-closure mappings across differently owned positions. Current recurrence regenerates these per edge even though they depend on geometry plus support heights, not owner coordinates or W/D/L.
+
+Candidate: enumerate support profiles at application initialization using injective mixed-radix (rows+1) height indexing. Store immutable, shared basis rows, sizes, inverse shape indices and child-coordinate closure masks. Cofactor uses the child's numeric plan handle, copies the same child basis into the existing scratch contract, projects active owner coordinates through prepared removal and closure data. Existing reflection, exact-key TT, move order, forced responses, CPC and alpha-beta remain unchanged. Do not add make/unmake or canonicalization changes to this candidate.
+
+7x6 estimates before implementation: 823543 support profiles, maxBasis69, shapeCount625, coordWords3. Fixed-stride basis276 bytes + inverse625 bytes + closure828 bytes + size1 byte =1730 bytes/profile,1424729390 bytes total plus small metadata. Initial preparation is geometry-only, including unreachable support combinations; no outcome/position labels. A declared1536MiB plan budget admits this geometry. Budget and representable-index checks occur before allocation. Other dimensions adapt at initialization; budget-exceeding geometries retain the existing prepared cofactor path. Inverse/size element width must match maxBasis rather than assume Uint8 universally.
+
+NEES realization: one shared prepared copy, all memory/scratch at init, no hot allocation/subarray view creation, cold dense/sparse and three-word/general selection; generated specialization from generic authority. Preserve exact terminal/full-board and nonwinning-chosen-move contracts. No TT entry-count changes. New memory use and whole initialization CPU/wall cost must be recorded separately, not hidden by ready timing.
+
+Proof obligation: the parent basis contains precisely the nonempty residuals of physical winning lines after removing occupied support cells, independent of owner assignment. Removing one legal landing yields the child support basis. For each surviving residual image, precompiled closure is exactly its supersets within that child basis. Opponent coordinates survive only when their residual did not contain the occupied cell. All canonical frames must use their actual support profile; no physical/canonical column conflation.
+
+Validation before timing: independent physical line/residual reconstruction on small exhaustive supports and randomized general boards; plan-vs-existing cofactor outputs with poisoned scratch/offsets, canonical reflection, general widths/heights/fallback and last-cell draw/nonwinning preconditions. Exact four-worker oracle cases computed after solver return. Verify no plan mutation and generated-source/catalog/cycle identities. Then full ready-empty repeated localhost solves versus immediately retained configuration, no concurrent workload.
+
+Falsifiers: any mapping/terminal/gauge mismatch; allocation outside declared budget; whole solve/cycles regression; added memory traffic erases avoided computation. Rejection applies to this layout, not all support-transition compilation or pointer/handle hypotheses.
