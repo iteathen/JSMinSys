@@ -28,7 +28,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
     targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
-    pairHub=prepareConnect4CpcxPairHub32(g),collectSingletons=pairHub.collect,
+    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,
     forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,
   connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null
     ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)
@@ -177,6 +177,14 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
       if(words[src+column]<g.rows){bestMove=column;break;}
     }
     return -1;
+  }
+
+  // Current mover has two distinct playable demands and no counterterminal.
+  const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
+  if(fork>=0){
+    if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover));
+    else bestMove=fork;
+    return 1;
   }
 
   // A positive certificate proves the previous mover wins. Zero is unresolved.
