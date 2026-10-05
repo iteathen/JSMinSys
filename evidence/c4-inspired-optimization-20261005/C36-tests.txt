@@ -1,0 +1,19 @@
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"seed":70368301,"solvedOutcomesQueried":false}
+✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (3854.8913ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (54.79ms)
+✔ application preparation allocates all four workers but performs no search (48.9073ms)
+✔ closing an idle prepared application joins workers without a solve (42.4946ms)
+✔ ordinary minimal API also waits for every worker before search (47.4547ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.6748ms)
+✔ closing an active prepared search resolves its result and joins every worker (59.6355ms)
+✔ auxiliary worker preserves native flag inheritance and removes only its search-affinity preload (3.4779ms)
+✔ cold support worker returns complete byte-identical tables and exits before handoff (149.74ms)
+✔ cold support worker honors cancellation, deadlines and invalid input without silent fallback (53.5237ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3933.8209
