@@ -29,7 +29,7 @@ const wallMs=performance.now()-t0,
 counter.close();
 
 console.log(JSON.stringify({
-  kind:'minimal-worker-i5-12600k-full-solve-v1',
+  kind:'minimal-worker-i5-12600k-prepared-empty-solve-v2',
   runtime:{node:process.version,v8:process.versions.v8},
   platform:{platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model??null,logicalProcessors:os.cpus().length},
   target:{wallTimeMsMax:10000,workers:4,workerMode:RBA_LAZY_SMP_WORKER_MINIMAL},
