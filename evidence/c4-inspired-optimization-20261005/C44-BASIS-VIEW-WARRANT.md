@@ -67,3 +67,13 @@ competitive results and remove the entire runtime realization if its primary
 benefit or independent memory/simplicity value does not justify its surface.
 No TT/search-window/CPC/NDC/move-order/terminal/gray hash changes. Any root/row
 transport mismatch falsifies the implementation rather than a patched witness.
+
+## Current-parent transport addendum (2026-10-05, before C44 replay)
+
+Execute against retainedc035266: C58/C54withC61private8388608nativeentries=256MiB,shared4GiB/fourdeep/CPU0,2,4,6/nightlyJ052400/9600. Oldparent/C48and1200/4800text is historical, not current authority. C48was costedout; do not restore it.
+
+Viewcanonicalizer MUST publish canonical supporthandle into scratch.map[0]. Current C54frontier.child expects rawhandle+reflectionbit, so companion calls child(canonicalHandle,0,depth+1) to avoid double reflection; live orientation still uses actualreflectionbit. Pass childBi=canonicalHandle*maxBasis as scalar recursion argument. Root ingress validation runs afterready; terminalrootneednot match unused supportbasis, nonterminalroot must exactly match size/IDorder. Full WDL/window/TT/first-terminal behavior unchanged.
+
+Complete-view scratch onlyneeds inverse(shapeCount), map(onehandle), mirror(keyWords). Exclude unused legacyseen/mirrorBasis/size arrays in companion initialization; old ABI parameters remain allowedignoredinputs, no hot tests added. This is deadstorage eliminated by full-viewprecondition, not a new tactical/quotient family. All three arrays/prepared metadata allocated before ready. Viewcofactor retains the required inverse rebuild; no full inverse tables. Default/fallbackordinaryworkers untouched, requested/selectedbasisViews reported explicitly. Admission onlycompleteclosures+mirror map, minimalworkerBooleanoption, unsupported geometry/budgetfallsback atinit.
+
+Generate companions from exact existingclosure/reflection/8worker authorities, no hand7x6fork. Dense/prepared/span/three and normal/nonwinning routines qualify against independent physical q on100dimensions whereplansadmitted; ordinaryfallbackchecks coverrest, no WDLholdouts. Proxy-write traps plus nested/sibling frame transport and nonempty/reflectedrootvalidate shape identity. Actual4workers/native/sharedbound variants and exactoracle beforeoptimized JIT/fulltimings. Selectedbasisview pointer/row replaces perchildbasis copies; addedsharedreadlocality risk remains empirical. Init/geometrybudgets and allotherconfig unchanged. Restoreallnew activehelpers/companionworkers/hostoption/launcher/ledger cleanly ifnotretained; keep fullprototype/evidence.
