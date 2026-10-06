@@ -99,9 +99,13 @@ test('attachment rejects malformed cloned layout offsets before permitting overl
 
 test('concurrent compact/direct/full-span writers never return another exact key value',async()=>{
  for(const geometry of [geometries[0],geometries[1],null]){
+  for(const heldLock of [false,true]){
   const keyWords=geometry?.keyWords??2,cache=candidate.createConnect4RbaSharedLayoutCache32({capacity:1,keyWords,geometry}),
    first=geometry?connect4RbaFromMoves([],{geometry}).words:Uint32Array.of(0x80000000,0xffffffff),
    keys=[first,first.slice(),first.slice()];keys[1][0]=1;keys[2][0]=2;
+  // A competing publication may own this row for the entire reader lifetime.
+  // That legal scheduling case produces only misses, without wrong-key values.
+  if(heldLock)Atomics.store(cache.entries,0,1);
   const code=`const {parentPort,workerData}=require('node:worker_threads');
    (async()=>{const m=await import(workerData.url),cache=m.attachConnect4RbaSharedLayoutCache32(workerData.cache),a=m.prepareSharedCacheAccess(cache);
     let hits=0;for(let i=0;i<12000;i++){const n=(i+workerData.id)%3,k=workerData.keys[n];a.store(cache,k,0,n+1,0);
@@ -110,8 +114,15 @@ test('concurrent compact/direct/full-span writers never return another exact key
   const workers=[0,1].map(id=>new Worker(code,{eval:true,workerData:{id,cache,keys,url:new URL('../addons/rba-connect4-shared-exact-cache-layout.mjs',import.meta.url).href}}));
   try{
    const hits=await Promise.all(workers.map(w=>new Promise((resolve,reject)=>{let n;w.on('message',v=>{n=v;});w.on('error',reject);w.on('exit',code=>code?reject(Error('worker exit '+code)):resolve(n));})));
-   assert.ok(hits.every(n=>Number.isInteger(n)&&n>0));
-   const access=candidate.prepareSharedCacheAccess(cache);access.store(cache,keys[0],0,1,0);assert.equal(access.probe(cache,keys[0],0,0),1);
+   assert.ok(hits.every(n=>Number.isInteger(n)&&n>=0));
+   if(heldLock)assert.deepEqual(hits,[0,0],'a continuously owned row must remain a miss');
+   if(heldLock)Atomics.store(cache.entries,0,0);
+   const access=candidate.prepareSharedCacheAccess(cache);
+   for(let n=0;n<keys.length;n++){
+    access.store(cache,keys[n],0,n+1,0);assert.equal(access.probe(cache,keys[n],0,0),n+1);
+    for(let other=0;other<keys.length;other++)if(other!==n)assert.equal(access.probe(cache,keys[other],0,0),0,'quiescent row cannot alias another exact key');
+   }
   }finally{await Promise.all(workers.map(w=>w.terminate()));}
+  }
  }
 });

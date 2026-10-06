@@ -1,0 +1,474 @@
+verify	Run node --test test/*.test.mjs	﻿2026-10-06T03:32:17.6174348Z ##[group]Run node --test test/*.test.mjs
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.6174800Z ^[[36;1mnode --test test/*.test.mjs^[[0m
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.6211874Z shell: /usr/bin/bash -e {0}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.6212279Z ##[endgroup]
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.7727545Z ✔ BranchManager is the minimal canonical JSMinSys manager base (2.113129ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.7880946Z ✔ future cancellation preserves completion published before its callback (10.958772ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.7882400Z ✔ file-worker argv filter removes only input-type mode (1.344487ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.7883592Z ✔ managed host completes, joins, and reports cleanup (31.431186ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8194798Z ✔ managed host deadline fails closed and wakes a waiting worker (33.491626ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8248747Z ✔ managed host cancellation and explicit failure preserve first error (2.763601ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8392208Z ✔ unexpected worker exit fails the session (14.776719ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8400859Z ✔ metric and shared-byte helpers stay numeric and caller-owned (0.653809ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8402761Z ✔ managed wait preserves completion published before waiting (0.194101ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8404378Z ✔ managed deadline observes completion published between polls (0.755474ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8900677Z ✔ managed wait supports deadlines beyond the Node timer limit (42.205641ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8902241Z ✔ managed long deadline uses elapsed time after a delayed chunk (1.057864ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8928705Z ✔ managed long deadline waits for the remaining chunk before failing (0.37887ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8948546Z ✔ managed wait rejects poll intervals beyond the Node timer limit (0.854203ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8955696Z ✔ managed long deadline cancellation clears the rearmed chunk (0.54275ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8978774Z ✔ already-aborted cancellation keeps precedence over completed work (0.187705ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.8981322Z ✔ managed wait returns an existing failure and removes abort listeners (0.170003ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9151702Z ✔ managed host joins workers after a thrown worker failure (25.590962ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9153098Z ✔ closing an active managed wait settles it after publishing stop (1.426181ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9240325Z ✔ closing an active cancelled wait preserves first error and joins workers (12.106129ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9315012Z ✔ runtime-sized set and exact-key primitives exceed former fixed widths (1.583542ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9316614Z ✔ runtime-sized skyline/product supports records wider than six words (0.590526ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9318223Z ✔ runtime action-count reductions and dependency publication handle width ten (1.438253ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9319514Z ✔ runtime packed-bit permutation spans more than three words (0.355165ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9321030Z ✔ runtime-sized board transition supports 10x10 without packed-three-bit heights (0.402577ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9322785Z ✔ live-line evaluator keeps only winning lines not blocked by the opponent (24.220964ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9324149Z ✔ rank-local history requires an indexed array or typed array (3.715389ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:17.9325555Z ✔ rank-local history rejects lengths beyond board capacity before indexing (0.241671ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1379274Z ✔ CPC per-column XOR parity equals literal future-event count on configured geometries (25.131823ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1398824Z ✔ nonterminal CPC path matches checked evaluator after terminal assertion (44.105434ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1412137Z ✔ projected CPC advisory collection is semantically inert and opt-in (27.754924ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1447158Z ✔ CPC pooled-frontier response extends all-even pairing without counting omitted frontiers (423.642396ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1458867Z ✔ CPC closes a forced block that lifts another opponent terminal singleton (1.663755ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1470186Z ✔ CPC closes when every legal move lifts an opponent terminal singleton (1.08321ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1493439Z ✔ CPC recognizes exact fork loss after enabling move (1.553197ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1528513Z ✔ CPC first-win ordering lets current immediate terminal supersede opponent fork (0.987089ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1531035Z ✔ CPC alpha-beta uses live winning-line contribution for move ordering (22.12221ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1558372Z ✔ CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle (405.086605ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1568118Z ✔ CPC alpha-beta modes agree with independent late standard-7x6 oracle (170.714669ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1569487Z ✔ multi-action preemption count implies <=32-column mask support (27.937872ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1570717Z ✔ CPC fork precursor restricts current defense without recursion (24.920247ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1571966Z ✔ CPC intersects alternative fork-precursor preemption sets (11.028816ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1683514Z ✔ cold CPC ledger accounts for every actual scratch array and object field (1.192679ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:19.1697473Z ✔ terminal CPC ledger counts actual writes and delegation has no wrapper scratch writes (0.588994ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3874931Z {"kind":"c58-common-matching-exhaustive-small-physical-policy","checked":32280,"positive":13806,"nonloss":13534,"newPositive":8}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3877341Z {"kind":"cpc-response-general-physical-policy","checked":9532,"positive":700,"nonloss":666}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3911398Z ✔ four-worker minimal search agrees with a physically verified CPC win certificate (185.485829ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3938807Z ✔ common-matching CPC equals independently enumerated physical policies and exact bounded game (553.02247ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3946576Z ✔ common matching preserves guards, offsets, physical frames and large-width fallback (1648.110699ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3948350Z ✔ matching constraints require one common policy, not separate blockers (1.066698ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.3949788Z ✔ all eight actual worker variants bind the common-policy response capability (0.773373ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4124351Z {"kind":"cpc-response-exhaustive-small-physical-policy","checked":32280,"positive":13798,"nonloss":13526}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4148227Z {"kind":"cpc-response-general-physical-policy","checked":9532,"positive":688,"nonloss":660}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4149961Z ✔ four-worker minimal search agrees with a physically verified CPC win certificate (168.84812ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4151749Z ✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (441.82305ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4153428Z ✔ prepared CPC preserves literal policy across general geometry, frames and support (1172.042384ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4208237Z {"kind":"cpc-exhaustive-small-physical-policy","checked":32280,"positive":272}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4221187Z {"kind":"cpc-general-physical-policy","checked":7666,"positive":34}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4228494Z ✔ four-worker minimal search agrees with a physically verified CPC win certificate (125.28446ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4230622Z ✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (383.672628ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.4232463Z ✔ prepared CPC preserves literal policy across general geometry, frames and support (664.330911ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:20.8738823Z {"name":"rba-connect4-lazy-smp-worker-minimal","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:21.7728728Z {"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:22.6781286Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:23.5173777Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:24.4308934Z {"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:25.2973704Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:26.1929477Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:27.1168858Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:27.8769047Z {"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:28.8880535Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:29.7928841Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:30.6431590Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:31.4928903Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:32.3438721Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:33.2281520Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0568753Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":1600}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0598983Z ✔ rba-connect4-lazy-smp-worker-minimal intersects CPC response bounds soundly with every original window (989.720762ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0656025Z ✔ rba-connect4-lazy-smp-worker-minimal-local32 intersects CPC response bounds soundly with every original window (896.241775ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0669843Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs intersects CPC response bounds soundly with every original window (905.710185ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0679258Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 intersects CPC response bounds soundly with every original window (839.588704ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0681282Z ✔ rba-connect4-lazy-smp-worker-minimal-center intersects CPC response bounds soundly with every original window (908.540565ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0683388Z ✔ rba-connect4-lazy-smp-worker-minimal-center-local32 intersects CPC response bounds soundly with every original window (864.808307ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0685301Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs intersects CPC response bounds soundly with every original window (896.898433ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0687476Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 intersects CPC response bounds soundly with every original window (921.800645ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0689456Z ✔ rba-connect4-lazy-smp-worker-minimal-views intersects CPC response bounds soundly with every original window (761.14989ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0691309Z ✔ rba-connect4-lazy-smp-worker-minimal-views-local32 intersects CPC response bounds soundly with every original window (1008.803957ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0693163Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs intersects CPC response bounds soundly with every original window (904.604798ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0695073Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 intersects CPC response bounds soundly with every original window (851.011961ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0697144Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center intersects CPC response bounds soundly with every original window (846.321313ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0699078Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 intersects CPC response bounds soundly with every original window (851.92619ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0701501Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs intersects CPC response bounds soundly with every original window (884.575606ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.0703725Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 intersects CPC response bounds soundly with every original window (827.274397ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1553649Z {"kind":"cpc-target-exhaustive-small-physical-policy","checked":32280,"positive":240,"added":144}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1555442Z {"kind":"cpc-target-general-physical-policy","checked":8754,"positive":58,"added":40}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1558274Z ✔ target-reservoir CPC equals literal guarded policy and physical exact game on bounded carriers (401.643378ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1559927Z ✔ target-reservoir CPC preserves literal policy across general geometry, frames and support (1776.322026ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1561411Z ✔ CPC proves a whole-reservoir response-parity win without WDL side channels (20.860967ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1562539Z ✔ CPC leaves an unclosed reservoir unresolved (12.548122ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1563852Z ✔ CPC module surface is win-only rather than WDL/bound/restriction closure (0.26527ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1565514Z ✔ CPC win kernel has no fixed standard-board width escape hatch (0.170509ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1566636Z ✔ CPC does not promote a proved no-win bound into a win (1.667883ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1567888Z ✔ legacy NDC adapter consumes only the positive CPC win certificate (19.88528ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1568985Z ✔ Negamax consumes CPC win closure as the winning move value (16.56887ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1570748Z ✔ CPC reservoir proof has no arbitrary standard-width cap (7.511589ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1571879Z ✔ known forbidden triggers are rejected before pair bookkeeping (3.762015ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1572795Z {"name":"rba-connect4-lazy-smp-worker-minimal","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1573756Z {"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1574746Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1576521Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1577818Z {"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1578874Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1579936Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1581049Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1582214Z {"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1583253Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1584359Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1585517Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1586644Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1588648Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1589834Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1591134Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":360}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1592798Z ✔ rba-connect4-lazy-smp-worker-minimal keeps early pair-hub wins as exact certificates in every window (247.244403ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1594428Z ✔ rba-connect4-lazy-smp-worker-minimal-local32 keeps early pair-hub wins as exact certificates in every window (174.310154ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1596140Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs keeps early pair-hub wins as exact certificates in every window (202.753664ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1597961Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 keeps early pair-hub wins as exact certificates in every window (213.906805ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1599978Z ✔ rba-connect4-lazy-smp-worker-minimal-center keeps early pair-hub wins as exact certificates in every window (200.822116ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1602050Z ✔ rba-connect4-lazy-smp-worker-minimal-center-local32 keeps early pair-hub wins as exact certificates in every window (197.694643ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1603927Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs keeps early pair-hub wins as exact certificates in every window (197.933257ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1605807Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (205.517455ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1607833Z ✔ rba-connect4-lazy-smp-worker-minimal-views keeps early pair-hub wins as exact certificates in every window (196.30733ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1609778Z ✔ rba-connect4-lazy-smp-worker-minimal-views-local32 keeps early pair-hub wins as exact certificates in every window (196.406352ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1611685Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs keeps early pair-hub wins as exact certificates in every window (226.920737ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1613903Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 keeps early pair-hub wins as exact certificates in every window (200.149631ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1615862Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center keeps early pair-hub wins as exact certificates in every window (199.888855ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1617986Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 keeps early pair-hub wins as exact certificates in every window (231.599564ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1620146Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs keeps early pair-hub wins as exact certificates in every window (131.695771ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1622262Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (136.616056ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1624204Z {"kind":"cpcx-pair-hub-physical-proof","checked":32986,"positive":910,"literalPositive":860,"forcedCases":2589,"seed":-1391019751}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1625730Z ✔ CPCX pair hub prepares native endpoint fields without a board-size fork (5.249127ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1627186Z ✔ pair hub rejects duplicate demands, unsupported completion and exposed counterwin (1.365404ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1628669Z ✔ CPCX pair hub positives pass independent physical reply proofs and general frames (2495.008452ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1630087Z {"kind":"cpcx-singleton-header-predicate-agreement","checked":9378,"flags":520,"forced":1558,"seed":1289385682}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1631531Z ✔ singleton tactical header has distinct native mask words and frame lifetimes (1.459568ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1632938Z ✔ singleton tactical header equals current exact C01 C05 predicates on admitted dimensions (812.665845ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1634717Z ✔ diagnostic forwards the requested basis-view flag to the actual solver entry point (5.217407ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1636673Z ✔ generated search ledger distinguishes insertion shifts and stop checks (11.451285ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1638482Z ✔ historical IsoMax archive, configuration, and measured artifacts remain frozen (4.621751ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1640171Z ✔ frozen calculator computes its prefix and stops before the sixth move (16.951456ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1641639Z ✔ current package is the immutable retained kernel with canonical support-library bindings (4.820991ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1643200Z ✔ promoted package selects the measured minimal four-worker configuration (1.843374ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1644501Z ✔ Connect4 exports Lazy SMP without the retired shared-work scheduler (1.158309ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1645598Z ✔ native worker execution cannot reenter cold ingress (1.64072ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1646835Z ✔ ManagedThreadSession is the canonical managed host lifecycle object (2.42397ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1650979Z NEUTRAL_QUOTIENT_AUDIT {"states":161029,"neutralClasses":42168,"rbaQClasses":34461,"neutralMultiQ":0,"qMultiNeutral":15182,"physicalCollapsedByQ":13526,"nonterminalCollapsedByQ":13259,"maxQPerNeutral":1,"maxNeutralPerQ":84,"maxPhysicalPerQ":5336,"witness":{"q":"4,4,4,4,66,0,0","neutral":"4,4,4,4,:","physical":["16:4,4,4,4,:0001111000011101","16:4,4,4,4,:0001111000011110"]},"nonterminalWitness":{"q":"4,4,4,3,60,0,0","neutral":"4,4,4,3,:","physical":["15:4,4,4,3,:000111100001110_","15:4,4,4,3,:000111010010110_"]}}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1654552Z ✔ audit neutral-token quotient against current RBA q on exhaustive 4x4 legal states (2537.064108ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1655922Z ✔ 49-bit position code matches independent board encoding and reflection (1.808894ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1657726Z ✔ 49-bit position code is collision-free across all gravity-valid sequences through ply 6 (450.336408ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:34.1659412Z ✔ RBA root reflection carries the same canonical physical position code for mirrored roots (2.890381ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5097270Z {"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"seed":70368301,"solvedOutcomesQueried":false}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5153886Z ✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (10668.320581ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5369459Z ✔ complete view preparation admits all four workers without position work (148.859523ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5404542Z ✔ basis-view admission falls back cleanly when complete plans are absent (120.844303ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5428734Z ✔ view option rejects non-Boolean and legacy requests before execution (2.746093ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5458415Z ✔ view worker preserves first-win and full-board roots without a basis read (194.502433ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5468342Z ✔ immutable view preserves the actual sparse removal profile (21.290629ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5497187Z {"kind":"C44-view-recursion-canonical-proof-frame","checks":18092,"nested":32564,"reflections":12030,"seed":2043095904}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:36.5499297Z ✔ view native/span and nested/sibling recursion transport one canonical handle into proof frames (7499.447238ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5534332Z {"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"viewChildren":16504,"viewReflections":9660,"seed":70368301,"solvedOutcomesQueried":false}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5596771Z ✔ immutable support views reproduce physical transitions and reflection across all100 dimensions (11346.541931ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5607721Z ✔ root support view rejects reordered or truncated nonterminal ingress and accepts terminal unused basis (1.878578ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5793231Z ✔ invalid oversized capacities are rejected before any shared allocation (1.105476ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5796310Z ✔ local capacity is checked before shared geometry or TT allocation (2.575144ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5797924Z ✔ native key-view lengths are validated before attempting allocation (0.236136ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5799196Z ✔ completed principal upset absorbs later images without repeated expansion (67.693351ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5800679Z ✔ absorbed native transitions match physical residuals across players, bases and profiles (1987.726824ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5802322Z ✔ cofactor ignores non-basis coordinate tail bits and preserves empty owner channels (94.116519ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5803676Z ✔ geometry derives different native carrier sizes for 4x4 and 10x10 (38.151545ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5805104Z ✔ configured winning geometry implies singleton residual id equals physical cell (32.956803ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5806451Z ✔ known-legal cofactor matches checked ingress after caller assertions (15.161508ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5808267Z ✔ configured RBA coordinates match independent physical residuals on 4x4 and 10x10 (17.335697ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5809681Z ✔ configured reflection canonicalizes mirrored 4x4 and 10x10 roots identically (32.747969ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5810897Z ✔ configured four-front bounds match independent physical propagation (123.994625ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5812687Z ✔ init-time specialization profile selects fast paths without changing semantics (61.230131ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5813848Z ✔ shared exact cache publishes only fully committed exact rows (1.800485ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5815403Z ✔ shared exact known-hash path retains full-key validation (0.255775ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5816537Z ✔ standard 7x6 shared exact cache uses lossless compact identity (27.430681ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5817859Z ✔ non-7x6 shared exact cache retains full-key identity (1.602096ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5818912Z ✔ Lazy SMP is a separate 2+ worker exact execution option (58.615221ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5820120Z ✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (8.331133ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5821458Z ✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (56.889531ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5822596Z ✔ sharing-density masks preserve exact Lazy SMP results (409.732851ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5823655Z ✔ Lazy SMP move ordering is center-line distance only (48.450755ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5824930Z ✔ Lazy SMP workers diversify only equal center-distance ties (51.690469ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5826048Z ✔ minimal Lazy SMP worker rejects legacy-only controls (1.748372ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5829508Z ✔ Lazy SMP rejects unknown worker mode (0.778334ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5835985Z ✔ minimal worker never publishes local bounds to shared exact cache (70.604964ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5837580Z ✔ minimal worker omits hot diagnostic counters (54.273403ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5838838Z ✔ minimal timeout is host-terminated without recursive polling (79.285591ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5839928Z ✔ pre-aborted minimal call allocates no workers (9.815719ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5841233Z ✔ minimal four-worker search returns after an immediate winning center move (113.311872ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5842724Z ✔ minimal four-worker search finds an off-center immediate win before descending (724.892436ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5844210Z ✔ empty residual geometry still reserves a support handle output slot (30.14423ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5845537Z ✔ private cache packs epoch and value into one exact uint32 tag (28.552785ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5846814Z ✔ standard 7x6 private exact/bound cache uses lossless compact identity (26.459076ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5848134Z ✔ non-7x6 private cache retains full-key identity (1.35216ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5849220Z ✔ a recursive fail-high win publishes exact current-q WDL (354.764033ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5850459Z ✔ an exact loss remains cacheable when structural closure resolves before recursion (4.522604ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5851856Z ✔ directed narrow windows and cached q values agree with an independent physical 4x4 oracle (187.391816ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5853060Z {"kind":"physical-propagated-no-immediate-win","recursiveChildChecks":58713}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5854479Z ✔ RBA immediate winning column matches physical rules across dimensions and frames (249.64628ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5855694Z ✔ three-word live update matches general update in-place and disjoint (27.673995ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5857683Z ✔ live-line ordering equals physical line counts across frames and dimensions (71.708724ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5859066Z ✔ private native proof records allocate cold and preserve all exact compact key lanes (32.491682ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5860482Z ✔ private native allocation refuses unsupported profiles and invalid capacities before allocation (50.129553ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5861979Z ✔ private layout is selected cold for the geometry and all four workers agree on exact results (593.419079ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5863236Z ✔ packed move-row geometry guard is exact and conservative (1.241177ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5864376Z ✔ packed move rows preserve maximum fields and stable score ties (0.335049ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5865627Z ✔ prepared solver uses packed recursive rows but keeps root row as columns (26.526509ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5867302Z ✔ nonwinning prepared cofactors match physical transitions under the explicit precondition (2347.815061ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5869098Z ✔ optional and generated prepared/dense cofactors match independent physical residuals (542.485888ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5870472Z ✔ dense kernel uses the cold removal table directly and preserves last-cell terminal precedence (11.323426ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5871866Z ✔ prepared module canonicalization exports retain selectedSet and offset behavior (40.270585ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5873178Z ✔ prepared-only canonicalization matches the optional API without selected-set work (44.395574ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5874451Z ✔ prepared empty solve waits for all four workers and preserves the exact result (192.686246ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5875637Z ✔ prepared empty boundary rejects nonempty positions and legacy workers (2.044017ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5877039Z ✔ abort during joined exact-result cleanup cannot replace DONE (89.186182ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5878571Z ✔ application preparation allocates all four workers but performs no search (98.384348ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5880026Z ✔ closing an idle prepared application joins workers without a solve (83.426423ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5881563Z ✔ ordinary minimal API also waits for every worker before search (85.735763ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5883412Z ✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (3.836669ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5887557Z ✔ closing an active prepared search resolves its result and joins every worker (124.444461ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5888956Z ✔ fixed 3/6/8 word set operations preserve bit-31 and lane boundaries (2.173169ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5890449Z ✔ six-word skyline insert rejects dominated candidates and removes dominated retained generators (0.415322ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5891971Z ✔ streamed six-word join product absorbs the Cartesian product immediately (0.504772ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5893319Z ✔ eight-word locator, exact probe/publication and span publication preserve exact identity (0.403117ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5894777Z ✔ exact interval tightening and fixed-degree Bellman reductions remain monotone (0.383949ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5896373Z ✔ ordered basis transform deduplicates mapped IDs and three-word permutation remaps active bits (0.404807ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5897833Z ✔ seven-slot masks stay inside seven bits (0.224957ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5899173Z ✔ intrusive stamped work list supports coalescing, arbitrary removal and generation validation (0.347542ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5900665Z ✔ layout preserves exact semantic equality at forced collisions and nonzero offsets (4.711893ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5902205Z ✔ public layout APIs preserve optional full-q locator and no-geometry full-span identity (3.537322ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5903669Z ✔ uncounted binding keeps reporting untouched while counted busy writes are reported (0.737509ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5905124Z ✔ zero sequence after rollover remains a miss and later publication restores visibility (0.486851ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5906614Z ✔ attachment repairs cloned/truncated views without copying and rejects wrong backing (1.287468ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5908188Z ✔ native heights preserve both sides of uint8 and uint16 field boundaries (0.334585ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5909515Z ✔ layout sizing rejects unsafe or aliased capacities before allocating (0.447613ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5910995Z ✔ attachment rejects malformed cloned layout offsets before permitting overlapping atomic fields (0.430252ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5912606Z ✖ concurrent compact/direct/full-span writers never return another exact key value (54.079566ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5913997Z ✔ native layout is selected once at initialization with four ready workers (304.337956ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5915295Z ✔ invalid native halfword capacity rejects before any shared allocation (12.555751ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5916615Z ✔ native memory accounting counts aliased TT backing once (187.550746ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5917984Z ✔ both layout owners clean up idle, active and aborted applications (592.47848ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5919339Z ✔ automatic layout uses qualified 7x6 storage and preserves generic storage (301.543549ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5921174Z ✔ concurrent proof writers cannot associate another key with a bound (135.092194ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5922523Z ✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.587943ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5924172Z ✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (20.868975ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5925745Z ✔ prepared grouped supersets are exact across configured geometry and global word 255 (564.624818ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5927762Z ✔ public cofactors preserve optional scratch, seen offsets, physical residuals and terminal ordering (134.706627ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5929098Z ✔ last-cell singleton wins still precede full-board draws (3.215449ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5930427Z ✔ shared support plans reproduce independently enumerated physical residual bases (496.998443ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:45.5931855Z ✔ support-plan admission handles generic widths and returns a cold budget fallback (125.168908ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.0546817Z ✔ closure-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (6645.004809ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2164923Z ✔ four-worker host admits a complete closure plan or falls back cold without changing exact semantics (179.733183ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2478674Z ✔ support closure masks equal independent cell-subset enumeration on every admitted small support (796.208456ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2480564Z ✔ cold-selected three-word/general closure OR preserves owner isolation and offset guards (0.883525ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2482289Z ✔ closure basis loading builds exact inverse in the same pass without clearing unrelated scratch (11.714367ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2484132Z ✔ support-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (3333.307899ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2486149Z ✔ four-worker host admits a complete plan or falls back cold without changing exact semantics (197.827681ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2487601Z {"checks":582,"ties":36,"reflections":266}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2488947Z ✔ cofactor handle drives exact reflection with owner ties, offsets and poisoned unused scratch (2475.597289ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2490350Z ✔ four-worker reflection plan has cold budget fallback and clean exact result (182.400018ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2492005Z ✔ support reflection maps equal physical cell reflection and form an involution on every small profile (523.513285ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2493478Z ✔ uncounted cache preserves exact keys and seqlock with untouched reporting words (34.612193ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2495007Z ✔ uncounted cache is generated from the counted protocol with reporting alone removed (43.597506ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2496386Z ✔ immutable cofactor IDs are charged at their actual native width (1.503775ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:50.2497982Z ✔ shared tactical consumers distinguish basis IDs from uint32 state reads (0.526676ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:51.7671487Z {"kind":"C54-actual-canonical-support-frame","checked":9950,"reflections":1273,"seed":-663184620}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:51.7720190Z ✔ actual closure and reflection publish the exact canonical frontier support handle (3179.293251ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0427746Z {"name":"rba-connect4-lazy-smp-worker-minimal","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0429004Z {"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0458771Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0523029Z {"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0536333Z {"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0548264Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0549633Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0562681Z {"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0564750Z {"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.0566283Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.3860422Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.5616776Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.7388219Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:52.9185860Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.0926144Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2711137Z {"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":560}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2759170Z ✔ rba-connect4-lazy-smp-worker-minimal consumes residual frontier tags with sound windows and root exclusion (354.142533ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2760587Z ✔ rba-connect4-lazy-smp-worker-minimal forwards current-run stores and exact draw joins to the same frame (2.307145ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2762119Z ✔ rba-connect4-lazy-smp-worker-minimal-local32 consumes residual frontier tags with sound windows and root exclusion (305.946818ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2769414Z ✔ rba-connect4-lazy-smp-worker-minimal-local32 forwards current-run stores and exact draw joins to the same frame (1.101848ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2770743Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs consumes residual frontier tags with sound windows and root exclusion (307.263369ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2772448Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs forwards current-run stores and exact draw joins to the same frame (1.381738ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2774123Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (319.800484ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2775959Z ✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.19077ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2777790Z ✔ rba-connect4-lazy-smp-worker-minimal-center consumes residual frontier tags with sound windows and root exclusion (369.845462ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2779528Z ✔ rba-connect4-lazy-smp-worker-minimal-center forwards current-run stores and exact draw joins to the same frame (1.160967ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2781260Z ✔ rba-connect4-lazy-smp-worker-minimal-center-local32 consumes residual frontier tags with sound windows and root exclusion (287.896202ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2783023Z ✔ rba-connect4-lazy-smp-worker-minimal-center-local32 forwards current-run stores and exact draw joins to the same frame (1.235652ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2784853Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs consumes residual frontier tags with sound windows and root exclusion (350.353054ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2786465Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs forwards current-run stores and exact draw joins to the same frame (0.826826ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2788577Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (259.300874ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2791063Z ✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.107123ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2793362Z ✔ rba-connect4-lazy-smp-worker-minimal-views consumes residual frontier tags with sound windows and root exclusion (495.173769ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2796268Z ✔ rba-connect4-lazy-smp-worker-minimal-views forwards current-run stores and exact draw joins to the same frame (1.055547ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2798365Z ✔ rba-connect4-lazy-smp-worker-minimal-views-local32 consumes residual frontier tags with sound windows and root exclusion (389.7033ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2800222Z ✔ rba-connect4-lazy-smp-worker-minimal-views-local32 forwards current-run stores and exact draw joins to the same frame (1.144589ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2801772Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs consumes residual frontier tags with sound windows and root exclusion (344.410102ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2803766Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs forwards current-run stores and exact draw joins to the same frame (0.833272ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2805743Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (174.39404ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2825809Z ✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.046236ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2828151Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center consumes residual frontier tags with sound windows and root exclusion (176.080279ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2830183Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center forwards current-run stores and exact draw joins to the same frame (0.945797ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2832184Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 consumes residual frontier tags with sound windows and root exclusion (178.907723ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2834221Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 forwards current-run stores and exact draw joins to the same frame (0.846961ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2836603Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs consumes residual frontier tags with sound windows and root exclusion (172.855195ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2838772Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs forwards current-run stores and exact draw joins to the same frame (0.906987ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2840834Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (177.713944ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.2844844Z ✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (0.855706ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3111151Z {"kind":"C54-native3-span-boundary-agreement","checked":15520,"counts":97,"seed":-1340818355}
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3112705Z ✔ residual proof frontier cold admission, native dimensions and frame transport (10.64117ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3113866Z ✔ residual threshold transfer preserves both gauges, bit31 and poisoned tails (9.349434ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3114678Z ✔ frontier replacement retains broad proofs and isolates exact support collisions (13.502383ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3115741Z ✔ generated native3 frontier equals span authority at every valid count and mask boundary (29.421708ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3116513Z ✔ selected hot closure stays allocation/string/experiment-free (31.272213ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3117387Z ✔ hot structural detector rejects representative negative controls (1.608757ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3118456Z ✔ native frontier closes the same root WDL across configured geometry and reflection (667.232536ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3119713Z ✔ incomplete frontier cancellation publishes no WDL and reused state can solve (34.742523ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3121124Z ✔ direct Lazy SMP frontier host preserves exact closure, counters and timeout cleanup (513.172576ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3122426Z ✔ worker attachment restores a truncated full-buffer view without copying storage (0.83658ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3123697Z ✔ worker attachment rejects wrong backing size rather than fabricating capacity (0.314828ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3124566Z ✔ word32 bit blocks (2.536784ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3125124Z ✔ first set bit index (0.244635ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3125767Z ✔ popcount32 (0.199776ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3126336Z ✔ signed bit-pattern profile (0.241495ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3127145Z ✔ subset32 (0.168529ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3127583Z ✔ two-lane wordwise blocks (1.080715ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3128158Z ✔ single-required-lane containment matches two-lane containment (0.242699ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3129325Z ✔ packed support can replace duplicate height storage (0.230326ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3130384Z ✔ guarded metadata prefix projects without scanning later words (0.277288ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3132367Z ✔ indexed and table blocks (0.587126ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3133064Z ✔ sentinel triple probe folds occupancy into exact key storage (0.294328ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3134025Z ✔ scalar two-word interner probe preserves producer-owned exact keys (0.256396ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3134700Z ✔ run-grouped indexed word reuse preserves exact values (0.15802ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3135377Z ✔ caller-owned residual frame restores parent without history loads (0.107698ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3135983Z ✔ apply and undo support state (0.249501ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3137247Z ✔ caller-owned ply transition profiles match state-owned transition mechanics (0.583294ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3138742Z ✔ known-cell apply profiles reuse an already observed landing cell (0.468698ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3139637Z ✔ known-cell undo profiles reuse the cell returned by apply (0.44369ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3140269Z ✔ known-cell undo prepared top-row boundary (0.110148ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3140938Z ✔ caller-ply odd-center omission fully packs eligible one-lane state (0.486042ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3141850Z ✔ omitted-center specialized transition skips zero support work (0.59473ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3142558Z ✔ caller-ply odd-center omission compresses 7x6 transition state (0.516123ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3143227Z ✔ general packed support+ply transitions match separate state (0.447341ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3144021Z ✔ packed support+ply transition profile preserves support-only reflection boundary (0.431843ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3144778Z ✔ rank-low packed support+ply layout keeps extraction cheap (0.221921ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3145507Z ✔ packed high-playable meta state matches separate two-lane state (0.469391ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3146532Z ✔ fully packed one-lane state matches separate transition state (0.364217ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3147699Z ✔ caller-carried meta restores support/high by recursive ownership (0.402721ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3148809Z ✔ one-lane caller meta makes known-cell undo landing-only (0.292835ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3149888Z ✔ exact ten-slot tuple hash matches generic separable builder (4.300794ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3150922Z ✔ separable tuple hash updates from exact slot deltas (4.43977ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3152027Z ✔ joint two-word direct index covers structured power-of-two buckets (1.252211ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3153042Z ✔ triple key publication hashes live scalars without scratch reload (0.285727ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3154236Z ✔ joint triple locator mixes exact-key coordinates without becoming identity (1.037279ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3155407Z ✔ direct triple power-of-two index preserves primary collision partition (2.932206ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3156473Z ✔ primary canonical comparison routes expensive secondary work (0.740012ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3157364Z ✔ mix and reflection blocks (0.905138ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3157916Z ✔ exact C3/C4 reflection tables match direct reference (1.234648ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3158592Z ✔ configured packed-3 register reflection profiles (21.002614ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3159278Z ✔ 5-column reflection fused final alignment preserves edge fields (1.743351ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3160209Z ✔ 9/10-column reflection fused final alignment preserves edge fields (0.172091ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3161096Z ✔ prepared 6/7 packed reflection shifts match direct reflection (0.719838ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3161836Z ✔ frontier normalization blocks (0.279208ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3162526Z ✔ signed frontier normalization profiles (0.266996ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3163298Z ✔ one-lane signed frontier normalization profiles (0.253824ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3164032Z ✔ lazy frontier compaction skips accepted-prefix rewrites (2.957262ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3164762Z ✔ lazy frontier normalizers seed the first accepted entry (0.209353ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3165575Z ✔ unsigned lazy frontier profiles preserve bit-31 semantics (0.333837ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3166281Z ✔ search scalar blocks (0.174144ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3167276Z ✔ two-lane shifts and arithmetic (0.248925ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3167909Z ✔ two-lane set iteration and cardinality (0.134656ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3168554Z ✔ sparse exact popcount profiles (0.161319ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3169229Z ✔ two-lane popcount fused at nibble stage (0.117198ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3169906Z ✔ three-lane popcount fused at nibble stage (0.112687ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3170568Z ✔ 10-bit high-lane popcount table profile (0.30886ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3171828Z ✔ configured exact selectors cover runtime candidate counts 2 through 10 (1.697835ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3172762Z ✔ scalar-producer selectors cover runtime candidate counts 2 through 10 (0.448358ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3173989Z ✔ move-slot index space removes hot physical-column remap (0.277406ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3174933Z ✔ isolated-bit clear profiles reuse caller isolation (0.100475ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3175624Z ✔ isolated-bit index profiles reuse caller isolation (0.097921ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3176449Z ✔ one-lane cardinality classification (0.082779ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3177176Z ✔ known landing cell legality reuses observed state (0.067156ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3177910Z ✔ trusted legality and coordinate reference decode (0.236097ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3178467Z ✔ capacity helpers and overwrite rehash (0.268087ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3178895Z ✔ atomic blocks (0.249331ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3179408Z ✔ bounded shared queue blocks without waiting (0.256949ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3180056Z ✔ queue dequeue ready sequence is int32-normalized across wrap (0.244594ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3180690Z ✔ caller-owned queue positions remove reservation CAS (0.175182ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3181346Z ✔ owned queue next-position profiles reuse publication increment (0.203634ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3181988Z ✔ owned blocking queue positions remove reservation RMW (0.238882ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3182526Z ✔ typed capacity allocation (0.101752ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3183124Z ✔ high-lane apply and undo derives masks without lookup tables (0.120892ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3183689Z ✔ runtime-configured 4x4 transition (0.112113ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3184267Z ✔ bit-31 transition survives typed-store coercion (0.137085ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3184834Z ✔ one-lane full-column transition (0.096744ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3185335Z ✔ nonblocking queue try paths (1.263888ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3186079Z ✔ performance targets distinguish SMT siblings, efficiency classes and processor groups (3.176691ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3186841Z ✔ malformed topology never silently supplies a placement (0.553359ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3188023Z ✔ prepared behavior worker reads every publication including extended unsigned words (4.838353ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3188855Z ✔ real search worker observes strategist stop published after search has begun (102.235692ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3189843Z ✔ Lazy SMP host selects optional per-node worker and returns interruption without WDL (81.864535ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3190618Z ✔ retiring one optional worker leaves the other worker able to solve (62.501984ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3191589Z ✔ mid-search cancellation preserves exact-cache semantics and a cleared flag permits a new solve (65.533512ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3192923Z ✔ optional search consumes stop at its first completed node and never returns WDL (3.61846ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3194074Z ✔ zero-flags optional search preserves exact value, move and visited-node count (27.357633ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3195010Z ✔ standard 7x6 optional search preserves all baseline metrics and observes every completed q (14.959062ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3195876Z ✔ in-flight extended publication defers then applies STOP at the next coherent node boundary (2.667086ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3196679Z ✔ flag-free Worker stays minimal; behavior variant is explicitly selected (6.742312ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3197577Z ✔ one-word read never reads a version or extension and never writes shared memory (0.381843ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3198418Z ✔ extension chain supports sparse four-word flags, truncation and all 124 payload bits (0.497356ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3199429Z ✔ overlapping extension publication defers without retry or modifying prior private snapshot (0.237664ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3200256Z ✔ a completed publication during extension reading cannot mix two flag sets (0.853167ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3201059Z ✔ publication before the version bracket rereads primary for every new chain length (1.061102ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3201748Z ✔ one-word checkpoint performs exactly one shared read (0.857961ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3202522Z ✔ cold writer rejects invalid flags/index/storage and version exhaustion before mutation (0.727208ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3203390Z ✔ real reader worker observes complete extended generations while strategist publishes (104.843597ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3204085Z ✔ Worker is the minimal canonical JSMinSys worker base (1.538608ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3204777Z ✔ worker take establishes ownership and lazily skips resolved/retired rows (2.057738ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3205517Z ✔ worker take rejects stale generation/ownership before touching the list (0.217864ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3206336Z ✔ resolved publication orders value before marker and validates owned work separately (1.553361ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3207462Z ✔ dependency publication carries fixed rows and retained handoff claims first runnable child (0.477141ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3208392Z ✔ wake observe/signal/park and stop/done primitives compose without hidden policy (0.289406ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3208919Z ℹ tests 375
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3209250Z ℹ suites 0
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3209568Z ℹ pass 374
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3209862Z ℹ fail 1
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3210157Z ℹ cancelled 0
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3210471Z ℹ skipped 0
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3210753Z ℹ todo 0
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3211092Z ℹ duration_ms 35652.497439
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3211332Z 
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3211502Z ✖ failing tests:
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3211654Z 
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3211923Z test at test/rba-shared-cache-layout.test.mjs:100:1
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3212650Z ✖ concurrent compact/direct/full-span writers never return another exact key value (54.079566ms)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3213305Z   AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3213814Z   
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3214187Z     assert.ok(hits.every(n=>Number.isInteger(n)&&n>0))
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3214552Z   
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3215273Z       at TestContext.<anonymous> (file:///home/runner/work/JSMinSys/JSMinSys/test/rba-shared-cache-layout.test.mjs:113:11)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3216047Z       at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3216609Z       at async Test.run (node:internal/test_runner/test:1409:7)
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3217299Z       at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3217780Z     generatedMessage: true,
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3218155Z     code: 'ERR_ASSERTION',
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3218494Z     actual: false,
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3218796Z     expected: true,
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3219102Z     operator: '==',
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3219391Z     diff: 'simple'
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3219690Z   }
+verify	Run node --test test/*.test.mjs	2026-10-06T03:32:53.3230309Z ##[error]Process completed with exit code 1.
