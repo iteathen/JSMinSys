@@ -1,5 +1,6 @@
 // COLD companion generation from all8 qualified current worker authorities.
 import assert from 'node:assert/strict';import {readFileSync,writeFileSync} from 'node:fs';
+import {transformPreparedCompactWorker} from './rba-prepared-compact-worker-transform.mjs';
 for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
  const suffix=(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':''),base='rba-connect4-lazy-smp-worker-minimal';
  let s=readFileSync(new URL('../addons/'+base+suffix+'.mjs',import.meta.url),'utf8').replaceAll('\r\n','\n');
@@ -26,6 +27,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
  once('negamax(depth+1,dst,ci,childN,','negamax(depth+1,dst,childBi,childN,');
  once('connect4RbaImmediateWinningColumn(g,words,0,basis,0,basisSize[0],mover)','connect4RbaImmediateWinningColumn(g,words,0,basis,rootBi,basisSize[0],mover)');
  once('negamax(0,0,0,basisSize[0],','negamax(0,0,rootBi,basisSize[0],');
+ if(native)s=transformPreparedCompactWorker(s);
  const output=new URL('../addons/'+base+'-views'+suffix+'.mjs',import.meta.url);
  if(process.argv.includes('--check'))assert.equal(readFileSync(output,'utf8').replaceAll('\r\n','\n'),s);else writeFileSync(output,s);
 }
