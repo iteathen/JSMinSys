@@ -1,0 +1,39 @@
+✖ banked partial24 keeps exact independent rows and publication through clones (4.5798ms)
+✖ banked partial24 prepared host initializes both banks before solving (8.6285ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 78.3187
+
+✖ failing tests:
+
+test at test\rba-index-partial-banked-cache.test.mjs:7:1
+✖ banked partial24 keeps exact independent rows and publication through clones (4.5798ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-index-partial-banked-cache.test.mjs:9:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\rba-index-partial-banked-cache.test.mjs:43:1
+✖ banked partial24 prepared host initializes both banks before solving (8.6285ms)
+  RangeError [Error]: partial TT requires native caches within one optimized bank
+      at prepareLazySmpConnect4Rba32 (file:///C:/r/jsminsys-cpc-rebuild-20261004/addons/rba-connect4-prepared-session-host.mjs:44:11)
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-index-partial-banked-cache.test.mjs:45:18)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
