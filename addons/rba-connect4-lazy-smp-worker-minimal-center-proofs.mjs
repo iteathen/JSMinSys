@@ -4,7 +4,6 @@ import {prepareSharedProofCacheAccess,transportConnect4ZeroBound32} from './rba-
 import {connect4RbaSupportCanonicalize} from './rba-connect4-coordinate-support-reflection.mjs';
 import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';
 import {prepareConnect4CpcxPairHub32} from './connect4-cpcx-pair-hub.mjs';
-import {prepareConnect4ResidualProofFrontier32} from './connect4-residual-proof-frontier.mjs';
 import {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-dense.mjs';
 import {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';
 import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';
@@ -34,8 +33,6 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
     targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
     pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,
     forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,
-    frontier=prepareConnect4ResidualProofFrontier32(g),frontProbe=frontier.probe,
-    frontStore=frontier.store,frontChild=frontier.child,frontRoot=frontier.initialize,
   connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null
     ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)
     :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null
@@ -81,7 +78,6 @@ if(workerData.readyGate){
   while(Atomics.load(workerData.readyGate,1)===0)Atomics.wait(workerData.readyGate,1,0);
 }
 words.set(workerData.root.words);
-frontRoot(words,0);
 basis.set(workerData.root.basis);
 basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;
 if(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);
@@ -133,15 +129,13 @@ function probeCache(src,hash,slot){
   return 0;
 }
 
-function storeExact(src,hash,slot,value,depth,mover){
+function storeExact(src,hash,slot,value){
   storeLocalEntry(slot,src,value);
-  frontStore(words,src,depth,value,mover);
   if(!(hash&sharedSampleBits))
     sharedStore(shared,words,src,value,hash);
 }
 
-function storeBound(src,hash,slot,value,depth,mover){
-  frontStore(words,src,depth,value,mover);
+function storeBound(src,hash,slot,value){
   const prior=localValues[slot];
   if(prior&&localKeyMatches(slot,src)){
     if(prior<=3||prior===value)return prior;
@@ -149,7 +143,6 @@ function storeBound(src,hash,slot,value,depth,mover){
     // Keep this inferred draw worker-local; shared publication is reserved for
     // exact values produced by the ordinary search result path.
     storeLocalEntry(slot,src,2);
-    frontStore(words,src,depth,2,mover);
     return 2;
   }
   storeLocalEntry(slot,src,value);
@@ -166,7 +159,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     slot=depth?(hash&localMask):0;
 
   if(depth){
-    const cached=probeCache(src,hash,slot)||frontProbe(words,src,depth,mover);
+    const cached=probeCache(src,hash,slot);
     if(cached){
       if(cached<=3)return relativeTerminal(cached,mover);
       if(cached===LOCAL_LOWER0){
@@ -183,7 +176,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   // also has no immediate mover win; cofactor uses that proved precondition.
   const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,forbiddenBase);
   if(forced===-2){
-    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover);
+    if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
       if(words[src+column]<g.rows){bestMove=column;break;}
@@ -194,20 +187,20 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
   // One common legal policy: WIN or a one-sided NONLOSS for previous mover.
   const response=evaluateConnect4PreparedCpcResponse32(cpc,words,src,basis,bi,n,mover^1);
   if(response===2){
-    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover);return 0;}
+    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0);return 0;}
     if(beta>0)beta=0;
   }else if(response===0){
     // Unresolved response policy falls through to independent pair proof.
     const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
     if(fork>=0){
-      if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover),depth,mover);
+      if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover));
       else bestMove=fork;
       return 1;
     }
   }
   if(response===1||
      evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
-    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover);
+    if(depth)storeExact(src,hash,slot,mover?3:1);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
       if(words[src+column]<g.rows){bestMove=column;break;}
@@ -232,8 +225,7 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     if(term)value=relativeTerminal(term,mover);
     else{
       const childN=basisSize[depth+1];
-      const childReflected=connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
-      frontChild(coord.map[0],childReflected,depth+1);
+      connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
       value=negamax(depth+1,dst,ci,childN,mover^1,-beta,-alpha);
       if(value===CANCELLED)return CANCELLED;
       value=-value;
@@ -252,17 +244,17 @@ function negamax(depth,src,bi,n,mover,alpha,beta){
     // non-exact zero-threshold bounds remain worker-local.
     if(best>alphaOrig&&best<betaOrig){
       const exact=relativeToAbsolute(best,mover);
-      storeExact(src,hash,slot,exact,depth,mover);
+      storeExact(src,hash,slot,exact);
     }else if(best>=betaOrig){
       if(best===1){
         const exact=relativeToAbsolute(1,mover);
-        storeExact(src,hash,slot,exact,depth,mover);
-      }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0,depth,mover);
+        storeExact(src,hash,slot,exact);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0);
     }else if(best<=alphaOrig){
       if(best===-1){
         const exact=relativeToAbsolute(-1,mover);
-        storeExact(src,hash,slot,exact,depth,mover);
-      }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover);
+        storeExact(src,hash,slot,exact);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0);
     }
   }
   return best;

@@ -1,0 +1,14 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+const ref=process.argv[2];
+if(!ref)throw Error('explicit frozen source required');
+const workers=execFileSync('git',['ls-tree','-r','--name-only',ref,'addons'],{encoding:'utf8'}).trim().split('\n').filter(x=>/^addons\/rba-connect4-lazy-smp-worker-minimal(?:-center)?(?:-proofs)?(?:-local32)?\.mjs$/.test(x));
+if(workers.length!==8)throw Error('eight worker identities required');
+const paths=[...workers,'tools/build-rba-minimal-center.mjs'];
+execFileSync('git',['restore','--source='+ref,'--',...paths]);
+const path='catalog/addon-cycle-ledger-v0.json',current=JSON.parse(readFileSync(path,'utf8')),frozen=JSON.parse(execFileSync('git',['show',ref+':'+path],{encoding:'utf8'}));
+current.units=current.units.filter(u=>!workers.includes(u.source)).concat(frozen.units.filter(u=>workers.includes(u.source)));
+for(const source of workers)current.decomposedSourceBlobs[source]=frozen.decomposedSourceBlobs[source];
+current.summary.units=current.units.length;
+writeFileSync(path,JSON.stringify(current,null,2)+'\n');
+console.log(JSON.stringify({ref,paths,units:current.units.length,note:'Retain unused frontier-library cost identities during parent crossover; runtime imports and allocations are frozen parent.'}));
