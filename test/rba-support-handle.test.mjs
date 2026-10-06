@@ -12,6 +12,7 @@ import {prepareSupportBasisPlans32} from '../addons/rba-connect4-support-basis-p
 const api=Object.assign({},...await Promise.all(['../addons/rba-connect4-support-basis-view.mjs','../addons/rba-connect4-support-handle-view.mjs','../addons/rba-connect4-coordinate-closure-handle-view-dense.mjs','../addons/rba-connect4-coordinate-closure-handle-view-prepared.mjs','../addons/rba-connect4-coordinate-support-reflection-view.mjs'].map(path=>import(path).catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;}))));
 const readonly=array=>new Proxy(array,{set(){assert.fail('immutable support basis was written');},get(t,k){const v=Reflect.get(t,k,t);return typeof v==='function'?v.bind(t):v;}});
 Object.assign(api,...await Promise.all(['../addons/rba-connect4-support-compiled-transition.mjs','../addons/rba-connect4-coordinate-compiled-transition.mjs'].map(path=>import(path))));
+Object.assign(api,await import('../addons/rba-connect4-coordinate-compiled-transition-bound.mjs'));
 test('incremental support handles reproduce physical transitions and reflection across all100 dimensions',()=>{
  assert.equal(typeof api.initializeSupportBasisHandle32,'function');
  assert.equal(typeof api.prepareSupportBasisViewScratch32,'function');
@@ -60,9 +61,10 @@ test('incremental support handles reproduce physical transitions and reflection 
       const rootHandle=api.initializeSupportBasisHandle32(g,q.words,0,q.basis,0,q.basis.length),rootBi=rootHandle*g.maxBasis,vb=g.supportBasisPlans.basis;
       const kinds=['PreparedSpan',...(g.removeByCell!==null?['DenseSpan']:[]),...(g.coordWords===3?['Prepared3',...(g.removeByCell!==null?['Dense3']:[])]:[])];
       for(const c of legal){const child=encode([...moves,c]);
-        for(const compiled of [false,true])for(const kind of compiled?['Span',...(g.coordWords===3?['3']:[])]:kinds)for(const nonWinning of [false,true]){
+        for(const compiled of [false,true,'bound'])for(const kind of compiled?['Span',...(g.coordWords===3?['3']:[])]:kinds)for(const nonWinning of [false,true]){
           if(nonWinning&&(child.words[g.metaOffset]&3)!==0&&(child.words[g.metaOffset]&3)!==2)continue;
-          const fn=api[(compiled?'connect4RbaCompiledTransition':'connect4RbaClosureHandleView')+kind+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight'];assert.equal(typeof fn,'function');
+          const name=(compiled?'connect4RbaCompiledTransition':'connect4RbaClosureHandleView')+kind+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight';
+          const fn=compiled==='bound'?api['prepare'+name[0].toUpperCase()+name.slice(1)](g):api[name];assert.equal(typeof fn,'function');
           const out=new Uint32Array(g.keyWords+8).fill(0xdeadbeef),sc=api.prepareSupportBasisViewScratch32(g),sizes=new Uint32Array(1);
           sc.inverse.fill(0xffffffff);const forbidden=new Proxy({},{get(){assert.fail('compiled hot inverse read');},set(){assert.fail('compiled hot inverse write');}});
           const term=fn(g,p,q.words,0,vb,rootBi,q.basis.length,c,expected.h[c],out,3,vb,0,undefined,sizes,0,sc.map,compiled?forbidden:sc.inverse,rootHandle);
