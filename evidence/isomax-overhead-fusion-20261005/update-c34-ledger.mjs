@@ -19,7 +19,14 @@ for(const u of l.units.filter(u=>u.source.includes('worker-minimal-views')&&u.so
    {op:'control.test.u32',count:2},{op:'control.branch',count:2});
   u.cycleCount.parameters.NONROOT='1 at each entered nonroot after stop gate, including empty cache/early proof path;0 root. Both eager packed scalars remain live across recursion.';
  }
- if(u.name==='<module-main>')for(const o of u.operations)if(o.op==='runtime.field.load'&&o.count==='3+2*NATIVE')o.count=3;
+ if(u.name==='<module-main>'){
+  for(const o of u.operations)if(o.op==='runtime.field.load'&&o.count==='3+2*NATIVE')o.count=3;
+  if(readFileSync(u.source,'utf8').includes('sharedPrepared=')){
+   u.operations.push({op:'runtime.field.load',count:'SHARED_BIND_FIELDS'},{op:'control.test.u32',count:'SHARED_BIND_TEST'},{op:'control.branch',count:'SHARED_BIND_TEST'});
+   u.cycleCount.parameters.SHARED_BIND_FIELDS='Actual shared layout/kind and fallback accessor fields at initialization; private/native admission is independent.';
+   u.cycleCount.parameters.SHARED_BIND_TEST='Optional-layout predicate and cold alias selections; never a hot layout flag.';
+  }
+ }
  const key=u.cycleCount.activeCycleExpression?'activeCycleExpression':'expression';u.cycleCount[key]=expr(u.operations);
  u.cycleCount.note+=' C34: two prepared scalars forwarded through existing wrappers. No identity array/allocator/hot selector; scalar arguments, spill/call/inlining cost remains included in target measurement. Cold aliases select only prepared compact accessors; cold attach and proof-domain validation retained.';
 }
