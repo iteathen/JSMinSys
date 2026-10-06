@@ -50,8 +50,9 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   shared=workerData.sharedExactCache.layout?attachConnect4RbaSharedLayoutCache32(workerData.sharedExactCache):
     attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
   sharedAccess=prepareSharedProofCacheAccess(shared),
-  sharedProbe=probeSharedPreparedCompact32,
-  sharedStore=storeSharedPreparedCompact32,
+  sharedPrepared=shared.layout?.kind==='compact32',
+  sharedProbe=sharedPrepared?probeSharedPreparedCompact32:sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,
+  sharedStore=sharedPrepared?storeSharedPreparedCompact32:sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
   localMask=workerData.localCacheCapacity-1,
   localCache=createLocalNativeProofCache32(g,workerData.localCacheCapacity),
@@ -100,11 +101,11 @@ function storeLocalEntry(slot,src,value,support,tail){
   storeLocalPreparedCompactEntry32(localCache,words,src,slot,value,support,tail);
 }
 
-function probeCache(src,hash,slot,support,tail){
+function probeCache(src,hash,slot,support,tail,mover){
   const local=localKeys[slot*8];
   if(local&&localKeyMatches(slot,src,support,tail)){return local;}
   if(!(hash&sharedSampleBits)){
-    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support,tail),(words[src+g.metaOffset]>>>2)&1);
+    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support,tail),mover);
     if(value){storeLocalEntry(slot,src,value,support,tail);return value;}
   }
   return 0;
@@ -131,7 +132,7 @@ function storeBound(src,hash,slot,value,depth,mover,support,tail){
   }
   storeLocalEntry(slot,src,value,support,tail);
   if(!(hash&sharedSampleBits))
-    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,(words[src+g.metaOffset]>>>2)&1),hash,support,tail);
+    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,mover),hash,support,tail);
   return value;
 }
 
@@ -145,7 +146,7 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
     tail=depth?compactTailProfile8(words,src):0;
 
   if(depth){
-    const cached=probeCache(src,hash,slot,support,tail)||frontProbe(words,src,depth,mover);
+    const cached=probeCache(src,hash,slot,support,tail,mover)||frontProbe(words,src,depth,mover);
     if(cached){
       if(cached<=3)return relativeTerminal(cached,mover);
       if(cached===LOCAL_LOWER0){
