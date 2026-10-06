@@ -4,11 +4,12 @@ export function transformPreparedCompactWorker(source){
  let s=source;
  function once(a,b){assert.equal(s.split(a).length,2,a);s=s.replace(a,b);}
  s="import {localPreparedCompactKeyMatches32,storeLocalPreparedCompactEntry32,probeSharedPreparedCompact32,storeSharedPreparedCompact32} from './rba-connect4-prepared-compact-cache.mjs';\n"+s;
+ s="import {probeSharedPreparedBankedCompact32,storeSharedPreparedBankedCompact32} from './rba-connect4-shared-banked-cache.mjs';\n"+s;
  s=s.replace('createLocalNativeProofCache32,localNativeProofKeyMatches32,storeLocalNativeProofEntry32','createLocalNativeProofCache32');
  once('sharedProbe=sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,',
-  "sharedPrepared=shared.layout?.kind==='compact32',\n  sharedProbe=sharedPrepared?probeSharedPreparedCompact32:sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,");
+  "sharedPrepared=shared.layout?.kind==='compact32',\n  sharedProbe=sharedPrepared?(shared.banks?probeSharedPreparedBankedCompact32:probeSharedPreparedCompact32):sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,");
  once('sharedStore=sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,',
-  'sharedStore=sharedPrepared?storeSharedPreparedCompact32:sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,');
+  'sharedStore=sharedPrepared?(shared.banks?storeSharedPreparedBankedCompact32:storeSharedPreparedCompact32):sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,');
  // Existing cold prepare/attach calls retain validation, including the proof domain.
  once('function localKeyMatches(slot,src){','function localKeyMatches(slot,src,support,tail){');
  once('localNativeProofKeyMatches32(localCache,words,src,slot)','localPreparedCompactKeyMatches32(localCache,words,src,slot,support,tail)');
