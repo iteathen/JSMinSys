@@ -60,7 +60,7 @@ for(const kind of ['partial24','partial16','partialMixed'])for(const center of [
   }
   if(kind==='partial16')for(const o of u.operations)if(o.target?.includes('IndexPartial24'))o.target=o.target.replace('IndexPartial24','IndexPartial16');
   if(kind==='partialMixed')for(const o of u.operations){
-   if(o.target?.includes('IndexPartial24'))o.target=o.target.replace('IndexPartial24','IndexPartialMixed');
+   if(/^(probe|store)IndexPartial24/.test(o.target??''))o.target=o.target.replace('IndexPartial24','IndexPartialMixed');
    if(o.target==='attachIndexPartialCache32')o.target='attachMixedIndexPartialCache32';
    if(o.target==='createIndexPartialCache32')o.target='createMixedIndexPartialCache32';
   }
@@ -82,4 +82,7 @@ for(const s of new Set(l.units.filter(u=>u.status==='decomposed').map(u=>u.sourc
  const bytes=readFileSync(s,'utf8').replaceAll('\r\n','\n');l.decomposedSourceBlobs[s]=createHash('sha1').update(`blob ${Buffer.byteLength(bytes)}\0`).update(bytes).digest('hex');
 }
 l.summary.units=l.units.length;l.summary.decomposed=l.units.filter(u=>u.status==='decomposed').length;
+const names=new Set([...l.units.map(u=>u.name),...JSON.parse(readFileSync('catalog/functions-v0.json','utf8')).functions.map(f=>f.name)]);
+for(const u of l.units.filter(u=>u.source===source||/-partial(?:24|16|Mixed)\.mjs$/.test(u.source)))
+ for(const operation of u.operations)if(operation.op==='runtime.call.subledger'&&!names.has(operation.target))throw Error('Unresolved candidate cost callee: '+u.unit+' -> '+operation.target);
 writeFileSync(path,JSON.stringify(l,null,2)+'\n');
