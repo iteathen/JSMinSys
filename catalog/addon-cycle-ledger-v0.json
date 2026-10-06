@@ -45276,11 +45276,125 @@
         "note": "Local-only alpha/beta bound retention. Opposite bounds for the same canonical q imply exact draw, retained worker-locally; bound-derived exactness is not automatically published to the shared TT. C17 publishes newly retained zero bounds in absolute gauge using unchanged atomic protocol; opposite local bounds still imply private exact draw. C20 native tag at slot*8; exact/bound logic and shared protocol unchanged. C54private residual-order frontier, exactTT unchanged. Rootsetup after readiness, childframe from exact cofactor/mirrorhandle, explicit depth/mover storeparameters. No hot reporting; actual captured view/context/register and inlining costs remain optimization debt before profiling. Added native payload2MiB/worker plus frames atstandard3words; no existingTTbudget reduced. C58import aliases bind new common-matching certificate atinit; no new worker-window branch or hot configuration test. C44immutable companion cold-selectedonlywithcompleteplans. Childcanonicalhandle selectsrowbase andisforwardedtofrontierwithreflection0; liveorientationusesactualreflectionbit. Defaultworker untouched. Sharedreadlocality/large-rowaddress/typedID/inliningdebt requiresactualprofile/fullsolve. No recurring selector, reporting orobjects. C34: two prepared scalars forwarded through existing wrappers. No identity array/allocator/hot selector; scalar arguments, spill/call/inlining cost remains included in target measurement. Cold aliases select only prepared compact accessors; cold attach and proof-domain validation retained. C65: known recurrence mover replaces repeated metadata word/shift/and in proof probe/storeBound. Store already receives mover; probe adds one scalar after prepared fields, exact-key and tag/CAS/absolute-gauge semantics unchanged. Remaining field/address counts exclude deleted extraction; argument/register/inlining pressure remains measured-machine debt. No new frame/table/flag/guard/allocation. C66compiled full-plan companion: only coordWords3/span cold selection, no dense/sparse hot dependency; two scratch buffers/map-mirror, inverse ABIargumentnull. C63/C34/C65/proof/order/cache behavior retained. Fcounts actual remaining fields."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/worker-topology.mjs#windowsWorkerPlan",
+      "source": "addons/worker-topology.mjs",
+      "name": "windowsWorkerPlan",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold physical-core/class scan and result allocation; one record per physical core, no logical-SMT duplication."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold physical-core/class scan and result allocation; one record per physical core, no logical-SMT duplication."
+      }
+    },
+    {
+      "unit": "addons/worker-topology.mjs#parseCpuList",
+      "source": "addons/worker-topology.mjs",
+      "name": "parseCpuList",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold OS list validation, bounded range expansion, Set deduplication, sorting and array construction."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold OS list validation, bounded range expansion, Set deduplication, sorting and array construction."
+      }
+    },
+    {
+      "unit": "addons/worker-topology.mjs#optionalTopologyFile",
+      "source": "addons/worker-topology.mjs",
+      "name": "optionalTopologyFile",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold filesystem/read boundary and ENOENT handling; no repeated polling during search."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold filesystem/read boundary and ENOENT handling; no repeated polling during search."
+      }
+    },
+    {
+      "unit": "addons/worker-topology.mjs#linuxWorkerPlan",
+      "source": "addons/worker-topology.mjs",
+      "name": "linuxWorkerPlan",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold proc/sysfs reads, allowed/online intersection, physical sibling grouping and optional PMU/capacity classification; allocation and filesystem latency remain symbolic."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold proc/sysfs reads, allowed/online intersection, physical sibling grouping and optional PMU/capacity classification; allocation and filesystem latency remain symbolic."
+      }
+    },
+    {
+      "unit": "addons/worker-topology.mjs#darwinWorkerPlan",
+      "source": "addons/worker-topology.mjs",
+      "name": "darwinWorkerPlan",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold bounded sysctl subprocesses, physical count validation and result allocation; process start/OS latency remains symbolic."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold bounded sysctl subprocesses, physical count validation and result allocation; process start/OS latency remains symbolic."
+      }
+    },
+    {
+      "unit": "addons/worker-topology.mjs#discoverWorkerPlan",
+      "source": "addons/worker-topology.mjs",
+      "name": "discoverWorkerPlan",
+      "scope": "cold-system-topology-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold platform selection and one platform discovery call; Windows topology uses existing FFI support and closes its OS library before return."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold platform selection and one platform discovery call; Windows topology uses existing FFI support and closes its OS library before return."
+      }
     }
   ],
   "summary": {
-    "units": 535,
-    "decomposed": 535,
+    "units": 541,
+    "decomposed": 541,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -45462,7 +45576,8 @@
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs": "432e865e91dbe9843f602ed0b39f3e10ed43d6a8",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs": "f11346bb2a96baf353e3422229b9aea8b731d54b",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs": "6cd3c90586dd44d84c9be418562f486ed82389d3",
-    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs": "40d1c3482bdec39dc8fafcef7377111d96c0646b"
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs": "40d1c3482bdec39dc8fafcef7377111d96c0646b",
+    "addons/worker-topology.mjs": "b6f271a4e3aec5d3d2d9cd7a9b8178bbbed9513e"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
