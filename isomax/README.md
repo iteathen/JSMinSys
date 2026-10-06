@@ -16,7 +16,7 @@ The last command solves the **empty 7×6 board**, discovering the worker count d
 
 Windows x64/ARM64 uses `GetLogicalProcessorInformationEx` and its efficiency classes; a homogeneous CPU uses all physical cores. The portable launcher enables the required experimental Node FFI support on Windows. Linux groups SMT siblings, intersects the process CPU allowance with online CPUs, and uses Intel hybrid PMU or ARM capacity data when available. If Linux does not expose core classes, the output explicitly reports `physical-cores-class-unreported` and `performanceCores: null`; only the physical count is known. macOS uses `hw.perflevel0.physicalcpu` for its highest performance tier and `hw.physicalcpu` on homogeneous machines.
 
-Each result includes `workerPlan`, its discovery source and the actual numeric worker count. Unknown/corrupt topology is an error; it is not guessed from `os.cpus().length`. Use `--workers N` to select an explicit count, including on unsupported platforms. The current multiworker engine supports 2..64 workers; auto detection outside that range fails before solver allocation. Discovery does not pin threads: the portable path uses OS scheduling. The measured Windows launcher retains its explicit four-worker pinning.
+Each result includes `workerPlan`, its discovery source and the actual numeric worker count. Unknown/corrupt topology is an error; it is not guessed from `os.cpus().length`. Use `--workers N` to select an explicit count, including on unsupported platforms. The current multiworker engine supports 2..64 workers; auto detection outside that range fails before solver allocation. Discovery does not pin threads: the portable path uses OS scheduling. There is one launcher for every supported machine; no i5-specific launcher or fixed worker default.
 
 ```sh
 node run.mjs --workers 4
@@ -24,13 +24,7 @@ node run.mjs --workers 4
 
 The recorded **four-worker** i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**, with observed peak RSS **6.44 GiB**. These historical timings do not qualify an automatically selected worker count. Initialization and cleanup are reported separately. The 10-second objective remains unmet. Normal portable execution is unpinned and has no timing qualification.
 
-For the exact measured Windows machine and runtime, use PowerShell 7:
-
-```powershell
-./run-i5.ps1 -NodePath 'C:/path/to/recorded-node27/node.exe'
-```
-
-This requires v27.0.0-nightly20260928b59840b593 and the i5-12600K. It sets process affinity85 and binds all four workers to verified processors0/2/4/6 before solver initialization. Actual affinity reports, result.json and stderr.txt are retained under the printed output directory. Different hardware/runtime uses the portable launcher; do not interpret its timing as equivalent.
+Historical benchmark invocations retain the exact runtime, four-worker count and affinity used for those records. They are evidence, not startup defaults. Automatic worker selection has correctness checks on Windows, Linux and macOS; its full-solve timing is unqualified.
 
 ## Change board dimensions
 
@@ -71,7 +65,6 @@ The optional exported rank-local calculator remains separate; using it changes t
 
 - index.mjs: public API.
 - run.mjs / cli.mjs: portable empty-board launcher/result.
-- run-i5.ps1 / targets.json: measured Windows affinity.
 - profile.json: automatic startup default and separate explicit four-worker measurement profile.
 - provenance.json / verify.mjs: SHA-256 identities and closure checks.
 - runtime/: frozen producer dependencies, with unchanged worker kernels and cold system discovery.

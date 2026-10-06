@@ -28,14 +28,13 @@ for(const family of ['','-views','-views-compiled'])for(const center of [false,t
 }
 for(const p of ['addons/rba-connect4-prepared-session-host.mjs','addons/rba-connect4-geometry.mjs','addons/connect4-rank-local-presearch.mjs','addons/worker-topology.mjs','tools/worker-affinity-preload.mjs','tools/benchmark-v8-startup-preload.mjs'])include(p);
 output('LICENSE',read('LICENSE'),'LICENSE');
-output('targets.json',read('isomax/targets.json'),'isomax/targets.json');
 for(const p of ['C61-MEMORY-GRID.json','C66-CROSSOVER.json','fusion-final-confirm.json'])output('evidence/'+p,read('evidence/c4-inspired-optimization-20261005/'+p),'evidence/c4-inspired-optimization-20261005/'+p);
 for(const p of ['CURRENT-CHECKPOINT.md','FINAL-REVIEW.md','final-correctness-ci.json'])output('evidence/'+p,read('evidence/isomax-overhead-fusion-20261005/'+p),'evidence/isomax-overhead-fusion-20261005/'+p);
 for(const name of ['fusion-b3-01','fusion-b3-parent-02','fusion-c66-01','fusion-c66-02','fusion-final-confirm-01']){
  const prefix='evidence/minimal-worker-localhost-20261004/'+name+'/';
  for(const p of ['stdout.json','stderr.txt','invocation.json','measurement.json','cleanup-verification.json',...Array.from({length:4},(_,i)=>'affinity-'+i+'.json')])output('evidence/runs/'+name+'/'+p,read(prefix+p),prefix+p);
 }
-for(const p of ['index.mjs','cli.mjs','run.mjs','run-i5.ps1','example.mjs','profile.json','package.json','verify.mjs','README.md','evidence/README.md',...readdirSync(root+'test').filter(n=>n.endsWith('.mjs')).map(n=>'test/'+n)])files[p]={source:'package-authored',sha256:digest(normal(readFileSync(root+p,'utf8')))};
+for(const p of ['index.mjs','cli.mjs','run.mjs','example.mjs','profile.json','package.json','verify.mjs','README.md','evidence/README.md',...readdirSync(root+'test').filter(n=>n.endsWith('.mjs')).map(n=>'test/'+n)])files[p]={source:'package-authored',sha256:digest(normal(readFileSync(root+p,'utf8')))};
 for(const [p,r] of Object.entries(previous.files))if(!files[p]&&/^(runtime|evidence)\//.test(p)&&r.source!=='package-authored'){
  if(p.split('/').includes('..'))throw Error('Unsafe stale path');
  if(check&&existsSync(root+p))throw Error('Stale package file: '+p);

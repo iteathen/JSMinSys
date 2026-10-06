@@ -10,7 +10,8 @@ test('package auto default retains an explicit measured four-worker configuratio
  assert.equal(p.options.rootFrontier,false);assert.equal(p.options.supportBasisViews,true);
  assert.equal(p.options.sharedProofBounds,true);assert.equal(p.options.localCacheLayout,'native');
  assert.deepEqual(p.launchFlags,['--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600']);
- for(const name of ['run.mjs','run-i5.ps1','cli.mjs'])assert.ok(existsSync(new URL(name,root)),name);
+ for(const name of ['run.mjs','cli.mjs'])assert.ok(existsSync(new URL(name,root)),name);
+ for(const name of ['run-i5.ps1','targets.json'])assert.equal(existsSync(new URL(name,root)),false,name);
  const api=readFileSync(new URL('index.mjs',root),'utf8');assert.match(api,/rba-connect4-prepared-session-host/);
  const cli=readFileSync(new URL('cli.mjs',root),'utf8');assert.match(cli,/\.solve\(\[\]\)/);assert.doesNotMatch(cli,/44444|RankLocal/);
 });
