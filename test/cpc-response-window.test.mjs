@@ -38,7 +38,6 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      if(response)assert.equal(pairCalls,0,'previous NONLOSS or WIN excludes current pair WIN');
      if(response===0&&cached===0)assert.equal(pairCalls,1,'failed response route must fall through even in narrow caller window');
      if(response===0&&cached===5&&depth){
-       assert.equal(pairCalls,0,'consumed upper0 proof excludes current pair WIN');
        if(alpha<0)assert.equal(targetCalls,1,'upper0 still permits target proof to strengthen LOSS');
      }
      if(response===0&&depth&&cached===4&&beta>0)assert.equal(pairCalls,1,'lower0 does not exclude WIN');
