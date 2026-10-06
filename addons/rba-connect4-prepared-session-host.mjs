@@ -9,6 +9,7 @@ import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './r
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
 import {prepareSupportCompiledTransitions32} from './rba-connect4-support-compiled-transition.mjs';
 import {prepareBankedSharedCapacity32,sharedNativeBankCapacity32} from './rba-connect4-shared-banked-cache.mjs';
+import {createIndexPartialCache32} from './rba-connect4-index-partial-cache.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -17,7 +18,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false,workerTargets=null,sharedBankCapacity=null}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false,workerTargets=null,sharedBankCapacity=null,cacheIdentity='native32'}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
@@ -30,6 +31,8 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
   if(workerTargets!==null&&(!Array.isArray(workerTargets)||workerTargets.length!==workers))throw new RangeError('Invalid worker affinity target count');
   const compact=isCompactProfile8(geometry,geometry.keyWords),keyWords=compact?8:geometry.keyWords;
+  if(!['native32','partial24'].includes(cacheIdentity))throw RangeError('invalid TT identity experiment');
+  const partial=compact&&cacheIdentity==='partial24',effectiveCacheIdentity=partial?cacheIdentity:'native32';
   if(localCacheLayout!=='split'&&localCacheLayout!=='native')throw new RangeError('invalid private TT layout');
   const localNative=localCacheLayout==='native'&&compact;
   if(localNative)validateConnect4CacheCapacity32(localCacheCapacity,16);
@@ -37,7 +40,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   // storage and valid larger capacities outside the native halfword-view bound.
   if(sharedCacheLayout==='auto')sharedCacheLayout=compact&&sharedCacheCapacity<=0x08000000?'native':'split40';
   if(sharedCacheLayout!=='split40'&&sharedCacheLayout!=='native')throw new RangeError('invalid shared TT layout');
-  const layout=sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
+  if(partial&&(!localNative||sharedCacheLayout!=='native'||sharedBankCapacity!==null||sharedCacheCapacity<8||localCacheCapacity<8||sharedCacheCapacity>2**28))
+    throw RangeError('partial TT requires native caches within one optimized bank');
+  const layout=partial?{kind:'partial24',entryBytes:24,entryWords:6}:sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
     sharedStride=layout===null?keyWords:layout.kind==='compact32'?16:
       layout.kind==='direct'?layout.heightStride:layout.entryWords;
   const banked=layout!==null&&(sharedBankCapacity!==null||sharedCacheCapacity>sharedNativeBankCapacity32(layout));
@@ -59,6 +64,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   const transitionBudget=536870912,
     transitionPlan=basisViews&&!signal?.aborted?prepareSupportCompiledTransitions32(geometry,geometry.supportBasisPlans,transitionBudget):null,
     compiledTransitions=transitionPlan!==null;
+  if(partial&&!compiledTransitions)throw RangeError('partial TT candidate requires admitted compiled support plans');
   if(compiledTransitions)geometry={...geometry,supportBasisPlans:transitionPlan};
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
@@ -85,7 +91,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed,basisViews,compiledTransitions,
+    searchStarted:started,closed,basisViews,compiledTransitions,cacheIdentity:effectiveCacheIdentity,
     affinityReady:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)>0).every(Boolean),
     affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
   function materializePreparedConnect4SearchResult32(reflected=0){
@@ -96,13 +102,13 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       move:exact?Atomics.load(resultWords,winner*STRIDE+2):-1,winner,winnerMetrics:null,
       nodeCounts:null,workerTiming:null,frontierMetrics:null,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
-      sharedSampleMask,workerMode:'minimal',
+      sharedSampleMask,workerMode:'minimal',cacheIdentity:effectiveCacheIdentity,
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
       sharedTtBanks:shared?.banks?.length??1,sharedTtBankEntries:shared?.banks?.[0]?.mask===undefined?null:shared.banks[0].mask+1,
       sharedProofBounds,basisViews,compiledTransitions,supportTransitionPlanBudgetBytes:transitionBudget,
       supportTransitionPlanBytes:geometry.supportBasisPlans?.transitionPlanBytes??0,
       supportTransitionWorkingBytes:geometry.supportBasisPlans?.transitionWorkingBytes??0,
-      localCacheLayout:localNative?'native':'split',privateTtEntryBytes:localNative?32:keyWords*4+1,
+      localCacheLayout:localNative?'native':'split',privateTtEntryBytes:partial?24:localNative?32:keyWords*4+1,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
       supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
@@ -151,14 +157,15 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
     workerGeometry=shareConnect4RbaGeometry32(geometry);
-    shared=(layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry,bankCapacity:sharedBankCapacity});
+    shared=partial?createIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true}):
+      (layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry,bankCapacity:sharedBankCapacity});
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else if(shared.banks)for(const bank of shared.banks)bank.entries.fill(0);
     else shared.entries.fill(0);
     for(let i=0;i<workers;i+=1){
      const file=new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(compiledTransitions?'-views-compiled':'-views'):'')+
-      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url);
+      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+(partial?'-partial24':'')+'.mjs',import.meta.url);
      session.spawn(workerTargets===null?file:new URL('./worker-startup-affinity.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
       root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate,

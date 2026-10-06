@@ -1,0 +1,34 @@
+✔ exact partial24 preserves omitted-coordinate identity at forced index collisions (4.91ms)
+✔ partial24 busy/wrap/clone publication retains the full32bit sequence contract (0.8084ms)
+✔ partial24 identity matches physical/current-rank inputs and reversible omitted lanes (12.1173ms)
+✔ partial24 concurrent colliding writers never lend another key a proof (35.3066ms)
+✖ prepared partial24 integration binds caches before search and preserves generic fallback (3049.6312ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3223.5292
+
+✖ failing tests:
+
+test at test\rba-index-partial-cache.test.mjs:83:1
+✖ prepared partial24 integration binds caches before search and preserves generic fallback (3049.6312ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'partial24'
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-index-partial-cache.test.mjs:88:13)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'partial24',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
