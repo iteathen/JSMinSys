@@ -1,0 +1,393 @@
+{
+  "kind": "system-discovery-and-worker-affinity-correctness",
+  "sourceCommit": "e6580e951c8318395446dd5916482efddc3d33fd",
+  "nativeCiUrl": "https://github.com/iteathen/JSMinSys/actions/runs/37508083480",
+  "nativeCi": {
+    "conclusion": "success",
+    "headSha": "4153940e1acec01bf1706c8a53d833ab736629ee",
+    "jobs": [
+      {
+        "completedAt": "2026-10-06T18:01:47Z",
+        "conclusion": "success",
+        "databaseId": 112421763740,
+        "name": "startup (ubuntu-latest)",
+        "startedAt": "2026-10-06T18:01:34Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-06T18:01:35Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-06T18:01:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:38Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 2,
+            "startedAt": "2026-10-06T18:01:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:43Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 3,
+            "startedAt": "2026-10-06T18:01:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:43Z",
+            "conclusion": "success",
+            "name": "Run node isomax/verify.mjs",
+            "number": 4,
+            "startedAt": "2026-10-06T18:01:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:44Z",
+            "conclusion": "success",
+            "name": "Run node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs",
+            "number": 5,
+            "startedAt": "2026-10-06T18:01:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:44Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 9,
+            "startedAt": "2026-10-06T18:01:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:44Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 10,
+            "startedAt": "2026-10-06T18:01:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:44Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 11,
+            "startedAt": "2026-10-06T18:01:44Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/iteathen/JSMinSys/actions/runs/37508083480/job/112421763740"
+      },
+      {
+        "completedAt": "2026-10-06T18:01:57Z",
+        "conclusion": "success",
+        "databaseId": 112421764045,
+        "name": "startup (windows-latest)",
+        "startedAt": "2026-10-06T18:01:34Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-06T18:01:36Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-06T18:01:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:42Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 2,
+            "startedAt": "2026-10-06T18:01:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:51Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 3,
+            "startedAt": "2026-10-06T18:01:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:51Z",
+            "conclusion": "success",
+            "name": "Run node isomax/verify.mjs",
+            "number": 4,
+            "startedAt": "2026-10-06T18:01:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:53Z",
+            "conclusion": "success",
+            "name": "Run node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs",
+            "number": 5,
+            "startedAt": "2026-10-06T18:01:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:53Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 9,
+            "startedAt": "2026-10-06T18:01:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:55Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 10,
+            "startedAt": "2026-10-06T18:01:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:55Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 11,
+            "startedAt": "2026-10-06T18:01:55Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/iteathen/JSMinSys/actions/runs/37508083480/job/112421764045"
+      },
+      {
+        "completedAt": "2026-10-06T18:01:58Z",
+        "conclusion": "success",
+        "databaseId": 112421764131,
+        "name": "startup (macos-latest)",
+        "startedAt": "2026-10-06T18:01:40Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-06T18:01:41Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-06T18:01:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:45Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 2,
+            "startedAt": "2026-10-06T18:01:41Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:52Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 3,
+            "startedAt": "2026-10-06T18:01:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:52Z",
+            "conclusion": "success",
+            "name": "Run node isomax/verify.mjs",
+            "number": 4,
+            "startedAt": "2026-10-06T18:01:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:53Z",
+            "conclusion": "success",
+            "name": "Run node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs",
+            "number": 5,
+            "startedAt": "2026-10-06T18:01:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:53Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+            "number": 9,
+            "startedAt": "2026-10-06T18:01:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:54Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "number": 10,
+            "startedAt": "2026-10-06T18:01:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-06T18:01:54Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 11,
+            "startedAt": "2026-10-06T18:01:54Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/iteathen/JSMinSys/actions/runs/37508083480/job/112421764131"
+      }
+    ],
+    "status": "completed"
+  },
+  "localNode": {
+    "node": "v26.7.0",
+    "v8": "14.6.202.34-node.28",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K"
+  },
+  "localWorkerPlan": {
+    "workers": 6,
+    "physicalCores": 10,
+    "systemPhysicalCores": 10,
+    "performanceCores": 6,
+    "targets": [
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 0,
+        "core": 0
+      },
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 2,
+        "core": 1
+      },
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 4,
+        "core": 2
+      },
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 6,
+        "core": 3
+      },
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 8,
+        "core": 4
+      },
+      {
+        "platform": "win32",
+        "group": 0,
+        "processor": 10,
+        "core": 5
+      }
+    ],
+    "selection": "performance-cores",
+    "source": "Windows GetLogicalProcessorInformationEx",
+    "platform": "win32",
+    "affinityRequired": true,
+    "affinityPolicy": "verified-pinning"
+  },
+  "localWorkerAffinity": [
+    {
+      "worker": 0,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 0,
+        "core": 0
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 0
+    },
+    {
+      "worker": 1,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 2,
+        "core": 1
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 2
+    },
+    {
+      "worker": 2,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 4,
+        "core": 2
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 4
+    },
+    {
+      "worker": 3,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 6,
+        "core": 3
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 6
+    },
+    {
+      "worker": 4,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 8,
+        "core": 4
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 8
+    },
+    {
+      "worker": 5,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 10,
+        "core": 5
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 10
+    }
+  ],
+  "localSmokeGeometry": {
+    "columns": 1,
+    "rows": 4
+  },
+  "localSmokeOutcome": 0,
+  "localSmokeStatus": "EXACT",
+  "cleanup": true,
+  "performanceQualified": false,
+  "macOSException": "Owner explicitly permits scheduling hints; no hard-pinning or P-core-residency claim",
+  "hotKernelChanges": 0
+}

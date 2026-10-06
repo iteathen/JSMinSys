@@ -1,0 +1,13 @@
+# Automatic worker setup
+
+IsoMax discovers physical CPU topology before allocating its solver or releasing search. The default selects one worker per available highest-performance physical core, excluding extra SMT siblings. Homogeneous Windows/macOS machines use their physical count; Linux reports a physical-only fallback explicitly when the OS does not provide class information.
+
+Windows and Linux verify a single selected CPU in each thread's affinity mask before loading its application module or touching private TT pages. The application only returns READY after all workers have acknowledged initialization. An invalid target or failed binding closes all workers before search. Explicit worker counts cannot exceed distinct discovered targets.
+
+The owner explicitly permits macOS scheduling hints. Every macOS worker requests user-initiated QoS, reads it back, and requests its own Mach affinity tag when supported. Apple Silicon may reject Mach tags; successful QoS still counts as an applied hint. These are not hard pins, and no CPU ID or guaranteed P-core residency is reported. The public result distinguishes `verified` masks from `hintsApplied` and records Mach tag acceptance separately. README prominently documents this exception.
+
+The fixed i5 launcher and target file are removed. Historical four-worker timing/profile records remain evidence; they are not startup defaults. Runtime requires Node >=26.7 with experimental FFI enabled by the sole portable launcher. Generic support libraries own topology, affinity/hints, startup sequencing and worker lifecycle. Search/kernel code is unchanged. The cycle ledger accounts for 546 add-on units; all new work is cold.
+
+Native startup correctness passed on Windows, Linux and macOS at [CI run 37508083480](https://github.com/iteathen/JSMinSys/actions/runs/37508083480), application commit 4153940e1acec01bf1706c8a53d833ab736629ee. The local extracted package selected six i5-12600K P-core workers, with verified logical CPUs 0/2/4/6/8/10 and clean exact 1x4 smoke completion. Raw machine-readable evidence is in `system-discovery-20261006.json`. These small capacities and geometries are correctness controls, not performance authority. No new full-solve timing conclusion is promoted.
+
+Review reproduced and repaired additional/empty Linux PMU masks, Windows ARM64 topology eligibility, legacy multi-group Windows discovery, minimum Node compatibility and stale unpinned documentation. The underlying 24 search kernels, CPC/NDC, TT semantics, ordering and solver logic are unchanged. Sealed formula-holdout outcomes were not accessed.

@@ -34,7 +34,7 @@ for(const name of ['fusion-b3-01','fusion-b3-parent-02','fusion-c66-01','fusion-
  const prefix='evidence/minimal-worker-localhost-20261004/'+name+'/';
  for(const p of ['stdout.json','stderr.txt','invocation.json','measurement.json','cleanup-verification.json',...Array.from({length:4},(_,i)=>'affinity-'+i+'.json')])output('evidence/runs/'+name+'/'+p,read(prefix+p),prefix+p);
 }
-for(const p of ['index.mjs','cli.mjs','run.mjs','example.mjs','profile.json','package.json','verify.mjs','README.md','evidence/README.md',...readdirSync(root+'test').filter(n=>n.endsWith('.mjs')).map(n=>'test/'+n)])files[p]={source:'package-authored',sha256:digest(normal(readFileSync(root+p,'utf8')))};
+for(const p of ['index.mjs','cli.mjs','run.mjs','example.mjs','profile.json','package.json','verify.mjs','README.md','evidence/README.md','evidence/SYSTEM-DISCOVERY.md','evidence/system-discovery-20261006.json',...readdirSync(root+'test').filter(n=>n.endsWith('.mjs')).map(n=>'test/'+n)])files[p]={source:'package-authored',sha256:digest(normal(readFileSync(root+p,'utf8')))};
 for(const [p,r] of Object.entries(previous.files))if(!files[p]&&/^(runtime|evidence)\//.test(p)&&r.source!=='package-authored'){
  if(p.split('/').includes('..'))throw Error('Unsafe stale path');
  if(check&&existsSync(root+p))throw Error('Stale package file: '+p);
