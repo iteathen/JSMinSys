@@ -4,7 +4,7 @@ import {mkdirSync,writeFileSync,readFileSync,existsSync,unlinkSync,readdirSync} 
 import {dirname,posix} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-const root=fileURLToPath(new URL('./',import.meta.url)),source='ea4fd8bc49481c92a2b92344108c3af4567a506b',check=process.argv.includes('--check'),
+const root=fileURLToPath(new URL('./',import.meta.url)),source='d2e4ccadcef6d67bc97a53679476e1ef6a5a9916',check=process.argv.includes('--check'),
  digest=s=>createHash('sha256').update(s).digest('hex'),normal=s=>s.replaceAll('\r\n','\n'),
  read=p=>normal(execFileSync('git',['show',source+':'+p],{cwd:root,encoding:'utf8',maxBuffer:32*1024*1024})),
  previous=JSON.parse(readFileSync(root+'provenance.json','utf8')),files={},seen=new Set(),workers=[];
@@ -23,14 +23,15 @@ function include(path){
   include(posix.normalize(posix.join(posix.dirname(path),m[1])));
  }
 }
-for(const views of [false,true])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
- const p='addons/rba-connect4-lazy-smp-worker-minimal'+(views?'-views':'')+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'')+'.mjs';workers.push('runtime/'+p);include(p);
+for(const family of ['','-views','-views-compiled'])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
+ const p='addons/rba-connect4-lazy-smp-worker-minimal'+family+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'')+'.mjs';workers.push('runtime/'+p);include(p);
 }
 for(const p of ['addons/rba-connect4-prepared-session-host.mjs','addons/rba-connect4-geometry.mjs','addons/connect4-rank-local-presearch.mjs','tools/worker-affinity-preload.mjs','tools/benchmark-v8-startup-preload.mjs'])include(p);
 output('LICENSE',read('LICENSE'),'LICENSE');
 output('targets.json',read('isomax/targets.json'),'isomax/targets.json');
-for(const p of ['CURRENT-CHECKPOINT.md','BATCH-REVIEW.md','C44-COMPARISON.json','C58-COMPARISON.json','C61-MEMORY-GRID.json','J06-PARENT-COMPARISON.json'])output('evidence/'+p,read('evidence/c4-inspired-optimization-20261005/'+p),'evidence/c4-inspired-optimization-20261005/'+p);
-for(const name of ['c4ideas-c44-01','c4ideas-c44-02','c4ideas-j06-parent-refresh-01']){
+for(const p of ['C61-MEMORY-GRID.json','C66-CROSSOVER.json','fusion-final-confirm.json'])output('evidence/'+p,read('evidence/c4-inspired-optimization-20261005/'+p),'evidence/c4-inspired-optimization-20261005/'+p);
+for(const p of ['CURRENT-CHECKPOINT.md','FINAL-REVIEW.md','final-correctness-ci.json'])output('evidence/'+p,read('evidence/isomax-overhead-fusion-20261005/'+p),'evidence/isomax-overhead-fusion-20261005/'+p);
+for(const name of ['fusion-b3-01','fusion-b3-parent-02','fusion-c66-01','fusion-c66-02','fusion-final-confirm-01']){
  const prefix='evidence/minimal-worker-localhost-20261004/'+name+'/';
  for(const p of ['stdout.json','stderr.txt','invocation.json','measurement.json','cleanup-verification.json',...Array.from({length:4},(_,i)=>'affinity-'+i+'.json')])output('evidence/runs/'+name+'/'+p,read(prefix+p),prefix+p);
 }
@@ -43,8 +44,8 @@ for(const [p,r] of Object.entries(previous.files))if(!files[p]&&/^(runtime|evide
   unlinkSync(root+p);
  }
 }
-const lock={version:'0.2.0-rc.1',status:'repository distribution; registry publication disabled',sourceRepository:'https://github.com/iteathen/JSMinSys',sourceCommit:source,
- measuredRuntimeCommits:['25fb582','2e71c9c','f3b0bad'],normalization:'UTF-8 with CRLF normalized to LF; SHA-256',workerModules:workers,files:Object.fromEntries(Object.entries(files).sort())};
+const lock={version:'0.2.0-rc.2',status:'repository distribution; registry publication disabled',sourceRepository:'https://github.com/iteathen/JSMinSys',sourceCommit:source,
+ measuredRuntimeCommits:['427f691b00248ac15b795e187508bf5144f69706','2e64e4b45cc8145f8c34b43829ae484ad2267bc1','1eddb12fa4dc80275e825025065e08898c3ffb14'],normalization:'UTF-8 with CRLF normalized to LF; SHA-256',workerModules:workers,files:Object.fromEntries(Object.entries(files).sort())};
 const text=JSON.stringify(lock,null,2)+'\n';
 if(check){if(normal(readFileSync(root+'provenance.json','utf8'))!==text)throw Error('Provenance drift');}else writeFileSync(root+'provenance.json',text);
 console.log('Prepared/checked '+seen.size+' immutable runtime modules and '+Object.keys(files).length+' locked files.');

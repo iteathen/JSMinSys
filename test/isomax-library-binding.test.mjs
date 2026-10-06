@@ -12,5 +12,5 @@ test('current package is the immutable retained kernel with canonical support-li
   const source=readFileSync(new URL('isomax/runtime/'+path,root),'utf8').replaceAll('\r\n','\n');
   assert.equal(createHash('sha256').update(source).digest('hex'),hash,path);
  }
- assert.equal(lock.workerModules.length,16);
+ assert.equal(lock.workerModules.length,24);
 });
