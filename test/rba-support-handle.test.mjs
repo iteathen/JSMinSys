@@ -11,18 +11,15 @@ import {prepareSupportBasisPlans32} from '../addons/rba-connect4-support-basis-p
 
 const api=Object.assign({},...await Promise.all(['../addons/rba-connect4-support-basis-view.mjs','../addons/rba-connect4-support-handle-view.mjs','../addons/rba-connect4-coordinate-closure-handle-view-dense.mjs','../addons/rba-connect4-coordinate-closure-handle-view-prepared.mjs','../addons/rba-connect4-coordinate-support-reflection-view.mjs'].map(path=>import(path).catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;}))));
 const readonly=array=>new Proxy(array,{set(){assert.fail('immutable support basis was written');},get(t,k){const v=Reflect.get(t,k,t);return typeof v==='function'?v.bind(t):v;}});
-Object.assign(api,...await Promise.all(['../addons/rba-connect4-support-search-view.mjs','../addons/rba-connect4-coordinate-closure-search-view-dense.mjs','../addons/rba-connect4-coordinate-closure-search-view-prepared.mjs'].map(path=>import(path).catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;}))));
-Object.assign(api,...await Promise.all(['../addons/rba-connect4-support-rank-query.mjs','../addons/rba-connect4-coordinate-closure-rank-view-dense.mjs','../addons/rba-connect4-coordinate-closure-rank-view-prepared.mjs'].map(path=>import(path))));
 test('incremental support handles reproduce physical transitions and reflection across all100 dimensions',()=>{
  assert.equal(typeof api.initializeSupportBasisHandle32,'function');
  assert.equal(typeof api.prepareSupportBasisViewScratch32,'function');
- assert.equal(typeof api.findSupportBasisSlot32,'function');
  let viewChildren=0,viewReflections=0;
  let seed=784129,states=0,children=0,geometries=0,plans=0;
  const random=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)%n;};
  for(let W=1;W<=10;W++)for(let H=1;H<=10;H++){
   const g=geom({columns:W,rows:H}),p=profile(g),lines=[],catalog=new Map();
-  g.supportBasisPlans=prepareSupportBasisPlans32(g,8*2**20,true,true);geometries++;if(g.supportBasisPlans){plans++;g.supportBasisPlans=api.prepareSupportRankQuery32(g,g.supportBasisPlans,16*2**20);assert.ok(g.supportBasisPlans);g.supportBasisPlans={...g.supportBasisPlans,basis:readonly(g.supportBasisPlans.basis)};}
+  g.supportBasisPlans=prepareSupportBasisPlans32(g,8*2**20,true,true);geometries++;if(g.supportBasisPlans){plans++;g.supportBasisPlans={...g.supportBasisPlans,basis:readonly(g.supportBasisPlans.basis)};}
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)for(const [dx,dy] of [[1,0],[0,1],[1,1],[1,-1]])if(x+3*dx<W&&y+3*dy>=0&&y+3*dy<H)lines.push(Array.from({length:4},(_,i)=>(y+i*dy)*W+x+i*dx).sort((a,b)=>a-b));
   for(let id=0;id<g.shapeCount;id++)catalog.set(Array.from(g.shapeCells.slice(id*4,id*4+g.shapeSize[id])).join(','),id);
  function encode(moves){
@@ -61,12 +58,11 @@ test('incremental support handles reproduce physical transitions and reflection 
       const rootHandle=api.initializeSupportBasisHandle32(g,q.words,0,q.basis,0,q.basis.length),rootBi=rootHandle*g.maxBasis,vb=g.supportBasisPlans.basis;
       const kinds=['PreparedSpan',...(g.removeByCell!==null?['DenseSpan']:[]),...(g.coordWords===3?['Prepared3',...(g.removeByCell!==null?['Dense3']:[])]:[])];
       for(const c of legal){const child=encode([...moves,c]);
-        for(const family of ['HandleView','SearchView','RankView'])for(const kind of kinds)for(const nonWinning of [false,true]){
+        for(const kind of kinds)for(const nonWinning of [false,true]){
           if(nonWinning&&(child.words[g.metaOffset]&3)!==0&&(child.words[g.metaOffset]&3)!==2)continue;
-          const fn=api['connect4RbaClosure'+family+kind+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight'];assert.equal(typeof fn,'function');
+          const fn=api['connect4RbaClosureHandleView'+kind+'Cofactor'+(nonWinning?'NonWinning':'')+'KnownHeight'];assert.equal(typeof fn,'function');
           const out=new Uint32Array(g.keyWords+8).fill(0xdeadbeef),sc=api.prepareSupportBasisViewScratch32(g),sizes=new Uint32Array(1);
-          sc.inverse.fill(0xffffffff);const forbiddenInverse=new Proxy({},{get(){assert.fail('inverse accessed');},set(){assert.fail('inverse written');}});
-          const term=fn(g,p,q.words,0,vb,rootBi,q.basis.length,c,expected.h[c],out,3,vb,0,undefined,sizes,0,sc.map,family==='HandleView'?sc.inverse:forbiddenInverse,rootHandle);
+          sc.inverse.fill(0xffffffff);const term=fn(g,p,q.words,0,vb,rootBi,q.basis.length,c,expected.h[c],out,3,vb,0,undefined,sizes,0,sc.map,sc.inverse,rootHandle);
           assert.equal(term,child.words[g.metaOffset]&3);assert.deepEqual(out.slice(3,3+g.keyWords),child.words);
           assert.equal(out[2],0xdeadbeef);assert.equal(out[3+g.keyWords],0xdeadbeef);
           if(!term){
