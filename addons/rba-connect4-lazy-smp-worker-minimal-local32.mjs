@@ -154,19 +154,17 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
     childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
-    slot=depth?(hash&localMask):0;
+    slot=depth?(hash&localMask):0,
+    cached=depth?(probeCache(src,hash,slot)||frontProbe(words,src,depth,mover)):0;
 
-  if(depth){
-    const cached=probeCache(src,hash,slot)||frontProbe(words,src,depth,mover);
-    if(cached){
-      if(cached<=3)return relativeTerminal(cached,mover);
-      if(cached===LOCAL_LOWER0){
-        if(beta<=0){return 0;}
-        if(alpha<0)alpha=0;
-      }else{
-        if(alpha>=0){return 0;}
-        if(beta>0)beta=0;
-      }
+  if(cached){
+    if(cached<=3)return relativeTerminal(cached,mover);
+    if(cached===LOCAL_LOWER0){
+      if(beta<=0){return 0;}
+      if(alpha<0)alpha=0;
+    }else{
+      if(alpha>=0){return 0;}
+      if(beta>0)beta=0;
     }
   }
 
@@ -187,8 +185,8 @@ function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta
   if(response===2){
     if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover);return 0;}
     if(beta>0)beta=0;
-  }else if(response===0){
-    // Unresolved response policy falls through to independent pair proof.
+  }else if(response===0&&cached!==LOCAL_UPPER0){
+    // Unresolved policy falls through unless a consumed upper0 already excludes WIN.
     const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
     if(fork>=0){
       if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover),depth,mover);

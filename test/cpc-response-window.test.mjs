@@ -12,7 +12,7 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
   for(const mover of [0,1])for(const response of [0,1,2])for(const truth of [-1,0,1])for(const target of [false,true]){
     if(response===1&&truth!==-1||response===2&&truth>0)continue;
     if(target&&truth!==-1)continue;
-   for(const cached of [0,4,5]){
+   for(const boundSource of ['cache','frontier'])for(const cached of [0,4,5]){
     if(cached===4&&truth<0||cached===5&&truth>0)continue;
     for(const depth of [0,1])for(const alpha of [-2,-1,0,1])for(const beta of [-1,0,1,2])if(alpha<beta){
      let constructed=0,targetCalls=0,pairCalls=0;
@@ -20,8 +20,8 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
       forbidden:new Uint32Array(4),forbiddenWords:1,g:{keyWords:14,maxBasis:64,columns:1,rows:1},words:new Uint32Array(64),basis:new Uint32Array(128),localMask:3,
       centerOrder:[0],bestMove:-1,liveWords:3,live:{},moveOrder:new Uint32Array(1),moveOrderMask:7,
       coord:{seen:new Uint32Array(64),map:new Uint32Array(64),inverse:new Uint32Array(64)},basisSize:new Uint32Array(4),profile:{},cpc:{},targetCpc:{},
-      mixSpan32Locator32:()=>0,probeCache:()=>cached,
-      frontProbe:()=>0,frontChild:()=>{},
+      mixSpan32Locator32:()=>0,probeCache:()=>boundSource==='cache'?cached:0,
+      frontProbe:()=>boundSource==='frontier'?cached:0,frontChild:()=>{},
       storeExact:(_s,_h,_slot,v)=>assert.equal(v,truth===0?2:mover===0?truth+2:2-truth),
       storeBound:(_s,_h,_slot,v)=>assert.ok(v===4?truth>=0:truth<=0),
       collectSingletons:()=>-1,evaluatePairHub:()=>{pairCalls++;return -1;},evaluateConnect4PreparedCpcResponse32:()=>response,evaluateTargetCpc:()=>{targetCalls++;return target;},
@@ -36,7 +36,13 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
      if(depth===0)assert.equal(context.bestMove,0,'root must produce a legal witness');
      if(response===1||response===2&&depth&&alpha>=0)assert.equal(constructed,0,'certified cutoff must not construct a child');
      if(response)assert.equal(pairCalls,0,'previous NONLOSS or WIN excludes current pair WIN');
-     if(response===0&&cached===0)assert.equal(pairCalls,1,'failed response route must fall through to independent pair route');
+     if(response===0&&cached===0)assert.equal(pairCalls,1,'failed response route must fall through even in narrow caller window');
+     if(response===0&&cached===5&&depth){
+       assert.equal(pairCalls,0,'consumed upper0 proof excludes current pair WIN');
+       if(alpha<0)assert.equal(targetCalls,1,'upper0 still permits target proof to strengthen LOSS');
+     }
+     if(response===0&&depth&&cached===4&&beta>0)assert.equal(pairCalls,1,'lower0 does not exclude WIN');
+     if(response===0&&!depth)assert.equal(pairCalls,1,'root does not consume nonroot proof tags');
      if(response===2&&depth&&alpha>=0&&cached===0)assert.equal(targetCalls,0,'nested sufficient-bound cutoff skips deeper target proof');
      cases++;
     }
