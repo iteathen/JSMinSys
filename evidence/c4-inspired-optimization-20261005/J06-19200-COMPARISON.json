@@ -43,6 +43,50 @@
       "rawPerformanceConclusionAllowed": false,
       "cycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
       "rawDirectory": "c4ideas-j06-19200-01"
+    },
+    {
+      "name": "c4ideas-j06-19200-02",
+      "commit": "96c3ed85138ec38c45d38632a816d68a88c3d6f1",
+      "solveMs": 57575.926,
+      "cycles": "809800359499",
+      "peakRssBytes": 6441598976,
+      "initializationMs": 2030.6246999999998,
+      "cleanupMs": 12.808900000003632,
+      "wholeOperationMs": 59620.365900000004,
+      "rootWdl": 1,
+      "move": 3,
+      "winner": 1,
+      "configuration": {
+        "basisViews": true,
+        "sharedCacheCapacity": 134217728,
+        "localCacheCapacity": 8388608,
+        "sharedProofBounds": true,
+        "sharedCacheLayout": "native",
+        "sharedTtEntryBytes": 32,
+        "sharedTtBytes": 4294967296,
+        "localCacheLayout": "native",
+        "privateTtEntryBytes": 32,
+        "privateTtBytesPerWorker": 268435456,
+        "supportBasisPlanBudgetBytes": 1073741824,
+        "supportBasisPlanBytes": 856484748,
+        "supportBasisPlanProfiles": 823543,
+        "workers": 4,
+        "rootFrontier": false,
+        "sharedSampleMask": 0,
+        "policies": [
+          "center",
+          "live",
+          "center",
+          "live"
+        ]
+      },
+      "exact": true,
+      "cleanup": true,
+      "affinityVerified": true,
+      "targetMet": false,
+      "rawPerformanceConclusionAllowed": false,
+      "cycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+      "rawDirectory": "c4ideas-j06-19200-02"
     }
   ],
   "caveat": "Completed localhost controlled comparisons only; no statistical confidence interval. Whole-operation cycles include initialization/cleanup. Null hot statistics are unavailable, not zero. Raw target flag is preserved; missing10s does not invalidate an exact completed relative trial."
