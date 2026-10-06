@@ -131,7 +131,7 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
   if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;
   const bi=supportHandle*g.maxBasis,dst=src+g.keyWords,ci=0,
     alphaOrig=alpha,betaOrig=beta,
-    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
+    hash=depth?(mixSpan32Locator32(words,src,g.keyWords)|0):0,
     support=depth?packIndexPartial24Support32(words,src):0;
 
   if(depth){

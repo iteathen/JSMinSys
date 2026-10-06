@@ -77,3 +77,8 @@ when needed to resolve noise; rejected experiments restored and tested too.
 - Change5 `30e670c`: three maintenance generators reject unrelated source drift;
   all rerun and11 tests/catalog pass. Full `nees-fix-05-scoped-guards`:39.4775608s,
   216.453125s CPU,EXACT/WIN/c4,six pins/exits. Solver remains baseline-identical.
+- Change6 `87ed597`: removed dead partial slot/tail ABI from all8 candidate
+  variants;10 focused/cache/dimension tests pass, including100 geometries and1551
+  states. Full `nees-fix-06-partial-abi`:34.9560658s,214.421875s CPU,EXACT/WIN/c4,
+  six pins/exits. One sample is not a claimed11% speedup. Current per-isolate
+  diagnostic still emits unsigned hash boxing, so M1 was not superseded.

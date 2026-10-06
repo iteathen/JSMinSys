@@ -62,6 +62,7 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
    u.operations.push(call('packIndexPartial24Support32',kind==='partialMixed'?'NONROOT*WIDE':'NONROOT'));
    if(kind==='partialMixed')u.operations.push(call('packIndexPartial16Heights32','NONROOT*(1-WIDE)'),op('control.test.u32',1),op('control.branch',1),op('alu.or.u32','NONROOT*WIDE'));
    if(u.cycleCount.parameters.AND)u.cycleCount.parameters.AND+=' Partial ABI: excludes removed unused local slot mask; actual cache row masking remains owned by cache callees.';
+   u.operations.push(op('runtime.native.access.lowering','NONROOT'));
   }
   if(kind==='partialMixed')for(const o of u.operations){
    if(/^(probe|store)IndexPartial24/.test(o.target??''))o.target=o.target.replace('IndexPartial24','IndexPartialMixed');
@@ -81,7 +82,7 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
    if(u.name==='<module-main>')u.operations.push(op('runtime.field.load',5),op('control.test.u32',3),op('control.branch',3));
   }
   u.cycleCount.expression=expr(u.operations);delete u.cycleCount.activeCycleExpression;
-  u.cycleCount.note='Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Unused local slot/tail calculations and ABI arguments removed; complete hash and actual cache address operations retained. Call/argument/inlining/boxing realization remains named uncertainty until current machine observation. Cold-selected candidate only, no hot profile/layout/reporting/aggregate construction. Original search guards unchanged.';
+  u.cycleCount.note='Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Unused local slot/tail calculations and ABI arguments removed; complete hash and actual cache address operations retained. One internal signed32 bit reinterpretation per nonroot hash is explicitly modeled as realization-sensitive lowering, not assumed one native OR or zero cycles. Public full hash algorithm/Uint32 result unchanged. Call/argument/inlining/boxing realization remains named uncertainty until current machine observation. Cold-selected candidate only, no hot profile/layout/reporting/aggregate construction. Original search guards unchanged.';
   l.units.push(u);
  }
 }

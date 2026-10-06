@@ -43,6 +43,10 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
  once('    slot=depth?(hash&localMask):0,\n','');
  once(',\n    tail=0;',';');
  s=s.replaceAll(',hash,slot,',',hash,').replaceAll(',support,tail',',support');
+ // Complete locator bits are unchanged. &/>>> consumers accept either numeric
+ // presentation; signed32 keeps high-bit hashes inside this V8 profile's Smi ABI.
+ once('hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,',
+  'hash=depth?(mixSpan32Locator32(words,src,g.keyWords)|0):0,');
  s='// GENERATED exact index-'+kind+' candidate; full32bit sequence unchanged.\n'+s;
  if(process.argv.includes('--check'))assert.equal(readFileSync(target,'utf8').replaceAll('\r\n','\n'),s);else writeFileSync(target,s);
 }
