@@ -100,11 +100,11 @@ function storeLocalEntry(slot,src,value,support,tail){
   storeLocalPreparedCompactEntry32(localCache,words,src,slot,value,support,tail);
 }
 
-function probeCache(src,hash,slot,support,tail,mover){
+function probeCache(src,hash,slot,support,tail){
   const local=localKeys[slot*8];
   if(local&&localKeyMatches(slot,src,support,tail)){return local;}
   if(!(hash&sharedSampleBits)){
-    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support,tail),mover);
+    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support,tail),(words[src+g.metaOffset]>>>2)&1);
     if(value){storeLocalEntry(slot,src,value,support,tail);return value;}
   }
   return 0;
@@ -131,7 +131,7 @@ function storeBound(src,hash,slot,value,depth,mover,support,tail){
   }
   storeLocalEntry(slot,src,value,support,tail);
   if(!(hash&sharedSampleBits))
-    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,mover),hash,support,tail);
+    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,(words[src+g.metaOffset]>>>2)&1),hash,support,tail);
   return value;
 }
 
@@ -145,7 +145,7 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
     tail=depth?compactTailProfile8(words,src):0;
 
   if(depth){
-    const cached=probeCache(src,hash,slot,support,tail,mover)||frontProbe(words,src,depth,mover);
+    const cached=probeCache(src,hash,slot,support,tail)||frontProbe(words,src,depth,mover);
     if(cached){
       if(cached<=3)return relativeTerminal(cached,mover);
       if(cached===LOCAL_LOWER0){
