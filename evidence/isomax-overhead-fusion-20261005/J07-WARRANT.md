@@ -1,0 +1,5 @@
+# J07 frozen larger-JIT interaction retest
+
+Earlier J06 rejected cumulative14400/19200 on the C44 stack whose core already inlined. New C64P carries a compiled rank query and larger hot footprint; its first diagnostic has rank/cofactor/closure in4searchSFIs but shared/frontier stores observed in fewer. This is a changed cost economy, not a blind repeat of J06.
+
+Freeze one alternative: max-inlined-bytecode-size remains2400; cumulative budget9600->19200 only. No other runtime flag, memory, affinity, topology, semantic/source change. Run the actual rank candidate at19200 after exact four-worker oracle/JIT checks, then restore exact B2 source and run it at the same19200 budget. Compare these with their own9600 controls; report flags and extra rank bytes explicitly. If competitive repeat/match. Do not claim a rank benefit from comparing rank19200 with B29600 alone. Initialization/compilation and cleanup remain secondary separately recorded. No performance promotion from a10s diagnostic. If higher budget has no useful interaction, restore9600 and cost out rank machinery completely; retain prototype source refs/evidence only. Main/package unchanged.
