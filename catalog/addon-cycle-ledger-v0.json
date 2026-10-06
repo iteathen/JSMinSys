@@ -13371,46 +13371,12 @@
         {
           "op": "runtime.string.concat",
           "count": "workers"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "BV",
-          "target": "prepareSupportRankQuery32"
-        },
-        {
-          "op": "runtime.object.allocate",
-          "count": "RANK"
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "RANK_FIELDS"
-        },
-        {
-          "op": "runtime.field.store",
-          "count": "RANK_FIELDS"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "RANK_TEST"
-        },
-        {
-          "op": "control.branch",
-          "count": "RANK_TEST"
-        },
-        {
-          "op": "runtime.string.concat",
-          "count": "workers*RANK"
-        },
-        {
-          "op": "runtime.call.subledger",
-          "count": "PLAN",
-          "target": "prepareSupportBasisPlans32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(BV)*CALL(prepareSupportRankQuery32)+(RANK)*C(runtime.object.allocate)+(RANK_FIELDS)*C(runtime.field.load)+(RANK_FIELDS)*C(runtime.field.store)+(RANK_TEST)*C(control.test.u32)+(RANK_TEST)*C(control.branch)+(workers*RANK)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)",
+        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+workers*C(runtime.string.concat)",
         "unboundedTerms": [
           "C(runtime.promise.await)",
           "CALL(ManagedThreadSession.spawn)"
@@ -13438,14 +13404,9 @@
           "BV_TEST": "ColdviewBoolean/minimal validation andcompleteplanadmission only; no search flag.",
           "BV_READ": "Actuallyreachedgeometryplanclosure/mirror admission andoption forwarding reads.",
           "BV_REPORT": "ActualcoldselectedbasisViews result/state fields, no hottelemetry.",
-          "workers": "Configuredpoolsize; oneadditionalview suffix concatenation perinitialworkerURL.",
-          "BV": "1when fullclosure/reflection view admitted;0otherwise. Rank preparation occurs entirely before ready.",
-          "RANK": "1when rank budget admitted;0old B2fallback.",
-          "RANK_FIELDS": "Actually reached rankplan/geometry metadata field reads/publications, including geometry spread; no buffer copying.",
-          "RANK_TEST": "Cold preparation/result and worker-path selections.",
-          "PLAN": "1when positive support budget and not already aborted. Audit correction: existing cold compiler call explicitly charged, previously absent here."
+          "workers": "Configuredpoolsize; oneadditionalview suffix concatenation perinitialworkerURL."
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges."
       },
       "status": "decomposed"
     },
@@ -13513,7 +13474,7 @@
           "CANCEL": "1 when active incomplete solve has no prior error",
           "SIG": "1 when signal supplied"
         },
-        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Listener detached at close entry before asynchronous joining; post-join repeated removal remains explicitly counted and harmless. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Listener detached at close entry before asynchronous joining; post-join repeated removal remains explicitly counted and harmless."
       },
       "status": "decomposed"
     },
@@ -13549,14 +13510,14 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*C(atomic.load.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(LIVE)*CALL(ManagedThreadSession.fail)+(LIVE)*CALL(closePreparedConnect4Search32)",
+        "activeCycleExpression": "C(atomic.load.u32)+C(control.test.u32)+C(control.branch)+(LIVE)*CALL(ManagedThreadSession.fail)+(LIVE)*CALL(closePreparedConnect4Search32)",
         "unboundedTerms": [
           "CALL(closePreparedConnect4Search32)"
         ],
         "parameters": {
           "LIVE": "1 when DONE is not yet published; completed result ignores future abort"
         },
-        "note": "Abort acquires existing first-error cancellation code and requests asynchronous cleanup. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. DONE observed before cancellation preserves exact completion; listener removed at close beginning. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Abort acquires existing first-error cancellation code and requests asynchronous cleanup. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. DONE observed before cancellation preserves exact completion; listener removed at close beginning."
       },
       "status": "decomposed"
     },
@@ -13590,31 +13551,15 @@
         {
           "op": "runtime.field.load",
           "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 2
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 2
-        },
-        {
-          "op": "control.branch",
-          "count": 2
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(ManagedThreadSession.state)+(1)*C(atomic.load.u32)+(1)*C(runtime.object.allocate)+(STATE_FIELDS)*C(runtime.field.load)+(1)*C(runtime.field.store)+(1)*C(runtime.field.load)+(2)*C(runtime.field.load)+(2)*C(runtime.field.store)+(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "expression": "CALL(ManagedThreadSession.state)+C(atomic.load.u32)+C(runtime.object.allocate)+(STATE_FIELDS)*C(runtime.field.load)+C(runtime.field.store)+C(runtime.field.load)",
         "parameters": {
           "STATE_FIELDS": "properties copied from managed state snapshot plus readyWorkers/searchStarted/closed"
         },
-        "note": "Cold state snapshot copies managed status and reads readiness without starting search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Cold state snapshot copies managed status and reads readiness without starting search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats."
       },
       "status": "decomposed"
     },
@@ -13709,27 +13654,11 @@
         {
           "op": "runtime.field.load",
           "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 2
-        },
-        {
-          "op": "runtime.field.store",
-          "count": 2
-        },
-        {
-          "op": "control.test.u32",
-          "count": 2
-        },
-        {
-          "op": "control.branch",
-          "count": 2
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+(1)*C(runtime.array.from)+(1)*C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(W+EXACT)*C(alu.add.u32)+(HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY)*CALL(sharedViewBytes32)+(RESULT_FIELDS+BYTE_FIELDS)*C(runtime.field.load)+(RT)*C(control.test.u32)+(RT)*C(control.branch)+(BYTE_ADDS)*C(alu.add.u32)+(4*HAS_SHARED*NATIVE+ENTRY_FIELD)*C(runtime.field.load)+(1-NATIVE)*C(runtime.number.multiply)+(1-NATIVE+HAS_SHARED*NATIVE)*C(alu.add.u32)+(3)*C(control.test.u32)+(3)*C(control.branch)+(1)*C(runtime.field.store)+(1)*C(runtime.field.load)+(2)*C(runtime.field.load)+(2)*C(runtime.field.store)+(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "expression": "CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+C(runtime.array.from)+C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(W+EXACT)*C(alu.add.u32)+(HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY)*CALL(sharedViewBytes32)+(RESULT_FIELDS+BYTE_FIELDS)*C(runtime.field.load)+(RT)*C(control.test.u32)+(RT)*C(control.branch)+(BYTE_ADDS)*C(alu.add.u32)+(4*HAS_SHARED*NATIVE+ENTRY_FIELD)*C(runtime.field.load)+(1-NATIVE)*C(runtime.number.multiply)+(1-NATIVE+HAS_SHARED*NATIVE)*C(alu.add.u32)+(3)*C(control.test.u32)+(3)*C(control.branch)+C(runtime.field.store)+C(runtime.field.load)",
         "parameters": {
           "W": "requested worker count; completedWorkers loads one result lane per worker",
           "EXACT": "1 when DONE,winner,error snapshot qualifies exact result",
@@ -13749,7 +13678,7 @@
           "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
           "ENTRY_FIELD": "1 native descriptor.entryBytes load; split default derives (keyWords+2)*4"
         },
-        "note": "Materialize exact/interrupted/timeout/failed status only after cleanup; unavailable hot metrics stay null. Array callback costs are included per worker. No source-work or hardware-cycle claim is inferred. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native sharedBytes sums entries.byteLength+stats.byteLength once and excludes aliased halves/heights views; split40 uses sharedViewBytes32 over disjoint views. Entry-size label and layout label are cold result fields. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Materialize exact/interrupted/timeout/failed status only after cleanup; unavailable hot metrics stay null. Array callback costs are included per worker. No source-work or hardware-cycle claim is inferred. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native sharedBytes sums entries.byteLength+stats.byteLength once and excludes aliased halves/heights views; split40 uses sharedViewBytes32 over disjoint views. Entry-size label and layout label are cold result fields. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats."
       },
       "status": "decomposed"
     },
@@ -13844,7 +13773,7 @@
           "REPEAT": "1 if solve already started, causing one-shot error",
           "ERR": "1 on thrown ingress/wait/finish error"
         },
-        "note": "Construct root after all workers report ready, publish root fields and release gate, await managed lifecycle, then join/materialize. Three typed-array copies transport root words,basis,history. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Construct root after all workers report ready, publish root fields and release gate, await managed lifecycle, then join/materialize. Three typed-array copies transport root words,basis,history. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
       },
       "status": "decomposed"
     },
@@ -13872,13 +13801,13 @@
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1)*CALL(closePreparedConnect4Search32)+(1)*C(runtime.promise.await)+(1)*CALL(materializePreparedConnect4SearchResult32)",
+        "activeCycleExpression": "CALL(closePreparedConnect4Search32)+C(runtime.promise.await)+CALL(materializePreparedConnect4SearchResult32)",
         "unboundedTerms": [
           "CALL(closePreparedConnect4Search32)",
           "C(runtime.promise.await)"
         ],
         "parameters": {},
-        "note": "Finish awaits cached join before exposing the result. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. C64Ponly cold rank preparation/selection/reporting added; result rankQuery and exact byte cost exposed. No hot statistics or solver policy change."
+        "note": "Finish awaits cached join before exposing the result. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency."
       },
       "status": "decomposed"
     },
@@ -47743,7 +47672,7 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "85c0fa1a9a676f1540dbf8efea9c83c09abea3f3",
+    "addons/rba-connect4-prepared-session-host.mjs": "3971f2c0785e1fc59fa1f80ba5569c1291519f40",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
