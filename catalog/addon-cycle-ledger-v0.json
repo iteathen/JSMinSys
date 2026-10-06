@@ -731,6 +731,13 @@
         "name": "COLD_BANK_SETUP(capacity,banks,validation,allocation,cloning)"
       },
       "note": "Cold power-of-two and exact-layout validation, bank array/object/view allocation, alias checking and attachment. Child TT allocation charged to the existing cache-create ledger."
+    },
+    "runtime.cold.memory.profile": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "MEMORY_PROFILE_INIT(platform,geometry,workers,profiles,FFI)"
+      },
+      "note": "Cold OS/libuv/Windows memory snapshot, catalog construction, power-of-two geometry-dependent cache sizing and admission. Includes FFI construction/close, validation, allocation and result freezing; no periodic or per-node sampling."
     }
   },
   "units": [
@@ -13469,7 +13476,7 @@
           "CP_TEST": "Cold selection and abort checks.",
           "BANK_SETUP": "Cold bank allocation/fill, selection or resource aggregation; zero for absent banks."
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers.",
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range.",
         "expression": "+BANK_SETUP*C(runtime.cold.tt.bank.initialize)"
       },
       "status": "decomposed"
@@ -14203,7 +14210,7 @@
           "BYTES": "capacity*entryBytes+12; allocation cost is not inferred as constant2 cycles.",
           "VIEW": "2 initial Uint32 views, before attach alias construction."
         },
-        "note": "Largest view stride16 on compact, entryBytes/heightBytes direct, entryWords fullspan. Capacity validator owns power-of-two/u32 view limits; byte product is safe-integer checked here. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
+        "note": "Largest view stride16 on compact, entryBytes/heightBytes direct, entryWords fullspan. Capacity validator owns power-of-two/u32 view limits; byte product is safe-integer checked here. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range."
       },
       "status": "decomposed"
     },
@@ -14322,7 +14329,7 @@
           "TYPE": "Native height constructor selection only on direct.",
           "FREEZE": "1 on successful attachment."
         },
-        "note": "No copying/resize/table growth. Validate exact descriptor offsets/widths to prevent atomic overlap, require backing span, repair only entry-view header, rebuild aliases and freeze descriptor. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
+        "note": "No copying/resize/table growth. Validate exact descriptor offsets/widths to prevent atomic overlap, require backing span, repair only entry-view header, rebuild aliases and freeze descriptor. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range."
       },
       "status": "decomposed"
     },
@@ -14382,7 +14389,7 @@
           "GUARD": "Target-dependent JS type/bounds/index/boxing/deoptimization/call-frame cost. Unqualified, never assumed zero.",
           "O": "1 when default options object constructed because second argument is omitted/undefined, otherwise0. Returned accessor-pair object separately counted1."
         },
-        "note": "Returns one probe/store pair for worker lifetime; uncounted variants have no reporting access or branch. Accessor invocation/call-site lowering remains charged in caller/callee graph. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
+        "note": "Returns one probe/store pair for worker lifetime; uncounted variants have no reporting access or branch. Accessor invocation/call-site lowering remains charged in caller/callee graph. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range."
       },
       "status": "decomposed"
     },
@@ -45517,10 +45524,48 @@
       }
     },
     {
-      "unit": "addons/rba-connect4-shared-banked-cache.mjs#createBankedCompactSharedCache32",
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#prepareBankedSharedCapacity32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
-      "name": "createBankedCompactSharedCache32",
-      "scope": "cold-banked-shared-tt-setup",
+      "name": "prepareBankedSharedCapacity32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.tt.bank.initialize",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#sharedNativeBankCapacity32",
+      "source": "addons/rba-connect4-shared-banked-cache.mjs",
+      "name": "sharedNativeBankCapacity32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.tt.bank.initialize",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#createBankedSharedLayoutCache32",
+      "source": "addons/rba-connect4-shared-banked-cache.mjs",
+      "name": "createBankedSharedLayoutCache32",
+      "scope": "cold-memory-profile-setup",
       "status": "decomposed",
       "operations": [
         {
@@ -45534,24 +45579,24 @@
         },
         {
           "op": "runtime.call.subledger",
-          "target": "attachBankedCompactSharedCache32",
+          "target": "attachBankedSharedLayoutCache32",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(BANKS)*CALL(createConnect4RbaSharedLayoutCache32)+(1)*CALL(attachBankedCompactSharedCache32)",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(BANKS)*CALL(createConnect4RbaSharedLayoutCache32)+(1)*CALL(attachBankedSharedLayoutCache32)",
         "parameters": {
-          "BANKS": "Number of banks; support tables and no current-position work are duplicated."
+          "BANKS": "1..64 disjoint allocations, all initialized before READY."
         },
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
       }
     },
     {
-      "unit": "addons/rba-connect4-shared-banked-cache.mjs#attachBankedCompactSharedCache32",
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#attachBankedSharedLayoutCache32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
-      "name": "attachBankedCompactSharedCache32",
-      "scope": "cold-banked-shared-tt-setup",
+      "name": "attachBankedSharedLayoutCache32",
+      "scope": "cold-memory-profile-setup",
       "status": "decomposed",
       "operations": [
         {
@@ -45568,16 +45613,16 @@
         "kind": "symbolic",
         "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(BANKS)*CALL(attachConnect4RbaSharedLayoutCache32)",
         "parameters": {
-          "BANKS": "Number of validated, nonaliased bank views."
+          "BANKS": "1..64 validated factory banks; no live mutation during attachment."
         },
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeSharedPreparedBankedCompact32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "probeSharedPreparedBankedCompact32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
@@ -45606,14 +45651,14 @@
         "kind": "symbolic",
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(probeSharedPreparedCompact32)",
         "parameters": {},
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeSharedPreparedBankedCompact32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "storeSharedPreparedBankedCompact32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
@@ -45642,14 +45687,14 @@
         "kind": "symbolic",
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(storeSharedPreparedCompact32)",
         "parameters": {},
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeBankedCompactSharedCache32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "probeBankedCompactSharedCache32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
@@ -45672,14 +45717,14 @@
         "kind": "symbolic",
         "expression": "(1)*CALL(probeSharedPreparedBankedCompact32)+(1)*CALL(compactLayoutSupportProfile8)+(1)*CALL(compactLayoutTailProfile8)",
         "parameters": {},
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeBankedCompactSharedCache32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "storeBankedCompactSharedCache32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
@@ -45702,48 +45747,145 @@
         "kind": "symbolic",
         "expression": "(1)*CALL(storeSharedPreparedBankedCompact32)+(1)*CALL(compactLayoutSupportProfile8)+(1)*CALL(compactLayoutTailProfile8)",
         "parameters": {},
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeBankedCompactSharedCacheCounted32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "probeBankedCompactSharedCacheCounted32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": 1
+        },
+        {
           "op": "runtime.call.subledger",
-          "target": "probeBankedCompactSharedCache32",
+          "target": "probeConnect4RbaSharedLayoutCache32",
           "count": 1
-        },
-        {
-          "op": "control.test.u32",
-          "count": 1
-        },
-        {
-          "op": "control.branch",
-          "count": 1
-        },
-        {
-          "op": "atomic.rmw.u32",
-          "count": "HIT"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(probeBankedCompactSharedCache32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(HIT)*C(atomic.rmw.u32)",
-        "parameters": {
-          "HIT": "1 only for a diagnostic hit; production access never uses counted functions."
+        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(probeConnect4RbaSharedLayoutCache32)",
+        "parameters": {},
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#prepareBankedDirectSharedCacheAccess32",
+      "source": "addons/rba-connect4-shared-banked-cache.mjs",
+      "name": "prepareBankedDirectSharedCacheAccess32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.tt.bank.initialize",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeBankedDirect32",
+      "source": "addons/rba-connect4-shared-banked-cache.mjs",
+      "name": "probeBankedDirect32",
+      "scope": "banked-native-shared-tt-access",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 3
         },
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "SELECTED_NATIVE_PROBE",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(SELECTED_NATIVE_PROBE)",
+        "parameters": {
+          "SELECTED_NATIVE_PROBE": "One cold-bound unchanged native layout function; lookup/proof/tag/atomic protocol charged in its existing subledger."
+        },
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeBankedDirect32",
+      "source": "addons/rba-connect4-shared-banked-cache.mjs",
+      "name": "storeBankedDirect32",
+      "scope": "banked-native-shared-tt-access",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "SELECTED_NATIVE_STORE",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(SELECTED_NATIVE_STORE)",
+        "parameters": {
+          "SELECTED_NATIVE_STORE": "One cold-bound unchanged native layout function; lookup/proof/tag/atomic protocol charged in its existing subledger."
+        },
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
       }
     },
     {
       "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeBankedCompactSharedCacheCounted32",
       "source": "addons/rba-connect4-shared-banked-cache.mjs",
       "name": "storeBankedCompactSharedCacheCounted32",
-      "scope": "experimental-banked-shared-tt-access",
+      "scope": "banked-native-shared-tt-access",
       "status": "decomposed",
       "operations": [
         {
@@ -45772,17 +45914,74 @@
         "kind": "symbolic",
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(storeConnect4RbaSharedLayoutCache32)",
         "parameters": {},
-        "note": "Experimental 8/16GiB capacity path only. Bank selection and call/argument/inlining costs are optimization debt until whole empty-board measurements. Existing seqlock/CAS, injective identity, proof tags, wrap and droppable writes remain in the called unchanged protocol. No decoder, allocation, clocks, statistics, layout test or polling inside the prepared uncounted wrappers."
+        "note": "Cold-bound lookup cost explicitly charged. Same existing native identity, proof transport and seqlock/CAS/wrap/drop calls. No allocation, clock, counters, retries, layout selection or profile checks in uncounted hot wrappers; actual JIT/call/cache cost remains machine-qualified only where measured."
+      }
+    },
+    {
+      "unit": "addons/isomax-memory-profile.mjs#createIsoMaxMemoryProfiles32",
+      "source": "addons/isomax-memory-profile.mjs",
+      "name": "createIsoMaxMemoryProfiles32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.memory.profile",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.memory.profile)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
+      }
+    },
+    {
+      "unit": "addons/isomax-memory-profile.mjs#discoverAvailableSolverMemory32",
+      "source": "addons/isomax-memory-profile.mjs",
+      "name": "discoverAvailableSolverMemory32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.memory.profile",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.memory.profile)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
+      }
+    },
+    {
+      "unit": "addons/isomax-memory-profile.mjs#selectIsoMaxMemoryProfile32",
+      "source": "addons/isomax-memory-profile.mjs",
+      "name": "selectIsoMaxMemoryProfile32",
+      "scope": "cold-memory-profile-setup",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.memory.profile",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.memory.profile)",
+        "parameters": {},
+        "note": "Initialization only. OS memory snapshots are transient, not allocation guarantees.128GiB address plans tested without large allocation;16..128GiB full-capacity performance remains experimental."
       }
     }
   ],
   "summary": {
-    "units": 554,
-    "decomposed": 554,
+    "units": 562,
+    "decomposed": 562,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 104
+    "localExtensionOperations": 105
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -45913,8 +46112,8 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "5abbaa22b46f6c15352073446e153cd6f916b97b",
-    "addons/rba-connect4-shared-exact-cache-layout.mjs": "78e35a16153e42468706913b935aec3d86d7ebda",
+    "addons/rba-connect4-prepared-session-host.mjs": "2640a1619817f9abb0a4d7f542138d3657d69d57",
+    "addons/rba-connect4-shared-exact-cache-layout.mjs": "d58339f9ca94cc1b77d6ceca76055afd5640b535",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
     "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": "d7151cab0a427680bf1a1800e6341c09e2d273a7",
@@ -45964,7 +46163,8 @@
     "addons/worker-topology.mjs": "a9f6ab060091377a2df7f1c4d36d0520bfae4671",
     "addons/worker-pinning.mjs": "5591fc18ab77bb0cffe869f5f26b93e7351e32ba",
     "addons/worker-startup-affinity.mjs": "44450aa2dbc7b3c6e4b7a0e3134ec4419eff0169",
-    "addons/rba-connect4-shared-banked-cache.mjs": "aa0d30ee67debea63b628daef956e1b19223fd03"
+    "addons/rba-connect4-shared-banked-cache.mjs": "cdcb940cf4d00341051ff209f32f8afd3bf3ff70",
+    "addons/isomax-memory-profile.mjs": "0f10f65f723199e19bac875cd8b01d24917d091b"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

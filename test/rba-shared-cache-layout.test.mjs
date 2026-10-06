@@ -82,7 +82,7 @@ test('native heights preserve both sides of uint8 and uint16 field boundaries',(
 
 test('layout sizing rejects unsafe or aliased capacities before allocating',()=>{
  const geometry=geometries[0];
- for(const capacity of [0,-1,3,2**32,2**32+1,2**32+2,Number.MAX_SAFE_INTEGER,Infinity,1.5])
+ for(const capacity of [0,-1,3,2**32+1,2**32+2,Number.MAX_SAFE_INTEGER,Infinity,1.5])
   assert.throws(()=>make(geometry,capacity),RangeError);
  assert.throws(()=>candidate.createConnect4RbaSharedLayoutCache32({capacity:1,keyWords:2**32}),RangeError);
 });

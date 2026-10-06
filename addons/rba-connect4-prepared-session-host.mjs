@@ -8,6 +8,7 @@ import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs
 import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './rba-connect4-shared-exact-cache-layout.mjs';
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
 import {prepareSupportCompiledTransitions32} from './rba-connect4-support-compiled-transition.mjs';
+import {prepareBankedSharedCapacity32,sharedNativeBankCapacity32} from './rba-connect4-shared-banked-cache.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -39,9 +40,10 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   const layout=sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
     sharedStride=layout===null?keyWords:layout.kind==='compact32'?16:
       layout.kind==='direct'?layout.heightStride:layout.entryWords;
-  const banked=layout?.kind==='compact32'&&(sharedBankCapacity!==null||sharedCacheCapacity>2**27);
-  if(sharedBankCapacity!==null&&!banked)throw RangeError('shared banks require native compact32 layout');
-  validateConnect4CacheCapacity32(sharedCacheCapacity,banked?1:sharedStride);
+  const banked=layout!==null&&(sharedBankCapacity!==null||sharedCacheCapacity>sharedNativeBankCapacity32(layout));
+  if(sharedBankCapacity!==null&&!banked)throw RangeError('shared banks require native layout');
+  if(banked)prepareBankedSharedCapacity32(sharedCacheCapacity,sharedBankCapacity??sharedNativeBankCapacity32(layout));
+  else validateConnect4CacheCapacity32(sharedCacheCapacity,sharedStride);
   validateConnect4CacheCapacity32(localCacheCapacity,keyWords);
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');

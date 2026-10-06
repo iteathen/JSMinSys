@@ -1,7 +1,7 @@
 // Native-field exact TT support; layout and consumer access selected once cold.
 import {mixSpan32Locator32} from '../src/widekey32.mjs';
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
-import {createBankedCompactSharedCache32,attachBankedCompactSharedCache32,
+import {createBankedSharedLayoutCache32,attachBankedSharedLayoutCache32,sharedNativeBankCapacity32,prepareBankedDirectSharedCacheAccess32,
   probeBankedCompactSharedCache32,storeBankedCompactSharedCache32,
   probeBankedCompactSharedCacheCounted32,storeBankedCompactSharedCacheCounted32} from './rba-connect4-shared-banked-cache.mjs';
 export function isCompactLayoutProfile8(geometry,keyWords){
@@ -48,9 +48,8 @@ export function prepareSharedCacheLayout(geometry,keyWords){
 export function createConnect4RbaSharedLayoutCache32({capacity=65536,keyWords,geometry=null,bankCapacity=null}={}){
   const layout=prepareSharedCacheLayout(geometry,keyWords),
     stride=layout.kind==='compact32'?16:layout.kind==='direct'?layout.heightStride:layout.entryWords;
-  if(layout.kind==='compact32'&&(bankCapacity!==null||capacity>2**27))
-    return createBankedCompactSharedCache32({capacity,bankCapacity:bankCapacity??2**27,keyWords,geometry});
-  if(bankCapacity!==null)throw RangeError('banked TT requires compact32 geometry');
+  if(bankCapacity!==null||capacity>sharedNativeBankCapacity32(layout))
+    return createBankedSharedLayoutCache32({capacity,bankCapacity:bankCapacity??sharedNativeBankCapacity32(layout),keyWords,geometry});
   validateConnect4CacheCapacity32(capacity,stride);
   const bytes=capacity*layout.entryBytes;
   if(!Number.isSafeInteger(bytes))throw RangeError('invalid shared exact backing span');
@@ -61,7 +60,7 @@ export function createConnect4RbaSharedLayoutCache32({capacity=65536,keyWords,ge
 
 // Restore complete aliased views after structured clone. Never copy or grow.
 export function attachConnect4RbaSharedLayoutCache32(cache){
-  if(cache.banks!==undefined)return attachBankedCompactSharedCache32(cache);
+  if(cache.banks!==undefined)return attachBankedSharedLayoutCache32(cache);
   const entries=cache.entries,p=cache.layout,capacity=cache.mask+1;
   if(!p||!['compact32','direct','fullspan'].includes(p.kind)||
      !Number.isSafeInteger(cache.keyWords)||cache.keyWords<1||
@@ -103,6 +102,7 @@ export function attachConnect4RbaSharedLayoutCache32(cache){
 // Bind at worker initialization. These selected functions require knownHash;
 // public optional-hash entry points below preserve the existing support API.
 export function prepareSharedCacheAccess(cache,{counted=false}={}){
+  if(cache.banks!==undefined&&cache.layout.kind!=='compact32')return prepareBankedDirectSharedCacheAccess32(cache,{counted});
   if(cache.banks!==undefined)return counted
     ?{probe:probeBankedCompactSharedCacheCounted32,store:storeBankedCompactSharedCacheCounted32}
     :{probe:probeBankedCompactSharedCache32,store:storeBankedCompactSharedCache32};
