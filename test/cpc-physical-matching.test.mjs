@@ -7,7 +7,7 @@ import {evaluateConnect4CpcWin32 as inherited} from '../addons/cpc-connect4.mjs'
 import {runLazySmpConnect4Rba32} from '../addons/rba-connect4-lazy-smp-host.mjs';
 import {evaluateConnect4PreparedCpcResponse32 as oldResponse} from '../addons/connect4-cpc-prepared-response.mjs';
 import {prepareConnect4CpcWin32} from '../addons/connect4-cpc-prepared-win.mjs';
-const api={...await import('../addons/connect4-cpc-matching-response.mjs').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;})};
+const api={...await import('../addons/connect4-cpc-physical-matching.mjs').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;})};
 
 test('four-worker minimal search agrees with a physically verified CPC win certificate',async()=>{
   const W=7,H=6,g=prepareConnect4RbaGeometry({columns:W,rows:H}),b=physical(W,H),
@@ -72,18 +72,18 @@ function physical(W,H){
   };return b;
 }
 
-test('common-matching CPC equals independently enumerated physical policies and exact bounded game',()=>{
-  assert.equal(typeof api.prepareConnect4CpcMatchingResponse32,'function');
-  assert.equal(typeof api.evaluateConnect4PreparedCpcMatchingResponse32,'function');
+test('physical-column compiled matching equals independently enumerated physical policies and exact bounded game',()=>{
+  assert.equal(typeof api.prepareConnect4CpcPhysicalMatching32,'function');
+  assert.equal(typeof api.prepareConnect4CpcPhysicalMatching32,'function');
   let checked=0,positive=0,nonloss=0,newPositive=0;
   for(const [W,H] of [[4,3],[3,4]]){
-    const g=prepareConnect4RbaGeometry({columns:W,rows:H}),p=api.prepareConnect4CpcMatchingResponse32(g),b=physical(W,H),seen=new Set(),moves=[];
+    const g=prepareConnect4RbaGeometry({columns:W,rows:H}),p=api.prepareConnect4CpcPhysicalMatching32(g),b=physical(W,H),seen=new Set(),moves=[];
     function visit(){
       if(b.winner()>=0||b.rank===W*H)return;
       const key=b.cells.join(',');if(seen.has(key))return;seen.add(key);
       for(const canonical of [false,true]){
         const q=connect4RbaFromMoves(moves,{geometry:g,canonical}),controller=1-b.rank%2;
-        const actual=api.evaluateConnect4PreparedCpcMatchingResponse32(p,q.words,0,q.basis,0,q.basis.length,controller);
+        const actual=p.evaluate(p,q.words,0,q.basis,0,q.basis.length,controller);
         const old=oldResponse(prepareConnect4CpcWin32(g),q.words,0,q.basis,0,q.basis.length,controller);
         assert.ok(!old||actual,'every previous common-policy positive is retained');
         if(old===1)assert.equal(actual,1,'previous controller WIN remains WIN');
@@ -100,23 +100,23 @@ test('common-matching CPC equals independently enumerated physical policies and 
   console.log(JSON.stringify({kind:'c58-common-matching-exhaustive-small-physical-policy',checked,positive,nonloss,newPositive}));
 });
 
-test('common matching preserves guards, offsets, physical frames and large-width fallback',()=>{
-  assert.equal(typeof api.prepareConnect4CpcMatchingResponse32,'function');
+test('physical table preserves matching guards, offsets and large-width fallback',()=>{
+  assert.equal(typeof api.prepareConnect4CpcPhysicalMatching32,'function');
   let seed=274291,checked=0,positive=0,nonloss=0;
   const rand=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)%n;};
   for(const [W,H] of [[1,4],[4,1],[4,4],[7,5],[7,6],[8,4],[33,4],[10,10],[3,3]]){
-    const g=prepareConnect4RbaGeometry({columns:W,rows:H}),p=api.prepareConnect4CpcMatchingResponse32(g);
+    const g=prepareConnect4RbaGeometry({columns:W,rows:H}),p=api.prepareConnect4CpcPhysicalMatching32(g);
     for(let trial=0;trial<30;trial++){
       const b=physical(W,H),moves=[];
       while(b.rank<W*H){
         for(const canonical of [false,true]){
           const q=connect4RbaFromMoves(moves,{geometry:g,canonical}),controller=1-b.rank%2;
-          const actual=api.evaluateConnect4PreparedCpcMatchingResponse32(p,q.words,0,q.basis,0,q.basis.length,controller);
+          const actual=p.evaluate(p,q.words,0,q.basis,0,q.basis.length,controller);
           const old=oldResponse(prepareConnect4CpcWin32(g),q.words,0,q.basis,0,q.basis.length,controller);
         assert.ok(!old||actual,'every previous common-policy positive is retained');
         if(old===1)assert.equal(actual,1,'previous controller WIN remains WIN');
           assert.equal(actual,b.certificate(controller,q.reflected),JSON.stringify({W,H,moves,canonical}));
-          assert.equal(api.evaluateConnect4PreparedCpcMatchingResponse32(p,q.words,0,q.basis,0,q.basis.length,1-controller),0);
+          assert.equal(p.evaluate(p,q.words,0,q.basis,0,q.basis.length,1-controller),0);
           const words=new Uint32Array(q.words.length+10).fill(0xffffffff),basis=new Uint32Array(q.basis.length+14).fill(0xffffffff);
           words.set(q.words,5);basis.set(q.basis,7);
           for(const owner of [g.p0Offset,g.p1Offset])for(let w=0;w<g.coordWords;w++){
@@ -124,9 +124,9 @@ test('common matching preserves guards, offsets, physical frames and large-width
             if(valid<=0)words[5+owner+w]=0xffffffff;
             else if(valid<32)words[5+owner+w]|=0xffffffff<<valid;
           }
-          assert.equal(api.evaluateConnect4PreparedCpcMatchingResponse32(p,words,5,basis,7,q.basis.length,controller),actual,'offset and poisoned inactive tails');
+          assert.equal(p.evaluate(p,words,5,basis,7,q.basis.length,controller),actual,'offset and poisoned inactive tails');
           words[5+g.metaOffset]|=2;
-          assert.equal(api.evaluateConnect4PreparedCpcMatchingResponse32(p,words,5,basis,7,q.basis.length,controller),0,'terminal state is never a policy premise');
+          assert.equal(p.evaluate(p,words,5,basis,7,q.basis.length,controller),0,'terminal state is never a policy premise');
           if(actual){positive++;if(actual===2)nonloss++;if(W===4&&H<=4){if(actual===1)assert.equal(b.exact(),-1);else assert.ok(b.exact()<=0);}}
           checked++;
         }
@@ -143,10 +143,10 @@ test('common matching preserves guards, offsets, physical frames and large-width
 
 
 test('matching constraints require one common policy, not separate blockers',()=>{
-  assert.equal(typeof api.prepareConnect4CpcMatchingResponse32,'function');
-  const g=prepareConnect4RbaGeometry({columns:4,rows:3}),p=api.prepareConnect4CpcMatchingResponse32(g),w=new Uint32Array(g.keyWords);
+  assert.equal(typeof api.prepareConnect4CpcPhysicalMatching32,'function');
+  const g=prepareConnect4RbaGeometry({columns:4,rows:3}),p=api.prepareConnect4CpcPhysicalMatching32(g),w=new Uint32Array(g.keyWords);
   function shape(cells){for(let id=0;id<g.shapeCount;id++){if(g.shapeSize[id]!==cells.length)continue;const actual=Array.from(g.shapeCells.subarray(id*4,id*4+cells.length));if(cells.every(c=>actual.includes(c)))return id;}assert.fail('synthetic valid shape absent');}
-  const evaluate=sets=>{const basis=new Uint32Array(sets.map(shape));w.fill(0);w[g.p0Offset]=3;return api.evaluateConnect4PreparedCpcMatchingResponse32(p,w,0,basis,0,basis.length,1);};
+  const evaluate=sets=>{const basis=new Uint32Array(sets.map(shape));w.fill(0);w[g.p0Offset]=3;return p.evaluate(p,w,0,basis,0,basis.length,1);};
   assert.equal(evaluate([[0,1],[0,2]]),0,'both clauses individually coverable but no perfect matching contains both edges');
   assert.equal(evaluate([[0,2],[1,3]]),2,'one alternative matching jointly covers both clauses');
   assert.equal(evaluate([[0],[1,3]]),0,'singleton frontier cannot be denied by a pair');
@@ -154,11 +154,31 @@ test('matching constraints require one common policy, not separate blockers',()=
   assert.equal(p.oddIndex.length,4);
 });
 
-test('all eight actual worker variants bind the common-policy response capability',()=>{
+
+test('physical matching table maps all rule-only column subsets with exact local transport',()=>{
+ assert.equal(typeof api.prepareConnect4CpcPhysicalMatching32,'function');
+ let entries=0;
+ for(let W=1;W<=10;W++){
+   const g=prepareConnect4RbaGeometry({columns:W,rows:4}),p=api.prepareConnect4CpcPhysicalMatching32(g),extent=1<<W;
+   assert.equal(p.physicalMatchingCoverage.byteLength,2*extent*extent);
+   for(let odd=0;odd<extent;odd++){
+     const columns=[];for(let c=0;c<W;c++)if(odd&(1<<c))columns.push(c);
+     if(columns.length%2||columns.length>6)continue;
+     const offset=p.matchingOffsets[columns.length>>>1];
+     for(let subset=0;subset<extent;subset++){
+       let local=0;for(let i=0;i<columns.length;i++)if(subset&(1<<columns[i]))local|=1<<i;
+       assert.equal(p.physicalMatchingCoverage[odd*extent+subset],p.matchingCoverage[offset+local]);entries++;
+     }
+   }
+ }
+ console.log(JSON.stringify({kind:'c59-rule-only-complete-column-table-transport',entries}));
+});
+
+test('all eight worker variants cold-bind the physical/general evaluator',()=>{
  for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
-   const name='rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
-   const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8');
-   assert.match(source,/prepareConnect4Cpc(?:MatchingResponse|PhysicalMatching)32 as prepareConnect4CpcWin32/);
-   assert.match(source,/evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32|evaluateConnect4PreparedCpcResponse32=cpc.evaluate/);
+ const name='rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
+ const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8');
+ assert.match(source,/prepareConnect4CpcPhysicalMatching32 as prepareConnect4CpcWin32/);
+ assert.match(source,/evaluateConnect4PreparedCpcResponse32=cpc.evaluate/);
  }
 });

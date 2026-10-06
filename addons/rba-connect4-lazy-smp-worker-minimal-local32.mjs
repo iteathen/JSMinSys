@@ -10,8 +10,7 @@ import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connec
 import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';
 import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
 import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';
-import {prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32} from './connect4-cpc-matching-response.mjs';
-import {evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-matching-response.mjs';
+import {prepareConnect4CpcPhysicalMatching32 as prepareConnect4CpcWin32} from './connect4-cpc-physical-matching.mjs';
 import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
@@ -32,6 +31,7 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
   index=workerData.workerIndex,g=workerData.geometry,
   profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
+    evaluateConnect4PreparedCpcResponse32=cpc.evaluate,
     targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
     pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,
     forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,
