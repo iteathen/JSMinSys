@@ -5066,12 +5066,16 @@
         {
           "op": "runtime.field.store",
           "count": 6
+        },
+        {
+          "op": "runtime.math.max",
+          "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "6*C(runtime.field.load)+6*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+6*C(runtime.field.store)",
-        "note": "Per-worker coordinate scratch allocation."
+        "expression": "6*C(runtime.field.load)+6*C(runtime.typed_array.allocate)+C(runtime.object.allocate)+6*C(runtime.field.store)+C(runtime.math.max)",
+        "note": "Per-worker coordinate scratch allocation. Onecoldmax(1,maxBasis) reserves supporthandle metadata forzero-residualgeometry. StandardmaxBasis69allocationunchanged, no hot cost. Arraymapbytes now4*max(1,maxBasis)."
       },
       "status": "decomposed"
     },
@@ -27187,7 +27191,7 @@
     }
   },
   "decomposedSourceBlobs": {
-    "addons/rba-connect4-geometry.mjs": "809ac951fbb0580bd6eee5aacad890d9f708811c",
+    "addons/rba-connect4-geometry.mjs": "ea897ee020db0ac00f386b7df42bdf9ad47df0cc",
     "addons/rba-connect4-alphabeta.mjs": "a40536e47fe319625bc4ac23da7afa9a410b44b6",
     "addons/cpc-connect4.mjs": "6a0131e174a768458242f316f3d8a0c55a4be7e6",
     "addons/rba-connect4-coordinate.mjs": "1c7176900ea4215330cd82f90132c03c2974ec1f",
