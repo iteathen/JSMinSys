@@ -24,7 +24,11 @@ jobs:
       - run: node tools/build-rba-shared-proof-workers.mjs --check
       - run: node tools/build-rba-local-native-workers.mjs --check
       - run: node tools/build-rba-basis-view-kernels.mjs --check
+      - run: node tools/build-rba-support-handle-kernels.mjs --check
       - run: node tools/build-rba-basis-view-workers.mjs --check
+      - run: node tools/build-rba-prepared-compact-cache.mjs --check
+      - run: node tools/build-rba-compiled-transition-kernels.mjs --check
+      - run: node tools/build-rba-compiled-transition-workers.mjs --check
       - run: node tools/build-cpc-matching-response.mjs --check
       - run: node tools/build-root-frontier.mjs --check
       - run: node tools/build-rba-coordinate-kernels.mjs --check

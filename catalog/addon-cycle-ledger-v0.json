@@ -37466,27 +37466,27 @@
         },
         {
           "op": "memory.allocate.shared.bytes",
-          "count": "2*ADMIT"
+          "count": "2*BUILD"
         },
         {
           "op": "runtime.typed_view.construct",
-          "count": "2*ADMIT"
+          "count": "2*BUILD"
         },
         {
           "op": "runtime.typed_array.allocate",
-          "count": "ADMIT"
+          "count": "BUILD"
         },
         {
           "op": "runtime.typed_array.fill",
-          "count": "ADMIT"
+          "count": "BUILD"
         },
         {
           "op": "runtime.object.allocate",
-          "count": "ADMIT"
+          "count": "BUILD"
         },
         {
           "op": "runtime.object.freeze",
-          "count": "ADMIT"
+          "count": "BUILD"
         },
         {
           "op": "runtime.field.store",
@@ -37526,7 +37526,7 @@
         },
         {
           "op": "runtime.call.subledger",
-          "count": "ADMIT",
+          "count": "BUILD",
           "target": "prepareConnect4RbaExecutionProfile"
         },
         {
@@ -37538,22 +37538,25 @@
           "op": "runtime.callback",
           "count": "PARENT",
           "target": "removePrepared"
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": "REUSE_TYPE"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(CHECK)*C(runtime.number.safe_integer.check)+(ERR)*C(runtime.error.throw)+(F)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(MUL)*C(runtime.number.multiply)+(LEGAL_CHECK)*C(runtime.number.divide)+(LEGAL_CHECK)*C(runtime.math.floor)+(LEGAL_CHECK)*C(runtime.number.remainder)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(2*ADMIT)*C(memory.allocate.shared.bytes)+(2*ADMIT)*C(runtime.typed_view.construct)+(ADMIT)*C(runtime.typed_array.allocate)+(ADMIT)*C(runtime.typed_array.fill)+(ADMIT)*C(runtime.object.allocate)+(ADMIT)*C(runtime.object.freeze)+(FIELDS)*C(runtime.field.store)+(SIZE+BASIS)*C(memory.load.native_index)+(INV_READ+STABLE)*C(memory.load.u32)+(INV_WRITE+STABLE)*C(memory.store.u32)+(SURVIVE)*C(memory.store.native_index)+(STABLE)*C(alu.and.u32)+(STABLE)*C(alu.shl.u32)+(STABLE)*C(alu.shr.u32)+(STABLE)*C(alu.or.u32)+(ADMIT)*CALL(prepareConnect4RbaExecutionProfile)+(LEGAL)*CALLBACK(prepareRemove)+(PARENT)*CALLBACK(removePrepared)",
+        "expression": "(CHECK)*C(runtime.number.safe_integer.check)+(ERR)*C(runtime.error.throw)+(F)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(MUL)*C(runtime.number.multiply)+(LEGAL_CHECK)*C(runtime.number.divide)+(LEGAL_CHECK)*C(runtime.math.floor)+(LEGAL_CHECK)*C(runtime.number.remainder)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(2*BUILD)*C(memory.allocate.shared.bytes)+(2*BUILD)*C(runtime.typed_view.construct)+(BUILD)*C(runtime.typed_array.allocate)+(BUILD)*C(runtime.typed_array.fill)+(BUILD)*C(runtime.object.allocate)+(BUILD)*C(runtime.object.freeze)+(FIELDS)*C(runtime.field.store)+(SIZE+BASIS)*C(memory.load.native_index)+(INV_READ+STABLE)*C(memory.load.u32)+(INV_WRITE+STABLE)*C(memory.store.u32)+(SURVIVE)*C(memory.store.native_index)+(STABLE)*C(alu.and.u32)+(STABLE)*C(alu.shl.u32)+(STABLE)*C(alu.shr.u32)+(STABLE)*C(alu.or.u32)+(BUILD)*CALL(prepareConnect4RbaExecutionProfile)+(LEGAL)*CALLBACK(prepareRemove)+(PARENT)*CALLBACK(removePrepared)+(REUSE_TYPE)*C(runtime.instanceof.check)",
         "parameters": {
           "CHECK": "Reached budget/extent safe checks before allocations.",
           "ERR": "Invalid budget or child-membership verification failure.",
-          "F": "Actual cold plan/geometry/array fields.",
-          "TEST": "Reached validation/width/column/row/member/stability predicates.",
+          "F": "Actual cold plan/geometry/array fields, including short-circuit reuse guards and replacement byte-accounting fields.",
+          "TEST": "Reached validation/width/column/row/member/stability/reuse predicates.",
           "BRANCH": "Reached selections and loops.",
           "MUL": "Executed cold size/byte/row/removal-address products.",
           "ADD": "Executed sums/address/loop increments.",
-          "SUB": "Executed decrements/subtractions.",
-          "ADMIT": "1when arrays fit explicit auxiliary budget;0fallback.",
-          "LEGAL_CHECK": "Admitted profiles*columns, includes full-column skip.",
+          "SUB": "Executed decrements and replacement subtraction of old transition-only retained/working bytes.",
+          "LEGAL_CHECK": "BUILD*profiles*columns, includes full-column skip;0reuse.",
           "LEGAL": "Actual nonfull column transitions.",
           "SIZE": "Actual size reads in parent and child loops, including repeated membership verification.",
           "BASIS": "Actual native ID reads while building inverse, projecting and verifying membership.",
@@ -37563,9 +37566,11 @@
           "FIELDS": "Spread/publication metadata fields; reuse all existing buffers.",
           "NATIVE_WIDTHS": "basis IDs by shapeCount; sizes by maxBasis; slots1/2/4 by disjoint dead sentinel. Stable uint32. Selection cold.",
           "INV_READ": "Surviving parent-image inverse reads, actual count.",
-          "INV_WRITE": "Child-member inverse writes while compiling, actual count."
+          "INV_WRITE": "Child-member inverse writes while compiling, actual count.",
+          "BUILD": "1when a fresh/replacement plane fits the auxiliary budget;0fallback or compatible supplied-plan reuse.",
+          "REUSE_TYPE": "0..4 reached cold typed-array/shared-buffer checks after byte/sentinel compatibility."
         },
-        "note": "COLD geometry-only compiler, no owner/value/move-label data. Native slot fill touches full admitted payload; inverse membership verified before use. Auxiliary footprint reported separately from unchanged TT/base budget. Native stride/mask products and argument/property/allocator lowering remain actual machine debt. Final accounting correction separates inverse reads/writes instead of charging their combined count to both. No runtime change."
+        "note": "COLD geometry-only compiler, no owner/value/move-label data. Native slot fill touches full admitted payload; inverse membership verified before use. Auxiliary footprint reported separately from unchanged TT/base budget. Native stride/mask products and argument/property/allocator lowering remain actual machine debt. Final accounting correction separates inverse reads/writes instead of charging their combined count to both. No runtime change. Reviewed cold reuse: eligible shared planes returned by identity before compiler/allocation; incompatible replacement subtracts old transition bytes before adding new payload. No worker/hot-body change."
       }
     },
     {
@@ -45448,7 +45453,7 @@
     "addons/rba-connect4-coordinate-closure-handle-view-prepared.mjs": "f72e25baaac195bd0e8597b1f0ef8c45950d2dfc",
     "addons/rba-connect4-coordinate-closure-handle-view-dense.mjs": "47e7cdda2bc1cb8d3b1d4d8028b9839cd285974f",
     "addons/rba-connect4-prepared-compact-cache.mjs": "bce1755f7312cbbccb490aa8bb5d7b9443cddc57",
-    "addons/rba-connect4-support-compiled-transition.mjs": "5653527a59a2d9be1e6c4a122085e7135909347e",
+    "addons/rba-connect4-support-compiled-transition.mjs": "aed73f999e352d43b85ddd00b39f4640771045ba",
     "addons/rba-connect4-coordinate-compiled-transition.mjs": "b0478f80aad60f13199643cc65b92d102abdff23",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled.mjs": "cf37c1f0de2f9d04c17213002dddf923fafdfe02",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center.mjs": "dfce661131bc1f4d6218852d5ab3b7716fd98ecd",
