@@ -1,9 +1,10 @@
 // Cold accounting. Counts describe emitted operations, not measured machine cycles.
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {cycleExpressionForOperations} from './cycle-ledger-validation.mjs';
 const path='catalog/addon-cycle-ledger-v0.json',l=JSON.parse(readFileSync(path,'utf8')),
  source='addons/rba-connect4-index-partial-cache.mjs';
-const expr=ops=>ops.map(o=>o.op==='runtime.call.subledger'?`(${o.count})*CALL(${o.target})`:`(${o.count})*C(${o.op})`).join('+'),
+const expr=cycleExpressionForOperations,
  op=(name,count)=>({op:name,count}),call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
 l.units=l.units.filter(u=>u.source!==source&&!/-partial(?:24|16|Mixed)\.mjs$/.test(u.source));
 const specs={

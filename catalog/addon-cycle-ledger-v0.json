@@ -3634,7 +3634,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(12+5*N+3*C+2*P)*C(runtime.field.load)+(5+3*N+C)*C(runtime.field.store)+(3*N+2*C+2*P)*C(memory.load.u32)+(W+4*N+C+1)*C(memory.store.u32)+(3+5*N+3*C+2*P)*C(alu.add.u32)+2*N*C(alu.and.u32)+N*C(alu.shl.u32)+N*C(alu.shr.u32)+(6+2*W+5*N+2*C+3*P)*C(control.test.u32)+(6+2*W+5*N+2*C+3*P)*C(control.branch)+CALL(compareReflectedSupport)+(1-E)*CALL(emitSortedSetBits32)+(1-E)*CALLBACK(permuteCoordinates)+(1-E)*(2+S)*CALL(publishSpan32)",
+        "expression": "(12+5*N+3*C+2*P)*C(runtime.field.load)+(5+3*N+C)*C(runtime.field.store)+(3*N+2*C+2*P)*C(memory.load.u32)+(W+4*N+C+1)*C(memory.store.u32)+(3+5*N+3*C+2*P)*C(alu.add.u32)+(2*N)*C(alu.and.u32)+(N)*C(alu.shl.u32)+(N)*C(alu.shr.u32)+(6+2*W+5*N+2*C+3*P)*C(control.test.u32)+(6+2*W+5*N+2*C+3*P)*C(control.branch)+(1)*CALL(compareReflectedSupport)+(1-E)*CALL(emitSortedSetBits32)+(1-E)*CALLBACK(permuteCoordinates)+((1-E)*(2+S))*CALL(publishSpan32)",
         "parameters": {
           "E": "1 when primary support comparison proves the current orientation strictly canonical and reflection work exits early; otherwise 0",
           "W": "shapeWordCount words cleared in reflection scratch",
@@ -4248,7 +4248,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(9+5*R)*C(runtime.field.load)+(4+3*R)*C(memory.load.u32)+2*C(memory.store.u32)+(2+2*R)*C(alu.imul.u32)+(3+4*R)*C(alu.add.u32)+(5+2*R)*C(control.test.u32)+(5+2*R)*C(control.branch)+U*CALL(swap)+R*CALL(insertFrom)+I*(CALL(spend)+CALLBACK(productJoin))",
+        "expression": "(9+5*R)*C(runtime.field.load)+(4+3*R)*C(memory.load.u32)+(2)*C(memory.store.u32)+(2+2*R)*C(alu.imul.u32)+(3+4*R)*C(alu.add.u32)+(5+2*R)*C(control.test.u32)+(5+2*R)*C(control.branch)+(U)*CALL(swap)+(R)*CALL(insertFrom)+(I)*CALL(spend)+(I)*CALLBACK(productJoin)",
         "parameters": {
           "U": "1 on union path that swaps left into output; 0 on intersection",
           "R": "right records inserted on union path",
@@ -4395,7 +4395,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "CALL(spend)+(1-S)*CALLBACK(insertFront)+8*C(runtime.field.load)+3*C(memory.load.u32)+(1+F)*C(memory.store.u32)+3*C(control.test.u32)+3*C(control.branch)",
+        "expression": "(1)*CALL(spend)+(1-S)*CALLBACK(insertFront)+(8)*C(runtime.field.load)+(3)*C(memory.load.u32)+(1+F)*C(memory.store.u32)+(3)*C(control.test.u32)+(3)*C(control.branch)",
         "parameters": {
           "S": "1 when spend fails and insertion is skipped; 0 otherwise",
           "F": "1 when capacity failure stores error; 0 when count stores new size"
@@ -4651,7 +4651,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(18+11*N+7*U)*C(runtime.field.load)+(5+7*N+5*U)*C(memory.load.u32)+(4+W*N+5*N+2*U)*C(memory.store.u32)+(3+N)*C(alu.imul.u32)+(8+8*N+5*U)*C(alu.add.u32)+(4*N+2*U)*C(alu.and.u32)+(2*N+2*U)*C(alu.or.u32)+(2*N+2*U)*C(alu.shl.u32)+(2*N+2*U)*C(alu.shr.u32)+(8+10*N+4*U)*C(control.test.u32)+(8+10*N+4*U)*C(control.branch)+CALLBACK(prepareRemove)+N*CALLBACK(removePrepared)+N*CALLBACK(prepareSubset)+U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(18+11*N+7*U)*C(runtime.field.load)+(5+7*N+5*U)*C(memory.load.u32)+(4+W*N+5*N+2*U)*C(memory.store.u32)+(3+N)*C(alu.imul.u32)+(8+8*N+5*U)*C(alu.add.u32)+(4*N+2*U)*C(alu.and.u32)+(2*N+2*U)*C(alu.or.u32)+(2*N+2*U)*C(alu.shl.u32)+(2*N+2*U)*C(alu.shr.u32)+(8+10*N+4*U)*C(control.test.u32)+(8+10*N+4*U)*C(control.branch)+(1)*CALLBACK(prepareRemove)+(N)*CALLBACK(removePrepared)+(N)*CALLBACK(prepareSubset)+(U)*CALLBACK(shapeSubsetPrepared)",
         "parameters": {
           "N": "parent residuals imaged",
           "W": "coordWords zeroed/copied per residual",
@@ -4724,7 +4724,7 @@
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "(10+7*N+5*U)*C(runtime.field.load)+(3*N+3*U)*C(memory.load.u32)+(W*N+2*N+U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(5+5*N+4*U)*C(alu.add.u32)+(3*N+U)*C(alu.and.u32)+(N+U)*C(alu.or.u32)+(N+U)*C(alu.shl.u32)+(N+U)*C(alu.shr.u32)+(6+W*N+7*N+3*U)*C(control.test.u32)+(6+W*N+7*N+3*U)*C(control.branch)+N*CALLBACK(prepareSubset)+U*CALLBACK(shapeSubsetPrepared)",
+        "expression": "(10+7*N+5*U)*C(runtime.field.load)+(3*N+3*U)*C(memory.load.u32)+(W*N+2*N+U)*C(memory.store.u32)+(2+N)*C(alu.imul.u32)+(5+5*N+4*U)*C(alu.add.u32)+(3*N+U)*C(alu.and.u32)+(N+U)*C(alu.or.u32)+(N+U)*C(alu.shl.u32)+(N+U)*C(alu.shr.u32)+(6+W*N+7*N+3*U)*C(control.test.u32)+(6+W*N+7*N+3*U)*C(control.branch)+(N)*CALLBACK(prepareSubset)+(U)*CALLBACK(shapeSubsetPrepared)",
         "parameters": {
           "N": "basis rows prepared",
           "W": "coordWords cleared per upset row",
@@ -15795,7 +15795,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(CHECK)*C(runtime.number.safe_integer.check)+(BAD)*C(runtime.error.throw)+(FIELD)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(MUL)*C(runtime.number.multiply)+(DIV)*C(runtime.number.divide)+(DIV)*C(runtime.math.floor)+(REM)*C(runtime.number.remainder)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(4*ADMIT)*C(memory.allocate.shared.bytes)+(4*ADMIT)*C(runtime.typed_view.construct)+(2*ADMIT)*C(runtime.typed_array.allocate)+(ADMIT)*C(runtime.object.allocate)+(ADMIT)*C(runtime.object.freeze)+(7*ADMIT)*C(runtime.field.store)+(LOAD32)*C(memory.load.u32)+(LOADID)*C(memory.load.native_index)+(STORE32)*C(memory.store.u32)+(P)*C(memory.store.native_index)+(IMAGE)*C(alu.and.u32)+(IMAGE)*C(alu.or.u32)+(IMAGE)*C(alu.shl.u32)+(IMAGE)*C(alu.shr.u32)+(ADMIT)*CALL(prepareConnect4RbaExecutionProfile)+(ADMIT)*CALL(connect4RbaBasisFromSupport)+(P-ADMIT)*CALL(emitSortedSetBitsAt32)+(P-ADMIT)*CALLBACK(prepareRemove)+(VISIT)*CALLBACK(removePrepared)+(ADMIT)*C(runtime.array.copy)+CL*CALL(compileSupportClosures32)+CL*C(memory.allocate.shared.bytes)+CL*C(runtime.typed_view.construct)+EXTRA*C(control.test.u32)+EXTRA*C(control.branch)+REF*CALL(compileSupportReflection32)+2*REF*C(memory.allocate.shared.bytes)+2*REF*C(runtime.typed_view.construct)+EXTRA_REF*C(control.test.u32)+EXTRA_REF*C(control.branch)",
+        "expression": "(CHECK)*C(runtime.number.safe_integer.check)+(BAD)*C(runtime.error.throw)+(FIELD)*C(runtime.field.load)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(MUL)*C(runtime.number.multiply)+(DIV)*C(runtime.number.divide)+(DIV)*C(runtime.math.floor)+(REM)*C(runtime.number.remainder)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(4*ADMIT)*C(memory.allocate.shared.bytes)+(4*ADMIT)*C(runtime.typed_view.construct)+(2*ADMIT)*C(runtime.typed_array.allocate)+(ADMIT)*C(runtime.object.allocate)+(ADMIT)*C(runtime.object.freeze)+(7*ADMIT)*C(runtime.field.store)+(LOAD32)*C(memory.load.u32)+(LOADID)*C(memory.load.native_index)+(STORE32)*C(memory.store.u32)+(P)*C(memory.store.native_index)+(IMAGE)*C(alu.and.u32)+(IMAGE)*C(alu.or.u32)+(IMAGE)*C(alu.shl.u32)+(IMAGE)*C(alu.shr.u32)+(ADMIT)*CALL(prepareConnect4RbaExecutionProfile)+(ADMIT)*CALL(connect4RbaBasisFromSupport)+(P-ADMIT)*CALL(emitSortedSetBitsAt32)+(P-ADMIT)*CALLBACK(prepareRemove)+(VISIT)*CALLBACK(removePrepared)+(ADMIT)*C(runtime.array.copy)+(CL)*CALL(compileSupportClosures32)+(CL)*C(memory.allocate.shared.bytes)+(CL)*C(runtime.typed_view.construct)+(EXTRA)*C(control.test.u32)+(EXTRA)*C(control.branch)+(REF)*CALL(compileSupportReflection32)+(2*REF)*C(memory.allocate.shared.bytes)+(2*REF)*C(runtime.typed_view.construct)+(EXTRA_REF)*C(control.test.u32)+(EXTRA_REF)*C(control.branch)",
         "parameters": {
           "ADMIT": "0 on cold budget/index fallback;1 on admitted plan.",
           "P": "Admitted support profile count, including root;0 on fallback.",
@@ -15961,7 +15961,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*W+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V+K)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+J+V+B+I+2*K)*C(alu.shr.u32)+(W+END+E+O)*C(alu.or.u32)+(V+N)*C(alu.xor.u32)+(V+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportBasis32)+(H)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+M+2*W+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+H+2*V+K)*C(alu.and.u32)+(1+END+T+N+J+H+V)*C(alu.shl.u32)+(1+T+J+V+B+I+2*K)*C(alu.shr.u32)+(W+END+E+O)*C(alu.or.u32)+(V+N)*C(alu.xor.u32)+(V+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportBasis32)+(H)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -16080,7 +16080,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+M+2*W+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+H+2*V+K)*C(alu.and.u32)+(1+END+0+N+J+H+V)*C(alu.shl.u32)+(1+0+J+V+0+I+2*K)*C(alu.shr.u32)+(W+END+E+O)*C(alu.or.u32)+(V+N)*C(alu.xor.u32)+(V+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportBasis32)+(H)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+M+2*W+A+RS+Q+P+2*U+2*H+I+E+O)*C(memory.load.u32)+(C+2*Z+3+END+K+M+E+O)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+H+2*V+K)*C(alu.and.u32)+(1+END+0+N+J+H+V)*C(alu.shl.u32)+(1+0+J+V+0+I+2*K)*C(alu.shr.u32)+(W+END+E+O)*C(alu.or.u32)+(V+N)*C(alu.xor.u32)+(V+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportBasis32)+(H)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -16671,7 +16671,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -16809,7 +16809,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -16944,7 +16944,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -17082,7 +17082,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasis32)+(0)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -20024,7 +20024,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
+        "expression": "(1)*C(memory.load.u8)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -20077,7 +20077,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -20981,7 +20981,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
+        "expression": "(1)*C(memory.load.u8)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -21034,7 +21034,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -21870,7 +21870,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+S*CALL(transportConnect4ZeroBound32)+S*C(memory.load.u32)+S*C(alu.shr.u32)+S*C(alu.and.u32)",
+        "expression": "(1)*C(memory.load.u8)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(memory.load.u32)+(S)*C(alu.shr.u32)+(S)*C(alu.and.u32)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -21923,7 +21923,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -22628,7 +22628,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(sharedStore)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -22875,7 +22875,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u8)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+S*CALL(transportConnect4ZeroBound32)+S*C(memory.load.u32)+S*C(alu.shr.u32)+S*C(alu.and.u32)",
+        "expression": "(1)*C(memory.load.u8)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(memory.load.u32)+(S)*C(alu.shr.u32)+(S)*C(alu.and.u32)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -22928,7 +22928,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -23548,7 +23548,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(sharedStore)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -23701,7 +23701,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u32)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -23754,7 +23754,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -24607,7 +24607,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u32)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+S*CALL(transportConnect4ZeroBound32)+S*C(memory.load.u32)+S*C(alu.shr.u32)+S*C(alu.and.u32)+C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(memory.load.u32)+(S)*C(alu.shr.u32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -24660,7 +24660,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -25374,7 +25374,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(sharedStore)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -25527,7 +25527,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u32)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -25580,7 +25580,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -26348,7 +26348,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "C(memory.load.u32)+C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+S*CALL(transportConnect4ZeroBound32)+S*C(memory.load.u32)+S*C(alu.shr.u32)+S*C(alu.and.u32)+C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(S)*CALLBACK(sharedProbe)+(P)*CALL(storeLocalEntry)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(memory.load.u32)+(S)*C(alu.shr.u32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -26401,7 +26401,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*CALLBACK(sharedStore)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -27030,7 +27030,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(sharedStore)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -27143,7 +27143,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(prepareConnect4CpcWin32)+(4)*C(runtime.typed_array.allocate)+(4)*C(runtime.array.from)+(4)*C(runtime.function.allocate)+(1)*C(runtime.object.allocate)+(1)*C(runtime.object.spread)+(5)*C(runtime.field.store)+(F)*C(runtime.field.load)+(4)*CALL(enumerateConnect4FrontierMatchings32)+(S16)*C(memory.store.u16)+(4)*C(memory.load.u8)+(READ)*C(memory.load.native_index)+(A)*C(alu.add.u32)+(SHIFT)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(4)*C(memory.store.u8)+(12)*C(runtime.callback)",
+        "expression": "(1)*CALL(prepareConnect4CpcWin32)+(4)*C(runtime.typed_array.allocate)+(4)*C(runtime.array.from)+(4)*C(runtime.function.allocate)+(1)*C(runtime.object.allocate)+(1)*C(runtime.object.spread)+(5)*C(runtime.field.store)+(F)*C(runtime.field.load)+(4)*CALL(enumerateConnect4FrontierMatchings32)+(S16)*C(memory.store.u16)+(4)*C(memory.load.u8)+(READ)*C(memory.load.native_index)+(A)*C(alu.add.u32)+(SHIFT)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(4)*C(memory.store.u8)+(12)*CALLBACK(cold-local-slot-identity)",
         "parameters": {
           "F": "Actual cold geometry/array/profile reads.",
           "S16": "85coverage words plus4mask constructor writes,4offset writes separately nativeu8.",
@@ -47258,7 +47258,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(probeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(probeBankedIndexPartial24Shared32)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -47317,7 +47317,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -48156,7 +48156,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(probeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(probeBankedIndexPartial24Shared32)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -48215,7 +48215,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -48948,7 +48948,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((PUB)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -49073,7 +49073,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(probeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(probeBankedIndexPartial24Shared32)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -49132,7 +49132,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -49886,7 +49886,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(probeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(probeBankedIndexPartial24Shared32)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -49945,7 +49945,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((S)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -50593,7 +50593,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*CALLBACK(storeIndexPartial24Shared32)+((PUB)*PARTIAL_BANKED)*CALLBACK(storeBankedIndexPartial24Shared32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -50713,7 +50713,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*CALLBACK(probeIndexPartialMixedShared32)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -50767,7 +50767,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*CALLBACK(storeIndexPartialMixedShared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -51601,7 +51601,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*CALLBACK(probeIndexPartialMixedShared32)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -51655,7 +51655,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*CALLBACK(storeIndexPartialMixedShared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -52383,7 +52383,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(storeIndexPartialMixedShared32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -52503,7 +52503,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*CALLBACK(probeIndexPartialMixedShared32)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -52557,7 +52557,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*CALLBACK(storeIndexPartialMixedShared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -53306,7 +53306,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*CALLBACK(probeIndexPartialMixedShared32)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
         "parameters": {
           "T": "Local-value, identity, sampling and shared-hit predicates.",
           "B": "Early local-hit/shared-hit and sampling control selections.",
@@ -53360,7 +53360,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*CALLBACK(storeIndexPartialMixedShared32)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
           "THREE": "Actual coordinate span3, cold selection.",
@@ -54003,7 +54003,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*CALLBACK(storeIndexPartialMixedShared32)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
         "parameters": {
           "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
           "B": "Executed local bound-disposition branches.",
@@ -54020,11 +54020,32 @@
         "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/connect4-cpc-matching-response.mjs#<matching-slot-identity-callback>",
+      "source": "addons/connect4-cpc-matching-response.mjs",
+      "name": "<matching-slot-identity-callback>",
+      "scope": "cold-geometry-matching-slot-identity",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.native.access.lowering",
+          "count": "ABI"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(ABI)*C(runtime.native.access.lowering)",
+        "parameters": {
+          "ABI": "Tagged argument-index return/call ABI for Array.from((_,i)=>i); source performs no arithmetic. Engine lowering unqualified, not zero."
+        },
+        "note": "Inline source callback at prepareConnect4CpcMatchingResponse32 line13. Parent owns Array.from/function construction; this callee owns argument/result propagation only."
+      }
     }
   ],
   "summary": {
-    "units": 642,
-    "decomposed": 642,
+    "units": 643,
+    "decomposed": 643,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -54365,6 +54386,27 @@
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCache32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCache32",
         "addons/rba-connect4-prepared-compact-cache.mjs#storeSharedPreparedCompact32"
+      ],
+      "probeIndexPartial24Shared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#probeIndexPartial24Shared32"
+      ],
+      "probeBankedIndexPartial24Shared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#probeBankedIndexPartial24Shared32"
+      ],
+      "storeIndexPartial24Shared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#storeIndexPartial24Shared32"
+      ],
+      "storeBankedIndexPartial24Shared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#storeBankedIndexPartial24Shared32"
+      ],
+      "probeIndexPartialMixedShared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#probeIndexPartialMixedShared32"
+      ],
+      "storeIndexPartialMixedShared32": [
+        "addons/rba-connect4-index-partial-cache.mjs#storeIndexPartialMixedShared32"
+      ],
+      "cold-local-slot-identity": [
+        "addons/connect4-cpc-matching-response.mjs#<matching-slot-identity-callback>"
       ]
     },
     "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback."

@@ -60,3 +60,7 @@ when needed to resolve noise; rejected experiments restored and tested too.
   CPU,EXACT/WIN/c4, six verified pins and six clean exits; producer6792395.
 - No source fixes applied at plan checkpoint. Old audit is historical evidence,
   not a verifier that new corrected source must preserve old defects.
+- Change1 `b5aeba3`: symbols repaired; two regression tests pass; checker now
+  catches missing IC before repair. Full `nees-fix-01-symbols`:37.7914212s,
+  212.8125s CPU,EXACT/WIN/c4,six pins/exits. Runtime byte-identical to baseline;
+  wall difference is run noise, not a tooling performance gain.

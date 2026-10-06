@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import {validateCycleSymbols} from './cycle-ledger-validation.mjs';
+import {validateCycleSymbols,validateCycleCallbacks} from './cycle-ledger-validation.mjs';
 
 const catalog = JSON.parse(readFileSync('catalog/catalog-v0.json', 'utf8'));
 const functions = JSON.parse(readFileSync('catalog/functions-v0.json', 'utf8'));
@@ -156,6 +156,7 @@ for (const unit of addonCycleLedger.units.filter((entry) => entry.status === 'de
     );
   }
   validateCycleSymbols(unit);
+  validateCycleCallbacks(unit);
 }
 
 function gitBlobSha(source) {
