@@ -39,7 +39,7 @@ for(const [name,operations] of Object.entries(specs)){
   cycleCount:{kind:'symbolic',expression:expr(operations),parameters:{DEFAULT:'0 in prepared worker calls;1 when public diagnostic default is used',ELIGIBLE:'1 if checked narrow-domain tail test passes;0 otherwise',WIDE:'1 for support-dependent wide class;0 for narrow'},
    note:'Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger.'}});
 }
-for(const kind of ['partial24','partial16','partialMixed'])for(const center of [false,true])for(const proofs of [false,true]){
+for(const kind of ['partial24','partialMixed'])for(const center of [false,true])for(const proofs of [false,true]){
  const base='addons/rba-connect4-lazy-smp-worker-minimal-views-compiled'+(center?'-center':'')+(proofs?'-proofs':'')+'-local32.mjs',target=base.replace('.mjs','-'+kind+'.mjs'),
   units=l.units.filter(u=>u.source===base&&!['localKeyMatches','storeLocalEntry'].includes(u.name));
  for(const original of units){
@@ -54,11 +54,9 @@ for(const kind of ['partial24','partial16','partialMixed'])for(const center of [
    if(o.target==='attachConnect4RbaSharedLayoutCache32'){o.target='attachIndexPartialCache32';o.count=1;}
   }
   if(u.name==='negamax'){
-   u.operations.push(call(kind==='partial16'?'packIndexPartial16Heights32':'packIndexPartial24Support32',kind==='partialMixed'?'NONROOT*WIDE':'NONROOT'));
-   if(kind==='partial16')u.operations.push(op('control.test.u32',1),op('control.branch',1));
+   u.operations.push(call('packIndexPartial24Support32',kind==='partialMixed'?'NONROOT*WIDE':'NONROOT'));
    if(kind==='partialMixed')u.operations.push(call('packIndexPartial16Heights32','NONROOT*(1-WIDE)'),op('control.test.u32',1),op('control.branch',1),op('alu.or.u32','NONROOT*WIDE'));
   }
-  if(kind==='partial16')for(const o of u.operations)if(o.target?.includes('IndexPartial24'))o.target=o.target.replace('IndexPartial24','IndexPartial16');
   if(kind==='partialMixed')for(const o of u.operations){
    if(/^(probe|store)IndexPartial24/.test(o.target??''))o.target=o.target.replace('IndexPartial24','IndexPartialMixed');
    if(o.target==='attachIndexPartialCache32')o.target='attachMixedIndexPartialCache32';
@@ -73,11 +71,13 @@ for(const kind of ['partial24','partial16','partialMixed'])for(const center of [
 for(const u of l.units.filter(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32')){
  u.operations=u.operations.filter(o=>!['createIndexPartialCache32','createMixedIndexPartialCache32'].includes(o.target));
  u.operations.push(call('createIndexPartialCache32','PARTIAL*(1-MIXED)'),call('createMixedIndexPartialCache32','PARTIAL*MIXED'));
- u.cycleCount.parameters.PARTIAL='1 only for explicitly selected partial24 on compact7x6;0 for unchanged generic/default layouts';
+ u.cycleCount.parameters.PARTIAL='1 only for explicitly selected partial24 or partialMixed on compact7x6;0 for unchanged generic/default layouts';
  u.cycleCount.parameters.MIXED='1 only for predeclared mixed16/24 current-rank pool;0 otherwise';
  u.cycleCount.expression=expr(u.operations);
  u.cycleCount.note+=' Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory.';
 }
+const activeSources=new Set(l.units.map(u=>u.source));
+for(const s of Object.keys(l.decomposedSourceBlobs))if(/-partial16\.mjs$/.test(s)&&!activeSources.has(s))delete l.decomposedSourceBlobs[s];
 for(const s of new Set(l.units.filter(u=>u.status==='decomposed').map(u=>u.source))){
  const bytes=readFileSync(s,'utf8').replaceAll('\r\n','\n');l.decomposedSourceBlobs[s]=createHash('sha1').update(`blob ${Buffer.byteLength(bytes)}\0`).update(bytes).digest('hex');
 }

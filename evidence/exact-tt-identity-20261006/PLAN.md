@@ -14,23 +14,24 @@ Generic dimensions retain their existing exact fallback. Six discovered verified
 P-core workers, Node27nightly/V8 retained2400/9600flags. Primary measurement is
 actual empty7x6 after all-ready; initialization/cleanup and external CPU/RSS separate.
 
-- [ ] Prove reversible single-lane hash elimination, including implicit rank,
+- [x] Prove reversible single-lane hash elimination, including implicit rank,
       terminal-free cache domain, tails, offsets and global bank/index bits.
-- [ ] RED/GREEN exact collision/race/wrap/clone tests for partial24 and narrow16.
+- [x] RED/GREEN exact collision/race/wrap/clone tests for partial24 and narrow16.
       Keep full32-bit publication sequence; pack proof with partial hash instead.
-- [ ] Bind candidate factories/accessors once cold. Preserve recursive algebra,
+- [x] Bind candidate factories/accessors once cold. Preserve recursive algebra,
       tactical guards, ordering, windows and proof transport. Define rank admission
       explicitly for16-byte identities; no outcome-based exceptions.
-- [ ] Check all100geometries via real ingress/transitions/cache tags and supported
+- [x] Check all100geometries via real ingress/transitions/cache tags and supported
       generic fallback. Independently validate small solved roots after return.
-- [ ] Verify generators/source identities/cycle ledger and actual JIT realization.
-- [ ] Fresh localhost native32 control at134217728shared/8388608private entries,
+- [x] Verify generators/source identities/cycle ledger and actual JIT realization.
+- [x] Fresh localhost native32 control at134217728shared/8388608private entries,
       six workers, all other retained settings. Test24,16-admission and mixed
       configurations causally. Record actual bytes and entries; never equate
       different memory configurations. Repeat/crossover promising candidates.
-- [ ] Document16-byte feasibility limits, rejected candidates and retained result.
-      Fresh final review, package only a qualified improvement; no main promotion
-      requested by this bounded investigation.
+- [x] Document16-byte feasibility limits, rejected candidates and retained result.
+      Final review recorded with the evidence. Full24 retained as an experimental
+      research candidate; production packaging/banked-profile qualification is
+      not complete and no main promotion was requested by this investigation.
 
 Review focus: omitted-word uniqueness is conditional on all other hash inputs;
 synthetic inconsistent rank/poisoned tails are outside the fast key contract and

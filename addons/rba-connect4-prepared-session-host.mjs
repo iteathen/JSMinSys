@@ -31,8 +31,8 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
   if(workerTargets!==null&&(!Array.isArray(workerTargets)||workerTargets.length!==workers))throw new RangeError('Invalid worker affinity target count');
   const compact=isCompactProfile8(geometry,geometry.keyWords),keyWords=compact?8:geometry.keyWords;
-  if(!['native32','partial24','partial16','partialMixed'].includes(cacheIdentity))throw RangeError('invalid TT identity experiment');
-  const partial=compact&&cacheIdentity!=='native32',mixed=partial&&cacheIdentity==='partialMixed',effectiveCacheIdentity=partial?cacheIdentity:'native32',partialEntryWords=cacheIdentity==='partial16'?4:6;
+  if(!['native32','partial24','partialMixed'].includes(cacheIdentity))throw RangeError('invalid TT identity experiment');
+  const partial=compact&&cacheIdentity!=='native32',mixed=partial&&cacheIdentity==='partialMixed',effectiveCacheIdentity=partial?cacheIdentity:'native32',partialEntryWords=6;
   if(localCacheLayout!=='split'&&localCacheLayout!=='native')throw new RangeError('invalid private TT layout');
   const localNative=localCacheLayout==='native'&&compact;
   if(localNative)validateConnect4CacheCapacity32(localCacheCapacity,16);

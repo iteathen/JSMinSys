@@ -107,6 +107,7 @@ test('partial24 concurrent colliding writers never lend another key a proof',asy
 });
 test('prepared partial24 integration binds caches before search and preserves generic fallback',async()=>{
  const {prepareLazySmpConnect4Rba32}=await import('../addons/rba-connect4-prepared-session-host.mjs');
+ await assert.rejects(prepareLazySmpConnect4Rba32({geometry:g,workers:2,cacheIdentity:'partial16'}),/invalid TT identity experiment/);
  const app=await prepareLazySmpConnect4Rba32({geometry:g,workers:2,sharedCacheCapacity:256,localCacheCapacity:256,
   sharedCacheLayout:'native',localCacheLayout:'native',sharedProofBounds:true,cacheIdentity:'partial24',
   supportBasisViews:true,supportBasisPlanBudgetBytes:2**30,supportClosurePlan:true,supportReflectionPlan:true,initializationTimeoutMs:30000});

@@ -1,0 +1,32 @@
+✖ prepared partial24 integration binds caches before search and preserves generic fallback (6.9892ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.3283
+
+✖ failing tests:
+
+test at test\rba-index-partial-cache.test.mjs:108:1
+✖ prepared partial24 integration binds caches before search and preserves generic fallback (6.9892ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /invalid TT identity experiment/. Input:
+  
+  'RangeError: partial TT requires native caches within one optimized bank'
+  
+      at async TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-index-partial-cache.test.mjs:110:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RangeError: partial TT requires native caches within one optimized bank
+        at prepareLazySmpConnect4Rba32 (file:///C:/r/jsminsys-cpc-rebuild-20261004/addons/rba-connect4-prepared-session-host.mjs:44:11)
+        at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/rba-index-partial-cache.test.mjs:110:23)
+        at async Test.run (node:internal/test_runner/test:1409:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    expected: /invalid TT identity experiment/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
