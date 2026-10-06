@@ -1,0 +1,61 @@
+{
+  "version": "0.2.0-rc.2",
+  "archive": "iteathen-isomax-0.2.0-rc.2.tgz",
+  "sha256": "26b1c5232ced8fa7c1e12f0bb3ccf0e6fd9c55788a7dab6caeab18e034d162e1",
+  "runtimeSourceCommit": "d2e4ccadcef6d67bc97a53679476e1ef6a5a9916",
+  "packagePreparationCommit": "85693be225fe0de86d708ba6c4c1a76ee7cdb4de",
+  "runtimeModules": 72,
+  "workerModules": 24,
+  "lockedFiles": 144,
+  "repositoryTests": {
+    "passed": 423,
+    "failed": 0
+  },
+  "packageTests": {
+    "passed": 46,
+    "failed": 0
+  },
+  "extractedSmoke": {
+    "columns": 1,
+    "rows": 4,
+    "workers": 4,
+    "status": "EXACT",
+    "rootWdl": 0,
+    "cleanup": true
+  },
+  "extractedFullSolve": {
+    "startingPosition": "empty",
+    "columns": 7,
+    "rows": 6,
+    "primaryWallMs": 55325.7796,
+    "initializationMs": 3866.1616999999997,
+    "cleanupMs": 14.046399999999267,
+    "status": "EXACT",
+    "rootWdl": 1,
+    "moveZeroBased": 3,
+    "workersReady": 4,
+    "workersExited": 4,
+    "cleanup": true,
+    "runtime": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K",
+    "affinity": [
+      0,
+      2,
+      4,
+      6
+    ],
+    "sharedTtBytes": 4294967296,
+    "privateTtBytesPerWorker": 268435456,
+    "compiledTransitionBytes": 466948881,
+    "peakRssBytes": 6913761280,
+    "processCpuMs": 210625,
+    "rawEvidenceDirectory": "evidence/isomax-overhead-fusion-20261005/promotion/extracted-full/"
+  },
+  "candidateMeanPrimaryMs": 53828.45145,
+  "goalMs": 10000,
+  "goalMet": false,
+  "runtimeCopiedWithoutChanges": true,
+  "registryPublished": false,
+  "caveat": "One standalone extracted packaging confirmation, not a new repeated optimization comparison. Primary excludes reusable initialization and cleanup. Current-run empty board, no RLC or prior solved knowledge."
+}
