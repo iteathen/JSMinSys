@@ -1,0 +1,570 @@
+✔ BranchManager is the minimal canonical JSMinSys manager base (1.9684ms)
+✔ future cancellation preserves completion published before its callback (8.4604ms)
+✔ file-worker argv filter removes only input-type mode (0.9828ms)
+✔ managed host completes, joins, and reports cleanup (42.1031ms)
+✔ managed host deadline fails closed and wakes a waiting worker (41.5534ms)
+✔ managed host cancellation and explicit failure preserve first error (14.3493ms)
+✔ unexpected worker exit fails the session (45.486ms)
+✔ metric and shared-byte helpers stay numeric and caller-owned (0.6471ms)
+✔ managed wait preserves completion published before waiting (0.2563ms)
+✔ managed deadline observes completion published between polls (0.9267ms)
+✔ managed wait supports deadlines beyond the Node timer limit (76.2145ms)
+✔ managed long deadline uses elapsed time after a delayed chunk (0.8474ms)
+✔ managed long deadline waits for the remaining chunk before failing (0.3403ms)
+✔ managed wait rejects poll intervals beyond the Node timer limit (0.7229ms)
+✔ managed long deadline cancellation clears the rearmed chunk (0.4445ms)
+✔ already-aborted cancellation keeps precedence over completed work (0.154ms)
+✔ managed wait returns an existing failure and removes abort listeners (0.143ms)
+✔ managed host joins workers after a thrown worker failure (163.1815ms)
+✔ closing an active managed wait settles it after publishing stop (2.8028ms)
+✔ closing an active cancelled wait preserves first error and joins workers (71.4203ms)
+✔ runtime-sized set and exact-key primitives exceed former fixed widths (1.3016ms)
+✔ runtime-sized skyline/product supports records wider than six words (0.4556ms)
+✔ runtime action-count reductions and dependency publication handle width ten (1.1455ms)
+✔ runtime packed-bit permutation spans more than three words (0.2642ms)
+✔ runtime-sized board transition supports 10x10 without packed-three-bit heights (0.2829ms)
+✔ live-line evaluator keeps only winning lines not blocked by the opponent (18.1999ms)
+✔ rank-local history requires an indexed array or typed array (3.9395ms)
+✔ rank-local history rejects lengths beyond board capacity before indexing (0.2437ms)
+✔ CPC per-column XOR parity equals literal future-event count on configured geometries (22.4316ms)
+✔ nonterminal CPC path matches checked evaluator after terminal assertion (37.8463ms)
+✔ projected CPC advisory collection is semantically inert and opt-in (16.3228ms)
+✔ CPC pooled-frontier response extends all-even pairing without counting omitted frontiers (400.1347ms)
+✔ CPC closes a forced block that lifts another opponent terminal singleton (0.9419ms)
+✔ CPC closes when every legal move lifts an opponent terminal singleton (0.8925ms)
+✔ CPC recognizes exact fork loss after enabling move (1.453ms)
+✔ CPC first-win ordering lets current immediate terminal supersede opponent fork (0.7906ms)
+✔ CPC alpha-beta uses live winning-line contribution for move ordering (13.7925ms)
+✔ CPC-only and CPC+Four-Front alpha-beta agree with independent exact oracle (485.1578ms)
+✔ CPC alpha-beta modes agree with independent late standard-7x6 oracle (198.0178ms)
+✔ multi-action preemption count implies <=32-column mask support (9.6168ms)
+✔ CPC fork precursor restricts current defense without recursion (5.8453ms)
+✔ CPC intersects alternative fork-precursor preemption sets (6.4578ms)
+✔ cold CPC ledger accounts for every actual scratch array and object field (2.8191ms)
+✔ terminal CPC ledger counts actual writes and delegation has no wrapper scratch writes (0.543ms)
+{"kind":"c58-common-matching-exhaustive-small-physical-policy","checked":32280,"positive":13806,"nonloss":13534,"newPositive":8}
+{"kind":"cpc-response-general-physical-policy","checked":9532,"positive":700,"nonloss":666}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (211.7876ms)
+✔ common-matching CPC equals independently enumerated physical policies and exact bounded game (473.7792ms)
+✔ common matching preserves guards, offsets, physical frames and large-width fallback (2430.8945ms)
+✔ matching constraints require one common policy, not separate blockers (0.7132ms)
+✔ all eight actual worker variants bind the common-policy response capability (1.9768ms)
+{"kind":"cpc-response-exhaustive-small-physical-policy","checked":32280,"positive":13798,"nonloss":13526}
+{"kind":"cpc-response-general-physical-policy","checked":9532,"positive":688,"nonloss":660}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (242.5875ms)
+✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (382.7061ms)
+✔ prepared CPC preserves literal policy across general geometry, frames and support (1483.7754ms)
+{"kind":"cpc-exhaustive-small-physical-policy","checked":32280,"positive":272}
+{"kind":"cpc-general-physical-policy","checked":7666,"positive":34}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (409.0252ms)
+✔ prepared CPC equals literal guarded policy and physical exact game on bounded carriers (390.5605ms)
+✔ prepared CPC preserves literal policy across general geometry, frames and support (1131.9115ms)
+{"name":"rba-connect4-lazy-smp-worker-minimal","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs","cases":1600}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32","cases":1600}
+✔ rba-connect4-lazy-smp-worker-minimal intersects CPC response bounds soundly with every original window (1031.7848ms)
+✔ rba-connect4-lazy-smp-worker-minimal-local32 intersects CPC response bounds soundly with every original window (1371.4735ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs intersects CPC response bounds soundly with every original window (1313.1336ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 intersects CPC response bounds soundly with every original window (1414.3553ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center intersects CPC response bounds soundly with every original window (1782.4494ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-local32 intersects CPC response bounds soundly with every original window (1329.4835ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs intersects CPC response bounds soundly with every original window (1428.901ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 intersects CPC response bounds soundly with every original window (1126.4946ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views intersects CPC response bounds soundly with every original window (715.302ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-local32 intersects CPC response bounds soundly with every original window (710.5509ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs intersects CPC response bounds soundly with every original window (612.7074ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 intersects CPC response bounds soundly with every original window (564.771ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center intersects CPC response bounds soundly with every original window (498.5013ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 intersects CPC response bounds soundly with every original window (617.3913ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs intersects CPC response bounds soundly with every original window (512.0778ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 intersects CPC response bounds soundly with every original window (417.0414ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled intersects CPC response bounds soundly with every original window (495.4914ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-local32 intersects CPC response bounds soundly with every original window (443.6991ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs intersects CPC response bounds soundly with every original window (436.0394ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32 intersects CPC response bounds soundly with every original window (416.4467ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center intersects CPC response bounds soundly with every original window (413.9947ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32 intersects CPC response bounds soundly with every original window (486.6379ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs intersects CPC response bounds soundly with every original window (420.3239ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32 intersects CPC response bounds soundly with every original window (420.6942ms)
+{"kind":"cpc-target-exhaustive-small-physical-policy","checked":32280,"positive":240,"added":144}
+{"kind":"cpc-target-general-physical-policy","checked":8754,"positive":58,"added":40}
+✔ target-reservoir CPC equals literal guarded policy and physical exact game on bounded carriers (394.0453ms)
+✔ target-reservoir CPC preserves literal policy across general geometry, frames and support (2506.3535ms)
+✔ CPC proves a whole-reservoir response-parity win without WDL side channels (19.055ms)
+✔ CPC leaves an unclosed reservoir unresolved (7.9283ms)
+✔ CPC module surface is win-only rather than WDL/bound/restriction closure (0.2356ms)
+✔ CPC win kernel has no fixed standard-board width escape hatch (4.2619ms)
+✔ CPC does not promote a proved no-win bound into a win (1.3252ms)
+✔ legacy NDC adapter consumes only the positive CPC win certificate (11.5994ms)
+✔ Negamax consumes CPC win closure as the winning move value (59.274ms)
+✔ CPC reservoir proof has no arbitrary standard-width cap (3.0468ms)
+✔ known forbidden triggers are rejected before pair bookkeeping (2.9081ms)
+{"name":"rba-connect4-lazy-smp-worker-minimal","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs","cases":360}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32","cases":360}
+✔ rba-connect4-lazy-smp-worker-minimal keeps early pair-hub wins as exact certificates in every window (282.8758ms)
+✔ rba-connect4-lazy-smp-worker-minimal-local32 keeps early pair-hub wins as exact certificates in every window (245.3049ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs keeps early pair-hub wins as exact certificates in every window (243.6365ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 keeps early pair-hub wins as exact certificates in every window (229.0748ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center keeps early pair-hub wins as exact certificates in every window (423.2737ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-local32 keeps early pair-hub wins as exact certificates in every window (193.0869ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs keeps early pair-hub wins as exact certificates in every window (297.2081ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (285.6671ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views keeps early pair-hub wins as exact certificates in every window (236.7135ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-local32 keeps early pair-hub wins as exact certificates in every window (266.4469ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs keeps early pair-hub wins as exact certificates in every window (271.8133ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 keeps early pair-hub wins as exact certificates in every window (254.6761ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center keeps early pair-hub wins as exact certificates in every window (240.4206ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 keeps early pair-hub wins as exact certificates in every window (297.5126ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs keeps early pair-hub wins as exact certificates in every window (271.1464ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (232.1311ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled keeps early pair-hub wins as exact certificates in every window (312.3416ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-local32 keeps early pair-hub wins as exact certificates in every window (422.8859ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs keeps early pair-hub wins as exact certificates in every window (396.5058ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32 keeps early pair-hub wins as exact certificates in every window (240.7758ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center keeps early pair-hub wins as exact certificates in every window (257.3148ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32 keeps early pair-hub wins as exact certificates in every window (320.5749ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs keeps early pair-hub wins as exact certificates in every window (341.7541ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32 keeps early pair-hub wins as exact certificates in every window (180.1066ms)
+{"kind":"cpcx-pair-hub-physical-proof","checked":32986,"positive":910,"literalPositive":860,"forcedCases":2589,"seed":-1391019751}
+✔ CPCX pair hub prepares native endpoint fields without a board-size fork (4.2623ms)
+✔ pair hub rejects duplicate demands, unsupported completion and exposed counterwin (0.4576ms)
+✔ CPCX pair hub positives pass independent physical reply proofs and general frames (3499.801ms)
+{"kind":"cpcx-singleton-header-predicate-agreement","checked":9378,"flags":520,"forced":1558,"seed":1289385682}
+✔ singleton tactical header has distinct native mask words and frame lifetimes (1.7754ms)
+✔ singleton tactical header equals current exact C01 C05 predicates on admitted dimensions (990.1436ms)
+✔ diagnostic forwards the requested basis-view flag to the actual solver entry point (73.5865ms)
+✔ generated search ledger distinguishes insertion shifts and stop checks (17.224ms)
+✔ historical IsoMax archive, configuration, and measured artifacts remain frozen (26.4384ms)
+✔ frozen calculator computes its prefix and stops before the sixth move (40.1972ms)
+✖ current package is the immutable retained kernel with canonical support-library bindings (28.581ms)
+✖ promoted package selects the measured minimal four-worker configuration (2.6168ms)
+✔ Connect4 exports Lazy SMP without the retired shared-work scheduler (1.2884ms)
+✔ native worker execution cannot reenter cold ingress (5.7685ms)
+✔ ManagedThreadSession is the canonical managed host lifecycle object (1.7832ms)
+NEUTRAL_QUOTIENT_AUDIT {"states":161029,"neutralClasses":42168,"rbaQClasses":34461,"neutralMultiQ":0,"qMultiNeutral":15182,"physicalCollapsedByQ":13526,"nonterminalCollapsedByQ":13259,"maxQPerNeutral":1,"maxNeutralPerQ":84,"maxPhysicalPerQ":5336,"witness":{"q":"4,4,4,4,66,0,0","neutral":"4,4,4,4,:","physical":["16:4,4,4,4,:0001111000011101","16:4,4,4,4,:0001111000011110"]},"nonterminalWitness":{"q":"4,4,4,3,60,0,0","neutral":"4,4,4,3,:","physical":["15:4,4,4,3,:000111100001110_","15:4,4,4,3,:000111010010110_"]}}
+✔ audit neutral-token quotient against current RBA q on exhaustive 4x4 legal states (4017.9804ms)
+✔ 49-bit position code matches independent board encoding and reflection (1.3086ms)
+✔ 49-bit position code is collision-free across all gravity-valid sequences through ply 6 (790.9825ms)
+✔ RBA root reflection carries the same canonical physical position code for mirrored roots (2.6846ms)
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"seed":70368301,"solvedOutcomesQueried":false}
+✔ fast physical transitions and canonical reflection across all100 dimensions1..10 (11811.6036ms)
+✔ complete view preparation admits all four workers without position work (320.8271ms)
+✔ basis-view admission falls back cleanly when complete plans are absent (227.5358ms)
+✔ view option rejects non-Boolean and legacy requests before execution (1.7696ms)
+✔ view worker preserves first-win and full-board roots without a basis read (357.4002ms)
+✔ immutable view preserves the actual sparse removal profile (14.6115ms)
+{"kind":"C44-view-recursion-canonical-proof-frame","checks":18092,"nested":32564,"reflections":12030,"seed":2043095904}
+✔ view native/span and nested/sibling recursion transport one canonical handle into proof frames (7297.8099ms)
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"viewChildren":16504,"viewReflections":9660,"seed":70368301,"solvedOutcomesQueried":false}
+✔ immutable support views reproduce physical transitions and reflection across all100 dimensions (12732.3965ms)
+✔ root support view rejects reordered or truncated nonterminal ingress and accepts terminal unused basis (1.7018ms)
+✔ invalid oversized capacities are rejected before any shared allocation (1.9008ms)
+✔ local capacity is checked before shared geometry or TT allocation (2.591ms)
+✔ native key-view lengths are validated before attempting allocation (0.2717ms)
+✔ completed principal upset absorbs later images without repeated expansion (93.5034ms)
+✔ absorbed native transitions match physical residuals across players, bases and profiles (2165.6421ms)
+✔ cofactor ignores non-basis coordinate tail bits and preserves empty owner channels (71.2243ms)
+✔ compiled preparation and resource fallback both release four workers without position work (4552.9086ms)
+✔ public prepared session reuses supplied compiled geometry without inflating resource reporting (211.0875ms)
+{"kind":"C66-compiled-recursion-canonical-proof-frame","checks":12073,"nested":21604,"reflections":8000,"seed":615236014}
+✔ compiled planes native/span and nested/sibling recursion transport one canonical handle into proof frames (9799.6962ms)
+{"images":2142231,"dead":54516,"stable":1794440,"bit31":29534}
+✔ native transition slots and stability match independent enumerated child rows (507.3745ms)
+✔ native slot sentinel widths adapt to declared basis bounds before allocation (2.721ms)
+✔ compiled plan reuse preserves buffers and accounts only reachable transition planes (3.0294ms)
+✔ geometry derives different native carrier sizes for 4x4 and 10x10 (55.6228ms)
+✔ configured winning geometry implies singleton residual id equals physical cell (17.8814ms)
+✔ known-legal cofactor matches checked ingress after caller assertions (8.5006ms)
+✔ configured RBA coordinates match independent physical residuals on 4x4 and 10x10 (37.6264ms)
+✔ configured reflection canonicalizes mirrored 4x4 and 10x10 roots identically (12.2692ms)
+✔ configured four-front bounds match independent physical propagation (145.3273ms)
+✔ init-time specialization profile selects fast paths without changing semantics (65.1839ms)
+✔ shared exact cache publishes only fully committed exact rows (1.3788ms)
+✔ shared exact known-hash path retains full-key validation (0.1944ms)
+✔ standard 7x6 shared exact cache uses lossless compact identity (16.4218ms)
+✔ non-7x6 shared exact cache retains full-key identity (1.6323ms)
+✔ Lazy SMP is a separate 2+ worker exact execution option (104.4842ms)
+✔ Lazy SMP rejects single-worker execution and is the sole Connect4 parallel composition (17.5598ms)
+✔ Lazy SMP matches serial CPC-Negamax on a standard 7x6 late position (84.0734ms)
+✔ sharing-density masks preserve exact Lazy SMP results (1029.5908ms)
+✔ Lazy SMP move ordering is center-line distance only (175.9716ms)
+✔ Lazy SMP workers diversify only equal center-distance ties (192.3197ms)
+✔ minimal Lazy SMP worker rejects legacy-only controls (2.208ms)
+✔ Lazy SMP rejects unknown worker mode (0.8877ms)
+✔ minimal worker never publishes local bounds to shared exact cache (184.1546ms)
+✔ minimal worker omits hot diagnostic counters (147.7409ms)
+✔ minimal timeout is host-terminated without recursive polling (216.9468ms)
+✔ pre-aborted minimal call allocates no workers (6.3856ms)
+✔ minimal four-worker search returns after an immediate winning center move (195.6581ms)
+✔ minimal four-worker search finds an off-center immediate win before descending (1568.9537ms)
+✔ empty residual geometry still reserves a support handle output slot (14.562ms)
+✔ private cache packs epoch and value into one exact uint32 tag (50.1546ms)
+✔ standard 7x6 private exact/bound cache uses lossless compact identity (9.3765ms)
+✔ non-7x6 private cache retains full-key identity (1.0784ms)
+✔ a recursive fail-high win publishes exact current-q WDL (306.8683ms)
+✔ an exact loss remains cacheable when structural closure resolves before recursion (4.1118ms)
+✔ directed narrow windows and cached q values agree with an independent physical 4x4 oracle (172.8373ms)
+{"kind":"physical-propagated-no-immediate-win","recursiveChildChecks":58713}
+✔ RBA immediate winning column matches physical rules across dimensions and frames (234.8961ms)
+✔ actual proof view cache reuses mover, center=false native=false (16.0496ms)
+✔ actual proof view cache reuses mover, center=false native=true (42.4264ms)
+✔ actual proof view cache reuses mover, center=true native=false (6.0617ms)
+✔ actual proof view cache reuses mover, center=true native=true (13.8476ms)
+✔ three-word live update matches general update in-place and disjoint (17.4105ms)
+✔ live-line ordering equals physical line counts across frames and dimensions (73.0479ms)
+✔ private native proof records allocate cold and preserve all exact compact key lanes (15.8823ms)
+✔ private native allocation refuses unsupported profiles and invalid capacities before allocation (39.8469ms)
+✔ private layout is selected cold for the geometry and all four workers agree on exact results (1279.4657ms)
+✔ packed move-row geometry guard is exact and conservative (1.5306ms)
+✔ packed move rows preserve maximum fields and stable score ties (0.4119ms)
+✔ prepared solver uses packed recursive rows but keeps root row as columns (33.1735ms)
+✔ nonwinning prepared cofactors match physical transitions under the explicit precondition (2537.1292ms)
+✔ optional and generated prepared/dense cofactors match independent physical residuals (627.2815ms)
+✔ dense kernel uses the cold removal table directly and preserves last-cell terminal precedence (43.4278ms)
+✔ prepared module canonicalization exports retain selectedSet and offset behavior (89.552ms)
+✔ prepared-only canonicalization matches the optional API without selected-set work (59.6879ms)
+✔ prepared native fields preserve exact keys, collisions and all proof tags (16.142ms)
+✔ prepared empty solve waits for all four workers and preserves the exact result (458.4614ms)
+✔ prepared empty boundary rejects nonempty positions and legacy workers (1.4213ms)
+✔ native private view workers preserve explicit native and split shared layouts (17233.2289ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (201.7606ms)
+✔ application preparation allocates all four workers but performs no search (266.4728ms)
+✔ closing an idle prepared application joins workers without a solve (110.295ms)
+✔ ordinary minimal API also waits for every worker before search (250.6556ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (1.009ms)
+✔ closing an active prepared search resolves its result and joins every worker (288.183ms)
+✔ fixed 3/6/8 word set operations preserve bit-31 and lane boundaries (2.2128ms)
+✔ six-word skyline insert rejects dominated candidates and removes dominated retained generators (0.3554ms)
+✔ streamed six-word join product absorbs the Cartesian product immediately (0.3778ms)
+✔ eight-word locator, exact probe/publication and span publication preserve exact identity (0.3525ms)
+✔ exact interval tightening and fixed-degree Bellman reductions remain monotone (0.2849ms)
+✔ ordered basis transform deduplicates mapped IDs and three-word permutation remaps active bits (0.3703ms)
+✔ seven-slot masks stay inside seven bits (0.1918ms)
+✔ intrusive stamped work list supports coalescing, arbitrary removal and generation validation (0.2961ms)
+✔ layout preserves exact semantic equality at forced collisions and nonzero offsets (3.4768ms)
+✔ public layout APIs preserve optional full-q locator and no-geometry full-span identity (3.7027ms)
+✔ uncounted binding keeps reporting untouched while counted busy writes are reported (0.6979ms)
+✔ zero sequence after rollover remains a miss and later publication restores visibility (0.3943ms)
+✔ attachment repairs cloned/truncated views without copying and rejects wrong backing (1.0438ms)
+✔ native heights preserve both sides of uint8 and uint16 field boundaries (0.2944ms)
+✔ layout sizing rejects unsafe or aliased capacities before allocating (0.3418ms)
+✔ attachment rejects malformed cloned layout offsets before permitting overlapping atomic fields (0.3864ms)
+✔ concurrent compact/direct/full-span writers never return another exact key value (801.578ms)
+✔ native layout is selected once at initialization with four ready workers (675.89ms)
+✔ invalid native halfword capacity rejects before any shared allocation (11.0351ms)
+✔ native memory accounting counts aliased TT backing once (411.6868ms)
+✔ both layout owners clean up idle, active and aborted applications (1085.2404ms)
+✔ automatic layout uses qualified 7x6 storage and preserves generic storage (589.4424ms)
+✔ concurrent proof writers cannot associate another key with a bound (416.9522ms)
+✔ zero-bound transport preserves exact tags and reverses the inequality for owner1 (0.7164ms)
+✔ proof storage retains exact key comparison, both bound tags and uncounted protocol across dimensions (14.3869ms)
+✔ prepared grouped supersets are exact across configured geometry and global word 255 (717.0677ms)
+✔ public cofactors preserve optional scratch, seen offsets, physical residuals and terminal ordering (153.7939ms)
+✔ last-cell singleton wins still precede full-board draws (3.0827ms)
+✔ shared support plans reproduce independently enumerated physical residual bases (570.1132ms)
+✔ support-plan admission handles generic widths and returns a cold budget fallback (117.7464ms)
+✔ closure-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (6313.7607ms)
+✔ four-worker host admits a complete closure plan or falls back cold without changing exact semantics (177.2778ms)
+✔ support closure masks equal independent cell-subset enumeration on every admitted small support (612.9062ms)
+✔ cold-selected three-word/general closure OR preserves owner isolation and offset guards (0.5915ms)
+✔ closure basis loading builds exact inverse in the same pass without clearing unrelated scratch (8.0406ms)
+{"kind":"C63-handle-recursion-canonical-proof-frame","checks":18092,"nested":32564,"reflections":12030,"seed":2043095904}
+✔ view native/span and nested/sibling recursion transport one canonical handle into proof frames (6395.1508ms)
+{"kind":"fast100-dimension-rule-transition-check","geometries":100,"states":2721,"children":22230,"plans":59,"viewChildren":24756,"viewReflections":14490,"seed":70368301,"solvedOutcomesQueried":false}
+✔ incremental support handles reproduce physical transitions and reflection across all100 dimensions (9564.7117ms)
+✔ root support view rejects reordered or truncated nonterminal ingress and accepts terminal unused basis (1.5878ms)
+✔ known-handle loader never scans child heights or copies shared basis (0.9047ms)
+✔ support-planned cofactors preserve original projection, reflection frames, poisoned scratch and first-terminal ordering (3413.7672ms)
+✔ four-worker host admits a complete plan or falls back cold without changing exact semantics (389.7917ms)
+{"checks":582,"ties":36,"reflections":266}
+✔ cofactor handle drives exact reflection with owner ties, offsets and poisoned unused scratch (3193.1242ms)
+✔ four-worker reflection plan has cold budget fallback and clean exact result (414.4763ms)
+✔ support reflection maps equal physical cell reflection and form an involution on every small profile (798.6579ms)
+✔ uncounted cache preserves exact keys and seqlock with untouched reporting words (56.0792ms)
+✔ uncounted cache is generated from the counted protocol with reporting alone removed (346.2201ms)
+✔ immutable cofactor IDs are charged at their actual native width (2.048ms)
+✔ shared tactical consumers distinguish basis IDs from uint32 state reads (0.4578ms)
+{"kind":"C54-actual-canonical-support-frame","checked":9950,"reflections":1273,"seed":-663184620}
+✔ actual closure and reflection publish the exact canonical frontier support handle (2863.8507ms)
+{"name":"rba-connect4-lazy-smp-worker-minimal","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-proofs-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-center-proofs-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-proofs-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs","cases":560}
+{"name":"rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32","cases":560}
+✔ rba-connect4-lazy-smp-worker-minimal consumes residual frontier tags with sound windows and root exclusion (467.6377ms)
+✔ rba-connect4-lazy-smp-worker-minimal forwards current-run stores and exact draw joins to the same frame (2.8886ms)
+✔ rba-connect4-lazy-smp-worker-minimal-local32 consumes residual frontier tags with sound windows and root exclusion (543.1944ms)
+✔ rba-connect4-lazy-smp-worker-minimal-local32 forwards current-run stores and exact draw joins to the same frame (2.1345ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs consumes residual frontier tags with sound windows and root exclusion (434.5631ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs forwards current-run stores and exact draw joins to the same frame (1.2042ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (569.2295ms)
+✔ rba-connect4-lazy-smp-worker-minimal-proofs-local32 forwards current-run stores and exact draw joins to the same frame (9.4936ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center consumes residual frontier tags with sound windows and root exclusion (368.17ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center forwards current-run stores and exact draw joins to the same frame (1.2568ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-local32 consumes residual frontier tags with sound windows and root exclusion (492.0042ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-local32 forwards current-run stores and exact draw joins to the same frame (1.6021ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs consumes residual frontier tags with sound windows and root exclusion (266.4307ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs forwards current-run stores and exact draw joins to the same frame (1.2351ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (267.4304ms)
+✔ rba-connect4-lazy-smp-worker-minimal-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.1458ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views consumes residual frontier tags with sound windows and root exclusion (235.8596ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views forwards current-run stores and exact draw joins to the same frame (1.1244ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-local32 consumes residual frontier tags with sound windows and root exclusion (233.7215ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-local32 forwards current-run stores and exact draw joins to the same frame (0.866ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs consumes residual frontier tags with sound windows and root exclusion (234.3618ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs forwards current-run stores and exact draw joins to the same frame (1.3634ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (299.69ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.2115ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center consumes residual frontier tags with sound windows and root exclusion (226.6416ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center forwards current-run stores and exact draw joins to the same frame (1.0952ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 consumes residual frontier tags with sound windows and root exclusion (214.9838ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-local32 forwards current-run stores and exact draw joins to the same frame (0.8213ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs consumes residual frontier tags with sound windows and root exclusion (220.8219ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs forwards current-run stores and exact draw joins to the same frame (1.0567ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (192.4813ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.0603ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled consumes residual frontier tags with sound windows and root exclusion (188.0096ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled forwards current-run stores and exact draw joins to the same frame (1.0044ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-local32 consumes residual frontier tags with sound windows and root exclusion (196.922ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-local32 forwards current-run stores and exact draw joins to the same frame (0.7479ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs consumes residual frontier tags with sound windows and root exclusion (168.1234ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs forwards current-run stores and exact draw joins to the same frame (0.9934ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (190.6008ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.0456ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center consumes residual frontier tags with sound windows and root exclusion (193.6142ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center forwards current-run stores and exact draw joins to the same frame (0.7463ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32 consumes residual frontier tags with sound windows and root exclusion (212.7092ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32 forwards current-run stores and exact draw joins to the same frame (2.4928ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs consumes residual frontier tags with sound windows and root exclusion (249.3856ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs forwards current-run stores and exact draw joins to the same frame (1.1594ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32 consumes residual frontier tags with sound windows and root exclusion (167.7287ms)
+✔ rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32 forwards current-run stores and exact draw joins to the same frame (1.1663ms)
+{"kind":"C54-native3-span-boundary-agreement","checked":15520,"counts":97,"seed":-1340818355}
+✔ residual proof frontier cold admission, native dimensions and frame transport (9.0433ms)
+✔ residual threshold transfer preserves both gauges, bit31 and poisoned tails (7.8187ms)
+✔ frontier replacement retains broad proofs and isolates exact support collisions (8.258ms)
+✔ generated native3 frontier equals span authority at every valid count and mask boundary (54.6235ms)
+✔ selected hot closure stays allocation/string/experiment-free (48.0951ms)
+✔ hot structural detector rejects representative negative controls (4.6ms)
+✔ native frontier closes the same root WDL across configured geometry and reflection (707.7769ms)
+✔ incomplete frontier cancellation publishes no WDL and reused state can solve (16.7896ms)
+✔ direct Lazy SMP frontier host preserves exact closure, counters and timeout cleanup (487.2319ms)
+✔ worker attachment restores a truncated full-buffer view without copying storage (1.0764ms)
+✔ worker attachment rejects wrong backing size rather than fabricating capacity (0.3639ms)
+✔ word32 bit blocks (1.7402ms)
+✔ first set bit index (0.2437ms)
+✔ popcount32 (0.168ms)
+✔ signed bit-pattern profile (0.192ms)
+✔ subset32 (0.1728ms)
+✔ two-lane wordwise blocks (0.8915ms)
+✔ single-required-lane containment matches two-lane containment (0.1871ms)
+✔ packed support can replace duplicate height storage (0.1836ms)
+✔ guarded metadata prefix projects without scanning later words (0.2235ms)
+✔ indexed and table blocks (0.4919ms)
+✔ sentinel triple probe folds occupancy into exact key storage (0.2539ms)
+✔ scalar two-word interner probe preserves producer-owned exact keys (0.193ms)
+✔ run-grouped indexed word reuse preserves exact values (0.1686ms)
+✔ caller-owned residual frame restores parent without history loads (0.1099ms)
+✔ apply and undo support state (0.2161ms)
+✔ caller-owned ply transition profiles match state-owned transition mechanics (0.4357ms)
+✔ known-cell apply profiles reuse an already observed landing cell (0.3591ms)
+✔ known-cell undo profiles reuse the cell returned by apply (0.3251ms)
+✔ known-cell undo prepared top-row boundary (0.089ms)
+✔ caller-ply odd-center omission fully packs eligible one-lane state (0.3828ms)
+✔ omitted-center specialized transition skips zero support work (0.4413ms)
+✔ caller-ply odd-center omission compresses 7x6 transition state (0.3722ms)
+✔ general packed support+ply transitions match separate state (0.3502ms)
+✔ packed support+ply transition profile preserves support-only reflection boundary (0.3267ms)
+✔ rank-low packed support+ply layout keeps extraction cheap (0.1812ms)
+✔ packed high-playable meta state matches separate two-lane state (0.3853ms)
+✔ fully packed one-lane state matches separate transition state (0.2675ms)
+✔ caller-carried meta restores support/high by recursive ownership (0.3182ms)
+✔ one-lane caller meta makes known-cell undo landing-only (0.2093ms)
+✔ exact ten-slot tuple hash matches generic separable builder (3.6053ms)
+✔ separable tuple hash updates from exact slot deltas (2.6212ms)
+✔ joint two-word direct index covers structured power-of-two buckets (0.8145ms)
+✔ triple key publication hashes live scalars without scratch reload (0.3214ms)
+✔ joint triple locator mixes exact-key coordinates without becoming identity (0.8213ms)
+✔ direct triple power-of-two index preserves primary collision partition (2.7629ms)
+✔ primary canonical comparison routes expensive secondary work (0.1755ms)
+✔ mix and reflection blocks (0.6656ms)
+✔ exact C3/C4 reflection tables match direct reference (0.7994ms)
+✔ configured packed-3 register reflection profiles (9.52ms)
+✔ 5-column reflection fused final alignment preserves edge fields (0.2699ms)
+✔ 9/10-column reflection fused final alignment preserves edge fields (0.115ms)
+✔ prepared 6/7 packed reflection shifts match direct reflection (0.487ms)
+✔ frontier normalization blocks (0.1898ms)
+✔ signed frontier normalization profiles (0.1553ms)
+✔ one-lane signed frontier normalization profiles (0.1359ms)
+✔ lazy frontier compaction skips accepted-prefix rewrites (0.381ms)
+✔ lazy frontier normalizers seed the first accepted entry (0.1387ms)
+✔ unsigned lazy frontier profiles preserve bit-31 semantics (0.3164ms)
+✔ search scalar blocks (0.2038ms)
+✔ two-lane shifts and arithmetic (0.314ms)
+✔ two-lane set iteration and cardinality (0.1736ms)
+✔ sparse exact popcount profiles (0.1582ms)
+✔ two-lane popcount fused at nibble stage (0.1163ms)
+✔ three-lane popcount fused at nibble stage (0.1131ms)
+✔ 10-bit high-lane popcount table profile (0.2458ms)
+✔ configured exact selectors cover runtime candidate counts 2 through 10 (0.4331ms)
+✔ scalar-producer selectors cover runtime candidate counts 2 through 10 (0.3067ms)
+✔ move-slot index space removes hot physical-column remap (0.1891ms)
+✔ isolated-bit clear profiles reuse caller isolation (0.0767ms)
+✔ isolated-bit index profiles reuse caller isolation (0.0722ms)
+✔ one-lane cardinality classification (0.0577ms)
+✔ known landing cell legality reuses observed state (0.0535ms)
+✔ trusted legality and coordinate reference decode (0.2832ms)
+✔ capacity helpers and overwrite rehash (0.1786ms)
+✔ atomic blocks (0.1786ms)
+✔ bounded shared queue blocks without waiting (0.2328ms)
+✔ queue dequeue ready sequence is int32-normalized across wrap (0.1545ms)
+✔ caller-owned queue positions remove reservation CAS (0.9497ms)
+✔ owned queue next-position profiles reuse publication increment (0.201ms)
+✔ owned blocking queue positions remove reservation RMW (0.1991ms)
+✔ typed capacity allocation (0.1043ms)
+✔ high-lane apply and undo derives masks without lookup tables (0.0962ms)
+✔ runtime-configured 4x4 transition (0.0901ms)
+✔ bit-31 transition survives typed-store coercion (0.0768ms)
+✔ one-lane full-column transition (0.0824ms)
+✔ nonblocking queue try paths (0.1391ms)
+✔ performance targets distinguish SMT siblings, efficiency classes and processor groups (38.302ms)
+✔ malformed topology never silently supplies a placement (1.092ms)
+✔ prepared behavior worker reads every publication including extended unsigned words (11.092ms)
+✔ real search worker observes strategist stop published after search has begun (179.2287ms)
+✔ Lazy SMP host selects optional per-node worker and returns interruption without WDL (151.243ms)
+✔ retiring one optional worker leaves the other worker able to solve (143.6138ms)
+✔ mid-search cancellation preserves exact-cache semantics and a cleared flag permits a new solve (88.3837ms)
+✔ optional search consumes stop at its first completed node and never returns WDL (2.5659ms)
+✔ zero-flags optional search preserves exact value, move and visited-node count (30.7149ms)
+✔ standard 7x6 optional search preserves all baseline metrics and observes every completed q (23.3955ms)
+✔ in-flight extended publication defers then applies STOP at the next coherent node boundary (3.1443ms)
+✔ flag-free Worker stays minimal; behavior variant is explicitly selected (3.0115ms)
+✔ one-word read never reads a version or extension and never writes shared memory (0.3359ms)
+✔ extension chain supports sparse four-word flags, truncation and all 124 payload bits (0.2552ms)
+✔ overlapping extension publication defers without retry or modifying prior private snapshot (0.168ms)
+✔ a completed publication during extension reading cannot mix two flag sets (0.6777ms)
+✔ publication before the version bracket rereads primary for every new chain length (0.4923ms)
+✔ one-word checkpoint performs exactly one shared read (0.2039ms)
+✔ cold writer rejects invalid flags/index/storage and version exhaustion before mutation (0.4395ms)
+✔ real reader worker observes complete extended generations while strategist publishes (148.6882ms)
+✔ Worker is the minimal canonical JSMinSys worker base (1.8901ms)
+✔ worker take establishes ownership and lazily skips resolved/retired rows (1.6233ms)
+✔ worker take rejects stale generation/ownership before touching the list (0.1954ms)
+✔ resolved publication orders value before marker and validates owned work separately (0.3213ms)
+✔ dependency publication carries fixed rows and retained handoff claims first runnable child (0.341ms)
+✔ wake observe/signal/park and stop/done primitives compose without hidden policy (0.328ms)
+ℹ tests 423
+ℹ suites 0
+ℹ pass 421
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21585.7761
+
+✖ failing tests:
+
+test at test\isomax-library-binding.test.mjs:6:1
+✖ current package is the immutable retained kernel with canonical support-library bindings (28.581ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'd2e4ccadcef6d67bc97a53679476e1ef6a5a9916'
+  - 'ea4fd8bc49481c92a2b92344108c3af4567a506b'
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/isomax-library-binding.test.mjs:8:9)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'd2e4ccadcef6d67bc97a53679476e1ef6a5a9916',
+    expected: 'ea4fd8bc49481c92a2b92344108c3af4567a506b',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\isomax-promotion-package.test.mjs:5:1
+✖ promoted package selects the measured minimal four-worker configuration (2.6168ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '0.2.0-rc.2'
+  - '0.2.0-rc.1'
+              ^
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/isomax-promotion-package.test.mjs:7:9)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '0.2.0-rc.2',
+    expected: '0.2.0-rc.1',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

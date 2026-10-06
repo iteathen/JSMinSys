@@ -1,4 +1,4 @@
-# IsoMax 0.2.0-rc.1
+# IsoMax 0.2.0-rc.2
 
 Start here. This folder contains the current promoted solver, its configuration, launchers, dependencies, tests and evidence. No npm install or manual file assembly is needed. Keep this folder together, or extract the matching archive from [dist/](dist/).
 
@@ -12,9 +12,9 @@ node run.mjs --help
 node run.mjs
 ```
 
-The last command solves the **empty 7×6 board** with four minimal deep workers. It applies the retained 2400/9600 JIT settings before process initialization. Default TT allocation: **4 GiB shared + 256 MiB per worker**, plus geometry/support plans; observed peak RSS about **6 GiB**. No opening book, solved table, prior-run cache, fixed opening or RLC is used by this default path.
+The last command solves the **empty 7×6 board** with four minimal deep workers. It applies the retained 2400/9600 JIT settings before process initialization. Default TT allocation: **4 GiB shared + 256 MiB per worker**, plus geometry/support plans. Compiled transitions add **445 MiB** when admitted within their 512 MiB auxiliary budget; observed peak RSS is **6.44 GiB**. No opening book, solved table, prior-run cache, fixed opening or RLC is used by this default path.
 
-The recorded i5-12600K runs average **56.893 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. Initialization and cleanup are reported separately. The 10-second objective remains unmet. Normal portable execution is unpinned and has no timing qualification.
+The recorded i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**. Initialization and cleanup are reported separately. The 10-second objective remains unmet. Normal portable execution is unpinned and has no timing qualification.
 
 For the exact measured Windows machine and runtime, use PowerShell 7:
 
@@ -66,8 +66,8 @@ The optional exported rank-local calculator remains separate; using it changes t
 - run-i5.ps1 / targets.json: measured Windows affinity.
 - profile.json: exact retained settings and timing boundary.
 - provenance.json / verify.mjs: SHA-256 identities and closure checks.
-- runtime/: immutable dependencies copied from ea4fd8b.
+- runtime/: immutable dependencies copied from d2e4cca, including the reviewed compiled-plan reuse correction.
 - evidence/: raw retained measurements and qualification summaries.
-- dist/: transferable packages; older rc.2/rc.3 archives are historical.
+- dist/: the current 0.2.0-rc.2 transferable archive; earlier versions are historical.
 
 Maintainers can reproduce with node prepare.mjs and check with node prepare.mjs --check in a full Git checkout. Source is AGPL-3.0-only. This is a repository distribution; npm registry publication remains disabled. Older package implementations remain in Git history.

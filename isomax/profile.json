@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0-rc.1",
-  "sourceCommit": "ea4fd8bc49481c92a2b92344108c3af4567a506b",
+  "version": "0.2.0-rc.2",
+  "sourceCommit": "d2e4ccadcef6d67bc97a53679476e1ef6a5a9916",
   "options": {
     "workers": 4,
     "workerMode": "minimal",
@@ -34,11 +34,15 @@
       4,
       6
     ],
-    "primaryMeanMs": 56893.4410667,
-    "peakRssBytes": 6444957696,
+    "primaryMeanMs": 53828.45145,
+    "finalConfirmationMs": 54155.658,
+    "peakRssBytes": 6913200128,
+    "compiledTransitionAuxiliaryBudgetBytes": 536870912,
+    "compiledTransitionBytes": 466948881,
+    "retainedSupportPlanBytes": 1323433629,
     "primaryBoundary": "all ready and empty TT initialized -> actual empty root -> exact; cleanup separate",
     "goalMs": 10000,
     "goalMet": false
   },
-  "notes": "Direct empty-board solve, no RLC. Dimension-dependent layout/fallback at init. Unpinned portable timing is unqualified."
+  "notes": "Direct empty-board solve, no RLC. Dimension-dependent layout/fallback at init; compiled transitions use the retained 512MiB auxiliary budget when admitted. Mean is two C66 trials; final confirmation is separate. Unpinned portable timing is unqualified."
 }
