@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import {validateCycleSymbols,validateCycleCallbacks} from './cycle-ledger-validation.mjs';
+import {resolveCycleGraph} from './cycle-graph-resolution.mjs';
 
 const catalog = JSON.parse(readFileSync('catalog/catalog-v0.json', 'utf8'));
 const functions = JSON.parse(readFileSync('catalog/functions-v0.json', 'utf8'));
@@ -236,52 +237,12 @@ for (const unit of addonCycleLedger.units) {
 
 const isomaxSystemGraph = addonCycleLedger.isomaxSystemCycleGraph;
 assert.ok(isomaxSystemGraph && Array.isArray(isomaxSystemGraph.roots), 'IsoMax system cycle graph missing');
-const addonUnitsByName = new Map();
-for (const unit of addonCycleLedger.units) {
-  const list = addonUnitsByName.get(unit.name) ?? [];
-  list.push(unit);
-  addonUnitsByName.set(unit.name, list);
-}
-const sealedFunctionNames = new Set(functions.functions.map((fn) => fn.name));
-const reachableIsoMaxUnits = new Set();
-const pendingIsoMaxUnits = [...isomaxSystemGraph.roots];
-while (pendingIsoMaxUnits.length) {
-  const id = pendingIsoMaxUnits.pop();
-  if (reachableIsoMaxUnits.has(id)) continue;
-  const unit = addonUnits.get(id);
-  assert.ok(unit, `IsoMax cycle-graph root/edge missing unit: ${id}`);
-  reachableIsoMaxUnits.add(id);
-  assert.equal(unit.status, 'decomposed', `${id}: reachable IsoMax unit must be decomposed`);
-  assert.ok(
-    !unit.operations.some((operation) => operation.op === 'runtime.legacy.addon.body'),
-    `${id}: reachable IsoMax unit may not hide work in a legacy body`,
-  );
-  for (const operation of unit.operations) {
-    if (operation.op === 'runtime.call.subledger') {
-      const target = operation.target;
-      if (sealedFunctionNames.has(target)) continue;
-      const candidates = addonUnitsByName.get(target) ?? [];
-      assert.equal(
-        candidates.length,
-        1,
-        `${id}: CALL(${target}) must resolve to exactly one add-on or sealed function`,
-      );
-      pendingIsoMaxUnits.push(candidates[0].unit);
-    } else if (operation.op === 'runtime.callback') {
-      const target = operation.target;
-      const concrete = isomaxSystemGraph.callbackTargets?.[target];
-      if (concrete) {
-        assert.ok(concrete.length > 0, `${id}: callback ${target} has empty concrete target set`);
-        for (const concreteId of concrete) pendingIsoMaxUnits.push(concreteId);
-      } else {
-        assert.ok(
-          isomaxSystemGraph.disabledCallbacks?.[target],
-          `${id}: unresolved IsoMax callback ${target}`,
-        );
-      }
-    }
-  }
-}
+const {reachable:reachableIsoMaxUnits}=resolveCycleGraph(addonCycleLedger,functions.functions);
+for(const unit of addonCycleLedger.units.filter(u=>/^addons\/rba-connect4-lazy-smp-worker-minimal.*\.mjs$/.test(u.source)&&u.name==='<module-main>'))
+ assert.ok(reachableIsoMaxUnits.has(unit.unit),`${unit.unit}: admitted prepared worker missing from enforced roots`);
+for(const id of ['addons/rba-connect4-prepared-session-host.mjs#prepareLazySmpConnect4Rba32',
+ 'addons/worker-topology.mjs#discoverWorkerPlan','addons/isomax-memory-profile.mjs#selectIsoMaxMemoryProfile32'])
+ assert.ok(reachableIsoMaxUnits.has(id),`${id}: active preparation missing from enforced roots`);
 assert.ok(reachableIsoMaxUnits.size > 0, 'IsoMax system cycle graph resolved no units');
 
 const isomaxLocalKernel = addonCycleLedger.isomaxLocalKernel;
@@ -322,3 +283,4 @@ console.log(
   `${coverage.summary.complete}/${coverage.summary.catalogBlocks} blocks complete, ` +
   `${functions.deferred.length} deferred function(s).`,
 );
+console.log(`IsoMax transitive cost graph: ${reachableIsoMaxUnits.size} enforced units, source-local/import-aware resolution.`);

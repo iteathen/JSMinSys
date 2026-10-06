@@ -45855,14 +45855,14 @@
           "count": 1
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "target": "SELECTED_NATIVE_PROBE",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(SELECTED_NATIVE_PROBE)",
+        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALLBACK(SELECTED_NATIVE_PROBE)",
         "parameters": {
           "SELECTED_NATIVE_PROBE": "One cold-bound unchanged native layout function; lookup/proof/tag/atomic protocol charged in its existing subledger."
         },
@@ -45893,14 +45893,14 @@
           "count": 1
         },
         {
-          "op": "runtime.call.subledger",
+          "op": "runtime.callback",
           "target": "SELECTED_NATIVE_STORE",
           "count": 1
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALL(SELECTED_NATIVE_STORE)",
+        "expression": "(3)*C(runtime.field.load)+(1)*C(alu.shr.u32)+(1)*C(alu.and.u32)+(1)*C(runtime.array.reference.load)+(1)*CALLBACK(SELECTED_NATIVE_STORE)",
         "parameters": {
           "SELECTED_NATIVE_STORE": "One cold-bound unchanged native layout function; lookup/proof/tag/atomic protocol charged in its existing subledger."
         },
@@ -54342,7 +54342,47 @@
       "addons/rba-connect4-lazy-smp-host.mjs#runLazySmpConnect4Rba32",
       "addons/rba-connect4-lazy-smp-worker.mjs#<module-main>",
       "addons/rba-connect4-lazy-smp-worker-behavior.mjs#<module-main>",
-      "addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>"
+      "addons/rba-connect4-lazy-smp-worker-frontier.mjs#<module-main>",
+      "addons/rba-connect4-prepared-session-host.mjs#prepareLazySmpConnect4Rba32",
+      "addons/rba-connect4-prepared-session-host.mjs#solvePreparedConnect4Search32",
+      "addons/rba-connect4-prepared-session-host.mjs#closePreparedConnect4Search32",
+      "addons/worker-topology.mjs#discoverWorkerPlan",
+      "addons/worker-startup-affinity.mjs#<module-main>",
+      "addons/isomax-memory-profile.mjs#selectIsoMaxMemoryProfile32",
+      "addons/rba-connect4-lazy-smp-worker-minimal.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#<module-main>",
+      "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#<module-main>",
+      "addons/isomax-memory-profile.mjs#discoverAvailableSolverMemory32",
+      "addons/isomax-memory-profile.mjs#estimateIsoMaxPreparationReserve32"
     ],
     "callbackTargets": {
       "prepareRemove": [
@@ -54378,14 +54418,18 @@
         "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCache32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCache32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCache32",
-        "addons/rba-connect4-prepared-compact-cache.mjs#probeSharedPreparedCompact32"
+        "addons/rba-connect4-prepared-compact-cache.mjs#probeSharedPreparedCompact32",
+        "addons/rba-connect4-shared-banked-cache.mjs#probeSharedPreparedBankedCompact32",
+        "addons/rba-connect4-shared-banked-cache.mjs#probeBankedDirect32"
       ],
       "sharedStore": [
         "addons/rba-connect4-shared-exact-cache-uncounted.mjs#storeConnect4RbaSharedExactCacheUncounted32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCache32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCache32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCache32",
-        "addons/rba-connect4-prepared-compact-cache.mjs#storeSharedPreparedCompact32"
+        "addons/rba-connect4-prepared-compact-cache.mjs#storeSharedPreparedCompact32",
+        "addons/rba-connect4-shared-banked-cache.mjs#storeSharedPreparedBankedCompact32",
+        "addons/rba-connect4-shared-banked-cache.mjs#storeBankedDirect32"
       ],
       "probeIndexPartial24Shared32": [
         "addons/rba-connect4-index-partial-cache.mjs#probeIndexPartial24Shared32"
@@ -54407,9 +54451,26 @@
       ],
       "cold-local-slot-identity": [
         "addons/connect4-cpc-matching-response.mjs#<matching-slot-identity-callback>"
+      ],
+      "SELECTED_NATIVE_PROBE": [
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeCompactSharedCacheCounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeDirectSharedCacheCounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#probeFullSpanSharedCacheCounted32"
+      ],
+      "SELECTED_NATIVE_STORE": [
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCache32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCacheCounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCacheCounted32",
+        "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCacheCounted32"
       ]
     },
-    "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback."
+    "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback.",
+    "resolution": "Source-local functions first, named import aliases/canonical imports next, exact sealed binding or unique explicit class/prepared semantic unit last. Ambiguity fails closed."
   },
   "isomaxRootFrontierCostProfile": {
     "id": "node26.7.0-v8-14.6.202.34/win32-x64-alder-lake-symbolic",

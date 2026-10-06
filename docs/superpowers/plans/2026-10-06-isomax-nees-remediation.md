@@ -64,3 +64,6 @@ when needed to resolve noise; rejected experiments restored and tested too.
   catches missing IC before repair. Full `nees-fix-01-symbols`:37.7914212s,
   212.8125s CPU,EXACT/WIN/c4,six pins/exits. Runtime byte-identical to baseline;
   wall difference is run noise, not a tooling performance gain.
+- Change2 `0084b24`: callback target expressions and concrete bindings retained;
+  four focused tests and catalog pass. Full `nees-fix-02-callbacks`:38.3485895s,
+  213.9375s CPU,EXACT/WIN/c4,six pins/exits. Solver unchanged.

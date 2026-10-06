@@ -31,5 +31,28 @@ if(action==='symbols'){
    note:'Inline source callback at prepareConnect4CpcMatchingResponse32 line13. Parent owns Array.from/function construction; this callee owns argument/result propagation only.'}});
  graph.callbackTargets['cold-local-slot-identity']=[id];
  ledger.summary.units=ledger.units.length;ledger.summary.decomposed=ledger.units.filter(u=>u.status==='decomposed').length;
+}else if(action==='graph'){
+ const graph=ledger.isomaxSystemCycleGraph;
+ graph.roots=[...new Set([...graph.roots,
+  'addons/rba-connect4-prepared-session-host.mjs#prepareLazySmpConnect4Rba32',
+  'addons/rba-connect4-prepared-session-host.mjs#solvePreparedConnect4Search32',
+  'addons/rba-connect4-prepared-session-host.mjs#closePreparedConnect4Search32',
+  'addons/worker-topology.mjs#discoverWorkerPlan',
+  'addons/worker-startup-affinity.mjs#<module-main>',
+  'addons/isomax-memory-profile.mjs#discoverAvailableSolverMemory32',
+  'addons/isomax-memory-profile.mjs#estimateIsoMaxPreparationReserve32',
+  'addons/isomax-memory-profile.mjs#selectIsoMaxMemoryProfile32',
+  ...ledger.units.filter(u=>/^addons\/rba-connect4-lazy-smp-worker-minimal.*\.mjs$/.test(u.source)&&u.name==='<module-main>').map(u=>u.unit)])];
+ for(const [target,pattern] of Object.entries({
+  sharedProbe:/^(probeSharedPreparedBankedCompact32|probeBankedDirect32)$/,
+  sharedStore:/^(storeSharedPreparedBankedCompact32|storeBankedDirect32)$/,
+  SELECTED_NATIVE_PROBE:/^probe(?:Compact|Direct|FullSpan)SharedCache(?:Counted)?32$/,
+  SELECTED_NATIVE_STORE:/^store(?:Compact|Direct|FullSpan)SharedCache(?:Counted)?32$/,
+ }))graph.callbackTargets[target]=[...new Set([...(graph.callbackTargets[target]??[]),...ledger.units.filter(u=>pattern.test(u.name)).map(u=>u.unit)])];
+ for(const u of ledger.units.filter(u=>u.source==='addons/rba-connect4-shared-banked-cache.mjs')){
+  for(const o of u.operations)if(['SELECTED_NATIVE_PROBE','SELECTED_NATIVE_STORE'].includes(o.target))o.op='runtime.callback';
+  u.cycleCount.expression=cycleExpressionForOperations(u.operations);
+ }
+ graph.resolution='Source-local functions first, named import aliases/canonical imports next, exact sealed binding or unique explicit class/prepared semantic unit last. Ambiguity fails closed.';
 }else throw Error('Unknown scoped NEES ledger repair: '+action);
 writeFileSync(path,JSON.stringify(ledger,null,2)+'\n');
