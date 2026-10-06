@@ -209,11 +209,16 @@ const workerSources=readdirSync('addons').filter(p=>/^rba-connect4-lazy-smp-work
  review:'Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.',
  machineCoverage:/center-proofs-local32-partial24/.test(p)?'isolate1/3/5':/compiled-proofs-local32-partial24/.test(p)?'isolate2/4/6':'No fresh machine capture for this exact variant.'}));
 assert.equal(workerSources.length,32);
-const evidenceFiles=readdirSync(run).filter(p=>!p.endsWith('.asm')).map(p=>({path:relative(consumer,resolve(run,p)).replaceAll('\\','/'),sha256:hash(resolve(run,p))}));
+const evidenceCommit=git(['rev-parse','HEAD'],consumer),
+ evidenceFiles=readdirSync(run).filter(p=>!asm.some(a=>a.file===p)).map(p=>({path:relative(consumer,resolve(run,p)).replaceAll('\\','/'),sha256:hash(resolve(run,p))}));
+for(const e of [...evidenceFiles,...asm.map(a=>({path:relative(consumer,resolve(run,a.file)).replaceAll('\\','/'),sha256:a.sha256}))]){
+ const committed=execFileSync('git',['show',evidenceCommit+':'+e.path],{cwd:consumer,maxBuffer:16*1024*1024});
+ assert.equal(createHash('sha256').update(committed).digest('hex'),e.sha256,'Committed raw bytes must match capture: '+e.path);
+}
 write('manifest.json',{kind:'Thorough NEES source/accounting/realization audit',overall:'INCOMPLETE_COST_CONFORMANCE',
  normative:{repository:'iteathen/NEES',commit:normative,documents:['SPEC.md','CONFORMANCE.md','COST_ACCOUNTING.md','NODE_V8_METHODS.md','RUNTIME_PROFILE_NODE26.md','STALE_ADVICE.md'].map(p=>({path:p,sha256:normalizedHash(resolve(norms,p))}))},
  producer:{repository:'iteathen/JSMinSys',branch:git(['branch','--show-current']),auditObservationHead:rep.auditHead,manifestPreparedAt:git(['rev-parse','HEAD']),candidateRuntime:candidate,runtimeDiffFromCandidate:'EMPTY'},
- consumer:{repository:'iteathen/Connect4',branch:git(['branch','--show-current'],consumer),diagnosticHarnessHead:invocation.repositoryCommit,manifestObservedHead:git(['rev-parse','HEAD'],consumer)},
+ consumer:{repository:'iteathen/Connect4',branch:git(['branch','--show-current'],consumer),diagnosticHarnessHead:invocation.repositoryCommit,evidenceCommit,manifestObservedHead:evidenceCommit},
  package:{version:lock.version,sourceCommit:production,lockSha256:normalizedHash('isomax/provenance.json'),frozenLedgerBlob:git(['rev-parse',production+':catalog/addon-cycle-ledger-v0.json']),lockedRuntime},
  currentLedger:{sha256:normalizedHash('catalog/addon-cycle-ledger-v0.json'),units:642,reachableDeclaredUnits:168,activeCompiledRootsReachable:0},
  coverage:{workerSources,method:'Independent read-only hot/cold/ledger domains, primary reproductions and representative current machine-code validation. Hash inventory is not itself line-by-line or machine proof.',
@@ -225,6 +230,6 @@ write('manifest.json',{kind:'Thorough NEES source/accounting/realization audit',
  diagnostic:{directory:relative(consumer,run).replaceAll('\\','/'),performanceConclusionAllowed:false,result:'TIMEOUT after declared10s observation; six clean exits',
  gcAttribution:'Runtime GC observed; no causal per-site or steady-search allocation frequency established.',asm,evidenceFiles},
  inheritedValidation:'467/467 tests;26 independent oracle cases/1340 memo nodes;7 fresh complete exact empty7x6 multiworker solves at measured candidate; no new runtime diff.',
- auditArtifacts:['REPORT.md','SCOPE.md','reproduce.mjs','reproduction.json','reproduction.txt','finalize.mjs','rule-dispositions.json','method-dispositions.json','debt.json'].map(p=>({path:p,sha256:normalizedHash(out+'/'+p)})),
+ auditArtifacts:['REPORT.md','SCOPE.md','REVIEW.md','verification.json','reproduce.mjs','reproduction.json','reproduction.txt','finalize.mjs','rule-dispositions.json','method-dispositions.json','debt.json'].map(p=>({path:p,sha256:normalizedHash(out+'/'+p)})),
  mutation:{solver:false,cpc:false,bsfp:false,package:false,defaults:false,main:false}});
 console.log('Audit artifacts verified: '+rules.length+' NEES rules, '+methods.length+' methods, '+entries.length+' durable debt items, '+workerSources.length+' worker source variants, '+asm.length+' machine-code isolates.');
