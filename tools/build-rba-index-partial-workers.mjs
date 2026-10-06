@@ -24,6 +24,13 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
   '  const prior=localProbe(localCache,words,src,hash,support);\n  if(prior){');
  once('support=depth?compactSupportProfile8(words,src):0,\n    tail=depth?compactTailProfile8(words,src):0;',
   'support=depth?packIndexPartial24Support32(words,src):0,\n    tail=0;');
+ if(kind==='partial24'){
+  s="import {attachBankedIndexPartialCache32,probeBankedIndexPartial24Shared32,storeBankedIndexPartial24Shared32} from './rba-connect4-index-partial-cache.mjs';\n"+s;
+  once('shared=attachIndexPartialCache32(workerData.sharedExactCache),',
+   'shared=workerData.sharedExactCache.banks?attachBankedIndexPartialCache32(workerData.sharedExactCache):attachIndexPartialCache32(workerData.sharedExactCache),');
+  once('sharedProbe=probeIndexPartial24Shared32,sharedStore=storeIndexPartial24Shared32,',
+   'sharedProbe=shared.banks?probeBankedIndexPartial24Shared32:probeIndexPartial24Shared32,sharedStore=shared.banks?storeBankedIndexPartial24Shared32:storeIndexPartial24Shared32,');
+ }
  if(kind==='partialMixed'){
   s=s.replaceAll('=probeIndexPartial24','=probeIndexPartialMixed').replaceAll('=storeIndexPartial24','=storeIndexPartialMixed');
   once('shared=attachIndexPartialCache32(workerData.sharedExactCache),','shared=attachMixedIndexPartialCache32(workerData.sharedExactCache),');

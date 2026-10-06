@@ -9,7 +9,7 @@ import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './r
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
 import {prepareSupportCompiledTransitions32} from './rba-connect4-support-compiled-transition.mjs';
 import {prepareBankedSharedCapacity32,sharedNativeBankCapacity32} from './rba-connect4-shared-banked-cache.mjs';
-import {createIndexPartialCache32,createMixedIndexPartialCache32} from './rba-connect4-index-partial-cache.mjs';
+import {createIndexPartialCache32,createMixedIndexPartialCache32,createBankedIndexPartialCache32} from './rba-connect4-index-partial-cache.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -40,8 +40,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   // storage and valid larger capacities outside the native halfword-view bound.
   if(sharedCacheLayout==='auto')sharedCacheLayout=compact&&sharedCacheCapacity<=0x08000000?'native':'split40';
   if(sharedCacheLayout!=='split40'&&sharedCacheLayout!=='native')throw new RangeError('invalid shared TT layout');
-  if(partial&&(!localNative||sharedCacheLayout!=='native'||sharedBankCapacity!==null||sharedCacheCapacity<(mixed?16:8)||localCacheCapacity<(mixed?16:8)||sharedCacheCapacity>2**28))
-    throw RangeError('partial TT requires native caches within one optimized bank');
+  if(partial&&(!localNative||sharedCacheLayout!=='native'||sharedCacheCapacity<(mixed?16:8)||localCacheCapacity<(mixed?16:8)||
+    sharedCacheCapacity>(mixed?2**28:2**32)||(mixed&&sharedBankCapacity!==null)))
+    throw RangeError('partial TT requires native caches within admitted banks');
   const layout=partial?{kind:cacheIdentity,entryBytes:partialEntryWords*4,entryWords:partialEntryWords}:sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
     sharedStride=layout===null?keyWords:layout.kind==='compact32'?16:
       layout.kind==='direct'?layout.heightStride:layout.entryWords;
@@ -50,6 +51,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(banked){
     const limit=sharedNativeBankCapacity32(layout),capacity=sharedBankCapacity??limit;
     if(capacity>limit)throw RangeError('native TT bank index exceeds optimized range');
+    if(partial&&(mixed||capacity<8))throw RangeError('invalid partial TT bank range');
     prepareBankedSharedCapacity32(sharedCacheCapacity,capacity);
   }
   else validateConnect4CacheCapacity32(sharedCacheCapacity,sharedStride);
@@ -161,7 +163,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
     workerGeometry=shareConnect4RbaGeometry32(geometry);
-    shared=mixed?createMixedIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true}):partial?createIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true,kind:cacheIdentity}):
+    shared=mixed?createMixedIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true}):partial?
+      (banked?createBankedIndexPartialCache32({geometry,capacity:sharedCacheCapacity,bankCapacity:sharedBankCapacity??2**28}):
+       createIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true,kind:cacheIdentity})):
       (layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry,bankCapacity:sharedBankCapacity});
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}

@@ -30,13 +30,16 @@ for(const side of ['Local','Shared'])for(const action of ['probe','store']){
 }
 specs.createMixedIndexPartialCache32=[op('runtime.cold.tt.bank.initialize',1),call('createIndexPartialCache32',2),call('attachMixedIndexPartialCache32')];
 specs.attachMixedIndexPartialCache32=[op('runtime.cold.tt.bank.initialize',1),call('attachIndexPartialCache32',2)];
+specs.createBankedIndexPartialCache32=[op('runtime.cold.tt.bank.initialize',1),call('prepareBankedSharedCapacity32'),call('isCompactLayoutProfile8'),call('createIndexPartialCache32','BANKS'),call('attachBankedIndexPartialCache32')];
+specs.attachBankedIndexPartialCache32=[op('runtime.cold.tt.bank.initialize',1),call('prepareBankedSharedCapacity32'),call('attachIndexPartialCache32','BANKS')];
+for(const action of ['probe','store'])specs[action+'BankedIndexPartial24Shared32']=[op('runtime.field.load',3),op('runtime.array.reference.load',1),op('alu.shr.u32',1),op('alu.and.u32',1),call(action+'IndexPartial24Shared32')];
 for(const side of ['Local','Shared'])for(const action of ['probe','store'])specs[action+'IndexPartialMixed'+side+'32']=[
  op('runtime.field.load',1),op('control.test.u32',1),op('control.branch',1),op('alu.and.u32','WIDE'),
  call(action+'IndexPartial16'+side+'32','1-WIDE'),call(action+'IndexPartial24'+side+'32','WIDE')];
 for(const [name,operations] of Object.entries(specs)){
- if(/^(probe|store)/.test(name)&&!name.includes('Mixed'))operations.push(call(name.includes('16')?'packIndexPartial16Support32':'packIndexPartial24Support32','DEFAULT'));
+ if(/^(probe|store)/.test(name)&&!name.includes('Mixed')&&!name.includes('Banked'))operations.push(call(name.includes('16')?'packIndexPartial16Support32':'packIndexPartial24Support32','DEFAULT'));
  l.units.push({unit:source+'#'+name,source,name,scope:'exact-index-partial-tt',status:'decomposed',operations,
-  cycleCount:{kind:'symbolic',expression:expr(operations),parameters:{DEFAULT:'0 in prepared worker calls;1 when public diagnostic default is used',ELIGIBLE:'1 if checked narrow-domain tail test passes;0 otherwise',WIDE:'1 for support-dependent wide class;0 for narrow'},
+  cycleCount:{kind:'symbolic',expression:expr(operations),parameters:{DEFAULT:'0 in prepared worker calls;1 when public diagnostic default is used',ELIGIBLE:'1 if checked narrow-domain tail test passes;0 otherwise',WIDE:'1 for support-dependent wide class;0 for narrow',BANKS:'cold validated bank count;2 for twelve-GiB shared TT'},
    note:'Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger.'}});
 }
 for(const kind of ['partial24','partialMixed'])for(const center of [false,true])for(const proofs of [false,true]){
@@ -63,16 +66,31 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
    if(o.target==='createIndexPartialCache32')o.target='createMixedIndexPartialCache32';
   }
   if(kind==='partialMixed')u.cycleCount.parameters.WIDE='1 when basis count>32;0 otherwise, support-only deterministic class';
+  if(kind==='partial24'){
+   const routed=[];
+   for(const o of u.operations){
+    if(['probeIndexPartial24Shared32','storeIndexPartial24Shared32','attachIndexPartialCache32'].includes(o.target)){
+     routed.push({...o,count:`(${o.count})*(1-PARTIAL_BANKED)`});
+     routed.push({...o,target:o.target==='attachIndexPartialCache32'?'attachBankedIndexPartialCache32':o.target.replace('IndexPartial24','BankedIndexPartial24'),count:`(${o.count})*PARTIAL_BANKED`});
+    }else routed.push(o);
+   }
+   u.operations=routed;u.cycleCount.parameters.PARTIAL_BANKED='1 for cold-selected banked shared TT;0 for unchanged single-bank accessors';
+   if(u.name==='<module-main>')u.operations.push(op('runtime.field.load',5),op('control.test.u32',3),op('control.branch',3));
+  }
   u.cycleCount.expression=expr(u.operations);delete u.cycleCount.activeCycleExpression;
   u.cycleCount.note='Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.';
   l.units.push(u);
  }
 }
 for(const u of l.units.filter(u=>u.source==='addons/rba-connect4-prepared-session-host.mjs'&&u.name==='prepareLazySmpConnect4Rba32')){
- u.operations=u.operations.filter(o=>!['createIndexPartialCache32','createMixedIndexPartialCache32'].includes(o.target));
- u.operations.push(call('createIndexPartialCache32','PARTIAL*(1-MIXED)'),call('createMixedIndexPartialCache32','PARTIAL*MIXED'));
+ u.operations=u.operations.filter(o=>!['createIndexPartialCache32','createMixedIndexPartialCache32','createBankedIndexPartialCache32'].includes(o.target));
+ for(const o of u.operations)if(['prepareSharedCacheLayout','createConnect4RbaSharedLayoutCache32','createConnect4RbaSharedExactCache32'].includes(o.target)){
+  if(!String(o.count).includes('PARTIAL'))o.count=`(${o.count})*(1-PARTIAL)`;
+ }
+ u.operations.push(call('createIndexPartialCache32','INIT*PARTIAL*(1-MIXED)*(1-PARTIAL_BANKED)'),call('createMixedIndexPartialCache32','INIT*PARTIAL*MIXED'),call('createBankedIndexPartialCache32','INIT*PARTIAL*(1-MIXED)*PARTIAL_BANKED'));
  u.cycleCount.parameters.PARTIAL='1 only for explicitly selected partial24 or partialMixed on compact7x6;0 for unchanged generic/default layouts';
  u.cycleCount.parameters.MIXED='1 only for predeclared mixed16/24 current-rank pool;0 otherwise';
+ u.cycleCount.parameters.PARTIAL_BANKED='1 for cold partial24 bank selection;0 for single-bank or mixed';
  u.cycleCount.expression=expr(u.operations);
  u.cycleCount.note+=' Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory.';
 }
