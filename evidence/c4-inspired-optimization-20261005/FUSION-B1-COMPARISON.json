@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "name": "fusion-b1-01",
+      "commit": "b02681b61aa09e78890fad5ca7461c2e80dbc67a",
+      "solveMs": 58066.26179999999,
+      "cycles": "819614693807",
+      "peakRssBytes": 6369796096,
+      "initializationMs": 2516.8194000000003,
+      "cleanupMs": 28.098100000002887,
+      "wholeOperationMs": 60612.2607,
+      "rootWdl": 1,
+      "move": 3,
+      "winner": 3,
+      "configuration": {
+        "basisViews": true,
+        "sharedCacheCapacity": 134217728,
+        "localCacheCapacity": 8388608,
+        "sharedProofBounds": true,
+        "sharedCacheLayout": "native",
+        "sharedTtEntryBytes": 32,
+        "sharedTtBytes": 4294967296,
+        "localCacheLayout": "native",
+        "privateTtEntryBytes": 32,
+        "privateTtBytesPerWorker": 268435456,
+        "supportBasisPlanBudgetBytes": 1073741824,
+        "supportBasisPlanBytes": 856484748,
+        "supportBasisPlanProfiles": 823543,
+        "workers": 4,
+        "rootFrontier": false,
+        "sharedSampleMask": 0,
+        "policies": [
+          "center",
+          "live",
+          "center",
+          "live"
+        ]
+      },
+      "exact": true,
+      "cleanup": true,
+      "affinityVerified": true,
+      "targetMet": false,
+      "rawPerformanceConclusionAllowed": false,
+      "cycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+      "rawDirectory": "fusion-b1-01"
+    }
+  ],
+  "caveat": "Completed localhost controlled comparisons only; no statistical confidence interval. Whole-operation cycles include initialization/cleanup. Null hot statistics are unavailable, not zero. Raw target flag is preserved; missing10s does not invalidate an exact completed relative trial."
+}
