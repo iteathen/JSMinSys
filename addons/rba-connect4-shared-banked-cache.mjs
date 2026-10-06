@@ -1,4 +1,4 @@
-// Experimental compact32 capacity extension. Bank topology is prepared cold.
+// Native shared-TT banks. Capacity qualification is recorded by memory profiles.
 // Each bank retains the unchanged native field layout and seqlock protocol.
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 import {createConnect4RbaSharedLayoutCache32,attachConnect4RbaSharedLayoutCache32,storeConnect4RbaSharedLayoutCache32,probeConnect4RbaSharedLayoutCache32,prepareSharedCacheAccess,prepareSharedCacheLayout,
