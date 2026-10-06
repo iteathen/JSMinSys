@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
+import {compactSupportProfile8,compactTailProfile8} from '../addons/rba-connect4-shared-exact-cache.mjs';
 
 // Execute actual generated search bodies, with independent exact leaf values.
 for(const views of [false,true])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
@@ -20,7 +21,7 @@ for(const views of [false,true])for(const center of [false,true])for(const proof
       forbidden:new Uint32Array(4),forbiddenWords:1,g:{keyWords:14,maxBasis:64,columns:1,rows:1},words:new Uint32Array(64),basis:new Uint32Array(128),localMask:3,
       centerOrder:[0],bestMove:-1,liveWords:3,live:{},moveOrder:new Uint32Array(1),moveOrderMask:7,
       coord:{seen:new Uint32Array(64),map:new Uint32Array(64),inverse:new Uint32Array(64)},basisSize:new Uint32Array(4),profile:{},cpc:{},targetCpc:{},
-      mixSpan32Locator32:()=>0,probeCache:()=>boundSource==='cache'?cached:0,
+     compactSupportProfile8,compactTailProfile8,mixSpan32Locator32:()=>0,probeCache:()=>boundSource==='cache'?cached:0,
       frontProbe:()=>boundSource==='frontier'?cached:0,frontChild:()=>{},
       storeExact:(_s,_h,_slot,v)=>assert.equal(v,truth===0?2:mover===0?truth+2:2-truth),
       storeBound:(_s,_h,_slot,v)=>assert.ok(v===4?truth>=0:truth<=0),
