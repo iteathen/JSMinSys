@@ -28,6 +28,16 @@ test('oversized bank overrides reject before support-plan preparation',async()=>
  await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,workers:2,sharedCacheLayout:'native',sharedCacheCapacity:2**29,
   sharedBankCapacity:2**29,supportBasisPlanBudgetBytes:2**30}),/bank.*optimized|optimized.*bank/i);
 });
+test('supplied support plans reserve missing compiled planes when preparation budget is zero',async()=>{
+ const {estimateIsoMaxPreparationReserve32}=await import('../addons/isomax-memory-profile.mjs'),
+  geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
+ // Metadata-only admission check: no support profiles or compiled planes allocated.
+ geometry.supportBasisPlans={profiles:7**7,closures:true,mirrorMap:true};
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:0}),2**30);
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:0,supportBasisViews:false}),2**29);
+ // A nonzero budget replaces supplied plans; this insufficient budget admits none.
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:1}),2**29);
+});
 test('profile sizing accounts for every worker and exact fit boundary',async()=>{
  const m=await import('../addons/isomax-memory-profile.mjs'),geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),GiB=2**30;
  for(const workers of [2,3,4,5,6,64]){

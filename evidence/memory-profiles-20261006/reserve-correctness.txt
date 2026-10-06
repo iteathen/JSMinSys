@@ -1,18 +1,32 @@
-(node:7076) ExperimentalWarning: FFI is an experimental feature and might change at any time
+(node:20188) ExperimentalWarning: FFI is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-✔ 128GiB compact bank plan uses full unsigned hash space without allocating (1.6229ms)
-✔ initialization reserve scales down for tiny geometry but retains measured7x6 headroom (11.0919ms)
-✔ oversized bank overrides reject before support-plan preparation (19.8024ms)
-✔ profile sizing accounts for every worker and exact fit boundary (6.9659ms)
-✔ dimension-dependent profile layouts fit all 1x1 through10x10 boards (166.5501ms)
-✔ native memory discovery reports physical and process/commit headroom (2.5594ms)
-✔ generic board banks retain native field identity without compact assumptions (8.8024ms)
-✔ memory profile catalog and selection include tested8 and experimental128 (3.4717ms)
-ℹ tests 8
+✔ 128GiB compact bank plan uses full unsigned hash space without allocating (2.2877ms)
+✔ initialization reserve scales down for tiny geometry but retains measured7x6 headroom (9.8118ms)
+✔ oversized bank overrides reject before support-plan preparation (20.0182ms)
+✔ supplied support plans reserve missing compiled planes when preparation budget is zero (5.6473ms)
+✔ profile sizing accounts for every worker and exact fit boundary (5.8002ms)
+✔ dimension-dependent profile layouts fit all 1x1 through10x10 boards (157.9732ms)
+✔ native memory discovery reports physical and process/commit headroom (1.4271ms)
+✔ generic board banks retain native field identity without compact assumptions (7.6145ms)
+✔ memory profile catalog and selection include tested8 and experimental128 (4.1972ms)
+✔ banked compact32 keeps distinct global slots, exact keys and proof tags (3.6703ms)
+✔ bank attachment rejects aliases, inconsistent mapping and malformed buffers (1.2316ms)
+✔ concurrent banked writers never return a value for a different exact key (41.5374ms)
+✔ prepared host initializes banked TT before search and joins all workers (64.0658ms)
+✔ layout preserves exact semantic equality at forced collisions and nonzero offsets (2.4613ms)
+✔ public layout APIs preserve optional full-q locator and no-geometry full-span identity (2.0849ms)
+✔ uncounted binding keeps reporting untouched while counted busy writes are reported (0.5204ms)
+✔ zero sequence after rollover remains a miss and later publication restores visibility (0.2418ms)
+✔ attachment repairs cloned/truncated views without copying and rejects wrong backing (0.7216ms)
+✔ native heights preserve both sides of uint8 and uint16 field boundaries (0.1659ms)
+✔ layout sizing rejects unsafe or aliased capacities before allocating (0.3027ms)
+✔ attachment rejects malformed cloned layout offsets before permitting overlapping atomic fields (0.2604ms)
+✔ concurrent compact/direct/full-span writers never return another exact key value (194.4222ms)
+ℹ tests 22
 ℹ suites 0
-ℹ pass 8
+ℹ pass 22
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 302.4944
+ℹ duration_ms 320.3501
