@@ -97,3 +97,33 @@ export function storeIndexPartial16Shared32(cache,words,offset,value,hash,packed
  Atomics.store(keys,record+1,(hash>>>cache.indexBits)|(value<<29));Atomics.store(keys,record+2,packed);Atomics.store(keys,record+3,words[offset+8]);
  Atomics.store(keys,record,(odd+1)>>>0);return value;
 }
+// Full-coverage mixed cache: narrowN plus wideN/2. These are separate collision
+// domains determined by support, not two alternative probes for the same q.
+export function createMixedIndexPartialCache32({geometry,capacity,shared=false}){
+ if(capacity<16)throw RangeError('mixed partial cache requires at least16 primary slots');
+ const narrow=createIndexPartialCache32({geometry,capacity,shared,kind:'partial16'}),
+  wide=createIndexPartialCache32({geometry,capacity:capacity/2,shared,kind:'partial24'});
+ wide.entries.fill(0); // Warm the secondary pool before READY as well.
+ return attachMixedIndexPartialCache32({kind:'partialMixed',narrow,wide,entries:narrow.entries,stats:narrow.stats,shared,
+  payloadBytes:narrow.entries.byteLength+wide.entries.byteLength,logicalEntries:capacity+capacity/2});
+}
+export function attachMixedIndexPartialCache32(cache){
+ const narrow=attachIndexPartialCache32(cache.narrow),wide=attachIndexPartialCache32(cache.wide);
+ if(cache.kind!=='partialMixed'||narrow.kind!=='partial16'||wide.kind!=='partial24'||
+  narrow.mask+1!==2*(wide.mask+1)||narrow.shared!==wide.shared||cache.shared!==narrow.shared||
+  cache.entries.buffer!==narrow.entries.buffer||wide.entries.buffer===narrow.entries.buffer||
+  cache.payloadBytes!==narrow.entries.byteLength+wide.entries.byteLength||cache.logicalEntries!==(narrow.mask+1)+(wide.mask+1))throw RangeError('invalid mixed partial topology');
+ cache.entries=narrow.entries;cache.stats=narrow.stats;return cache;
+}
+export function probeIndexPartialMixedLocal32(cache,words,offset,hash,packed){
+ return packed<0?probeIndexPartial24Local32(cache.wide,words,offset,hash,packed&0x7fffffff):probeIndexPartial16Local32(cache.narrow,words,offset,hash,packed);
+}
+export function storeIndexPartialMixedLocal32(cache,words,offset,value,hash,packed){
+ return packed<0?storeIndexPartial24Local32(cache.wide,words,offset,value,hash,packed&0x7fffffff):storeIndexPartial16Local32(cache.narrow,words,offset,value,hash,packed);
+}
+export function probeIndexPartialMixedShared32(cache,words,offset,hash,packed){
+ return packed<0?probeIndexPartial24Shared32(cache.wide,words,offset,hash,packed&0x7fffffff):probeIndexPartial16Shared32(cache.narrow,words,offset,hash,packed);
+}
+export function storeIndexPartialMixedShared32(cache,words,offset,value,hash,packed){
+ return packed<0?storeIndexPartial24Shared32(cache.wide,words,offset,value,hash,packed&0x7fffffff):storeIndexPartial16Shared32(cache.narrow,words,offset,value,hash,packed);
+}

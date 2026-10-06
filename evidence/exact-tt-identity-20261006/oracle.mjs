@@ -5,7 +5,7 @@ import {prepareLazySmpConnect4Rba32} from '../../addons/rba-connect4-prepared-se
 import {prepareSupportBasisPlans32} from '../../addons/rba-connect4-support-basis-plan.mjs';
 import {prepareSupportCompiledTransitions32} from '../../addons/rba-connect4-support-compiled-transition.mjs';
 const identity=process.argv[2]??'partial24';
-if(!['native32','partial24','partial16'].includes(identity))throw Error('Invalid identity case');
+if(!['native32','partial24','partial16','partialMixed'].includes(identity))throw Error('Invalid identity case');
 const runLazySmpConnect4Rba32=async(moves,options)=>{
  const g=options.geometry;
  if(!g.supportBasisPlans){g.supportBasisPlans=prepareSupportBasisPlans32(g,2**30,true,true);g.supportBasisPlans=prepareSupportCompiledTransitions32(g,g.supportBasisPlans)??g.supportBasisPlans;}

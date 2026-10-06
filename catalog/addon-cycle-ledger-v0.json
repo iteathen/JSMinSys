@@ -13439,7 +13439,12 @@
         {
           "op": "runtime.call.subledger",
           "target": "createIndexPartialCache32",
-          "count": "PARTIAL"
+          "count": "PARTIAL*(1-MIXED)"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "createMixedIndexPartialCache32",
+          "count": "PARTIAL*MIXED"
         }
       ],
       "cycleCount": {
@@ -13480,10 +13485,11 @@
           "CP_FIELDS": "Actual geometry spread/transition metadata accesses/publications.",
           "CP_TEST": "Cold selection and abort checks.",
           "BANK_SETUP": "Cold bank allocation/fill, selection or resource aggregation; zero for absent banks.",
-          "PARTIAL": "1 only for explicitly selected partial24 on compact7x6;0 for unchanged generic/default layouts"
+          "PARTIAL": "1 only for explicitly selected partial24 on compact7x6;0 for unchanged generic/default layouts",
+          "MIXED": "1 only for predeclared mixed16/24 current-rank pool;0 otherwise"
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory.",
-        "expression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)+(1)*C(runtime.cold.affinity)+(BANK_SETUP)*C(runtime.cold.tt.bank.initialize)+(PARTIAL)*CALL(createIndexPartialCache32)"
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory.",
+        "expression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)+(1)*C(runtime.cold.affinity)+(BANK_SETUP)*C(runtime.cold.tt.bank.initialize)+(PARTIAL*(1-MIXED))*CALL(createIndexPartialCache32)+(PARTIAL*MIXED)*CALL(createMixedIndexPartialCache32)"
       },
       "status": "decomposed"
     },
@@ -46036,7 +46042,8 @@
         "expression": "(9)*C(memory.load.u32)+(8)*C(alu.add.u32)+(8)*C(alu.shl.u32)+(8)*C(alu.or.u32)+(2)*C(alu.and.u32)+(1)*C(alu.shr.u32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46073,7 +46080,8 @@
         "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(1)*CALL(isCompactLayoutProfile8)+(1)*CALL(validateConnect4CacheCapacity32)+(1)*CALL(attachIndexPartialCache32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46100,7 +46108,8 @@
         "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(1)*CALL(validateConnect4CacheCapacity32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46155,7 +46164,8 @@
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(8)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(9)*C(memory.load.u32)+(6)*C(control.test.u32)+(6)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial24Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46206,7 +46216,8 @@
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(8)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(3)*C(memory.load.u32)+(6)*C(memory.store.u32)+(DEFAULT)*CALL(packIndexPartial24Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46265,7 +46276,8 @@
         "expression": "(3)*C(runtime.field.load)+(4)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(8)*C(alu.add.u32)+(2)*C(alu.shr.u32)+(3)*C(memory.load.u32)+(7)*C(atomic.load.u32)+(9)*C(control.test.u32)+(9)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial24Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46340,7 +46352,8 @@
         "expression": "(3)*C(runtime.field.load)+(2)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(10)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(1)*C(alu.shl.u32)+(1)*C(alu.or.u32)+(3)*C(memory.load.u32)+(1)*C(atomic.load.u32)+(1)*C(atomic.rmw.u32)+(6)*C(atomic.store.u32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial24Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46378,7 +46391,8 @@
         "expression": "(7)*C(memory.load.u32)+(6)*C(alu.add.u32)+(6)*C(alu.shl.u32)+(6)*C(alu.or.u32)+(1)*C(alu.shr.u32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46421,7 +46435,8 @@
         "expression": "(4)*C(memory.load.u32)+(4)*C(alu.add.u32)+(3)*C(alu.or.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(ELIGIBLE)*CALL(packIndexPartial16Heights32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46484,7 +46499,8 @@
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(4)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(5)*C(memory.load.u32)+(6)*C(control.test.u32)+(6)*C(control.branch)+(1)*C(control.test.u32)+(1)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial16Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46543,7 +46559,8 @@
         "expression": "(3)*C(runtime.field.load)+(1)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(4)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(1)*C(memory.load.u32)+(4)*C(memory.store.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial16Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46610,7 +46627,8 @@
         "expression": "(3)*C(runtime.field.load)+(4)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(4)*C(alu.add.u32)+(2)*C(alu.shr.u32)+(1)*C(memory.load.u32)+(5)*C(atomic.load.u32)+(9)*C(control.test.u32)+(9)*C(control.branch)+(1)*C(control.test.u32)+(1)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial16Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -46693,7 +46711,249 @@
         "expression": "(3)*C(runtime.field.load)+(2)*C(alu.and.u32)+(1)*C(runtime.number.multiply)+(6)*C(alu.add.u32)+(1)*C(alu.shr.u32)+(1)*C(alu.shl.u32)+(1)*C(alu.or.u32)+(1)*C(memory.load.u32)+(1)*C(atomic.load.u32)+(1)*C(atomic.rmw.u32)+(4)*C(atomic.store.u32)+(2)*C(control.test.u32)+(2)*C(control.branch)+(1)*C(control.test.u32)+(1)*C(control.branch)+(DEFAULT)*CALL(packIndexPartial16Support32)",
         "parameters": {
           "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
-          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise"
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#createMixedIndexPartialCache32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "createMixedIndexPartialCache32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.tt.bank.initialize",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "createIndexPartialCache32",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "attachMixedIndexPartialCache32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(2)*CALL(createIndexPartialCache32)+(1)*CALL(attachMixedIndexPartialCache32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#attachMixedIndexPartialCache32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "attachMixedIndexPartialCache32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.tt.bank.initialize",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "attachIndexPartialCache32",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.cold.tt.bank.initialize)+(2)*CALL(attachIndexPartialCache32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#probeIndexPartialMixedLocal32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "probeIndexPartialMixedLocal32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "probeIndexPartial16Local32",
+          "count": "1-WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "probeIndexPartial24Local32",
+          "count": "WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(WIDE)*C(alu.and.u32)+(1-WIDE)*CALL(probeIndexPartial16Local32)+(WIDE)*CALL(probeIndexPartial24Local32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#storeIndexPartialMixedLocal32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "storeIndexPartialMixedLocal32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "storeIndexPartial16Local32",
+          "count": "1-WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "storeIndexPartial24Local32",
+          "count": "WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(WIDE)*C(alu.and.u32)+(1-WIDE)*CALL(storeIndexPartial16Local32)+(WIDE)*CALL(storeIndexPartial24Local32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#probeIndexPartialMixedShared32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "probeIndexPartialMixedShared32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "probeIndexPartial16Shared32",
+          "count": "1-WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "probeIndexPartial24Shared32",
+          "count": "WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(WIDE)*C(alu.and.u32)+(1-WIDE)*CALL(probeIndexPartial16Shared32)+(WIDE)*CALL(probeIndexPartial24Shared32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
+        },
+        "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-index-partial-cache.mjs#storeIndexPartialMixedShared32",
+      "source": "addons/rba-connect4-index-partial-cache.mjs",
+      "name": "storeIndexPartialMixedShared32",
+      "scope": "exact-index-partial-tt",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "storeIndexPartial16Shared32",
+          "count": "1-WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "storeIndexPartial24Shared32",
+          "count": "WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(WIDE)*C(alu.and.u32)+(1-WIDE)*CALL(storeIndexPartial16Shared32)+(WIDE)*CALL(storeIndexPartial24Shared32)",
+        "parameters": {
+          "DEFAULT": "0 in prepared worker calls;1 when public diagnostic default is used",
+          "ELIGIBLE": "1 if checked narrow-domain tail test passes;0 otherwise",
+          "WIDE": "1 for support-dependent wide class;0 for narrow"
         },
         "note": "Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger."
       }
@@ -53341,11 +53601,3421 @@
         "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#relativeTerminal",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "relativeTerminal",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#relativeToAbsolute",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "relativeToAbsolute",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)+(1)*C(alu.add.u32)+(1)*C(alu.sub.u32)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#probeCache",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "probeCache",
+      "scope": "lazy-smp-tt-probe",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "probeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
+        "parameters": {
+          "T": "Local-value, identity, sampling and shared-hit predicates.",
+          "B": "Early local-hit/shared-hit and sampling control selections.",
+          "K": "1 when a local slot is populated, otherwise 0.",
+          "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#storeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "storeExact",
+      "scope": "lazy-smp-tt-store",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#negamax",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "negamax",
+      "scope": "lazy-smp-negamax-hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "SP"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND+1"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "probeCache"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X+D+CW",
+          "target": "storeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BND",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*PK",
+          "target": "orderConnect4LiveLinePacked32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*(1-PK)",
+          "target": "orderConnect4LiveLineGeneral32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*LK",
+          "target": "advanceConnect4LiveLineState3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-LK)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PAIR_OPEN",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "collectConnect4CpcxSingletons32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "TACT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*A"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "RESP_TESTS"
+        },
+        {
+          "op": "control.branch",
+          "count": "RESP_BRANCHES"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NONLOSS_CUT",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*THREE*ENABLED",
+          "target": "probeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*(1-THREE)*ENABLED",
+          "target": "probeResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "MISS"
+        },
+        {
+          "op": "control.branch",
+          "count": "MISS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "connect4RbaSupportCanonicalizeView"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "SELF"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*THREE",
+          "target": "connect4RbaCompiledTransition3CofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*(1-THREE)",
+          "target": "connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartialMixedSupport32",
+          "count": "NONROOT*WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartial16Heights32",
+          "count": "NONROOT*(1-WIDE)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "NONROOT*WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "R*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "L": "Center-order, support-height and child-size reads. Includes move-row and optional reflection-table reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Actualword/order/loopaddresses; no privatechildbasisframe addition.",
+          "AND": "Local TT slot mask applications. Includes decoding packed move columns.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes physical/canonical orientation transport. Includes controller=mover XOR1 for certificate calls.",
+          "SUB": "Negamax sign/window negations represented at source-operation level.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
+          "BRANCH": "Executed source control selections and early returns.",
+          "H": "1 only for a non-root node surviving cooperative stop.",
+          "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
+          "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
+          "R": "Nonterminal child recursions/frontier updates; canonical handle forwarded without repeating mirror or row construction in caller.",
+          "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
+          "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
+          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
+          "KD": "Cold dense-removaltable admitted.",
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "O": "Nodes ordering unrestricted legal moves; forced response skips sorting.",
+          "PK": "Cold-selected packed versus general move-row layout.",
+          "LK": "Cold-selected three-word versus general live-state update.",
+          "CP": "One response policy check after cache and dual-singleton exits, before independent pair route.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Actually reached dense target checks after pair route fails or NONLOSSstillneedsLOSS/DRAWsearch; response1short-circuits target.",
+          "TG": "Same domain, cold-selected general target path.",
+          "SB": "Cold complete support-basis plan binding0/1.",
+          "CL": "Cold complete closure binding0/1; implies SB.",
+          "THREE": "ColdactualcoordWords3 versusspan choice, no boardliteral.",
+          "MIRROR": "1complete-view admission; nohotcheck.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication.",
+          "RESP_TESTS": "Actual response2/then response0group gates, nested depth/alpha/beta and response1target-short-circuit tests.",
+          "RESP_BRANCHES": "Corresponding actually reached nested/fall-through branches.",
+          "NONLOSS_CUT": "Depth>0,current alpha>=0,response2; existing upper0 store/gauge protocol. Target evaluation not reached on this sufficient cutoff.",
+          "PAIR_OPEN": "CPnodes whose response policy is0unresolved; response1/2make current WIN impossible and skip pair analysis.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SELF": "One rowbase multiplication on each admitted node entry after stop gate; same recursive scalar slot carries canonical supporthandle, no extra frame or parameter.",
+          "NONROOT": "1 at each entered nonroot after stop gate, including empty cache/early proof path;0 root. Both eager packed scalars remain live across recursion.",
+          "ATTEMPTS": "Actual legal child cofactor calls including terminal attempts; no dense/sparse branch or inverse field load.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcMatchingResponse32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(PAIR_OPEN)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)+(TACT)*CALL(collectConnect4CpcxSingletons32)+(TACT)*C(alu.imul.u32)+(A)*C(memory.load.u32)+(A)*C(alu.shr.u32)+(A)*C(alu.shl.u32)+(2*A)*C(alu.and.u32)+(A)*C(alu.add.u32)+(RESP_TESTS)*C(control.test.u32)+(RESP_BRANCHES)*C(control.branch)+(NONLOSS_CUT)*CALL(storeBound)+(MISS*THREE*ENABLED)*CALL(probeResidualProof3)+(MISS*(1-THREE)*ENABLED)*CALL(probeResidualProof32)+(R*THREE*ENABLED)*CALL(childResidualProof3)+(R*(1-THREE)*ENABLED)*CALL(childResidualProof32)+(R)*C(memory.load.u32)+(MISS)*C(control.test.u32)+(MISS)*C(control.branch)+(R)*CALL(connect4RbaSupportCanonicalizeView)+(SELF)*C(runtime.number.multiply)+(2)*C(control.test.u32)+(2)*C(control.branch)+(ATTEMPTS*THREE)*CALL(connect4RbaCompiledTransition3CofactorNonWinningKnownHeight)+(ATTEMPTS*(1-THREE))*CALL(connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight)+(NONROOT*WIDE)*CALL(packIndexPartialMixedSupport32)+(NONROOT*(1-WIDE))*CALL(packIndexPartial16Heights32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NONROOT*WIDE)*C(alu.or.u32)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 4
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+PAIR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 4
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "PAIR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareSupportCompiledTransitionScratch32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineOrder32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "IW",
+          "target": "connect4RbaImmediateWinningColumn"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT_LOAD"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*PT"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H*(1-LIVE3)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*H"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*H"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "H+2"
+        },
+        {
+          "op": "control.branch",
+          "count": "H+2"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "advanceConnect4LiveLineState3x32",
+          "count": "H*LIVE3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4ResidualProofFrontier32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "initializeSupportBasisHandle32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "SHARED_BIND_FIELDS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "SHARED_BIND_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "SHARED_BIND_TEST"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "N*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Actualcoldfieldloads forcomplete-view geometry/pointer/callbackbindings.",
+          "S": "Actualrootkey/centerorder/history/size stores, NOprivatebasis rootcopy.",
+          "MUL": "Coldalloc/result/ordercomputations excludingprivatebasisarena dimensions.",
+          "ADD": "Arena sizing, center-shell ordering indices and result indices.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate. Includes root immediate-win branch.",
+          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections. Includes one cold kernel selection.",
+          "T": "1 for a terminal root, otherwise 0.",
+          "N": "1 for a nonterminal root without an immediate win; otherwise zero.",
+          "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
+          "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell.",
+          "IW": "1 for a nonterminal root; the only own-immediate scan in this worker.",
+          "PT": "one when prepared empty timing enabled, otherwise zero",
+          "PT_TIMER": "cold timer reads",
+          "PT_LOAD": "cold readiness/start loads",
+          "PT_WAIT": "cold blocking wait calls",
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "H": "Actual moveHistory length handed off after readiness, not allocated typed-array capacity; one live advance per root move",
+          "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SHARED_BIND_FIELDS": "Actually reached shared layout/kind and fallback accessor reads at cold binding; compact32 uses prepared helper, split/direct/fullspan unchanged access.",
+          "SHARED_BIND_TEST": "Cold optional-layout check and two alias selections, never a hot layout flag.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareSupportCompiledTransitionScratch32)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcMatchingResponse32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(1)*CALL(attachMixedIndexPartialCache32)+(3)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createMixedIndexPartialCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(1)*CALL(prepareConnect4ResidualProofFrontier32)+(4)*C(runtime.field.load)+(THREE*ENABLED)*CALL(childResidualProof3)+((1-THREE)*ENABLED)*CALL(childResidualProof32)+(1)*CALL(initializeSupportBasisHandle32)+(1)*C(runtime.field.load)+(1)*C(runtime.number.multiply)+(SHARED_BIND_FIELDS)*C(runtime.field.load)+(SHARED_BIND_TEST)*C(control.test.u32)+(SHARED_BIND_TEST)*C(control.branch)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#storeBound",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+      "name": "storeBound",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
+          "B": "Executed local bound-disposition branches.",
+          "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
+          "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1incoming proved bound plus1only when opposite localzero bounds join exactdraw.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#relativeTerminal",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "relativeTerminal",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#relativeToAbsolute",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "relativeToAbsolute",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)+(1)*C(alu.add.u32)+(1)*C(alu.sub.u32)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#probeCache",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "probeCache",
+      "scope": "lazy-smp-tt-probe",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "probeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "transportConnect4ZeroBound32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "S"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "parameters": {
+          "T": "Local-value, identity, sampling and shared-hit predicates.",
+          "B": "Early local-hit/shared-hit and sampling control selections.",
+          "K": "1 when a local slot is populated, otherwise 0.",
+          "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#storeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "storeExact",
+      "scope": "lazy-smp-tt-store",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#negamax",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "negamax",
+      "scope": "lazy-smp-negamax-hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "SP"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND+1"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "probeCache"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X+D+CW",
+          "target": "storeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BND",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*PK",
+          "target": "orderConnect4LiveLinePacked32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "O*(1-PK)",
+          "target": "orderConnect4LiveLineGeneral32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*LK",
+          "target": "advanceConnect4LiveLineState3x32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-LK)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "R"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PAIR_OPEN",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "collectConnect4CpcxSingletons32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "TACT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*A"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "RESP_TESTS"
+        },
+        {
+          "op": "control.branch",
+          "count": "RESP_BRANCHES"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NONLOSS_CUT",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*THREE*ENABLED",
+          "target": "probeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*(1-THREE)*ENABLED",
+          "target": "probeResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "MISS"
+        },
+        {
+          "op": "control.branch",
+          "count": "MISS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "connect4RbaSupportCanonicalizeView"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "SELF"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*THREE",
+          "target": "connect4RbaCompiledTransition3CofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*(1-THREE)",
+          "target": "connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartialMixedSupport32",
+          "count": "NONROOT*WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartial16Heights32",
+          "count": "NONROOT*(1-WIDE)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "NONROOT*WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "R*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "L": "Center-order, support-height and child-size reads. Includes move-row and optional reflection-table reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Actualword/order/loopaddresses; no privatechildbasisframe addition.",
+          "AND": "Local TT slot mask applications. Includes decoding packed move columns.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes physical/canonical orientation transport. Includes controller=mover XOR1 for certificate calls.",
+          "SUB": "Negamax sign/window negations represented at source-operation level.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
+          "BRANCH": "Executed source control selections and early returns.",
+          "H": "1 only for a non-root node surviving cooperative stop.",
+          "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
+          "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
+          "R": "Nonterminal child recursions/frontier updates; canonical handle forwarded without repeating mirror or row construction in caller.",
+          "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
+          "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
+          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
+          "KD": "Cold dense-removaltable admitted.",
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "O": "Nodes ordering unrestricted legal moves; forced response skips sorting.",
+          "PK": "Cold-selected packed versus general move-row layout.",
+          "LK": "Cold-selected three-word versus general live-state update.",
+          "CP": "One response policy check after cache and dual-singleton exits, before independent pair route.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Actually reached dense target checks after pair route fails or NONLOSSstillneedsLOSS/DRAWsearch; response1short-circuits target.",
+          "TG": "Same domain, cold-selected general target path.",
+          "SB": "Cold complete support-basis plan binding0/1.",
+          "CL": "Cold complete closure binding0/1; implies SB.",
+          "THREE": "ColdactualcoordWords3 versusspan choice, no boardliteral.",
+          "MIRROR": "1complete-view admission; nohotcheck.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication.",
+          "RESP_TESTS": "Actual response2/then response0group gates, nested depth/alpha/beta and response1target-short-circuit tests.",
+          "RESP_BRANCHES": "Corresponding actually reached nested/fall-through branches.",
+          "NONLOSS_CUT": "Depth>0,current alpha>=0,response2; existing upper0 store/gauge protocol. Target evaluation not reached on this sufficient cutoff.",
+          "PAIR_OPEN": "CPnodes whose response policy is0unresolved; response1/2make current WIN impossible and skip pair analysis.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SELF": "One rowbase multiplication on each admitted node entry after stop gate; same recursive scalar slot carries canonical supporthandle, no extra frame or parameter.",
+          "NONROOT": "1 at each entered nonroot after stop gate, including empty cache/early proof path;0 root. Both eager packed scalars remain live across recursion.",
+          "ATTEMPTS": "Actual legal child cofactor calls including terminal attempts; no dense/sparse branch or inverse field load.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(O*PK)*CALL(orderConnect4LiveLinePacked32)+(O*(1-PK))*CALL(orderConnect4LiveLineGeneral32)+(R*LK)*CALL(advanceConnect4LiveLineState3x32)+(R*(1-LK))*CALL(advanceConnect4LiveLineState32)+(R)*C(alu.imul.u32)+(CP)*CALL(evaluateConnect4PreparedCpcMatchingResponse32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(PAIR_OPEN)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)+(TACT)*CALL(collectConnect4CpcxSingletons32)+(TACT)*C(alu.imul.u32)+(A)*C(memory.load.u32)+(A)*C(alu.shr.u32)+(A)*C(alu.shl.u32)+(2*A)*C(alu.and.u32)+(A)*C(alu.add.u32)+(RESP_TESTS)*C(control.test.u32)+(RESP_BRANCHES)*C(control.branch)+(NONLOSS_CUT)*CALL(storeBound)+(MISS*THREE*ENABLED)*CALL(probeResidualProof3)+(MISS*(1-THREE)*ENABLED)*CALL(probeResidualProof32)+(R*THREE*ENABLED)*CALL(childResidualProof3)+(R*(1-THREE)*ENABLED)*CALL(childResidualProof32)+(R)*C(memory.load.u32)+(MISS)*C(control.test.u32)+(MISS)*C(control.branch)+(R)*CALL(connect4RbaSupportCanonicalizeView)+(SELF)*C(runtime.number.multiply)+(2)*C(control.test.u32)+(2)*C(control.branch)+(ATTEMPTS*THREE)*CALL(connect4RbaCompiledTransition3CofactorNonWinningKnownHeight)+(ATTEMPTS*(1-THREE))*CALL(connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight)+(NONROOT*WIDE)*CALL(packIndexPartialMixedSupport32)+(NONROOT*(1-WIDE))*CALL(packIndexPartial16Heights32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NONROOT*WIDE)*C(alu.or.u32)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 4
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+PAIR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 4
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "PAIR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareSupportCompiledTransitionScratch32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4LiveLineOrder32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "IW",
+          "target": "connect4RbaImmediateWinningColumn"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT_LOAD"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*PT"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "resetConnect4LiveLineState32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H*(1-LIVE3)",
+          "target": "advanceConnect4LiveLineState32"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "2*H"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "H"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2*H"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "H"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "H+2"
+        },
+        {
+          "op": "control.branch",
+          "count": "H+2"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "advanceConnect4LiveLineState3x32",
+          "count": "H*LIVE3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4ResidualProofFrontier32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "initializeSupportBasisHandle32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "SHARED_BIND_FIELDS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "SHARED_BIND_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "SHARED_BIND_TEST"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "N*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Actualcoldfieldloads forcomplete-view geometry/pointer/callbackbindings.",
+          "S": "Actualrootkey/centerorder/history/size stores, NOprivatebasis rootcopy.",
+          "MUL": "Coldalloc/result/ordercomputations excludingprivatebasisarena dimensions.",
+          "ADD": "Arena sizing, center-shell ordering indices and result indices.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate. Includes root immediate-win branch.",
+          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections. Includes one cold kernel selection.",
+          "T": "1 for a terminal root, otherwise 0.",
+          "N": "1 for a nonterminal root without an immediate win; otherwise zero.",
+          "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
+          "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell.",
+          "IW": "1 for a nonterminal root; the only own-immediate scan in this worker.",
+          "PT": "one when prepared empty timing enabled, otherwise zero",
+          "PT_TIMER": "cold timer reads",
+          "PT_LOAD": "cold readiness/start loads",
+          "PT_WAIT": "cold blocking wait calls",
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "H": "Actual moveHistory length handed off after readiness, not allocated typed-array capacity; one live advance per root move",
+          "LIVE3": "1 when the prepared live profile has three words and selects the 3x32 advance; otherwise 0",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SHARED_BIND_FIELDS": "Actually reached shared layout/kind and fallback accessor reads at cold binding; compact32 uses prepared helper, split/direct/fullspan unchanged access.",
+          "SHARED_BIND_TEST": "Cold optional-layout check and two alias selections, never a hot layout flag.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(1)*C(runtime.module.bookkeeping)+(4)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareSupportCompiledTransitionScratch32)+(1)*CALL(prepareConnect4LiveLineOrder32)+(1)*CALL(prepareConnect4CpcMatchingResponse32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.array.allocate)+(1)*CALL(resetConnect4LiveLineState32)+(H*(1-LIVE3))*CALL(advanceConnect4LiveLineState32)+(PT)*C(atomic.load.u32)+(2*H)*C(memory.load.u32)+(H)*C(memory.store.u32)+(H)*C(alu.imul.u32)+(2*H)*C(alu.add.u32)+(H)*C(alu.and.u32)+(H+2)*C(control.test.u32)+(H+2)*C(control.branch)+(H*LIVE3)*CALL(advanceConnect4LiveLineState3x32)+(1)*CALL(attachMixedIndexPartialCache32)+(3)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createMixedIndexPartialCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(1)*CALL(prepareConnect4ResidualProofFrontier32)+(4)*C(runtime.field.load)+(THREE*ENABLED)*CALL(childResidualProof3)+((1-THREE)*ENABLED)*CALL(childResidualProof32)+(1)*CALL(initializeSupportBasisHandle32)+(1)*C(runtime.field.load)+(1)*C(runtime.number.multiply)+(SHARED_BIND_FIELDS)*C(runtime.field.load)+(SHARED_BIND_TEST)*C(control.test.u32)+(SHARED_BIND_TEST)*C(control.branch)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#storeBound",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+      "name": "storeBound",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PUB",
+          "target": "transportConnect4ZeroBound32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "PUB",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
+          "B": "Executed local bound-disposition branches.",
+          "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
+          "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
+          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1incoming proved bound plus1only when opposite localzero bounds join exactdraw.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#relativeTerminal",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "relativeTerminal",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#relativeToAbsolute",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "relativeToAbsolute",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)+(1)*C(alu.add.u32)+(1)*C(alu.sub.u32)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#probeCache",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "probeCache",
+      "scope": "lazy-smp-tt-probe",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "probeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)",
+        "parameters": {
+          "T": "Local-value, identity, sampling and shared-hit predicates.",
+          "B": "Early local-hit/shared-hit and sampling control selections.",
+          "K": "1 when a local slot is populated, otherwise 0.",
+          "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#storeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "storeExact",
+      "scope": "lazy-smp-tt-store",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#negamax",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "negamax",
+      "scope": "lazy-smp-negamax-hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "SP"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND+1"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "probeCache"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X+D+CW",
+          "target": "storeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BND",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PAIR_OPEN",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "collectConnect4CpcxSingletons32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "TACT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*A"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "RESP_TESTS"
+        },
+        {
+          "op": "control.branch",
+          "count": "RESP_BRANCHES"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NONLOSS_CUT",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*THREE*ENABLED",
+          "target": "probeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*(1-THREE)*ENABLED",
+          "target": "probeResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "MISS"
+        },
+        {
+          "op": "control.branch",
+          "count": "MISS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "connect4RbaSupportCanonicalizeView"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "SELF"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*THREE",
+          "target": "connect4RbaCompiledTransition3CofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*(1-THREE)",
+          "target": "connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartialMixedSupport32",
+          "count": "NONROOT*WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartial16Heights32",
+          "count": "NONROOT*(1-WIDE)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "NONROOT*WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "R*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "L": "Center-order, support-height and child-size reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Actualword/order/loopaddresses; no privatechildbasisframe addition.",
+          "AND": "Local TT slot mask applications.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes controller=mover XOR1 for certificate calls.",
+          "SUB": "Negamax sign/window negations represented at source-operation level.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
+          "BRANCH": "Executed source control selections and early returns.",
+          "H": "1 only for a non-root node surviving cooperative stop.",
+          "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
+          "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
+          "R": "Nonterminal child recursions/frontier updates; canonical handle forwarded without repeating mirror or row construction in caller.",
+          "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
+          "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
+          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
+          "KD": "Cold dense-removaltable admitted.",
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "CP": "One response policy check after cache and dual-singleton exits, before independent pair route.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Actually reached dense target checks after pair route fails or NONLOSSstillneedsLOSS/DRAWsearch; response1short-circuits target.",
+          "TG": "Same domain, cold-selected general target path.",
+          "SB": "Cold complete support-basis plan binding0/1.",
+          "CL": "Cold complete closure binding0/1; implies SB.",
+          "THREE": "ColdactualcoordWords3 versusspan choice, no boardliteral.",
+          "MIRROR": "1complete-view admission; nohotcheck.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication.",
+          "RESP_TESTS": "Actual response2/then response0group gates, nested depth/alpha/beta and response1target-short-circuit tests.",
+          "RESP_BRANCHES": "Corresponding actually reached nested/fall-through branches.",
+          "NONLOSS_CUT": "Depth>0,current alpha>=0,response2; existing upper0 store/gauge protocol. Target evaluation not reached on this sufficient cutoff.",
+          "PAIR_OPEN": "CPnodes whose response policy is0unresolved; response1/2make current WIN impossible and skip pair analysis.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SELF": "One rowbase multiplication on each admitted node entry after stop gate; same recursive scalar slot carries canonical supporthandle, no extra frame or parameter.",
+          "NONROOT": "1 at each entered nonroot after stop gate, including empty cache/early proof path;0 root. Both eager packed scalars remain live across recursion.",
+          "ATTEMPTS": "Actual legal child cofactor calls including terminal attempts; no dense/sparse branch or inverse field load.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(CP)*CALL(evaluateConnect4PreparedCpcMatchingResponse32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(PAIR_OPEN)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)+(TACT)*CALL(collectConnect4CpcxSingletons32)+(TACT)*C(alu.imul.u32)+(A)*C(memory.load.u32)+(A)*C(alu.shr.u32)+(A)*C(alu.shl.u32)+(2*A)*C(alu.and.u32)+(A)*C(alu.add.u32)+(RESP_TESTS)*C(control.test.u32)+(RESP_BRANCHES)*C(control.branch)+(NONLOSS_CUT)*CALL(storeBound)+(MISS*THREE*ENABLED)*CALL(probeResidualProof3)+(MISS*(1-THREE)*ENABLED)*CALL(probeResidualProof32)+(R*THREE*ENABLED)*CALL(childResidualProof3)+(R*(1-THREE)*ENABLED)*CALL(childResidualProof32)+(R)*C(memory.load.u32)+(MISS)*C(control.test.u32)+(MISS)*C(control.branch)+(R)*CALL(connect4RbaSupportCanonicalizeView)+(SELF)*C(runtime.number.multiply)+(2)*C(control.test.u32)+(2)*C(control.branch)+(ATTEMPTS*THREE)*CALL(connect4RbaCompiledTransition3CofactorNonWinningKnownHeight)+(ATTEMPTS*(1-THREE))*CALL(connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight)+(NONROOT*WIDE)*CALL(packIndexPartialMixedSupport32)+(NONROOT*(1-WIDE))*CALL(packIndexPartial16Heights32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NONROOT*WIDE)*C(alu.or.u32)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+PAIR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 4
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "PAIR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareSupportCompiledTransitionScratch32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "IW",
+          "target": "connect4RbaImmediateWinningColumn"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT_LOAD"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*PT"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4ResidualProofFrontier32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "initializeSupportBasisHandle32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "SHARED_BIND_FIELDS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "SHARED_BIND_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "SHARED_BIND_TEST"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "N*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Actualcoldfieldloads forcomplete-view geometry/pointer/callbackbindings.",
+          "S": "Actualrootkey/centerorder/history/size stores, NOprivatebasis rootcopy.",
+          "MUL": "Coldalloc/result/ordercomputations excludingprivatebasisarena dimensions.",
+          "ADD": "Arena sizing, center-shell ordering indices and result indices.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate. Includes root immediate-win branch.",
+          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections. Includes one cold kernel selection.",
+          "T": "1 for a terminal root, otherwise 0.",
+          "N": "1 for a nonterminal root without an immediate win; otherwise zero.",
+          "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
+          "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell.",
+          "IW": "1 for a nonterminal root; the only own-immediate scan in this worker.",
+          "PT": "one when prepared empty timing enabled, otherwise zero",
+          "PT_TIMER": "cold timer reads",
+          "PT_LOAD": "cold readiness/start loads",
+          "PT_WAIT": "cold blocking wait calls",
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SHARED_BIND_FIELDS": "Actually reached shared layout/kind and fallback accessor reads at cold binding; compact32 uses prepared helper, split/direct/fullspan unchanged access.",
+          "SHARED_BIND_TEST": "Cold optional-layout check and two alias selections, never a hot layout flag.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(1)*C(runtime.module.bookkeeping)+(3)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareSupportCompiledTransitionScratch32)+(1)*CALL(prepareConnect4CpcMatchingResponse32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(attachMixedIndexPartialCache32)+(3)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createMixedIndexPartialCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(1)*CALL(prepareConnect4ResidualProofFrontier32)+(4)*C(runtime.field.load)+(THREE*ENABLED)*CALL(childResidualProof3)+((1-THREE)*ENABLED)*CALL(childResidualProof32)+(1)*CALL(initializeSupportBasisHandle32)+(1)*C(runtime.field.load)+(1)*C(runtime.number.multiply)+(SHARED_BIND_FIELDS)*C(runtime.field.load)+(SHARED_BIND_TEST)*C(control.test.u32)+(SHARED_BIND_TEST)*C(control.branch)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#storeBound",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+      "name": "storeBound",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
+          "B": "Executed local bound-disposition branches.",
+          "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
+          "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1incoming proved bound plus1only when opposite localzero bounds join exactdraw.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#relativeTerminal",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "relativeTerminal",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#relativeToAbsolute",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "relativeToAbsolute",
+      "scope": "lazy-smp-negamax",
+      "operations": [
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(2)*C(control.test.u32)+(2)*C(control.branch)+(1)*C(alu.add.u32)+(1)*C(alu.sub.u32)",
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "parameters": {
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        }
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#probeCache",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "probeCache",
+      "scope": "lazy-smp-tt-probe",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "probeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "P",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "transportConnect4ZeroBound32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "S"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)",
+        "parameters": {
+          "T": "Local-value, identity, sampling and shared-hit predicates.",
+          "B": "Early local-hit/shared-hit and sampling control selections.",
+          "K": "1 when a local slot is populated, otherwise 0.",
+          "S": "1 when the hash is admitted to shared probing after local miss, otherwise 0.",
+          "P": "1 when a shared exact hit is promoted to the local TT, otherwise 0.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#storeExact",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "storeExact",
+      "scope": "lazy-smp-tt-store",
+      "operations": [
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "S",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "S": "1 when the hash is admitted by the configured shared sampling mask, otherwise 0.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#negamax",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "negamax",
+      "scope": "lazy-smp-negamax-hot",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "SP"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "L"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "AND+1"
+        },
+        {
+          "op": "alu.xor.u32",
+          "count": "XOR"
+        },
+        {
+          "op": "alu.sub.u32",
+          "count": "SUB"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "mixSpan32Locator32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "H",
+          "target": "probeCache"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X+D+CW",
+          "target": "storeExact"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "BND",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "X",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "CP",
+          "target": "evaluateConnect4PreparedCpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetDenseWin32",
+          "count": "TD"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "evaluateConnect4CpcTargetGeneralWin32",
+          "count": "TG"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PAIR_OPEN",
+          "target": "findConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "FORK_D",
+          "target": "storeExact"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "control.branch",
+          "count": "TACT+FORK"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "FORK_ROOT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "TACT",
+          "target": "collectConnect4CpcxSingletons32"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "TACT"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": "A"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "2*A"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "A"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "RESP_TESTS"
+        },
+        {
+          "op": "control.branch",
+          "count": "RESP_BRANCHES"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "NONLOSS_CUT",
+          "target": "storeBound"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*THREE*ENABLED",
+          "target": "probeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "MISS*(1-THREE)*ENABLED",
+          "target": "probeResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R*(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "memory.load.u32",
+          "count": "R"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "MISS"
+        },
+        {
+          "op": "control.branch",
+          "count": "MISS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "R",
+          "target": "connect4RbaSupportCanonicalizeView"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "SELF"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 2
+        },
+        {
+          "op": "control.branch",
+          "count": 2
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*THREE",
+          "target": "connect4RbaCompiledTransition3CofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ATTEMPTS*(1-THREE)",
+          "target": "connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartialMixedSupport32",
+          "count": "NONROOT*WIDE"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "packIndexPartial16Heights32",
+          "count": "NONROOT*(1-WIDE)"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "alu.or.u32",
+          "count": "NONROOT*WIDE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "R*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Geometry and worker-local state field reads outside subledgers.",
+          "L": "Center-order, support-height and child-size reads. Includes legal root witness on CPC-proven loss.",
+          "ADD": "Actualword/order/loopaddresses; no privatechildbasisframe addition.",
+          "AND": "Local TT slot mask applications.",
+          "XOR": "Mover inversion on recursive nonterminal edges. Includes controller=mover XOR1 for certificate calls.",
+          "SUB": "Negamax sign/window negations represented at source-operation level.",
+          "TEST": "Cache, loop, legality, terminal, best, maximal-win/alpha-beta cutoff, exact-publication and depth-gated stop predicates. Includes double-threat, forced-action and root-loss legal-column selection. Includes exposure proof and opponent absolute-value selection. Includes certificate result and root legal-witness selection.",
+          "BRANCH": "Executed source control selections and early returns.",
+          "H": "1 only for a non-root node surviving cooperative stop.",
+          "A": "Legal actions whose RBA cofactors are constructed. Excludes exposed-opponent singleton cuts.",
+          "T": "Terminal child actions plus exact cache hits translated player-relatively. Includes exposed-opponent singleton child-loss proofs.",
+          "R": "Nonterminal child recursions/frontier updates; canonical handle forwarded without repeating mirror or row construction in caller.",
+          "X": "All search-proven exact non-root results, including narrow-window domain-extreme proofs, converted to absolute 1/2/3 and published to local/shared exact TTs.",
+          "BND": "Zero-threshold bound retention; explicit proof pool additionally publishes transported bounds through its storeBound subledger.",
+          "SP": "1 when depth is divisible by four and the cooperative stop atomic executes, otherwise 0.",
+          "Q": "Opponent frontier scan after no immediate mover win; before child descent.",
+          "D": "1 for a non-root double-threat exact loss publication; 0 otherwise.",
+          "KD": "Cold dense-removaltable admitted.",
+          "LA": "Legal actions considered, including exact child losses proved without constructing a cofactor.",
+          "CP": "One response policy check after cache and dual-singleton exits, before independent pair route.",
+          "CW": "Positive non-root CPC certificates published as an exact previous-mover win.",
+          "TD": "Actually reached dense target checks after pair route fails or NONLOSSstillneedsLOSS/DRAWsearch; response1short-circuits target.",
+          "TG": "Same domain, cold-selected general target path.",
+          "SB": "Cold complete support-basis plan binding0/1.",
+          "CL": "Cold complete closure binding0/1; implies SB.",
+          "THREE": "ColdactualcoordWords3 versusspan choice, no boardliteral.",
+          "MIRROR": "1complete-view admission; nohotcheck.",
+          "TACT": "1 only after stop/cache and C01 dual-threat-loss exits.",
+          "FORK": "1 only for a positive current-mover pair-hub certificate.",
+          "FORK_D": "FORK at non-root.",
+          "FORK_ROOT": "FORK at root; bestMove context slot publication.",
+          "RESP_TESTS": "Actual response2/then response0group gates, nested depth/alpha/beta and response1target-short-circuit tests.",
+          "RESP_BRANCHES": "Corresponding actually reached nested/fall-through branches.",
+          "NONLOSS_CUT": "Depth>0,current alpha>=0,response2; existing upper0 store/gauge protocol. Target evaluation not reached on this sufficient cutoff.",
+          "PAIR_OPEN": "CPnodes whose response policy is0unresolved; response1/2make current WIN impossible and skip pair analysis.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SELF": "One rowbase multiplication on each admitted node entry after stop gate; same recursive scalar slot carries canonical supporthandle, no extra frame or parameter.",
+          "NONROOT": "1 at each entered nonroot after stop gate, including empty cache/early proof path;0 root. Both eager packed scalars remain live across recursion.",
+          "ATTEMPTS": "Actual legal child cofactor calls including terminal attempts; no dense/sparse branch or inverse field load.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(SP)*C(atomic.load.u32)+(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(AND+1)*C(alu.and.u32)+(XOR)*C(alu.xor.u32)+(SUB)*C(alu.sub.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(H)*CALL(mixSpan32Locator32)+(H)*CALL(probeCache)+(T)*CALL(relativeTerminal)+(R)*CALL(negamax)+(X+D+CW)*CALL(storeExact)+(BND)*CALL(storeBound)+(X)*CALL(relativeToAbsolute)+(CP)*CALL(evaluateConnect4PreparedCpcMatchingResponse32)+(TD)*CALL(evaluateConnect4CpcTargetDenseWin32)+(TG)*CALL(evaluateConnect4CpcTargetGeneralWin32)+(PAIR_OPEN)*CALL(findConnect4CpcxPairHub32)+(FORK_D)*CALL(relativeToAbsolute)+(FORK_D)*CALL(storeExact)+(TACT+FORK)*C(control.test.u32)+(TACT+FORK)*C(control.branch)+(FORK_ROOT)*C(runtime.field.store)+(TACT)*CALL(collectConnect4CpcxSingletons32)+(TACT)*C(alu.imul.u32)+(A)*C(memory.load.u32)+(A)*C(alu.shr.u32)+(A)*C(alu.shl.u32)+(2*A)*C(alu.and.u32)+(A)*C(alu.add.u32)+(RESP_TESTS)*C(control.test.u32)+(RESP_BRANCHES)*C(control.branch)+(NONLOSS_CUT)*CALL(storeBound)+(MISS*THREE*ENABLED)*CALL(probeResidualProof3)+(MISS*(1-THREE)*ENABLED)*CALL(probeResidualProof32)+(R*THREE*ENABLED)*CALL(childResidualProof3)+(R*(1-THREE)*ENABLED)*CALL(childResidualProof32)+(R)*C(memory.load.u32)+(MISS)*C(control.test.u32)+(MISS)*C(control.branch)+(R)*CALL(connect4RbaSupportCanonicalizeView)+(SELF)*C(runtime.number.multiply)+(2)*C(control.test.u32)+(2)*C(control.branch)+(ATTEMPTS*THREE)*CALL(connect4RbaCompiledTransition3CofactorNonWinningKnownHeight)+(ATTEMPTS*(1-THREE))*CALL(connect4RbaCompiledTransitionSpanCofactorNonWinningKnownHeight)+(NONROOT*WIDE)*CALL(packIndexPartialMixedSupport32)+(NONROOT*(1-WIDE))*CALL(packIndexPartial16Heights32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(NONROOT*WIDE)*C(alu.or.u32)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#<module-main>",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "<module-main>",
+      "scope": "lazy-smp-worker-main",
+      "operations": [
+        {
+          "op": "runtime.module.bookkeeping",
+          "count": 1
+        },
+        {
+          "op": "runtime.typed_array.allocate",
+          "count": 3
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "F"
+        },
+        {
+          "op": "memory.store.u32",
+          "count": "S"
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "MUL"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADD"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": "1+PAIR"
+        },
+        {
+          "op": "alu.shl.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "BRANCH"
+        },
+        {
+          "op": "atomic.store.u32",
+          "count": 4
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": 2
+        },
+        {
+          "op": "atomic.notify",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4RbaExecutionProfile"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "isCompactProfile8"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "T",
+          "target": "relativeTerminal"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "N",
+          "target": "negamax"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "A",
+          "target": "relativeToAbsolute"
+        },
+        {
+          "op": "alu.shr.u32",
+          "count": "PAIR"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareSupportCompiledTransitionScratch32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcMatchingResponse32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "IW",
+          "target": "connect4RbaImmediateWinningColumn"
+        },
+        {
+          "op": "runtime.typed_array.fill",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.rmw.u32",
+          "count": "PT"
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT_LOAD"
+        },
+        {
+          "op": "atomic.wait",
+          "count": "PT_WAIT"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "target": "prepareConnect4CpcTargetWin32",
+          "count": 1
+        },
+        {
+          "op": "atomic.load.u32",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "PT"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "2*PT"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "attachMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "control.test.u32",
+          "count": 4
+        },
+        {
+          "op": "control.branch",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "createMixedIndexPartialCache32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4CpcxPairHub32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "prepareConnect4ResidualProofFrontier32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 4
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "THREE*ENABLED",
+          "target": "childResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "(1-THREE)*ENABLED",
+          "target": "childResidualProof32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "initializeSupportBasisHandle32"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "SHARED_BIND_FIELDS"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "SHARED_BIND_TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "SHARED_BIND_TEST"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "minCycles": 0,
+        "unboundedTerms": [
+          "N*CALL(negamax)"
+        ],
+        "parameters": {
+          "F": "Actualcoldfieldloads forcomplete-view geometry/pointer/callbackbindings.",
+          "S": "Actualrootkey/centerorder/history/size stores, NOprivatebasis rootcopy.",
+          "MUL": "Coldalloc/result/ordercomputations excludingprivatebasisarena dimensions.",
+          "ADD": "Arena sizing, center-shell ordering indices and result indices.",
+          "TEST": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate. Includes root immediate-win branch.",
+          "BRANCH": "Center-shell tie-direction construction and executed module-level control selections. Includes one cold kernel selection.",
+          "T": "1 for a terminal root, otherwise 0.",
+          "N": "1 for a nonterminal root without an immediate win; otherwise zero.",
+          "A": "1 when a completed nonterminal result is converted to the host absolute wire value, otherwise 0.",
+          "PAIR": "Center-distance shells containing a left/right tie; worker-index bits choose only the order within each shell.",
+          "IW": "1 for a nonterminal root; the only own-immediate scan in this worker.",
+          "PT": "one when prepared empty timing enabled, otherwise zero",
+          "PT_TIMER": "cold timer reads",
+          "PT_LOAD": "cold readiness/start loads",
+          "PT_WAIT": "cold blocking wait calls",
+          "PT_POLL": "cold readiness polling and promise/timer bookkeeping; includes validation, initialization fills and root handoff; no recursive work",
+          "NATIVE": "1 when workerData cache has native layout descriptor;0 split40",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1perproved exact entry.",
+          "SHARED_BIND_FIELDS": "Actually reached shared layout/kind and fallback accessor reads at cold binding; compact32 uses prepared helper, split/direct/fullspan unchanged access.",
+          "SHARED_BIND_TEST": "Cold optional-layout check and two alias selections, never a hot layout flag.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.",
+        "expression": "(1)*C(runtime.module.bookkeeping)+(3)*C(runtime.typed_array.allocate)+(F)*C(runtime.field.load)+(S)*C(memory.store.u32)+(MUL)*C(alu.imul.u32)+(ADD)*C(alu.add.u32)+(1+PAIR)*C(alu.and.u32)+(1)*C(alu.shl.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(4)*C(atomic.store.u32)+(2)*C(atomic.rmw.u32)+(1)*C(atomic.notify)+(1)*CALL(prepareConnect4RbaExecutionProfile)+(1)*CALL(isCompactProfile8)+(T)*CALL(relativeTerminal)+(N)*CALL(negamax)+(A)*CALL(relativeToAbsolute)+(PAIR)*C(alu.shr.u32)+(1)*CALL(prepareSupportCompiledTransitionScratch32)+(1)*CALL(prepareConnect4CpcMatchingResponse32)+(IW)*CALL(connect4RbaImmediateWinningColumn)+(PT)*C(runtime.typed_array.fill)+(PT)*C(atomic.rmw.u32)+(PT_LOAD)*C(atomic.load.u32)+(PT_WAIT)*C(atomic.wait)+(1)*CALL(prepareConnect4CpcTargetWin32)+(PT)*C(atomic.load.u32)+(PT)*C(runtime.field.store)+(2*PT)*C(runtime.field.load)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(attachMixedIndexPartialCache32)+(3)*C(runtime.field.load)+(4)*C(control.test.u32)+(4)*C(control.branch)+(1)*CALL(createMixedIndexPartialCache32)+(1)*CALL(prepareConnect4CpcxPairHub32)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(1)*CALL(prepareConnect4ResidualProofFrontier32)+(4)*C(runtime.field.load)+(THREE*ENABLED)*CALL(childResidualProof3)+((1-THREE)*ENABLED)*CALL(childResidualProof32)+(1)*CALL(initializeSupportBasisHandle32)+(1)*C(runtime.field.load)+(1)*C(runtime.number.multiply)+(SHARED_BIND_FIELDS)*C(runtime.field.load)+(SHARED_BIND_TEST)*C(control.test.u32)+(SHARED_BIND_TEST)*C(control.branch)"
+      },
+      "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#storeBound",
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+      "name": "storeBound",
+      "scope": "lazy-smp-local-tt",
+      "operations": [
+        {
+          "op": "memory.load.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": "T"
+        },
+        {
+          "op": "control.branch",
+          "count": "B"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "probeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "D",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "S",
+          "target": "storeIndexPartialMixedLocal32"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "PUB",
+          "target": "transportConnect4ZeroBound32"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "PUB",
+          "target": "storeIndexPartialMixedShared32"
+        },
+        {
+          "op": "alu.and.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        },
+        {
+          "op": "control.branch",
+          "count": 1
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*THREE*ENABLED",
+          "target": "storeResidualProof3"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "STORES*(1-THREE)*ENABLED",
+          "target": "storeResidualProof32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)",
+        "parameters": {
+          "T": "Existing-tag, identity, exact/same/opposite-bound predicates.",
+          "B": "Executed local bound-disposition branches.",
+          "K": "1 when the occupied local slot requires semantic-key validation, otherwise 0.",
+          "S": "1 when a new local-only bound entry replaces an empty/colliding slot, otherwise 0.",
+          "D": "1 when opposite local bounds prove exact draw and the local entry is replaced by exact value 2, otherwise 0.",
+          "PUB": "1 when a new local bound is admitted by unchanged shared sampling; existing same/exact or inferred local draw returns without publication.",
+          "THREE": "Actual coordinate span3, cold selection.",
+          "ENABLED": "Complete immutable closure+reflection plans admitted; else monomorphic no-op path.",
+          "MISS": "Non-root existing cache misses0; no added frontier query on exact OR zero-bound hit.",
+          "STORES": "1incoming proved bound plus1only when opposite localzero bounds join exactdraw.",
+          "WIDE": "1 when basis count>32;0 otherwise, support-only deterministic class"
+        },
+        "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged."
+      },
+      "status": "decomposed"
     }
   ],
   "summary": {
-    "units": 632,
-    "decomposed": 632,
+    "units": 666,
+    "decomposed": 666,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -53480,7 +57150,7 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "df9a54ce58a9eac5b86816b9b54bdd5ee8f6c272",
+    "addons/rba-connect4-prepared-session-host.mjs": "130e2df7dd119cdc7ebe0d42a70e837945b3e1de",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "d58339f9ca94cc1b77d6ceca76055afd5640b535",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
@@ -53533,7 +57203,7 @@
     "addons/worker-startup-affinity.mjs": "44450aa2dbc7b3c6e4b7a0e3134ec4419eff0169",
     "addons/rba-connect4-shared-banked-cache.mjs": "3d8118b06571044375500487aefffd16926cc2e6",
     "addons/isomax-memory-profile.mjs": "ab51946e25b928295797fe8921489a7f57538bfb",
-    "addons/rba-connect4-index-partial-cache.mjs": "43857826a24d5518bc6db1baaa3a203d8754e7c2",
+    "addons/rba-connect4-index-partial-cache.mjs": "8a713477ffecb1eaf20d19bc4bfc01b756e5baa1",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs": "b9ca0121bf709a635b60ca1199e3fe16cc11e726",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs": "51cae8eb98f8b71147553f4ac105bbbad1bd9589",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs": "29be244b659beb7d40c70a33b4bfa5b696c0f574",
@@ -53541,7 +57211,11 @@
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial16.mjs": "c284ffb5f268b12ff96a93d7db90978609cb4ea6",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial16.mjs": "d2570084aad7061b71f301486f6172ac0731a3fd",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial16.mjs": "d721d3d52fa7566da39e8eb5e1ea6f199de28050",
-    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial16.mjs": "98013577924453531313940a8dbb6fded5867511"
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial16.mjs": "98013577924453531313940a8dbb6fded5867511",
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs": "ef11244a984927cb817fba9f5286d643ddd22e51",
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs": "7e55f5cba8d69269ed36cb3ddf30d2505edcc4e5",
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs": "c48039624b89d46b643e331c3ba04f11f8f4fd01",
+    "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs": "a5c949a274349613e6fdb085a8800847b789238f"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",
