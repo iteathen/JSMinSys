@@ -9,6 +9,10 @@ export function prepareSupportCompiledTransitions32(g,plan,budgetBytes=536870912
   actions=plan.profiles*g.columns,slotElements=actions*g.maxBasis,maskElements=actions*g.coordWords,
   bytes=slotElements*Slot.BYTES_PER_ELEMENT+maskElements*4;
  if(!Number.isSafeInteger(bytes)||bytes>budgetBytes||slotElements>0xffffffff||maskElements>0xffffffff)return null;
+ // Reusable supplied plans already own these geometry-only shared planes.
+ if(plan.transitionPlanBytes===bytes&&plan.transitionDead===dead&&
+  plan.transitionSlots instanceof Slot&&plan.transitionSlots.length===slotElements&&plan.transitionSlots.buffer instanceof SharedArrayBuffer&&
+  plan.transitionStable instanceof Uint32Array&&plan.transitionStable.length===maskElements&&plan.transitionStable.buffer instanceof SharedArrayBuffer)return plan;
  const slots=new Slot(new SharedArrayBuffer(slotElements*Slot.BYTES_PER_ELEMENT)),
   stable=new Uint32Array(new SharedArrayBuffer(maskElements*4)),inverse=new Uint32Array(g.shapeCount),p=prepareConnect4RbaExecutionProfile(g);
  slots.fill(dead);
@@ -28,7 +32,8 @@ export function prepareSupportCompiledTransitions32(g,plan,budgetBytes=536870912
  }
  return Object.freeze({...plan,transitionSlots:slots,transitionStable:stable,transitionDead:dead,
   transitionPlanBudgetBytes:budgetBytes,transitionPlanBytes:bytes,transitionWorkingBytes:bytes+inverse.byteLength,
-  bytes:plan.bytes+bytes,workingBytes:plan.workingBytes+bytes+inverse.byteLength});
+  bytes:plan.bytes-(plan.transitionPlanBytes??0)+bytes,
+  workingBytes:plan.workingBytes-(plan.transitionWorkingBytes??0)+bytes+inverse.byteLength});
 }
 export function prepareSupportCompiledTransitionScratch32(g){
  return {map:new Uint32Array(1),mirror:new Uint32Array(g.keyWords)};

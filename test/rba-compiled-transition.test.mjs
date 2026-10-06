@@ -30,3 +30,13 @@ test('native slot sentinel widths adapt to declared basis bounds before allocati
  }
  assert.throws(()=>prepareSupportCompiledTransitions32({},null,-1),/budget/);
 });
+test('compiled plan reuse preserves buffers and accounts only reachable transition planes',()=>{
+ const g=prepareConnect4RbaGeometry({columns:4,rows:3}),base=prepareSupportBasisPlans32(g,8388608,true,true),
+  first=prepareSupportCompiledTransitions32(g,base),again=prepareSupportCompiledTransitions32(g,first);
+ assert.equal(base.bytes,5904);assert.equal(first.bytes,13072);
+ assert.equal(again,first);assert.equal(again.transitionSlots,first.transitionSlots);assert.equal(again.transitionStable,first.transitionStable);
+ assert.equal(prepareSupportCompiledTransitions32(g,first,first.transitionPlanBytes-1),null);
+ const incomplete={...first,transitionSlots:new Uint8Array(0)},repaired=prepareSupportCompiledTransitions32(g,incomplete);
+ assert.equal(repaired.bytes,13072);assert.equal(repaired.workingBytes,first.workingBytes);
+ assert.equal(repaired.transitionSlots.length,first.transitionSlots.length);
+});
