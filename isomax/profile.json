@@ -1,8 +1,8 @@
 {
-  "version": "0.2.0-rc.2",
-  "sourceCommit": "d2e4ccadcef6d67bc97a53679476e1ef6a5a9916",
+  "version": "0.2.0-rc.3",
+  "sourceCommit": "8ea0b505993631a78d4005a2112e53efa41a8c82",
   "options": {
-    "workers": 4,
+    "workers": "auto",
     "workerMode": "minimal",
     "sharedCacheCapacity": 134217728,
     "localCacheCapacity": 8388608,
@@ -23,6 +23,7 @@
     "--max-inlined-bytecode-size-cumulative=9600"
   ],
   "measured": {
+    "workers": 4,
     "node": "v27.0.0-nightly20260928b59840b593",
     "v8": "14.6.202.34-node.36",
     "cpu": "Intel Core i5-12600K",

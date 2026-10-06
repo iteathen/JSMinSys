@@ -17,11 +17,11 @@ for(const [C,R,moves,wdl] of [
  [1,4,[],0],[4,1,[],0]
 ])test('four-worker '+C+'x'+R+' preserves exact outcome and cleanup',async()=>{
  for(const budget of C===7?[0,1073741824]:[0]){
-  const result=await runLazySmpConnect4Rba32(moves,{geometry:prepareConnect4RbaGeometry({columns:C,rows:R}),sharedCacheCapacity:256,localCacheCapacity:256,supportBasisPlanBudgetBytes:budget,timeoutMs:10000});
+  const result=await runLazySmpConnect4Rba32(moves,{workers:4,geometry:prepareConnect4RbaGeometry({columns:C,rows:R}),sharedCacheCapacity:256,localCacheCapacity:256,supportBasisPlanBudgetBytes:budget,timeoutMs:10000});
   assert.equal(result.status,'EXACT',JSON.stringify(result.errors));assert.equal(result.rootWdl,wdl);assert.equal(result.workersExited,4);assert.equal(result.cleanup,true);assert.equal(result.nodeCounts,null);assert.equal(result.basisViews,C===7&&budget>0);
  }
 });
 test('portable launcher starts without installation and reports empty-board execution',()=>{
- const r=spawnSync(process.execPath,[fileURLToPath(new URL('../run.mjs',import.meta.url)),'--columns','1','--rows','4','--shared-entries','256','--local-entries','256'],{encoding:'utf8',timeout:15000});
+ const r=spawnSync(process.execPath,[fileURLToPath(new URL('../run.mjs',import.meta.url)),'--workers','4','--columns','1','--rows','4','--shared-entries','256','--local-entries','256'],{encoding:'utf8',timeout:15000});
  assert.equal(r.status,0,r.stderr);const out=JSON.parse(r.stdout);assert.equal(out.startingPosition,'empty');assert.equal(out.result.rootWdl,0);assert.equal(out.result.workersExited,4);assert.equal(out.configuration.workers,4);
 });

@@ -1,8 +1,8 @@
 {
   "name": "@iteathen/isomax",
-  "version": "0.2.0-rc.2",
+  "version": "0.2.0-rc.3",
   "private": true,
-  "description": "Exact prepared-empty IsoMax; four minimal workers and frozen localhost settings",
+  "description": "Exact prepared-empty IsoMax; physical performance-core discovery at initialization",
   "type": "module",
   "license": "AGPL-3.0-only",
   "engines": {
@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "start": "node run.mjs",
-    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "test": "node --experimental-ffi --test --test-concurrency=1 test/*.test.mjs",
     "verify": "node verify.mjs",
     "example": "node run.mjs"
   },

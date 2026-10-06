@@ -11,7 +11,7 @@ $info.WorkingDirectory=$PSScriptRoot
 $info.UseShellExecute=$false
 $info.RedirectStandardOutput=$true
 $info.RedirectStandardError=$true
-foreach($arg in @('--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600','--import',([uri]::new((Join-Path $PSScriptRoot 'runtime/tools/benchmark-v8-startup-preload.mjs')).AbsoluteUri),'--experimental-ffi','--import',([uri]::new((Join-Path $PSScriptRoot 'runtime/tools/worker-affinity-preload.mjs')).AbsoluteUri),(Join-Path $PSScriptRoot 'cli.mjs'))){$info.ArgumentList.Add($arg)}
+foreach($arg in @('--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600','--import',([uri]::new((Join-Path $PSScriptRoot 'runtime/tools/benchmark-v8-startup-preload.mjs')).AbsoluteUri),'--experimental-ffi','--import',([uri]::new((Join-Path $PSScriptRoot 'runtime/tools/worker-affinity-preload.mjs')).AbsoluteUri),(Join-Path $PSScriptRoot 'cli.mjs'),'--workers','4')){$info.ArgumentList.Add($arg)}
 $info.Environment['JMS_WORKER_AFFINITY_FILE']=Join-Path $PSScriptRoot 'targets.json'
 $info.Environment['JMS_WORKER_AFFINITY_REPORT']=Join-Path $OutputDirectory 'affinity'
 $process=[System.Diagnostics.Process]::Start($info)

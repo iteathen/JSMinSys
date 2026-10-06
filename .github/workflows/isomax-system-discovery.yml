@@ -1,0 +1,24 @@
+name: IsoMax system discovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/isomax-auto-workers-20261006]
+  pull_request:
+    paths: ['addons/worker-topology.mjs', 'isomax/**', '.github/workflows/isomax-system-discovery.yml']
+permissions:
+  contents: read
+jobs:
+  startup:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '26'
+      - run: node isomax/verify.mjs
+      - run: node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs
+      - run: node isomax/run.mjs --workers 4 --columns 1 --rows 4 --shared-entries 256 --local-entries 256
