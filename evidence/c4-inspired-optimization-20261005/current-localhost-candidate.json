@@ -1,8 +1,8 @@
 {
   "kind": "retained-localhost-candidate-configuration",
-  "updatedAt": "2026-10-06T02:28:03.854Z",
+  "updatedAt": "2026-10-06T02:51:33.557Z",
   "branch": "work/cpc-rebuild-20261004",
-  "latestMeasuredSourceCommit": "2e71c9c",
+  "latestMeasuredSourceCommit": "f3b0bad2c17424d085820c2ba469c022c20a696d",
   "sourceConfigurationChanges": [
     "C17 zero bounds",
     "C19 union projection",
@@ -81,11 +81,12 @@
   "secondaryCycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
   "authorityRuns": [
     "c4ideas-c44-01",
-    "c4ideas-c44-02"
+    "c4ideas-c44-02",
+    "c4ideas-j06-parent-refresh-01"
   ],
-  "primaryMeanMs": 56902.5414,
+  "primaryMeanMs": 56893.44106666667,
   "goalMs": 10000,
   "goalMet": false,
   "command": "./evidence/minimal-worker-localhost-20261004/run-campaign.ps1 -Name NEW-NAME -LocalCapacity 8388608 -SharedProofBounds -SupportPlanBudget 1073741824 -SupportClosures -SupportReflection -PrivateLayout native -BasisViews -NodeFlags @('--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600')",
-  "notes": "C44retained after two56.9sfullsolves+ordinarypathcrossover;actualview selection/JIT4paths/full371suite+26oracle. No new table, savedprivatebasis copies/unusedscratch12,500B/worker, inverse kept. Shared4GiB/private256MiB/fourdeep/J05unchanged. Emptygeometryhandlecoldfixqualifiedseparately, wrongfirstdiagmodecaughtandfixedbeforetiming. Goal10s unmet."
+  "notes": "C44retained after two56.9sfullsolves+ordinarypathcrossover;actualview selection/JIT4paths/full371suite+26oracle. No new table, savedprivatebasis copies/unusedscratch12,500B/worker, inverse kept. Shared4GiB/private256MiB/fourdeep/J05unchanged. Emptygeometryhandlecoldfixqualifiedseparately, wrongfirstdiagmodecaughtandfixedbeforetiming. Goal10s unmet. Fresh J06 parent56.875s confirms retained settings;14400/19200 cumulative budgets not selected after two full trials each.374test suite and native-width NEES review correction pass. Raw cycles include init/cleanup."
 }
