@@ -1,0 +1,308 @@
+import {connect4RbaSupportCanonicalize} from './rba-connect4-coordinate-support-reflection.mjs';
+import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';
+import {prepareConnect4CpcxPairHub32} from './connect4-cpcx-pair-hub.mjs';
+import {prepareConnect4ResidualProofFrontier32} from './connect4-residual-proof-frontier.mjs';
+import {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-dense.mjs';
+import {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';
+import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';
+import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';
+import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';
+import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';
+import {prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32} from './connect4-cpc-matching-response.mjs';
+import {evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-matching-response.mjs';
+import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
+import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
+import {workerData} from 'node:worker_threads';
+import {mixSpan32Locator32} from '../src/widekey32.mjs';
+import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';
+import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';
+import {connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';
+import {
+  attachConnect4RbaSharedExactCache32,
+  isCompactProfile8,
+  compactSupportProfile8,
+  compactTailProfile8,
+} from './rba-connect4-shared-exact-cache.mjs';
+import {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';
+import {attachConnect4RbaSharedLayoutCache32,prepareSharedCacheAccess} from './rba-connect4-shared-exact-cache-layout.mjs';
+
+const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
+  RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,
+  index=workerData.workerIndex,g=workerData.geometry,
+  profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),
+    targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,
+    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,
+    forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,
+    frontier=prepareConnect4ResidualProofFrontier32(g),frontProbe=frontier.probe,
+    frontStore=frontier.store,frontChild=frontier.child,frontRoot=frontier.initialize,
+  connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null
+    ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)
+    :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null
+    ?connect4RbaSupportDenseCofactorNonWinningKnownHeight:connect4RbaSupportPreparedCofactorNonWinningKnownHeight):g.removeByCell!==null
+    ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,
+  connect4RbaCanonicalize=g.supportBasisPlans?.mirrorMap?connect4RbaSupportCanonicalize:connect4RbaPreparedCanonicalize,
+  control=workerData.control,resultWords=workerData.resultWords,
+  words=new Uint32Array((g.cellCount+1)*g.keyWords),
+  basis=new Uint32Array((g.cellCount+1)*g.maxBasis),
+  basisSize=new Uint32Array(g.cellCount+1),
+  coord=prepareConnect4RbaCoordinateScratch(g),
+  centerOrder=new Uint32Array(g.columns),
+  shared=workerData.sharedExactCache.layout?attachConnect4RbaSharedLayoutCache32(workerData.sharedExactCache):
+    attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),
+  sharedAccess=shared.layout?prepareSharedCacheAccess(shared):null,
+  sharedProbe=sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,
+  sharedStore=sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,
+  sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
+  localMask=workerData.localCacheCapacity-1,
+  localCompact=isCompactProfile8(g,g.keyWords)?1:0,
+  localStoredKeyWords=localCompact?8:g.keyWords,
+  localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),
+  localValues=new Uint8Array(workerData.localCacheCapacity);
+
+let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1,pair=0;
+if(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}
+while(orderAt<g.columns){
+  const rightFirst=(index>>>pair)&1;
+  if(rightFirst){
+    if(right<g.columns)centerOrder[orderAt++]=right++;
+    if(left>=0)centerOrder[orderAt++]=left--;
+  }else{
+    if(left>=0)centerOrder[orderAt++]=left--;
+    if(right<g.columns)centerOrder[orderAt++]=right++;
+  }
+  pair+=1;
+}
+
+const live=prepareConnect4LiveLineOrder32(g,centerOrder,[]),
+  liveWords=live.profile.stateWords,liveState=live.state,
+  liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,
+  moveOrder=live.ordered,moveOrderMask=live.mask,
+  rootHeights=new Uint32Array(g.columns);
+
+// COLD one-shot benchmark handoff. No barrier or timing work in negamax.
+if(workerData.readyGate){
+  localKeys.fill(0);localValues.fill(0);
+  Atomics.add(workerData.readyGate,0,1);
+  while(Atomics.load(workerData.readyGate,1)===0)Atomics.wait(workerData.readyGate,1,0);
+}
+words.set(workerData.root.words);
+frontRoot(words,0);
+basis.set(workerData.root.basis);
+basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;
+if(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);
+resetConnect4LiveLineState32(liveProfile,liveState,0);
+const history=workerData.root.moveHistory,
+  historyLength=workerData.readyGate?Atomics.load(workerData.readyGate,4):history.length;
+for(let i=0;i<historyLength;i+=1){
+  const c=history[i],cell=rootHeights[c]*g.columns+c;
+  advanceLive(liveProfile,liveState,0,i&1,cell,liveState,0);rootHeights[c]+=1;
+}
+
+let bestMove=-1;
+
+function relativeTerminal(value,mover){
+  return value===2?0:value===(mover?1:3)?1:-1;
+}
+
+function relativeToAbsolute(value,mover){
+  return value===0?2:mover===0?value+2:2-value;
+}
+
+function localKeyMatches(slot,src){
+  const base=slot*localStoredKeyWords;
+  if(localCompact)return localKeys[base]===words[src]&&
+    localKeys[base+1]===words[src+1]&&
+    localKeys[base+2]===compactSupportProfile8(words,src)&&
+    localKeys[base+3]===words[src+8]&&
+    localKeys[base+4]===words[src+9]&&
+    localKeys[base+5]===words[src+11]&&
+    localKeys[base+6]===words[src+12]&&
+    localKeys[base+7]===compactTailProfile8(words,src);
+  for(let w=0;w<g.keyWords;w+=1)
+    if(localKeys[base+w]!==words[src+w])return 0;
+  return 1;
+}
+
+function storeLocalEntry(slot,src,value){
+  const base=slot*localStoredKeyWords;
+  if(localCompact){
+    localKeys[base]=words[src];localKeys[base+1]=words[src+1];
+    localKeys[base+2]=compactSupportProfile8(words,src);
+    localKeys[base+3]=words[src+8];localKeys[base+4]=words[src+9];
+    localKeys[base+5]=words[src+11];localKeys[base+6]=words[src+12];
+    localKeys[base+7]=compactTailProfile8(words,src);
+  }else for(let w=0;w<g.keyWords;w+=1)localKeys[base+w]=words[src+w];
+  localValues[slot]=value;
+}
+
+function probeCache(src,hash,slot){
+  const local=localValues[slot];
+  if(local&&localKeyMatches(slot,src)){return local;}
+  if(!(hash&sharedSampleBits)){
+    const value=sharedProbe(shared,words,src,hash);
+    if(value){storeLocalEntry(slot,src,value);return value;}
+  }
+  return 0;
+}
+
+function storeExact(src,hash,slot,value,depth,mover){
+  storeLocalEntry(slot,src,value);
+  frontStore(words,src,depth,value,mover);
+  if(!(hash&sharedSampleBits))
+    sharedStore(shared,words,src,value,hash);
+}
+
+function storeBound(src,hash,slot,value,depth,mover){
+  frontStore(words,src,depth,value,mover);
+  const prior=localValues[slot];
+  if(prior&&localKeyMatches(slot,src)){
+    if(prior<=3||prior===value)return prior;
+    // The same canonical q has both >=0 and <=0, therefore exact draw.
+    // Keep this inferred draw worker-local; shared publication is reserved for
+    // exact values produced by the ordinary search result path.
+    storeLocalEntry(slot,src,2);
+    frontStore(words,src,depth,2,mover);
+    return 2;
+  }
+  storeLocalEntry(slot,src,value);
+  return value;
+}
+
+function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){
+  if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;
+  const dst=src+g.keyWords,ci=bi+g.maxBasis,
+    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,
+    alphaOrig=alpha,betaOrig=beta,
+    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
+    slot=depth?(hash&localMask):0;
+
+  if(depth){
+    const cached=probeCache(src,hash,slot)||frontProbe(words,src,depth,mover);
+    if(cached){
+      if(cached<=3)return relativeTerminal(cached,mover);
+      if(cached===LOCAL_LOWER0){
+        if(beta<=0){return 0;}
+        if(alpha<0)alpha=0;
+      }else{
+        if(alpha>=0){return 0;}
+        if(beta>0)beta=0;
+      }
+    }
+  }
+
+  // Root excludes immediate wins once. C01/C05 ensure every recursed child
+  // also has no immediate mover win; cofactor uses that proved precondition.
+  const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,forbiddenBase);
+  if(forced===-2){
+    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover);
+    else for(let oi=0;oi<g.columns;oi+=1){
+      const column=centerOrder[oi];
+      if(words[src+column]<g.rows){bestMove=column;break;}
+    }
+    return -1;
+  }
+
+  // One common legal policy: WIN or a one-sided NONLOSS for previous mover.
+  const response=evaluateConnect4PreparedCpcResponse32(cpc,words,src,basis,bi,n,mover^1);
+  if(response===2){
+    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover);return 0;}
+    if(beta>0)beta=0;
+  }else if(response===0){
+    // Unresolved response policy falls through to independent pair proof.
+    const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
+    if(fork>=0){
+      if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover),depth,mover);
+      else bestMove=fork;
+      return 1;
+    }
+  }
+  if(response===1||
+     evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
+    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover);
+    else for(let oi=0;oi<g.columns;oi+=1){
+      const column=centerOrder[oi];
+      if(words[src+column]<g.rows){bestMove=column;break;}
+    }
+    return -1;
+  }
+
+  const actionCount=forced>=0?1:orderLive(live,words,src,mover,orientation,liveOffset,orderRow);
+  let best=-2;
+  for(let oi=0;oi<actionCount;oi+=1){
+    const column=forced>=0?forced:(moveOrder[orderRow+oi]&moveOrderMask),
+      height=words[src+column];
+    if(height>=g.rows)continue;
+
+    // An exposed opponent singleton proves this child loses without building it.
+    const term=forbidden[forbiddenBase+(column>>>5)]&(1<<(column&31))
+      ?(mover?3:1):connect4RbaCofactorKnownHeight(
+      g,profile,words,src,basis,bi,n,column,height,
+      words,dst,basis,ci,coord.seen,basisSize,depth+1,coord.map,coord.inverse,
+    );
+    let value;
+    if(term)value=relativeTerminal(term,mover);
+    else{
+      const childN=basisSize[depth+1],
+        childReflected=connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord),
+        physicalColumn=orientation?g.mirrorColumn[column]:column;
+      frontChild(coord.map[0],childReflected,depth+1);
+      advanceLive(liveProfile,liveState,liveOffset,mover,height*g.columns+physicalColumn,liveState,childLiveOffset);
+      value=negamax(depth+1,dst,ci,childN,mover^1,orientation^childReflected,childLiveOffset,childOrderRow,-beta,-alpha);
+      if(value===CANCELLED)return CANCELLED;
+      value=-value;
+    }
+
+    if(value>best){
+      best=value;
+      if(depth===0)bestMove=column;
+    }
+    if(value>alpha)alpha=value;
+    if(best===1||alpha>=beta){break;}
+  }
+
+  if(depth){
+    // Classify against the caller's original window. Share proven exact values;
+    // non-exact zero-threshold bounds remain worker-local.
+    if(best>alphaOrig&&best<betaOrig){
+      const exact=relativeToAbsolute(best,mover);
+      storeExact(src,hash,slot,exact,depth,mover);
+    }else if(best>=betaOrig){
+      if(best===1){
+        const exact=relativeToAbsolute(1,mover);
+        storeExact(src,hash,slot,exact,depth,mover);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0,depth,mover);
+    }else if(best<=alphaOrig){
+      if(best===-1){
+        const exact=relativeToAbsolute(-1,mover);
+        storeExact(src,hash,slot,exact,depth,mover);
+      }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover);
+    }
+  }
+  return best;
+}
+
+const meta=words[g.metaOffset],mover=(meta>>>2)&1,terminal=meta&3;
+let relative;
+if(terminal)relative=relativeTerminal(terminal,mover);
+else{
+  const winningColumn=connect4RbaImmediateWinningColumn(g,words,0,basis,0,basisSize[0],mover);
+  if(winningColumn>=0){bestMove=winningColumn;relative=1;}
+  else relative=negamax(0,0,0,basisSize[0],mover,workerData.rootReflected,0,0,-2,2);
+}
+
+if(relative!==CANCELLED){
+  const resultBase=index*RESULT_STRIDE,
+    value=terminal||relativeToAbsolute(relative,mover),
+    move=bestMove<0?-1:workerData.rootReflected?g.mirrorColumn[bestMove]:bestMove;
+
+  Atomics.store(resultWords,resultBase,value);
+  Atomics.store(resultWords,resultBase+1,relative);
+  Atomics.store(resultWords,resultBase+2,move);
+  Atomics.store(resultWords,resultBase+3,1);
+
+  if(Atomics.compareExchange(control,CONTROL_WINNER,-1,index)===-1){
+    Atomics.store(control,CONTROL_DONE,1);
+    Atomics.add(control,CONTROL_WAKE,1);
+    Atomics.notify(control,CONTROL_WAKE);
+  }
+}

@@ -1,8 +1,8 @@
 {
   "name": "@iteathen/isomax",
-  "version": "0.1.0-rc.3",
+  "version": "0.2.0-rc.1",
   "private": true,
-  "description": "Prepared IsoMax candidate with initialization-selected geometry and exact Lazy SMP search",
+  "description": "Exact prepared-empty IsoMax; four minimal workers and frozen localhost settings",
   "type": "module",
   "license": "AGPL-3.0-only",
   "engines": {
@@ -14,6 +14,9 @@
   },
   "files": [
     "index.mjs",
+    "cli.mjs",
+    "run.mjs",
+    "run-i5.ps1",
     "example.mjs",
     "verify.mjs",
     "test",
@@ -21,15 +24,15 @@
     "profile.json",
     "targets.json",
     "provenance.json",
-    "cold-corrections.json",
     "README.md",
     "LICENSE",
     "evidence"
   ],
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "start": "node run.mjs",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "verify": "node verify.mjs",
-    "example": "node example.mjs"
+    "example": "node run.mjs"
   },
   "repository": {
     "type": "git",

@@ -18,7 +18,14 @@ jobs:
         with:
           node-version: '26'
       - run: node tools/verify-catalog.mjs
-      - run: node tools/build-behavior-search.mjs --check
+      # Historical behavior generator diverged before the minimal campaign.
+      # Catalog locks/tests still cover it; verify the promoted generators here.
+      - run: node tools/build-rba-minimal-center.mjs --check
+      - run: node tools/build-rba-shared-proof-workers.mjs --check
+      - run: node tools/build-rba-local-native-workers.mjs --check
+      - run: node tools/build-rba-basis-view-kernels.mjs --check
+      - run: node tools/build-rba-basis-view-workers.mjs --check
+      - run: node tools/build-cpc-matching-response.mjs --check
       - run: node tools/build-root-frontier.mjs --check
       - run: node tools/build-rba-coordinate-kernels.mjs --check
       - run: node tools/audit-root-frontier.mjs

@@ -8,18 +8,18 @@ test('prepared package starts search only after every worker is ready',async()=>
   assert.equal(typeof api.prepareLazySmpConnect4Rba32,'function');
   const app=await api.prepareLazySmpConnect4Rba32(options(api.prepareConnect4RbaGeometry({columns:1,rows:1})));
   try{
-    assert.equal(app.state().phase,'READY');assert.equal(app.state().readyWorkers,4);
+    assert.equal(app.state().closed,false);assert.equal(app.state().readyWorkers,4);
     assert.equal(app.state().searchStarted,false);
     const result=await app.solve([]);
     assert.equal(result.status,'EXACT');assert.equal(result.rootWdl,0);
     assert.equal(result.readyWorkers,4);assert.equal(result.workersExited,4);assert.equal(result.cleanup,true);
-    assert.ok(result.initializationMs>=0);assert.ok(result.cleanupMs>=0);
+    assert.ok(result.preparedTiming.initializationMs>=0);assert.ok(result.preparedTiming.cleanupMs>=0);
     await assert.rejects(()=>app.solve([]),/one-shot/);
   }finally{await app.close();}
 });
 test('prepared package closes idle workers without starting search',async()=>{
   const app=await api.prepareLazySmpConnect4Rba32(options(api.prepareConnect4RbaGeometry({columns:1,rows:1})));
-  await app.close();assert.equal(app.state().phase,'CLOSED');assert.equal(app.state().searchStarted,false);
+  await app.close();assert.equal(app.state().closed,true);assert.equal(app.state().searchStarted,false);
   assert.equal(app.state().cleanup,true);assert.equal(app.state().workersExited,4);
 });
 for(const [columns,rows,moves] of [[7,6,[...'1320461024522311'].map(Number)],[7,5,[...'1320461024522311'].map(Number)]])
@@ -45,13 +45,14 @@ test('aborting READY owns cleanup without a subsequent solve or close',async()=>
     abort.abort();
     const deadline=Date.now()+1000;
     while(!app.state().cleanup&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,2));
-    assert.equal(app.state().phase,'CLOSED');assert.equal(app.state().cleanup,true);
+    assert.equal(app.state().closed,true);assert.equal(app.state().cleanup,true);
     assert.equal(ownership,1);
     assert.equal(app.state().workersExited,4);assert.equal(app.state().searchStarted,false);
     assert.equal(getEventListeners(abort.signal,'abort').length,0);
     const result=await app.solve([]);
     assert.equal(result.status,'INTERRUPTED');assert.equal(result.cleanup,true);
-    await assert.rejects(()=>app.solve([]),/one-shot/);
+    const closedResult=await app.solve([]);
+    assert.equal(closedResult.status,'INTERRUPTED');assert.equal(app.state().searchStarted,false);
   }finally{await app.close();}
 });
 test('abort at terminal cleanup preserves the exact result and removes ownership',async()=>{
@@ -76,7 +77,7 @@ test('closing an active prepared solve interrupts and cleans workers',async()=>{
 test('invalid supplied root closes the prepared application',async()=>{
   const app=await api.prepareLazySmpConnect4Rba32(options(api.prepareConnect4RbaGeometry({columns:1,rows:1})));
   await assert.rejects(()=>app.solve([1]),RangeError);
-  assert.equal(app.state().phase,'CLOSED');assert.equal(app.state().cleanup,true);assert.equal(app.state().workersExited,4);
+  assert.equal(app.state().closed,true);assert.equal(app.state().cleanup,true);assert.equal(app.state().workersExited,4);
 });
 test('pre-aborted initialization rejects without leaving an application',async()=>{
   const abort=new AbortController();abort.abort();

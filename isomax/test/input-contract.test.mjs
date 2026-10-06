@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareConnect4RbaGeometry,evaluateConnect4RankLocalLanding32,prepareLazySmpConnect4Rba32} from '../index.mjs';
-import {createConnect4RbaSharedExactCache32} from '../runtime/experiments/isomax-lean/shared-cache.mjs';
+import {createConnect4RbaSharedExactCache32} from '../runtime/addons/rba-connect4-shared-exact-cache.mjs';
+import {createConnect4RbaSharedLayoutCache32} from '../runtime/addons/rba-connect4-shared-exact-cache-layout.mjs';
 
 const geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
 test('packaged rank-local history rejects non-indexed views',()=>{
@@ -19,8 +20,8 @@ test('packaged capacity guards reject unsupported views before allocating',async
       assert.throws(()=>createConnect4RbaSharedExactCache32({capacity,geometry,keyWords:geometry.keyWords}),RangeError);
     }
     // Compact shared cache creates a 16-element-per-entry Uint16Array view.
-    await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,sharedCacheCapacity:268435456}),RangeError);
-    assert.throws(()=>createConnect4RbaSharedExactCache32({capacity:268435456,geometry,keyWords:geometry.keyWords}),RangeError);
+    await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,sharedCacheLayout:'native',sharedCacheCapacity:268435456}),RangeError);
+    assert.throws(()=>createConnect4RbaSharedLayoutCache32({capacity:268435456,geometry,keyWords:geometry.keyWords}),RangeError);
     assert.equal(allocations,0);
   }finally{globalThis.SharedArrayBuffer=Native;}
 });

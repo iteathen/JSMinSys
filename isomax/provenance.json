@@ -1,14 +1,32 @@
 {
-  "status": "prepared candidate; unpublished",
+  "version": "0.2.0-rc.1",
+  "status": "repository distribution; registry publication disabled",
   "sourceRepository": "https://github.com/iteathen/JSMinSys",
-  "sourceCommit": "ab628f21fa8c989aa7fc1bc416b23ed126f82b93",
-  "measuredRuntimeCommit": "8713baa11148a7723043d8c434ffb77343a96253",
-  "coldCorrections": {
-    "manifest": "cold-corrections.json",
-    "sha256": "c7a39690f1c087b88aa599f2176649f2a545ef5f37cbac6a1260ccb80252aae8",
-    "performanceQualification": "historical measurements apply to the frozen source; corrections have correctness qualification only"
-  },
+  "sourceCommit": "ea4fd8bc49481c92a2b92344108c3af4567a506b",
+  "measuredRuntimeCommits": [
+    "25fb582",
+    "2e71c9c",
+    "f3b0bad"
+  ],
   "normalization": "UTF-8 with CRLF normalized to LF; SHA-256",
+  "workerModules": [
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs",
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs"
+  ],
   "files": {
     "LICENSE": {
       "source": "LICENSE",
@@ -16,1484 +34,383 @@
     },
     "README.md": {
       "source": "package-authored",
-      "sha256": "0e2fea42a9b03f9b031755337984c518aab8496a7f214f0b34eab24e7aa3e8f9"
+      "sha256": "c8e0890b6c7c2862d9418d22a31aee44e262d3fd088452e00eae7f6348b04d72"
     },
-    "cold-corrections.json": {
+    "cli.mjs": {
       "source": "package-authored",
-      "sha256": "c7a39690f1c087b88aa599f2176649f2a545ef5f37cbac6a1260ccb80252aae8"
+      "sha256": "ea61ae99da2ff4f553d262378a70c198a3950b62ad4e28e874bbf9aacc74e040"
     },
-    "evidence/CLAIM_AUDIT.md": {
-      "source": "experiments/isomax-structural-cost/CLAIM_AUDIT.md",
-      "sha256": "dd026e73a972ea444650f98aa0bb1d19a892558514052ecdb14bacaeb3d8789c"
+    "evidence/BATCH-REVIEW.md": {
+      "source": "evidence/c4-inspired-optimization-20261005/BATCH-REVIEW.md",
+      "sha256": "4ff82d19ccdf334bedbb6b25fa5cf403c1b206e184751927750138d41472d062"
     },
-    "evidence/INITIALIZATION_PROTOCOL.md": {
-      "source": "experiments/isomax-tt-layout/INITIALIZATION_PROTOCOL.md",
-      "sha256": "d5d02b01f4a68d0b2ac8edb07cde07084e9e9cf6fb5cf250ff7a317d851b6f43"
+    "evidence/C44-COMPARISON.json": {
+      "source": "evidence/c4-inspired-optimization-20261005/C44-COMPARISON.json",
+      "sha256": "6244e224440b4d87d6853396f2e9ef167e7e7cce55abe923f26c2bc4f570a547"
     },
-    "evidence/LIBRARY_NEES_REVIEW.md": {
-      "source": "experiments/isomax-library-geometry/NEES_REVIEW.md",
-      "sha256": "d19c25bcac33a253e272d7b2cd54541b7fe681d379afd369233665155375fd17"
+    "evidence/C58-COMPARISON.json": {
+      "source": "evidence/c4-inspired-optimization-20261005/C58-COMPARISON.json",
+      "sha256": "0bbdcaa99888469a68786a0e4f72221bdb3a10b8b0137f55c933ce2366de7db8"
     },
-    "evidence/NEES_REVIEW.md": {
-      "source": "experiments/isomax-structural-cost/NEES_REVIEW.md",
-      "sha256": "5ca5d45b5e3aa15da1ced35c5bbc9ec54fb326eaccce39e0862c1a32f47ed0b7"
+    "evidence/C61-MEMORY-GRID.json": {
+      "source": "evidence/c4-inspired-optimization-20261005/C61-MEMORY-GRID.json",
+      "sha256": "2a88d4e2b4606858d3134fc04a8d3615ec55a83a7b5c47f74c464caba2bb3b2a"
     },
-    "evidence/PLAN.md": {
-      "source": "experiments/isomax-structural-cost/PLAN.md",
-      "sha256": "8aa80840f4b872d8b89f5583cb95b5445d9ce6f4ed7e15cd0c5454d872a1e7f0"
+    "evidence/CURRENT-CHECKPOINT.md": {
+      "source": "evidence/c4-inspired-optimization-20261005/CURRENT-CHECKPOINT.md",
+      "sha256": "d23e737329690cb4169f2c968a0f7dfe81b67c8613939815b761b164c9971622"
+    },
+    "evidence/J06-PARENT-COMPARISON.json": {
+      "source": "evidence/c4-inspired-optimization-20261005/J06-PARENT-COMPARISON.json",
+      "sha256": "e786fe7f79bc6fcb2a6a0a4aa00d381d42a24283ab83ac316b13f6e620e9b1b3"
     },
     "evidence/README.md": {
       "source": "package-authored",
-      "sha256": "a139c8e2e7feab703b984d50e92705da4c174c3683532ed441b78ce941c77300"
-    },
-    "evidence/benchmark-7x5/REPORT.md": {
-      "source": "evidence/isomax-library-native-7x5-20261002/REPORT.md",
-      "sha256": "4a45d4c6926dc20364f4b22280d65da473657574f48604c396581b6dde8253d8"
-    },
-    "evidence/benchmark-7x5/RESULT.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/RESULT.json",
-      "sha256": "a73785d7dccb935362a84e572fea2d5e85657f955c5fae4f8437c763110e62ab"
-    },
-    "evidence/benchmark-7x5/SUMMARY.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/SUMMARY.json",
-      "sha256": "b8d76feccc813c5fa68243e25b8f21e78d1722e9d30891908df769f8d47081de"
-    },
-    "evidence/benchmark-7x5/affinity-0-0.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-7x5/affinity-0-1.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-7x5/affinity-0-2.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-7x5/affinity-0-3.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-7x5/affinity-1-0.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-7x5/affinity-1-1.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-7x5/affinity-1-2.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-7x5/affinity-1-3.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-7x5/affinity-2-0.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-7x5/affinity-2-1.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-7x5/affinity-2-2.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-7x5/affinity-2-3.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-7x5/affinity-3-0.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-7x5/affinity-3-1.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-7x5/affinity-3-2.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-7x5/affinity-3-3.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-7x5/manifest.json": {
-      "source": "evidence/isomax-library-native-7x5-20261002/manifest.json",
-      "sha256": "9aebb339b5215fba41efae30a3cae817fab23ad27471d1be95405c482d644575"
-    },
-    "evidence/benchmark-7x5/raw.jsonl": {
-      "source": "evidence/isomax-library-native-7x5-20261002/raw.jsonl",
-      "sha256": "2ccb917ebef2c7716dacad9167352f45fc4f0893b9308c93736b8d51055c0b41"
-    },
-    "evidence/benchmark-7x5/samples.jsonl": {
-      "source": "evidence/isomax-library-native-7x5-20261002/samples.jsonl",
-      "sha256": "9d35bb98c966d3319ae13ff8de237bc6a9aebffdc2fc4f1d561f48fc2801f952"
-    },
-    "evidence/benchmark-rc2/BLOCK_ANALYSIS.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/BLOCK_ANALYSIS.json",
-      "sha256": "c9f63027fcb31742875c9e30fa8eb4c9e02c749b0ce4dea0cc9e9d1d0c48a872"
-    },
-    "evidence/benchmark-rc2/REPORT.md": {
-      "source": "evidence/isomax-boolean-confirm-20261002/REPORT.md",
-      "sha256": "81680dffb8e1ce751e99130d1a2f8f1291fdc0d94d0ab02782ee4ec4ae9e9662"
-    },
-    "evidence/benchmark-rc2/SUMMARY.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/SUMMARY.json",
-      "sha256": "4288097570fdbd566984af0b86fe2283966c25eadf770d2b6a087829b6eb1039"
-    },
-    "evidence/benchmark-rc2/affinity-0-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-0-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-0-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-0-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-1-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-1-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-1-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-1-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-2-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-2-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-2-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-2-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-3-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-3-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-3-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-3-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-4-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-4-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-4-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-4-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-4-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-4-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-4-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-4-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-5-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-5-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-5-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-5-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-5-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-5-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-5-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-5-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-6-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-6-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-6-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-6-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-6-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-6-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-6-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-6-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/affinity-7-0.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-7-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark-rc2/affinity-7-1.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-7-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark-rc2/affinity-7-2.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-7-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark-rc2/affinity-7-3.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/affinity-7-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark-rc2/manifest.json": {
-      "source": "evidence/isomax-boolean-confirm-20261002/manifest.json",
-      "sha256": "d67b2668d1e4f7552a7177854336a0a42b2092997a8559091467473ea51dbc8d"
-    },
-    "evidence/benchmark-rc2/raw.jsonl": {
-      "source": "evidence/isomax-boolean-confirm-20261002/raw.jsonl",
-      "sha256": "d671b331e3fdaacff4fcab533beabfcf23b9522e325c8d57bf6b9dc8cdaf46eb"
-    },
-    "evidence/benchmark-rc2/samples.jsonl": {
-      "source": "evidence/isomax-boolean-confirm-20261002/samples.jsonl",
-      "sha256": "54eaeebf4772962e5f5a54b31350c249c951cd2d337394c321f57ca122feac87"
-    },
-    "evidence/benchmark/REPORT.md": {
-      "source": "evidence/isomax-library-native-7x6-20261002/REPORT.md",
-      "sha256": "12e998ddb8d17553937ecafc8851940483136b373ce7a9b2fc9f1f38ccfc391b"
-    },
-    "evidence/benchmark/RESULT.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/RESULT.json",
-      "sha256": "4d4a5c07ebb0d57c605b7651ff4b7c625998d6db9fea1de51fddb7a3f5d258de"
-    },
-    "evidence/benchmark/SUMMARY.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/SUMMARY.json",
-      "sha256": "052d931735bd6e333aa322d0b250a8f19716aabd8a0e67fbd6356ae8b26931a5"
-    },
-    "evidence/benchmark/affinity-0-0.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark/affinity-0-1.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark/affinity-0-2.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark/affinity-0-3.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark/affinity-1-0.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark/affinity-1-1.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark/affinity-1-2.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark/affinity-1-3.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark/affinity-2-0.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark/affinity-2-1.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark/affinity-2-2.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark/affinity-2-3.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark/affinity-3-0.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/benchmark/affinity-3-1.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/benchmark/affinity-3-2.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/benchmark/affinity-3-3.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/benchmark/manifest.json": {
-      "source": "evidence/isomax-library-native-7x6-20261002/manifest.json",
-      "sha256": "0b210141bc0b677c533bc0c6dc76634663b6bfa5fc4d174b22569b7375405265"
-    },
-    "evidence/benchmark/raw.jsonl": {
-      "source": "evidence/isomax-library-native-7x6-20261002/raw.jsonl",
-      "sha256": "10e9602b58f4e96ac8598b3aeb893d19544cbb8058c04c77d0277b9eabd5c2af"
-    },
-    "evidence/benchmark/samples.jsonl": {
-      "source": "evidence/isomax-library-native-7x6-20261002/samples.jsonl",
-      "sha256": "8defb72bc3a8e0e608d7e7e91da98bccc1d1388f5fc2b66bd5cda1a5fd1491e3"
-    },
-    "evidence/campaign/profile/ANALYSIS.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/ANALYSIS.json",
-      "sha256": "618d5090539d36a9e7c364e9ca6f264361d014c44c3fb86e7c44e1f9cae90045"
-    },
-    "evidence/campaign/profile/CPU.20261002.120545.18372.0.001.cpuprofile": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/CPU.20261002.120545.18372.0.001.cpuprofile",
-      "sha256": "f34f7ff0651fc1f012af2cc35674da378b2fd3cdc03ee39dae6580e94a5610da"
-    },
-    "evidence/campaign/profile/CPU.20261002.120545.18372.1.002.cpuprofile": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/CPU.20261002.120545.18372.1.002.cpuprofile",
-      "sha256": "c22c60954ad7fbfb690088d41f6cca294bb6dddce5b78bf1dc45d58c6dcfc21f"
-    },
-    "evidence/campaign/profile/CPU.20261002.120545.18372.2.003.cpuprofile": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/CPU.20261002.120545.18372.2.003.cpuprofile",
-      "sha256": "57f5fbcd0d1310be3ea22edad33771a974bc9b8eda7f6a46182c7da75bd36506"
-    },
-    "evidence/campaign/profile/CPU.20261002.120545.18372.3.004.cpuprofile": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/CPU.20261002.120545.18372.3.004.cpuprofile",
-      "sha256": "27901b9296b0b45c8d90f84d218abc15a2e86ec7b03c6808c664798bf4b957cf"
-    },
-    "evidence/campaign/profile/CPU.20261002.120545.18372.4.005.cpuprofile": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/CPU.20261002.120545.18372.4.005.cpuprofile",
-      "sha256": "6b73861c1ab7ce6abc16735d620face5dbc07e660af112439ec4083efd661a18"
-    },
-    "evidence/campaign/profile/affinity-0.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/affinity-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/campaign/profile/affinity-1.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/affinity-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/campaign/profile/affinity-2.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/affinity-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/campaign/profile/affinity-3.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/affinity-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/campaign/profile/analysis-console.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/analysis-console.json",
-      "sha256": "aadba7c17c84f47306e136ed33ecae837a66055e39fc7d32f0e900c6e8e7eaac"
-    },
-    "evidence/campaign/profile/result.json": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/result.json",
-      "sha256": "66bfe956453cf1006fe382950aaca6a00dccab8239444d8c57cdd4bb0c51d62b"
-    },
-    "evidence/campaign/profile/stderr.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/profile/stderr.txt",
-      "sha256": "1e4a8411542fddb4c3803c19647f538d53f073e6412311d1e6fe3b6bf32ef809"
-    },
-    "evidence/campaign/qualification/boolean-jit.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/qualification/boolean-jit.txt",
-      "sha256": "f71620e7ff5c920fbcb253f5e24e04ef10568ed45725b182f2419938b53ec64a"
-    },
-    "evidence/campaign/qualification/dense-jit.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/qualification/dense-jit.txt",
-      "sha256": "a624b9e0acf4455a6e0810be0500a1e67efc24f8200359f146733c2c32dc2621"
-    },
-    "evidence/campaign/qualification/nightly-final.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/qualification/nightly-final.txt",
-      "sha256": "72bdc9cfea0ade9087f33613105446fd2ab14989b3687b32d184f1b70c40b162"
-    },
-    "evidence/campaign/qualification/node26-final.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/qualification/node26-final.txt",
-      "sha256": "e4160faf443712f22460863ca07f207ae62cdcba624761bace96e0126e7eb823"
-    },
-    "evidence/campaign/qualification/node26-prepared.txt": {
-      "source": "evidence/isomax-structural-cost-20261002/qualification/node26-prepared.txt",
-      "sha256": "52400b1c510426ce602a00a856011aac46764248d7bb7485a92e433bd4fdc551"
-    },
-    "evidence/library-qualification/qualification/MACHINE.json": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/MACHINE.json",
-      "sha256": "7c2765b8498ef08d7ffd76a29e36f8632836e7cfc1b017cccb519fc2b147c0f8"
-    },
-    "evidence/library-qualification/qualification/hoisted-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/hoisted-tests.txt",
-      "sha256": "82cd7e2af3c54979c23f7f8ac99f17d2d0c61be622c824a6d24bc6c0dd8f8605"
-    },
-    "evidence/library-qualification/qualification/jit-7x5.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/jit-7x5.txt",
-      "sha256": "d12a67a15beeaa87b0ca7b3b1c6f77aa091214d9e3705c35687d1877ddd4f07a"
-    },
-    "evidence/library-qualification/qualification/jit-7x6.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/jit-7x6.txt",
-      "sha256": "ef1ebc7e092f8de33311f7eee08968a72b60b1f7595e1e9ec7bb94bf77d0e91f"
-    },
-    "evidence/library-qualification/qualification/jit-hoisted-7x6.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/jit-hoisted-7x6.txt",
-      "sha256": "b6ee67bd3244934b89f3abec503e09d7d32dfe309b2619bc3d9092b5daa75bd2"
-    },
-    "evidence/library-qualification/qualification/jit-native-7x5.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/jit-native-7x5.txt",
-      "sha256": "e40a81877dabde1fa8308dbeb55789be0caaea458b5baadb4862a419ae73d3c4"
-    },
-    "evidence/library-qualification/qualification/jit-native-7x6.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/jit-native-7x6.txt",
-      "sha256": "9f30e55a14a0b45ea1e08f3f2fe9be92531561d8de480ba69555dfa75061590c"
-    },
-    "evidence/library-qualification/qualification/native-node26-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/native-node26-tests.txt",
-      "sha256": "f12eb5a48add3b693ed3cd640d2dff7850ffc830124bb12b60aae187707dc602"
-    },
-    "evidence/library-qualification/qualification/native-node27-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/native-node27-tests.txt",
-      "sha256": "49e7a8d19b041b41d12f8d78b0d72d9b1834f087def172e06528ce214863d5c5"
-    },
-    "evidence/library-qualification/qualification/native-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/native-tests.txt",
-      "sha256": "d9c9066cf88e0462b511d4aeb8e3e5269118656cdcfd032b654587e4ea8bbed6"
-    },
-    "evidence/library-qualification/qualification/node26-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/node26-tests.txt",
-      "sha256": "b6096ce312a9818e2936d242772cd5a5b243758a80b701bba83d4b36aae7bd54"
-    },
-    "evidence/library-qualification/qualification/node27-tests.txt": {
-      "source": "evidence/isomax-library-geometry-20261002/qualification/node27-tests.txt",
-      "sha256": "c9831d5be2c328dd23f0663040f72a2a35c75e8d189cf721b75f048aa92a534d"
-    },
-    "evidence/qualification/full-suite-final.txt": {
-      "source": "evidence/isomax-init-integration-20261002/full-suite-final.txt",
-      "sha256": "bd5ceaaff1247ae4146fb778310ccc72b605417fd9866b9085eb1a67c485755f"
-    },
-    "evidence/qualification/nightly-tests-final.txt": {
-      "source": "evidence/isomax-init-integration-20261002/nightly-tests-final.txt",
-      "sha256": "21366c5ebb2ec8b27c653fc899b8f1c0096889f56a9b1f0a1808d14cbc51d286"
-    },
-    "evidence/screens/closure-confirm/BLOCK_ANALYSIS.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/BLOCK_ANALYSIS.json",
-      "sha256": "cc9646dcef0f1adb3acf1cea5bd4ae0d8dce50289f6d26588a4f70bd7c5ad70d"
-    },
-    "evidence/screens/closure-confirm/SUMMARY.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/SUMMARY.json",
-      "sha256": "4ff3d69a6d4de50e46012fcfb41beb7915cc33219af9866641d055a4524807e6"
-    },
-    "evidence/screens/closure-confirm/affinity-0-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-0-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-0-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-0-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-1-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-1-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-1-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-1-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-2-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-2-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-2-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-2-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-3-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-3-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-3-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-3-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-4-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-4-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-4-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-4-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-4-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-4-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-4-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-4-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-5-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-5-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-5-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-5-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-5-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-5-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-5-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-5-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-6-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-6-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-6-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-6-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-6-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-6-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-6-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-6-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/affinity-7-0.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-7-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/closure-confirm/affinity-7-1.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-7-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/closure-confirm/affinity-7-2.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-7-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/closure-confirm/affinity-7-3.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/affinity-7-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/closure-confirm/manifest.json": {
-      "source": "evidence/isomax-closure-confirm-20261002/manifest.json",
-      "sha256": "5cb1568207b0040d13bf39ba1e450da40b4646dac1b64cf9e1e2080aae7008b2"
-    },
-    "evidence/screens/closure-confirm/raw.jsonl": {
-      "source": "evidence/isomax-closure-confirm-20261002/raw.jsonl",
-      "sha256": "32146c58d933248469ec79ca5d484cf0ff2115dc2c9fb7155ade89b1102f2102"
-    },
-    "evidence/screens/closure-confirm/samples.jsonl": {
-      "source": "evidence/isomax-closure-confirm-20261002/samples.jsonl",
-      "sha256": "5d004eb15a6e3e2bc1e3b846280d57d6ad825f6698ea1dc1c5f8186e0056a3bd"
-    },
-    "evidence/screens/constants/SUMMARY.json": {
-      "source": "evidence/isomax-constants-screen-20261002/SUMMARY.json",
-      "sha256": "f3f105a9bbfe5749c2ad1b378c370d41076807c0ef78bd11cf4e5f64ad76705a"
-    },
-    "evidence/screens/constants/affinity-0-0.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/constants/affinity-0-1.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/constants/affinity-0-2.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/constants/affinity-0-3.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/constants/affinity-1-0.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/constants/affinity-1-1.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/constants/affinity-1-2.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/constants/affinity-1-3.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/constants/affinity-2-0.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/constants/affinity-2-1.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/constants/affinity-2-2.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/constants/affinity-2-3.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/constants/affinity-3-0.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/constants/affinity-3-1.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/constants/affinity-3-2.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/constants/affinity-3-3.json": {
-      "source": "evidence/isomax-constants-screen-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/constants/manifest.json": {
-      "source": "evidence/isomax-constants-screen-20261002/manifest.json",
-      "sha256": "f7276816d52bd8c9ba9f931363a9a49faf680d0b4ae96a90f745d7c9defb2b28"
-    },
-    "evidence/screens/constants/raw.jsonl": {
-      "source": "evidence/isomax-constants-screen-20261002/raw.jsonl",
-      "sha256": "e16da986974d9f480e56ef3b0ee90b7aba6cdebd813cf219dfc1065b1c98329b"
-    },
-    "evidence/screens/constants/samples.jsonl": {
-      "source": "evidence/isomax-constants-screen-20261002/samples.jsonl",
-      "sha256": "902167813c6c8c74b909636111848ca76a9799fd77e8f08ea95115a43067b4c4"
-    },
-    "evidence/screens/csr/SUMMARY.json": {
-      "source": "evidence/isomax-csr-screen-20261002/SUMMARY.json",
-      "sha256": "b86489b102d877a1db2263f2a450d99137933acf385765a0c183773e9ce0bee5"
-    },
-    "evidence/screens/csr/affinity-0-0.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/csr/affinity-0-1.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/csr/affinity-0-2.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/csr/affinity-0-3.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/csr/affinity-1-0.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/csr/affinity-1-1.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/csr/affinity-1-2.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/csr/affinity-1-3.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/csr/affinity-2-0.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/csr/affinity-2-1.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/csr/affinity-2-2.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/csr/affinity-2-3.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/csr/affinity-3-0.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/csr/affinity-3-1.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/csr/affinity-3-2.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/csr/affinity-3-3.json": {
-      "source": "evidence/isomax-csr-screen-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/csr/manifest.json": {
-      "source": "evidence/isomax-csr-screen-20261002/manifest.json",
-      "sha256": "0f8b68f83fe85335e1d9808e37b89d6711122a32a7315b72bd6fe826577529e7"
-    },
-    "evidence/screens/csr/raw.jsonl": {
-      "source": "evidence/isomax-csr-screen-20261002/raw.jsonl",
-      "sha256": "7ad5a6a29ad85a53b758fbb395b89d8e4b529817820c57e7e65d75aa30fae05b"
-    },
-    "evidence/screens/csr/samples.jsonl": {
-      "source": "evidence/isomax-csr-screen-20261002/samples.jsonl",
-      "sha256": "bbf73d2c820e0718acc3cb1e4f12a9e90d80cd3b52a037aa067cf4606ecd254d"
-    },
-    "evidence/screens/library-hoisted/SUMMARY.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/SUMMARY.json",
-      "sha256": "a3263b1c48fc682285a8008cff24ffc7e9fe784b17478768fd6801cca0576567"
-    },
-    "evidence/screens/library-hoisted/affinity-0-0.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-hoisted/affinity-0-1.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-hoisted/affinity-0-2.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-hoisted/affinity-0-3.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-hoisted/affinity-1-0.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-hoisted/affinity-1-1.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-hoisted/affinity-1-2.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-hoisted/affinity-1-3.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-hoisted/affinity-2-0.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-hoisted/affinity-2-1.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-hoisted/affinity-2-2.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-hoisted/affinity-2-3.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-hoisted/affinity-3-0.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-hoisted/affinity-3-1.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-hoisted/affinity-3-2.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-hoisted/affinity-3-3.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-hoisted/manifest.json": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/manifest.json",
-      "sha256": "2be390bac68d9f98920ffccb6ae0686e7e4dc9c84ac311880d55a6c681626c82"
-    },
-    "evidence/screens/library-hoisted/raw.jsonl": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/raw.jsonl",
-      "sha256": "38cae9c0c61c78170fa2c4b1d6dc2109b2084e69e483757c6a386f7ae092a4ba"
-    },
-    "evidence/screens/library-hoisted/samples.jsonl": {
-      "source": "evidence/isomax-library-hoisted-7x6-20261002/samples.jsonl",
-      "sha256": "f4ae9789b5f86e162e4d240bdfc6bb338cff4342fb5f347cb00357d739cedc67"
-    },
-    "evidence/screens/library-unhoisted/SUMMARY.json": {
-      "source": "evidence/isomax-library-7x6-20261002/SUMMARY.json",
-      "sha256": "8ddc401e8c7085d95ece9e1ea41805e9a94591e9d2775edd5759afbefefcb094"
-    },
-    "evidence/screens/library-unhoisted/affinity-0-0.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-unhoisted/affinity-0-1.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-unhoisted/affinity-0-2.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-unhoisted/affinity-0-3.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-unhoisted/affinity-1-0.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-unhoisted/affinity-1-1.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-unhoisted/affinity-1-2.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-unhoisted/affinity-1-3.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-unhoisted/affinity-2-0.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-unhoisted/affinity-2-1.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-unhoisted/affinity-2-2.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-unhoisted/affinity-2-3.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-unhoisted/affinity-3-0.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/library-unhoisted/affinity-3-1.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/library-unhoisted/affinity-3-2.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/library-unhoisted/affinity-3-3.json": {
-      "source": "evidence/isomax-library-7x6-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/library-unhoisted/manifest.json": {
-      "source": "evidence/isomax-library-7x6-20261002/manifest.json",
-      "sha256": "1b3f832454468b02a1fb66c4de6b116c09e737d0edd9866e522d519e558a488d"
-    },
-    "evidence/screens/library-unhoisted/raw.jsonl": {
-      "source": "evidence/isomax-library-7x6-20261002/raw.jsonl",
-      "sha256": "451b77552e142de62d528d309e7ee8c2b0d269823d869d7eaae6f5c249fcc97b"
-    },
-    "evidence/screens/library-unhoisted/samples.jsonl": {
-      "source": "evidence/isomax-library-7x6-20261002/samples.jsonl",
-      "sha256": "4b7bb39d3cb73f47a5a6386ec952249282687d491049af39f76052744be9ce4f"
-    },
-    "evidence/screens/masks/SUMMARY.json": {
-      "source": "evidence/isomax-masks-screen-20261002/SUMMARY.json",
-      "sha256": "107c1876ec1708c0f1974e8c534fb8274c127890d85e3ebd11c3bafa33e72d2e"
-    },
-    "evidence/screens/masks/affinity-0-0.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/masks/affinity-0-1.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/masks/affinity-0-2.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/masks/affinity-0-3.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/masks/affinity-1-0.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/masks/affinity-1-1.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/masks/affinity-1-2.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/masks/affinity-1-3.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/masks/affinity-2-0.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/masks/affinity-2-1.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/masks/affinity-2-2.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/masks/affinity-2-3.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/masks/affinity-3-0.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/masks/affinity-3-1.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/masks/affinity-3-2.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/masks/affinity-3-3.json": {
-      "source": "evidence/isomax-masks-screen-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/masks/manifest.json": {
-      "source": "evidence/isomax-masks-screen-20261002/manifest.json",
-      "sha256": "14f2f06f8945cdc970156148bd83b3db931d75efbca3e877640a8befbffd4a95"
-    },
-    "evidence/screens/masks/raw.jsonl": {
-      "source": "evidence/isomax-masks-screen-20261002/raw.jsonl",
-      "sha256": "11461e16637095ae473d377ebec905e200d569b7761cbc8554ab4f91af985a20"
-    },
-    "evidence/screens/masks/samples.jsonl": {
-      "source": "evidence/isomax-masks-screen-20261002/samples.jsonl",
-      "sha256": "4431f2918f3c88f3fd9f373bb3cbe1ebd47d52c2f9fd6775c3a7dec61e8e12a2"
-    },
-    "evidence/screens/prepared/SUMMARY.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/SUMMARY.json",
-      "sha256": "f4289c64f3310026056341640145d57598e00029b47be765f2f2ff8f0782f5d9"
-    },
-    "evidence/screens/prepared/affinity-0-0.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/prepared/affinity-0-1.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/prepared/affinity-0-2.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/prepared/affinity-0-3.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/prepared/affinity-1-0.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/prepared/affinity-1-1.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/prepared/affinity-1-2.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/prepared/affinity-1-3.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/prepared/affinity-2-0.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/prepared/affinity-2-1.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/prepared/affinity-2-2.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/prepared/affinity-2-3.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/prepared/affinity-3-0.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/screens/prepared/affinity-3-1.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/screens/prepared/affinity-3-2.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/screens/prepared/affinity-3-3.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/screens/prepared/manifest.json": {
-      "source": "evidence/isomax-prepared-screen-20261002/manifest.json",
-      "sha256": "c9ac766d3a76306bc73caa5bd4ace19a7b576f96bae75653995108406392d1fb"
-    },
-    "evidence/screens/prepared/raw.jsonl": {
-      "source": "evidence/isomax-prepared-screen-20261002/raw.jsonl",
-      "sha256": "2695281b728b7f13963634130dd3206ee13f8bf13d555ae7e793be4ba9f832a0"
-    },
-    "evidence/screens/prepared/samples.jsonl": {
-      "source": "evidence/isomax-prepared-screen-20261002/samples.jsonl",
-      "sha256": "09bc74412a60b59f47d488fcae1988a35165e5f3cdf286302e65c79c2da5bcef"
-    },
-    "evidence/tt-layout/BLOCK_ANALYSIS.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/BLOCK_ANALYSIS.json",
-      "sha256": "d61e9f0f57148d3a58023f9e15adae813095d69c539a40e7c97ccef4df5fde0f"
-    },
-    "evidence/tt-layout/REPORT.md": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/REPORT.md",
-      "sha256": "72d5b226e0f2e894e428cc1392c00b0b3f8f84e002b30a6598f07795849038c1"
-    },
-    "evidence/tt-layout/SUMMARY.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/SUMMARY.json",
-      "sha256": "2ba783a193500d791dd5de203f71fea58f02c8e990f533d94f527193af925706"
-    },
-    "evidence/tt-layout/affinity-0-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-0-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-0-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-0-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-0-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-0-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-0-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-0-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-1-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-1-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-1-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-1-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-1-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-1-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-1-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-1-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-2-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-2-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-2-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-2-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-2-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-2-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-2-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-2-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-3-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-3-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-3-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-3-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-3-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-3-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-3-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-3-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-4-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-4-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-4-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-4-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-4-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-4-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-4-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-4-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-5-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-5-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-5-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-5-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-5-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-5-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-5-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-5-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-6-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-6-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-6-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-6-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-6-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-6-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-6-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-6-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/affinity-7-0.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-7-0.json",
-      "sha256": "e7fa6ed2c6c2bf8b52fbb61691fdc72c15f6be620fcdc8c9e67d2b0dd7ec8fa6"
-    },
-    "evidence/tt-layout/affinity-7-1.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-7-1.json",
-      "sha256": "72de8fdcb57acadf80f8ba61be57799354f2aa06cfd5d1aa576615d3e3ecc15a"
-    },
-    "evidence/tt-layout/affinity-7-2.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-7-2.json",
-      "sha256": "680593e4bfbb781a96b403208ffb5c04bbdba65a0a7aa945c5caa8b14b51f82e"
-    },
-    "evidence/tt-layout/affinity-7-3.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/affinity-7-3.json",
-      "sha256": "202b16fb543c269bd4215c9c87f0925a815b16fd9c6a26319ca265411353d318"
-    },
-    "evidence/tt-layout/manifest.json": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/manifest.json",
-      "sha256": "419a82df62ff22aca73b00f7f9ec66444119c810f451edfeeca678e8b1318fd9"
-    },
-    "evidence/tt-layout/raw.jsonl": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/raw.jsonl",
-      "sha256": "b9b6f2836cb5b23402ccf2c28641ce31b1bbcc679f8669070248dd31adc19cf2"
-    },
-    "evidence/tt-layout/samples.jsonl": {
-      "source": "evidence/isomax-tt-init-confirm-20261002/samples.jsonl",
-      "sha256": "db6881fc0a168b6b8bba5020420b0f5d6f923df43ab3f78f261a2b9fdcd4ddb3"
+      "sha256": "3f3cdb561920a853f1be977348738416cc8ee3964102324bb5433302d39b9f68"
+    },
+    "evidence/runs/c4ideas-c44-01/affinity-0.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/affinity-0.json",
+      "sha256": "2c724fdb08be0b324971eb2315cf1522a814c68ef4ec525c21500f12f81def54"
+    },
+    "evidence/runs/c4ideas-c44-01/affinity-1.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/affinity-1.json",
+      "sha256": "d52aea7466928b378dd49bec7ccc33166873307d8fee824446d7774ac1e87e7f"
+    },
+    "evidence/runs/c4ideas-c44-01/affinity-2.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/affinity-2.json",
+      "sha256": "743f7abacfe5c94f2356b1e30eeed5b852c282bfe559b4c6735a5c4643acc3b5"
+    },
+    "evidence/runs/c4ideas-c44-01/affinity-3.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/affinity-3.json",
+      "sha256": "aa56958ba8f23c95bef5abd299011713801a9ad3f17d5cb033ac8eead1ef9abb"
+    },
+    "evidence/runs/c4ideas-c44-01/cleanup-verification.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/cleanup-verification.json",
+      "sha256": "b04ad18675a44101799b2cb59298c02337914411a79f84da3a6b1184d20bfd76"
+    },
+    "evidence/runs/c4ideas-c44-01/invocation.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/invocation.json",
+      "sha256": "b859e162f6af2cc15c359c03527093cb91207873485cd6c3e921402af4543aea"
+    },
+    "evidence/runs/c4ideas-c44-01/measurement.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/measurement.json",
+      "sha256": "218dad43ec62ef06e2ef71574099d8cb2953c381b76df0b024c81155084da1e8"
+    },
+    "evidence/runs/c4ideas-c44-01/stderr.txt": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/stderr.txt",
+      "sha256": "0988f85e2710ec4251315b6da2bc502edb9d71adae7f28f98401c641d75a98a8"
+    },
+    "evidence/runs/c4ideas-c44-01/stdout.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-01/stdout.json",
+      "sha256": "d1d89524f21a62dc486c4c1f72c93413ece737e3073e2d515d58056a6254a820"
+    },
+    "evidence/runs/c4ideas-c44-02/affinity-0.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/affinity-0.json",
+      "sha256": "2c724fdb08be0b324971eb2315cf1522a814c68ef4ec525c21500f12f81def54"
+    },
+    "evidence/runs/c4ideas-c44-02/affinity-1.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/affinity-1.json",
+      "sha256": "d52aea7466928b378dd49bec7ccc33166873307d8fee824446d7774ac1e87e7f"
+    },
+    "evidence/runs/c4ideas-c44-02/affinity-2.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/affinity-2.json",
+      "sha256": "743f7abacfe5c94f2356b1e30eeed5b852c282bfe559b4c6735a5c4643acc3b5"
+    },
+    "evidence/runs/c4ideas-c44-02/affinity-3.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/affinity-3.json",
+      "sha256": "aa56958ba8f23c95bef5abd299011713801a9ad3f17d5cb033ac8eead1ef9abb"
+    },
+    "evidence/runs/c4ideas-c44-02/cleanup-verification.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/cleanup-verification.json",
+      "sha256": "0a46de02f970b94041e25838f8c83212615de3940bf04218e6c347a54cea580b"
+    },
+    "evidence/runs/c4ideas-c44-02/invocation.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/invocation.json",
+      "sha256": "48830411134678260b66f304824d69467a0d68662982d7f01715df0fd56e692e"
+    },
+    "evidence/runs/c4ideas-c44-02/measurement.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/measurement.json",
+      "sha256": "64e5ea9022df95e170afaf7598f85d264c90045894a0bd64e3f9c5f3f18d2416"
+    },
+    "evidence/runs/c4ideas-c44-02/stderr.txt": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/stderr.txt",
+      "sha256": "783d07f21c650d92d38e1e919bd31dd6260d0275087199a4590294e2cfe94a1f"
+    },
+    "evidence/runs/c4ideas-c44-02/stdout.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-c44-02/stdout.json",
+      "sha256": "ed34af84649975db216863229c96b4b1e2ae4d8a73fdf53977c70e67c9a9d592"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/affinity-0.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/affinity-0.json",
+      "sha256": "2c724fdb08be0b324971eb2315cf1522a814c68ef4ec525c21500f12f81def54"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/affinity-1.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/affinity-1.json",
+      "sha256": "d52aea7466928b378dd49bec7ccc33166873307d8fee824446d7774ac1e87e7f"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/affinity-2.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/affinity-2.json",
+      "sha256": "743f7abacfe5c94f2356b1e30eeed5b852c282bfe559b4c6735a5c4643acc3b5"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/affinity-3.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/affinity-3.json",
+      "sha256": "aa56958ba8f23c95bef5abd299011713801a9ad3f17d5cb033ac8eead1ef9abb"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/cleanup-verification.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/cleanup-verification.json",
+      "sha256": "ed0fa4c09455dfb67d80937830eb74f3e5b93bc54dc37ba9ef0fd5f3376d83f1"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/invocation.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/invocation.json",
+      "sha256": "b719c7ccb9ef49e5d8859181945fe243e032e19d304c2193abe9bf1748236e0c"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/measurement.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/measurement.json",
+      "sha256": "10ebccadad37661dda08d04f3145f581deefc477f79f332cddb15d160333da50"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/stderr.txt": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/stderr.txt",
+      "sha256": "dd1d8da2ae5b00b157ffba7a94c6228303a8ee6e17bdecfaf9cad5d9283c1ec8"
+    },
+    "evidence/runs/c4ideas-j06-parent-refresh-01/stdout.json": {
+      "source": "evidence/minimal-worker-localhost-20261004/c4ideas-j06-parent-refresh-01/stdout.json",
+      "sha256": "bb10a0f6c9ab335f801f179c90946c0318346044baf0e27b86007ff8e0d6ad08"
     },
     "example.mjs": {
       "source": "package-authored",
-      "sha256": "2cadf732030faa8aef8702b5451a4d1a9cce0322042fa3903eda30864293f9f9"
+      "sha256": "ca52160caec7e5dbb69e5597d12e3064b0b9d112955d3dfc9f2c8eb01516821a"
     },
     "index.mjs": {
       "source": "package-authored",
-      "sha256": "201f179942af57c01ecd05f37d7bfe2a21e1bedf4e0fef689a57bf4057aa474a"
+      "sha256": "c93ce8281b1d98748f6f97a4e3b01555d0de512b56bf5e7fe115eefb3d548e07"
     },
     "package.json": {
       "source": "package-authored",
-      "sha256": "8a2ba50a47ae719110fcfa41f5dceddfde44f6ed44bf132d42fe41f21133c0eb"
+      "sha256": "b22d7c65e3d41db8a2b89c08ba72796145fe74aadc5be3446b227870d789ca99"
     },
     "profile.json": {
       "source": "package-authored",
-      "sha256": "487675ecaf9fd2d5a4d89395f55f35c761a227e88c7bf7173aff37b8c1c0ec6a"
+      "sha256": "ea6717cbf3a6fb0bc0294371a9ece83d4943306739c6ee17e2a498b3208771a6"
+    },
+    "run-i5.ps1": {
+      "source": "package-authored",
+      "sha256": "610dd784f8828d8011fc778e4b3f0b942c87f0692b1ab5936990d37ba8c16f2d"
+    },
+    "run.mjs": {
+      "source": "package-authored",
+      "sha256": "c94ea7f39d40e94e5f55016090cbfcda25f1c26e4de3075849b0517b5199dedd"
     },
     "runtime/addons/branch-manager-host.mjs": {
       "source": "addons/branch-manager-host.mjs",
-      "sha256": "d663f828a91d69133820e30c13de7ac1e5988fb7816570c045ffaf20f56cfb13",
-      "sourceSha256": "ae9f76f43677852e5da2855cde7e2d4ceea321a21995e0312b1c6a665b48d052",
-      "correction": "A01-A02-managed-session-and-terminal-abort"
+      "sha256": "d663f828a91d69133820e30c13de7ac1e5988fb7816570c045ffaf20f56cfb13"
+    },
+    "runtime/addons/connect4-cpc-matching-response.mjs": {
+      "source": "addons/connect4-cpc-matching-response.mjs",
+      "sha256": "1e67fb8110ea535de4d0bf28e23057347e8d06013b2cb19813818729dd26b58c"
+    },
+    "runtime/addons/connect4-cpc-prepared-response.mjs": {
+      "source": "addons/connect4-cpc-prepared-response.mjs",
+      "sha256": "fc1f65fc453cfd4791e10c5eaeaaee1696c35b0631a29ed8f233c50410b1079f"
+    },
+    "runtime/addons/connect4-cpc-prepared-win.mjs": {
+      "source": "addons/connect4-cpc-prepared-win.mjs",
+      "sha256": "ce84aaeda7ef1965e887b30e7ad45eb6eeb43f489e2add2e4b2436725faab458"
+    },
+    "runtime/addons/connect4-cpc-target-dense-win.mjs": {
+      "source": "addons/connect4-cpc-target-dense-win.mjs",
+      "sha256": "f100b0ff794c6cb0f5234feea6827c02036ed92cb3e6f2998e28f529271536dd"
+    },
+    "runtime/addons/connect4-cpc-target-win.mjs": {
+      "source": "addons/connect4-cpc-target-win.mjs",
+      "sha256": "92f1848b7530c6045ec7a355bdce9852713486e45f0d7a7f6a11cb0acc80a6c7"
+    },
+    "runtime/addons/connect4-cpcx-pair-hub.mjs": {
+      "source": "addons/connect4-cpcx-pair-hub.mjs",
+      "sha256": "66de3d0fbd9a923410fec7e141f9a623329e1acf37ead426017ba06b96dd97bb"
     },
     "runtime/addons/connect4-live-line-evaluator.mjs": {
       "source": "addons/connect4-live-line-evaluator.mjs",
-      "sha256": "7470ef41f8516cbe5f2fb616998426a7c8522e1b9d4eea830fb01394f9f6f8e2"
+      "sha256": "94609f645d5988b15d0aece8f087701329f2ea15e8f19f7e89128e4660483b75"
+    },
+    "runtime/addons/connect4-live-line-order.mjs": {
+      "source": "addons/connect4-live-line-order.mjs",
+      "sha256": "1070bbce728a5245af8bc1a03f5943726d70f332ea3253c9c63568f5e3626cee"
     },
     "runtime/addons/connect4-rank-local-presearch.mjs": {
       "source": "addons/connect4-rank-local-presearch.mjs",
-      "sha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25",
-      "sourceSha256": "f3bfd946a3f624e0a56b6982c86985bf03a5833fa085eebbefa5fd3cdbf8f190",
-      "correction": "A05-indexed-move-history"
+      "sha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25"
+    },
+    "runtime/addons/connect4-residual-proof-frontier-span.mjs": {
+      "source": "addons/connect4-residual-proof-frontier-span.mjs",
+      "sha256": "e4b175e7f0b31dd417107a3ce4ff5db3fe3351abf1a499af45c9c0af95bc404a"
+    },
+    "runtime/addons/connect4-residual-proof-frontier-three.mjs": {
+      "source": "addons/connect4-residual-proof-frontier-three.mjs",
+      "sha256": "571f0c6c1a60c155f8e0a109f83a3a40320a664c6a4a05edbea2d6316cc76200"
+    },
+    "runtime/addons/connect4-residual-proof-frontier.mjs": {
+      "source": "addons/connect4-residual-proof-frontier.mjs",
+      "sha256": "8fdb95152ce6957d6c4f856798834a0c8f05590ae5e32b5aae8d44a5fc1cbc35"
     },
     "runtime/addons/rba-connect4-cache-capacity.mjs": {
-      "source": "cold-correction addition",
-      "sha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e",
-      "correction": "A03-native-capacity-validation"
+      "source": "addons/rba-connect4-cache-capacity.mjs",
+      "sha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e"
+    },
+    "runtime/addons/rba-connect4-coordinate-closure-dense.mjs": {
+      "source": "addons/rba-connect4-coordinate-closure-dense.mjs",
+      "sha256": "2e5c717f7a7b763c3ccc18c08fe199aa467f489682c2f04346e6652cd7d358ff"
+    },
+    "runtime/addons/rba-connect4-coordinate-closure-prepared.mjs": {
+      "source": "addons/rba-connect4-coordinate-closure-prepared.mjs",
+      "sha256": "4e75a4873953f5ef51a130e53b7cb011cd74b1e6f6ce007983e1f6ba1dacfee5"
+    },
+    "runtime/addons/rba-connect4-coordinate-closure-view-dense.mjs": {
+      "source": "addons/rba-connect4-coordinate-closure-view-dense.mjs",
+      "sha256": "4ca7ba1fc42f3c80be2bd2b10d4e7af88191c6360168427edeee63977fc5ee09"
+    },
+    "runtime/addons/rba-connect4-coordinate-closure-view-prepared.mjs": {
+      "source": "addons/rba-connect4-coordinate-closure-view-prepared.mjs",
+      "sha256": "a76297bf0a4e0ed1790d1a153af0a59391e053de56b4a649e093ace5eaf01b7b"
     },
     "runtime/addons/rba-connect4-coordinate-dense.mjs": {
       "source": "addons/rba-connect4-coordinate-dense.mjs",
-      "sha256": "b463803372aab8ecdfbbe6185a5af1f421752e4fc00313cd6854bdf74712c71c"
+      "sha256": "3b0e583342d757ca436a599b1d8b145918a16e639a331d88374861e581412355"
     },
     "runtime/addons/rba-connect4-coordinate-prepared.mjs": {
       "source": "addons/rba-connect4-coordinate-prepared.mjs",
-      "sha256": "4df62559637083d4a9eb1108662ebe670699e1871dfc249ec3d820183b490b52"
+      "sha256": "4e7e351197af44815f3d972fd0a9bb07c2ad6552870d3649f1de17cbe3cec084"
+    },
+    "runtime/addons/rba-connect4-coordinate-support-dense.mjs": {
+      "source": "addons/rba-connect4-coordinate-support-dense.mjs",
+      "sha256": "bb236355d6dc56092b43b65fd373fd4c595560a2851927dfa71999dbb65e6779"
+    },
+    "runtime/addons/rba-connect4-coordinate-support-prepared.mjs": {
+      "source": "addons/rba-connect4-coordinate-support-prepared.mjs",
+      "sha256": "d517c2fe616c65c43b94450e9c00087b3f845e7d68022ad71e908c0264a9cebe"
+    },
+    "runtime/addons/rba-connect4-coordinate-support-reflection-view.mjs": {
+      "source": "addons/rba-connect4-coordinate-support-reflection-view.mjs",
+      "sha256": "db834c0fe4ed907a2042d270186a74a4a74dc3707bf4198a2d88171523a657c5"
+    },
+    "runtime/addons/rba-connect4-coordinate-support-reflection.mjs": {
+      "source": "addons/rba-connect4-coordinate-support-reflection.mjs",
+      "sha256": "17a6d8733a4a919c9516729b4c1bdbffd1318a3cfb6aee207c8b42cd2f21f361"
     },
     "runtime/addons/rba-connect4-coordinate.mjs": {
       "source": "addons/rba-connect4-coordinate.mjs",
-      "sha256": "b299993155d9f0bb66c81bda032d27bba0306b41dbb053ec913a4670a613c2c7"
+      "sha256": "328f9ecd3874c86544d1ca639e37dd5d630e29c4f5f0728e6b05f9b21d6f6e0e"
     },
     "runtime/addons/rba-connect4-geometry.mjs": {
       "source": "addons/rba-connect4-geometry.mjs",
-      "sha256": "e57f6ad08215062587c08780540098c9573e105031d8ebadf87c202ad5c01c8f"
+      "sha256": "6236813c8dcf907ecbdcc6d9f665af2c9bc4dd49d32139c8e20e38f6380e4185"
     },
     "runtime/addons/rba-connect4-ingress.mjs": {
       "source": "addons/rba-connect4-ingress.mjs",
       "sha256": "f4a36b17ca96a13971f3a1deeb0c70375eddfcb765bbb9d841dfbffcfe080db9"
     },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs",
+      "sha256": "e89ad77d21439c0d4c6e993cd1f0f2b5ef24a92b9ff29d05b5a132427262159e"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs",
+      "sha256": "4a77b20cdf23367447b13bb520184f2ca1a5ebd9e442c58b827798d937da6ddf"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+      "sha256": "f0347972d5f93b4dc456031b8712f247bf84443597674df642c120ff75280763"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs",
+      "sha256": "befba775063b346543724cc4d948c4250d20d9d7ddfed293faff89cfc962c6c5"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs",
+      "sha256": "2030ee1f24cd1a23b829d94440550a9dfdc8ba9ef48376e0edef48a1d4bff666"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs",
+      "sha256": "1723a4e9ff87302609c4db9851340989fe957c66db40fb7b2c400ec89caf4acb"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+      "sha256": "66ebe61d68d9597c400dc07026b90708942e58d489a5ec614b7b1a650e295d07"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs",
+      "sha256": "6be6fc049ae297a3befab1b0cc328e573016cc81603391f2851a8afb581c53db"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs",
+      "sha256": "79cd53e88b577678fc058d8409549dba9ddf8be80b7d873992536d89d93254b2"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs",
+      "sha256": "4868288e1c9379459e2e52683a0caf112328820278b55f0b3929d833dc40230b"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs",
+      "sha256": "49932b069734bd96eef53f79267019bdeee66e5def67674a796f799c3303f800"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs",
+      "sha256": "ead7e313c76be9c8704ec66bfe367b56fe735d7d26422cc33c765eb3aba88a0d"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs",
+      "sha256": "a42cc53c38948d5bd04df3bdff73362c1ac6c9994b610a253537da85dfe28781"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs",
+      "sha256": "d67bf6a0b44638df86518a7a43848dd45e744db34725188e8d8370152bdd10f4"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal-views.mjs",
+      "sha256": "58293df1c6d561d1dcf8dc2849c8ba525dc254407a4329e41b2a367e96ee9434"
+    },
+    "runtime/addons/rba-connect4-lazy-smp-worker-minimal.mjs": {
+      "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+      "sha256": "7b5fb2d1f89fabca3428b50cd48971e9603d4d8900eda2844dcd97adf7e6b029"
+    },
+    "runtime/addons/rba-connect4-local-native-proof-cache.mjs": {
+      "source": "addons/rba-connect4-local-native-proof-cache.mjs",
+      "sha256": "cf2fe8b57b4b31a7bfc6070bdd6a6e1d78c0395920f9a3dd9b5deaf93fb866ef"
+    },
+    "runtime/addons/rba-connect4-prepared-session-host.mjs": {
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "sha256": "3ce2518f8ba45d3bb3b857295b9e34e22218eea44312229372922de959831aad"
+    },
     "runtime/addons/rba-connect4-profile.mjs": {
       "source": "addons/rba-connect4-profile.mjs",
       "sha256": "edd8d17bcafdb2349b688f880ff2ba26cf362003eb4969ee0d98dacb65f11727"
     },
+    "runtime/addons/rba-connect4-shared-exact-cache-layout.mjs": {
+      "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+      "sha256": "57fd642c41ab845676589e26f2196dac1012e234445cc5fb5a52bbdd83c68c6f"
+    },
+    "runtime/addons/rba-connect4-shared-exact-cache-uncounted.mjs": {
+      "source": "addons/rba-connect4-shared-exact-cache-uncounted.mjs",
+      "sha256": "d3cdf4efa3515a9e740cf16ff487d9430f221ac1987ba9cb76a53201c1a3f648"
+    },
+    "runtime/addons/rba-connect4-shared-exact-cache.mjs": {
+      "source": "addons/rba-connect4-shared-exact-cache.mjs",
+      "sha256": "b85ad37e944cabb7e59e4df447e541318eebe8445425ccd4f9f7a502afeb100d"
+    },
+    "runtime/addons/rba-connect4-shared-proof-cache.mjs": {
+      "source": "addons/rba-connect4-shared-proof-cache.mjs",
+      "sha256": "6c735a7f0ae1c81f3620d84725efc85ff81cd1606b100420cbf6203db722a6f4"
+    },
+    "runtime/addons/rba-connect4-support-basis-plan.mjs": {
+      "source": "addons/rba-connect4-support-basis-plan.mjs",
+      "sha256": "9e54c57dd702ebdd4322bfb33b415111010c86778b0a7defac853ac609e21e52"
+    },
+    "runtime/addons/rba-connect4-support-basis-view.mjs": {
+      "source": "addons/rba-connect4-support-basis-view.mjs",
+      "sha256": "f5e9f648a9830dc6da5c68a973e2a0190a30d486b834f454544f55b6d23bc6cb"
+    },
     "runtime/addons/worker-affinity.mjs": {
       "source": "addons/worker-affinity.mjs",
       "sha256": "c22c347f5d8414632ae7fa247f31208b319e24c4b241c83d0b7b06ca9cd6fff3"
-    },
-    "runtime/addons/worker-behavior-search.mjs": {
-      "source": "addons/worker-behavior-search.mjs",
-      "sha256": "6aecc20929ef0e32b3f7a5d4b699ce0988da1151711535ed080220ef6b958b4c"
-    },
-    "runtime/addons/worker-behavior.mjs": {
-      "source": "addons/worker-behavior.mjs",
-      "sha256": "891231e5093cc60ad9d8197bd49883a7112efe45e2073760e353e625930fe8cd"
-    },
-    "runtime/addons/worker.mjs": {
-      "source": "addons/worker.mjs",
-      "sha256": "6696165720589d3434f5ab9a899b3494c54bfd0fd6b27c6b36701dae7329f17b"
-    },
-    "runtime/experiments/isomax-lean/cpc-general.mjs": {
-      "source": "experiments/isomax-lean/cpc-general.mjs",
-      "sha256": "48dea26c8153279aa0d527491fa3a07450ff24a867ac9cf8e4b3758fd374ba0f"
-    },
-    "runtime/experiments/isomax-lean/cpc-wide.mjs": {
-      "source": "experiments/isomax-lean/cpc-wide.mjs",
-      "sha256": "6201b047b4b1f812df5aadbbe9991c2b47dfface075b32fa191352da4ba911aa"
-    },
-    "runtime/experiments/isomax-lean/cpc.mjs": {
-      "source": "experiments/isomax-lean/cpc.mjs",
-      "sha256": "b1019a22454e256e7580868b42ad00f99274113da81bd4cdfb1af6757bed21ff"
-    },
-    "runtime/experiments/isomax-lean/execution-profile.mjs": {
-      "source": "experiments/isomax-lean/execution-profile.mjs",
-      "sha256": "b80804b09e4791f999dc1f5ff08d4600e0a882e46c6e93f1890ffb1bd5ce8bf5"
-    },
-    "runtime/experiments/isomax-lean/fixed-ops.mjs": {
-      "source": "experiments/isomax-lean/fixed-ops.mjs",
-      "sha256": "a3e01734b8f3012497a6fcc22b1d05e13aaff700dacbf866effd85757de46a32"
-    },
-    "runtime/experiments/isomax-lean/host.mjs": {
-      "source": "experiments/isomax-lean/host.mjs",
-      "sha256": "08bb206cbb38cb3c8add939a1587d04c766f36f3e82d15b8a73c86d46898d663",
-      "sourceSha256": "6d8b52a75261c8a810198f7545cd3e990423353a15d22633d520efe1da388e3a",
-      "correction": "A03-A06-prepared-host-and-abort-ownership"
-    },
-    "runtime/experiments/isomax-lean/live-profile.mjs": {
-      "source": "experiments/isomax-lean/live-profile.mjs",
-      "sha256": "76dfc517bf71b3a699e55cd2396508655a705db54c1bd21c8a15e066129de0f0"
-    },
-    "runtime/experiments/isomax-lean/shared-cache.mjs": {
-      "source": "experiments/isomax-lean/shared-cache.mjs",
-      "sha256": "c9d0f61df90fd422fd043388c7b7f9ad77babdb016977e628cf9ef1d388a4563",
-      "sourceSha256": "a6b33afe59164165a5618de27d2f07b8757bf30b74f97e12827e156440793974",
-      "correction": "A03-native-shared-cache-view"
-    },
-    "runtime/experiments/isomax-lean/solver-dense.mjs": {
-      "source": "experiments/isomax-lean/solver-dense.mjs",
-      "sha256": "241e4fcc99eab1f7d8a153fa79d6faad0416a2dc1f7be686f2d0fa5db79c5ab7"
-    },
-    "runtime/experiments/isomax-lean/solver-general-dense.mjs": {
-      "source": "experiments/isomax-lean/solver-general-dense.mjs",
-      "sha256": "d3f2dc90c4171f562c8547691f35fdc46ee9e3b39c5c3050b16fc3a7e0c907ae"
-    },
-    "runtime/experiments/isomax-lean/solver-general-unpacked-dense.mjs": {
-      "source": "experiments/isomax-lean/solver-general-unpacked-dense.mjs",
-      "sha256": "e86e3fa9d13ff3d89ef1f1cd52f3f65f246aa31a1318e6bc48b0bdc09e3b629c"
-    },
-    "runtime/experiments/isomax-lean/solver-general-unpacked.mjs": {
-      "source": "experiments/isomax-lean/solver-general-unpacked.mjs",
-      "sha256": "eda8f08b3819623f9ac45860ef5aa57181ff7f78195385f09e0d4918a3e3a143"
-    },
-    "runtime/experiments/isomax-lean/solver-general-wide-dense.mjs": {
-      "source": "experiments/isomax-lean/solver-general-wide-dense.mjs",
-      "sha256": "a7e6bd16e080548a102c789bdd84049f906d445c0a4e9657938fe6e0c98ff006"
-    },
-    "runtime/experiments/isomax-lean/solver-general-wide-unpacked-dense.mjs": {
-      "source": "experiments/isomax-lean/solver-general-wide-unpacked-dense.mjs",
-      "sha256": "5e6cfee3411a594ec30cf1e1fb7658df27bb3cc41ffda30af21b6d58a13211bb"
-    },
-    "runtime/experiments/isomax-lean/solver-general-wide-unpacked.mjs": {
-      "source": "experiments/isomax-lean/solver-general-wide-unpacked.mjs",
-      "sha256": "61f9f825cd718810aaf8e886da57627108d9fb86c4b36e586f2a43776de1b9ec"
-    },
-    "runtime/experiments/isomax-lean/solver-general-wide.mjs": {
-      "source": "experiments/isomax-lean/solver-general-wide.mjs",
-      "sha256": "9020b03fe6373c3c36b73043c3100d0f008d2b0c04d86971f3ad9deb2d3a8138"
-    },
-    "runtime/experiments/isomax-lean/solver-general.mjs": {
-      "source": "experiments/isomax-lean/solver-general.mjs",
-      "sha256": "350e5f0d9bf8c389c3bb6f8e1e70bfa0d6f5ea3ce4a31f5c4d9f3fa91d720165"
-    },
-    "runtime/experiments/isomax-lean/solver.mjs": {
-      "source": "experiments/isomax-lean/solver.mjs",
-      "sha256": "8b8f6d263c2b7c2e8106ba213e8f9aa5d3e80bc60b69d7c80796ff874510d546"
-    },
-    "runtime/experiments/isomax-lean/worker-dense.mjs": {
-      "source": "experiments/isomax-lean/worker-dense.mjs",
-      "sha256": "d399e5a2b09e1679707e5f1652e2daf9431403d96a110ae726d199b12203dd11",
-      "sourceSha256": "00387713eeecfbc3779d1e671c2da6bd033676e81cec6ea1b3d883198251076e",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-dense.mjs": {
-      "source": "experiments/isomax-lean/worker-general-dense.mjs",
-      "sha256": "aabf02b70c0ab71a67604281d3313f1e1fd064ea18deadca15580a06108d8e4c",
-      "sourceSha256": "2d42ff46d7c8a3e0bb73a165ff0c9829ff01cf88f7cf82c2472b299c8675bc39",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-unpacked-dense.mjs": {
-      "source": "experiments/isomax-lean/worker-general-unpacked-dense.mjs",
-      "sha256": "5abfbc04e8a9f56332d4c7faac3dede270ba81e604980879f75474c06136fcc0",
-      "sourceSha256": "400342164c9500e6c4f27e920b333982df57ea479a0835c86ea64573cbd7f8b7",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-unpacked.mjs": {
-      "source": "experiments/isomax-lean/worker-general-unpacked.mjs",
-      "sha256": "61eb1bce67af01043c22fe24d0bb0b95116ccc1809f81dd29ce275a76edb8b9f",
-      "sourceSha256": "f29f983d85e30cf57037029333a11568b60bb8ffc429167b8d4fa6e3328aac63",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-wide-dense.mjs": {
-      "source": "experiments/isomax-lean/worker-general-wide-dense.mjs",
-      "sha256": "72ea7540f04c2fd7a645d61b5a7406ee3076e35578ea77c5ff49f972efbb5469",
-      "sourceSha256": "7915f853dd4935ddcda2f57655a79d6718dcd4baf0126f2d4b639e45ba0e8b90",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-wide-unpacked-dense.mjs": {
-      "source": "experiments/isomax-lean/worker-general-wide-unpacked-dense.mjs",
-      "sha256": "22513343bf8b5dcdbf5a53dd8df3c1afd70c7bb63f24b8d0191e54ce14239018",
-      "sourceSha256": "244fb375ac9e32dee70b9cf8c0d6e595ad35dda009e33c256567d24af308f0fd",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-wide-unpacked.mjs": {
-      "source": "experiments/isomax-lean/worker-general-wide-unpacked.mjs",
-      "sha256": "208de6926466df5d34dea9340a874ae05448d336fe34040a62307908d315d4d9",
-      "sourceSha256": "9a4f75c6b5826c9f8c51a245d404c584f4d9f05c9e52ea8c28fda06aaab25b82",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general-wide.mjs": {
-      "source": "experiments/isomax-lean/worker-general-wide.mjs",
-      "sha256": "5993883613d24e7971a30daab246dcd8b96c4a6cfe4332b97aa8f2e65f28a9c0",
-      "sourceSha256": "921dfca6594b83338a0c51608c2af0bb05ab18ccb8538dde833109af193a70d2",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker-general.mjs": {
-      "source": "experiments/isomax-lean/worker-general.mjs",
-      "sha256": "85383013c903a762c43c92124afb9217572c543d30ac6cecd9fc1263c0ba3be8",
-      "sourceSha256": "167c40e0fbf76639c07f3243daf444663e59e18be31a89546215f46aa600d5ea",
-      "correction": "A06-cold-ready-and-root-transport"
-    },
-    "runtime/experiments/isomax-lean/worker.mjs": {
-      "source": "experiments/isomax-lean/worker.mjs",
-      "sha256": "a399579be168f292db887c889629da1fc4caf97010020ebc869111190e61b6fa",
-      "sourceSha256": "be0ce10a9709f8804f04477e877d7bf90f40f25aa45d6dfddfd1258f1d92117c",
-      "correction": "A06-cold-ready-and-root-transport"
     },
     "runtime/src/basis32.mjs": {
       "source": "src/basis32.mjs",
@@ -1502,10 +419,6 @@
     "runtime/src/relational32.mjs": {
       "source": "src/relational32.mjs",
       "sha256": "ef28a812be3e1a5df695e67ced20168689f9b0887b83518aca2c857ea9581d3c"
-    },
-    "runtime/src/search32.mjs": {
-      "source": "src/search32.mjs",
-      "sha256": "4131be32cfc4141cbe0fdf05961d6a909c75164258e22355fbe3afbc8595d845"
     },
     "runtime/src/widekey32.mjs": {
       "source": "src/widekey32.mjs",
@@ -1519,17 +432,21 @@
       "source": "src/word64x32.mjs",
       "sha256": "ca59372f9f74b8272c0d24d2221899fb1b075334198ca14b54997e578ed49985"
     },
-    "runtime/src/worker-behavior32.mjs": {
-      "source": "src/worker-behavior32.mjs",
-      "sha256": "beb8be728d1b571681aef06c5367f6c2913158e89ae113a7ccaebbeef1c8a6f8"
+    "runtime/tools/benchmark-v8-startup-preload.mjs": {
+      "source": "tools/benchmark-v8-startup-preload.mjs",
+      "sha256": "3900df3b51e8cad5b309441f50a6d659650eb4a5c712d86c0cecfae2972ad2e7"
     },
     "runtime/tools/worker-affinity-preload.mjs": {
       "source": "tools/worker-affinity-preload.mjs",
       "sha256": "02105fdf5204ef91434fe9ef2358ebc8ef953b87188b33dbf7705d65493d651f"
     },
     "targets.json": {
-      "source": "evidence/isomax-memory-affinity-20260928/targets.json",
+      "source": "isomax/targets.json",
       "sha256": "1447f09c35bd01d309a57586b397460a95ea7efcad9a24cdfa2a4f34a0e9e0b5"
+    },
+    "test/basis-view.test.mjs": {
+      "source": "package-authored",
+      "sha256": "fe7ebce3ea3da0c89784490b24de61870eaebf09bace5b6c437ee5f47c126586"
     },
     "test/cofactor.test.mjs": {
       "source": "package-authored",
@@ -1541,7 +458,7 @@
     },
     "test/input-contract.test.mjs": {
       "source": "package-authored",
-      "sha256": "32f04fda021c40446d106e2a84911d62d92565a3f7de38fea81daccc949c824a"
+      "sha256": "8010399e29ef978326b844697ddba53d663c8be863e46a5681c2eb0551f1519c"
     },
     "test/package-verification.test.mjs": {
       "source": "package-authored",
@@ -1549,15 +466,15 @@
     },
     "test/prepared.test.mjs": {
       "source": "package-authored",
-      "sha256": "641700d0d04984302b2d8656fe2e15db69571040a4f0647ec0d5fb760eda0dc8"
+      "sha256": "80886c4fd94662857dba2c9f2a29cf4858d54bed8e0c8c77e1ad24c5a0c78032"
     },
     "test/smoke.test.mjs": {
       "source": "package-authored",
-      "sha256": "f327874bb0c5ce2076d1b5194132cc03b27140e4837e93d6e1ece8bb6ca4b0d2"
+      "sha256": "496d6b0c734b01ac345a36dcdc55da8fb6d4127c0720570ec8fb727e3e643c9f"
     },
     "verify.mjs": {
       "source": "package-authored",
-      "sha256": "b78550f68afebe7bd53b116e65f98cc8d056d748dd178417ba49842aff4337a8"
+      "sha256": "944577494864e1a08c8adcb41c2794b8ee593d2ee08681d5a27d0f96fbccc685"
     }
   }
 }

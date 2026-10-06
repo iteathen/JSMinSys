@@ -205,7 +205,7 @@ export function shareConnect4RbaGeometry32(g){
 
 export function prepareConnect4RbaCoordinateScratch(g){
   return {seen:new Uint32Array(g.shapeWordCount),mirrorBasis:new Uint32Array(g.maxBasis),
-    inverse:new Uint32Array(g.shapeCount),map:new Uint32Array(g.maxBasis),
+    inverse:new Uint32Array(g.shapeCount),map:new Uint32Array(Math.max(1,g.maxBasis)),
     mirror:new Uint32Array(g.keyWords),size:new Uint32Array(1)};
 }
 

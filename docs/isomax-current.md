@@ -1,6 +1,9 @@
 # Historical frozen IsoMax version
 
 The current prepared candidate is [the self-contained isomax package](../isomax/README.md).
+The promoted minimal-worker package is `0.2.0-rc.1`, with direct empty-board
+execution and a 56.893-second retained localhost mean. Its own profile/provenance
+is authoritative for setup. The remainder of this document preserves older evidence.
 Canonical support libraries in `src/` and `addons/` may receive owner-authorized
 upgrades. This document, the unchanged source lock, and the
 [historical archive](../profiles/frozen-isomax-20261001/) preserve the earlier

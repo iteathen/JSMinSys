@@ -4,6 +4,11 @@
 It is self-contained: public API, runtime, configuration, example, evidence and
 transfer archive in one folder. Prepared on main; **not published**.
 
+From `isomax/`, run `node verify.mjs`, then `node run.mjs`. No installation is
+needed. The current package is `0.2.0-rc.1`: four minimal workers, direct empty-board
+solve, 4 GiB shared TT and 256 MiB private TT per worker. Setup, dimension options
+and the measured Windows launcher are explained in that folder's README.
+
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
 The current normative draft is [SPEC.md](SPEC.md). JSMinSys is a strict NEES-EXTREME execution profile: NEES supplies the governing optimization, evidence, qualification, and cost-accounting standard; JSMinSys adds narrower admissible data, operations, blocks, and mechanical sealing.
