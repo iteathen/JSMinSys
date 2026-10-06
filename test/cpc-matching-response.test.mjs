@@ -158,7 +158,7 @@ test('all eight actual worker variants bind the common-policy response capabilit
  for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
    const name='rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
    const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8');
-   assert.match(source,/prepareConnect4Cpc(?:MatchingResponse|PhysicalMatching)32 as prepareConnect4CpcWin32/);
-   assert.match(source,/evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32|evaluateConnect4PreparedCpcResponse32=cpc.evaluate/);
+   assert.match(source,/prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32/);
+   assert.match(source,/evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32/);
  }
 });
