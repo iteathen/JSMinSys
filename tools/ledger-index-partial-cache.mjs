@@ -5,7 +5,7 @@ const path='catalog/addon-cycle-ledger-v0.json',l=JSON.parse(readFileSync(path,'
  source='addons/rba-connect4-index-partial-cache.mjs';
 const expr=ops=>ops.map(o=>o.op==='runtime.call.subledger'?`(${o.count})*CALL(${o.target})`:`(${o.count})*C(${o.op})`).join('+'),
  op=(name,count)=>({op:name,count}),call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
-l.units=l.units.filter(u=>u.source!==source&&!u.source.endsWith('-partial24.mjs'));
+l.units=l.units.filter(u=>u.source!==source&&!/-partial(?:24|16)\.mjs$/.test(u.source));
 const specs={
  packIndexPartial24Support32:[op('memory.load.u32',9),op('alu.add.u32',8),op('alu.shl.u32',8),op('alu.or.u32',8),op('alu.and.u32',2),op('alu.shr.u32',1)],
  createIndexPartialCache32:[op('runtime.cold.tt.bank.initialize',1),call('isCompactLayoutProfile8'),call('validateConnect4CacheCapacity32'),call('attachIndexPartialCache32')],
@@ -15,14 +15,27 @@ const specs={
  probeIndexPartial24Shared32:[op('runtime.field.load',3),op('alu.and.u32',4),op('runtime.number.multiply',1),op('alu.add.u32',8),op('alu.shr.u32',2),op('memory.load.u32',3),op('atomic.load.u32',7),op('control.test.u32',9),op('control.branch',9)],
  storeIndexPartial24Shared32:[op('runtime.field.load',3),op('alu.and.u32',2),op('runtime.number.multiply',1),op('alu.add.u32',10),op('alu.shr.u32',1),op('alu.shl.u32',1),op('alu.or.u32',1),op('memory.load.u32',3),op('atomic.load.u32',1),op('atomic.rmw.u32',1),op('atomic.store.u32',6),op('control.test.u32',2),op('control.branch',2)],
 };
-for(const [name,operations] of Object.entries(specs)){
- if(/^(probe|store)/.test(name))operations.push(call('packIndexPartial24Support32','DEFAULT'));
- l.units.push({unit:source+'#'+name,source,name,scope:'exact-index-partial-tt',status:'decomposed',operations,
-  cycleCount:{kind:'symbolic',expression:expr(operations),parameters:{DEFAULT:'0 in prepared worker calls;1 when public diagnostic default is used'},
-   note:'Native24byte nonterminal q identity. Full32bit seqlock preserved; partial hash proof packing and support/tail preparation explicitly charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS failure exits early; no timing claim from ledger.'}});
+specs.packIndexPartial16Heights32=[op('memory.load.u32',7),op('alu.add.u32',6),op('alu.shl.u32',6),op('alu.or.u32',6),op('alu.shr.u32',1)];
+specs.packIndexPartial16Support32=[op('memory.load.u32',4),op('alu.add.u32',4),op('alu.or.u32',3),op('control.test.u32',1),op('control.branch',1),call('packIndexPartial16Heights32','ELIGIBLE')];
+for(const side of ['Local','Shared'])for(const action of ['probe','store']){
+ const name=action+'IndexPartial16'+side+'32',ops=structuredClone(specs[action+'IndexPartial24'+side+'32']);
+ for(const o of ops){
+  if(o.op==='memory.load.u32')o.count-=side==='Local'&&action==='probe'?4:2;
+  if(o.op==='memory.store.u32')o.count-=2;
+  if(o.op==='atomic.load.u32'&&action==='probe')o.count-=2;
+  if(o.op==='atomic.store.u32')o.count-=2;
+  if(o.op==='alu.add.u32')o.count-=4;
+ }
+ ops.push(op('control.test.u32',1),op('control.branch',1));specs[name]=ops;
 }
-for(const center of [false,true])for(const proofs of [false,true]){
- const base='addons/rba-connect4-lazy-smp-worker-minimal-views-compiled'+(center?'-center':'')+(proofs?'-proofs':'')+'-local32.mjs',target=base.replace('.mjs','-partial24.mjs'),
+for(const [name,operations] of Object.entries(specs)){
+ if(/^(probe|store)/.test(name))operations.push(call(name.includes('16')?'packIndexPartial16Support32':'packIndexPartial24Support32','DEFAULT'));
+ l.units.push({unit:source+'#'+name,source,name,scope:'exact-index-partial-tt',status:'decomposed',operations,
+  cycleCount:{kind:'symbolic',expression:expr(operations),parameters:{DEFAULT:'0 in prepared worker calls;1 when public diagnostic default is used',ELIGIBLE:'1 if checked narrow-domain tail test passes;0 otherwise'},
+   note:'Native24/16byte nonterminal q identities. Full32bit seqlock preserved; partial hash proof packing, support/tail preparation and narrow admission guard charged. No runtime decoder/allocator/clock/stats. Counts are full-path upper bounds where short-circuit/CAS/admission failure exits early; no timing claim from ledger.'}});
+}
+for(const kind of ['partial24','partial16'])for(const center of [false,true])for(const proofs of [false,true]){
+ const base='addons/rba-connect4-lazy-smp-worker-minimal-views-compiled'+(center?'-center':'')+(proofs?'-proofs':'')+'-local32.mjs',target=base.replace('.mjs','-'+kind+'.mjs'),
   units=l.units.filter(u=>u.source===base&&!['localKeyMatches','storeLocalEntry'].includes(u.name));
  for(const original of units){
   const u=structuredClone(original);u.unit=target+'#'+u.name;u.source=target;
@@ -35,7 +48,11 @@ for(const center of [false,true])for(const proofs of [false,true]){
    if(o.target==='createLocalNativeProofCache32')o.target='createIndexPartialCache32';
    if(o.target==='attachConnect4RbaSharedLayoutCache32'){o.target='attachIndexPartialCache32';o.count=1;}
   }
-  if(u.name==='negamax')u.operations.push(call('packIndexPartial24Support32','NONROOT'));
+  if(u.name==='negamax'){
+   u.operations.push(call(kind==='partial16'?'packIndexPartial16Heights32':'packIndexPartial24Support32','NONROOT'));
+   if(kind==='partial16')u.operations.push(op('control.test.u32',1),op('control.branch',1));
+  }
+  if(kind==='partial16')for(const o of u.operations)if(o.target?.includes('IndexPartial24'))o.target=o.target.replace('IndexPartial24','IndexPartial16');
   u.cycleCount.expression=expr(u.operations);delete u.cycleCount.activeCycleExpression;
   u.cycleCount.note='Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Conservative inherited arithmetic counts include unused slot/scalar plumbing until machine JIT removes it; final full solve pays actual emitted cost. Cold-selected candidate only, no hot profile/layout/reporting/allocation. Original search guards unchanged.';
   l.units.push(u);

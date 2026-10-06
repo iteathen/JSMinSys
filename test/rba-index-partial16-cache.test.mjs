@@ -23,3 +23,13 @@ test('narrow16 exact index-partial keys reject ineligible residual words',async(
  assert.equal(api.probeIndexPartial16Shared32(cache,q,0,hash),0);
  assert.equal(api.probeIndexPartial16Shared32(cache,collision.other,0,collision.h),3);
 });
+test('narrow16 retains busy wrap clone and private proof protocols',async()=>{
+ const api=await import('../addons/rba-connect4-index-partial-cache.mjs'),q=connect4RbaFromMoves(grayMoves,{geometry:g}).words,
+  hash=mixSpan32Locator32(q,0,14),cache=api.createIndexPartialCache32({geometry:g,capacity:8,shared:true,kind:'partial16'}),record=(hash&7)*4;
+ Atomics.store(cache.entries,record,11);const before=Array.from(cache.entries);
+ assert.equal(api.probeIndexPartial16Shared32(cache,q,0,hash),0);api.storeIndexPartial16Shared32(cache,q,0,3,hash);assert.deepEqual(Array.from(cache.entries),before);
+ Atomics.store(cache.entries,record,0xfffffffe);api.storeIndexPartial16Shared32(cache,q,0,3,hash);assert.equal(api.probeIndexPartial16Shared32(cache,q,0,hash),0);
+ api.storeIndexPartial16Shared32(cache,q,0,5,hash);assert.equal(api.probeIndexPartial16Shared32(api.attachIndexPartialCache32(structuredClone(cache)),q,0,hash),5);
+ const local=api.createIndexPartialCache32({geometry:g,capacity:8,kind:'partial16'});
+ for(let tag=1;tag<=5;tag++){api.storeIndexPartial16Local32(local,q,0,tag,hash);assert.equal(api.probeIndexPartial16Local32(local,q,0,hash),tag);}
+});
