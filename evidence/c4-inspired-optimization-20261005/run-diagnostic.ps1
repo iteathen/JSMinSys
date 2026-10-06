@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[string]$SourceRun='c4ideas-c26-01',[ValidateSet('','split','native')][string]$PrivateLayout='',[string[]]$NodeFlags=@(),[switch]$Inlining,[switch]$CpuProfile)
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$Name,[string]$SourceRun='c4ideas-c26-01',[ValidateSet('','split','native')][string]$PrivateLayout='',[string[]]$NodeFlags=@(),[switch]$Inlining,[switch]$CpuProfile,[switch]$BasisViews)
 $ErrorActionPreference='Stop'
 $repo='C:/r/jsminsys-cpc-rebuild-20261004'
 Set-Location $repo
@@ -13,6 +13,7 @@ if($PrivateLayout){$config.environment | Add-Member -NotePropertyName JMS_BENCH_
 $config.arguments[-1]="$repo/evidence/c4-inspired-optimization-20261005/probes/diagnostic.mjs"
 if($Inlining){$config.arguments=@('--trace-turbo-inlining')+@($config.arguments)}
 if($CpuProfile){$config.arguments=@('--cpu-prof',"--cpu-prof-dir=$runDir")+@($config.arguments)}
+if($BasisViews){$config.environment | Add-Member -NotePropertyName JMS_BENCH_BASIS_VIEWS -NotePropertyValue '1' -Force}
 $config.environment.JMS_WORKER_AFFINITY_REPORT="$runDir/affinity"
 $config.environment.TEMP="$runDir/temp"; $config.environment.TMP="$runDir/temp"
 $config.timeoutMs=60000

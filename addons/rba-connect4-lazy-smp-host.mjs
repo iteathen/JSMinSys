@@ -34,7 +34,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   sharedProofBounds=false,
   supportBasisPlanBudgetBytes=0,
   supportClosurePlan=false,supportReflectionPlan=false,
-  localCacheLayout='split',
+  localCacheLayout='split',supportBasisViews=false,
 }={}){
   const initializationStarted=performance.now();
   if(preparedEmptyTiming&&(workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL||moves.length!==0))
@@ -53,6 +53,7 @@ export async function runLazySmpConnect4Rba32(moves,{
   if(typeof rootFrontier!=='boolean')throw new TypeError('rootFrontier must be boolean');
   if(workerMode!==RBA_LAZY_SMP_WORKER_LEGACY&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL)
     throw new RangeError('invalid Lazy SMP worker mode');
+  if(typeof supportBasisViews!=='boolean'||(supportBasisViews&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))throw new TypeError('basis views require Boolean minimal-worker option');
   if(typeof sharedProofBounds!=='boolean'||(sharedProofBounds&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
     throw new TypeError('shared proof bounds require a homogeneous minimal pool');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0||(supportBasisPlanBudgetBytes&&workerMode!==RBA_LAZY_SMP_WORKER_MINIMAL))
@@ -65,7 +66,7 @@ export async function runLazySmpConnect4Rba32(moves,{
     throw new TypeError('minimal Lazy SMP worker does not support legacy behavior/CPC options');
   if(workerMode===RBA_LAZY_SMP_WORKER_MINIMAL){
     const prepared=await prepareLazySmpConnect4Rba32({geometry,workers,sharedCacheCapacity,
-      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout,sharedProofBounds,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan,localCacheLayout});
+      localCacheCapacity,sharedSampleMask,timeoutMs,signal,workerMode,sharedCacheLayout,sharedProofBounds,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan,localCacheLayout,supportBasisViews});
     try{return await prepared.solve(moves);}finally{await prepared.close();}
   }
   if(sharedCacheLayout==='auto')sharedCacheLayout='split40';

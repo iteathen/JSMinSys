@@ -15,12 +15,13 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split'}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
   if(typeof supportClosurePlan!=='boolean')throw new TypeError('invalid support closure mode');
   if(typeof supportReflectionPlan!=='boolean'||(supportReflectionPlan&&!supportClosurePlan))throw new TypeError('reflection requires support closures');
+  if(typeof supportBasisViews!=='boolean')throw new TypeError('support basis views must be boolean');
   if(typeof sharedProofBounds!=='boolean')throw new TypeError('sharedProofBounds must be boolean');
   if(workerMode!=='minimal'||rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory)
     throw new TypeError('prepared application requires minimal workers without legacy options');
@@ -44,6 +45,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     throw new RangeError('invalid Lazy SMP timeout');
   if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
+  const basisViews=supportBasisViews&&Boolean(geometry.supportBasisPlans?.closures&&geometry.supportBasisPlans?.mirrorMap);
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
     readyGate=new Int32Array(new SharedArrayBuffer(20)),
@@ -68,7 +70,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed};}
+    searchStarted:started,closed,basisViews};}
   function materializePreparedConnect4SearchResult32(reflected=0){
     const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
       exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
@@ -79,7 +81,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
       sharedSampleMask,workerMode:'minimal',
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
-      sharedProofBounds,
+      sharedProofBounds,basisViews,
       localCacheLayout:localNative?'native':'split',privateTtEntryBytes:localNative?32:keyWords*4+1,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
       supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
@@ -127,7 +129,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else shared.entries.fill(0);
-    for(let i=0;i<workers;i+=1)session.spawn(new URL('./rba-connect4-lazy-smp-worker-minimal'+
+    for(let i=0;i<workers;i+=1)session.spawn(new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?'-views':'')+
       (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
       root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate});

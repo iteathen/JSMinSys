@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
-for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
- const name='rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
+for(const views of [false,true])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
+ const name='rba-connect4-lazy-smp-worker-minimal'+(views?'-views':'')+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
  test(name+' consumes residual frontier tags with sound windows and root exclusion',()=>{
   const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8'),start=source.indexOf('function negamax('),end=source.indexOf('\nconst meta=',start);
   assert.ok(start>=0&&end>start);let cases=0;

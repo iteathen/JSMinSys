@@ -4,8 +4,8 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
 // Execute actual generated search bodies, with independent exact leaf values.
-for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
- const name='rba-connect4-lazy-smp-worker-minimal'+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
+for(const views of [false,true])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
+ const name='rba-connect4-lazy-smp-worker-minimal'+(views?'-views':'')+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
  test(name+' intersects CPC response bounds soundly with every original window',()=>{
   const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8'),start=source.indexOf('function negamax('),end=source.indexOf('\nconst meta=',start);
   assert.ok(start>=0&&end>start);let cases=0;
