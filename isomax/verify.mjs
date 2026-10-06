@@ -3,7 +3,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 const base=new URL('./',import.meta.url),lock=JSON.parse(readFileSync(new URL('provenance.json',base))),
  required=['index.mjs','cli.mjs','run.mjs','profile.json','example.mjs','package.json','verify.mjs','README.md','evidence/README.md','test/smoke.test.mjs','test/package-verification.test.mjs'];
-assert.equal(lock.sourceCommit,'e6580e951c8318395446dd5916482efddc3d33fd');assert.equal(lock.workerModules.length,24);
+assert.equal(lock.sourceCommit,'89b1b147b8811bfd343724150ed304a081d61498');assert.equal(lock.workerModules.length,24);
 for(const p of [...required,...lock.workerModules])assert.ok(lock.files[p],'Unlocked required file: '+p);
 for(const [path,record] of Object.entries(lock.files)){
  assert.ok(!path.startsWith('/')&&!path.split('/').includes('..'));
@@ -19,8 +19,9 @@ const actual=readdirSync(new URL('runtime/',base),{recursive:true,withFileTypes:
 assert.equal(actual.length,Object.keys(lock.files).filter(p=>p.startsWith('runtime/')).length,'Runtime closure');
 assert.deepEqual(readdirSync(new URL('test/',base)).filter(n=>n.endsWith('.mjs')).map(n=>'test/'+n).sort(),Object.keys(lock.files).filter(p=>p.startsWith('test/')).sort());
 const pkg=JSON.parse(readFileSync(new URL('package.json',base)));
-assert.equal(pkg.private,true);assert.equal(pkg.version,'0.2.0-rc.3');assert.equal(pkg.exports['.'],'./index.mjs');
+assert.equal(pkg.private,true);assert.equal(pkg.version,'0.2.0-rc.4');assert.equal(pkg.exports['.'],'./index.mjs');
 const profile=JSON.parse(readFileSync(new URL('profile.json',base)));
 assert.equal(profile.sourceCommit,lock.sourceCommit);assert.equal(profile.options.workers,'auto');assert.equal(profile.measured.workers,4);
-assert.equal(profile.options.localCacheCapacity,8388608);assert.equal(profile.options.supportBasisViews,true);
+assert.equal(profile.explicitCacheDefaults.localCacheCapacity,8388608);assert.equal(profile.options.supportBasisViews,true);
+assert.equal(profile.options.memoryProfile,'auto');
 console.log('Verified '+Object.keys(lock.files).length+' locked files and self-contained runtime/public launchers.');

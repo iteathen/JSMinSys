@@ -1,6 +1,6 @@
-# IsoMax 0.2.0-rc.3
+# IsoMax 0.2.0-rc.4
 
-Start here. This folder contains the current promoted solver, its configuration, launchers, dependencies, tests and evidence. No npm install or manual file assembly is needed. Keep this folder together, or extract the matching archive from [dist/](dist/).
+Start here. This folder contains the current solver package, its configuration, launchers, dependencies, tests and evidence. No npm install or manual file assembly is needed. Keep this folder together, or extract the matching archive from [dist/](dist/).
 
 ## Setup and run
 
@@ -12,7 +12,30 @@ node run.mjs --help
 node run.mjs
 ```
 
-The last command solves the **empty 7×6 board**, discovering the worker count during initialization. It selects one minimal deep worker per physical performance core where the OS reports core classes. Hyperthreads are not additional workers. It applies the retained 2400/9600 JIT settings before process initialization. Default TT allocation remains **4 GiB shared + 256 MiB per worker**, plus geometry/support plans. This is not automatic memory sizing: more workers allocate more private TT memory. Compiled transitions add **445 MiB** when admitted within their 512 MiB auxiliary budget. No opening book, solved table, prior-run cache, fixed opening or RLC is used by this default path.
+The last command solves the **empty 7×6 board**, discovering physical performance cores and selecting memory during initialization. Hyperthreads are not additional workers. The retained2400/9600 JIT flags are supplied by the launcher. All worker creation, memory discovery, profile selection, table allocation and page initialization precede search. No opening book, solved table, prior-run cache, fixed opening or RLC is used.
+
+## Memory profiles
+
+| Shared TT budget (GiB) | Status |
+|---|---|
+| 1,2,4,8 | Tested |
+| 16,32,64,128 | Experimental |
+
+```sh
+node run.mjs --list-memory-profiles
+node run.mjs --memory-profile 8
+node run.mjs --memory-profile 128
+```
+
+Default `--memory-profile auto` selects the **largest fitting profile, including experimental profiles**. Experimental selections are explicitly labeled in stderr and the result's `memoryPlan`. They are usable options, not claims of measured large-memory performance.1/2/4GiB were measured locally with2..6 workers;8GiB with six workers. These measurements are on the Windows i5-12600K standard7×6 workload and do not guarantee another system's optimum.
+
+The memory snapshot uses physical availability and Node's process/resource-limit availability; Windows also limits allocation by available commit. Selection budgets all workers' private tables plus a minimum2GiB support/runtime reserve before choosing shared capacity. Private TT budget is256MiB per worker. Snapshotting is not an OS reservation; competing allocations can still cause preparation to fail cleanly. Worker count is not silently reduced to fit memory. There are no memory-policy checks, resizing or profile branches in the recursive hot loop.
+
+Profile sizes are **shared-TT budgets**, not total RAM. On7×6,32-byte records use exactly the listed shared GiB and256MiB private per worker. Other dimensions select field widths and power-of-two capacities cold; actual bytes may be below the nominal budget. `memoryPlan` reports actual shared/private bytes, entry width, bank count, reserve, required headroom and discovery snapshot. The compiled transition plan retains its512MiB auxiliary budget and is included in support/runtime planning.
+
+Individual banks keep their native index range below2^31; standard7×6 banks hold at most4GiB.8GiB uses two banks,16GiB four,32GiB eight,64GiB sixteen,128GiB thirty-two. The128GiB plan consumes all2^32 unsigned hash slots without signed global-index truncation. Lookup retains the exact field identity and atomic publication protocol; bank selection adds a shift/mask/reference lookup whose large-memory performance remains an experimental concern. Metadata/boundary and small-bank checks do not qualify128GiB allocation or speed. Profiles adapt at initialization to other geometry layouts; their performance is not qualified outside7×6.
+
+Explicit `--shared-entries N --local-entries N` selects a custom capacity configuration. It cannot be combined with a numeric memory-profile selection. These entry counts are not GiB. Embedders may restrict **automatic** experimental selection using `allowExperimentalMemoryProfiles:false`; an explicit numeric profile remains an explicit choice.
 
 Windows x64/ARM64 uses `GetLogicalProcessorInformationEx` and its efficiency classes; a homogeneous CPU uses all physical cores. The portable launcher enables the required experimental Node FFI support on Windows. Linux groups SMT siblings, intersects the process CPU allowance with online CPUs, and uses Intel hybrid PMU or ARM capacity data when available. If Linux does not expose core classes, the output explicitly reports `physical-cores-class-unreported` and `performanceCores: null`; only the physical count is known. macOS uses `hw.perflevel0.physicalcpu` for its highest performance tier and `hw.physicalcpu` on homogeneous machines.
 
@@ -26,9 +49,9 @@ Windows and Linux bind each worker to a distinct selected physical core and veri
 node run.mjs --workers 4
 ```
 
-The recorded **four-worker** i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**, with observed peak RSS **6.44 GiB**. These historical timings do not qualify an automatically selected worker count. Initialization and cleanup are reported separately. The 10-second objective remains unmet. The new portable configuration has no full-solve timing qualification.
+The recorded **four-worker** i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**, with observed peak RSS **6.44 GiB**. These historical timings do not qualify an automatically selected worker count. Initialization and cleanup are reported separately. The 10-second objective remains unmet. Current six-worker native32 measurements are roughly42s at4GiB;8GiB averaged41.124s over three runs, best39.822s, with10.96GiB peak RSS. That small mean advantage overlaps observed timing variation.16..128GiB full-capacity performance is unqualified.
 
-Historical benchmark invocations retain the exact runtime, four-worker count and affinity used for those records. They are evidence, not startup defaults. The automatic worker count and affinity policy have separate platform correctness checks; their full-solve timing is unqualified.
+Historical benchmark invocations retain the exact runtime, four-worker count and affinity used for those records. They are evidence, not startup defaults. The automatic worker count and affinity policy have separate platform correctness checks; timings remain scoped to the exact measured hardware/profile.
 
 ## Change board dimensions
 
@@ -69,7 +92,7 @@ The optional exported rank-local calculator remains separate; using it changes t
 
 - index.mjs: public API.
 - run.mjs / cli.mjs: portable empty-board launcher/result.
-- profile.json: automatic startup default and separate explicit four-worker measurement profile.
+- profile.json: automatic worker/memory settings and historical explicit measurements.
 - provenance.json / verify.mjs: SHA-256 identities and closure checks.
 - runtime/: frozen producer dependencies, with unchanged worker kernels and cold system discovery.
 - evidence/: raw retained measurements and qualification summaries.

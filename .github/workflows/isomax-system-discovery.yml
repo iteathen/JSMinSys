@@ -20,4 +20,4 @@ jobs:
         with:
           node-version: '26'
       - run: node isomax/verify.mjs
-      - run: node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs
+      - run: node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs isomax/test/memory-profiles.test.mjs test/isomax-memory-profile.test.mjs

@@ -1,12 +1,10 @@
 {
-  "version": "0.2.0-rc.3",
-  "sourceCommit": "e6580e951c8318395446dd5916482efddc3d33fd",
+  "version": "0.2.0-rc.4",
+  "sourceCommit": "89b1b147b8811bfd343724150ed304a081d61498",
   "options": {
     "workers": "auto",
     "workerMode": "minimal",
-    "sharedCacheCapacity": 134217728,
-    "localCacheCapacity": 8388608,
-    "sharedCacheLayout": "auto",
+    "sharedCacheLayout": "native",
     "localCacheLayout": "native",
     "rootFrontier": false,
     "sharedSampleMask": 0,
@@ -16,7 +14,8 @@
     "supportReflectionPlan": true,
     "supportBasisViews": true,
     "timeoutMs": 600000,
-    "initializationTimeoutMs": 120000
+    "initializationTimeoutMs": 120000,
+    "memoryProfile": "auto"
   },
   "launchFlags": [
     "--max-inlined-bytecode-size=2400",
@@ -45,5 +44,9 @@
     "goalMs": 10000,
     "goalMet": false
   },
-  "notes": "Direct empty-board solve, no RLC. Defaults discover physical performance cores and apply verified hard affinity on Windows/Linux or documented scheduling hints on macOS. Dimension-dependent layout and compiled 512MiB auxiliary budget remain unchanged. Historical four-worker timings do not qualify the automatic hardware-dependent configuration."
+  "notes": "Direct empty-board solve, no RLC. Discover all available physical performance cores and largest fitting memory profile, including clearly labeled experimental16/32/64/128GiB.1/2/4/8GiB are tested profiles, scoped to recorded localhost evidence. Shared/private layouts adapt to geometry at initialization. All pinning and hot search semantics retained.",
+  "explicitCacheDefaults": {
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 8388608
+  }
 }

@@ -1,32 +1,19 @@
 # JSMinSys
 
-**IsoMax 0.2.0-rc.2 is promoted on main. Start at [isomax/](isomax/README.md).**
-The public API, runtime, configuration, launchers, tests and evidence are together
-in that folder. Node 26 or later is required; no npm install is needed.
-
-From the repository root:
+**IsoMax0.2.0-rc.4 is packaged under [isomax/](isomax/README.md).** Node26.7 or later; no npm install is needed. This branch contains automatic physical-core discovery and initialization-time memory profiles.
 
 ```sh
 cd isomax
 node verify.mjs
+node run.mjs --list-memory-profiles
 node run.mjs
 ```
 
-This solves the empty 7×6 board with four minimal deep workers, a **4 GiB shared
-TT and 256 MiB private TT per worker**, plus geometry plans. Observed peak RSS is
-**6.44 GiB**. All workers and memory are prepared before search. The default path
-uses current-run exact search without RLC, an opening book or persisted solutions.
+The solver starts from the empty7×6 board, discovers/pins one worker per physical performance core (macOS uses documented scheduling hints), and selects the largest fitting shared-TT profile. **1/2/4/8GiB are tested;16/32/64/128GiB are experimental and can be selected automatically.** Every result reports the selected status, available memory, actual allocation and worker bindings. Private memory budget is256MiB/worker, plus support/runtime reserve. All preparation occurs before search.
 
-The retained localhost candidate mean is **53.828 s**; the standalone extracted
-package confirmation took **55.326 s**. Both measure empty-root construction and
-solving after readiness, with initialization and cleanup recorded separately.
-The ≤10 s target remains unmet. Portable unpinned runs have no timing qualification.
+Local six-worker8GiB measurements averaged41.124s over three runs, best39.822s, with10.96GiB peak RSS. This does not establish a universal memory optimum;16..128GiB full-capacity performance is unqualified. Primary solve timing excludes initialization and cleanup. No RLC, book, solved table or persisted proof cache is consumed. The10s goal remains unmet.
 
-[Download the complete archive](isomax/dist/iteathen-isomax-0.2.0-rc.2.tgz),
-[check its SHA-256](isomax/dist/SHA256SUMS), or read the
-[current configuration, evidence and version history](docs/isomax-current.md).
-The package supports board dimensions selected at initialization. Registry
-publication remains disabled.
+[Complete archive](isomax/dist/iteathen-isomax-0.2.0-rc.4.tgz), [SHA-256](isomax/dist/SHA256SUMS), [setup and evidence](isomax/README.md). Earlier archives and measurements are retained as history. Registry publication remains disabled.
 
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
