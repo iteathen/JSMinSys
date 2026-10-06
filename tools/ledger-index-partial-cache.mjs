@@ -7,7 +7,7 @@ const expr=ops=>ops.map(o=>o.op==='runtime.call.subledger'?`(${o.count})*CALL(${
  op=(name,count)=>({op:name,count}),call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
 l.units=l.units.filter(u=>u.source!==source&&!u.source.endsWith('-partial24.mjs'));
 const specs={
- packIndexPartial24Support32:[op('memory.load.u32',9),op('alu.shl.u32',8),op('alu.or.u32',8),op('alu.and.u32',2)],
+ packIndexPartial24Support32:[op('memory.load.u32',9),op('alu.add.u32',8),op('alu.shl.u32',8),op('alu.or.u32',8),op('alu.and.u32',2),op('alu.shr.u32',1)],
  createIndexPartialCache32:[op('runtime.cold.tt.bank.initialize',1),call('isCompactLayoutProfile8'),call('validateConnect4CacheCapacity32'),call('attachIndexPartialCache32')],
  attachIndexPartialCache32:[op('runtime.cold.tt.bank.initialize',1),call('validateConnect4CacheCapacity32')],
  probeIndexPartial24Local32:[op('runtime.field.load',3),op('alu.and.u32',1),op('runtime.number.multiply',1),op('alu.add.u32',8),op('alu.shr.u32',1),op('memory.load.u32',9),op('control.test.u32',6),op('control.branch',6)],

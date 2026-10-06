@@ -2,11 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 const root=new URL('../isomax/',import.meta.url);
-test('package auto default retains an explicit measured four-worker configuration',()=>{
+test('package auto worker and memory defaults preserve the historical measured configuration',()=>{
  const pkg=JSON.parse(readFileSync(new URL('package.json',root))),p=JSON.parse(readFileSync(new URL('profile.json',root)));
- assert.equal(pkg.version,'0.2.0-rc.3');
+ assert.equal(pkg.version,'0.2.0-rc.4');
  assert.equal(p.options.workers,'auto');assert.equal(p.measured.workers,4);assert.equal(p.options.workerMode,'minimal');
- assert.equal(p.options.sharedCacheCapacity,134217728);assert.equal(p.options.localCacheCapacity,8388608);
+ assert.equal(p.options.memoryProfile,'auto');
+ assert.equal(Object.hasOwn(p.options,'sharedCacheCapacity'),false);assert.equal(Object.hasOwn(p.options,'localCacheCapacity'),false);
+ assert.equal(p.explicitCacheDefaults.sharedCacheCapacity,134217728);assert.equal(p.explicitCacheDefaults.localCacheCapacity,8388608);
  assert.equal(p.options.rootFrontier,false);assert.equal(p.options.supportBasisViews,true);
  assert.equal(p.options.sharedProofBounds,true);assert.equal(p.options.localCacheLayout,'native');
  assert.deepEqual(p.launchFlags,['--max-inlined-bytecode-size=2400','--max-inlined-bytecode-size-cumulative=9600']);

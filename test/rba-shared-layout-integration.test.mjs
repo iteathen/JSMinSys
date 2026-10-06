@@ -20,7 +20,7 @@ test('invalid native halfword capacity rejects before any shared allocation',asy
   const original=globalThis.SharedArrayBuffer;let allocations=0;
   globalThis.SharedArrayBuffer=new Proxy(original,{construct(target,args){allocations++;throw Error('unexpected allocation');}});
   try{await assert.rejects(prepareLazySmpConnect4Rba32({geometry,workers:4,
-    sharedCacheLayout:'native',sharedCacheCapacity:2**28,localCacheCapacity:256}),RangeError);
+    sharedCacheLayout:'native',sharedCacheCapacity:2**28,sharedBankCapacity:2**28,localCacheCapacity:256}),RangeError);
     assert.equal(allocations,0);
   }finally{globalThis.SharedArrayBuffer=original;}
 });
