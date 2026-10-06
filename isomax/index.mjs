@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry} from './runtime/addons/rba-connect4-geometry.mjs';
 import {prepareLazySmpConnect4Rba32 as prepareRaw} from './runtime/addons/rba-connect4-prepared-session-host.mjs';
 import {discoverWorkerPlan} from './runtime/addons/worker-topology.mjs';
-import {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32} from './runtime/addons/isomax-memory-profile.mjs';
+import {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32,estimateIsoMaxPreparationReserve32} from './runtime/addons/isomax-memory-profile.mjs';
 import {prepareSharedCacheLayout,isCompactLayoutProfile8} from './runtime/addons/rba-connect4-shared-exact-cache-layout.mjs';
 export {discoverWorkerPlan};
 export {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32};
@@ -23,7 +23,7 @@ export async function prepareLazySmpConnect4Rba32(options={}){
  const geometry=options.geometry??prepareConnect4RbaGeometry({columns:7,rows:6}),snapshot=await discoverAvailableSolverMemory32(),
   memoryRequested=options.memoryProfile??profile.options.memoryProfile,
   custom=Object.hasOwn(options,'sharedCacheCapacity')||Object.hasOwn(options,'localCacheCapacity'),
-  reserveBytes=Math.max(2**31,(options.supportBasisPlanBudgetBytes??profile.options.supportBasisPlanBudgetBytes)+2**30);
+  reserveBytes=estimateIsoMaxPreparationReserve32({...profile.options,...options,geometry,workers});
  let memoryPlan,config={...profile.options,...options,geometry,workers:workerPlan.workers,workerTargets:workerPlan.targets};
  if(custom){
   if(memoryRequested!=='auto')throw RangeError('Choose a memory profile or explicit cache capacities');

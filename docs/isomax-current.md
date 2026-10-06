@@ -1,6 +1,6 @@
 # Current memory-profile package — 2026-10-06
 
-IsoMax0.2.0-rc.4 runtime freeze89b1b147b8811bfd343724150ed304a081d61498. See [package setup](../isomax/README.md). Cold startup discovers physical P-cores and available physical/process/Windows-commit memory, then selects the largest fitting profile, including experimental sizes as owner-authorized.
+IsoMax0.2.0-rc.4 runtime freeze40b19431f00174c5d52c442677d67ec698e8c50a. See [package setup](../isomax/README.md). Cold startup discovers physical P-cores and available physical/process/Windows-commit memory, then selects the largest fitting profile, including experimental sizes as owner-authorized.
 
 Shared budgets1/2/4/8GiB are tested profiles;16/32/64/128GiB are experimental. Their real allocation depends on geometry/record width, reported before search. All workers are retained, with256MiB private budget each; reserve includes support/runtime memory. No per-node sizing or allocation. Standard128GiB uses32 independently addressed4GiB banks; metadata/boundary tests do not qualify actual128GiB allocation or performance. Current local8GiB tests averaged41.124s with six workers, not a universal optimum.
 

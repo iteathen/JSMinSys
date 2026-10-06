@@ -29,6 +29,51 @@ export async function discoverAvailableSolverMemory32(){
   commitAvailableBytes,availableBytes,source});
 }
 
+export function estimateIsoMaxPreparationReserve32({geometry:g,workers,supportBasisPlanBudgetBytes=GiB,
+ supportClosurePlan=true,supportReflectionPlan=true,supportBasisViews=true}={}){
+ if(!g||!Number.isInteger(workers)||workers<2||workers>64||!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)
+  throw RangeError('Invalid support/runtime memory reserve inputs');
+ let profiles=1,planBytes=0,effectivePlan=supportBasisPlanBudgetBytes?null:g.supportBasisPlans;
+ for(let column=0;column<g.columns;column++){
+  profiles*=g.rows+1;if(!Number.isSafeInteger(profiles)||profiles>0xffffffff){profiles=0;break;}
+ }
+ if(profiles&&supportBasisPlanBudgetBytes){
+  const idBytes=g.shapeCount<=256?1:g.shapeCount<=65536?2:4,sizeBytes=g.maxBasis<=255?1:g.maxBasis<=65535?2:4,
+   indexBytes=g.maxBasis<=256?1:g.maxBasis<=65536?2:4,basisElements=profiles*g.maxBasis,maskElements=profiles*g.shapeWordCount,
+   closureElements=supportClosurePlan?basisElements*g.coordWords:0,
+   bytes=basisElements*idBytes+maskElements*4+profiles*sizeBytes+g.columns*4+closureElements*4+
+    (supportReflectionPlan?basisElements*indexBytes+profiles*4:0);
+  const admitted=Number.isSafeInteger(bytes)&&bytes<=supportBasisPlanBudgetBytes&&basisElements<=0xffffffff&&maskElements<=0xffffffff&&closureElements<=0xffffffff;
+  if(admitted){
+   planBytes=bytes+g.shapeCount*4;
+   effectivePlan={profiles,closures:supportClosurePlan,mirrorMap:supportReflectionPlan};
+  }
+ }
+ const basisViews=supportBasisViews&&Boolean(effectivePlan?.closures&&effectivePlan?.mirrorMap);
+ if(basisViews){
+  const Slot=g.maxBasis<=255?Uint8Array:g.maxBasis<=65535?Uint16Array:Uint32Array,
+   dead=Slot===Uint8Array?255:Slot===Uint16Array?65535:0xffffffff,
+   slots=effectivePlan.profiles*g.columns*g.maxBasis,masks=effectivePlan.profiles*g.columns*g.coordWords,
+   compiledBytes=slots*Slot.BYTES_PER_ELEMENT+masks*4,
+   reusable=effectivePlan.transitionPlanBytes===compiledBytes&&effectivePlan.transitionDead===dead&&
+    effectivePlan.transitionSlots instanceof Slot&&effectivePlan.transitionSlots.length===slots&&effectivePlan.transitionSlots.buffer instanceof SharedArrayBuffer&&
+    effectivePlan.transitionStable instanceof Uint32Array&&effectivePlan.transitionStable.length===masks&&effectivePlan.transitionStable.buffer instanceof SharedArrayBuffer;
+  if(Number.isSafeInteger(compiledBytes)&&compiledBytes<=2**29&&slots<=0xffffffff&&masks<=0xffffffff&&!reusable)
+   planBytes+=compiledBytes+g.shapeCount*4;
+ }
+ // shareConnect4RbaGeometry32 allocates one shared copy per private view.
+ let geometryCopyBytes=0;
+ for(const value of Object.values(g))if(ArrayBuffer.isView(value)&&!(value.buffer instanceof SharedArrayBuffer)){
+  geometryCopyBytes+=value.byteLength;
+ }
+ const frameBytes=(g.cellCount+1)*g.keyWords*4,
+  basisBytes=basisViews?0:(g.cellCount+1)*g.maxBasis*4,
+  // Runtime allowances are estimates, not claims of measured per-isolate cost.
+  bytes=planBytes+geometryCopyBytes+2**27+workers*(2**25+frameBytes+basisBytes);
+ if(!Number.isSafeInteger(bytes)||bytes<0)throw RangeError('Geometry exceeds memory reserve range');
+ return Math.max(2**28,2**Math.ceil(Math.log2(bytes)));
+}
+
 export function selectIsoMaxMemoryProfile32({geometry,workers,availableBytes,requested='auto',allowExperimental=true,reserveBytes=2*GiB}={}){
  if(!geometry||!Number.isInteger(workers)||workers<2||workers>64||!Number.isSafeInteger(availableBytes)||availableBytes<0||
   !Number.isSafeInteger(reserveBytes)||reserveBytes<0||typeof allowExperimental!=='boolean')throw RangeError('Invalid memory profile inputs');

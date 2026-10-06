@@ -14,12 +14,29 @@ test('128GiB compact bank plan uses full unsigned hash space without allocating'
  }
  assert.throws(()=>banks.prepareBankedSharedCapacity32(2**33,2**27),RangeError);
 });
+test('initialization reserve scales down for tiny geometry but retains measured7x6 headroom',async()=>{
+ const m=await import('../runtime/addons/isomax-memory-profile.mjs');
+ assert.equal(typeof m.estimateIsoMaxPreparationReserve32,'function');
+ const small=m.estimateIsoMaxPreparationReserve32({geometry:prepareConnect4RbaGeometry({columns:1,rows:4}),workers:6});
+ const standard=m.estimateIsoMaxPreparationReserve32({geometry:prepareConnect4RbaGeometry({columns:7,rows:6}),workers:6});
+ assert.equal(standard,2**31);assert.ok(small<2**30);assert.ok(small>=6*2**25);
+});
 test('oversized bank overrides reject before support-plan preparation',async()=>{
  const {prepareLazySmpConnect4Rba32}=await import('../runtime/addons/rba-connect4-prepared-session-host.mjs'),
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
  Object.defineProperty(geometry,'maxBasis',{get(){throw Error('support plans reached before bank validation');}});
  await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,workers:2,sharedCacheLayout:'native',sharedCacheCapacity:2**29,
   sharedBankCapacity:2**29,supportBasisPlanBudgetBytes:2**30}),/bank.*optimized|optimized.*bank/i);
+});
+test('supplied support plans reserve missing compiled planes when preparation budget is zero',async()=>{
+ const {estimateIsoMaxPreparationReserve32}=await import('../runtime/addons/isomax-memory-profile.mjs'),
+  geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
+ // Metadata-only admission check: no support profiles or compiled planes allocated.
+ geometry.supportBasisPlans={profiles:7**7,closures:true,mirrorMap:true};
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:0}),2**30);
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:0,supportBasisViews:false}),2**29);
+ // A nonzero budget replaces supplied plans; this insufficient budget admits none.
+ assert.equal(estimateIsoMaxPreparationReserve32({geometry,workers:6,supportBasisPlanBudgetBytes:1}),2**29);
 });
 test('profile sizing accounts for every worker and exact fit boundary',async()=>{
  const m=await import('../runtime/addons/isomax-memory-profile.mjs'),geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),GiB=2**30;

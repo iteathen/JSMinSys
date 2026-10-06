@@ -111,7 +111,7 @@ sealed hot vocabulary.
 The canonical libraries expose `runLazySmpConnect4Rba32` for exact Connect4
 parallel execution. The promoted package also exposes `prepareLazySmpConnect4Rba32`
 to allocate tables, create workers and complete the readiness barrier before
-`solve()`. Both preserve the 2+ worker contract; the package defaults to four.
+`solve()`. Both preserve the 2+ worker contract; the package discovers physical performance cores by default.
 
 - `workerMode: 'legacy'` is the compatibility default. It uses
   `rba-connect4-lazy-smp-worker.mjs` and retains the existing CPC/NDC-first

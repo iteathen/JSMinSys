@@ -4,7 +4,7 @@ import {mkdirSync,writeFileSync,readFileSync,existsSync,unlinkSync,readdirSync} 
 import {dirname,posix} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-const root=fileURLToPath(new URL('./',import.meta.url)),source='89b1b147b8811bfd343724150ed304a081d61498',check=process.argv.includes('--check'),
+const root=fileURLToPath(new URL('./',import.meta.url)),source='40b19431f00174c5d52c442677d67ec698e8c50a',check=process.argv.includes('--check'),
  digest=s=>createHash('sha256').update(s).digest('hex'),normal=s=>s.replaceAll('\r\n','\n'),
  read=p=>normal(execFileSync('git',['show',source+':'+p],{cwd:root,encoding:'utf8',maxBuffer:32*1024*1024})),
  previous=JSON.parse(readFileSync(root+'provenance.json','utf8')),files={},seen=new Set(),workers=[];
