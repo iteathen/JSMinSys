@@ -14,6 +14,13 @@ test('128GiB compact bank plan uses full unsigned hash space without allocating'
  }
  assert.throws(()=>banks.prepareBankedSharedCapacity32(2**33,2**27),RangeError);
 });
+test('initialization reserve scales down for tiny geometry but retains measured7x6 headroom',async()=>{
+ const m=await import('../addons/isomax-memory-profile.mjs');
+ assert.equal(typeof m.estimateIsoMaxPreparationReserve32,'function');
+ const small=m.estimateIsoMaxPreparationReserve32({geometry:prepareConnect4RbaGeometry({columns:1,rows:4}),workers:6});
+ const standard=m.estimateIsoMaxPreparationReserve32({geometry:prepareConnect4RbaGeometry({columns:7,rows:6}),workers:6});
+ assert.equal(standard,2**31);assert.ok(small<2**30);assert.ok(small>=6*2**25);
+});
 test('oversized bank overrides reject before support-plan preparation',async()=>{
  const {prepareLazySmpConnect4Rba32}=await import('../addons/rba-connect4-prepared-session-host.mjs'),
   geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
