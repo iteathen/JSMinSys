@@ -38,6 +38,7 @@ test('incremental support handles reproduce physical transitions and reflection 
    for(let ply=0;ply<=Math.min(W*H,16);ply++){
     const expected=encode(moves),q=ingress(moves,{geometry:g,canonical:false});states++;
     assert.deepEqual(q.words,expected.words,`${W}x${H} ingress`);assert.deepEqual(q.basis,expected.basis);
+    assert.equal((q.words[g.metaOffset]>>>2)&1,moves.length&1,'physical history fixes mover');
     if(expected.words[g.metaOffset]&3)break;
     const legal=Array.from({length:W},(_,c)=>c).filter(c=>expected.h[c]<H);
     const cw=q.words.slice(),cb=q.basis.slice(),sc=scratch(g);
@@ -69,6 +70,7 @@ test('incremental support handles reproduce physical transitions and reflection 
             assert.deepEqual(Array.from(vb.subarray(sc.map[0]*g.maxBasis,sc.map[0]*g.maxBasis+sizes[0])),Array.from(child.basis));
             const ref=api.connect4RbaSupportCanonicalizeView(g,p,out,3,vb,0,sizes[0],sc),mirrorChild=encode([...moves,c].map(c=>W-1-c));
             assert.deepEqual(out.slice(3,3+g.keyWords),ref?mirrorChild.words:child.words);
+            assert.equal((out[3+g.metaOffset]>>>2)&1,(moves.length+1)&1,'reflection preserves child mover');
             let handle=0;for(let x=0;x<W;x++)handle+=out[3+x]*g.supportBasisPlans.strides[x];assert.equal(sc.map[0],handle,'canonical handle published once');
             assert.deepEqual(Array.from(vb.subarray(handle*g.maxBasis,handle*g.maxBasis+sizes[0])),Array.from(ref?mirrorChild.basis:child.basis));
             viewReflections+=ref;
