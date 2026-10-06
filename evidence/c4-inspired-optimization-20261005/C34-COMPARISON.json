@@ -1,0 +1,93 @@
+{
+  "records": [
+    {
+      "name": "fusion-c63-parent-01",
+      "commit": "a78a903f974a4136b76f0c70f8c0835e556ff67f",
+      "solveMs": 56690.0827,
+      "cycles": "797452011094",
+      "peakRssBytes": 6437470208,
+      "initializationMs": 2028.7867999999999,
+      "cleanupMs": 16.557099999998172,
+      "wholeOperationMs": 58736.4771,
+      "rootWdl": 1,
+      "move": 3,
+      "winner": 1,
+      "configuration": {
+        "basisViews": true,
+        "sharedCacheCapacity": 134217728,
+        "localCacheCapacity": 8388608,
+        "sharedProofBounds": true,
+        "sharedCacheLayout": "native",
+        "sharedTtEntryBytes": 32,
+        "sharedTtBytes": 4294967296,
+        "localCacheLayout": "native",
+        "privateTtEntryBytes": 32,
+        "privateTtBytesPerWorker": 268435456,
+        "supportBasisPlanBudgetBytes": 1073741824,
+        "supportBasisPlanBytes": 856484748,
+        "supportBasisPlanProfiles": 823543,
+        "workers": 4,
+        "rootFrontier": false,
+        "sharedSampleMask": 0,
+        "policies": [
+          "center",
+          "live",
+          "center",
+          "live"
+        ]
+      },
+      "exact": true,
+      "cleanup": true,
+      "affinityVerified": true,
+      "targetMet": false,
+      "rawPerformanceConclusionAllowed": false,
+      "cycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+      "rawDirectory": "fusion-c63-parent-01"
+    },
+    {
+      "name": "fusion-c34-01",
+      "commit": "5b5666968a7a369ae44316a2fa822bb6412fb860",
+      "solveMs": 57207.3206,
+      "cycles": "805821354973",
+      "peakRssBytes": 6433431552,
+      "initializationMs": 1993.0262,
+      "cleanupMs": 12.454700000002049,
+      "wholeOperationMs": 59213.8547,
+      "rootWdl": 1,
+      "move": 3,
+      "winner": 1,
+      "configuration": {
+        "basisViews": true,
+        "sharedCacheCapacity": 134217728,
+        "localCacheCapacity": 8388608,
+        "sharedProofBounds": true,
+        "sharedCacheLayout": "native",
+        "sharedTtEntryBytes": 32,
+        "sharedTtBytes": 4294967296,
+        "localCacheLayout": "native",
+        "privateTtEntryBytes": 32,
+        "privateTtBytesPerWorker": 268435456,
+        "supportBasisPlanBudgetBytes": 1073741824,
+        "supportBasisPlanBytes": 856484748,
+        "supportBasisPlanProfiles": 823543,
+        "workers": 4,
+        "rootFrontier": false,
+        "sharedSampleMask": 0,
+        "policies": [
+          "center",
+          "live",
+          "center",
+          "live"
+        ]
+      },
+      "exact": true,
+      "cleanup": true,
+      "affinityVerified": true,
+      "targetMet": false,
+      "rawPerformanceConclusionAllowed": false,
+      "cycleBoundary": "entire operation including initialization and cleanup; not solve-only cycles",
+      "rawDirectory": "fusion-c34-01"
+    }
+  ],
+  "caveat": "Completed localhost controlled comparisons only; no statistical confidence interval. Whole-operation cycles include initialization/cleanup. Null hot statistics are unavailable, not zero. Raw target flag is preserved; missing10s does not invalidate an exact completed relative trial."
+}
