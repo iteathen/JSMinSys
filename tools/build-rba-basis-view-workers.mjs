@@ -40,6 +40,10 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
  once('frontChild(coord.map[0],0,depth+1);','frontChild(childHandle,0,depth+1);');
  once('negamax(depth+1,dst,childBi,childN,','negamax(depth+1,dst,childHandle,childN,');
  once('negamax(0,0,rootBi,basisSize[0],','negamax(0,0,rootHandle,basisSize[0],');
+ // C64: sorted row lookup consumes the handle, never builds an inverse map.
+ s=s.replaceAll("'./rba-connect4-coordinate-closure-handle-view-dense.mjs'","'./rba-connect4-coordinate-closure-search-view-dense.mjs'").replaceAll("'./rba-connect4-coordinate-closure-handle-view-prepared.mjs'","'./rba-connect4-coordinate-closure-search-view-prepared.mjs'").replaceAll('connect4RbaClosureHandleView','connect4RbaClosureSearchView');
+ s=s.replace("import {prepareSupportBasisViewScratch32} from './rba-connect4-support-basis-view.mjs';","import {prepareSupportSearchBasisScratch32} from './rba-connect4-support-search-view.mjs';").replace('coord=prepareSupportBasisViewScratch32(g),','coord=prepareSupportSearchBasisScratch32(g),');
+ once('coord.map,coord.inverse,supportHandle,','coord.map,null,supportHandle,');
  if(native)s=transformPreparedCompactWorker(s);
  const output=new URL('../addons/'+base+'-views'+suffix+'.mjs',import.meta.url);
  if(process.argv.includes('--check'))assert.equal(readFileSync(output,'utf8').replaceAll('\r\n','\n'),s);else writeFileSync(output,s);
