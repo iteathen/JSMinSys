@@ -30,7 +30,7 @@ export function attachBankedCompactSharedCache32(cache){
   if(bank.banks!==undefined||bank.mask!==2**cache.bankShift-1||bank.keyWords!==cache.keyWords||
    bank.layout?.kind!=='compact32')throw RangeError('invalid compact TT bank');
   attachConnect4RbaSharedLayoutCache32(bank);
-  if(buffers.has(bank.entries.buffer))throw RangeError('aliased compact TT banks');
+  if(buffers.has(bank.entries.buffer)||bank.entries.buffer===cache.stats.buffer)throw RangeError('aliased compact TT banks/statistics');
   buffers.add(bank.entries.buffer);
   bank.stats=cache.stats;
  }
