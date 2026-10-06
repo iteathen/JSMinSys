@@ -67,3 +67,7 @@ when needed to resolve noise; rejected experiments restored and tested too.
 - Change2 `0084b24`: callback target expressions and concrete bindings retained;
   four focused tests and catalog pass. Full `nees-fix-02-callbacks`:38.3485895s,
   213.9375s CPU,EXACT/WIN/c4,six pins/exits. Solver unchanged.
+- Change3 `1f95647`: actual source-local/import-aware closure now564 enforced
+  units including32 workers and cold memory/discovery/startup roots; eight focused
+  tests pass. Full `nees-fix-03-graph`:38.6730454s,213.8125s CPU,EXACT/WIN/c4,
+  six pins/exits; solver unchanged.

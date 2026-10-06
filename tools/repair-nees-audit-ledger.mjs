@@ -54,5 +54,17 @@ if(action==='symbols'){
   u.cycleCount.expression=cycleExpressionForOperations(u.operations);
  }
  graph.resolution='Source-local functions first, named import aliases/canonical imports next, exact sealed binding or unique explicit class/prepared semantic unit last. Ambiguity fails closed.';
+}else if(action==='completion'){
+ for(const u of ledger.units.filter(u=>/^addons\/rba-connect4-lazy-smp-worker-minimal.*\.mjs$/.test(u.source)&&u.name==='<module-main>')){
+  for(const o of u.operations){
+   if(o.op==='atomic.store.u32'&&(o.count===4||o.count==='4*COMPLETED+WINNER'))o.count='4*COMPLETED+WINNER';
+   if(o.op==='atomic.rmw.u32'&&(o.count===2||o.count==='COMPLETED+WINNER'))o.count='COMPLETED+WINNER';
+   if(o.op==='atomic.notify'&&(o.count===1||o.count==='WINNER'))o.count='WINNER';
+  }
+  u.cycleCount.parameters.COMPLETED='1 iff relative!==CANCELLED and result row published;0 on cancelled path.';
+  u.cycleCount.parameters.WINNER='1 iff COMPLETED and winner compareExchange succeeds;0 otherwise. Must not be1 when COMPLETED=0.';
+  u.cycleCount.parameters.TEST=u.cycleCount.parameters.TEST.replace('CANCELLED sentinel handling is removed.','CANCELLED sentinel guard remains; publication occurs only on completed paths.');
+  u.cycleCount.expression=cycleExpressionForOperations(u.operations);
+ }
 }else throw Error('Unknown scoped NEES ledger repair: '+action);
 writeFileSync(path,JSON.stringify(ledger,null,2)+'\n');
