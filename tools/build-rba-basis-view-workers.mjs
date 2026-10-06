@@ -26,6 +26,19 @@ for(const center of [false,true])for(const proofs of [false,true])for(const nati
  once('negamax(depth+1,dst,ci,childN,','negamax(depth+1,dst,childBi,childN,');
  once('connect4RbaImmediateWinningColumn(g,words,0,basis,0,basisSize[0],mover)','connect4RbaImmediateWinningColumn(g,words,0,basis,rootBi,basisSize[0],mover)');
  once('negamax(0,0,0,basisSize[0],','negamax(0,0,rootBi,basisSize[0],');
+ // C63: carry canonical handle in the existing scalar recursion slot.
+ s=s.replace('import {initializeSupportBasisView32,prepareSupportBasisViewScratch32}', 'import {initializeSupportBasisHandle32} from \'./rba-connect4-support-handle-view.mjs\';\nimport {prepareSupportBasisViewScratch32}');
+ s=s.replaceAll("'./rba-connect4-coordinate-closure-view-dense.mjs'","'./rba-connect4-coordinate-closure-handle-view-dense.mjs'").replaceAll("'./rba-connect4-coordinate-closure-view-prepared.mjs'","'./rba-connect4-coordinate-closure-handle-view-prepared.mjs'").replaceAll('connect4RbaClosureView','connect4RbaClosureHandleView');
+ once('frontRoot=frontier.initialize,','');
+ once('frontRoot(words,0);\n','');
+ once('const rootBi=initializeSupportBasisView32(g,words,0,workerData.root.basis,0,basisSize[0]);','const rootHandle=initializeSupportBasisHandle32(g,words,0,workerData.root.basis,0,basisSize[0]),rootBi=rootHandle*g.maxBasis;\nfrontChild(rootHandle,0,0);');
+ once('function negamax(depth,src,bi,n,','function negamax(depth,src,supportHandle,n,');
+ once('  const dst=src+g.keyWords,ci=0,','  const bi=supportHandle*g.maxBasis,dst=src+g.keyWords,ci=0,');
+ once('coord.map,coord.inverse,\n','coord.map,coord.inverse,supportHandle,\n');
+ once('const childBi=coord.map[0]*g.maxBasis;','const childHandle=coord.map[0];');
+ once('frontChild(coord.map[0],0,depth+1);','frontChild(childHandle,0,depth+1);');
+ once('negamax(depth+1,dst,childBi,childN,','negamax(depth+1,dst,childHandle,childN,');
+ once('negamax(0,0,rootBi,basisSize[0],','negamax(0,0,rootHandle,basisSize[0],');
  const output=new URL('../addons/'+base+'-views'+suffix+'.mjs',import.meta.url);
  if(process.argv.includes('--check'))assert.equal(readFileSync(output,'utf8').replaceAll('\r\n','\n'),s);else writeFileSync(output,s);
 }
