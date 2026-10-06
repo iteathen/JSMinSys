@@ -1,0 +1,373 @@
+{
+  "authority": {
+    "repository": "iteathen/NEES",
+    "commit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69",
+    "document": "NODE_V8_METHODS.md"
+  },
+  "methods": [
+    {
+      "id": "M01",
+      "title": "Normalize and specialize at ownership boundaries",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-BOUND-001",
+      "reason": "Cold layout/geometry dispatch exists; caller facts and history admission debt remain."
+    },
+    {
+      "id": "M02",
+      "title": "Keep hot feedback stable and bounded",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-JIT-001",
+      "reason": "Candidate bodies observed; complete feedback/tier coverage not proved."
+    },
+    {
+      "id": "M03",
+      "title": "Keep object shapes stable when objects are the right representation",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-JIT-002",
+      "reason": "Stable retained objects; no repeated reshaping found, all-tier realization incomplete."
+    },
+    {
+      "id": "M04",
+      "title": "Prefer scalars for small ephemeral fixed tuples",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-ALLOC-004",
+      "reason": "Rank frames/scalars preserve values needed after descendant scratch reuse."
+    },
+    {
+      "id": "M05",
+      "title": "Use indexed records for large fixed-schema populations",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-REP-001",
+      "reason": "Fixed indexed TT records and typed state arenas; packing qualified at enclosing solve."
+    },
+    {
+      "id": "M06",
+      "title": "Use semantic coordinates for identity; use addresses only for lookup",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-003",
+      "reason": "Addresses narrow lookup; exact encoded coordinates still determine equality."
+    },
+    {
+      "id": "M07",
+      "title": "Precompute small immutable relations",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-FINITE-001",
+      "reason": "Support/closure/reflection/cell-incidence tables cold, bounded and reused."
+    },
+    {
+      "id": "M08",
+      "title": "Use exact hash indexes, never hash identity",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-003",
+      "reason": "Exact partial-key reconstruction and collision/alias controls; no hash-only equality."
+    },
+    {
+      "id": "M09",
+      "title": "Preserve useful numeric representation; do not cargo-cult signedness tricks",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-REP-002",
+      "reason": "M1/M2 emitted numeric boxing; any signed/window trick needs ABI proof and full-solve evidence."
+    },
+    {
+      "id": "M10",
+      "title": "Choose Array, TypedArray, and Buffer by representation contract",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-REP-001",
+      "reason": "Fixed-width/shared representation is load-bearing, not typed-array folklore."
+    },
+    {
+      "id": "M11",
+      "title": "Eliminate repeated allocation only when the aggregate is unnecessary",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-ALLOC-001",
+      "reason": "No source temporary aggregates in recurrence; numeric engine allocation separately recorded."
+    },
+    {
+      "id": "M12",
+      "title": "Pool only resources with a real reusable lifetime",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-ALLOC-002",
+      "reason": "Prepared one-shot resource ownership; no arbitrary pooling, closed-app retention unresolved."
+    },
+    {
+      "id": "M13",
+      "title": "Prepare and seal capacity when hot growth is not semantic",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-ALLOC-003",
+      "reason": "Capacities sealed before recursive execution, budget fallback explicit."
+    },
+    {
+      "id": "M14",
+      "title": "Make arena reuse generation-safe",
+      "status": "NOT-APPLICABLE",
+      "relatedRule": "NEES-CONC-004",
+      "reason": "No queued generation-bearing arena references; TT replacement uses exact-key/sequence protocol instead."
+    },
+    {
+      "id": "M15",
+      "title": "Construct derived facts once at the best owner",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-REP-004",
+      "reason": "Prepared plans and C34 reuse retained; extraction/repacking debt remains."
+    },
+    {
+      "id": "M16",
+      "title": "Never materialize structure to rediscover structure",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-REP-003",
+      "reason": "No hot serialization/reparsing to rediscover structured state."
+    },
+    {
+      "id": "M17",
+      "title": "Split fast and slow paths by proven frequency/semantics",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-CF-001",
+      "reason": "Terminal and tactical gates exist; eager child preparation still bypassable in principle."
+    },
+    {
+      "id": "M18",
+      "title": "Consume exact simplifying facts before general transforms",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-CF-001",
+      "reason": "D5 eager products can precede exact child/cache simplification."
+    },
+    {
+      "id": "M19",
+      "title": "Choose iteration by required work, not syntax folklore",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-COMP-001",
+      "reason": "Hot indexed loops and bit scans; cold iterators not rewritten from syntax folklore."
+    },
+    {
+      "id": "M20",
+      "title": "Keep hot signatures and code size specialization-friendly",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-JIT-003",
+      "reason": "Dead slot/tail ABI emitted; large bodies still retain costly calls."
+    },
+    {
+      "id": "M21",
+      "title": "Control closure and lexical-environment creation",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-ALLOC-001",
+      "reason": "Worker helpers prepared at module/setup boundary; no closure per node found."
+    },
+    {
+      "id": "M22",
+      "title": "Split validation from trusted internal primitives only with provenance",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-BOUND-002",
+      "reason": "Do not globally remove proof guards; admitted specialized preconditions need caller provenance."
+    },
+    {
+      "id": "M23",
+      "title": "Prefer mutate/undo to clone/replay for local reversible search",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-COMP-002",
+      "reason": "Preallocated rank frames avoid deep clones; incremental make/unmake remains unqualified alternative."
+    },
+    {
+      "id": "M24",
+      "title": "Collapse deterministic outdegree-one execution before scheduling",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CONC-002",
+      "reason": "Forced moves directly recurse without central scheduling; further transition fusion remains D10."
+    },
+    {
+      "id": "M25",
+      "title": "Use the narrowest priority structure that expresses the policy",
+      "status": "NOT-APPLICABLE",
+      "relatedRule": "NEES-CONC-002",
+      "reason": "No interworker priority heap/queue in selected independent deep-worker runtime."
+    },
+    {
+      "id": "M26",
+      "title": "Represent high-frequency shared claims as explicit numeric state",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CONC-004",
+      "reason": "Explicit numeric ready/stop/done/winner state, no object claim transport."
+    },
+    {
+      "id": "M27",
+      "title": "Design the synchronization protocol before minimizing Atomics",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CONC-004",
+      "reason": "Atomic sequence/payload protocol retained before any attempt to remove synchronization."
+    },
+    {
+      "id": "M28",
+      "title": "Design shared layout for coherence traffic, not just byte count",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-CONC-003",
+      "reason": "Interleaved layout/compact rows qualified, current coherence traffic and contention frequency unmeasured."
+    },
+    {
+      "id": "M29",
+      "title": "Reuse worker threads; tune task granularity and queue pressure",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CONC-002",
+      "reason": "Workers instantiated once before search; no child-created workers. One-shot session contract explicit."
+    },
+    {
+      "id": "M30",
+      "title": "Make worker transport ownership explicit",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-ALLOC-004",
+      "reason": "Shared geometry/root/cache ownership and rank-local private scratch explicit; no escaping borrowed Buffer."
+    },
+    {
+      "id": "M31",
+      "title": "Choose native/WASM/FFI by boundary economics",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-NATIVE-001",
+      "reason": "FFI only cold OS affinity/discovery; no hot native solver substitution."
+    },
+    {
+      "id": "M32",
+      "title": "Prefer Node-API for stable native addons",
+      "status": "NOT-APPLICABLE",
+      "relatedRule": "NEES-NATIVE-001",
+      "reason": "No compiled Node-API addon in solver; OS FFI is a separately constrained cold mechanism."
+    },
+    {
+      "id": "M33",
+      "title": "Use V8 Fast API only with fast-path admission proof",
+      "status": "NOT-APPLICABLE",
+      "relatedRule": "NEES-NATIVE-001",
+      "reason": "No custom V8 Fast API solver callback; generic experimental FFI only."
+    },
+    {
+      "id": "M34",
+      "title": "Treat node:ffi as experimental unsafe execution machinery",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-NATIVE-001",
+      "reason": "Exact OS calls and cold lifetime inspected; complete ABI/permission/failure profile across all deployment platforms not recertified here."
+    },
+    {
+      "id": "M35",
+      "title": "Keep diagnostics off the success-frequency path",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-DIAG-001",
+      "reason": "No hot reporting counters; bounded external runtime tracing labels its perturbation."
+    },
+    {
+      "id": "M36",
+      "title": "Choose the cheapest introspection API that satisfies the question",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-DIAG-001",
+      "reason": "RSS external; main heap snapshots explicitly exclude workers, collected only for diagnostic ownership question."
+    },
+    {
+      "id": "M37",
+      "title": "Lay out hot data for working-set locality",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-005",
+      "reason": "Compact flat/interleaved exact TT layout is measured, not bytes-only promotion."
+    },
+    {
+      "id": "M38",
+      "title": "Specialize only after semantic narrowing",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-BOUND-002",
+      "reason": "Admitted geometry specializations retained; repeated CPC/caller facts still need shared ownership proof."
+    },
+    {
+      "id": "M39",
+      "title": "Remove obsolete work before optimizing it",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-005",
+      "reason": "C24/C44/C66 supersession and current load-bearing full hash preserved; obsolete passes not restored."
+    },
+    {
+      "id": "M40",
+      "title": "Prefer an existing optimized builtin until a narrower method is admitted",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-BOUND-004",
+      "reason": "No folklore replacement of builtin primitives."
+    },
+    {
+      "id": "M41",
+      "title": "Derive exact size, allocate once, write once",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-COMP-004",
+      "reason": "Geometry-derived fixed arrays allocated once; no hot dry-run encoding/grow-copy."
+    },
+    {
+      "id": "M42",
+      "title": "Compile stable structure once when repeated interpretation is the cost",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-FINITE-002",
+      "reason": "C66 bounded table compilation and fallback; no runtime eval/code injection for search specialization."
+    },
+    {
+      "id": "M43",
+      "title": "Attack unavoidable product/materialization boundaries before subdominant work",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-004",
+      "reason": "Tiny result materialization E3 does not justify moving fine-grained arithmetic across native boundary."
+    },
+    {
+      "id": "M44",
+      "title": "Keep every engine trick attached to a realization record",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-COST-005",
+      "reason": "Candidate Node27 machine record exists; whole production/fallback/profile ledger evidence incomplete."
+    },
+    {
+      "id": "M45",
+      "title": "Perform a maximal-effort hot-path cost audit",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-XTRM-002",
+      "reason": "Complete selected source/support scope reviewed; debt durable, machine coverage limits explicit."
+    },
+    {
+      "id": "M46",
+      "title": "Optimize critical-path cycles, not a single proxy metric",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-XTRM-004",
+      "reason": "Static proxies subordinate to full-solve cost; unavailable cycles/PMU not zero."
+    },
+    {
+      "id": "M47",
+      "title": "Establish the governing optimization unit before local rewrites",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-EVID-006",
+      "reason": "Governing exact multiworker empty7x6 unit and secondary initialization named for each debt."
+    },
+    {
+      "id": "M48",
+      "title": "Treat detector findings as hypotheses until causal role is established",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-EVID-005",
+      "reason": "Detected code and bookkeeping defects not turned into untested solver rewrites."
+    },
+    {
+      "id": "M49",
+      "title": "Qualify composite optimizations as composite units",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-CORE-005",
+      "reason": "Composite overhead sharing and existing absorbed gates reviewed."
+    },
+    {
+      "id": "M50",
+      "title": "Map the regression surface before promotion",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-EVID-003",
+      "reason": "Board widths, worker counts, lifetime, JIT/spills and memory surfaces mapped in debt; no new promotion."
+    },
+    {
+      "id": "M51",
+      "title": "Use local proxy metrics diagnostically",
+      "status": "CONFORMS",
+      "relatedRule": "NEES-EVID-007",
+      "reason": "GC/sites/code size diagnostic only."
+    },
+    {
+      "id": "M52",
+      "title": "Build a quantified cycle ledger",
+      "status": "UNVERIFIED",
+      "relatedRule": "NEES-COST-003",
+      "reason": "Concrete incomplete transitive cycle accounting/enforcement L1–L5 prevents complete qualification."
+    }
+  ]
+}

@@ -1,0 +1,1287 @@
+{
+  "kind": "Thorough NEES source/accounting/realization audit",
+  "overall": "INCOMPLETE_COST_CONFORMANCE",
+  "normative": {
+    "repository": "iteathen/NEES",
+    "commit": "7650bef0aecc0d2b226ecf253a1f8937ccf89d69",
+    "documents": [
+      {
+        "path": "SPEC.md",
+        "sha256": "e013479d7ad799a9b5a91fbba7c2a1cc3b147391e78f176ee546eb281b0767db"
+      },
+      {
+        "path": "CONFORMANCE.md",
+        "sha256": "b0622c1c0607240859d33aa868d1cac71c66783dded985ec4efc6b8964e4fbfb"
+      },
+      {
+        "path": "COST_ACCOUNTING.md",
+        "sha256": "2fad977f24502f8f3352b3e958940865e257f6eb20b2e3de87c1a3f39e916c3e"
+      },
+      {
+        "path": "NODE_V8_METHODS.md",
+        "sha256": "a9c48d9d8031266facdc21a944feb248103a06a5a32123ccbaac337e19a5d42d"
+      },
+      {
+        "path": "RUNTIME_PROFILE_NODE26.md",
+        "sha256": "cb91572705141f91727ef69f8579ddfaed3171ac500be62a9197c2670a637115"
+      },
+      {
+        "path": "STALE_ADVICE.md",
+        "sha256": "7c11e8d89563f5ec4f1997a0d346e1c285f6417a59e0b4b7e0ac5509347b21a3"
+      }
+    ]
+  },
+  "producer": {
+    "repository": "iteathen/JSMinSys",
+    "branch": "work/isomax-auto-workers-20261006",
+    "auditObservationHead": "c6f584a90e55851319225abce824f67f5adc5c82",
+    "manifestPreparedAt": "c6f584a90e55851319225abce824f67f5adc5c82",
+    "candidateRuntime": "6bc1dd047209664f9924c4cb49597a2154555107",
+    "runtimeDiffFromCandidate": "EMPTY"
+  },
+  "consumer": {
+    "repository": "iteathen/Connect4",
+    "branch": "work/isomax-auto-workers-20261006",
+    "diagnosticHarnessHead": "919856663dcde038a9847594a40916f080946351",
+    "manifestObservedHead": "919856663dcde038a9847594a40916f080946351"
+  },
+  "package": {
+    "version": "0.2.0-rc.4",
+    "sourceCommit": "40b19431f00174c5d52c442677d67ec698e8c50a",
+    "lockSha256": "704eca02a3eec9abc27a03a6248ae98c9fcf8d67fd296dacf2abc954744d58e8",
+    "frozenLedgerBlob": "f697fe6bdf866a5f3be15ee86ec71b43c446801b",
+    "lockedRuntime": [
+      {
+        "path": "runtime/addons/branch-manager-host.mjs",
+        "source": "addons/branch-manager-host.mjs",
+        "sha256": "1635196c2b3660392fa9286de836fa6fba00bca82cba2aa1735fa65d543f8378",
+        "lockedSha256": "1635196c2b3660392fa9286de836fa6fba00bca82cba2aa1735fa65d543f8378",
+        "sourceBlob": "b95f06eb6d11bd2b3b9a495de171f6d0d9b9c96a",
+        "sourceLineCount": 252,
+        "frozenSourceSha256": "1635196c2b3660392fa9286de836fa6fba00bca82cba2aa1735fa65d543f8378"
+      },
+      {
+        "path": "runtime/addons/connect4-cpc-matching-response.mjs",
+        "source": "addons/connect4-cpc-matching-response.mjs",
+        "sha256": "1e67fb8110ea535de4d0bf28e23057347e8d06013b2cb19813818729dd26b58c",
+        "lockedSha256": "1e67fb8110ea535de4d0bf28e23057347e8d06013b2cb19813818729dd26b58c",
+        "sourceBlob": "c357af5a8037f93183531b63dedb5454145df179",
+        "sourceLineCount": 96,
+        "frozenSourceSha256": "1e67fb8110ea535de4d0bf28e23057347e8d06013b2cb19813818729dd26b58c"
+      },
+      {
+        "path": "runtime/addons/connect4-cpc-prepared-response.mjs",
+        "source": "addons/connect4-cpc-prepared-response.mjs",
+        "sha256": "fc1f65fc453cfd4791e10c5eaeaaee1696c35b0631a29ed8f233c50410b1079f",
+        "lockedSha256": "fc1f65fc453cfd4791e10c5eaeaaee1696c35b0631a29ed8f233c50410b1079f",
+        "sourceBlob": "2260dd2924712ff59556a0aa2f30a684ac62c8fe",
+        "sourceLineCount": 68,
+        "frozenSourceSha256": "fc1f65fc453cfd4791e10c5eaeaaee1696c35b0631a29ed8f233c50410b1079f"
+      },
+      {
+        "path": "runtime/addons/connect4-cpc-prepared-win.mjs",
+        "source": "addons/connect4-cpc-prepared-win.mjs",
+        "sha256": "ce84aaeda7ef1965e887b30e7ad45eb6eeb43f489e2add2e4b2436725faab458",
+        "lockedSha256": "ce84aaeda7ef1965e887b30e7ad45eb6eeb43f489e2add2e4b2436725faab458",
+        "sourceBlob": "86a9febf524b18fd4f10563aaf8637778b162bca",
+        "sourceLineCount": 85,
+        "frozenSourceSha256": "ce84aaeda7ef1965e887b30e7ad45eb6eeb43f489e2add2e4b2436725faab458"
+      },
+      {
+        "path": "runtime/addons/connect4-cpc-target-dense-win.mjs",
+        "source": "addons/connect4-cpc-target-dense-win.mjs",
+        "sha256": "f100b0ff794c6cb0f5234feea6827c02036ed92cb3e6f2998e28f529271536dd",
+        "lockedSha256": "f100b0ff794c6cb0f5234feea6827c02036ed92cb3e6f2998e28f529271536dd",
+        "sourceBlob": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
+        "sourceLineCount": 66,
+        "frozenSourceSha256": "f100b0ff794c6cb0f5234feea6827c02036ed92cb3e6f2998e28f529271536dd"
+      },
+      {
+        "path": "runtime/addons/connect4-cpc-target-win.mjs",
+        "source": "addons/connect4-cpc-target-win.mjs",
+        "sha256": "92f1848b7530c6045ec7a355bdce9852713486e45f0d7a7f6a11cb0acc80a6c7",
+        "lockedSha256": "92f1848b7530c6045ec7a355bdce9852713486e45f0d7a7f6a11cb0acc80a6c7",
+        "sourceBlob": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
+        "sourceLineCount": 94,
+        "frozenSourceSha256": "92f1848b7530c6045ec7a355bdce9852713486e45f0d7a7f6a11cb0acc80a6c7"
+      },
+      {
+        "path": "runtime/addons/connect4-cpcx-pair-hub.mjs",
+        "source": "addons/connect4-cpcx-pair-hub.mjs",
+        "sha256": "66de3d0fbd9a923410fec7e141f9a623329e1acf37ead426017ba06b96dd97bb",
+        "lockedSha256": "66de3d0fbd9a923410fec7e141f9a623329e1acf37ead426017ba06b96dd97bb",
+        "sourceBlob": "41847a2cfaa72d066efa00cc33aa02142077452b",
+        "sourceLineCount": 62,
+        "frozenSourceSha256": "66de3d0fbd9a923410fec7e141f9a623329e1acf37ead426017ba06b96dd97bb"
+      },
+      {
+        "path": "runtime/addons/connect4-live-line-evaluator.mjs",
+        "source": "addons/connect4-live-line-evaluator.mjs",
+        "sha256": "94609f645d5988b15d0aece8f087701329f2ea15e8f19f7e89128e4660483b75",
+        "lockedSha256": "94609f645d5988b15d0aece8f087701329f2ea15e8f19f7e89128e4660483b75",
+        "sourceBlob": "b9bf66a91df2a35880516404f3180af40ffa179c",
+        "sourceLineCount": 122,
+        "frozenSourceSha256": "94609f645d5988b15d0aece8f087701329f2ea15e8f19f7e89128e4660483b75"
+      },
+      {
+        "path": "runtime/addons/connect4-live-line-order.mjs",
+        "source": "addons/connect4-live-line-order.mjs",
+        "sha256": "1070bbce728a5245af8bc1a03f5943726d70f332ea3253c9c63568f5e3626cee",
+        "lockedSha256": "1070bbce728a5245af8bc1a03f5943726d70f332ea3253c9c63568f5e3626cee",
+        "sourceBlob": "8f5636abe507fb87d2c391448800c00f93d28486",
+        "sourceLineCount": 67,
+        "frozenSourceSha256": "1070bbce728a5245af8bc1a03f5943726d70f332ea3253c9c63568f5e3626cee"
+      },
+      {
+        "path": "runtime/addons/connect4-rank-local-presearch.mjs",
+        "source": "addons/connect4-rank-local-presearch.mjs",
+        "sha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25",
+        "lockedSha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25",
+        "sourceBlob": "047db4697678f54cfd2bde6362a0779b67408744",
+        "sourceLineCount": 149,
+        "frozenSourceSha256": "e698fa6325be829269c9784331739e02a7a7ff92735c1fff51cd5109ea460d25"
+      },
+      {
+        "path": "runtime/addons/connect4-residual-proof-frontier-span.mjs",
+        "source": "addons/connect4-residual-proof-frontier-span.mjs",
+        "sha256": "e4b175e7f0b31dd417107a3ce4ff5db3fe3351abf1a499af45c9c0af95bc404a",
+        "lockedSha256": "e4b175e7f0b31dd417107a3ce4ff5db3fe3351abf1a499af45c9c0af95bc404a",
+        "sourceBlob": "d2a5e87c4b58a8d17990f3a5a81180d8ec18e863",
+        "sourceLineCount": 100,
+        "frozenSourceSha256": "e4b175e7f0b31dd417107a3ce4ff5db3fe3351abf1a499af45c9c0af95bc404a"
+      },
+      {
+        "path": "runtime/addons/connect4-residual-proof-frontier-three.mjs",
+        "source": "addons/connect4-residual-proof-frontier-three.mjs",
+        "sha256": "571f0c6c1a60c155f8e0a109f83a3a40320a664c6a4a05edbea2d6316cc76200",
+        "lockedSha256": "571f0c6c1a60c155f8e0a109f83a3a40320a664c6a4a05edbea2d6316cc76200",
+        "sourceBlob": "141d5681b7ffccbdf500600e521c2a7487a06bee",
+        "sourceLineCount": 125,
+        "frozenSourceSha256": "571f0c6c1a60c155f8e0a109f83a3a40320a664c6a4a05edbea2d6316cc76200"
+      },
+      {
+        "path": "runtime/addons/connect4-residual-proof-frontier.mjs",
+        "source": "addons/connect4-residual-proof-frontier.mjs",
+        "sha256": "8fdb95152ce6957d6c4f856798834a0c8f05590ae5e32b5aae8d44a5fc1cbc35",
+        "lockedSha256": "8fdb95152ce6957d6c4f856798834a0c8f05590ae5e32b5aae8d44a5fc1cbc35",
+        "sourceBlob": "0fb400b416b7850aa1c9034c30818d71f9878fb9",
+        "sourceLineCount": 6,
+        "frozenSourceSha256": "8fdb95152ce6957d6c4f856798834a0c8f05590ae5e32b5aae8d44a5fc1cbc35"
+      },
+      {
+        "path": "runtime/addons/isomax-memory-profile.mjs",
+        "source": "addons/isomax-memory-profile.mjs",
+        "sha256": "fca4f1404ec9de7f4fa46bde689a52f9e7e946d53abc2566c6300ce52f896368",
+        "lockedSha256": "fca4f1404ec9de7f4fa46bde689a52f9e7e946d53abc2566c6300ce52f896368",
+        "sourceBlob": "ab51946e25b928295797fe8921489a7f57538bfb",
+        "sourceLineCount": 101,
+        "frozenSourceSha256": "fca4f1404ec9de7f4fa46bde689a52f9e7e946d53abc2566c6300ce52f896368"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-cache-capacity.mjs",
+        "source": "addons/rba-connect4-cache-capacity.mjs",
+        "sha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e",
+        "lockedSha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e",
+        "sourceBlob": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
+        "sourceLineCount": 10,
+        "frozenSourceSha256": "bfafaee4e1420f6ca7df5b18fdd87555625e457c123e74e95b7b5a2848117b8e"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-closure-dense.mjs",
+        "source": "addons/rba-connect4-coordinate-closure-dense.mjs",
+        "sha256": "2e5c717f7a7b763c3ccc18c08fe199aa467f489682c2f04346e6652cd7d358ff",
+        "lockedSha256": "2e5c717f7a7b763c3ccc18c08fe199aa467f489682c2f04346e6652cd7d358ff",
+        "sourceBlob": "9992f6aae9161fa437a8ce9342e5f5c7606f8033",
+        "sourceLineCount": 226,
+        "frozenSourceSha256": "2e5c717f7a7b763c3ccc18c08fe199aa467f489682c2f04346e6652cd7d358ff"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-closure-handle-view-dense.mjs",
+        "source": "addons/rba-connect4-coordinate-closure-handle-view-dense.mjs",
+        "sha256": "5a1609118694d414fe572fa2cd140f98514b3e9d56b572d45c38086cd8e541ec",
+        "lockedSha256": "5a1609118694d414fe572fa2cd140f98514b3e9d56b572d45c38086cd8e541ec",
+        "sourceBlob": "47e7cdda2bc1cb8d3b1d4d8028b9839cd285974f",
+        "sourceLineCount": 227,
+        "frozenSourceSha256": "5a1609118694d414fe572fa2cd140f98514b3e9d56b572d45c38086cd8e541ec"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-closure-handle-view-prepared.mjs",
+        "source": "addons/rba-connect4-coordinate-closure-handle-view-prepared.mjs",
+        "sha256": "021e534d3fa33f298d4f87d9c0cb598f452c0437d5b902a4ab4d1640fbfda155",
+        "lockedSha256": "021e534d3fa33f298d4f87d9c0cb598f452c0437d5b902a4ab4d1640fbfda155",
+        "sourceBlob": "f72e25baaac195bd0e8597b1f0ef8c45950d2dfc",
+        "sourceLineCount": 227,
+        "frozenSourceSha256": "021e534d3fa33f298d4f87d9c0cb598f452c0437d5b902a4ab4d1640fbfda155"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-closure-prepared.mjs",
+        "source": "addons/rba-connect4-coordinate-closure-prepared.mjs",
+        "sha256": "4e75a4873953f5ef51a130e53b7cb011cd74b1e6f6ce007983e1f6ba1dacfee5",
+        "lockedSha256": "4e75a4873953f5ef51a130e53b7cb011cd74b1e6f6ce007983e1f6ba1dacfee5",
+        "sourceBlob": "7079b896963f8a8508a3507d2828e41fc9d18c07",
+        "sourceLineCount": 226,
+        "frozenSourceSha256": "4e75a4873953f5ef51a130e53b7cb011cd74b1e6f6ce007983e1f6ba1dacfee5"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-compiled-transition.mjs",
+        "source": "addons/rba-connect4-coordinate-compiled-transition.mjs",
+        "sha256": "7372b172cd1f23d605d81762e8239a0f23c62909abdf5e6ead532cdf94600908",
+        "lockedSha256": "7372b172cd1f23d605d81762e8239a0f23c62909abdf5e6ead532cdf94600908",
+        "sourceBlob": "b0478f80aad60f13199643cc65b92d102abdff23",
+        "sourceLineCount": 235,
+        "frozenSourceSha256": "7372b172cd1f23d605d81762e8239a0f23c62909abdf5e6ead532cdf94600908"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-dense.mjs",
+        "source": "addons/rba-connect4-coordinate-dense.mjs",
+        "sha256": "3b0e583342d757ca436a599b1d8b145918a16e639a331d88374861e581412355",
+        "lockedSha256": "3b0e583342d757ca436a599b1d8b145918a16e639a331d88374861e581412355",
+        "sourceBlob": "73f09433ab1b34f2c89bad55669bf7f940a17ed0",
+        "sourceLineCount": 163,
+        "frozenSourceSha256": "3b0e583342d757ca436a599b1d8b145918a16e639a331d88374861e581412355"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-prepared.mjs",
+        "source": "addons/rba-connect4-coordinate-prepared.mjs",
+        "sha256": "4e7e351197af44815f3d972fd0a9bb07c2ad6552870d3649f1de17cbe3cec084",
+        "lockedSha256": "4e7e351197af44815f3d972fd0a9bb07c2ad6552870d3649f1de17cbe3cec084",
+        "sourceBlob": "d8ed2bc15d4014d7be99267eaf8f43a3db9e029f",
+        "sourceLineCount": 198,
+        "frozenSourceSha256": "4e7e351197af44815f3d972fd0a9bb07c2ad6552870d3649f1de17cbe3cec084"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-support-dense.mjs",
+        "source": "addons/rba-connect4-coordinate-support-dense.mjs",
+        "sha256": "bb236355d6dc56092b43b65fd373fd4c595560a2851927dfa71999dbb65e6779",
+        "lockedSha256": "bb236355d6dc56092b43b65fd373fd4c595560a2851927dfa71999dbb65e6779",
+        "sourceBlob": "7358488a080f03c612954dbe5e9b9622925efce3",
+        "sourceLineCount": 146,
+        "frozenSourceSha256": "bb236355d6dc56092b43b65fd373fd4c595560a2851927dfa71999dbb65e6779"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-support-prepared.mjs",
+        "source": "addons/rba-connect4-coordinate-support-prepared.mjs",
+        "sha256": "d517c2fe616c65c43b94450e9c00087b3f845e7d68022ad71e908c0264a9cebe",
+        "lockedSha256": "d517c2fe616c65c43b94450e9c00087b3f845e7d68022ad71e908c0264a9cebe",
+        "sourceBlob": "318322b414eac1827dc233f01c230e852173c076",
+        "sourceLineCount": 146,
+        "frozenSourceSha256": "d517c2fe616c65c43b94450e9c00087b3f845e7d68022ad71e908c0264a9cebe"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-support-reflection-view.mjs",
+        "source": "addons/rba-connect4-coordinate-support-reflection-view.mjs",
+        "sha256": "db834c0fe4ed907a2042d270186a74a4a74dc3707bf4198a2d88171523a657c5",
+        "lockedSha256": "db834c0fe4ed907a2042d270186a74a4a74dc3707bf4198a2d88171523a657c5",
+        "sourceBlob": "6d495b897b49a94ea1bc3ed1f49bae0964546b1a",
+        "sourceLineCount": 32,
+        "frozenSourceSha256": "db834c0fe4ed907a2042d270186a74a4a74dc3707bf4198a2d88171523a657c5"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate-support-reflection.mjs",
+        "source": "addons/rba-connect4-coordinate-support-reflection.mjs",
+        "sha256": "17a6d8733a4a919c9516729b4c1bdbffd1318a3cfb6aee207c8b42cd2f21f361",
+        "lockedSha256": "17a6d8733a4a919c9516729b4c1bdbffd1318a3cfb6aee207c8b42cd2f21f361",
+        "sourceBlob": "f89e79453dd108cd0ad19583888293bf8b70defd",
+        "sourceLineCount": 35,
+        "frozenSourceSha256": "17a6d8733a4a919c9516729b4c1bdbffd1318a3cfb6aee207c8b42cd2f21f361"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-coordinate.mjs",
+        "source": "addons/rba-connect4-coordinate.mjs",
+        "sha256": "328f9ecd3874c86544d1ca639e37dd5d630e29c4f5f0728e6b05f9b21d6f6e0e",
+        "lockedSha256": "328f9ecd3874c86544d1ca639e37dd5d630e29c4f5f0728e6b05f9b21d6f6e0e",
+        "sourceBlob": "1c7176900ea4215330cd82f90132c03c2974ec1f",
+        "sourceLineCount": 210,
+        "frozenSourceSha256": "328f9ecd3874c86544d1ca639e37dd5d630e29c4f5f0728e6b05f9b21d6f6e0e"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-geometry.mjs",
+        "source": "addons/rba-connect4-geometry.mjs",
+        "sha256": "6236813c8dcf907ecbdcc6d9f665af2c9bc4dd49d32139c8e20e38f6380e4185",
+        "lockedSha256": "6236813c8dcf907ecbdcc6d9f665af2c9bc4dd49d32139c8e20e38f6380e4185",
+        "sourceBlob": "ea897ee020db0ac00f386b7df42bdf9ad47df0cc",
+        "sourceLineCount": 232,
+        "frozenSourceSha256": "6236813c8dcf907ecbdcc6d9f665af2c9bc4dd49d32139c8e20e38f6380e4185"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-ingress.mjs",
+        "source": "addons/rba-connect4-ingress.mjs",
+        "sha256": "f4a36b17ca96a13971f3a1deeb0c70375eddfcb765bbb9d841dfbffcfe080db9",
+        "lockedSha256": "f4a36b17ca96a13971f3a1deeb0c70375eddfcb765bbb9d841dfbffcfe080db9",
+        "sourceBlob": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
+        "sourceLineCount": 90,
+        "frozenSourceSha256": "f4a36b17ca96a13971f3a1deeb0c70375eddfcb765bbb9d841dfbffcfe080db9"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs",
+        "sha256": "e89ad77d21439c0d4c6e993cd1f0f2b5ef24a92b9ff29d05b5a132427262159e",
+        "lockedSha256": "e89ad77d21439c0d4c6e993cd1f0f2b5ef24a92b9ff29d05b5a132427262159e",
+        "sourceBlob": "b48ddd8d1cfa9db7e0ce911293f129d3c60fa44c",
+        "sourceLineCount": 271,
+        "frozenSourceSha256": "e89ad77d21439c0d4c6e993cd1f0f2b5ef24a92b9ff29d05b5a132427262159e"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs",
+        "sha256": "4a77b20cdf23367447b13bb520184f2ca1a5ebd9e442c58b827798d937da6ddf",
+        "lockedSha256": "4a77b20cdf23367447b13bb520184f2ca1a5ebd9e442c58b827798d937da6ddf",
+        "sourceBlob": "da851562e96dc4823fe9bb311e2bca77c70c0452",
+        "sourceLineCount": 275,
+        "frozenSourceSha256": "4a77b20cdf23367447b13bb520184f2ca1a5ebd9e442c58b827798d937da6ddf"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+        "sha256": "f0347972d5f93b4dc456031b8712f247bf84443597674df642c120ff75280763",
+        "lockedSha256": "f0347972d5f93b4dc456031b8712f247bf84443597674df642c120ff75280763",
+        "sourceBlob": "d7151cab0a427680bf1a1800e6341c09e2d273a7",
+        "sourceLineCount": 295,
+        "frozenSourceSha256": "f0347972d5f93b4dc456031b8712f247bf84443597674df642c120ff75280763"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-center.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs",
+        "sha256": "befba775063b346543724cc4d948c4250d20d9d7ddfed293faff89cfc962c6c5",
+        "lockedSha256": "befba775063b346543724cc4d948c4250d20d9d7ddfed293faff89cfc962c6c5",
+        "sourceBlob": "90e48441b68aaa64ae317a59030a6dfd1ee2b07e",
+        "sourceLineCount": 291,
+        "frozenSourceSha256": "befba775063b346543724cc4d948c4250d20d9d7ddfed293faff89cfc962c6c5"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs",
+        "sha256": "2030ee1f24cd1a23b829d94440550a9dfdc8ba9ef48376e0edef48a1d4bff666",
+        "lockedSha256": "2030ee1f24cd1a23b829d94440550a9dfdc8ba9ef48376e0edef48a1d4bff666",
+        "sourceBlob": "1625f23084183f256debc4da098e9218973cdbc2",
+        "sourceLineCount": 288,
+        "frozenSourceSha256": "2030ee1f24cd1a23b829d94440550a9dfdc8ba9ef48376e0edef48a1d4bff666"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs",
+        "sha256": "1723a4e9ff87302609c4db9851340989fe957c66db40fb7b2c400ec89caf4acb",
+        "lockedSha256": "1723a4e9ff87302609c4db9851340989fe957c66db40fb7b2c400ec89caf4acb",
+        "sourceBlob": "e363a0a7f45140343d22a304315155bbb8684972",
+        "sourceLineCount": 292,
+        "frozenSourceSha256": "1723a4e9ff87302609c4db9851340989fe957c66db40fb7b2c400ec89caf4acb"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+        "sha256": "66ebe61d68d9597c400dc07026b90708942e58d489a5ec614b7b1a650e295d07",
+        "lockedSha256": "66ebe61d68d9597c400dc07026b90708942e58d489a5ec614b7b1a650e295d07",
+        "sourceBlob": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
+        "sourceLineCount": 312,
+        "frozenSourceSha256": "66ebe61d68d9597c400dc07026b90708942e58d489a5ec614b7b1a650e295d07"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs",
+        "sha256": "5195677db91d1104a975b1a36016825f04718a03d78869224d51fa9357f9f990",
+        "lockedSha256": "5195677db91d1104a975b1a36016825f04718a03d78869224d51fa9357f9f990",
+        "sourceBlob": "600af67825dcb49465377ca925255178f0747bf9",
+        "sourceLineCount": 273,
+        "frozenSourceSha256": "5195677db91d1104a975b1a36016825f04718a03d78869224d51fa9357f9f990"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs",
+        "sha256": "a6d7cb7d13fd13d24a387647686928f4b6bae5dd96cee9c95c542f0a8159be53",
+        "lockedSha256": "a6d7cb7d13fd13d24a387647686928f4b6bae5dd96cee9c95c542f0a8159be53",
+        "sourceBlob": "26fe8951361b3750051c02a6262decaf3d4ab929",
+        "sourceLineCount": 277,
+        "frozenSourceSha256": "a6d7cb7d13fd13d24a387647686928f4b6bae5dd96cee9c95c542f0a8159be53"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs",
+        "sha256": "95e0e5e1bbfae2c93e2f68fc222448d9f0fe9609b8dfc40e1184e30ba38af5c2",
+        "lockedSha256": "95e0e5e1bbfae2c93e2f68fc222448d9f0fe9609b8dfc40e1184e30ba38af5c2",
+        "sourceBlob": "b84ff4409df86357b1d37bbfac297f017a9fe42c",
+        "sourceLineCount": 292,
+        "frozenSourceSha256": "95e0e5e1bbfae2c93e2f68fc222448d9f0fe9609b8dfc40e1184e30ba38af5c2"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs",
+        "sha256": "f9ccafaaf60690f1d1650c2c21e95f5b76eb63b928e0920fa9e04f7091d36d6d",
+        "lockedSha256": "f9ccafaaf60690f1d1650c2c21e95f5b76eb63b928e0920fa9e04f7091d36d6d",
+        "sourceBlob": "a6179cfb9f5d18106886d83e682f5b0145dd789a",
+        "sourceLineCount": 288,
+        "frozenSourceSha256": "f9ccafaaf60690f1d1650c2c21e95f5b76eb63b928e0920fa9e04f7091d36d6d"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs",
+        "sha256": "d4ebba308f42b5663d7ee85563b290110074524a189f50e8fffdd6011bc96092",
+        "lockedSha256": "d4ebba308f42b5663d7ee85563b290110074524a189f50e8fffdd6011bc96092",
+        "sourceBlob": "03432a7f3394731f7580b09f0bd5cba8187fd569",
+        "sourceLineCount": 271,
+        "frozenSourceSha256": "d4ebba308f42b5663d7ee85563b290110074524a189f50e8fffdd6011bc96092"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs",
+        "sha256": "742b0824e6967d126e6abee1434486078e3e647022df3557412b20a2e082450d",
+        "lockedSha256": "742b0824e6967d126e6abee1434486078e3e647022df3557412b20a2e082450d",
+        "sourceBlob": "b4dbed40aacbdb0b8f4b2502af84967e8787202f",
+        "sourceLineCount": 275,
+        "frozenSourceSha256": "742b0824e6967d126e6abee1434486078e3e647022df3557412b20a2e082450d"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs.mjs",
+        "sha256": "7cd62e677186090b0bdb26765198090e1b32e3b6128fdb6743078e97a3cad0f7",
+        "lockedSha256": "7cd62e677186090b0bdb26765198090e1b32e3b6128fdb6743078e97a3cad0f7",
+        "sourceBlob": "444dd4fc9be267e1766107c26676a10d9f09106e",
+        "sourceLineCount": 290,
+        "frozenSourceSha256": "7cd62e677186090b0bdb26765198090e1b32e3b6128fdb6743078e97a3cad0f7"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center.mjs",
+        "sha256": "151000c75ed897fdcba882a4aa6594dda9eb4573de92f2ef2f19a0c721c8d516",
+        "lockedSha256": "151000c75ed897fdcba882a4aa6594dda9eb4573de92f2ef2f19a0c721c8d516",
+        "sourceBlob": "dfce661131bc1f4d6218852d5ab3b7716fd98ecd",
+        "sourceLineCount": 286,
+        "frozenSourceSha256": "151000c75ed897fdcba882a4aa6594dda9eb4573de92f2ef2f19a0c721c8d516"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs",
+        "sha256": "923e7feb1530fe1cc63c7e47d1510015fa1bffd415ed2e78ac845303b5f9c55a",
+        "lockedSha256": "923e7feb1530fe1cc63c7e47d1510015fa1bffd415ed2e78ac845303b5f9c55a",
+        "sourceBlob": "1aa51d274eec188f3e015e9c91b5a2b45f2395f8",
+        "sourceLineCount": 288,
+        "frozenSourceSha256": "923e7feb1530fe1cc63c7e47d1510015fa1bffd415ed2e78ac845303b5f9c55a"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs",
+        "sha256": "7edfdb244293bded628fc4d7ab0546a79511249a90e5acf1bade0861597cab62",
+        "lockedSha256": "7edfdb244293bded628fc4d7ab0546a79511249a90e5acf1bade0861597cab62",
+        "sourceBlob": "fd85b26f7826e00644cd59f2a896f1974b8c745d",
+        "sourceLineCount": 292,
+        "frozenSourceSha256": "7edfdb244293bded628fc4d7ab0546a79511249a90e5acf1bade0861597cab62"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs.mjs",
+        "sha256": "d26607cc9cc4c53fa5dcc4afb3146db9d2d9ef9f840428e0c0c897b0ffc19b6f",
+        "lockedSha256": "d26607cc9cc4c53fa5dcc4afb3146db9d2d9ef9f840428e0c0c897b0ffc19b6f",
+        "sourceBlob": "e383cc038ace50431f114840269dac6fd58cd615",
+        "sourceLineCount": 307,
+        "frozenSourceSha256": "d26607cc9cc4c53fa5dcc4afb3146db9d2d9ef9f840428e0c0c897b0ffc19b6f"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-compiled.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled.mjs",
+        "sha256": "d8f252cf8ea678ea5ef339650723eb6c90dd13a115742a1947e895da5a348584",
+        "lockedSha256": "d8f252cf8ea678ea5ef339650723eb6c90dd13a115742a1947e895da5a348584",
+        "sourceBlob": "cf37c1f0de2f9d04c17213002dddf923fafdfe02",
+        "sourceLineCount": 303,
+        "frozenSourceSha256": "d8f252cf8ea678ea5ef339650723eb6c90dd13a115742a1947e895da5a348584"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs",
+        "sha256": "b45db3e6df9ed68e9714ce1b9a8da6de23a9276f71cdc6b4a2f4edd22cd0edad",
+        "lockedSha256": "b45db3e6df9ed68e9714ce1b9a8da6de23a9276f71cdc6b4a2f4edd22cd0edad",
+        "sourceBlob": "8c0fcaec712ad1c32e8db19ba5dd39a9e2f5b981",
+        "sourceLineCount": 290,
+        "frozenSourceSha256": "b45db3e6df9ed68e9714ce1b9a8da6de23a9276f71cdc6b4a2f4edd22cd0edad"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs",
+        "sha256": "cf894d63627b34e726cc58b80fd530e19cb0f76b6868637e75d866e71efb2d85",
+        "lockedSha256": "cf894d63627b34e726cc58b80fd530e19cb0f76b6868637e75d866e71efb2d85",
+        "sourceBlob": "64e6d0ba42325eba9cb19d81e8199acc71595631",
+        "sourceLineCount": 294,
+        "frozenSourceSha256": "cf894d63627b34e726cc58b80fd530e19cb0f76b6868637e75d866e71efb2d85"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs",
+        "sha256": "0cb4598e77c3742213947178fe4b1d4dcba934bb937a7875ef9a45fff90ee2e5",
+        "lockedSha256": "0cb4598e77c3742213947178fe4b1d4dcba934bb937a7875ef9a45fff90ee2e5",
+        "sourceBlob": "3b6a1a772cb9beb19bb4c864081864fdfbe350bf",
+        "sourceLineCount": 309,
+        "frozenSourceSha256": "0cb4598e77c3742213947178fe4b1d4dcba934bb937a7875ef9a45fff90ee2e5"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal-views.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal-views.mjs",
+        "sha256": "3790b433de424a53abe0cf0a92761b648345a44f8b5907a4b5fb77f6cf03b834",
+        "lockedSha256": "3790b433de424a53abe0cf0a92761b648345a44f8b5907a4b5fb77f6cf03b834",
+        "sourceBlob": "3dd1a46a705e3df921dc4c6ae1d1bc6a4add6d41",
+        "sourceLineCount": 305,
+        "frozenSourceSha256": "3790b433de424a53abe0cf0a92761b648345a44f8b5907a4b5fb77f6cf03b834"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+        "source": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+        "sha256": "7b5fb2d1f89fabca3428b50cd48971e9603d4d8900eda2844dcd97adf7e6b029",
+        "lockedSha256": "7b5fb2d1f89fabca3428b50cd48971e9603d4d8900eda2844dcd97adf7e6b029",
+        "sourceBlob": "6c95b0c55e7d411d63056e8ed7074b82b138fc96",
+        "sourceLineCount": 308,
+        "frozenSourceSha256": "7b5fb2d1f89fabca3428b50cd48971e9603d4d8900eda2844dcd97adf7e6b029"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-local-native-proof-cache.mjs",
+        "source": "addons/rba-connect4-local-native-proof-cache.mjs",
+        "sha256": "cf2fe8b57b4b31a7bfc6070bdd6a6e1d78c0395920f9a3dd9b5deaf93fb866ef",
+        "lockedSha256": "cf2fe8b57b4b31a7bfc6070bdd6a6e1d78c0395920f9a3dd9b5deaf93fb866ef",
+        "sourceBlob": "51a24ce7a2565269c26df2ca59755d6ad15c437b",
+        "sourceLineCount": 31,
+        "frozenSourceSha256": "cf2fe8b57b4b31a7bfc6070bdd6a6e1d78c0395920f9a3dd9b5deaf93fb866ef"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-prepared-compact-cache.mjs",
+        "source": "addons/rba-connect4-prepared-compact-cache.mjs",
+        "sha256": "c191081ff9a421a475eac3460d544fcafbdd38c16936798eb8684afcad38b307",
+        "lockedSha256": "c191081ff9a421a475eac3460d544fcafbdd38c16936798eb8684afcad38b307",
+        "sourceBlob": "bce1755f7312cbbccb490aa8bb5d7b9443cddc57",
+        "sourceLineCount": 54,
+        "frozenSourceSha256": "c191081ff9a421a475eac3460d544fcafbdd38c16936798eb8684afcad38b307"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-prepared-session-host.mjs",
+        "source": "addons/rba-connect4-prepared-session-host.mjs",
+        "sha256": "0eeacc1b634d2282a95377e33b9a1af4ad2ddc967a2dc3f7f4653294e321a27e",
+        "lockedSha256": "0eeacc1b634d2282a95377e33b9a1af4ad2ddc967a2dc3f7f4653294e321a27e",
+        "sourceBlob": "4ef72933e94efe7510e9a9c9a0945d9d25783c3c",
+        "sourceLineCount": 176,
+        "frozenSourceSha256": "0eeacc1b634d2282a95377e33b9a1af4ad2ddc967a2dc3f7f4653294e321a27e"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-profile.mjs",
+        "source": "addons/rba-connect4-profile.mjs",
+        "sha256": "edd8d17bcafdb2349b688f880ff2ba26cf362003eb4969ee0d98dacb65f11727",
+        "lockedSha256": "edd8d17bcafdb2349b688f880ff2ba26cf362003eb4969ee0d98dacb65f11727",
+        "sourceBlob": "429083c6e210ee5f1df0f00f5f91c159d5fc58fb",
+        "sourceLineCount": 70,
+        "frozenSourceSha256": "edd8d17bcafdb2349b688f880ff2ba26cf362003eb4969ee0d98dacb65f11727"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-shared-banked-cache.mjs",
+        "source": "addons/rba-connect4-shared-banked-cache.mjs",
+        "sha256": "b087674aa12f2e9776f04db4b03b0de3913ce8911b82f102d0fc877c8b327307",
+        "lockedSha256": "b087674aa12f2e9776f04db4b03b0de3913ce8911b82f102d0fc877c8b327307",
+        "sourceBlob": "3d8118b06571044375500487aefffd16926cc2e6",
+        "sourceLineCount": 89,
+        "frozenSourceSha256": "b087674aa12f2e9776f04db4b03b0de3913ce8911b82f102d0fc877c8b327307"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-shared-exact-cache-layout.mjs",
+        "source": "addons/rba-connect4-shared-exact-cache-layout.mjs",
+        "sha256": "a4ea7e2a854e645e6f6f44662fef65a49d9316bfbe486c1348797dbdffba651c",
+        "lockedSha256": "a4ea7e2a854e645e6f6f44662fef65a49d9316bfbe486c1348797dbdffba651c",
+        "sourceBlob": "d58339f9ca94cc1b77d6ceca76055afd5640b535",
+        "sourceLineCount": 331,
+        "frozenSourceSha256": "a4ea7e2a854e645e6f6f44662fef65a49d9316bfbe486c1348797dbdffba651c"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-shared-exact-cache-uncounted.mjs",
+        "source": "addons/rba-connect4-shared-exact-cache-uncounted.mjs",
+        "sha256": "d3cdf4efa3515a9e740cf16ff487d9430f221ac1987ba9cb76a53201c1a3f648",
+        "lockedSha256": "d3cdf4efa3515a9e740cf16ff487d9430f221ac1987ba9cb76a53201c1a3f648",
+        "sourceBlob": "e9accae8957321eb304c638ab4731a7f614123de",
+        "sourceLineCount": 57,
+        "frozenSourceSha256": "d3cdf4efa3515a9e740cf16ff487d9430f221ac1987ba9cb76a53201c1a3f648"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-shared-exact-cache.mjs",
+        "source": "addons/rba-connect4-shared-exact-cache.mjs",
+        "sha256": "b85ad37e944cabb7e59e4df447e541318eebe8445425ccd4f9f7a502afeb100d",
+        "lockedSha256": "b85ad37e944cabb7e59e4df447e541318eebe8445425ccd4f9f7a502afeb100d",
+        "sourceBlob": "2e6b09787864b4cc22748174cb71295e243467ee",
+        "sourceLineCount": 103,
+        "frozenSourceSha256": "b85ad37e944cabb7e59e4df447e541318eebe8445425ccd4f9f7a502afeb100d"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-shared-proof-cache.mjs",
+        "source": "addons/rba-connect4-shared-proof-cache.mjs",
+        "sha256": "6c735a7f0ae1c81f3620d84725efc85ff81cd1606b100420cbf6203db722a6f4",
+        "lockedSha256": "6c735a7f0ae1c81f3620d84725efc85ff81cd1606b100420cbf6203db722a6f4",
+        "sourceBlob": "fd63d791c2b73e66ba36196a003d9f866ea15774",
+        "sourceLineCount": 16,
+        "frozenSourceSha256": "6c735a7f0ae1c81f3620d84725efc85ff81cd1606b100420cbf6203db722a6f4"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-support-basis-plan.mjs",
+        "source": "addons/rba-connect4-support-basis-plan.mjs",
+        "sha256": "9e54c57dd702ebdd4322bfb33b415111010c86778b0a7defac853ac609e21e52",
+        "lockedSha256": "9e54c57dd702ebdd4322bfb33b415111010c86778b0a7defac853ac609e21e52",
+        "sourceBlob": "8252059ae2bb302a03086943c62777ec58954808",
+        "sourceLineCount": 127,
+        "frozenSourceSha256": "9e54c57dd702ebdd4322bfb33b415111010c86778b0a7defac853ac609e21e52"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-support-basis-view.mjs",
+        "source": "addons/rba-connect4-support-basis-view.mjs",
+        "sha256": "f5e9f648a9830dc6da5c68a973e2a0190a30d486b834f454544f55b6d23bc6cb",
+        "lockedSha256": "f5e9f648a9830dc6da5c68a973e2a0190a30d486b834f454544f55b6d23bc6cb",
+        "sourceBlob": "6db95fa569fa6bae9b8c75c4f986957f672237d9",
+        "sourceLineCount": 25,
+        "frozenSourceSha256": "f5e9f648a9830dc6da5c68a973e2a0190a30d486b834f454544f55b6d23bc6cb"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-support-compiled-transition.mjs",
+        "source": "addons/rba-connect4-support-compiled-transition.mjs",
+        "sha256": "44f2e6f9acc3d275eb4b70dd178177c7fb52fd058f190da81da6562f849ea66c",
+        "lockedSha256": "44f2e6f9acc3d275eb4b70dd178177c7fb52fd058f190da81da6562f849ea66c",
+        "sourceBlob": "aed73f999e352d43b85ddd00b39f4640771045ba",
+        "sourceLineCount": 43,
+        "frozenSourceSha256": "44f2e6f9acc3d275eb4b70dd178177c7fb52fd058f190da81da6562f849ea66c"
+      },
+      {
+        "path": "runtime/addons/rba-connect4-support-handle-view.mjs",
+        "source": "addons/rba-connect4-support-handle-view.mjs",
+        "sha256": "f99a535a9079697943772fd9ff01bd826bf1d77011cd78812ddc6e88a1ffc216",
+        "lockedSha256": "f99a535a9079697943772fd9ff01bd826bf1d77011cd78812ddc6e88a1ffc216",
+        "sourceBlob": "cb06747652f9dae5b75d1fe2658ecf5e478ebb3d",
+        "sourceLineCount": 18,
+        "frozenSourceSha256": "f99a535a9079697943772fd9ff01bd826bf1d77011cd78812ddc6e88a1ffc216"
+      },
+      {
+        "path": "runtime/addons/worker-affinity.mjs",
+        "source": "addons/worker-affinity.mjs",
+        "sha256": "a7f84871bfeb6e7a6a681c0c4caab7f05960f46399d82fd30f4218d8fca2f600",
+        "lockedSha256": "a7f84871bfeb6e7a6a681c0c4caab7f05960f46399d82fd30f4218d8fca2f600",
+        "sourceBlob": "02b8d5f634e085fbbd6aac184dfd7263302f9e41",
+        "sourceLineCount": 89,
+        "frozenSourceSha256": "a7f84871bfeb6e7a6a681c0c4caab7f05960f46399d82fd30f4218d8fca2f600"
+      },
+      {
+        "path": "runtime/addons/worker-pinning.mjs",
+        "source": "addons/worker-pinning.mjs",
+        "sha256": "1f94834e9128b05c72b62e2fd1d66edd03c232065dfa284cdd76097700bf7cca",
+        "lockedSha256": "1f94834e9128b05c72b62e2fd1d66edd03c232065dfa284cdd76097700bf7cca",
+        "sourceBlob": "5591fc18ab77bb0cffe869f5f26b93e7351e32ba",
+        "sourceLineCount": 78,
+        "frozenSourceSha256": "1f94834e9128b05c72b62e2fd1d66edd03c232065dfa284cdd76097700bf7cca"
+      },
+      {
+        "path": "runtime/addons/worker-startup-affinity.mjs",
+        "source": "addons/worker-startup-affinity.mjs",
+        "sha256": "e96fcd4732c86551b2e0bbe0fccea864ab519900ecd8130b31e2e87e943ccb38",
+        "lockedSha256": "e96fcd4732c86551b2e0bbe0fccea864ab519900ecd8130b31e2e87e943ccb38",
+        "sourceBlob": "44450aa2dbc7b3c6e4b7a0e3134ec4419eff0169",
+        "sourceLineCount": 15,
+        "frozenSourceSha256": "e96fcd4732c86551b2e0bbe0fccea864ab519900ecd8130b31e2e87e943ccb38"
+      },
+      {
+        "path": "runtime/addons/worker-topology.mjs",
+        "source": "addons/worker-topology.mjs",
+        "sha256": "7ac82aed754da3a9878bf5a9afd78eb7ce07a4bcb78786e63a1d5be8d6de4955",
+        "lockedSha256": "7ac82aed754da3a9878bf5a9afd78eb7ce07a4bcb78786e63a1d5be8d6de4955",
+        "sourceBlob": "a9f6ab060091377a2df7f1c4d36d0520bfae4671",
+        "sourceLineCount": 93,
+        "frozenSourceSha256": "7ac82aed754da3a9878bf5a9afd78eb7ce07a4bcb78786e63a1d5be8d6de4955"
+      },
+      {
+        "path": "runtime/src/basis32.mjs",
+        "source": "src/basis32.mjs",
+        "sha256": "d39e5e8d7db0fdbfb894b78ecd0b36f31481e2e777caca08f577134e30bf6b51",
+        "lockedSha256": "d39e5e8d7db0fdbfb894b78ecd0b36f31481e2e777caca08f577134e30bf6b51",
+        "sourceBlob": "d717d864750e6129d3fde2e440fad3bef49342e9",
+        "sourceLineCount": 85,
+        "frozenSourceSha256": "d39e5e8d7db0fdbfb894b78ecd0b36f31481e2e777caca08f577134e30bf6b51"
+      },
+      {
+        "path": "runtime/src/relational32.mjs",
+        "source": "src/relational32.mjs",
+        "sha256": "ef28a812be3e1a5df695e67ced20168689f9b0887b83518aca2c857ea9581d3c",
+        "lockedSha256": "ef28a812be3e1a5df695e67ced20168689f9b0887b83518aca2c857ea9581d3c",
+        "sourceBlob": "6f3700558dc3f5418f6a77b93de885e7bde9efe7",
+        "sourceLineCount": 172,
+        "frozenSourceSha256": "ef28a812be3e1a5df695e67ced20168689f9b0887b83518aca2c857ea9581d3c"
+      },
+      {
+        "path": "runtime/src/widekey32.mjs",
+        "source": "src/widekey32.mjs",
+        "sha256": "81e11700ff71a38af021a21b8f9b59f80c4eb5508173c8ebbf3ee9aaefdf58c3",
+        "lockedSha256": "81e11700ff71a38af021a21b8f9b59f80c4eb5508173c8ebbf3ee9aaefdf58c3",
+        "sourceBlob": "390d3fabf2ecc1e4485754a94956582a3656b33f",
+        "sourceLineCount": 65,
+        "frozenSourceSha256": "81e11700ff71a38af021a21b8f9b59f80c4eb5508173c8ebbf3ee9aaefdf58c3"
+      },
+      {
+        "path": "runtime/src/word32.mjs",
+        "source": "src/word32.mjs",
+        "sha256": "f0b27429d7120362eedda5c6e48201e0b698da26b57848f547baa97ece2a2c33",
+        "lockedSha256": "f0b27429d7120362eedda5c6e48201e0b698da26b57848f547baa97ece2a2c33",
+        "sourceBlob": "e486bce7496e02c74e7e2b4d92995fe941ebc359",
+        "sourceLineCount": 71,
+        "frozenSourceSha256": "f0b27429d7120362eedda5c6e48201e0b698da26b57848f547baa97ece2a2c33"
+      },
+      {
+        "path": "runtime/src/word64x32.mjs",
+        "source": "src/word64x32.mjs",
+        "sha256": "ca59372f9f74b8272c0d24d2221899fb1b075334198ca14b54997e578ed49985",
+        "lockedSha256": "ca59372f9f74b8272c0d24d2221899fb1b075334198ca14b54997e578ed49985",
+        "sourceBlob": "8d431f37c08c70b1b74625104ef7e945548172df",
+        "sourceLineCount": 238,
+        "frozenSourceSha256": "ca59372f9f74b8272c0d24d2221899fb1b075334198ca14b54997e578ed49985"
+      },
+      {
+        "path": "runtime/tools/benchmark-v8-startup-preload.mjs",
+        "source": "tools/benchmark-v8-startup-preload.mjs",
+        "sha256": "3900df3b51e8cad5b309441f50a6d659650eb4a5c712d86c0cecfae2972ad2e7",
+        "lockedSha256": "3900df3b51e8cad5b309441f50a6d659650eb4a5c712d86c0cecfae2972ad2e7",
+        "sourceBlob": "b2cfc3f62825b40a9b146918e4461243be51a9df",
+        "sourceLineCount": 8,
+        "frozenSourceSha256": "3900df3b51e8cad5b309441f50a6d659650eb4a5c712d86c0cecfae2972ad2e7"
+      },
+      {
+        "path": "runtime/tools/worker-affinity-preload.mjs",
+        "source": "tools/worker-affinity-preload.mjs",
+        "sha256": "02105fdf5204ef91434fe9ef2358ebc8ef953b87188b33dbf7705d65493d651f",
+        "lockedSha256": "02105fdf5204ef91434fe9ef2358ebc8ef953b87188b33dbf7705d65493d651f",
+        "sourceBlob": "92c94f8eab536f1e15f161b06efa703b8df5a58f",
+        "sourceLineCount": 15,
+        "frozenSourceSha256": "02105fdf5204ef91434fe9ef2358ebc8ef953b87188b33dbf7705d65493d651f"
+      }
+    ]
+  },
+  "currentLedger": {
+    "sha256": "80c0b91b342511d5c38d6fdc2de618d85b34b09e00c1979c4040d117b333bdcd",
+    "units": 642,
+    "reachableDeclaredUnits": 168,
+    "activeCompiledRootsReachable": 0
+  },
+  "coverage": {
+    "workerSources": [
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs",
+        "sourceBlob": "b48ddd8d1cfa9db7e0ce911293f129d3c60fa44c",
+        "sha256": "e89ad77d21439c0d4c6e993cd1f0f2b5ef24a92b9ff29d05b5a132427262159e",
+        "lines": 271,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs",
+        "sourceBlob": "da851562e96dc4823fe9bb311e2bca77c70c0452",
+        "sha256": "4a77b20cdf23367447b13bb520184f2ca1a5ebd9e442c58b827798d937da6ddf",
+        "lines": 275,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs",
+        "sourceBlob": "d7151cab0a427680bf1a1800e6341c09e2d273a7",
+        "sha256": "f0347972d5f93b4dc456031b8712f247bf84443597674df642c120ff75280763",
+        "lines": 295,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs",
+        "sourceBlob": "90e48441b68aaa64ae317a59030a6dfd1ee2b07e",
+        "sha256": "befba775063b346543724cc4d948c4250d20d9d7ddfed293faff89cfc962c6c5",
+        "lines": 291,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs",
+        "sourceBlob": "1625f23084183f256debc4da098e9218973cdbc2",
+        "sha256": "2030ee1f24cd1a23b829d94440550a9dfdc8ba9ef48376e0edef48a1d4bff666",
+        "lines": 288,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs",
+        "sourceBlob": "e363a0a7f45140343d22a304315155bbb8684972",
+        "sha256": "1723a4e9ff87302609c4db9851340989fe957c66db40fb7b2c400ec89caf4acb",
+        "lines": 292,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs",
+        "sourceBlob": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
+        "sha256": "66ebe61d68d9597c400dc07026b90708942e58d489a5ec614b7b1a650e295d07",
+        "lines": 312,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-local32.mjs",
+        "sourceBlob": "600af67825dcb49465377ca925255178f0747bf9",
+        "sha256": "5195677db91d1104a975b1a36016825f04718a03d78869224d51fa9357f9f990",
+        "lines": 273,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs-local32.mjs",
+        "sourceBlob": "26fe8951361b3750051c02a6262decaf3d4ab929",
+        "sha256": "a6d7cb7d13fd13d24a387647686928f4b6bae5dd96cee9c95c542f0a8159be53",
+        "lines": 277,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-center-proofs.mjs",
+        "sourceBlob": "b84ff4409df86357b1d37bbfac297f017a9fe42c",
+        "sha256": "95e0e5e1bbfae2c93e2f68fc222448d9f0fe9609b8dfc40e1184e30ba38af5c2",
+        "lines": 292,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-center.mjs",
+        "sourceBlob": "a6179cfb9f5d18106886d83e682f5b0145dd789a",
+        "sha256": "f9ccafaaf60690f1d1650c2c21e95f5b76eb63b928e0920fa9e04f7091d36d6d",
+        "lines": 288,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs",
+        "sourceBlob": "d49de24b75fbe159325727b87cbca1a56adf5a44",
+        "sha256": "84c132454a730570f702165195d876034d7922bcacef22356ce125717c302f5e",
+        "lines": 264,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs",
+        "sourceBlob": "c48039624b89d46b643e331c3ba04f11f8f4fd01",
+        "sha256": "11f2ea44e45640b4f3150114d19103491c142b3dd2141bf2ac468f7a289d5f38",
+        "lines": 264,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs",
+        "sourceBlob": "03432a7f3394731f7580b09f0bd5cba8187fd569",
+        "sha256": "d4ebba308f42b5663d7ee85563b290110074524a189f50e8fffdd6011bc96092",
+        "lines": 271,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs",
+        "sourceBlob": "15ab51d162ae89a4d8186ea393bacbcb3673e252",
+        "sha256": "029a32ee6deed89ffb962d30768f8c8642fe6bc48d3a0d1b1c91e0a4d58a4d95",
+        "lines": 268,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "isolate1/3/5"
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs",
+        "sourceBlob": "a5c949a274349613e6fdb085a8800847b789238f",
+        "sha256": "afaf2d12b50e709fe39542dee38893a787bb662968816c6b5b6b810d41522a2a",
+        "lines": 268,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs",
+        "sourceBlob": "b4dbed40aacbdb0b8f4b2502af84967e8787202f",
+        "sha256": "742b0824e6967d126e6abee1434486078e3e647022df3557412b20a2e082450d",
+        "lines": 275,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs.mjs",
+        "sourceBlob": "444dd4fc9be267e1766107c26676a10d9f09106e",
+        "sha256": "7cd62e677186090b0bdb26765198090e1b32e3b6128fdb6743078e97a3cad0f7",
+        "lines": 290,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center.mjs",
+        "sourceBlob": "dfce661131bc1f4d6218852d5ab3b7716fd98ecd",
+        "sha256": "151000c75ed897fdcba882a4aa6594dda9eb4573de92f2ef2f19a0c721c8d516",
+        "lines": 286,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs",
+        "sourceBlob": "7acd968d588e66a52813b03fc9f2c8c785e1b0c8",
+        "sha256": "f9cccd09361d3254f17781c13c37e392b56d33b1158cfc090fc696de5e1b383a",
+        "lines": 281,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs",
+        "sourceBlob": "ef11244a984927cb817fba9f5286d643ddd22e51",
+        "sha256": "a9cbc07b7f10e2156a489bcc0913f6c255a732d5dd97734eac9598c58a154567",
+        "lines": 281,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs",
+        "sourceBlob": "1aa51d274eec188f3e015e9c91b5a2b45f2395f8",
+        "sha256": "923e7feb1530fe1cc63c7e47d1510015fa1bffd415ed2e78ac845303b5f9c55a",
+        "lines": 288,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs",
+        "sourceBlob": "912bf99d00198fd66775ed376db97ab12188a2cf",
+        "sha256": "7c70424eea212766213d4bcd225302663165bbb867ce160ae2562a2e8c15be9e",
+        "lines": 285,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "isolate2/4/6"
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs",
+        "sourceBlob": "7e55f5cba8d69269ed36cb3ddf30d2505edcc4e5",
+        "sha256": "a2cf28b71e219a7fc5d342df84b188e4b191ee5c1228385eb76bc567b42cb084",
+        "lines": 285,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs",
+        "sourceBlob": "fd85b26f7826e00644cd59f2a896f1974b8c745d",
+        "sha256": "7edfdb244293bded628fc4d7ab0546a79511249a90e5acf1bade0861597cab62",
+        "lines": 292,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs.mjs",
+        "sourceBlob": "e383cc038ace50431f114840269dac6fd58cd615",
+        "sha256": "d26607cc9cc4c53fa5dcc4afb3146db9d2d9ef9f840428e0c0c897b0ffc19b6f",
+        "lines": 307,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled.mjs",
+        "sourceBlob": "cf37c1f0de2f9d04c17213002dddf923fafdfe02",
+        "sha256": "d8f252cf8ea678ea5ef339650723eb6c90dd13a115742a1947e895da5a348584",
+        "lines": 303,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-local32.mjs",
+        "sourceBlob": "8c0fcaec712ad1c32e8db19ba5dd39a9e2f5b981",
+        "sha256": "b45db3e6df9ed68e9714ce1b9a8da6de23a9276f71cdc6b4a2f4edd22cd0edad",
+        "lines": 290,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs-local32.mjs",
+        "sourceBlob": "64e6d0ba42325eba9cb19d81e8199acc71595631",
+        "sha256": "cf894d63627b34e726cc58b80fd530e19cb0f76b6868637e75d866e71efb2d85",
+        "lines": 294,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views-proofs.mjs",
+        "sourceBlob": "3b6a1a772cb9beb19bb4c864081864fdfbe350bf",
+        "sha256": "0cb4598e77c3742213947178fe4b1d4dcba934bb937a7875ef9a45fff90ee2e5",
+        "lines": 309,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal-views.mjs",
+        "sourceBlob": "3dd1a46a705e3df921dc4c6ae1d1bc6a4add6d41",
+        "sha256": "3790b433de424a53abe0cf0a92761b648345a44f8b5907a4b5fb77f6cf03b834",
+        "lines": 305,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      },
+      {
+        "path": "addons/rba-connect4-lazy-smp-worker-minimal.mjs",
+        "sourceBlob": "6c95b0c55e7d411d63056e8ed7074b82b138fc96",
+        "sha256": "7b5fb2d1f89fabca3428b50cd48971e9603d4d8900eda2844dcd97adf7e6b029",
+        "lines": 308,
+        "review": "Full source review of hot recurrence, caches/publication, terminal/forced gates, support/reflection/live ownership; fallback variants included.",
+        "machineCoverage": "No fresh machine capture for this exact variant."
+      }
+    ],
+    "method": "Independent read-only hot/cold/ledger domains, primary reproductions and representative current machine-code validation. Hash inventory is not itself line-by-line or machine proof.",
+    "supportReview": [
+      "Compiled cofactor/child loader/closure",
+      "Prepared and dense cofactor/closure/support",
+      "Basis/support-handle/view/profile plans",
+      "Reflection/canonicalization and inverse construction",
+      "CPC win/response/matching/target/dense/pair-hub proof guards",
+      "Live-line evaluator/ordering and residual proof-frontier",
+      "Exact/index-partial/banked TT identity and atomic protocol",
+      "Ingress, managed lifecycle, discovery, affinity, memory profiles and package closure"
+    ],
+    "limitations": [
+      "Source review does not prove all-tier/all-OS allocation freedom.",
+      "Fresh assembly captures only two selected candidate policies.",
+      "Runtime-wide transitive cost enforcement remains defective.",
+      "No full10x10 solve or experimental16–128GiB allocation qualification."
+    ]
+  },
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36",
+    "cpu": "Intel Core i5-12600K",
+    "platform": "win32/x64",
+    "executable": "C:/r/isomax-nightly-runtime/node-v27.0.0-nightly20260928b59840b593-win-x64/node.exe",
+    "sha256": "2f2843c1802f6a17ba7fabe5550c90bb055c9bef8738a08338d94f71dbe91f29",
+    "flags": [
+      "--redirect-code-traces",
+      "--experimental-ffi",
+      "--max-inlined-bytecode-size=2400",
+      "--max-inlined-bytecode-size-cumulative=9600",
+      "--trace-opt",
+      "--trace-deopt",
+      "--trace-file-names",
+      "--trace-gc",
+      "--print-opt-code",
+      "--print-opt-code-filter=negamax",
+      "--import",
+      "file:///C:/r/c4-external-20261004/docs/qualification/20261006-nees-audit/diagnostic-preload.mjs",
+      "C:\\r\\c4-external-20261004\\docs\\qualification\\20261006-nees-audit\\diagnostic.mjs",
+      "C:\\r\\c4-external-20261004\\docs\\qualification\\20261006-nees-audit\\partial24-banked-code-gc-02\\summary.json"
+    ],
+    "workers": 6,
+    "affinity": [
+      {
+        "worker": 0,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 0,
+          "core": 0
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 0
+      },
+      {
+        "worker": 1,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 2,
+          "core": 1
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 2
+      },
+      {
+        "worker": 2,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 4,
+          "core": 2
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 4
+      },
+      {
+        "worker": 3,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 6,
+          "core": 3
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 6
+      },
+      {
+        "worker": 4,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 8,
+          "core": 4
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 8
+      },
+      {
+        "worker": 5,
+        "target": {
+          "platform": "win32",
+          "group": 0,
+          "processor": 10,
+          "core": 5
+        },
+        "verified": true,
+        "hintsApplied": false,
+        "affinityTagApplied": false,
+        "affinityTagStatus": null,
+        "group": 0,
+        "cpu": 10
+      }
+    ],
+    "sharedBytes": 12884901888,
+    "privateBytesPerWorker": 201326592,
+    "sharedBanks": 2,
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "sharedProofBounds": true,
+    "compiledTransitions": true,
+    "sourceHotCountersAdded": false,
+    "processCycles": null
+  },
+  "diagnostic": {
+    "directory": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02",
+    "performanceConclusionAllowed": false,
+    "result": "TIMEOUT after declared10s observation; six clean exits",
+    "gcAttribution": "Runtime GC observed; no causal per-site or steady-search allocation frequency established.",
+    "asm": [
+      {
+        "file": "code-31656-1.asm",
+        "latestHeaderLine": 18257,
+        "instructionBytes": 42192,
+        "allocatorSlowCallSites": 20,
+        "inlinedFunctions": 27,
+        "sha256": "0b7e13856a13752fe32993c9ec9b78f241d1be330a47d9d40604338b207e3d61"
+      },
+      {
+        "file": "code-31656-2.asm",
+        "latestHeaderLine": 687,
+        "instructionBytes": 45276,
+        "allocatorSlowCallSites": 20,
+        "inlinedFunctions": 30,
+        "sha256": "ef09f8dee12278521ca8fbe8fa9dbf20c1846b61c52003a70baf401610c21a24"
+      },
+      {
+        "file": "code-31656-3.asm",
+        "latestHeaderLine": 34396,
+        "instructionBytes": 40100,
+        "allocatorSlowCallSites": 17,
+        "inlinedFunctions": 26,
+        "sha256": "244b1329086f2c92f7eec078e19333c763a6957d71b4701339a97eb00a08ac88"
+      },
+      {
+        "file": "code-31656-4.asm",
+        "latestHeaderLine": 501,
+        "instructionBytes": 48112,
+        "allocatorSlowCallSites": 21,
+        "inlinedFunctions": 36,
+        "sha256": "2d4df03a6ac2a67ef3dd5d6b440575c9525fb01513d283821152e42823fcd729"
+      },
+      {
+        "file": "code-31656-5.asm",
+        "latestHeaderLine": 778,
+        "instructionBytes": 47300,
+        "allocatorSlowCallSites": 30,
+        "inlinedFunctions": 31,
+        "sha256": "bfb672039713a16dcb7cd71255b85ed0b17d186f0fde81c66be8c4fd611d53fa"
+      },
+      {
+        "file": "code-31656-6.asm",
+        "latestHeaderLine": 602,
+        "instructionBytes": 48564,
+        "allocatorSlowCallSites": 23,
+        "inlinedFunctions": 36,
+        "sha256": "7af6d61776f1b3581244e36c263edb815c09f15538a1d1c827b52b83d19dc1ef"
+      }
+    ],
+    "evidenceFiles": [
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/invocation.json",
+        "sha256": "f8aadceccb82ce5cf8d76dc5d717ac8932c56d306eb1d0909db952f33b88efae"
+      },
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/measurement.json",
+        "sha256": "37ed88fcd79d270f3738c8d80094293735227aab755d26fab1f79b98f4802134"
+      },
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/preflight-memory.json",
+        "sha256": "eba1951797efeab06e824cf27711b6d345285ecebe5800443c56e977ff89c4e6"
+      },
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/stderr.txt",
+        "sha256": "71e3a320133bdc9ac0cb38b2c46b1dfa23d91886cd4f7b054fd09647eeb097c8"
+      },
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/stdout.txt",
+        "sha256": "21d9e23557f98e07c9b131d240dae09b36040fa8b590ba51725bfbd0c35f5a29"
+      },
+      {
+        "path": "docs/qualification/20261006-nees-audit/partial24-banked-code-gc-02/summary.json",
+        "sha256": "012b13225f4acde1ee3671122de41961e63b7fd681076a8f34178be5f339a7a3"
+      }
+    ]
+  },
+  "inheritedValidation": "467/467 tests;26 independent oracle cases/1340 memo nodes;7 fresh complete exact empty7x6 multiworker solves at measured candidate; no new runtime diff.",
+  "auditArtifacts": [
+    {
+      "path": "REPORT.md",
+      "sha256": "56a9c021a4d2ea8f43e78e7d95d1d0515677498ac15414c5e2f86b6106b18ddd"
+    },
+    {
+      "path": "SCOPE.md",
+      "sha256": "6c3e32eeb785a6b32f7a8870db8a04d80560118a97b2b98841ce21a5c2b77ac6"
+    },
+    {
+      "path": "reproduce.mjs",
+      "sha256": "b1b0614bdc8041bad0ff2774b4ea3cadd282f3f0f1649996cf1335aa7a1e0a41"
+    },
+    {
+      "path": "reproduction.json",
+      "sha256": "d09a59ce0356a14c010a76e66b2c59390dd824aa8bd806aec687f421020c6947"
+    },
+    {
+      "path": "reproduction.txt",
+      "sha256": "01107a17e380ff1198aac5eab895b7c04e916eeba6a24585a122c75dbc9df706"
+    },
+    {
+      "path": "finalize.mjs",
+      "sha256": "8de83f6fa0c42a0b3ff138181502c362d16510b67c934054f8c37c58ea54673d"
+    },
+    {
+      "path": "rule-dispositions.json",
+      "sha256": "5f687b507da29c79bc56ace74f7e4b10a693009b587898316fe8759a60ffa996"
+    },
+    {
+      "path": "method-dispositions.json",
+      "sha256": "c051b56eed4540003c35afca3ad3ae556c4f18ddca20df20d67cb8328888f256"
+    },
+    {
+      "path": "debt.json",
+      "sha256": "b17fdd253b9a4b20039adec0873e4f3155dba2b0a464a3aeea231f63dc5a16da"
+    }
+  ],
+  "mutation": {
+    "solver": false,
+    "cpc": false,
+    "bsfp": false,
+    "package": false,
+    "defaults": false,
+    "main": false
+  }
+}

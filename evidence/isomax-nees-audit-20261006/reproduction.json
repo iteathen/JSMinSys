@@ -1,0 +1,528 @@
+{
+  "method": "Read-only declarations and reproduction of current flat graph resolver. Not a JavaScript AST graph or emitted-machine-cost proof.",
+  "auditHead": "c6f584a90e55851319225abce824f67f5adc5c82",
+  "current": {
+    "summary": {
+      "units": 642,
+      "decomposed": 642,
+      "legacySymbolicVisible": 0,
+      "missing": 0,
+      "neesBoundOperations": 11,
+      "localExtensionOperations": 105
+    },
+    "reachableUnits": 168,
+    "graphErrors": [],
+    "unboundCounts": [
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "IC",
+        "count": "IC"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "FS",
+        "count": "FS"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "OA",
+        "count": "OA"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "ERR",
+        "count": "ERR"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "IC",
+        "count": "IC"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "FS",
+        "count": "FS"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "OA",
+        "count": "OA"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "ERR",
+        "count": "ERR"
+      }
+    ],
+    "ambiguousOrAbsentCalls": 530,
+    "absentCalls": [
+      {
+        "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeBankedDirect32",
+        "target": "SELECTED_NATIVE_PROBE",
+        "matches": 0
+      },
+      {
+        "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeBankedDirect32",
+        "target": "SELECTED_NATIVE_STORE",
+        "matches": 0
+      }
+    ],
+    "nameMatches": {
+      "negamax": 32,
+      "probeCache": 32,
+      "storeExact": 32,
+      "localKeyMatches": 24,
+      "storeLocalEntry": 24
+    },
+    "compiledLocal32ModuleMains": [
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#<module-main>",
+        "reachable": false
+      }
+    ],
+    "targetlessCallbackExpressions": [
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/connect4-cpc-matching-response.mjs#prepareConnect4CpcMatchingResponse32",
+        "target": "cold-local-slot-identity",
+        "expression": "(1)*CALL(prepareConnect4CpcWin32)+(4)*C(runtime.typed_array.allocate)+(4)*C(runtime.array.from)+(4)*C(runtime.function.allocate)+(1)*C(runtime.object.allocate)+(1)*C(runtime.object.spread)+(5)*C(runtime.field.store)+(F)*C(runtime.field.load)+(4)*CALL(enumerateConnect4FrontierMatchings32)+(S16)*C(memory.store.u16)+(4)*C(memory.load.u8)+(READ)*C(memory.load.native_index)+(A)*C(alu.add.u32)+(SHIFT)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(4)*C(memory.store.u8)+(12)*C(runtime.callback)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#probeCache",
+        "target": "probeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#probeCache",
+        "target": "probeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#storeExact",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partial24.mjs#storeExact",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#probeCache",
+        "target": "probeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#probeCache",
+        "target": "probeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#storeExact",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#storeExact",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#storeBound",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partial24.mjs#storeBound",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#probeCache",
+        "target": "probeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#probeCache",
+        "target": "probeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#storeExact",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partial24.mjs#storeExact",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#probeCache",
+        "target": "probeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#probeCache",
+        "target": "probeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(P)*CALL(storeIndexPartial24Local32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#storeExact",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#storeExact",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartial24Local32)+((S)*(1-PARTIAL_BANKED))*C(runtime.callback)+((S)*PARTIAL_BANKED)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#storeBound",
+        "target": "storeIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partial24.mjs#storeBound",
+        "target": "storeBankedIndexPartial24Shared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartial24Local32)+(D)*CALL(storeIndexPartial24Local32)+(S)*CALL(storeIndexPartial24Local32)+(PUB)*CALL(transportConnect4ZeroBound32)+((PUB)*(1-PARTIAL_BANKED))*C(runtime.callback)+((PUB)*PARTIAL_BANKED)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#probeCache",
+        "target": "probeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32-partialMixed.mjs#storeExact",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#probeCache",
+        "target": "probeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#storeExact",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32-partialMixed.mjs#storeBound",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#probeCache",
+        "target": "probeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#storeExact",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#probeCache",
+        "target": "probeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(1)*C(alu.and.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(P)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(transportConnect4ZeroBound32)+(S)*C(alu.and.u32)+(1)*C(runtime.number.multiply)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#storeExact",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeIndexPartialMixedLocal32)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#storeBound",
+        "target": "storeIndexPartialMixedShared32",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(1)*CALL(probeIndexPartialMixedLocal32)+(D)*CALL(storeIndexPartialMixedLocal32)+(S)*CALL(storeIndexPartialMixedLocal32)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      }
+    ]
+  },
+  "frozen": {
+    "ref": "40b19431f00174c5d52c442677d67ec698e8c50a",
+    "ledgerGitBlob": "f697fe6bdf866a5f3be15ee86ec71b43c446801b",
+    "summary": {
+      "units": 563,
+      "decomposed": 563,
+      "legacySymbolicVisible": 0,
+      "missing": 0,
+      "neesBoundOperations": 11,
+      "localExtensionOperations": 105
+    },
+    "reachableUnits": 161,
+    "graphErrors": [],
+    "unboundCounts": [
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "IC",
+        "count": "IC"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "FS",
+        "count": "FS"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "OA",
+        "count": "OA"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#createConnect4RbaSharedLayoutCache32",
+        "term": "ERR",
+        "count": "ERR"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "IC",
+        "count": "IC"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "FS",
+        "count": "FS"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "OA",
+        "count": "OA"
+      },
+      {
+        "unit": "addons/rba-connect4-shared-exact-cache-layout.mjs#attachConnect4RbaSharedLayoutCache32",
+        "term": "ERR",
+        "count": "ERR"
+      }
+    ],
+    "ambiguousOrAbsentCalls": 434,
+    "absentCalls": [
+      {
+        "unit": "addons/rba-connect4-shared-banked-cache.mjs#probeBankedDirect32",
+        "target": "SELECTED_NATIVE_PROBE",
+        "matches": 0
+      },
+      {
+        "unit": "addons/rba-connect4-shared-banked-cache.mjs#storeBankedDirect32",
+        "target": "SELECTED_NATIVE_STORE",
+        "matches": 0
+      }
+    ],
+    "nameMatches": {
+      "negamax": 24,
+      "probeCache": 24,
+      "storeExact": 24,
+      "localKeyMatches": 24,
+      "storeLocalEntry": 24
+    },
+    "compiledLocal32ModuleMains": [
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs#<module-main>",
+        "reachable": false
+      },
+      {
+        "id": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs#<module-main>",
+        "reachable": false
+      }
+    ],
+    "targetlessCallbackExpressions": [
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u8)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-proofs-local32.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs#storeExact",
+        "target": "sharedStore",
+        "expression": "(1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*CALL(storeLocalEntry)+(S)*C(runtime.callback)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/rba-connect4-lazy-smp-worker-minimal-center-proofs-local32.mjs#storeBound",
+        "target": "sharedStore",
+        "expression": "(1)*C(memory.load.u32)+(T)*C(control.test.u32)+(B)*C(control.branch)+(K)*CALL(localKeyMatches)+(D)*CALL(storeLocalEntry)+(S)*CALL(storeLocalEntry)+(PUB)*CALL(transportConnect4ZeroBound32)+(PUB)*C(runtime.callback)+(PUB)*C(memory.load.u32)+(PUB)*C(alu.shr.u32)+(PUB+1)*C(alu.and.u32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(1)*C(runtime.number.multiply)+(STORES*THREE*ENABLED)*CALL(storeResidualProof3)+(STORES*(1-THREE)*ENABLED)*CALL(storeResidualProof32)"
+      },
+      {
+        "unit": "addons/connect4-cpc-matching-response.mjs#prepareConnect4CpcMatchingResponse32",
+        "target": "cold-local-slot-identity",
+        "expression": "(1)*CALL(prepareConnect4CpcWin32)+(4)*C(runtime.typed_array.allocate)+(4)*C(runtime.array.from)+(4)*C(runtime.function.allocate)+(1)*C(runtime.object.allocate)+(1)*C(runtime.object.spread)+(5)*C(runtime.field.store)+(F)*C(runtime.field.load)+(4)*CALL(enumerateConnect4FrontierMatchings32)+(S16)*C(memory.store.u16)+(4)*C(memory.load.u8)+(READ)*C(memory.load.native_index)+(A)*C(alu.add.u32)+(SHIFT)*C(alu.shl.u32)+(4)*C(alu.shr.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(4)*C(memory.store.u8)+(12)*C(runtime.callback)"
+      }
+    ]
+  },
+  "packageResult": {
+    "lockedFiles": 154,
+    "ledgerOrAuthorityLocks": [],
+    "coveredAddonFiles": 70,
+    "uncovered": [],
+    "mismatches": [],
+    "frozenWorkerCount": 24,
+    "frozenWorkerRootsInLedger": 24,
+    "frozenWorkerRootsReachable": 0
+  },
+  "publicationCheck": {
+    "source": "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs",
+    "sourceAtomicStoresInCompletionBranch": 5,
+    "ledgerAtomicStores": [
+      {
+        "op": "atomic.store.u32",
+        "count": 4
+      }
+    ],
+    "testDescription": "Center-shell construction, root terminal, move/reflection and winner predicates; CANCELLED sentinel handling is removed. Includes one cold dense-table predicate. Includes root immediate-win branch."
+  },
+  "badRegexMatchesOrdinaryTerms": false
+}

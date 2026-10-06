@@ -12,12 +12,15 @@ source structure, accounting, artifacts, runtime realization and performance.
   Local authority: `C:/r/NEES-isomax-rebuild-ref`.
 - JSMinSys local profile: `SPEC.md`, including JMS-NEES/COST/DATA rules and
   restricted/transitive enforcement. No JMS-SEALED whole-runtime claim assumed.
-- Producer audit head: `5cbc567b327bb0f7e780ae5414ce761b1cf4a1f8` on
+- Producer initial planning head: `5cbc567b327bb0f7e780ae5414ce761b1cf4a1f8` on
   `work/isomax-auto-workers-20261006`.
 - Actual measured partial24/banked runtime:
   `6bc1dd047209664f9924c4cb49597a2154555107`; producer head changes docs only.
-- Consumer audit head: `87018ae7f01943b081202b1acf45f03e56438ca8` on the same
+- Consumer initial planning head: `87018ae7f01943b081202b1acf45f03e56438ca8` on the same
   branch name in `iteathen/Connect4`.
+- Diagnostic observations later used producer `c6f584a90e55851319225abce824f67f5adc5c82`
+  and consumer harness `919856663dcde038a9847594a40916f080946351`;
+  `REPORT.md` and `manifest.json` distinguish these from the planning heads.
 - Frozen production package0.2.0-rc.4 source:
   `40b19431f00174c5d52c442677d67ec698e8c50a`,154 locked files/77 runtime modules.
   The24-byte candidate is not the production package/default/main.

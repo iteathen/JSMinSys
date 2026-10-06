@@ -1,0 +1,28 @@
+{
+  "kind": "Read-only audit verification",
+  "sourceObservationHead": "c6f584a90e55851319225abce824f67f5adc5c82",
+  "runtimeCandidate": "6bc1dd047209664f9924c4cb49597a2154555107",
+  "runtime": "v27.0.0-nightly20260928b59840b593 / V8 14.6.202.34-node.36",
+  "checks": [
+    {
+      "command": "node tools/verify-catalog.mjs",
+      "exitCode": 0,
+      "output": "JSMinSys catalog verified: 298 sealed functions + 642 add-on units cycle-ledgered, 30/30 blocks complete, 0 deferred function(s).",
+      "interpretation": "Pass reproduces existing checker behavior; confirmed enforcement/accounting gaps remain."
+    },
+    {
+      "command": "node isomax/verify.mjs",
+      "exitCode": 0,
+      "output": "Verified 154 locked files and self-contained runtime/public launchers.",
+      "interpretation": "Frozen production package identity/import closure, not full NEES graph coverage."
+    },
+    {
+      "command": "git diff 6bc1dd047209664f9924c4cb49597a2154555107 -- addons src",
+      "exitCode": 0,
+      "output": "",
+      "interpretation": "No measured-runtime source change during audit."
+    }
+  ],
+  "inheritedCorrectness": "467/467 tests, 26 independent oracle cases, seven complete exact multiworker empty7x6 runs; no runtime changes requiring a repeated full suite.",
+  "freshDiagnostic": "Two intentional10s observations; no WDL promotion; both six ready/pinned workers and six clean exits."
+}
