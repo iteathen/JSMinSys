@@ -2,14 +2,22 @@
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {queryWindowsTopology} from './worker-affinity.mjs';
+import {queryWindowsAllowedGroups} from './worker-pinning.mjs';
 
-export function windowsWorkerPlan(topology){
+export function windowsWorkerPlan(topology,allowedGroups=null){
  if(!Array.isArray(topology?.cores)||!topology.cores.length)throw Error('CPU topology contains no physical cores');
  const classes=topology.cores.map(c=>c.efficiency);
  if(classes.some(c=>!Number.isInteger(c)||c<0||c>255))throw Error('Invalid CPU efficiency class');
  const maximum=Math.max(...classes),hybrid=classes.some(c=>c!==maximum),
-  performanceCores=classes.filter(c=>c===maximum).length;
- return {workers:performanceCores,physicalCores:classes.length,performanceCores,
+  eligible=topology.cores.filter(c=>allowedGroups===null||c.groups.some(g=>allowedGroups.some(a=>a.group===g.group&&(BigInt(a.mask)&BigInt(g.mask))!==0n))),
+  targets=eligible.filter(c=>c.efficiency===maximum).map(c=>{
+   for(const g of c.groups){
+    const allowed=allowedGroups===null?BigInt(g.mask):BigInt(g.mask)&BigInt(allowedGroups.find(a=>a.group===g.group)?.mask??0);
+    for(let processor=0;processor<64;processor++)if(allowed&(1n<<BigInt(processor)))return {platform:'win32',group:g.group,processor,core:c.core};
+   }
+   throw Error('Physical core has no allowed CPU');
+  }),performanceCores=targets.length;
+ return {workers:performanceCores,physicalCores:eligible.length,systemPhysicalCores:classes.length,performanceCores,targets,
   selection:hybrid?'performance-cores':'physical-cores',source:'Windows GetLogicalProcessorInformationEx'};
 }
 export function parseCpuList(text){
@@ -50,13 +58,16 @@ export function linuxWorkerPlan(read=path=>readFileSync(path,'utf8')){
   throw Error('Performance-core classification unavailable');
  }else if(rows.some(r=>r.capacity!==null)){
   if(rows.some(r=>r.capacity===null||!/^\d+\s*$/.test(r.capacity)||!Number.isSafeInteger(Number(r.capacity))||Number(r.capacity)<=0))throw Error('Incomplete CPU capacity classification');
-  const maximum=Math.max(...rows.map(r=>Number(r.capacity)));
+  const capacities=(online===null?allowed:parseCpuList(online)).map(cpu=>optionalTopologyFile(read,`/sys/devices/system/cpu/cpu${cpu}/cpu_capacity`));
+  if(capacities.some(c=>c===null||!Number.isSafeInteger(Number(c))||Number(c)<1))throw Error('Incomplete system CPU capacity classification');
+  const maximum=Math.max(...capacities.map(Number));
   selected=rows.filter(r=>Number(r.capacity)===maximum);
   selection=selected.length===rows.length?'physical-cores':'performance-cores';
  }
- const workers=new Set(selected.map(r=>r.core)).size;
+ const distinct=new Map();for(const row of selected)if(!distinct.has(row.core))distinct.set(row.core,{platform:'linux',cpu:row.cpu,core:row.core});
+ const targets=[...distinct.values()],workers=targets.length;
  if(selection!=='physical-cores-class-unreported')performanceCores=workers;
- return {workers,physicalCores,performanceCores,selection,source:'Linux sysfs physical topology and process affinity'};
+ return {workers,physicalCores,performanceCores,selection,targets,source:'Linux sysfs physical topology and process affinity'};
 }
 export function darwinWorkerPlan(read=key=>execFileSync('/usr/sbin/sysctl',['-n',key],{encoding:'utf8',timeout:5000,stdio:['ignore','pipe','ignore']})){
  let levels;try{levels=read('hw.nperflevels').trim();}catch{levels='';}
@@ -74,7 +85,7 @@ export function darwinWorkerPlan(read=key=>execFileSync('/usr/sbin/sysctl',['-n'
 }
 export async function discoverWorkerPlan(){
  let plan;
- if(process.platform==='win32')plan=windowsWorkerPlan(await queryWindowsTopology());
+ if(process.platform==='win32')plan=windowsWorkerPlan(await queryWindowsTopology(),await queryWindowsAllowedGroups());
  else if(process.platform==='linux')plan=linuxWorkerPlan();
  else if(process.platform==='darwin')plan=darwinWorkerPlan();
  else throw Error(`CPU topology discovery is unsupported on ${process.platform}; supply an explicit worker count`);
