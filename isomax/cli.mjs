@@ -3,7 +3,7 @@ import {performance} from 'node:perf_hooks';
 import {readFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry,prepareLazySmpConnect4Rba32,profile} from './index.mjs';
 const args=process.argv.slice(2),v={columns:7,rows:6,workers:'auto','timeout-ms':600000,'shared-entries':profile.options.sharedCacheCapacity,'local-entries':profile.options.localCacheCapacity};
-if(args.includes('--help'))console.log('IsoMax exact empty-board solve. Workers default to discovered physical performance cores.\nnode run.mjs [--workers auto|N] [--columns N] [--rows N] [--timeout-ms N] [--shared-entries N] [--local-entries N]\nDefaults:7x6,4GiB shared TT,256MiB private TT/worker. Node>=26; no installation needed.');
+if(args.includes('--help'))console.log('IsoMax exact empty-board solve. Workers default to discovered physical performance cores.\nnode run.mjs [--workers auto|N] [--columns N] [--rows N] [--timeout-ms N] [--shared-entries N] [--local-entries N]\nDefaults:7x6,4GiB shared TT,256MiB private TT/worker. Node>=26.7; no installation needed.');
 else try{
  for(let i=0;i<args.length;i+=2){const k=args[i].replace(/^--/,'');if(!args[i].startsWith('--')||!Object.hasOwn(v,k))throw Error('Invalid option: '+args[i]);if(k==='workers'&&args[i+1]==='auto'){v[k]='auto';continue;}if(!/^\d+$/.test(args[i+1]??''))throw Error('Invalid option: '+args[i]);v[k]=Number(args[i+1]);if(!Number.isSafeInteger(v[k])||v[k]<1)throw Error('Invalid positive integer: '+k);}
  const started=performance.now(),geometry=prepareConnect4RbaGeometry({columns:v.columns,rows:v.rows}),app=await prepareLazySmpConnect4Rba32({geometry,workers:v.workers,timeoutMs:v['timeout-ms'],sharedCacheCapacity:v['shared-entries'],localCacheCapacity:v['local-entries']});

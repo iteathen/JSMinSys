@@ -4,7 +4,7 @@ import {mkdirSync,writeFileSync,readFileSync,existsSync,unlinkSync,readdirSync} 
 import {dirname,posix} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-const root=fileURLToPath(new URL('./',import.meta.url)),source='a02bc4946d741e4aaacc30802aeb850fa8c59a95',check=process.argv.includes('--check'),
+const root=fileURLToPath(new URL('./',import.meta.url)),source='e6580e951c8318395446dd5916482efddc3d33fd',check=process.argv.includes('--check'),
  digest=s=>createHash('sha256').update(s).digest('hex'),normal=s=>s.replaceAll('\r\n','\n'),
  read=p=>normal(execFileSync('git',['show',source+':'+p],{cwd:root,encoding:'utf8',maxBuffer:32*1024*1024})),
  previous=JSON.parse(readFileSync(root+'provenance.json','utf8')),files={},seen=new Set(),workers=[];
@@ -26,7 +26,7 @@ function include(path){
 for(const family of ['','-views','-views-compiled'])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
  const p='addons/rba-connect4-lazy-smp-worker-minimal'+family+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'')+'.mjs';workers.push('runtime/'+p);include(p);
 }
-for(const p of ['addons/rba-connect4-prepared-session-host.mjs','addons/rba-connect4-geometry.mjs','addons/connect4-rank-local-presearch.mjs','addons/worker-topology.mjs','tools/worker-affinity-preload.mjs','tools/benchmark-v8-startup-preload.mjs'])include(p);
+for(const p of ['addons/rba-connect4-prepared-session-host.mjs','addons/rba-connect4-geometry.mjs','addons/connect4-rank-local-presearch.mjs','addons/worker-topology.mjs','addons/worker-startup-affinity.mjs','tools/worker-affinity-preload.mjs','tools/benchmark-v8-startup-preload.mjs'])include(p);
 output('LICENSE',read('LICENSE'),'LICENSE');
 for(const p of ['C61-MEMORY-GRID.json','C66-CROSSOVER.json','fusion-final-confirm.json'])output('evidence/'+p,read('evidence/c4-inspired-optimization-20261005/'+p),'evidence/c4-inspired-optimization-20261005/'+p);
 for(const p of ['CURRENT-CHECKPOINT.md','FINAL-REVIEW.md','final-correctness-ci.json'])output('evidence/'+p,read('evidence/isomax-overhead-fusion-20261005/'+p),'evidence/isomax-overhead-fusion-20261005/'+p);

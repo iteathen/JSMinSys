@@ -16,7 +16,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false,workerTargets=null}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
@@ -27,6 +27,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(workerMode!=='minimal'||rootFrontier||behaviorMemory!==null||cpcFrontierResponse||cpcProjectedAdvisory)
     throw new TypeError('prepared application requires minimal workers without legacy options');
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
+  if(workerTargets!==null&&(!Array.isArray(workerTargets)||workerTargets.length!==workers))throw new RangeError('Invalid worker affinity target count');
   const compact=isCompactProfile8(geometry,geometry.keyWords),keyWords=compact?8:geometry.keyWords;
   if(localCacheLayout!=='split'&&localCacheLayout!=='native')throw new RangeError('invalid private TT layout');
   const localNative=localCacheLayout==='native'&&compact;
@@ -54,6 +55,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
     readyGate=new Int32Array(new SharedArrayBuffer(20)),
+    affinityState=workerTargets===null?null:new Int32Array(new SharedArrayBuffer(workers*3*4)),
     session=createManagedThreadSession32({control,stopIndex:STOP,doneIndex:DONE,errorIndex:ERROR,
       wakeIndex:WAKE,workerDiedCode:WORKER_DIED,deadlineCode:DEADLINE,cancelledCode:CANCELLED});
   control[WINNER]=-1;
@@ -75,7 +77,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed,basisViews,compiledTransitions};}
+    searchStarted:started,closed,basisViews,compiledTransitions,
+    affinityReady:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)>0).every(Boolean),
+    affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
   function materializePreparedConnect4SearchResult32(reflected=0){
     const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
       exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
@@ -102,8 +106,14 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
         boundary:'all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate'},
       errorCode,errors:host.errors,cleanup:host.cleanup,workersExited:host.workersExited,
       requestedWorkers:workers,workersUsed:session.threads.length,
+      workerAffinity:affinityState===null?null:Array.from({length:workers},(_,i)=>({worker:i,target:workerTargets[i],
+        verified:Atomics.load(affinityState,i*3)===1,hintsApplied:Atomics.load(affinityState,i*3)>1,
+        affinityTagApplied:Atomics.load(affinityState,i*3)===3,
+        affinityTagStatus:workerTargets[i].platform==='darwin'?Atomics.load(affinityState,i*3+1):null,
+        group:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+1),
+        cpu:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+2)})),
       sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):shared.entries.byteLength+shared.stats.byteLength)+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
-        control.byteLength+resultWords.byteLength+readyGate.byteLength+
+        control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
         (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
   }
   async function solvePreparedConnect4Search32(moves){
@@ -136,15 +146,20 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else shared.entries.fill(0);
-    for(let i=0;i<workers;i+=1)session.spawn(new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(compiledTransitions?'-views-compiled':'-views'):'')+
-      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url),{
+    for(let i=0;i<workers;i+=1){
+     const file=new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(compiledTransitions?'-views-compiled':'-views'):'')+
+      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url);
+     session.spawn(workerTargets===null?file:new URL('./worker-startup-affinity.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
-      root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate});
+      root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate,
+      workerAffinityTarget:workerTargets?.[i]??null,workerAffinityState:affinityState,workerModuleUrl:file.href});
+    }
     while(Atomics.load(readyGate,0)!==workers&&!closed&&!Atomics.load(control,ERROR)){
       if(performance.now()-initializationStarted>initializationTimeoutMs){session.fail(DEADLINE);break;}
       await new Promise(resolve=>setTimeout(resolve,5));
     }
     if(Atomics.load(control,ERROR)||closed)await closePreparedConnect4Search32();
+    if(affinityState!==null&&!closed&&!preparedConnect4SearchState32().affinityReady){session.fail(WORKER_DIED);await closePreparedConnect4Search32();}
     initializationFinished=performance.now();
     return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};
   }catch(error){await closePreparedConnect4Search32();throw error;}

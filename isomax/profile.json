@@ -1,6 +1,6 @@
 {
   "version": "0.2.0-rc.3",
-  "sourceCommit": "a02bc4946d741e4aaacc30802aeb850fa8c59a95",
+  "sourceCommit": "e6580e951c8318395446dd5916482efddc3d33fd",
   "options": {
     "workers": "auto",
     "workerMode": "minimal",
@@ -45,5 +45,5 @@
     "goalMs": 10000,
     "goalMet": false
   },
-  "notes": "Direct empty-board solve, no RLC. Dimension-dependent layout/fallback at init; compiled transitions use the retained 512MiB auxiliary budget when admitted. Mean is two C66 trials; final confirmation is separate. Unpinned portable timing is unqualified."
+  "notes": "Direct empty-board solve, no RLC. Defaults discover physical performance cores and apply verified hard affinity on Windows/Linux or documented scheduling hints on macOS. Dimension-dependent layout and compiled 512MiB auxiliary budget remain unchanged. Historical four-worker timings do not qualify the automatic hardware-dependent configuration."
 }

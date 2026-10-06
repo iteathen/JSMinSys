@@ -4,7 +4,7 @@ Start here. This folder contains the current promoted solver, its configuration,
 
 ## Setup and run
 
-Install Node 26 or later. From this folder:
+Install Node 26.7 or later. From this folder:
 
 ```sh
 node verify.mjs
@@ -16,15 +16,19 @@ The last command solves the **empty 7×6 board**, discovering the worker count d
 
 Windows x64/ARM64 uses `GetLogicalProcessorInformationEx` and its efficiency classes; a homogeneous CPU uses all physical cores. The portable launcher enables the required experimental Node FFI support on Windows. Linux groups SMT siblings, intersects the process CPU allowance with online CPUs, and uses Intel hybrid PMU or ARM capacity data when available. If Linux does not expose core classes, the output explicitly reports `physical-cores-class-unreported` and `performanceCores: null`; only the physical count is known. macOS uses `hw.perflevel0.physicalcpu` for its highest performance tier and `hw.physicalcpu` on homogeneous machines.
 
-Each result includes `workerPlan`, its discovery source and the actual numeric worker count. Unknown/corrupt topology is an error; it is not guessed from `os.cpus().length`. Use `--workers N` to select an explicit count, including on unsupported platforms. The current multiworker engine supports 2..64 workers; auto detection outside that range fails before solver allocation. Discovery does not pin threads: the portable path uses OS scheduling. There is one launcher for every supported machine; no i5-specific launcher or fixed worker default.
+Each result includes `workerPlan`, its discovery source and the actual numeric worker count. Unknown/corrupt topology is an error; it is not guessed from `os.cpus().length`. Use `--workers N` for an explicit experiment with an available count; it cannot exceed the number of discovered physical targets. The current multiworker engine supports 2..64 workers; auto detection outside that range fails before solver allocation. There is one launcher for every supported machine; no i5-specific launcher or fixed worker default.
+
+Windows and Linux bind each worker to a distinct selected physical core and verify the exact thread CPU mask before loading its solver module or allocating its private TT. Windows honors a visible partial process mask; an unrestricted initial processor-group assignment does not hide other active groups. Each binding is the final OS acceptance check. Linux respects process CPU allowance and online CPUs. A rejected or unverified binding fails initialization and closes the workers; search does not start.
+
+**macOS warning:** Apple exposes scheduling hints, not supported hard CPU pinning. Each worker receives user-initiated QoS, verified by the pthread QoS readback, and a distinct Mach affinity tag where supported. Apple Silicon may reject Mach affinity tags; QoS still applies. These hints do **not** guarantee placement on a particular core or even continuous P-core residency. `workerPlan.affinityPolicy` is `macos-hints`, and each `result.workerAffinity` record has `verified: false`, `hintsApplied: true`, and no claimed CPU ID. Windows/Linux records instead show verified CPU IDs. This macOS exception was explicitly requested by the owner.
 
 ```sh
 node run.mjs --workers 4
 ```
 
-The recorded **four-worker** i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**, with observed peak RSS **6.44 GiB**. These historical timings do not qualify an automatically selected worker count. Initialization and cleanup are reported separately. The 10-second objective remains unmet. Normal portable execution is unpinned and has no timing qualification.
+The recorded **four-worker** i5-12600K candidate trials average **53.828 seconds** from all workers ready/empty TT initialized through actual empty-root construction and exact result. A final source confirmation took **54.156 seconds**, with observed peak RSS **6.44 GiB**. These historical timings do not qualify an automatically selected worker count. Initialization and cleanup are reported separately. The 10-second objective remains unmet. The new portable configuration has no full-solve timing qualification.
 
-Historical benchmark invocations retain the exact runtime, four-worker count and affinity used for those records. They are evidence, not startup defaults. Automatic worker selection has correctness checks on Windows, Linux and macOS; its full-solve timing is unqualified.
+Historical benchmark invocations retain the exact runtime, four-worker count and affinity used for those records. They are evidence, not startup defaults. The automatic worker count and affinity policy have separate platform correctness checks; their full-solve timing is unqualified.
 
 ## Change board dimensions
 
@@ -59,7 +63,7 @@ try {
 
 Preparation owns all worker creation, table allocation and the all-ready barrier. Search starts only at solve(). The prepared object is one-shot; close idle applications. rootWdl is first-player-relative(-1/0/+1), move is zero-based, and -1 means no move. Check status before consuming an answer. The module's runLazySmpConnect4Rba32 convenience function prepares/solves/closes once. Embedders must supply the documented JIT flags and startup preload at process launch to reproduce the retained compiler configuration.
 
-The optional exported rank-local calculator remains separate; using it changes the execution being measured. Diagnostic counters remain unavailable; no reporting or CPU discovery is added to search hot loops. Windows embedders invoking the automatic API directly must launch Node with `--experimental-ffi`; explicit worker overrides do not require discovery.
+The optional exported rank-local calculator remains separate; using it changes the execution being measured. Diagnostic counters remain unavailable; no reporting or CPU discovery is added to search hot loops. Embedders must launch Node with `--experimental-ffi` for the cold OS affinity/hint API. `run.mjs` supplies this flag automatically.
 
 ## Contents
 

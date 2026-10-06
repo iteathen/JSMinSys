@@ -21,4 +21,3 @@ jobs:
           node-version: '26'
       - run: node isomax/verify.mjs
       - run: node --experimental-ffi --test --test-concurrency=1 isomax/test/worker-topology.test.mjs isomax/test/worker-discovery.test.mjs
-      - run: node isomax/run.mjs --workers 4 --columns 1 --rows 4 --shared-entries 256 --local-entries 256

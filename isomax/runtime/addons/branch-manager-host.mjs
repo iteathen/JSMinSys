@@ -66,7 +66,7 @@ export class ManagedThreadSession {
     this.workerDiedCode=workerDiedCode;
     this.deadlineCode=deadlineCode;
     this.cancelledCode=cancelledCode;
-    this.execArgv=filterFileWorkerExecArgv32(execArgv);
+    this.execArgv=filterFileWorkerExecArgv32(execArgv)??(execArgv===process.execArgv?undefined:execArgv);
     this.threads=[];
     this.exits=[];
     this.errors=[];
