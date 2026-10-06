@@ -77,7 +77,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed,basisViews,compiledTransitions,affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
+    searchStarted:started,closed,basisViews,compiledTransitions,
+    affinityReady:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)>0).every(Boolean),
+    affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
   function materializePreparedConnect4SearchResult32(reflected=0){
     const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
       exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
@@ -104,7 +106,11 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
         boundary:'all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate'},
       errorCode,errors:host.errors,cleanup:host.cleanup,workersExited:host.workersExited,
       requestedWorkers:workers,workersUsed:session.threads.length,
-      workerAffinity:affinityState===null?null:Array.from({length:workers},(_,i)=>({worker:i,target:workerTargets[i],verified:Atomics.load(affinityState,i*3)===1,group:Atomics.load(affinityState,i*3+1),cpu:Atomics.load(affinityState,i*3+2)})),
+      workerAffinity:affinityState===null?null:Array.from({length:workers},(_,i)=>({worker:i,target:workerTargets[i],
+        verified:Atomics.load(affinityState,i*3)===1,hintsApplied:Atomics.load(affinityState,i*3)>1,
+        affinityTagApplied:Atomics.load(affinityState,i*3)===3,
+        group:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+1),
+        cpu:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+2)})),
       sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):shared.entries.byteLength+shared.stats.byteLength)+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
         control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
         (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
@@ -152,7 +158,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       await new Promise(resolve=>setTimeout(resolve,5));
     }
     if(Atomics.load(control,ERROR)||closed)await closePreparedConnect4Search32();
-    if(affinityState!==null&&!closed&&!preparedConnect4SearchState32().affinityVerified){session.fail(WORKER_DIED);await closePreparedConnect4Search32();}
+    if(affinityState!==null&&!closed&&!preparedConnect4SearchState32().affinityReady){session.fail(WORKER_DIED);await closePreparedConnect4Search32();}
     initializationFinished=performance.now();
     return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};
   }catch(error){await closePreparedConnect4Search32();throw error;}

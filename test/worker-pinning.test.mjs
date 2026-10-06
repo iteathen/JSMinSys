@@ -12,7 +12,7 @@ test('Linux targets use allowed online siblings and never choose an E core',()=>
  const p=linuxWorkerPlan(path=>{if(Object.hasOwn(data,path))return data[path];const e=Error();e.code='ENOENT';throw e;});
  assert.deepEqual(p.targets.map(t=>t.cpu),[1,3]);
 });
-test('affinity primitive exists and rejects unsupported pinning',async()=>{
- assert.equal(typeof pinning.bindVerifiedWorkerCpu,'function');
- await assert.rejects(()=>pinning.bindVerifiedWorkerCpu({platform:'darwin',cpu:0}),/macOS.*hard|unsupported/i);
+test('affinity primitive exists and rejects unsupported platforms',async()=>{
+ assert.equal(typeof pinning.configureCurrentWorkerAffinity,'function');
+ await assert.rejects(()=>pinning.configureCurrentWorkerAffinity({platform:'unsupported',cpu:0}),/unsupported/i);
 });

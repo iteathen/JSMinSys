@@ -24,9 +24,9 @@ export async function queryWindowsAllowedGroups(){
   return Array.from({length:count.readUInt16LE(0)},(_,i)=>({group:ids.readUInt16LE(i*2),mask:'18446744073709551615'}));
  }finally{lib.close();}
 }
-export async function bindVerifiedWorkerCpu(target){
- if(target?.platform==='darwin')throw Error('macOS does not support verified hard CPU pinning');
+export async function configureCurrentWorkerAffinity(target){
  if(target?.platform!==process.platform)throw Error('Unsupported worker pinning platform');
+ if(process.platform==='darwin')return applyMacWorkerHints(target);
  if(process.platform==='win32'){
   const actual=await bindCurrentThread(target);
   return {platform:'win32',group:actual.group,cpu:actual.processor,verified:true};
@@ -51,5 +51,22 @@ export async function bindVerifiedWorkerCpu(target){
   requested[offset]=bit;
   if(set(0,length,requested)!==0||get(0,length,actual)!==0||!requested.equals(actual))throw Error('Linux CPU pinning was not accepted exactly');
   return {platform:'linux',group:0,cpu:target.cpu,verified:true};
+ }finally{lib.close();}
+}
+export async function applyMacWorkerHints(target){
+ if(process.platform!=='darwin'||!Number.isInteger(target.affinityTag)||target.affinityTag<1||target.affinityTag>2147483647)throw Error('Invalid macOS scheduling hint');
+ const {DynamicLibrary}=await import('node:ffi'),lib=new DynamicLibrary('/usr/lib/libSystem.B.dylib');
+ try{
+  const self=lib.getFunction('pthread_self',{arguments:[],return:'pointer'}),
+   mach=lib.getFunction('pthread_mach_thread_np',{arguments:['pointer'],return:'uint32'}),
+   qosSet=lib.getFunction('pthread_set_qos_class_self_np',{arguments:['uint32','int32'],return:'int32'}),
+   qosGet=lib.getFunction('pthread_get_qos_class_np',{arguments:['pointer','buffer','buffer'],return:'int32'}),
+   affinity=lib.getFunction('thread_policy_set',{arguments:['uint32','int32','buffer','uint32'],return:'int32'}),
+   thread=self(),policy=Buffer.alloc(4),qos=Buffer.alloc(4),priority=Buffer.alloc(4);
+  policy.writeInt32LE(target.affinityTag);
+  const affinityCode=affinity(mach(thread),4,policy,1);
+  if(qosSet(0x19,0)!==0)throw Error('macOS rejected user-initiated QoS');
+  if(qosGet(thread,qos,priority)!==0||qos.readUInt32LE(0)!==0x19)throw Error('macOS did not accept the scheduling hint');
+  return {platform:'darwin',group:-1,cpu:-1,verified:false,hintsApplied:true,affinityTagApplied:affinityCode===0,affinityCode,qos:'user-initiated'};
  }finally{lib.close();}
 }

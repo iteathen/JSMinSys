@@ -45416,9 +45416,9 @@
       }
     },
     {
-      "unit": "addons/worker-pinning.mjs#bindVerifiedWorkerCpu",
+      "unit": "addons/worker-pinning.mjs#configureCurrentWorkerAffinity",
       "source": "addons/worker-pinning.mjs",
-      "name": "bindVerifiedWorkerCpu",
+      "name": "configureCurrentWorkerAffinity",
       "scope": "cold-worker-affinity-initialization",
       "status": "decomposed",
       "operations": [
@@ -45432,6 +45432,25 @@
         "kind": "symbolic",
         "expression": "C(runtime.cold.affinity)",
         "note": "Cold per-thread verified binding: Windows Set/GetThreadGroupAffinity or Linux sched_setaffinity/sched_getaffinity with native-word masks, inherited allowance checks and exact readback. Temporary buffers and FFI handles finish before application module load. No search-node work."
+      }
+    },
+    {
+      "unit": "addons/worker-pinning.mjs#applyMacWorkerHints",
+      "source": "addons/worker-pinning.mjs",
+      "name": "applyMacWorkerHints",
+      "scope": "cold-worker-affinity-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold macOS FFI library/symbol setup, user-initiated pthread QoS set/readback, optional Mach affinity tag hint, and handle close. These are scheduling hints, never proof of CPU binding. Called once before application module/private TT initialization."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold macOS FFI library/symbol setup, user-initiated pthread QoS set/readback, optional Mach affinity tag hint, and handle close. These are scheduling hints, never proof of CPU binding. Called once before application module/private TT initialization."
       }
     },
     {
@@ -45455,8 +45474,8 @@
     }
   ],
   "summary": {
-    "units": 544,
-    "decomposed": 544,
+    "units": 545,
+    "decomposed": 545,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -45591,7 +45610,7 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "a83411e205d6f10506be35962a0bedd8e5ef57ce",
+    "addons/rba-connect4-prepared-session-host.mjs": "e201a3fbc70b0903bd15da394b36446ce67f98c8",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "4b1e8ec74bd37d1b9be52e4e3392ba38e53a4381",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "11d0cb15923a9d9c623268ec2db5e3d65dba271f",
@@ -45639,9 +45658,9 @@
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs": "f11346bb2a96baf353e3422229b9aea8b731d54b",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs": "6cd3c90586dd44d84c9be418562f486ed82389d3",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs": "40d1c3482bdec39dc8fafcef7377111d96c0646b",
-    "addons/worker-topology.mjs": "c2a0eb29b593976deadc925a3e263286b0bf6c9c",
-    "addons/worker-pinning.mjs": "2fd9a11fb2e519820b0b3429f7f62b4c460e76f4",
-    "addons/worker-startup-affinity.mjs": "053af23f08d9d8fadffae722ae12d8863f247b1e"
+    "addons/worker-topology.mjs": "9b44bdd6eef459b287989c05b40ace85ed198e72",
+    "addons/worker-pinning.mjs": "da70033fc36a010a46dfb7a795b1f76a31aab154",
+    "addons/worker-startup-affinity.mjs": "65d54c475ed31f5fed2013a529812b56bdce19ba"
   },
   "isomaxLocalKernel": {
     "profile": "node26-v8-14.6/x86_64-amd-zen3",

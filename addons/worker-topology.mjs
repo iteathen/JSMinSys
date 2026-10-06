@@ -77,11 +77,11 @@ export function darwinWorkerPlan(read=key=>execFileSync('/usr/sbin/sysctl',['-n'
  if(count>1){
   const cores=Array.from({length:count},(_,i)=>Number(read(`hw.perflevel${i}.physicalcpu`).trim()));
   if(cores.some(c=>!Number.isSafeInteger(c)||c<1))throw Error('Invalid physical core count');
-  return {workers:cores[0],physicalCores:cores.reduce((a,b)=>a+b,0),performanceCores:cores[0],selection:'performance-cores',source:'macOS hw.perflevel0.physicalcpu'};
+  return {workers:cores[0],physicalCores:cores.reduce((a,b)=>a+b,0),performanceCores:cores[0],targets:Array.from({length:cores[0]},(_,i)=>({platform:'darwin',affinityTag:i+1})),selection:'performance-cores',source:'macOS hw.perflevel0.physicalcpu'};
  }
  const workers=Number(read('hw.physicalcpu').trim());
  if(!Number.isSafeInteger(workers)||workers<1)throw Error('Invalid physical core count');
- return {workers,physicalCores:workers,performanceCores:workers,selection:'physical-cores',source:'macOS hw.physicalcpu'};
+ return {workers,physicalCores:workers,performanceCores:workers,targets:Array.from({length:workers},(_,i)=>({platform:'darwin',affinityTag:i+1})),selection:'physical-cores',source:'macOS hw.physicalcpu'};
 }
 export async function discoverWorkerPlan(){
  let plan;
