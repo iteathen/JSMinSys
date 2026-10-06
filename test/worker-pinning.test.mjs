@@ -16,3 +16,15 @@ test('affinity primitive exists and rejects unsupported platforms',async()=>{
  assert.equal(typeof pinning.configureCurrentWorkerAffinity,'function');
  await assert.rejects(()=>pinning.configureCurrentWorkerAffinity({platform:'unsupported',cpu:0}),/unsupported/i);
 });
+test('Windows allowance selects an available SMT sibling without reclassifying E cores',()=>{
+ const topology={cores:[{core:0,efficiency:1,groups:[{group:0,mask:'3'}]},{core:1,efficiency:0,groups:[{group:0,mask:'4'}]}]};
+ const p=windowsWorkerPlan(topology,[{group:0,mask:'6'}]);
+ assert.equal(p.workers,1);assert.equal(p.targets[0].processor,1);
+ assert.equal(windowsWorkerPlan(topology,[{group:0,mask:'4'}]).workers,0);
+});
+test('Linux capacity ranking uses system classes even when only E cores are allowed',()=>{
+ const files={'/proc/self/status':'Cpus_allowed_list:\t2-3\n','/sys/devices/system/cpu/online':'0-3'};
+ for(let i=0;i<4;i++){files[`/sys/devices/system/cpu/cpu${i}/topology/thread_siblings_list`]=String(i);files[`/sys/devices/system/cpu/cpu${i}/cpu_capacity`]=i<2?'1024':'512';}
+ const p=linuxWorkerPlan(path=>{if(Object.hasOwn(files,path))return files[path];const e=Error();e.code='ENOENT';throw e;});
+ assert.equal(p.workers,0);
+});

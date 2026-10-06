@@ -109,6 +109,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       workerAffinity:affinityState===null?null:Array.from({length:workers},(_,i)=>({worker:i,target:workerTargets[i],
         verified:Atomics.load(affinityState,i*3)===1,hintsApplied:Atomics.load(affinityState,i*3)>1,
         affinityTagApplied:Atomics.load(affinityState,i*3)===3,
+        affinityTagStatus:workerTargets[i].platform==='darwin'?Atomics.load(affinityState,i*3+1):null,
         group:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+1),
         cpu:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+2)})),
       sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):shared.entries.byteLength+shared.stats.byteLength)+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
