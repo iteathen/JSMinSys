@@ -1,9 +1,119 @@
-# Historical frozen IsoMax version
+# Current IsoMax package and historical versions
 
-The current prepared candidate is [the self-contained isomax package](../isomax/README.md).
-The promoted minimal-worker package is `0.2.0-rc.1`, with direct empty-board
-execution and a 56.893-second retained localhost mean. Its own profile/provenance
-is authoritative for setup. The remainder of this document preserves older evidence.
+The promoted package is **0.2.0-rc.2**, available together under
+[isomax/](../isomax/README.md). Runtime promotion commit:
+`8e176bc03bec4a0f8d7871d49595f7e0a4fd88be`, through
+[PR #125](https://github.com/iteathen/JSMinSys/pull/125). Later documentation commits
+may advance main without changing this runtime.
+
+## Setup
+
+With Node 26 or later, from the repository root:
+
+```sh
+cd isomax
+node verify.mjs
+node run.mjs
+```
+
+Alternatively, extract the complete `package/` folder from
+[iteathen-isomax-0.2.0-rc.2.tgz](../isomax/dist/iteathen-isomax-0.2.0-rc.2.tgz)
+and run those two Node commands inside it. No installation or manual dependency
+assembly is needed. The archive SHA-256 is
+`26b1c5232ced8fa7c1e12f0bb3ccf0e6fd9c55788a7dab6caeab18e034d162e1`.
+
+The default operation is one exact solve from the actual empty 7×6 board.
+No RLC, supplied prefix, opening book, prior-run proof cache or solved knowledge
+is consumed. Preparation creates all workers and tables and completes an
+all-ready barrier; root construction and search begin afterward. This measures
+a root outcome and optimal move, not a complete self-play game.
+
+For a small installation check or a different board, inside `isomax/`:
+
+```sh
+node run.mjs --columns 1 --rows 4 --shared-entries 256 --local-entries 256
+node run.mjs --columns 7 --rows 5
+```
+
+Winning length is four. Geometry, native widths, key/cache layout and the complete
+plan or fallback path are selected during initialization. Fast physical checks
+cover all 100 dimensions from 1×1 through 10×10; full performance qualification
+is on 7×6. Different dimensions may require substantially longer searches.
+
+## Retained configuration
+
+[profile.json](../isomax/profile.json) is the package launch authority.
+Historical target profiles and GitHub runner cache sizes are not substitutes.
+
+| Setting | Promoted value |
+|---|---|
+| Workers | Four deep workers, center/live/center/live |
+| Shared TT | 134,217,728 native 32-byte entries, 4 GiB |
+| Private TT | 8,388,608 native 32-byte entries, 256 MiB per worker |
+| Root frontier / shared sampling | Disabled / mask 0 |
+| Shared proof bounds | Enabled |
+| Base support-plan budget | 1 GiB, closures and reflection enabled |
+| Compiled-transition auxiliary budget | 512 MiB; actual 7×6 planes 466,948,881 bytes |
+| Total retained 7×6 geometry plans | 1,323,433,629 bytes |
+| V8 inlining flags | 2400 / cumulative 9600, applied before initialization |
+| Search / initialization deadlines | 600 s / 120 s |
+
+Compiled transitions are admitted only when they fit; otherwise initialization
+selects the retained fallback workers. The new planes contain rule-derived
+transitions and stability, with no game values. Their memory is additional to
+the TT allocation. Peak RSS is whole-process memory, not a measurement of TT
+occupancy. Production node/cache counters are unavailable rather than zero.
+
+For the measured Windows machine, use PowerShell 7:
+
+```powershell
+./run-i5.ps1 -NodePath 'C:/path/to/recorded-node27/node.exe'
+```
+
+That launcher requires the i5-12600K and
+`v27.0.0-nightly20260928b59840b593` / V8 `14.6.202.34-node.36`. Process affinity is
+85, with workers pinned to verified logical processors 0/2/4/6 before solver
+initialization. The portable launcher is unpinned; its timings are unqualified.
+
+## Results and qualification
+
+| Measurement | Primary time | Evidence |
+|---|---:|---|
+| Matching pre-C66 control mean | 56.239 s | [Crossover](../isomax/evidence/C66-CROSSOVER.json) |
+| Retained C66 candidate mean, two trials | 53.828 s | Same crossover |
+| Final reviewed source confirmation | 54.156 s | [Raw confirmation](../isomax/evidence/runs/fusion-final-confirm-01/stdout.json) |
+| Standalone extracted package confirmation | 55.326 s | [Archive verification](../isomax/dist/VERIFICATION-0.2.0-rc.2.json) |
+
+Primary time runs from all workers ready and cold tables initialized through
+actual empty-root construction and the observed exact result. Initialization and
+cleanup are reported separately. Process cycles in the research evidence include
+initialization and cleanup. Standalone confirmation is one packaging check,
+not another repeated performance comparison. The ≤10 s target remains unmet.
+
+The extracted package returned WIN/column 4, with four workers ready/exited and
+clean termination. Peak RSS was about 6.44 GiB. Fresh post-promotion checks passed
+423 repository tests, 46 package tests, source/closure reproduction, archive
+identity and the 535-unit NEES catalog. Read the
+[review and its limits](../isomax/evidence/FINAL-REVIEW.md) and
+[packaging review](../evidence/isomax-overhead-fusion-20261005/promotion/PACKAGE-REVIEW.md).
+These checks do not establish a universal UC4A evaluator; both formula holdouts
+remain sealed.
+
+## Version preservation
+
+The package runtime is copied unchanged from
+`d2e4ccadcef6d67bc97a53679476e1ef6a5a9916`, preserved by
+`isomax-0.2.0-rc.2-source`. [provenance.json](../isomax/provenance.json) locks 72
+runtime modules, all 24 selectable worker variants, and public package files.
+Maintainers can run `node isomax/prepare.mjs --check` in a full Git checkout.
+Keep the versioned archive and [checksums](../isomax/dist/SHA256SUMS) immutable.
+Registry publication remains disabled. Prior archives are retained under
+[dist/](../isomax/dist/).
+
+## Historical structural-prefix version
+
+The remainder preserves the earlier selection; its configuration and timing
+do not describe the promoted 0.2.0-rc.2 package.
 Canonical support libraries in `src/` and `addons/` may receive owner-authorized
 upgrades. This document, the unchanged source lock, and the
 [historical archive](../profiles/frozen-isomax-20261001/) preserve the earlier
@@ -35,7 +145,7 @@ does not cover a full self-play game or qualify a persistent-worker application.
 The exact W/D/L belongs to the computed search root. The timing observation does
 not independently prove the structural opening rule for arbitrary positions.
 
-## Reproduce the exact localhost measurement
+### Reproduce the historical localhost measurement
 
 The saved harness intentionally retains its recorded Windows paths. Preserve
 the clean solver checkout at `C:/r/isomax-p2-memory-source` on `6bbba7c`, the
@@ -61,7 +171,7 @@ cleanup. The sample checks seven calculator controls before timing and obtains
 every opening move from the calculator. Allocation, worker startup, and teardown
 inside the historical solver invocation remain in the measured wall interval.
 
-## Preserve this selection
+### Preserve the historical selection
 
 Keep the frozen tags, archive, lock and measured artifacts unchanged. Repository
 tag rules reject tag updates and deletion. The required lock test checks archived

@@ -1,13 +1,32 @@
 # JSMinSys
 
-**Looking for the current IsoMax candidate? Open [isomax/](isomax/README.md).**
-It is self-contained: public API, runtime, configuration, example, evidence and
-transfer archive in one folder. Prepared on main; **not published**.
+**IsoMax 0.2.0-rc.2 is promoted on main. Start at [isomax/](isomax/README.md).**
+The public API, runtime, configuration, launchers, tests and evidence are together
+in that folder. Node 26 or later is required; no npm install is needed.
 
-From `isomax/`, run `node verify.mjs`, then `node run.mjs`. No installation is
-needed. The current package is `0.2.0-rc.2`: four minimal workers, direct empty-board
-solve, 4 GiB shared TT and 256 MiB private TT per worker. Setup, dimension options
-and the measured Windows launcher are explained in that folder's README.
+From the repository root:
+
+```sh
+cd isomax
+node verify.mjs
+node run.mjs
+```
+
+This solves the empty 7×6 board with four minimal deep workers, a **4 GiB shared
+TT and 256 MiB private TT per worker**, plus geometry plans. Observed peak RSS is
+**6.44 GiB**. All workers and memory are prepared before search. The default path
+uses current-run exact search without RLC, an opening book or persisted solutions.
+
+The retained localhost candidate mean is **53.828 s**; the standalone extracted
+package confirmation took **55.326 s**. Both measure empty-root construction and
+solving after readiness, with initialization and cleanup recorded separately.
+The ≤10 s target remains unmet. Portable unpinned runs have no timing qualification.
+
+[Download the complete archive](isomax/dist/iteathen-isomax-0.2.0-rc.2.tgz),
+[check its SHA-256](isomax/dist/SHA256SUMS), or read the
+[current configuration, evidence and version history](docs/isomax-current.md).
+The package supports board dimensions selected at initialization. Registry
+publication remains disabled.
 
 JSMinSys is an experimental project for deriving a minimal-cost computational substrate for high-performance JavaScript.
 
@@ -102,26 +121,27 @@ sealed hot vocabulary.
 
 ### Connect4 parallel execution
 
-JSMinSys exposes `runLazySmpConnect4Rba32` as the sole supported exact
-Connect4 parallel composition. It supports two explicit deep-worker modes while
-preserving the same 2+ worker host, local exact caches, and concurrency-safe
-shared exact cache.
+The canonical libraries expose `runLazySmpConnect4Rba32` for exact Connect4
+parallel execution. The promoted package also exposes `prepareLazySmpConnect4Rba32`
+to allocate tables, create workers and complete the readiness barrier before
+`solve()`. Both preserve the 2+ worker contract; the package defaults to four.
 
 - `workerMode: 'legacy'` is the compatibility default. It uses
   `rba-connect4-lazy-smp-worker.mjs` and retains the existing CPC/NDC-first
   alpha-beta path plus Behavior/Root-Frontier compatibility.
-- `workerMode: 'minimal'` uses
-  `rba-connect4-lazy-smp-worker-minimal.mjs`. It is exact canonical-RBA
-  Negamax/alpha-beta with local/shared exact TT support, center-distance move
-  ordering diversified only within equal-distance shells, and no CPC, NDC,
-  evaluator, heuristic score, restriction, or interval layer. Neutral/gray-token
-  ownership is already quotiented by RBA q; child reflection is canonicalized
-  before TT identity.
+- `workerMode: 'minimal'` selects the admitted generic, native-cache, basis-view
+  or compiled-transition workers during initialization. It uses exact
+  canonical-RBA Negamax/alpha-beta, guarded current-position tactical certificates,
+  and local/shared TT access. The promoted configuration alternates center and
+  live-line move ordering across its four deep workers. Neutral/gray-token
+  ownership is quotiented by RBA q, and child reflection is canonicalized before
+  TT identity.
 
-The minimal worker rejects legacy-only Behavior/CPC/Root-Frontier options rather
-than silently switching execution semantics. Workers share only committed exact
-W/D/L cache evidence. There is no shared surplus queue and no Branch Manager in
-the Connect4 execution path.
+Prepared minimal execution rejects legacy-only Behavior and Root-Frontier options.
+The promoted `sharedProofBounds:true` configuration shares committed exact W/D/L
+and licensed zero bounds; hash equality alone never licenses a cache hit. Node,
+cutoff and cache-hit counters are unavailable in this path. Cold session lifecycle
+mechanics remain in the support libraries; no shared surplus task queue is used.
 
 The current prepared candidate is [the self-contained IsoMax package](isomax/README.md):
 four deep workers, initialization-selected geometry, and a 32-byte standard TT.
