@@ -1,14 +1,107 @@
 {
   "version": "0.2.0-rc.3",
-  "source": "a02bc4946d741e4aaacc30802aeb850fa8c59a95",
-  "archiveSha256": "bec8ca54d7672569bc423ff362244ad4dc8e31b7f9d3374a151d05e9580299cc",
-  "lockedFiles": 147,
-  "runtimeModules": 73,
+  "source": "e6580e951c8318395446dd5916482efddc3d33fd",
+  "archiveSha256": "3c1a83ab173b15a2efa7c908cbae606cc50efe2bdba2fa2e7376832515b2fd6f",
+  "lockedFiles": 150,
+  "runtimeModules": 75,
   "detectedWorkers": 6,
+  "affinityPolicy": "verified-pinning",
+  "workerAffinity": [
+    {
+      "worker": 0,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 0,
+        "core": 0
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 0
+    },
+    {
+      "worker": 1,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 2,
+        "core": 1
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 2
+    },
+    {
+      "worker": 2,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 4,
+        "core": 2
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 4
+    },
+    {
+      "worker": 3,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 6,
+        "core": 3
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 6
+    },
+    {
+      "worker": 4,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 8,
+        "core": 4
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 8
+    },
+    {
+      "worker": 5,
+      "target": {
+        "platform": "win32",
+        "group": 0,
+        "processor": 10,
+        "core": 5
+      },
+      "verified": true,
+      "hintsApplied": false,
+      "affinityTagApplied": false,
+      "affinityTagStatus": null,
+      "group": 0,
+      "cpu": 10
+    }
+  ],
   "status": "EXACT",
   "rootWdl": 0,
   "ready": 6,
   "exited": 6,
   "cleanup": true,
-  "testKind": "cold extracted auto-start smoke; not performance evidence"
+  "testKind": "cold extracted auto-start and verified affinity smoke; not performance evidence"
 }
