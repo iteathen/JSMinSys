@@ -71,3 +71,6 @@ when needed to resolve noise; rejected experiments restored and tested too.
   units including32 workers and cold memory/discovery/startup roots; eight focused
   tests pass. Full `nees-fix-03-graph`:38.6730454s,213.8125s CPU,EXACT/WIN/c4,
   six pins/exits; solver unchanged.
+- Change4 `bccd9ae`: actual completion source executed for96 winner/loser/cancelled
+  paths across32 variants, now matches stores/RMW/notify accounting. Full
+  `nees-fix-04-completion`:38.528148s,213.046875s CPU,EXACT/WIN/c4,six pins/exits.

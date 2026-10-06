@@ -1,9 +1,9 @@
 // Cold accounting. Counts describe emitted operations, not measured machine cycles.
 import {readFileSync,writeFileSync} from 'node:fs';
-import {createHash} from 'node:crypto';
+import {refreshReviewedSourceGuards} from './cycle-source-guards.mjs';
 import {cycleExpressionForOperations} from './cycle-ledger-validation.mjs';
 const path='catalog/addon-cycle-ledger-v0.json',l=JSON.parse(readFileSync(path,'utf8')),
- source='addons/rba-connect4-index-partial-cache.mjs';
+ source='addons/rba-connect4-index-partial-cache.mjs',reviewedSources=new Set([source,'addons/rba-connect4-prepared-session-host.mjs']);
 const expr=cycleExpressionForOperations,
  op=(name,count)=>({op:name,count}),call=(target,count=1)=>({op:'runtime.call.subledger',target,count});
 l.units=l.units.filter(u=>u.source!==source&&!/-partial(?:24|16|Mixed)\.mjs$/.test(u.source));
@@ -46,6 +46,7 @@ for(const [name,operations] of Object.entries(specs)){
 for(const kind of ['partial24','partialMixed'])for(const center of [false,true])for(const proofs of [false,true]){
  const base='addons/rba-connect4-lazy-smp-worker-minimal-views-compiled'+(center?'-center':'')+(proofs?'-proofs':'')+'-local32.mjs',target=base.replace('.mjs','-'+kind+'.mjs'),
   units=l.units.filter(u=>u.source===base&&!['localKeyMatches','storeLocalEntry'].includes(u.name));
+ reviewedSources.add(target);
  for(const original of units){
   const u=structuredClone(original);u.unit=target+'#'+u.name;u.source=target;
   u.operations=u.operations.filter(o=>!['compactSupportProfile8','compactTailProfile8','prepareSharedCacheAccess','attachConnect4RbaSharedExactCache32'].includes(o.target));
@@ -97,9 +98,7 @@ for(const u of l.units.filter(u=>u.source==='addons/rba-connect4-prepared-sessio
 }
 const activeSources=new Set(l.units.map(u=>u.source));
 for(const s of Object.keys(l.decomposedSourceBlobs))if(/-partial16\.mjs$/.test(s)&&!activeSources.has(s))delete l.decomposedSourceBlobs[s];
-for(const s of new Set(l.units.filter(u=>u.status==='decomposed').map(u=>u.source))){
- const bytes=readFileSync(s,'utf8').replaceAll('\r\n','\n');l.decomposedSourceBlobs[s]=createHash('sha1').update(`blob ${Buffer.byteLength(bytes)}\0`).update(bytes).digest('hex');
-}
+refreshReviewedSourceGuards(l,reviewedSources);
 l.summary.units=l.units.length;l.summary.decomposed=l.units.filter(u=>u.status==='decomposed').length;
 const names=new Set([...l.units.map(u=>u.name),...JSON.parse(readFileSync('catalog/functions-v0.json','utf8')).functions.map(f=>f.name)]);
 for(const u of l.units.filter(u=>u.source===source||/-partial(?:24|16|Mixed)\.mjs$/.test(u.source)))
