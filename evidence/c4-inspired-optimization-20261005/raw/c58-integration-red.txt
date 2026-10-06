@@ -1,0 +1,232 @@
+{"kind":"c58-common-matching-exhaustive-small-physical-policy","checked":32280,"positive":13806,"nonloss":13534,"newPositive":8}
+{"kind":"cpc-response-general-physical-policy","checked":9532,"positive":700,"nonloss":666}
+✔ four-worker minimal search agrees with a physically verified CPC win certificate (62.5484ms)
+✔ common-matching CPC equals independently enumerated physical policies and exact bounded game (183.5032ms)
+✔ common matching preserves guards, offsets, physical frames and large-width fallback (680.7997ms)
+✔ matching constraints require one common policy, not separate blockers (0.4628ms)
+✖ all eight actual worker variants bind the common-policy response capability (2.1326ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1012.0848
+
+✖ failing tests:
+
+test at test\cpc-matching-response.test.mjs:157:1
+✖ all eight actual worker variants bind the common-policy response capability (2.1326ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32/. Input:
+  
+  "import {connect4RbaSupportCanonicalize} from './rba-connect4-coordinate-support-reflection.mjs';\r\n" +
+    "import {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';\r\n" +
+    "import {prepareConnect4CpcxPairHub32} from './connect4-cpcx-pair-hub.mjs';\r\n" +
+    "import {prepareConnect4ResidualProofFrontier32} from './connect4-residual-proof-frontier.mjs';\r\n" +
+    "import {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-dense.mjs';\r\n" +
+    "import {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';\r\n" +
+    "import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';\r\n" +
+    "import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';\r\n" +
+    "import {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';\r\n" +
+    "import {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';\r\n" +
+    "import {prepareConnect4CpcWin32} from './connect4-cpc-prepared-win.mjs';\r\n" +
+    "import {evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-prepared-response.mjs';\r\n" +
+    "import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';\r\n" +
+    "import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';\r\n" +
+    "import {workerData} from 'node:worker_threads';\r\n" +
+    "import {mixSpan32Locator32} from '../src/widekey32.mjs';\r\n" +
+    "import {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';\r\n" +
+    "import {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';\r\n" +
+    "import {connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';\r\n" +
+    'import {\r\n' +
+    '  attachConnect4RbaSharedExactCache32,\r\n' +
+    '  isCompactProfile8,\r\n' +
+    '  compactSupportProfile8,\r\n' +
+    '  compactTailProfile8,\r\n' +
+    "} from './rba-connect4-shared-exact-cache.mjs';\r\n" +
+    "import {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';\r\n" +
+    "import {attachConnect4RbaSharedLayoutCache32,prepareSharedCacheAccess} from './rba-connect4-shared-exact-cache-layout.mjs';\r\n" +
+    '\r\n' +
+    'const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,\r\n' +
+    '  RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,\r\n' +
+    '  index=workerData.workerIndex,g=workerData.geometry,\r\n' +
+    '  profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),\r\n' +
+    '    targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,\r\n' +
+    '    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,\r\n' +
+    '    forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,\r\n' +
+    '    frontier=prepareConnect4ResidualProofFrontier32(g),frontProbe=frontier.probe,\r\n' +
+    '    frontStore=frontier.store,frontChild=frontier.child,frontRoot=frontier.initialize,\r\n' +
+    '  connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null\r\n' +
+    '    ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)\r\n' +
+    '    :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null\r\n' +
+    '    ?connect4RbaSupportDenseCofactorNonWinningKnownHeight:connect4RbaSupportPreparedCofactorNonWinningKnownHeight):g.removeByCell!==null\r\n' +
+    '    ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,\r\n' +
+    '  connect4RbaCanonicalize=g.supportBasisPlans?.mirrorMap?connect4RbaSupportCanonicalize:connect4RbaPreparedCanonicalize,\r\n' +
+    '  control=workerData.control,resultWords=workerData.resultWords,\r\n' +
+    '  words=new Uint32Array((g.cellCount+1)*g.keyWords),\r\n' +
+    '  basis=new Uint32Array((g.cellCount+1)*g.maxBasis),\r\n' +
+    '  basisSize=new Uint32Array(g.cellCount+1),\r\n' +
+    '  coord=prepareConnect4RbaCoordinateScratch(g),\r\n' +
+    '  centerOrder=new Uint32Array(g.columns),\r\n' +
+    '  shared=workerData.sharedExactCache.layout?attachConnect4RbaSharedLayoutCache32(workerData.sharedExactCache):\r\n' +
+    '    attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),\r\n' +
+    '  sharedAccess=shared.layout?prepareSharedCacheAccess(shared):null,\r\n' +
+    '  sharedProbe=sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,\r\n' +
+    '  sharedStore=sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,\r\n' +
+    '  sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,\r\n' +
+    '  localMask=workerData.localCacheCapacity-1,\r\n' +
+    '  localCompact=isCompactProfile8(g,g.keyWords)?1:0,\r\n' +
+    '  localStoredKeyWords=localCompact?8:g.keyWords,\r\n' +
+    '  localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),\r\n' +
+    '  localValues=new Uint8Array(workerData.localCacheCapacity);\r\n' +
+    '\r\n' +
+    'let orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1,pair=0;\r\n' +
+    'if(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}\r\n' +
+    'while(orderAt<g.columns){\r\n' +
+    '  const rightFirst=(index>>>pair)&1;\r\n' +
+    '  if(rightFirst){\r\n' +
+    '    if(right<g.columns)centerOrder[orderAt++]=right++;\r\n' +
+    '    if(left>=0)centerOrder[orderAt++]=left--;\r\n' +
+    '  }else{\r\n' +
+    '    if(left>=0)centerOrder[orderAt++]=left--;\r\n' +
+    '    if(right<g.columns)centerOrder[orderAt++]=right++;\r\n' +
+    '  }\r\n' +
+    '  pair+=1;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'const live=prepareConnect4LiveLineOrder32(g,centerOrder,[]),\r\n' +
+    '  liveWords=live.profile.stateWords,liveState=live.state,\r\n' +
+    '  liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,\r\n' +
+    '  moveOrder=live.ordered,moveOrderMask=live.mask,\r\n' +
+    '  rootHeights=new Uint32Array(g.columns);\r\n' +
+    '\r\n' +
+    '// COLD one-shot benchmark handoff. No barrier or timing work in negamax.\r\n' +
+    'if(workerData.readyGate){\r\n' +
+    '  localKeys.fill(0);localValues.fill(0);\r\n' +
+    '  Atomics.add(workerData.readyGate,0,1);\r\n' +
+    '  while(Atomics.load(workerData.readyGate,1)===0)Atomics.wait(workerData.readyGate,1,0);\r\n' +
+    '}\r\n' +
+    'words.set(workerData.root.words);\r\n' +
+    'frontRoot(words,0);\r\n' +
+    'basis.set(workerData.root.basis);\r\n' +
+    'basisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;\r\n' +
+    'if(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);\r\n' +
+    'resetConnect4LiveLineState32(liveProfile,liveState,0);\r\n' +
+    'const history=workerData.root.moveHistory,\r\n' +
+    '  historyLength=workerData.readyGate?Atomics.load(workerData.readyGate,4):history.length;\r\n' +
+    'for(let i=0;i<historyLength;i+=1){\r\n' +
+    '  const c=history[i],cell=rootHeights[c]*g.columns+c;\r\n' +
+    '  advanceLive(liveProfile,liveState,0,i&1,cell,liveState,0);rootHeights[c]+=1;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'let bestMove=-1;\r\n' +
+    '\r\n' +
+    'function relativeTerminal(value,mover){\r\n' +
+    '  return value===2?0:value===(mover?1:3)?1:-1;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function relativeToAbsolute(value,mover){\r\n' +
+    '  return value===0?2:mover===0?value+2:2-value;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function localKeyMatches(slot,src){\r\n' +
+    '  const base=slot*localStoredKeyWords;\r\n' +
+    '  if(localCompact)return localKeys[base]===words[src]&&\r\n' +
+    '    localKeys[base+1]===words[src+1]&&\r\n' +
+    '    localKeys[base+2]===compactSupportProfile8(words,src)&&\r\n' +
+    '    localKeys[base+3]===words[src+8]&&\r\n' +
+    '    localKeys[base+4]===words[src+9]&&\r\n' +
+    '    localKeys[base+5]===words[src+11]&&\r\n' +
+    '    localKeys[base+6]===words[src+12]&&\r\n' +
+    '    localKeys[base+7]===compactTailProfile8(words,src);\r\n' +
+    '  for(let w=0;w<g.keyWords;w+=1)\r\n' +
+    '    if(localKeys[base+w]!==words[src+w])return 0;\r\n' +
+    '  return 1;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function storeLocalEntry(slot,src,value){\r\n' +
+    '  const base=slot*localStoredKeyWords;\r\n' +
+    '  if(localCompact){\r\n' +
+    '    localKeys[base]=words[src];localKeys[base+1]=words[src+1];\r\n' +
+    '    localKeys[base+2]=compactSupportProfile8(words,src);\r\n' +
+    '    localKeys[base+3]=words[src+8];localKeys[base+4]=words[src+9];\r\n' +
+    '    localKeys[base+5]=words[src+11];localKeys[base+6]=words[src+12];\r\n' +
+    '    localKeys[base+7]=compactTailProfile8(words,src);\r\n' +
+    '  }else for(let w=0;w<g.keyWords;w+=1)localKeys[base+w]=words[src+w];\r\n' +
+    '  localValues[slot]=value;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function probeCache(src,hash,slot){\r\n' +
+    '  const local=localValues[slot];\r\n' +
+    '  if(local&&localKeyMatches(slot,src)){return local;}\r\n' +
+    '  if(!(hash&sharedSampleBits)){\r\n' +
+    '    const value=sharedProbe(shared,words,src,hash);\r\n' +
+    '    if(value){storeLocalEntry(slot,src,value);return value;}\r\n' +
+    '  }\r\n' +
+    '  return 0;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function storeExact(src,hash,slot,value,depth,mover){\r\n' +
+    '  storeLocalEntry(slot,src,value);\r\n' +
+    '  frontStore(words,src,depth,value,mover);\r\n' +
+    '  if(!(hash&sharedSampleBits))\r\n' +
+    '    sharedStore(shared,words,src,value,hash);\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function storeBound(src,hash,slot,value,depth,mover){\r\n' +
+    '  frontStore(words,src,depth,value,mover);\r\n' +
+    '  const prior=localValues[slot];\r\n' +
+    '  if(prior&&localKeyMatches(slot,src)){\r\n' +
+    '    if(prior<=3||prior===value)return prior;\r\n' +
+    '    // The same canonical q has both >=0 and <=0, therefore exact draw.\r\n' +
+    '    // Keep this inferred draw worker-local; shared publication is reserved for\r\n' +
+    '    // exact values produced by the ordinary search result path.\r\n' +
+    '    storeLocalEntry(slot,src,2);\r\n' +
+    '    frontStore(words,src,depth,2,mover);\r\n' +
+    '    return 2;\r\n' +
+    '  }\r\n' +
+    '  storeLocalEntry(slot,src,value);\r\n' +
+    '  return value;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){\r\n' +
+    '  if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;\r\n' +
+    '  const dst=src+g.keyWords,ci=bi+g.maxBasis,\r\n' +
+    '    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,\r\n' +
+    '    alphaOrig=alpha,betaOrig=beta,\r\n' +
+    '    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,\r\n' +
+    '    slot=depth?(hash&localMask):0;\r\n' +
+    '\r\n' +
+    '  if(depth){\r\n' +
+    '    const cached=probeCache(src,hash,slot)||frontProbe(words,src,depth,mover);\r\n' +
+    '    if(cached){\r\n' +
+    '      if(cached<=3)return relativeTerminal(cached,mover);\r\n' +
+    '      if(cached===LOCAL_LOWER0){\r\n' +
+    '        if(beta<=0){return 0;}\r\n' +
+    '        if(alpha<0)alpha=0;\r\n' +
+    '      }else{\r\n' +
+    '        if(alpha>=0){return 0;}\r\n' +
+    '        if(beta>0)beta=0;\r\n' +
+    '      }\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  // Root excludes immediate wins once. C01/C05 ensure every recursed child\r\n' +
+    '  // also has no immediate mover win; cofactor uses that proved precondition.\r\n' +
+    '  const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,for'... 4496 more characters
+  
+      at TestContext.<anonymous> (file:///C:/r/jsminsys-cpc-rebuild-20261004/test/cpc-matching-response.test.mjs:161:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "import {connect4RbaSupportCanonicalize} from './rba-connect4-coordinate-support-reflection.mjs';\r\nimport {prepareConnect4CpcTargetWin32} from './connect4-cpc-target-win.mjs';\r\nimport {prepareConnect4CpcxPairHub32} from './connect4-cpcx-pair-hub.mjs';\r\nimport {prepareConnect4ResidualProofFrontier32} from './connect4-residual-proof-frontier.mjs';\r\nimport {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-dense.mjs';\r\nimport {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';\r\nimport {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';\r\nimport {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';\r\nimport {prepareConnect4LiveLineOrder32} from './connect4-live-line-order.mjs';\r\nimport {resetConnect4LiveLineState32} from './connect4-live-line-evaluator.mjs';\r\nimport {prepareConnect4CpcWin32} from './connect4-cpc-prepared-win.mjs';\r\nimport {evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-prepared-response.mjs';\r\nimport {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';\r\nimport {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';\r\nimport {workerData} from 'node:worker_threads';\r\nimport {mixSpan32Locator32} from '../src/widekey32.mjs';\r\nimport {prepareConnect4RbaExecutionProfile} from './rba-connect4-profile.mjs';\r\nimport {prepareConnect4RbaCoordinateScratch} from './rba-connect4-geometry.mjs';\r\nimport {connect4RbaImmediateWinningColumn} from './rba-connect4-coordinate.mjs';\r\nimport {\r\n  attachConnect4RbaSharedExactCache32,\r\n  isCompactProfile8,\r\n  compactSupportProfile8,\r\n  compactTailProfile8,\r\n} from './rba-connect4-shared-exact-cache.mjs';\r\nimport {probeConnect4RbaSharedExactCacheUncounted32,storeConnect4RbaSharedExactCacheUncounted32} from './rba-connect4-shared-exact-cache-uncounted.mjs';\r\nimport {attachConnect4RbaSharedLayoutCache32,prepareSharedCacheAccess} from './rba-connect4-shared-exact-cache-layout.mjs';\r\n\r\nconst CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,\r\n  RESULT_STRIDE=4,CANCELLED=-2,LOCAL_LOWER0=4,LOCAL_UPPER0=5,\r\n  index=workerData.workerIndex,g=workerData.geometry,\r\n  profile=prepareConnect4RbaExecutionProfile(g),cpc=prepareConnect4CpcWin32(g),\r\n    targetCpc=prepareConnect4CpcTargetWin32(g),evaluateTargetCpc=targetCpc.evaluate,\r\n    pairHub=prepareConnect4CpcxPairHub32(g),evaluatePairHub=pairHub.find,collectSingletons=pairHub.collect,\r\n    forbidden=pairHub.forbidden,forbiddenWords=pairHub.forbiddenWords,\r\n    frontier=prepareConnect4ResidualProofFrontier32(g),frontProbe=frontier.probe,\r\n    frontStore=frontier.store,frontChild=frontier.child,frontRoot=frontier.initialize,\r\n  connect4RbaCofactorKnownHeight=g.supportBasisPlans?.closures?(g.removeByCell!==null\r\n    ?(g.coordWords===3?connect4RbaClosureDense3CofactorNonWinningKnownHeight:connect4RbaClosureDenseSpanCofactorNonWinningKnownHeight)\r\n    :(g.coordWords===3?connect4RbaClosurePrepared3CofactorNonWinningKnownHeight:connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight)):g.supportBasisPlans?(g.removeByCell!==null\r\n    ?connect4RbaSupportDenseCofactorNonWinningKnownHeight:connect4RbaSupportPreparedCofactorNonWinningKnownHeight):g.removeByCell!==null\r\n    ?connect4RbaDenseCofactorNonWinningKnownHeight:connect4RbaPreparedCofactorNonWinningKnownHeight,\r\n  connect4RbaCanonicalize=g.supportBasisPlans?.mirrorMap?connect4RbaSupportCanonicalize:connect4RbaPreparedCanonicalize,\r\n  control=workerData.control,resultWords=workerData.resultWords,\r\n  words=new Uint32Array((g.cellCount+1)*g.keyWords),\r\n  basis=new Uint32Array((g.cellCount+1)*g.maxBasis),\r\n  basisSize=new Uint32Array(g.cellCount+1),\r\n  coord=prepareConnect4RbaCoordinateScratch(g),\r\n  centerOrder=new Uint32Array(g.columns),\r\n  shared=workerData.sharedExactCache.layout?attachConnect4RbaSharedLayoutCache32(workerData.sharedExactCache):\r\n    attachConnect4RbaSharedExactCache32(workerData.sharedExactCache),\r\n  sharedAccess=shared.layout?prepareSharedCacheAccess(shared):null,\r\n  sharedProbe=sharedAccess===null?probeConnect4RbaSharedExactCacheUncounted32:sharedAccess.probe,\r\n  sharedStore=sharedAccess===null?storeConnect4RbaSharedExactCacheUncounted32:sharedAccess.store,\r\n  sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,\r\n  localMask=workerData.localCacheCapacity-1,\r\n  localCompact=isCompactProfile8(g,g.keyWords)?1:0,\r\n  localStoredKeyWords=localCompact?8:g.keyWords,\r\n  localKeys=new Uint32Array(workerData.localCacheCapacity*localStoredKeyWords),\r\n  localValues=new Uint8Array(workerData.localCacheCapacity);\r\n\r\nlet orderAt=0,left=(g.columns-1)>>1,right=g.columns>>1,pair=0;\r\nif(left===right){centerOrder[orderAt++]=left;left-=1;right+=1;}\r\nwhile(orderAt<g.columns){\r\n  const rightFirst=(index>>>pair)&1;\r\n  if(rightFirst){\r\n    if(right<g.columns)centerOrder[orderAt++]=right++;\r\n    if(left>=0)centerOrder[orderAt++]=left--;\r\n  }else{\r\n    if(left>=0)centerOrder[orderAt++]=left--;\r\n    if(right<g.columns)centerOrder[orderAt++]=right++;\r\n  }\r\n  pair+=1;\r\n}\r\n\r\nconst live=prepareConnect4LiveLineOrder32(g,centerOrder,[]),\r\n  liveWords=live.profile.stateWords,liveState=live.state,\r\n  liveProfile=live.profile,advanceLive=live.advance,orderLive=live.order,\r\n  moveOrder=live.ordered,moveOrderMask=live.mask,\r\n  rootHeights=new Uint32Array(g.columns);\r\n\r\n// COLD one-shot benchmark handoff. No barrier or timing work in negamax.\r\nif(workerData.readyGate){\r\n  localKeys.fill(0);localValues.fill(0);\r\n  Atomics.add(workerData.readyGate,0,1);\r\n  while(Atomics.load(workerData.readyGate,1)===0)Atomics.wait(workerData.readyGate,1,0);\r\n}\r\nwords.set(workerData.root.words);\r\nfrontRoot(words,0);\r\nbasis.set(workerData.root.basis);\r\nbasisSize[0]=workerData.readyGate?Atomics.load(workerData.readyGate,2):workerData.root.basis.length;\r\nif(workerData.readyGate)workerData.rootReflected=Atomics.load(workerData.readyGate,3);\r\nresetConnect4LiveLineState32(liveProfile,liveState,0);\r\nconst history=workerData.root.moveHistory,\r\n  historyLength=workerData.readyGate?Atomics.load(workerData.readyGate,4):history.length;\r\nfor(let i=0;i<historyLength;i+=1){\r\n  const c=history[i],cell=rootHeights[c]*g.columns+c;\r\n  advanceLive(liveProfile,liveState,0,i&1,cell,liveState,0);rootHeights[c]+=1;\r\n}\r\n\r\nlet bestMove=-1;\r\n\r\nfunction relativeTerminal(value,mover){\r\n  return value===2?0:value===(mover?1:3)?1:-1;\r\n}\r\n\r\nfunction relativeToAbsolute(value,mover){\r\n  return value===0?2:mover===0?value+2:2-value;\r\n}\r\n\r\nfunction localKeyMatches(slot,src){\r\n  const base=slot*localStoredKeyWords;\r\n  if(localCompact)return localKeys[base]===words[src]&&\r\n    localKeys[base+1]===words[src+1]&&\r\n    localKeys[base+2]===compactSupportProfile8(words,src)&&\r\n    localKeys[base+3]===words[src+8]&&\r\n    localKeys[base+4]===words[src+9]&&\r\n    localKeys[base+5]===words[src+11]&&\r\n    localKeys[base+6]===words[src+12]&&\r\n    localKeys[base+7]===compactTailProfile8(words,src);\r\n  for(let w=0;w<g.keyWords;w+=1)\r\n    if(localKeys[base+w]!==words[src+w])return 0;\r\n  return 1;\r\n}\r\n\r\nfunction storeLocalEntry(slot,src,value){\r\n  const base=slot*localStoredKeyWords;\r\n  if(localCompact){\r\n    localKeys[base]=words[src];localKeys[base+1]=words[src+1];\r\n    localKeys[base+2]=compactSupportProfile8(words,src);\r\n    localKeys[base+3]=words[src+8];localKeys[base+4]=words[src+9];\r\n    localKeys[base+5]=words[src+11];localKeys[base+6]=words[src+12];\r\n    localKeys[base+7]=compactTailProfile8(words,src);\r\n  }else for(let w=0;w<g.keyWords;w+=1)localKeys[base+w]=words[src+w];\r\n  localValues[slot]=value;\r\n}\r\n\r\nfunction probeCache(src,hash,slot){\r\n  const local=localValues[slot];\r\n  if(local&&localKeyMatches(slot,src)){return local;}\r\n  if(!(hash&sharedSampleBits)){\r\n    const value=sharedProbe(shared,words,src,hash);\r\n    if(value){storeLocalEntry(slot,src,value);return value;}\r\n  }\r\n  return 0;\r\n}\r\n\r\nfunction storeExact(src,hash,slot,value,depth,mover){\r\n  storeLocalEntry(slot,src,value);\r\n  frontStore(words,src,depth,value,mover);\r\n  if(!(hash&sharedSampleBits))\r\n    sharedStore(shared,words,src,value,hash);\r\n}\r\n\r\nfunction storeBound(src,hash,slot,value,depth,mover){\r\n  frontStore(words,src,depth,value,mover);\r\n  const prior=localValues[slot];\r\n  if(prior&&localKeyMatches(slot,src)){\r\n    if(prior<=3||prior===value)return prior;\r\n    // The same canonical q has both >=0 and <=0, therefore exact draw.\r\n    // Keep this inferred draw worker-local; shared publication is reserved for\r\n    // exact values produced by the ordinary search result path.\r\n    storeLocalEntry(slot,src,2);\r\n    frontStore(words,src,depth,2,mover);\r\n    return 2;\r\n  }\r\n  storeLocalEntry(slot,src,value);\r\n  return value;\r\n}\r\n\r\nfunction negamax(depth,src,bi,n,mover,orientation,liveOffset,orderRow,alpha,beta){\r\n  if(!(depth&3)&&Atomics.load(control,CONTROL_STOP))return CANCELLED;\r\n  const dst=src+g.keyWords,ci=bi+g.maxBasis,\r\n    childLiveOffset=liveOffset+liveWords,childOrderRow=orderRow+g.columns,\r\n    alphaOrig=alpha,betaOrig=beta,\r\n    hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,\r\n    slot=depth?(hash&localMask):0;\r\n\r\n  if(depth){\r\n    const cached=probeCache(src,hash,slot)||frontProbe(words,src,depth,mover);\r\n    if(cached){\r\n      if(cached<=3)return relativeTerminal(cached,mover);\r\n      if(cached===LOCAL_LOWER0){\r\n        if(beta<=0){return 0;}\r\n        if(alpha<0)alpha=0;\r\n      }else{\r\n        if(alpha>=0){return 0;}\r\n        if(beta>0)beta=0;\r\n      }\r\n    }\r\n  }\r\n\r\n  // Root excludes immediate wins once. C01/C05 ensure every recursed child\r\n  // also has no immediate mover win; cofactor uses that proved precondition.\r\n  const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,for"... 4496 more characters,
+    expected: /prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32/,
+    operator: 'match',
+    diff: 'simple'
+  }

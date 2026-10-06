@@ -7,8 +7,8 @@ import {connect4RbaClosureDense3CofactorNonWinningKnownHeight,connect4RbaClosure
 import {connect4RbaClosurePrepared3CofactorNonWinningKnownHeight,connect4RbaClosurePreparedSpanCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-closure-prepared.mjs';
 import {connect4RbaSupportDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-dense.mjs';
 import {connect4RbaSupportPreparedCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-support-prepared.mjs';
-import {prepareConnect4CpcWin32} from './connect4-cpc-prepared-win.mjs';
-import {evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-prepared-response.mjs';
+import {prepareConnect4CpcMatchingResponse32 as prepareConnect4CpcWin32} from './connect4-cpc-matching-response.mjs';
+import {evaluateConnect4PreparedCpcMatchingResponse32 as evaluateConnect4PreparedCpcResponse32} from './connect4-cpc-matching-response.mjs';
 import {connect4RbaDenseCofactorNonWinningKnownHeight} from './rba-connect4-coordinate-dense.mjs';
 import {connect4RbaPreparedCofactorNonWinningKnownHeight,connect4RbaPreparedCanonicalize} from './rba-connect4-coordinate-prepared.mjs';
 import {workerData} from 'node:worker_threads';
