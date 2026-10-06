@@ -1,0 +1,166 @@
+{
+  "packageVersion": "0.2.0-rc.2",
+  "sourceCommit": "d2e4ccadcef6d67bc97a53679476e1ef6a5a9916",
+  "startingPosition": "empty",
+  "columns": 7,
+  "rows": 6,
+  "runtime": {
+    "node": "v27.0.0-nightly20260928b59840b593",
+    "v8": "14.6.202.34-node.36",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12600K"
+  },
+  "affinity": [
+    {
+      "index": 0,
+      "target": {
+        "group": 0,
+        "processor": 0,
+        "core": 0,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      "actual": {
+        "group": 0,
+        "processor": 0,
+        "mask": "1",
+        "previousGroup": 0,
+        "previousMask": "85"
+      },
+      "beforeSolverInitialization": true
+    },
+    {
+      "index": 1,
+      "target": {
+        "group": 0,
+        "processor": 2,
+        "core": 1,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      "actual": {
+        "group": 0,
+        "processor": 2,
+        "mask": "4",
+        "previousGroup": 0,
+        "previousMask": "85"
+      },
+      "beforeSolverInitialization": true
+    },
+    {
+      "index": 2,
+      "target": {
+        "group": 0,
+        "processor": 4,
+        "core": 2,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      "actual": {
+        "group": 0,
+        "processor": 4,
+        "mask": "16",
+        "previousGroup": 0,
+        "previousMask": "85"
+      },
+      "beforeSolverInitialization": true
+    },
+    {
+      "index": 3,
+      "target": {
+        "group": 0,
+        "processor": 6,
+        "core": 3,
+        "efficiency": 1,
+        "l2Bytes": 1310720
+      },
+      "actual": {
+        "group": 0,
+        "processor": 6,
+        "mask": "64",
+        "previousGroup": 0,
+        "previousMask": "85"
+      },
+      "beforeSolverInitialization": true
+    }
+  ],
+  "configuration": {
+    "workers": 4,
+    "workerMode": "minimal",
+    "sharedCacheCapacity": 134217728,
+    "localCacheCapacity": 8388608,
+    "sharedCacheLayout": "auto",
+    "localCacheLayout": "native",
+    "rootFrontier": false,
+    "sharedSampleMask": 0,
+    "sharedProofBounds": true,
+    "supportBasisPlanBudgetBytes": 1073741824,
+    "supportClosurePlan": true,
+    "supportReflectionPlan": true,
+    "supportBasisViews": true,
+    "timeoutMs": 600000,
+    "initializationTimeoutMs": 120000
+  },
+  "primaryWallMs": 55325.7796,
+  "operationWallMs": 59217.293900000004,
+  "memory": {
+    "rss": 5706379264,
+    "heapTotal": 6950912,
+    "heapUsed": 6047912,
+    "external": 4128054,
+    "arrayBuffers": 5621959640
+  },
+  "result": {
+    "status": "EXACT",
+    "rootWdl": 1,
+    "move": 3,
+    "winner": 1,
+    "winnerMetrics": null,
+    "nodeCounts": null,
+    "workerTiming": null,
+    "frontierMetrics": null,
+    "sharedCacheHits": null,
+    "sharedCacheStores": null,
+    "sharedCacheStoreContention": null,
+    "sharedSampleMask": 0,
+    "workerMode": "minimal",
+    "sharedCacheLayout": "native",
+    "sharedTtEntryBytes": 32,
+    "sharedProofBounds": true,
+    "basisViews": true,
+    "compiledTransitions": true,
+    "supportTransitionPlanBudgetBytes": 536870912,
+    "supportTransitionPlanBytes": 466948881,
+    "supportTransitionWorkingBytes": 466951381,
+    "localCacheLayout": "native",
+    "privateTtEntryBytes": 32,
+    "supportBasisPlanBytes": 1323433629,
+    "supportBasisPlanProfiles": 823543,
+    "supportClosurePlan": true,
+    "supportReflectionPlan": true,
+    "supportPlanWorkingBytes": 1389319569,
+    "completedWorkers": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "reflected": 0,
+    "elapsedMs": 59206.4828,
+    "readyWorkers": 4,
+    "preparedTiming": {
+      "readyWorkers": 4,
+      "rootConstructedAfterReady": true,
+      "initializationMs": 3866.1616999999997,
+      "solveMs": 55325.7796,
+      "cleanupMs": 14.046399999999267,
+      "boundary": "all workers ready and empty TT pages initialized -> root construction -> exact result observed; cleanup separate"
+    },
+    "errorCode": 0,
+    "errors": [],
+    "cleanup": true,
+    "workersExited": 4,
+    "requestedWorkers": 4,
+    "workersUsed": 4,
+    "sharedBytes": 5620111627
+  }
+}
