@@ -6,8 +6,8 @@ import {compactSupportProfile8,compactTailProfile8} from '../addons/rba-connect4
 
 // Actual generated search body; synthetic exact leaves isolate window algebra.
 // Physical rule/precondition equivalence is checked by separate minimax tests.
-for(const views of [false,true])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
- const name='rba-connect4-lazy-smp-worker-minimal'+(views?'-views':'')+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
+for(const views of ['','-views','-views-rank'])for(const center of [false,true])for(const proofs of [false,true])for(const native of [false,true]){
+ const name='rba-connect4-lazy-smp-worker-minimal'+views+(center?'-center':'')+(proofs?'-proofs':'')+(native?'-local32':'');
  test(name+' keeps early pair-hub wins as exact certificates in every window',()=>{
   const source=readFileSync(new URL('../addons/'+name+'.mjs',import.meta.url),'utf8'),start=source.indexOf('function negamax('),end=source.indexOf('\nconst meta=',start);
   assert.ok(start>=0&&end>start);

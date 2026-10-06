@@ -7,6 +7,7 @@ import {createConnect4RbaSharedExactCache32,isCompactProfile8} from './rba-conne
 import {validateConnect4CacheCapacity32} from './rba-connect4-cache-capacity.mjs';
 import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './rba-connect4-shared-exact-cache-layout.mjs';
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
+import {prepareSupportRankQuery32} from './rba-connect4-support-rank-query.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -46,6 +47,9 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
   const basisViews=supportBasisViews&&Boolean(geometry.supportBasisPlans?.closures&&geometry.supportBasisPlans?.mirrorMap);
+  const rankPlans=basisViews?prepareSupportRankQuery32(geometry,geometry.supportBasisPlans,supportBasisPlanBudgetBytes):null,
+    rankQuery=rankPlans!==null;
+  if(rankQuery)geometry={...geometry,supportBasisPlans:rankPlans};
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
     readyGate=new Int32Array(new SharedArrayBuffer(20)),
@@ -70,7 +74,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed,basisViews};}
+    searchStarted:started,closed,basisViews,rankQuery,supportRankQueryBytes:geometry.supportBasisPlans?.rankQueryBytes??0};}
   function materializePreparedConnect4SearchResult32(reflected=0){
     const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
       exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
@@ -81,7 +85,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
       sharedSampleMask,workerMode:'minimal',
       sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
-      sharedProofBounds,basisViews,
+      sharedProofBounds,basisViews,rankQuery,supportRankQueryBytes:geometry.supportBasisPlans?.rankQueryBytes??0,
       localCacheLayout:localNative?'native':'split',privateTtEntryBytes:localNative?32:keyWords*4+1,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
       supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
@@ -129,7 +133,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else shared.entries.fill(0);
-    for(let i=0;i<workers;i+=1)session.spawn(new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?'-views':'')+
+    for(let i=0;i<workers;i+=1)session.spawn(new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(rankQuery?'-views-rank':'-views'):'')+
       (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
       root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate});
