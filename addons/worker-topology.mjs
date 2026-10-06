@@ -39,13 +39,17 @@ export function linuxWorkerPlan(read=path=>readFileSync(path,'utf8')){
    capacity:optionalTopologyFile(read,`/sys/devices/system/cpu/cpu${cpu}/cpu_capacity`)})),
   physicalCores=new Set(rows.map(r=>r.core)).size;
  let selected=rows,selection='physical-cores-class-unreported',performanceCores=null;
- if(coreText!==null||atomText!==null){
-  if(coreText===null||atomText===null)throw Error('Incomplete hybrid CPU classification');
-  const p=new Set(parseCpuList(coreText)),e=new Set(parseCpuList(atomText));
-  if(rows.some(r=>p.has(r.cpu)===e.has(r.cpu)))throw Error('Ambiguous hybrid CPU classification');
+ if(coreText!==null){
+  // The P-core mask is authoritative. E cores can span additional PMUs, and
+  // a registered E-core mask can legitimately be empty when those CPUs are offline.
+  const p=new Set(coreText.trim()?parseCpuList(coreText):[]),
+   e=new Set(atomText?.trim()?parseCpuList(atomText):[]);
+  if([...p].some(cpu=>e.has(cpu)))throw Error('Ambiguous hybrid CPU classification');
   selected=rows.filter(r=>p.has(r.cpu));selection='performance-cores';
+ }else if(atomText!==null){
+  throw Error('Performance-core classification unavailable');
  }else if(rows.some(r=>r.capacity!==null)){
-  if(rows.some(r=>r.capacity===null||!/^\d+\s*$/.test(r.capacity)||Number(r.capacity)<=0))throw Error('Incomplete CPU capacity classification');
+  if(rows.some(r=>r.capacity===null||!/^\d+\s*$/.test(r.capacity)||!Number.isSafeInteger(Number(r.capacity))||Number(r.capacity)<=0))throw Error('Incomplete CPU capacity classification');
   const maximum=Math.max(...rows.map(r=>Number(r.capacity)));
   selected=rows.filter(r=>Number(r.capacity)===maximum);
   selection=selected.length===rows.length?'physical-cores':'performance-cores';
