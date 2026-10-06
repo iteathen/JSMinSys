@@ -11711,20 +11711,26 @@
         {
           "op": "control.branch",
           "count": "BRANCH"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "F*C(runtime.field.load)+L*C(memory.load.u32)+ADD*C(alu.add.u32)+S*C(alu.shr.u32)+S*C(alu.shl.u32)+2*S*C(alu.and.u32)+TEST*C(control.test.u32)+BRANCH*C(control.branch)",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(S)*C(alu.shr.u32)+(S)*C(alu.shl.u32)+(2*S)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Executed geometry field reads: selected player offset, singleton boundary and cell coordinate arrays.",
-          "L": "Basis IDs, mover coordinate words, active singleton column/row and support-height reads.",
+          "L": "mover coordinate words, active singleton column/row and support-height reads. Excludes basis-array reads charged by BASIS.",
           "ADD": "Executed offset/index additions and loop increments.",
           "S": "Singleton coordinate-bit tests reached; excludes the first nonsingleton basis entry.",
           "TEST": "Mover selection, loop bound, singleton-boundary, active-bit and frontier-equality predicates.",
-          "BRANCH": "Executed selections, loop control, early break/continue and winning return."
+          "BRANCH": "Executed selections, loop control, early break/continue and winning return.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Nonterminal q only; scan ends at the first larger residual or the first playable mover singleton. No allocation, child construction, board reconstruction, or outcome data. Dimension-derived tables prepared at initialization. Costs are symbolic source-operation accounting, not measured cycle savings."
+        "note": "Nonterminal q only; scan ends at the first larger residual or the first playable mover singleton. No allocation, child construction, board reconstruction, or outcome data. Dimension-derived tables prepared at initialization. Costs are symbolic source-operation accounting, not measured cycle savings. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -12486,14 +12492,18 @@
           "op": "runtime.call.subledger",
           "count": "N",
           "target": "firstSetBitIndex32"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(B)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)+(N)*CALL(firstSetBitIndex32)",
+        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(B)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)+(N)*CALL(firstSetBitIndex32)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Geometry/profile table aliases loaded once on each reached phase.",
-          "L32": "Meta, coordinate words, basis IDs, prepared rows/columns, support heights, shape cells/rows/columns and partner loads.",
+          "L32": "Meta, coordinate words, prepared rows/columns, support heights, shape cells/rows/columns and partner loads. Excludes basis-array reads charged by BASIS.",
           "L8": "Candidate eligibility and response-count loads for visited shapes.",
           "S": "W partner clears plus two stores per odd frontier pair, only after an own fixed-response residual is found.",
           "A": "Word/shape/cell/pair loop increments and offset additions.",
@@ -12503,9 +12513,11 @@
           "SHL": "Coordinate word index bases.",
           "SHR": "Meta/rank and unsigned coordinate conversions.",
           "T": "Guards, loops, fixed-response availability, pairing, certificate early exits.",
-          "N": "Active coordinate memberships actually examined."
+          "N": "Active coordinate memberships actually examined.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Win-only guarded whole-reservoir pairing certificate. No allocation, counters, recursion or oracle. Fixed-response geometry precomputed; dynamic support remains required. Unknown memory/JIT/call-frame costs remain symbolic; actual full solve governs."
+        "note": "Win-only guarded whole-reservoir pairing certificate. No allocation, counters, recursion or oracle. Fixed-response geometry precomputed; dynamic support remains required. Unknown memory/JIT/call-frame costs remain symbolic; actual full solve governs. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -12917,14 +12929,18 @@
           "op": "runtime.call.subledger",
           "count": "CALLS0",
           "target": "firstSetBitIndex32"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+CALLS0*CALL(firstSetBitIndex32)",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(CALLS0)*CALL(firstSetBitIndex32)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Executed runtime.field.load operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
-          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate. Excludes basis-array reads charged by BASIS.",
           "L8": "Executed memory.load.u8 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "S": "Executed memory.store.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "A": "Executed alu.add.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
@@ -12937,9 +12953,11 @@
           "SHR": "Executed alu.shr.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "TEST": "Executed control.test.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "BRANCH": "Executed control.branch operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
-          "CALLS0": "Actual calls to firstSetBitIndex32"
+          "CALLS0": "Actual calls to firstSetBitIndex32",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
+        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -13009,14 +13027,18 @@
           "op": "runtime.call.subledger",
           "count": "CALLS0",
           "target": "firstSetBitIndex32"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+CALLS0*CALL(firstSetBitIndex32)",
+        "expression": "(F)*C(runtime.field.load)+(L)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(XOR)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(CALLS0)*CALL(firstSetBitIndex32)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Executed runtime.field.load operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
-          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
+          "L": "Executed memory.load.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate. Excludes basis-array reads charged by BASIS.",
           "L8": "Executed memory.load.u8 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "S": "Executed memory.store.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "A": "Executed alu.add.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
@@ -13029,9 +13051,11 @@
           "SHR": "Executed alu.shr.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "TEST": "Executed control.test.u32 operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
           "BRANCH": "Executed control.branch operations; geometry-plan counts for cold units, visited own/opponent residual/support counts for hot certificate.",
-          "CALLS0": "Actual calls to firstSetBitIndex32"
+          "CALLS0": "Actual calls to firstSetBitIndex32",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention."
+        "note": "All target response/deadline maps geometry-derived; hot work has no allocations or counters. Counts and hardware costs remain symbolic; full solve measurement decides retention. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -18042,7 +18066,7 @@
       "operations": [
         {
           "op": "memory.load.u32",
-          "count": "SOURCE+BASIS"
+          "count": "SOURCE"
         },
         {
           "op": "memory.load.native_index",
@@ -18100,14 +18124,18 @@
         {
           "op": "runtime.field.load",
           "count": "CTX"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(SOURCE+BASIS)*C(memory.load.u32)+(4*PAIRS)*C(memory.load.native_index)+(RESET)*C(memory.store.u8)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(BITS)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(BITS)*C(alu.clz.u32)+(PAIRS)*C(alu.imul.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(SPOKES)*CALL(addSpoke)+(CTX)*C(runtime.field.load)",
+        "expression": "(SOURCE)*C(memory.load.u32)+(4*PAIRS)*C(memory.load.native_index)+(RESET)*C(memory.store.u8)+(ADD)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(BITS)*C(alu.xor.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(BITS)*C(alu.clz.u32)+(PAIRS)*C(alu.imul.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(SPOKES)*CALL(addSpoke)+(CTX)*C(runtime.field.load)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "SOURCE": "Active mover coordinate words loaded.",
-          "BASIS": "Early basis predicates and actual active slot IDs.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
           "PAIRS": "Active pair IDs actually reached before return.",
           "RESET": "columns only when cardinality preguard passes.",
           "ADD": "Actual source/slot/plan/reset address and loop arithmetic.",
@@ -18119,9 +18147,10 @@
           "TEST": "Reached cardinality/loop/candidate predicates; positive candidate returns immediately without a late guard.",
           "BRANCH": "Actual short-circuit/loop branches.",
           "SPOKES": "At most2*PAIRS, shortened by positive first endpoint.",
-          "CTX": "Actually reached captured context-slot loads; optimizer may hoist/eliminate after inlining, not assumed free."
+          "CTX": "Actually reached captured context-slot loads; optimizer may hoist/eliminate after inlining, not assumed free.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Captured geometry/native plans, reusable worker-local scratch. No allocation, reports, child preparation or generic prototype dispatcher. Actual register/bounds/native-access/inlining costs require optimized diagnostics and whole solve. Table index is direct native field, not packed identity. C53C05predicate supplied by current exact singleton collector, frame-specific across recursion. No child dependency, no per-candidate binary search. Captured context-slot loading is explicitly charged; source-only preload does not imply free registers. C55finder no longer stores failed sentinel or repeats known mask on positives; unchanged per-call seen reset remains charged. addSpoke owns every early mask access."
+        "note": "Captured geometry/native plans, reusable worker-local scratch. No allocation, reports, child preparation or generic prototype dispatcher. Actual register/bounds/native-access/inlining costs require optimized diagnostics and whole solve. Table index is direct native field, not packed identity. C53C05predicate supplied by current exact singleton collector, frame-specific across recursion. No child dependency, no per-candidate binary search. Captured context-slot loading is explicitly charged; source-only preload does not imply free registers. C55finder no longer stores failed sentinel or repeats known mask on positives; unchanged per-call seen reset remains charged. addSpoke owns every early mask access. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -18141,7 +18170,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "BASIS+BITS+3*ACTIVE+HAZARDS"
+          "count": "BITS+3*ACTIVE+HAZARDS"
         },
         {
           "op": "alu.add.u32",
@@ -18166,16 +18195,20 @@
         {
           "op": "control.branch",
           "count": "BRANCH"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(CTX)*C(runtime.field.load)+(FW+HAZARDS)*C(memory.store.u32)+(BASIS+BITS+3*ACTIVE+HAZARDS)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(SHR)*C(alu.shr.u32)+(SHL)*C(alu.shl.u32)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)",
+        "expression": "(CTX)*C(runtime.field.load)+(FW+HAZARDS)*C(memory.store.u32)+(BITS+3*ACTIVE+HAZARDS)*C(memory.load.u32)+(ADD)*C(alu.add.u32)+(SHR)*C(alu.shr.u32)+(SHL)*C(alu.shl.u32)+(AND)*C(alu.and.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "CTX": "Actual captured dimensions, geometry views, owner offsets and forbidden storage reads.",
           "FW": "Prepared forbiddenWords reset for this one frame.",
           "HAZARDS": "Active opponent singletons exactly one row above their landing.",
-          "BASIS": "Singleton prefix plus first non-singleton stop, if reached.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
           "BITS": "Opponent coordinate memberships read for prefixslots.",
           "ACTIVE": "Active singleton cells; column,row and supportheight loads.",
           "ADD": "Frame/slot/word address, increment and height+1 operations.",
@@ -18183,9 +18216,10 @@
           "SHL": "Coordinate membership and hazard column bit masks.",
           "AND": "Slot/column low bits and memberships.",
           "TEST": "Loop/cardinality/active/frontier/duplicate/depth-one predicates actually reached.",
-          "BRANCH": "Reached loop/short-circuit/return branches."
+          "BRANCH": "Reached loop/short-circuit/return branches.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Exact C01/C05predicates together. Dual frontier returns-2; completed hazard mask not required on that early loss path. Parent maskframe survives nested children. No allocation/telemetry/async/physical-terminal mutation."
+        "note": "Exact C01/C05predicates together. Dual frontier returns-2; completed hazard mask not required on that early loss path. Parent maskframe survives nested children. No allocation/telemetry/async/physical-terminal mutation. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -18255,14 +18289,18 @@
         {
           "op": "control.branch",
           "count": 1
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(B)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)+(N)*CALL(firstSetBitIndex32)+(1)*C(control.test.u32)+(1)*C(control.branch)",
+        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(B)*C(alu.sub.u32)+(M)*C(alu.imul.u32)+(AND)*C(alu.and.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(T)*C(control.test.u32)+(T)*C(control.branch)+(N)*CALL(firstSetBitIndex32)+(1)*C(control.test.u32)+(1)*C(control.branch)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Geometry/profile table aliases loaded once on each reached phase.",
-          "L32": "Meta, coordinate words, basis IDs, prepared rows/columns, support heights, shape cells/rows/columns and partner loads.",
+          "L32": "Meta, coordinate words, prepared rows/columns, support heights, shape cells/rows/columns and partner loads. Excludes basis-array reads charged by BASIS.",
           "L8": "Candidate eligibility and response-count loads for visited shapes.",
           "S": "W partner clears plus two stores per odd frontier pair, only after an own fixed-response residual is found.",
           "A": "Word/shape/cell/pair loop increments and offset additions.",
@@ -18272,9 +18310,11 @@
           "SHL": "Coordinate word index bases.",
           "SHR": "Meta/rank and unsigned coordinate conversions.",
           "T": "Guards, loops, fixed-response availability, pairing, certificate early exits.",
-          "N": "Active coordinate memberships actually examined."
+          "N": "Active coordinate memberships actually examined.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Win-only guarded whole-reservoir pairing certificate. No allocation, counters, recursion or oracle. Fixed-response geometry precomputed; dynamic support remains required. Unknown memory/JIT/call-frame costs remain symbolic; actual full solve governs. C51same common legal policy; denial scanned first, optional own guarantee only after full denial. Parameters count actually reached reads/scans, including NONLOSS2; failed own guarantee is no longer an unresolved exit. No additional initialization table/scratch or hot allocations/counters."
+        "note": "Win-only guarded whole-reservoir pairing certificate. No allocation, counters, recursion or oracle. Fixed-response geometry precomputed; dynamic support remains required. Unknown memory/JIT/call-frame costs remain symbolic; actual full solve governs. C51same common legal policy; denial scanned first, optional own guarantee only after full denial. Parameters count actually reached reads/scans, including NONLOSS2; failed own guarantee is no longer an unresolved exit. No additional initialization table/scratch or hot allocations/counters. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27136,14 +27176,18 @@
           "op": "runtime.call.subledger",
           "count": "FALLBACK",
           "target": "evaluateConnect4PreparedCpcResponse32"
+        },
+        {
+          "op": "memory.load.native_index",
+          "count": "BASIS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(L16)*C(memory.load.u16)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(N)*CALL(firstSetBitIndex32)+(FALLBACK)*CALL(evaluateConnect4PreparedCpcResponse32)",
+        "expression": "(F)*C(runtime.field.load)+(L32)*C(memory.load.u32)+(L8)*C(memory.load.u8)+(L16)*C(memory.load.u16)+(S)*C(memory.store.u32)+(A)*C(alu.add.u32)+(SUB)*C(alu.sub.u32)+(AND)*C(alu.and.u32)+(OR)*C(alu.or.u32)+(SHL)*C(alu.shl.u32)+(SHR)*C(alu.shr.u32)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(N)*CALL(firstSetBitIndex32)+(FALLBACK)*CALL(evaluateConnect4PreparedCpcResponse32)+(BASIS)*C(memory.load.native_index)",
         "parameters": {
           "F": "Actually reached captured profile/geometry view aliases and field loads; not free.",
-          "L32": "Meta, heights, active words,basis IDs,response coordinates,shape cells and dynamic slot indices.",
+          "L32": "Meta, heights, active words,response coordinates,shape cells and dynamic slot indices. Excludes basis-array reads charged by BASIS.",
           "L8": "Response/candidate counts and one coverage offset.",
           "L16": "One initial feasibleMask and one coverage lookup per residual not denied by fixed upper response.",
           "S": "columns slot clears plusone overwrite per odd frontier; unused oddColumns array eliminated.",
@@ -27155,9 +27199,11 @@
           "SHR": "Meta,current oddkind,coordinate conversion.",
           "TEST": "Actual guards/supportscan/earlydeny/constraint/own guarantee gates.",
           "N": "Visited opponent+own active memberships.",
-          "FALLBACK": "1only if actualoddcount>6; oldguard/supportpass repeated and charged there."
+          "FALLBACK": "1only if actualoddcount>6; oldguard/supportpass repeated and charged there.",
+          "BASIS": "Actual basis-array reads, including reached early predicates, singleton prefix/search and active residual IDs; counted separately from uint32 state/geometry reads.",
+          "BASIS_BYTES": "Actual supplied basis.BYTES_PER_ELEMENT: ordinary ingress/private arena4, immutable plan1/2/4 chosen by shapeCount at init. Native-index operation is context-specific, not a hot selector."
         },
-        "note": "Common intersection replaces nested mate comparisons. Every residual uses same surviving matching set; no per-residual union, no draw guess. Own guarantee/previousWIN unchanged, broadgeometry >6falls back. No hotallocations, clocks, statistics or configdispatch."
+        "note": "Common intersection replaces nested mate comparisons. Every residual uses same surviving matching set; no per-residual union, no draw guess. Own guarantee/previousWIN unchanged, broadgeometry >6falls back. No hotallocations, clocks, statistics or configdispatch. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27187,7 +27233,9 @@
       "cycleCount": {
         "kind": "symbolic",
         "expression": "(2)*C(runtime.field.load)+(3)*C(runtime.typed_array.allocate)+(1)*C(runtime.object.allocate)+(3)*C(runtime.field.store)",
-        "parameters": {},
+        "parameters": {
+          "NATIVE_WIDTHS": "Each native-index read uses its actual array: sizes width from maxBasis<=255/65535; basis IDs from shapeCount<=256/65536. Both constructor choices occur at init. Ingress basis and strides remain uint32."
+        },
         "note": "Inverse(shapeCount),map1,mirror(keyWords) before readiness. Legacyseen/mirrorBasis/size/unneeded mapcapacity eliminated bycomplete-view contract. Standardbytes g.shapeCount*4+4+g.keyWords*4."
       },
       "status": "decomposed"
@@ -27245,7 +27293,8 @@
           "F": "Reachedplan/geometry/viewfields.",
           "ADD": "Loop/indexsum/addressincrements.",
           "TEST": "Reachedrootterminal/size/ID/loopgates.",
-          "FAIL": "RangeErrorexceptiononlyoninvalidingress; no expectedsolvepathallocation."
+          "FAIL": "RangeErrorexceptiononlyoninvalidingress; no expectedsolvepathallocation.",
+          "NATIVE_WIDTHS": "Each native-index read uses its actual array: sizes width from maxBasis<=255/65535; basis IDs from shapeCount<=256/65536. Both constructor choices occur at init. Ingress basis and strides remain uint32."
         },
         "note": "Position-dependent root handle/IDvalidation AFTERallready, insideprimarytime. Basisorder/size mustmatch; no pernode validationorwitnesspatch."
       },
@@ -27297,7 +27346,8 @@
         "parameters": {
           "C": "Configured columns.",
           "N": "Exactcurrent inverse slots built fromsharednativeIDs, nonecopiedtobasis.",
-          "FIELD": "All plan/geometry/view properties and loop bounds."
+          "FIELD": "All plan/geometry/view properties and loop bounds.",
+          "NATIVE_WIDTHS": "Each native-index read uses its actual array: sizes width from maxBasis<=255/65535; basis IDs from shapeCount<=256/65536. Both constructor choices occur at init. Ingress basis and strides remain uint32."
         },
         "note": "Same supporthandle/inverse build, nochildBasiswrites, ignoredlegacyseen/childBasis/ciargs. Sharedrowread remainsactualcachelocality/IDwidth debt. Onehandle outputalwayspresent."
       }
@@ -27314,7 +27364,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -27371,7 +27421,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "B+D+A"
         },
         {
           "op": "runtime.callback",
@@ -27403,7 +27453,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(B+D+A)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -27431,12 +27481,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27452,7 +27502,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -27509,7 +27559,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "A"
         },
         {
           "op": "runtime.callback",
@@ -27541,7 +27591,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(A)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -27566,12 +27616,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27587,7 +27637,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -27644,7 +27694,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "B+D+A"
         },
         {
           "op": "runtime.callback",
@@ -27676,7 +27726,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(B+D+A)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -27704,12 +27754,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27725,7 +27775,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -27782,7 +27832,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "A"
         },
         {
           "op": "runtime.callback",
@@ -27814,7 +27864,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*CALLBACK(prepareRemove)+A*CALLBACK(removePrepared)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(A)*C(memory.load.native_index)+(K)*CALLBACK(prepareRemove)+(A)*CALLBACK(removePrepared)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -27839,12 +27889,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27860,7 +27910,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -27917,7 +27967,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "B+D+A"
         },
         {
           "op": "runtime.number.multiply",
@@ -27947,7 +27997,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*C(runtime.number.multiply)+A*C(alu.add.u32)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(B+D+A)*C(memory.load.native_index)+(K)*C(runtime.number.multiply)+(A)*C(alu.add.u32)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -27975,12 +28025,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -27996,7 +28046,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -28053,7 +28103,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "A"
         },
         {
           "op": "runtime.number.multiply",
@@ -28083,7 +28133,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*C(runtime.number.multiply)+A*C(alu.add.u32)+U*CALL(applySupportClosureSpan32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(A)*C(memory.load.native_index)+(K)*C(runtime.number.multiply)+(A)*C(alu.add.u32)+(U)*CALL(applySupportClosureSpan32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -28108,12 +28158,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -28129,7 +28179,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -28186,7 +28236,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "B+D+A"
         },
         {
           "op": "runtime.number.multiply",
@@ -28216,7 +28266,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+B+D+T+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*C(runtime.number.multiply)+A*C(alu.add.u32)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+T+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*T+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+T+N+J+0+0)*C(alu.shl.u32)+(1+T+J+0+B+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(B+D+A)*C(memory.load.native_index)+(K)*C(runtime.number.multiply)+(A)*C(alu.add.u32)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -28244,12 +28294,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
@@ -28265,7 +28315,7 @@
         },
         {
           "op": "memory.load.u32",
-          "count": "1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0"
+          "count": "1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0"
         },
         {
           "op": "memory.store.u32",
@@ -28322,7 +28372,7 @@
         },
         {
           "op": "memory.load.native_index",
-          "count": "0"
+          "count": "A"
         },
         {
           "op": "runtime.number.multiply",
@@ -28352,7 +28402,7 @@
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+A+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(0)*C(memory.load.native_index)+K*C(runtime.number.multiply)+A*C(alu.add.u32)+U*CALL(applySupportClosure3x32)+HANDLE*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+CLOSE_ADDR*C(alu.add.u32)",
+        "expression": "(FIELD)*C(runtime.field.load)+(1+C+0+0+0+0+2*W+RS+Q+P+2*U+2*0+I+0+0)*C(memory.load.u32)+(C+2*Z+3+END+K+0+0+0)*C(memory.store.u32)+(MULTIPLY)*C(runtime.number.multiply)+(ADD)*C(alu.add.u32)+(SUBTRACT)*C(alu.sub.u32)+(1+2*0+3*N+J+P+0+2*0+K)*C(alu.and.u32)+(1+END+0+N+J+0+0)*C(alu.shl.u32)+(1+0+J+0+0+I+2*K)*C(alu.shr.u32)+(W+END+0+0)*C(alu.or.u32)+(0+N)*C(alu.xor.u32)+(0+N)*C(alu.clz.u32)+(TEST)*C(control.test.u32)+(BRANCH)*C(control.branch)+(K)*CALL(loadSupportClosureBasisView32)+(A)*C(memory.load.native_index)+(K)*C(runtime.number.multiply)+(A)*C(alu.add.u32)+(U)*CALL(applySupportClosure3x32)+(HANDLE)*C(memory.load.u32)+(2*HANDLE+CLOSE_ADDR)*C(runtime.number.multiply)+(CLOSE_ADDR)*C(alu.add.u32)",
         "parameters": {
           "C": "Configured columns copied to child support.",
           "Z": "Coordinate words per player cleared before terminal tests.",
@@ -28377,12 +28427,12 @@
           "MULTIPLY": "Executed numeric multiplications in this function only, including cell calculation; V8 constant folding is not assumed.",
           "TEST": "Executed source predicate evaluations, including short-circuit operands and loop-exit tests; does not assert a machine branch per predicate.",
           "BRANCH": "Executed source control selections in this function only, including loops, conditional expressions and short-circuit paths; lowering remains unverified.",
-          "WORD_BYTES": "1 when shapeWordCount <= 256, 2 when <= 65536, otherwise 4; selected once in geometry, governs C(memory.load.native_index) without a hot dispatch.",
           "W": "ceil(n/32) owner-union words scanned on nonterminal construction; final word masked to n. SUBTRACT/ADD/TEST/BRANCH include per-word scan and per-active-bit extraction rather than inactive-slot tests.",
           "HANDLE": "K: one scratch handle read and two closure-base multiplies.",
-          "CLOSE_ADDR": "U: one closure-row multiplication and addition."
+          "CLOSE_ADDR": "U: one closure-row multiplication and addition.",
+          "BASIS_BYTES": "Plan ID width: shapeCount <=256 selects1, <=65536 selects2, otherwise4 bytes; standard7x6 is Uint16. Cold array selection; no decoder or hot width switch."
         },
-        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder."
+        "note": "Grouped closure replaces cardinality discovery and all hot prepareSubset/shapeSubsetPrepared calls. H counts two Uint32 mask/seen loads, one native-width word-index load and one intersection each; V counts isolated-bit extraction, clz32, local-index translation and conditional player writes. E/O read-modify-write loads are included. Exact current child-set intersection certifies inverse-map membership; stale entries are never tested as membership. Integer, property and control source multiplicities are symbolic path counts (no runtime counters), not invented fixed machine costs. Bounds guards, signedness conversions, register allocation, overlap, locality and JIT remain unverified machine debt. Callee work is counted only through subledgers. Prepared variants require saved removal and inverse scratch at seenOffset zero; generic variant retains both optional fallbacks. Native word-index width is chosen from the exact geometry word-count range at initialization, not board dimensions. The hot expression remains a direct typed-array indexed load; actual polymorphism/guards and width-specific lowering remain unverified until measured. C11 generated nonwinning-move specialization: the selected legal move is proved nonwinning before entry. All immediate singleton search/test operations removed; general entry point remains unchanged and first-win-aware. C19 active union traversal preserves increasing slot order and closure-before-absorption. Unary bit negation/index subtraction is in SUBTRACT; word-address and index additions in ADD; loops/tail/short-circuit selections in TEST/BRANCH. Word count and tail-mask shifts are included; no claim of measured Intel savings. C21 complete support plan replaces basis rebuilding/sorting only. Existing inverse construction, active-owner projection and closure absorption remain; removal is read directly from dense geometry or sparse callback instead of saved removed scratch. Library/frame contract is otherwise unchanged. C23 replaces the strict-closure traversal and image writes with immutable complete closure OR after the unchanged absorption guard. FIELD/control/address symbols are actual executed source counts of this shorter kernel, not inherited fixed counts; no measured machine-cost inference. C24 removes the immediate child-basis reread/inverse traversal; ADD/TEST/BRANCH count only remaining executed source operations. C44generatedfromexactclosureauthority; ONLYloaderchanges. Sameactiveunion/upsetabsorption/firstterminal/nonwinningguard/ownerfields; parentIDsreadimmutableviewwithscalarrowbase. Nohotflag/allocation/decoder. Review correction: distinguish immutable/native basis reads from uint32 coordinate/state accesses; no measured cycle estimate or solver change."
       },
       "status": "decomposed"
     },
