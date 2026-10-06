@@ -42,7 +42,11 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       layout.kind==='direct'?layout.heightStride:layout.entryWords;
   const banked=layout!==null&&(sharedBankCapacity!==null||sharedCacheCapacity>sharedNativeBankCapacity32(layout));
   if(sharedBankCapacity!==null&&!banked)throw RangeError('shared banks require native layout');
-  if(banked)prepareBankedSharedCapacity32(sharedCacheCapacity,sharedBankCapacity??sharedNativeBankCapacity32(layout));
+  if(banked){
+    const limit=sharedNativeBankCapacity32(layout),capacity=sharedBankCapacity??limit;
+    if(capacity>limit)throw RangeError('native TT bank index exceeds optimized range');
+    prepareBankedSharedCapacity32(sharedCacheCapacity,capacity);
+  }
   else validateConnect4CacheCapacity32(sharedCacheCapacity,sharedStride);
   validateConnect4CacheCapacity32(localCacheCapacity,keyWords);
   if(!Number.isInteger(sharedSampleMask)||sharedSampleMask<0||sharedSampleMask>255||

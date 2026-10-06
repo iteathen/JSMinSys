@@ -14,6 +14,13 @@ test('128GiB compact bank plan uses full unsigned hash space without allocating'
  }
  assert.throws(()=>banks.prepareBankedSharedCapacity32(2**33,2**27),RangeError);
 });
+test('oversized bank overrides reject before support-plan preparation',async()=>{
+ const {prepareLazySmpConnect4Rba32}=await import('../addons/rba-connect4-prepared-session-host.mjs'),
+  geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
+ Object.defineProperty(geometry,'maxBasis',{get(){throw Error('support plans reached before bank validation');}});
+ await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,workers:2,sharedCacheLayout:'native',sharedCacheCapacity:2**29,
+  sharedBankCapacity:2**29,supportBasisPlanBudgetBytes:2**30}),/bank.*optimized|optimized.*bank/i);
+});
 test('profile sizing accounts for every worker and exact fit boundary',async()=>{
  const m=await import('../addons/isomax-memory-profile.mjs'),geometry=prepareConnect4RbaGeometry({columns:7,rows:6}),GiB=2**30;
  for(const workers of [2,3,4,5,6,64]){
