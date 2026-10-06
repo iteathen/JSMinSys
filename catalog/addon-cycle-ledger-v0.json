@@ -45397,6 +45397,25 @@
       }
     },
     {
+      "unit": "addons/worker-pinning.mjs#windowsAllowedGroupMasks",
+      "source": "addons/worker-pinning.mjs",
+      "name": "windowsAllowedGroupMasks",
+      "scope": "cold-worker-affinity-initialization",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.cold.affinity",
+          "count": 1,
+          "note": "Cold per-thread verified binding: Windows Set/GetThreadGroupAffinity or Linux sched_setaffinity/sched_getaffinity with native-word masks, inherited allowance checks and exact readback. Temporary buffers and FFI handles finish before application module load. No search-node work."
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "C(runtime.cold.affinity)",
+        "note": "Cold per-thread verified binding: Windows Set/GetThreadGroupAffinity or Linux sched_setaffinity/sched_getaffinity with native-word masks, inherited allowance checks and exact readback. Temporary buffers and FFI handles finish before application module load. No search-node work."
+      }
+    },
+    {
       "unit": "addons/worker-pinning.mjs#queryWindowsAllowedGroups",
       "source": "addons/worker-pinning.mjs",
       "name": "queryWindowsAllowedGroups",
@@ -45474,8 +45493,8 @@
     }
   ],
   "summary": {
-    "units": 545,
-    "decomposed": 545,
+    "units": 546,
+    "decomposed": 546,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
@@ -45658,8 +45677,8 @@
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-proofs-local32.mjs": "f11346bb2a96baf353e3422229b9aea8b731d54b",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32.mjs": "6cd3c90586dd44d84c9be418562f486ed82389d3",
     "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32.mjs": "40d1c3482bdec39dc8fafcef7377111d96c0646b",
-    "addons/worker-topology.mjs": "9b44bdd6eef459b287989c05b40ace85ed198e72",
-    "addons/worker-pinning.mjs": "da70033fc36a010a46dfb7a795b1f76a31aab154",
+    "addons/worker-topology.mjs": "a9f6ab060091377a2df7f1c4d36d0520bfae4671",
+    "addons/worker-pinning.mjs": "5591fc18ab77bb0cffe869f5f26b93e7351e32ba",
     "addons/worker-startup-affinity.mjs": "44450aa2dbc7b3c6e4b7a0e3134ec4419eff0169"
   },
   "isomaxLocalKernel": {

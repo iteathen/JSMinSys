@@ -85,7 +85,7 @@ export function darwinWorkerPlan(read=key=>execFileSync('/usr/sbin/sysctl',['-n'
 }
 export async function discoverWorkerPlan(){
  let plan;
- if(process.platform==='win32')plan=windowsWorkerPlan(await queryWindowsTopology(),await queryWindowsAllowedGroups());
+ if(process.platform==='win32'){const topology=await queryWindowsTopology();plan=windowsWorkerPlan(topology,await queryWindowsAllowedGroups(topology));}
  else if(process.platform==='linux')plan=linuxWorkerPlan();
  else if(process.platform==='darwin')plan=darwinWorkerPlan();
  else throw Error(`CPU topology discovery is unsupported on ${process.platform}; supply an explicit worker count`);

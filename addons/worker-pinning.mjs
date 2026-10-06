@@ -1,7 +1,13 @@
 // Cold verified per-thread CPU binding, completed before worker initialization.
 import {endianness} from 'node:os';
 import {bindCurrentThread} from './worker-affinity.mjs';
-export async function queryWindowsAllowedGroups(){
+export function windowsAllowedGroupMasks(topology,assigned,processMask=null,systemMask=null){
+ if(assigned.length===1&&processMask!==null&&processMask!==systemMask)return [{group:assigned[0],mask:processMask}];
+ const masks=new Map();
+ for(const core of topology.cores)for(const g of core.groups)masks.set(g.group,(masks.get(g.group)??0n)|BigInt(g.mask));
+ return [...masks].map(([group,mask])=>({group,mask:mask.toString()}));
+}
+export async function queryWindowsAllowedGroups(topology){
  if(process.platform!=='win32')throw Error('Windows process affinity required');
  const {DynamicLibrary}=await import('node:ffi'),lib=new DynamicLibrary('kernel32.dll');
  try{
@@ -17,11 +23,11 @@ export async function queryWindowsAllowedGroups(){
   }
   if(count.readUInt16LE(0)===1){
    if(!masks(handle,processMask,systemMask))throw Error('Cannot discover process CPU allowance');
-   return [{group:ids.readUInt16LE(0),mask:processMask.readBigUInt64LE(0).toString()}];
+   return windowsAllowedGroupMasks(topology,[ids.readUInt16LE(0)],processMask.readBigUInt64LE(0).toString(),systemMask.readBigUInt64LE(0).toString());
   }
-  // Windows exposes this mask only for single-group processes. Bind/readback
-  // remains the final authority for each target in a multi-group process.
-  return Array.from({length:count.readUInt16LE(0)},(_,i)=>({group:ids.readUInt16LE(i*2),mask:'18446744073709551615'}));
+  // Current group assignment does not prohibit explicit binding to another
+  // active group. Every eventual worker binding still requires exact readback.
+  return windowsAllowedGroupMasks(topology,Array.from({length:count.readUInt16LE(0)},(_,i)=>ids.readUInt16LE(i*2)));
  }finally{lib.close();}
 }
 export async function configureCurrentWorkerAffinity(target){

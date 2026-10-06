@@ -22,6 +22,11 @@ test('Windows allowance selects an available SMT sibling without reclassifying E
  assert.equal(p.workers,1);assert.equal(p.targets[0].processor,1);
  assert.equal(windowsWorkerPlan(topology,[{group:0,mask:'4'}]).workers,0);
 });
+test('default Windows group assignment does not hide other bindable groups',()=>{
+ const t={cores:[{groups:[{group:0,mask:'3'}]},{groups:[{group:1,mask:'12'}]}]};
+ assert.deepEqual(pinning.windowsAllowedGroupMasks(t,[0],'3','3'),[{group:0,mask:'3'},{group:1,mask:'12'}]);
+ assert.deepEqual(pinning.windowsAllowedGroupMasks(t,[0],'1','3'),[{group:0,mask:'1'}]);
+});
 test('Linux capacity ranking uses system classes even when only E cores are allowed',()=>{
  const files={'/proc/self/status':'Cpus_allowed_list:\t2-3\n','/sys/devices/system/cpu/online':'0-3'};
  for(let i=0;i<4;i++){files[`/sys/devices/system/cpu/cpu${i}/topology/thread_siblings_list`]=String(i);files[`/sys/devices/system/cpu/cpu${i}/cpu_capacity`]=i<2?'1024':'512';}
