@@ -13,3 +13,7 @@ Reviewer fresh verification: 11 targeted cache/handle/compiler/transport tests; 
 Independent recalculation confirms C66 4.287% primary improvement, 3.419% whole-operation cycle improvement, 1.165% whole-operation wall improvement. Primary mean53.828s; initialization2.018s->3.755s. The <=10s objective remains unmet.
 
 Added missing retained generator checks to the correctness-only Verify workflow. GitHub timings are not performance authority. Main and the published isomax package remain untouched.
+
+The same reviewer inspected the correction at `1eddb12fa4dc80275e825025065e08898c3ffb14`: reported finding resolved, no flaw specific to the correction. It verified budget admission precedes reuse, native shared buffers are returned by identity, replacement accounting subtracts old bytes, and ledger/source identities include cold reuse checks. It read saved 423/423 suite results and ran no tests or CPU-heavy work during the final localhost confirmation.
+
+Correctness CI at that exact source commit passed all three jobs (Verify, schema, node compatibility): https://github.com/iteathen/JSMinSys/actions/runs/37429205584 . The source commit's fresh complete localhost confirmation returned EXACT WIN/c4 in 54,155.658 ms, all four workers ready/exited/clean; raw evidence is `../minimal-worker-localhost-20261004/fusion-final-confirm-01/`.
