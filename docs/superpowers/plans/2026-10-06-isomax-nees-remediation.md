@@ -74,3 +74,6 @@ when needed to resolve noise; rejected experiments restored and tested too.
 - Change4 `bccd9ae`: actual completion source executed for96 winner/loser/cancelled
   paths across32 variants, now matches stores/RMW/notify accounting. Full
   `nees-fix-04-completion`:38.528148s,213.046875s CPU,EXACT/WIN/c4,six pins/exits.
+- Change5 `30e670c`: three maintenance generators reject unrelated source drift;
+  all rerun and11 tests/catalog pass. Full `nees-fix-05-scoped-guards`:39.4775608s,
+  216.453125s CPU,EXACT/WIN/c4,six pins/exits. Solver remains baseline-identical.

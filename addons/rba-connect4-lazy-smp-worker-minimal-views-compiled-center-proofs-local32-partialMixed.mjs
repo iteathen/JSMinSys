@@ -53,7 +53,6 @@ const CONTROL_STOP=0,CONTROL_DONE=1,CONTROL_WAKE=3,CONTROL_WINNER=4,
   sharedProbe=probeIndexPartialMixedShared32,sharedStore=storeIndexPartialMixedShared32,
   localProbe=probeIndexPartialMixedLocal32,localStore=storeIndexPartialMixedLocal32,
   sharedSampleBits=(workerData.sharedSampleMask<<24)>>>0,
-  localMask=workerData.localCacheCapacity-1,
   localCache=createMixedIndexPartialCache32({geometry:g,capacity:workerData.localCacheCapacity}),
   localKeys=localCache.entries;
 
@@ -93,24 +92,24 @@ function relativeToAbsolute(value,mover){
   return value===0?2:mover===0?value+2:2-value;
 }
 
-function probeCache(src,hash,slot,support,tail,mover){
+function probeCache(src,hash,support,mover){
   const local=localProbe(localCache,words,src,hash,support);
   if(local)return local;
   if(!(hash&sharedSampleBits)){
-    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support,tail),mover);
+    const value=transportConnect4ZeroBound32(sharedProbe(shared,words,src,hash,support),mover);
     if(value){localStore(localCache,words,src,value,hash,support);return value;}
   }
   return 0;
 }
 
-function storeExact(src,hash,slot,value,depth,mover,support,tail){
+function storeExact(src,hash,value,depth,mover,support){
   localStore(localCache,words,src,value,hash,support);
   frontStore(words,src,depth,value,mover);
   if(!(hash&sharedSampleBits))
-    sharedStore(shared,words,src,value,hash,support,tail);
+    sharedStore(shared,words,src,value,hash,support);
 }
 
-function storeBound(src,hash,slot,value,depth,mover,support,tail){
+function storeBound(src,hash,value,depth,mover,support){
   frontStore(words,src,depth,value,mover);
   const prior=localProbe(localCache,words,src,hash,support);
   if(prior){
@@ -124,7 +123,7 @@ function storeBound(src,hash,slot,value,depth,mover,support,tail){
   }
   localStore(localCache,words,src,value,hash,support);
   if(!(hash&sharedSampleBits))
-    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,mover),hash,support,tail);
+    sharedStore(shared,words,src,transportConnect4ZeroBound32(value,mover),hash,support);
   return value;
 }
 
@@ -133,12 +132,10 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
   const bi=supportHandle*g.maxBasis,dst=src+g.keyWords,ci=0,
     alphaOrig=alpha,betaOrig=beta,
     hash=depth?mixSpan32Locator32(words,src,g.keyWords):0,
-    slot=depth?(hash&localMask):0,
-    support=depth?(n<=32?packIndexPartial16Heights32(words,src):packIndexPartial24Support32(words,src)|0x80000000):0,
-    tail=0;
+    support=depth?(n<=32?packIndexPartial16Heights32(words,src):packIndexPartial24Support32(words,src)|0x80000000):0;
 
   if(depth){
-    const cached=probeCache(src,hash,slot,support,tail,mover)||frontProbe(words,src,depth,mover);
+    const cached=probeCache(src,hash,support,mover)||frontProbe(words,src,depth,mover);
     if(cached){
       if(cached<=3)return relativeTerminal(cached,mover);
       if(cached===LOCAL_LOWER0){
@@ -155,7 +152,7 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
   // also has no immediate mover win; cofactor uses that proved precondition.
   const forbiddenBase=depth*forbiddenWords,forced=collectSingletons(words,src,basis,bi,n,mover,forbiddenBase);
   if(forced===-2){
-    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover,support,tail);
+    if(depth)storeExact(src,hash,mover?3:1,depth,mover,support);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
       if(words[src+column]<g.rows){bestMove=column;break;}
@@ -166,20 +163,20 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
   // One common legal policy: WIN or a one-sided NONLOSS for previous mover.
   const response=evaluateConnect4PreparedCpcResponse32(cpc,words,src,basis,bi,n,mover^1);
   if(response===2){
-    if(depth&&alpha>=0){storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover,support,tail);return 0;}
+    if(depth&&alpha>=0){storeBound(src,hash,LOCAL_UPPER0,depth,mover,support);return 0;}
     if(beta>0)beta=0;
   }else if(response===0){
     // Unresolved response policy falls through to independent pair proof.
     const fork=evaluatePairHub(words,src,basis,bi,n,mover,forced,forbiddenBase);
     if(fork>=0){
-      if(depth)storeExact(src,hash,slot,relativeToAbsolute(1,mover),depth,mover,support,tail);
+      if(depth)storeExact(src,hash,relativeToAbsolute(1,mover),depth,mover,support);
       else bestMove=fork;
       return 1;
     }
   }
   if(response===1||
      evaluateTargetCpc(targetCpc,words,src,basis,bi,n,mover^1)){
-    if(depth)storeExact(src,hash,slot,mover?3:1,depth,mover,support,tail);
+    if(depth)storeExact(src,hash,mover?3:1,depth,mover,support);
     else for(let oi=0;oi<g.columns;oi+=1){
       const column=centerOrder[oi];
       if(words[src+column]<g.rows){bestMove=column;break;}
@@ -225,17 +222,17 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
     // non-exact zero-threshold bounds remain worker-local.
     if(best>alphaOrig&&best<betaOrig){
       const exact=relativeToAbsolute(best,mover);
-      storeExact(src,hash,slot,exact,depth,mover,support,tail);
+      storeExact(src,hash,exact,depth,mover,support);
     }else if(best>=betaOrig){
       if(best===1){
         const exact=relativeToAbsolute(1,mover);
-        storeExact(src,hash,slot,exact,depth,mover,support,tail);
-      }else if(best===0)storeBound(src,hash,slot,LOCAL_LOWER0,depth,mover,support,tail);
+        storeExact(src,hash,exact,depth,mover,support);
+      }else if(best===0)storeBound(src,hash,LOCAL_LOWER0,depth,mover,support);
     }else if(best<=alphaOrig){
       if(best===-1){
         const exact=relativeToAbsolute(-1,mover);
-        storeExact(src,hash,slot,exact,depth,mover,support,tail);
-      }else if(best===0)storeBound(src,hash,slot,LOCAL_UPPER0,depth,mover,support,tail);
+        storeExact(src,hash,exact,depth,mover,support);
+      }else if(best===0)storeBound(src,hash,LOCAL_UPPER0,depth,mover,support);
     }
   }
   return best;

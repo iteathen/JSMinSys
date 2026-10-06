@@ -37,6 +37,12 @@ for(const kind of ['partial24','partialMixed'])for(const center of [false,true])
   once('localCache=createIndexPartialCache32({geometry:g,capacity:workerData.localCacheCapacity}),','localCache=createMixedIndexPartialCache32({geometry:g,capacity:workerData.localCacheCapacity}),');
   once('support=depth?packIndexPartial24Support32(words,src):0,','support=depth?(n<=32?packIndexPartial16Heights32(words,src):packIndexPartial24Support32(words,src)|0x80000000):0,');
  }
+ // Cache consumers already derive their row from the complete hash. These
+ // inherited slot/tail ABI values are never consumed by a partial identity.
+ once('  localMask=workerData.localCacheCapacity-1,\n','');
+ once('    slot=depth?(hash&localMask):0,\n','');
+ once(',\n    tail=0;',';');
+ s=s.replaceAll(',hash,slot,',',hash,').replaceAll(',support,tail',',support');
  s='// GENERATED exact index-'+kind+' candidate; full32bit sequence unchanged.\n'+s;
  if(process.argv.includes('--check'))assert.equal(readFileSync(target,'utf8').replaceAll('\r\n','\n'),s);else writeFileSync(target,s);
 }
