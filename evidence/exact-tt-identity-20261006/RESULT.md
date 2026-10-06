@@ -66,6 +66,8 @@ answers were never worker inputs. Concurrent colliding writers, busy/wrap/clone,
 all five proof tags, disjoint offsets and10000 independent modular inversions
 passed. **No full10x10 solve was attempted.** Sealed formula holdouts stayed sealed.
 
-Current candidate admission requires compact7x6, compiled support plans, native
-caches and one optimized shared bank. Banked/large-profile production integration
-is not yet qualified. Production isomax package/defaults/main are unchanged.
+That initial batch admitted compact7x6, compiled support plans, native caches
+and one optimized shared bank. The subsequent extension is recorded in
+[TWELVE-GIB-RESULT.md](TWELVE-GIB-RESULT.md), including fresh banked controls.
+Larger production profiles are not qualified by those bounded tests. Production
+isomax package/defaults/main are unchanged.
