@@ -1,0 +1,30 @@
+✔ compiled preparation and resource fallback both release four workers without position work (2375.9741ms)
+✔ public prepared session reuses supplied compiled geometry without inflating resource reporting (64.7406ms)
+✔ prepared native fields preserve exact keys, collisions and all proof tags (10.4476ms)
+✔ abort during joined exact-result cleanup cannot replace DONE (72.757ms)
+✔ application preparation allocates all four workers but performs no search (62.3167ms)
+✔ closing an idle prepared application joins workers without a solve (59.9391ms)
+✔ ordinary minimal API also waits for every worker before search (62.7863ms)
+✔ pre-aborted empty preparation returns INTERRUPTED rather than initialization error (0.7031ms)
+✔ closing an active prepared search resolves its result and joins every worker (73.7276ms)
+✔ banked compact32 keeps distinct global slots, exact keys and proof tags (2.2958ms)
+✔ bank attachment rejects aliases, inconsistent mapping and malformed buffers (0.7166ms)
+✔ concurrent banked writers never return a value for a different exact key (39.4331ms)
+✔ prepared host initializes banked TT before search and joins all workers (67.22ms)
+✔ layout preserves exact semantic equality at forced collisions and nonzero offsets (3.4499ms)
+✔ public layout APIs preserve optional full-q locator and no-geometry full-span identity (1.397ms)
+✔ uncounted binding keeps reporting untouched while counted busy writes are reported (0.4372ms)
+✔ zero sequence after rollover remains a miss and later publication restores visibility (0.2354ms)
+✔ attachment repairs cloned/truncated views without copying and rejects wrong backing (0.6949ms)
+✔ native heights preserve both sides of uint8 and uint16 field boundaries (0.1853ms)
+✔ layout sizing rejects unsafe or aliased capacities before allocating (0.2713ms)
+✔ attachment rejects malformed cloned layout offsets before permitting overlapping atomic fields (0.2419ms)
+✔ concurrent compact/direct/full-span writers never return another exact key value (179.8108ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3495.9383
