@@ -37,6 +37,14 @@ test('Linux physical fallback never counts hyperthreads as extra workers',()=>{
  const plan=topology.linuxWorkerPlan(fakeReader(files));assert.equal(plan.workers,2);
  assert.equal(plan.selection,'physical-cores-class-unreported');
 });
+for(const atom of ['2-3',''])test(`Linux P-core selection tolerates low-power PMUs and empty E masks (${atom})`,()=>{
+ const files={'/proc/self/status':'Cpus_allowed_list:\t0-5\n',
+  '/sys/bus/event_source/devices/cpu_core/cpus':'0-1',
+  '/sys/bus/event_source/devices/cpu_atom/cpus':atom,
+  '/sys/bus/event_source/devices/cpu_lowpower/cpus':'4-5'};
+ for(let i=0;i<6;i++)files[`/sys/devices/system/cpu/cpu${i}/topology/thread_siblings_list`]=String(i);
+ assert.equal(topology.linuxWorkerPlan(fakeReader(files)).workers,2);
+});
 test('Linux capacity classes distinguish heterogeneous ARM cores',()=>{
  const files={'/proc/self/status':'Cpus_allowed_list:\t0-3\n'};
  for(let i=0;i<4;i++){

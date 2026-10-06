@@ -57,7 +57,7 @@ export function selectPerformanceTargets(topology,count){
  return validateWorkerTargets(topology,targets,count);
 }
 export async function queryWindowsTopology(){
- if(process.platform!=='win32'||process.arch!=='x64')throw Error('Windows x64 affinity profile required');
+ if(process.platform!=='win32'||(process.arch!=='x64'&&process.arch!=='arm64'))throw Error('Windows 64-bit topology required');
  const {DynamicLibrary}=await import('node:ffi'),lib=new DynamicLibrary('kernel32.dll');
  try{
   const get=lib.getFunction('GetLogicalProcessorInformationEx',{arguments:['int32','buffer','buffer'],return:'int32'}),

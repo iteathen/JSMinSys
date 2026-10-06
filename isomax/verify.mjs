@@ -3,7 +3,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 const base=new URL('./',import.meta.url),lock=JSON.parse(readFileSync(new URL('provenance.json',base))),
  required=['index.mjs','cli.mjs','run.mjs','run-i5.ps1','profile.json','example.mjs','package.json','verify.mjs','README.md','evidence/README.md','test/smoke.test.mjs','test/package-verification.test.mjs'];
-assert.equal(lock.sourceCommit,'8ea0b505993631a78d4005a2112e53efa41a8c82');assert.equal(lock.workerModules.length,24);
+assert.equal(lock.sourceCommit,'a02bc4946d741e4aaacc30802aeb850fa8c59a95');assert.equal(lock.workerModules.length,24);
 for(const p of [...required,...lock.workerModules])assert.ok(lock.files[p],'Unlocked required file: '+p);
 for(const [path,record] of Object.entries(lock.files)){
  assert.ok(!path.startsWith('/')&&!path.split('/').includes('..'));
