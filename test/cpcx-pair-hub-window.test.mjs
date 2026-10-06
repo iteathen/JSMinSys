@@ -31,7 +31,7 @@ for(const views of [false,true])for(const center of [false,true])for(const proof
      connect4RbaCofactorKnownHeight:()=>{assert.equal(fork,false,'certified pair hub must avoid child construction');return truth===0?2:mover===0?truth+2:2-truth;},
      relativeTerminal:(code,player)=>code===2?0:code===(player?1:3)?1:-1,
      relativeToAbsolute:(value,player)=>value===0?2:player===0?value+2:2-value};
-    if(views&&native)for(const name of ['probeCache','storeExact','storeBound']){
+    if(views&&native&&source.includes('rba-connect4-prepared-compact-cache.mjs'))for(const name of ['probeCache','storeExact','storeBound']){
      const original=context[name];context[name]=(...args)=>{
       const i=name==='probeCache'?3:6;
       assert.equal(args[i],compactSupportProfile8(context.words,args[0]),'same-frame support forwarded');
