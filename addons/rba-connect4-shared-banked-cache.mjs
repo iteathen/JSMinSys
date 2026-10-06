@@ -17,6 +17,9 @@ export function createBankedCompactSharedCache32({capacity,bankCapacity,keyWords
 }
 
 export function attachBankedCompactSharedCache32(cache){
+ // Attachment accepts our factory's topology and whole-object clones. JS SAB
+ // object identity cannot authenticate independently supplied native backing
+ // handles; arbitrary manually assembled bank topologies are not supported.
  const capacity=cache.mask+1,banks=cache.banks;
  validateConnect4CacheCapacity32(capacity,1);
  if(cache.layout?.kind!=='compact32'||cache.keyWords!==14||cache.storedKeyWords!==8||cache.compact8!==1||
@@ -24,7 +27,8 @@ export function attachBankedCompactSharedCache32(cache){
   !Number.isInteger(Math.log2(banks.length))||cache.bankMask!==banks.length-1||
   !Number.isInteger(cache.bankShift)||cache.bankShift<0||cache.bankShift>27||
   capacity!==banks.length*2**cache.bankShift||!(cache.stats instanceof Uint32Array)||cache.stats.length!==3||
-  !(cache.stats.buffer instanceof SharedArrayBuffer))throw RangeError('invalid compact TT bank mapping');
+  !(cache.stats.buffer instanceof SharedArrayBuffer)||cache.stats.byteOffset!==0||cache.stats.buffer.byteLength!==12)
+   throw RangeError('invalid compact TT bank mapping');
  const buffers=new Set();
  for(const bank of banks){
   if(bank.banks!==undefined||bank.mask!==2**cache.bankShift-1||bank.keyWords!==cache.keyWords||

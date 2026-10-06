@@ -32,7 +32,8 @@ test('banked compact32 keeps distinct global slots, exact keys and proof tags',(
 test('bank attachment rejects aliases, inconsistent mapping and malformed buffers',()=>{
  const make=()=>cacheApi.createConnect4RbaSharedLayoutCache32({capacity:16,bankCapacity:8,keyWords:geometry.keyWords,geometry});
  for(const corrupt of [c=>c.bankShift++,c=>c.bankMask=0,c=>c.banks[1]=c.banks[0],c=>c.banks[0].entries=new Uint32Array(new SharedArrayBuffer(4)),
-  c=>c.stats=new Uint32Array(c.banks[0].entries.buffer,24,3)]){
+  c=>c.stats=new Uint32Array(c.banks[0].entries.buffer,24,3),
+  c=>c.stats=new Uint32Array(structuredClone(c.banks[0].entries.buffer),24,3)]){
   const cache=make();assert.equal(cache.banks?.length,2);corrupt(cache);
   assert.throws(()=>cacheApi.attachConnect4RbaSharedLayoutCache32(cache),RangeError);
  }
