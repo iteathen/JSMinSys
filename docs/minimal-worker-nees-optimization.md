@@ -1,15 +1,47 @@
 # Minimal Lazy-SMP worker — NEES-EXTREME optimization record
 
-**Status:** active optimization authority  
-**Scope:** `addons/rba-connect4-lazy-smp-worker-minimal.mjs` and the directly coupled RBA/TT execution it invokes  
-**NEES authority:** NEES Draft 0.5, NEES-EXTREME  
-**Runtime profile:** `node26-v8-14.6`  
-**Performance target:** exact empty-board standard 7x6 solve in **<= 10,000 ms** on the local Intel Core i5-12600K target  
-**Hardware target authority:** `profiles/minimal-worker-i5-12600k-target.json`  
-**Primitive-cycle policy:** every repeated E0/E1 primitive remains optimization debt until its role is required, its realization is cycle-qualified on the target, or a lower-cost replacement is costed out.  
-**Current worker source identity at baseline:** `ecca6a46a535c7209c83ea22f6422577aa12cea0`
+- **Status:** baseline audit with current promoted checkpoint below.
+- **Scope:** minimal worker families and their directly coupled RBA/TT support libraries.
+- **NEES authority:** NEES Draft 0.5, NEES-EXTREME.
+- **Accounting profile:** `node26-v8-14.6`; measured promotion uses the recorded Node 27 nightly.
+- **Performance target:** exact empty-board standard 7x6 solve in **<= 10,000 ms** on the local Intel Core i5-12600K.
+- **Current configuration authority:** `isomax/profile.json` and raw localhost evidence; `profiles/minimal-worker-i5-12600k-target.json` is the baseline target record.
+- **Primitive-cycle policy:** every repeated E0/E1 primitive remains optimization debt until its role is required, its realization is cycle-qualified on the target, or a lower-cost replacement is costed out.
+- **Worker source identity at baseline:** `ecca6a46a535c7209c83ea22f6422577aa12cea0`.
 
 This document is the durable first-adoption E0-E2 baseline audit and optimization-debt/disposition record required by NEES-EXTREME. Later coherent changes inherit this record and re-audit the affected causal neighborhood plus any invalidated assumptions.
+
+## Current promoted checkpoint — 2026-10-06
+
+IsoMax 0.2.0-rc.2 was promoted at `8e176bc03bec4a0f8d7871d49595f7e0a4fd88be`.
+See [current setup, configuration and qualification](isomax-current.md),
+[package profile](../isomax/profile.json), and
+[overhead-sharing campaign](../evidence/isomax-overhead-fusion-20261005/CURRENT-CHECKPOINT.md).
+
+The retained path uses four deep center/live workers, native 32-byte TTs,
+licensed shared zero bounds and exact outcomes, current-position tactical
+certificates, canonical support handles, prepared compact TT fields and compiled
+transition slots/stability planes. It removes per-child inverse rebuilding on
+the admitted compiled path. Generic geometry and auxiliary-budget failures
+select the retained fallback at initialization. Worker creation, table/geometry
+allocation and configuration selection occur before the readiness barrier.
+
+Diagnostic node/cutoff/hit counters are absent from the production hot loop;
+reported counts are unavailable. Required cancellation polling, cache protocol
+atomics and exact semantic transitions remain. The current sharing policy must
+not be reverted from historical exact-only or narrow-sharing experiment prose.
+
+C63+C34 were retained together; standalone gains remained unqualified. C65's
+mover reuse was retained for simpler phase ownership, with speed unqualified.
+C66's compiled transitions improved matching primary mean 56.239 s to 53.828 s
+(4.287%) and whole-operation cycles by 3.419%, with 445 MiB added geometry.
+Binary rank, membership/prefix rank and the larger-JIT-budget retest were rejected;
+the prebound factory was removed without claiming a proven slowdown. Rejected
+machinery is absent from retained runtime. The target remains unmet.
+
+The execution classes and initial debt tables below describe the original
+baseline. They preserve discovery history; current dispositions and source locks
+belong to the linked retained campaign and package.
 
 ## Semantic owner
 
@@ -29,7 +61,7 @@ At this document's original baseline, CPC, NDC, live-line evaluation, heuristic 
 
 ### E0 — recurrence
 
-`negamax()` is the E0 recurrence. Per visited node it currently includes:
+`negamax()` is the E0 recurrence. At this document's original baseline it included:
 
 - stop polling through `Atomics.load`;
 - node accounting;
@@ -45,7 +77,7 @@ At this document's original baseline, CPC, NDC, live-line evaluation, heuristic 
 
 ### E1 — transition / probe work
 
-The principal E1 mechanisms are:
+The original baseline's principal E1 mechanisms were:
 
 - `connect4RbaCofactorKnownHeight`;
 - `connect4RbaCanonicalize`;
@@ -216,9 +248,10 @@ The explicit objective is **<=10 seconds**, not a proxy node count or local help
 
 ### Primitive hot-path audit
 
-Every primitive below is considered live optimization debt unless marked required/tradeoff:
+The following table records baseline debt. Apply the current checkpoint above
+before treating an item as a remaining production cost.
 
-| Primitive / mechanism | Frequency | Current status | Required next evidence |
+| Primitive / mechanism | Baseline frequency | Baseline status | Evidence requested at baseline |
 | --- | --- | --- | --- |
 | shared stop `Atomics.load` | every visited node | UNVERIFIED-DEBT | target generated code + cycle impact; test reduced polling only if cancellation/cleanup bound preserved |
 | node/cutoff/cache-hit counter increments | node/cutoff/hit frequency | UNVERIFIED-DEBT | production path should not pay diagnostic cost unless contract requires it |
