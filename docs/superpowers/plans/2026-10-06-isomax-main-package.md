@@ -72,3 +72,12 @@ immutable source/ledger bindings and extraction closure; preserved main files.
 - Ruling: the metadata discrepancy is Important for exact configuration/evidence
  claims, so repaired with compatibility in the same cold pass. No hot cost added.
  Reviewer declined exhaustive/portable/globalNEES/RSS claims; keep those limits.
+- Completed: PR181 squash-merged to Connect4 main at
+ 389e58993b3f14c1e1772a5d8a7715af494ea3b3 after required verify passed.
+ Owner's configured PR review exception used with exact expected-head guard.
+ Post-merge main verify and Push-on-main workflows both passed. Actual merged
+ tree matches tested branch; package123locks/archiveSHA and bounded main
+ startup verified. No benchmark process remains. OneDrive stays stopped.
+- Disposition: retain the clean main checkout for immediate use and separate
+ archive extractions as qualification recovery copies. Producer source/evidence
+ branch stays intact; original unrelated untracked file remains protected.
