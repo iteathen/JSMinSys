@@ -38,6 +38,13 @@ test('retaining a closed application does not retain its large shared TT buffer'
   for(let i=0;i<8;i++){await new Promise(setImmediate);global.gc();await new Promise(setImmediate);}
   assert.ok(tracked.every(ref=>ref.deref()===undefined),'closed application still retains TT backing handle');
   assert.equal(app.state().cleanup,true);assert.equal(app.state().workersExited,4);
+  const afterClose=await app.solve([]);
+  assert.ok(afterClose.sharedTtPayloadBytes>=65536,'allocated TT size remains available after reference release');
+  assert.ok(afterClose.sharedBytes>=afterClose.sharedTtPayloadBytes);
+  assert.equal(afterClose.sharedTtLogicalEntries,8192);
+  assert.equal(afterClose.searchStarted,undefined);
+  assert.equal(afterClose.preparedTiming.rootConstructedAfterReady,false);
+  assert.equal(afterClose.workersUsed,4);assert.equal(afterClose.workersExited,4);
   await app.close();
  }finally{
   globalThis.SharedArrayBuffer=Native;process.execArgv.splice(0,process.execArgv.length,...argv);

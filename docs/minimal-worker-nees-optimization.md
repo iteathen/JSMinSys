@@ -11,7 +11,24 @@
 
 This document is the durable first-adoption E0-E2 baseline audit and optimization-debt/disposition record required by NEES-EXTREME. Later coherent changes inherit this record and re-audit the affected causal neighborhood plus any invalidated assumptions.
 
-## Current promoted checkpoint — 2026-10-06
+## Current audit/remediation boundary — 2026-10-06
+
+The frozen package is0.2.0-rc.4; setup/profile authority is described in
+[isomax-current.md](isomax-current.md). It discovers performance cores and memory
+at initialization. The ongoing NEES remediation is an unpromoted producer
+candidate, recorded in [the remediation plan](superpowers/plans/2026-10-06-isomax-nees-remediation.md).
+Its qualification uses six pinned P-core workers and12GiB shared/192MiB private
+TTs on this localhost. Those explicit settings are not portable defaults.
+
+Persistent worker arenas, TTs and geometry plans are prepared before READY.
+One-shot position ingress constructs and validates the actual root after READY;
+that E3 work is included in primary solve time. Initialization cancellation and
+deadline checks are cooperative between synchronous preparation stages, not
+preemptive. After close joins workers, the candidate drops its large owned
+root/TT/geometry references and preserves scalar resource/result metadata.
+Caller-owned plans and garbage-collection/RSS timing remain outside that promise.
+
+## Historical rc.2 promoted checkpoint
 
 IsoMax 0.2.0-rc.2 was promoted at `8e176bc03bec4a0f8d7871d49595f7e0a4fd88be`.
 See [current setup, configuration and qualification](isomax-current.md),

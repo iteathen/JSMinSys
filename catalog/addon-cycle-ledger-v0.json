@@ -738,6 +738,13 @@
         "name": "MEMORY_PROFILE_INIT(platform,geometry,workers,profiles,FFI)"
       },
       "note": "Cold OS/libuv/Windows memory snapshot, catalog construction, power-of-two geometry-dependent cache sizing and admission. Includes FFI construction/close, validation, allocation and result freezing; no periodic or per-node sampling."
+    },
+    "runtime.array.is_array.check": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ARRAY_IS_ARRAY_COST(type,map)"
+      },
+      "note": "Cold ingress Array.isArray predicate; V8 realization not assigned zero cost."
     }
   },
   "units": [
@@ -5349,7 +5356,7 @@
         {
           "op": "memory.allocate.shared.bytes",
           "count": "V",
-          "bytes": "Σ view[i].byteLength"
+          "bytes": "Î£ view[i].byteLength"
         },
         {
           "op": "runtime.typed_view.construct",
@@ -5358,7 +5365,7 @@
         {
           "op": "runtime.array.copy",
           "count": "V",
-          "bytes": "Σ view[i].byteLength"
+          "bytes": "Î£ view[i].byteLength"
         },
         {
           "op": "runtime.object.allocate",
@@ -5894,16 +5901,33 @@
         {
           "op": "runtime.object.allocate",
           "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "validateConnect4MoveHistory32"
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": "M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "M+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "M+1"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(6+4*M)*C(runtime.field.load)+3*C(runtime.typed_array.allocate)+M*C(runtime.integer.check)+(2+4*M)*C(memory.load.u32)+2*M*C(memory.store.u32)+4*M*C(alu.add.u32)+M*C(alu.and.u32)+(3+5*M)*C(control.test.u32)+(3+5*M)*C(control.branch)+CALL(positionCodeEmpty64)+M*CALL(advancePositionCode64)+R*CALL(reflectPositionCode64)+C(runtime.object.allocate)",
+        "expression": "(6+4*M)*C(runtime.field.load)+(3)*C(runtime.typed_array.allocate)+(M)*C(runtime.integer.check)+(2+4*M)*C(memory.load.u32)+(2*M)*C(memory.store.u32)+(4*M)*C(alu.add.u32)+(M)*C(alu.and.u32)+(3+5*M)*C(control.test.u32)+(3+5*M)*C(control.branch)+(1)*CALL(positionCodeEmpty64)+(M)*CALL(advancePositionCode64)+(R)*CALL(reflectPositionCode64)+(1)*C(runtime.object.allocate)+(1)*CALL(validateConnect4MoveHistory32)+(M)*C(runtime.array.reference.load)+(M+1)*C(control.test.u32)+(M+1)*C(control.branch)",
         "parameters": {
           "M": "ingress moves encoded",
           "R": "1 when canonical reflection is requested; 0 otherwise"
         },
-        "note": "Cold optional exact physical position-code construction."
+        "note": "Cold optional exact physical position-code construction. Fixed indexed ingress, never user-defined iterators. RBA reads original once and replays its owned history for optional position code. E3 one-shot construction remains inside primary solve interval."
       },
       "status": "decomposed"
     },
@@ -5952,16 +5976,33 @@
         {
           "op": "memory.store.u32",
           "count": "M"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "validateConnect4MoveHistory32"
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": "M"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "M+1"
+        },
+        {
+          "op": "control.branch",
+          "count": "M+1"
         }
       ],
       "cycleCount": {
         "kind": "expression",
-        "expression": "C(runtime.root.storage.setup)+C(runtime.field.load)+C(runtime.typed_array.allocate)+M*(C(runtime.move.validation)+C(memory.store.u32))+CALL(connect4RbaBasisFromSupport)+M*CALL(connect4RbaCofactorKnownHeight)+CALL(connect4RbaCanonicalize)+PC*CALL(connect4PositionCode64FromMoves)",
+        "expression": "(1)*C(runtime.root.storage.setup)+(M)*C(runtime.move.validation)+(1)*CALL(connect4RbaBasisFromSupport)+(M)*CALL(connect4RbaCofactorKnownHeight)+(1)*CALL(connect4RbaCanonicalize)+(PC)*CALL(connect4PositionCode64FromMoves)+(1)*C(runtime.field.load)+(1)*C(runtime.typed_array.allocate)+(M)*C(memory.store.u32)+(1)*CALL(validateConnect4MoveHistory32)+(M)*C(runtime.array.reference.load)+(M+1)*C(control.test.u32)+(M+1)*C(control.branch)",
         "parameters": {
           "M": "ingress move count",
           "PC": "1 when positionCode capability enabled, else 0"
         },
-        "note": "Cold ingress preserves the validated physical move history in one Uint32Array so the live-line move-order evaluator can be seeded exactly in the worker. Managed runtime still sets PC=0."
+        "note": "Cold ingress preserves the validated physical move history in one Uint32Array so the live-line move-order evaluator can be seeded exactly in the worker. Managed runtime still sets PC=0. Fixed indexed ingress, never user-defined iterators. RBA reads original once and replays its owned history for optional position code. E3 one-shot construction remains inside primary solve interval."
       },
       "status": "decomposed"
     },
@@ -13257,7 +13298,7 @@
         },
         {
           "op": "runtime.function.allocate",
-          "count": 6
+          "count": 9
         },
         {
           "op": "memory.store.u32",
@@ -13450,18 +13491,23 @@
           "op": "runtime.call.subledger",
           "target": "createBankedIndexPartialCache32",
           "count": "INIT*PARTIAL*(1-MIXED)*PARTIAL_BANKED"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "ADMISSION_CHECKS",
+          "target": "preparedInitializationAllowed32"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+(INIT*(1-NATIVE))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+(NATIVE)*CALL(prepareSharedCacheLayout)+(INIT*NATIVE)*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)",
+        "activeCycleExpression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(9)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+((INIT*(1-NATIVE))*(1-PARTIAL))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+((NATIVE)*(1-PARTIAL))*CALL(prepareSharedCacheLayout)+((INIT*NATIVE)*(1-PARTIAL))*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)+(1)*C(runtime.cold.affinity)+(BANK_SETUP)*C(runtime.cold.tt.bank.initialize)+(INIT*PARTIAL*(1-MIXED)*(1-PARTIAL_BANKED))*CALL(createIndexPartialCache32)+(INIT*PARTIAL*MIXED)*CALL(createMixedIndexPartialCache32)+(INIT*PARTIAL*(1-MIXED)*PARTIAL_BANKED)*CALL(createBankedIndexPartialCache32)+(ADMISSION_CHECKS)*CALL(preparedInitializationAllowed32)",
         "unboundedTerms": [
           "C(runtime.promise.await)",
           "CALL(ManagedThreadSession.spawn)"
         ],
         "parameters": {
-          "INIT": "1 when initialization proceeds past pre-aborted signal; else 0",
+          "INIT": "1 only when preparation passes abort/deadline check and allocations proceed.",
           "W": "workers actually spawned (0 pre-aborted; otherwise requested 2..64)",
           "Q": "readiness loop body iterations, one 5ms timer promise per non-expiring iteration",
           "QL": "executed readiness/error atomic loads across loop and final status check",
@@ -13484,18 +13530,19 @@
           "BV_READ": "Actuallyreachedgeometryplanclosure/mirror admission andoption forwarding reads.",
           "BV_REPORT": "ActualcoldselectedbasisViews result/state fields, no hottelemetry.",
           "workers": "Configuredpoolsize; oneadditionalview suffix concatenation perinitialworkerURL.",
-          "PLAN": "1positive support budget and not already aborted; existing cold compiler explicitly accounted.",
-          "COMPILE": "1full view and not already aborted;0otherwise, all before ready.",
+          "PLAN": "1 iff positive support budget and live cooperative deadline permits compiler.",
+          "COMPILE": "1 iff full basis-view admission and live cooperative deadline permits transition compiler.",
           "CP": "1auxiliary budget admits planes;0old B3fallback.",
           "CP_FIELDS": "Actual geometry spread/transition metadata accesses/publications.",
           "CP_TEST": "Cold selection and abort checks.",
           "BANK_SETUP": "Cold bank allocation/fill, selection or resource aggregation; zero for absent banks.",
           "PARTIAL": "1 only for explicitly selected partial24 or partialMixed on compact7x6;0 for unchanged generic/default layouts",
           "MIXED": "1 only for predeclared mixed16/24 current-rank pool;0 otherwise",
-          "PARTIAL_BANKED": "1 for cold partial24 bank selection;0 for single-bank or mixed"
+          "PARTIAL_BANKED": "1 for cold partial24 bank selection;0 for single-bank or mixed",
+          "ADMISSION_CHECKS": "Actually reached compiler/admission/allocation/worker-loop checks;0..4+requested workers."
         },
-        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory.",
-        "expression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(6)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+((INIT*(1-NATIVE))*(1-PARTIAL))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+((NATIVE)*(1-PARTIAL))*CALL(prepareSharedCacheLayout)+((INIT*NATIVE)*(1-PARTIAL))*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)+(1)*C(runtime.cold.affinity)+(BANK_SETUP)*C(runtime.cold.tt.bank.initialize)+(INIT*PARTIAL*(1-MIXED)*(1-PARTIAL_BANKED))*CALL(createIndexPartialCache32)+(INIT*PARTIAL*MIXED)*CALL(createMixedIndexPartialCache32)+(INIT*PARTIAL*(1-MIXED)*PARTIAL_BANKED)*CALL(createBankedIndexPartialCache32)"
+        "note": "Prepare owns page initialization and readiness, then returns six uniquely named lifecycle closures. Closure bodies are separate units. It constructs no move-history root before readiness and performs no recursive search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native selection validates largest native view stride (compact16,direct heightStride,fullspan entryWords) before any shared/cache allocation. Factory allocation and attachment have separate owned subledgers. Native fill touches one aliased backing, split40 fills three disjoint key/value/sequence stores. Symbolic source accounting only; generated code, Intel i5-12600K/Node27 costs and whole-solve performance remain unqualified. Automatic standard compact selection is localhost-qualified only; generic and oversized native-view capacities retain previous storage. C27 cold native private-index capacity guard. Existing symbolic validations, worker URL selection, materialization fields and byte accounting include local layout option. No new hot geometry dispatch or allocation. C44coldview admission/defaultfallback andworkerfilename suffix, reportactualselection. No worker count/topology/TT/searchloopchanges. Cold accounting correction retained after C64P rejection: existing compiler call included, no runtime change. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Memory-profile adoption: cold generic bank sizing/attachment/selection also includes all geometry-specific field widths. Global capacity uses unsigned32 hash space; each leaf stays within its original native index range. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Partial identity admission/layout/worker selection is cold; allocations/page warming precede READY. Candidate factory replaces the original selected cache factory. Three new named COLD closures; deadline is checked around synchronous stages and before every worker launch, not a preemption promise. Closed app clears its large owned references.",
+        "expression": "(2+ITER)*C(runtime.timer.read)+(2)*C(runtime.integer.check)+(2)*C(runtime.number.finite.check)+(VT+4*ITER)*C(control.test.u32)+(VB+4*ITER)*C(control.branch)+(1)*C(alu.and.u32)+(1+W)*C(alu.add.u32)+(1)*CALL(isCompactProfile8)+(2)*CALL(validateConnect4CacheCapacity32)+(3+3*INIT)*C(memory.allocate.shared.bytes)+(3+3*INIT)*C(runtime.typed_view.construct)+(2+3*INIT)*C(runtime.number.multiply)+(2+2*INIT+W)*C(runtime.object.allocate)+(9)*C(runtime.function.allocate)+(1)*C(memory.store.u32)+(1)*CALL(createManagedThreadSession32)+(INIT)*CALL(shareConnect4RbaGeometry32)+((INIT*(1-NATIVE))*(1-PARTIAL))*CALL(createConnect4RbaSharedExactCache32)+(INIT*(3-2*NATIVE))*C(runtime.typed_array.fill)+(W)*C(runtime.url.construct)+(W)*CALL(ManagedThreadSession.spawn)+(VF+3*INIT+WF*W)*C(runtime.field.load)+(SIG*INIT)*C(runtime.event.listener)+(AB)*CALL(abortPreparedConnect4Search32)+(EXP)*CALL(ManagedThreadSession.fail)+(CLOSE)*CALL(closePreparedConnect4Search32)+(QL)*C(atomic.load.u32)+(ITER)*C(runtime.number.subtract)+(Q)*C(runtime.promise.construct)+(Q+CLOSE+AB)*C(runtime.promise.await)+(Q)*C(runtime.timer.set)+(Q)*C(runtime.promise.resolve)+(X)*C(runtime.error.throw)+((NATIVE)*(1-PARTIAL))*CALL(prepareSharedCacheLayout)+((INIT*NATIVE)*(1-PARTIAL))*CALL(createConnect4RbaSharedLayoutCache32)+(LAYOUT_FIELDS)*C(runtime.field.load)+(LAYOUT_TEST)*C(control.test.u32)+(LAYOUT_BRANCH)*C(control.branch)+(1)*C(runtime.layout.auto.select)+(LOCAL_NATIVE)*CALL(validateConnect4CacheCapacity32)+(BV_TEST)*C(control.test.u32)+(BV_TEST)*C(control.branch)+(BV_READ)*C(runtime.field.load)+(BV_REPORT)*C(runtime.field.store)+(workers)*C(runtime.string.concat)+(PLAN)*CALL(prepareSupportBasisPlans32)+(COMPILE)*CALL(prepareSupportCompiledTransitions32)+(CP)*C(runtime.object.allocate)+(CP_FIELDS)*C(runtime.field.load)+(CP_FIELDS)*C(runtime.field.store)+(CP_TEST)*C(control.test.u32)+(CP_TEST)*C(control.branch)+(workers*CP)*C(runtime.string.concat)+(1)*C(runtime.cold.affinity)+(BANK_SETUP)*C(runtime.cold.tt.bank.initialize)+(INIT*PARTIAL*(1-MIXED)*(1-PARTIAL_BANKED))*CALL(createIndexPartialCache32)+(INIT*PARTIAL*MIXED)*CALL(createMixedIndexPartialCache32)+(INIT*PARTIAL*(1-MIXED)*PARTIAL_BANKED)*CALL(createBankedIndexPartialCache32)+(ADMISSION_CHECKS)*CALL(preparedInitializationAllowed32)"
       },
       "status": "decomposed"
     },
@@ -13524,7 +13571,7 @@
         },
         {
           "op": "runtime.timer.read",
-          "count": "2*NEW"
+          "count": "NEW"
         },
         {
           "op": "atomic.store.u32",
@@ -13537,7 +13584,7 @@
         {
           "op": "runtime.call.subledger",
           "count": "NEW",
-          "target": "ManagedThreadSession.close"
+          "target": "releasePreparedConnect4Resources32"
         },
         {
           "op": "runtime.promise.await",
@@ -13545,15 +13592,15 @@
         },
         {
           "op": "runtime.event.listener",
-          "count": "2*NEW*SIG"
+          "count": "NEW*SIG"
         }
       ],
       "cycleCount": {
         "kind": "unbounded",
         "minCycles": 0,
-        "activeCycleExpression": "(1+NEW*(3+DL))*C(control.test.u32)+(1+NEW*(3+DL))*C(control.branch)+(NEW*(STARTED+DL))*C(atomic.load.u32)+(CANCEL)*CALL(ManagedThreadSession.fail)+(2*NEW)*C(runtime.timer.read)+(NEW)*C(atomic.store.u32)+(NEW)*C(atomic.notify)+(NEW)*CALL(ManagedThreadSession.close)+(NEW)*C(runtime.promise.await)+(2*NEW*SIG)*C(runtime.event.listener)",
+        "activeCycleExpression": "(1+NEW*(3+DL))*C(control.test.u32)+(1+NEW*(3+DL))*C(control.branch)+(NEW*(STARTED+DL))*C(atomic.load.u32)+(CANCEL)*CALL(ManagedThreadSession.fail)+(NEW)*C(runtime.timer.read)+(NEW)*C(atomic.store.u32)+(NEW)*C(atomic.notify)+(NEW)*CALL(releasePreparedConnect4Resources32)+(NEW)*C(runtime.promise.await)+(NEW*SIG)*C(runtime.event.listener)",
         "unboundedTerms": [
-          "CALL(ManagedThreadSession.close)",
+          "CALL(releasePreparedConnect4Resources32)",
           "C(runtime.promise.await)"
         ],
         "parameters": {
@@ -13563,7 +13610,8 @@
           "CANCEL": "1 when active incomplete solve has no prior error",
           "SIG": "1 when signal supplied"
         },
-        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Listener detached at close entry before asynchronous joining; post-join repeated removal remains explicitly counted and harmless. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
+        "note": "One close owner caches join promise. Active unfinished solves acquire cancellation only if no DONE/error was observed; ordinary exact-result cleanup preserves completion. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Listener detached at close entry before asynchronous joining; post-join repeated removal remains explicitly counted and harmless. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers.",
+        "expression": "(1+NEW*(3+DL))*C(control.test.u32)+(1+NEW*(3+DL))*C(control.branch)+(NEW*(STARTED+DL))*C(atomic.load.u32)+(CANCEL)*CALL(ManagedThreadSession.fail)+(NEW)*C(runtime.timer.read)+(NEW)*C(atomic.store.u32)+(NEW)*C(atomic.notify)+(NEW)*CALL(releasePreparedConnect4Resources32)+(NEW)*C(runtime.promise.await)+(NEW*SIG)*C(runtime.event.listener)"
       },
       "status": "decomposed"
     },
@@ -13708,82 +13756,38 @@
           "count": "W+2*EXACT"
         },
         {
-          "op": "alu.add.u32",
-          "count": "W+EXACT"
-        },
-        {
           "op": "runtime.call.subledger",
-          "count": "HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY",
-          "target": "sharedViewBytes32"
+          "count": "RESOURCE",
+          "target": "preparedConnect4ResourceMetadata32"
         },
         {
-          "op": "runtime.field.load",
-          "count": "RESULT_FIELDS+BYTE_FIELDS"
-        },
-        {
-          "op": "control.test.u32",
-          "count": "RT"
-        },
-        {
-          "op": "control.branch",
-          "count": "RT"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "BYTE_ADDS"
-        },
-        {
-          "op": "runtime.field.load",
-          "count": "4*HAS_SHARED*NATIVE+ENTRY_FIELD"
-        },
-        {
-          "op": "runtime.number.multiply",
-          "count": "1-NATIVE"
-        },
-        {
-          "op": "alu.add.u32",
-          "count": "1-NATIVE+HAS_SHARED*NATIVE"
-        },
-        {
-          "op": "control.test.u32",
-          "count": 3
-        },
-        {
-          "op": "control.branch",
-          "count": 3
-        },
-        {
-          "op": "runtime.field.store",
+          "op": "runtime.object.spread",
           "count": 1
         },
         {
           "op": "runtime.field.load",
-          "count": 1
-        },
-        {
-          "op": "runtime.field.load",
-          "count": 3
+          "count": "FIELDS"
         },
         {
           "op": "runtime.field.store",
-          "count": 4
+          "count": "STORES"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADDS"
         },
         {
           "op": "control.test.u32",
-          "count": 2
+          "count": "TESTS"
         },
         {
           "op": "control.branch",
-          "count": 2
-        },
-        {
-          "op": "runtime.cold.tt.bank.initialize",
-          "count": "BANK_SETUP"
+          "count": "TESTS"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+(1)*C(runtime.array.from)+(1)*C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(W+EXACT)*C(alu.add.u32)+(HAS_SHARED*(1-NATIVE)+HAS_GEOMETRY)*CALL(sharedViewBytes32)+(RESULT_FIELDS+BYTE_FIELDS)*C(runtime.field.load)+(RT)*C(control.test.u32)+(RT)*C(control.branch)+(BYTE_ADDS)*C(alu.add.u32)+(4*HAS_SHARED*NATIVE+ENTRY_FIELD)*C(runtime.field.load)+(1-NATIVE)*C(runtime.number.multiply)+(1-NATIVE+HAS_SHARED*NATIVE)*C(alu.add.u32)+(3)*C(control.test.u32)+(3)*C(control.branch)+(1)*C(runtime.field.store)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(4)*C(runtime.field.store)+(2)*C(control.test.u32)+(2)*C(control.branch)+BANK_SETUP*C(runtime.cold.tt.bank.initialize)",
+        "expression": "(1)*CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+(1)*C(runtime.array.from)+(1)*C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(RESOURCE)*CALL(preparedConnect4ResourceMetadata32)+(1)*C(runtime.object.spread)+(FIELDS)*C(runtime.field.load)+(STORES)*C(runtime.field.store)+(ADDS)*C(alu.add.u32)+(TESTS)*C(control.test.u32)+(TESTS)*C(control.branch)",
         "parameters": {
           "W": "requested worker count; completedWorkers loads one result lane per worker",
           "EXACT": "1 when DONE,winner,error snapshot qualifies exact result",
@@ -13802,9 +13806,14 @@
           "RESULT_DONE": "0/1 DONE load after the error-code short circuit",
           "NATIVE": "1 for explicitly selected native shared layout;0 for split40 default",
           "ENTRY_FIELD": "1 native descriptor.entryBytes load; split default derives (keyWords+2)*4",
-          "BANK_SETUP": "Cold bank allocation/fill, selection or resource aggregation; zero for absent banks."
+          "BANK_SETUP": "Cold bank allocation/fill, selection or resource aggregation; zero for absent banks.",
+          "RESOURCE": "1 only without cached scalar resource snapshot;0 after close.",
+          "FIELDS": "Executed managed-result/timing/affinity property reads outside metadata callee.",
+          "STORES": "Executed result/timing/affinity object field writes.",
+          "ADDS": "Executed result/affinity index additions.",
+          "TESTS": "Executed status/timing/nullish/affinity predicates outside metadata callee."
         },
-        "note": "Materialize exact/interrupted/timeout/failed status only after cleanup; unavailable hot metrics stay null. Array callback costs are included per worker. No source-work or hardware-cycle claim is inferred. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. Native sharedBytes sums entries.byteLength+stats.byteLength once and excludes aliased halves/heights views; split40 uses sharedViewBytes32 over disjoint views. Entry-size label and layout label are cold result fields. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
+        "note": "Result/state remains valid after large-owned-reference release; metadata is charged to its own helper. No hidden root/cache references. Array.from completion/affinity callbacks retain existing cold accounting; source model is not measured native latency."
       },
       "status": "decomposed"
     },
@@ -54409,15 +54418,217 @@
         "note": "Inherited retained search/tactical/cofactor/window/frontier costs. Native24 exact key consumers replace old key/store wrappers; one packed support replaces two prepared scalars. Unused local slot/tail calculations and ABI arguments removed; complete hash and actual cache address operations retained. One internal signed32 bit reinterpretation per nonroot hash is explicitly modeled as realization-sensitive lowering, not assumed one native OR or zero cycles. Public full hash algorithm/Uint32 result unchanged. Call/argument/inlining/boxing realization remains named uncertainty until current machine observation. Cold-selected candidate only, no hot profile/layout/reporting/aggregate construction. Original search guards unchanged."
       },
       "status": "decomposed"
+    },
+    {
+      "unit": "addons/rba-connect4-ingress.mjs#validateConnect4MoveHistory32",
+      "source": "addons/rba-connect4-ingress.mjs",
+      "name": "validateConnect4MoveHistory32",
+      "scope": "cold-application-boundary",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.array.is_array.check",
+          "count": 1
+        },
+        {
+          "op": "runtime.view.check",
+          "count": "VIEW"
+        },
+        {
+          "op": "runtime.instanceof.check",
+          "count": "DV"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "ACCEPTED*2"
+        },
+        {
+          "op": "runtime.number.safe_integer.check",
+          "count": "ACCEPTED"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TEST"
+        },
+        {
+          "op": "control.branch",
+          "count": "TEST"
+        },
+        {
+          "op": "runtime.error.throw",
+          "count": "ERR"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.array.is_array.check)+(VIEW)*C(runtime.view.check)+(DV)*C(runtime.instanceof.check)+(ACCEPTED*2)*C(runtime.field.load)+(ACCEPTED)*C(runtime.number.safe_integer.check)+(TEST)*C(control.test.u32)+(TEST)*C(control.branch)+(ERR)*C(runtime.error.throw)",
+        "parameters": {
+          "VIEW": "1 when input is not an Array;0 otherwise.",
+          "DV": "1 only when reached view is tested against DataView.",
+          "ACCEPTED": "1 when Array or non-DataView typed array shape reaches length/capacity check.",
+          "TEST": "Actually executed short-circuit shape/length/capacity predicates; no external iteration or index reads.",
+          "ERR": "1 on reached throwing path;0 otherwise."
+        },
+        "note": "Runs before ingress allocations. Fixed bounded length is returned; per-column legality remains owned by the caller."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#preparedInitializationAllowed32",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "preparedInitializationAllowed32",
+      "scope": "cold-application-boundary",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.field.load",
+          "count": "SIG"
+        },
+        {
+          "op": "runtime.timer.read",
+          "count": "LIVE"
+        },
+        {
+          "op": "runtime.number.subtract",
+          "count": "LIVE"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "1+LIVE"
+        },
+        {
+          "op": "control.branch",
+          "count": "1+LIVE"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(SIG)*C(runtime.field.load)+(LIVE)*C(runtime.timer.read)+(LIVE)*C(runtime.number.subtract)+(1+LIVE)*C(control.test.u32)+(1+LIVE)*C(control.branch)",
+        "parameters": {
+          "SIG": "1 if signal supplied, else0.",
+          "LIVE": "1 when signal is not already aborted; elapsed-time check otherwise short-circuits."
+        },
+        "note": "Cooperative COLD checks before compilers, admission, allocation and each worker launch. Does not preempt synchronous compilation/allocation. Not executed by E0 recurrence."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#preparedConnect4ResourceMetadata32",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "preparedConnect4ResourceMetadata32",
+      "scope": "cold-application-boundary",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.array.allocate",
+          "count": "2*MIXED"
+        },
+        {
+          "op": "runtime.field.load",
+          "count": "FIELDS"
+        },
+        {
+          "op": "runtime.field.store",
+          "count": "STORES"
+        },
+        {
+          "op": "control.test.u32",
+          "count": "TESTS"
+        },
+        {
+          "op": "control.branch",
+          "count": "TESTS"
+        },
+        {
+          "op": "runtime.number.multiply",
+          "count": "MULTS"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "ADDS"
+        },
+        {
+          "op": "runtime.iterator.advance",
+          "count": "BANKS"
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": "SHARED_SCAN+GEOMETRY_SCAN",
+          "target": "sharedViewBytes32"
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(runtime.object.allocate)+(2*MIXED)*C(runtime.array.allocate)+(FIELDS)*C(runtime.field.load)+(STORES)*C(runtime.field.store)+(TESTS)*C(control.test.u32)+(TESTS)*C(control.branch)+(MULTS)*C(runtime.number.multiply)+(ADDS)*C(alu.add.u32)+(BANKS)*C(runtime.iterator.advance)+(SHARED_SCAN+GEOMETRY_SCAN)*CALL(sharedViewBytes32)",
+        "parameters": {
+          "FIELDS": "Actually executed metadata property reads, including optional/nullish and bank byteLength reads; excludes callee internals.",
+          "STORES": "Actual metadata property writes into the fresh scalar/width result object.",
+          "TESTS": "Actually evaluated metadata short-circuit/ternary/loop predicates.",
+          "ADDS": "Executed byte-count additions and key-width arithmetic.",
+          "MULTS": "Executed width/capacity multiplications.",
+          "MIXED": "1 for mixed16/24 layout;0 otherwise.",
+          "SHARED_SCAN": "1 if a shared split cache was allocated and sharedViewBytes32 is reached.",
+          "GEOMETRY_SCAN": "1 if shared geometry allocated;0 otherwise.",
+          "BANKS": "Banks explicitly iterated only when payloadBytes absent;0 otherwise."
+        },
+        "note": "Snapshot allocated resource sizes before reference release. Width arrays contain only numbers. No geometry/TT/root reference enters snapshot. sharedBytes records prepared allocation, not live post-close RSS. Cold costs remain symbolic on actual Intel/Node27."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#releasePreparedConnect4Resources32",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "releasePreparedConnect4Resources32",
+      "scope": "cold-application-boundary",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "ManagedThreadSession.close"
+        },
+        {
+          "op": "runtime.promise.await",
+          "count": 1
+        },
+        {
+          "op": "runtime.call.subledger",
+          "count": 1,
+          "target": "preparedConnect4ResourceMetadata32"
+        },
+        {
+          "op": "runtime.timer.read",
+          "count": 1
+        },
+        {
+          "op": "runtime.event.listener",
+          "count": "SIG"
+        }
+      ],
+      "cycleCount": {
+        "kind": "unbounded",
+        "expression": "(1)*CALL(ManagedThreadSession.close)+(1)*C(runtime.promise.await)+(1)*CALL(preparedConnect4ResourceMetadata32)+(1)*C(runtime.timer.read)+(SIG)*C(runtime.event.listener)",
+        "parameters": {
+          "SIG": "1 when supplied signal listener is removed;0 otherwise."
+        },
+        "note": "First close only: join workers, capture scalar metadata, clear root/cache/shared geometry/input geometry references, then mark cleanup finished. Control/result/ready planes remain for state/result. JS GC/RSS release timing is not guaranteed.",
+        "minCycles": 0,
+        "activeCycleExpression": "(1)*CALL(ManagedThreadSession.close)+(1)*C(runtime.promise.await)+(1)*CALL(preparedConnect4ResourceMetadata32)+(1)*C(runtime.timer.read)+(SIG)*C(runtime.event.listener)",
+        "unboundedTerms": [
+          "CALL(ManagedThreadSession.close)",
+          "C(runtime.promise.await)"
+        ]
+      }
     }
   ],
   "summary": {
-    "units": 643,
-    "decomposed": 643,
+    "units": 647,
+    "decomposed": 647,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 105
+    "localExtensionOperations": 106
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -54526,7 +54737,7 @@
     "addons/rba-connect4-shared-exact-cache.mjs": "2e6b09787864b4cc22748174cb71295e243467ee",
     "addons/rba-connect4-lazy-smp-host.mjs": "7cd0dc5f37bfb3992b27f43a4dd56455390858ee",
     "addons/rba-connect4-lazy-smp-worker.mjs": "844678c5641807f40c33f9bf12a8a236c82ef235",
-    "addons/rba-connect4-ingress.mjs": "2e5a0250bb418e2e81289d6e95ea977c7df5096c",
+    "addons/rba-connect4-ingress.mjs": "7d0ad4dcbd6ae0280510ab2814c081846f58ffc2",
     "addons/worker-behavior.mjs": "2fc15dc683c57058fd83d8dff1c422eefd7b847d",
     "addons/rba-connect4-alphabeta-behavior.mjs": "3055d703a37be032dbf627b8f7f5c0b43eb0550d",
     "addons/rba-connect4-lazy-smp-worker-behavior.mjs": "b8a25f557be0b7d00ba720ce2d203e46a2cacb8e",
@@ -54548,7 +54759,7 @@
     "addons/connect4-cpc-target-win.mjs": "e77c81b4eee824a2ebe7c6cac047c9ed176c7878",
     "addons/connect4-cpc-target-dense-win.mjs": "f77cd1f2ec6ba3d108b521e4adf76c1e7814bb4e",
     "addons/rba-connect4-cache-capacity.mjs": "23a2e4fc980a7d888bec00d20623dca72d03ff66",
-    "addons/rba-connect4-prepared-session-host.mjs": "1a911cdfde3f791eaf74075c80f5cdbffc1ac269",
+    "addons/rba-connect4-prepared-session-host.mjs": "7388c9fb021bd7b39f3cf177224f0ad47aa79b38",
     "addons/rba-connect4-shared-exact-cache-layout.mjs": "d58339f9ca94cc1b77d6ceca76055afd5640b535",
     "addons/rba-connect4-shared-proof-cache.mjs": "fd63d791c2b73e66ba36196a003d9f866ea15774",
     "addons/rba-connect4-lazy-smp-worker-minimal-proofs.mjs": "d8b4b546ad5bf6c3ceb3c3e13b527ce2405cb678",

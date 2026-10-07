@@ -103,3 +103,17 @@ No implementation change may bypass the matched memory preflight.
  ingress allocates before rejecting oversize/uses external iteration; expired
  preparation launches4workers; pre-aborted partial throws; closed app retains a
  real TT backing handle after8major-GC turns. Tests expose existing failures.
+- Change8 completed `nees-fix-08-integer-windows-02`:33.6200016s primary,
+  209.984375s whole-process CPU, EXACT/WIN/c4, six verified pins/exits,
+  peak RSS15,664,070,656bytes. Sourcef983426 is runtime-identical to86e7823.
+  Owner authorized temporarily stopping OneDrive to recover required memory;
+  this run differs in background activity from prior runs. Do not attribute
+  its timing change solely to integer normalization. OneDrive must be restarted
+  after qualification. Capacities/runtime/topology remained unchanged.
+- Grouped COLD implementation: bounded indexed history before allocation,
+  owned history replay, cooperative initialization checks before compilers,
+  allocation and each launch, joined close clears large references after taking
+  scalar resource snapshot. Seven targeted regressions pass including actual
+  WeakRef/major-GC release and100 geometry shapes. Broad scan caught and corrected
+  a new split-layout12byte double-count before timing. The proper top-level test
+  set is being rerun; automatic discovery wrongly executes worker fixtures.

@@ -4,6 +4,15 @@ import {connect4RbaBasisFromSupport,connect4RbaCofactorKnownHeight,connect4RbaCa
 
 // COLD INGRESS ONLY: encode the external root once; workers never import this module.
 
+function validateConnect4MoveHistory32(moves,g){
+  if(!Array.isArray(moves)&&(!ArrayBuffer.isView(moves)||moves instanceof DataView))
+    throw new TypeError('move history must be an indexed numeric array');
+  const length=moves.length;
+  if(!Number.isSafeInteger(length)||length<0||length>g.cellCount)
+    throw new RangeError('move history exceeds board capacity');
+  return length;
+}
+
 function positionCodeEmpty64(g,outLo,outHi,index){
   if(!g.positionMode){outLo[index]=0;outHi[index]=0;return 0;}
   outLo[index]=g.positionEmptyLo;outHi[index]=g.positionEmptyHi;return 1;
@@ -50,11 +59,12 @@ function reflectPositionCode64(g,lo,hi,outLo,outHi,index){
 
 export function connect4PositionCode64FromMoves(moves,{geometry,reflected=0}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  const g=geometry,heights=new Uint32Array(g.columns),
+  const g=geometry,length=validateConnect4MoveHistory32(moves,g),heights=new Uint32Array(g.columns),
     loOut=new Uint32Array(1),hiOut=new Uint32Array(1);
   if(!positionCodeEmpty64(g,loOut,hiOut,0))return {lo:0,hi:0};
   let lo=loOut[0],hi=hiOut[0],rank=0;
-  for(const column of moves){
+  for(let i=0;i<length;i+=1){
+    const column=moves[i];
     if(!Number.isInteger(column)||column<0||column>=g.columns||heights[column]>=g.rows)
       throw new RangeError('invalid position-code move');
     advancePositionCode64(g,lo,hi,column,heights[column],rank&1,loOut,hiOut,0);
@@ -66,12 +76,13 @@ export function connect4PositionCode64FromMoves(moves,{geometry,reflected=0}={})
 
 export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode=true}={}){
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
-  const g=geometry,profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g),
-    moveHistory=new Uint32Array(moves.length);
+  const g=geometry,length=validateConnect4MoveHistory32(moves,g),profile=prepareConnect4RbaExecutionProfile(g),words=new Uint32Array(g.keyWords*2),basis=new Uint32Array(g.maxBasis*2),scratch=prepareConnect4RbaCoordinateScratch(g),
+    moveHistory=new Uint32Array(length);
   let src=0,dst=g.keyWords,bi=0,ci=g.maxBasis,moveIndex=0;
   let n=connect4RbaBasisFromSupport(g,words,src,basis,bi,scratch.seen);
   for(let p=0;p<2;p+=1){const off=src+(p?g.p1Offset:g.p0Offset);for(let i=0;i<n;i+=1)words[off+(i>>>5)]|=1<<(i&31);}
-  for(const column of moves){
+  for(let i=0;i<length;i+=1){
+    const column=moves[i];
     if(!Number.isInteger(column)||column<0||column>=g.columns)throw new RangeError('invalid column');
     moveHistory[moveIndex++]=column;
     if(connect4RbaTerminal(g,words,src))throw new RangeError('move after terminal');
@@ -83,7 +94,7 @@ export function connect4RbaFromMoves(moves,{geometry,canonical=true,positionCode
   const reflected=canonical?connect4RbaCanonicalize(g,profile,result,0,rootBasis,0,n,scratch):0;
   let positionLo=0,positionHi=0;
   if(positionCode){
-    const position=connect4PositionCode64FromMoves(moves,{geometry:g,reflected});
+    const position=connect4PositionCode64FromMoves(moveHistory,{geometry:g,reflected});
     positionLo=position.lo;positionHi=position.hi;
   }
   return {words:result,basis:rootBasis,reflected,positionLo,positionHi,moveHistory};

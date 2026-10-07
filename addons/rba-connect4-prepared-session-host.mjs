@@ -60,13 +60,17 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0||!Number.isFinite(initializationTimeoutMs)||initializationTimeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
-  if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
+  // Cooperative COLD deadline checks cannot preempt a synchronous initializer.
+  function preparedInitializationAllowed32(){
+    return !signal?.aborted&&performance.now()-initializationStarted<=initializationTimeoutMs;
+  }
+  if(supportBasisPlanBudgetBytes&&preparedInitializationAllowed32())geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
   const basisViews=supportBasisViews&&Boolean(geometry.supportBasisPlans?.closures&&geometry.supportBasisPlans?.mirrorMap);
   const transitionBudget=536870912,
-    transitionPlan=basisViews&&!signal?.aborted?prepareSupportCompiledTransitions32(geometry,geometry.supportBasisPlans,transitionBudget):null,
+    transitionPlan=basisViews&&preparedInitializationAllowed32()?prepareSupportCompiledTransitions32(geometry,geometry.supportBasisPlans,transitionBudget):null,
     compiledTransitions=transitionPlan!==null;
-  if(partial&&!compiledTransitions)throw RangeError('partial TT candidate requires admitted compiled support plans');
+  if(partial&&!compiledTransitions&&preparedInitializationAllowed32())throw RangeError('partial TT candidate requires admitted compiled support plans');
   if(compiledTransitions)geometry={...geometry,supportBasisPlans:transitionPlan};
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
@@ -75,7 +79,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session=createManagedThreadSession32({control,stopIndex:STOP,doneIndex:DONE,errorIndex:ERROR,
       wakeIndex:WAKE,workerDiedCode:WORKER_DIED,deadlineCode:DEADLINE,cancelledCode:CANCELLED});
   control[WINNER]=-1;
-  let root=null,shared=null,workerGeometry=null,started=false,closed=false,closePromise=null,
+  let root=null,shared=null,workerGeometry=null,resourceMetadata=null,started=false,closed=false,closePromise=null,
     initializationFinished=null,solveStarted=null,solveFinished=null,cleanupStarted=null,cleanupFinished=null;
 
   async function closePreparedConnect4Search32(){
@@ -84,8 +88,14 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     if(started&&!Atomics.load(control,DONE)&&!Atomics.load(control,ERROR))session.fail(CANCELLED);
     closed=true;cleanupStarted=performance.now();
     Atomics.store(readyGate,1,-1);Atomics.notify(readyGate,1);
-    closePromise=session.close();
-    await closePromise;cleanupFinished=performance.now();
+    closePromise=releasePreparedConnect4Resources32();
+    await closePromise;
+  }
+  async function releasePreparedConnect4Resources32(){
+    await session.close();
+    resourceMetadata=preparedConnect4ResourceMetadata32();
+    root=null;shared=null;workerGeometry=null;geometry=null;
+    cleanupFinished=performance.now();
     signal?.removeEventListener('abort',abortPreparedConnect4Search32);
   }
   function abortPreparedConnect4Search32(){
@@ -96,14 +106,16 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     searchStarted:started,closed,basisViews,compiledTransitions,cacheIdentity:effectiveCacheIdentity,
     affinityReady:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)>0).every(Boolean),
     affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
-  function materializePreparedConnect4SearchResult32(reflected=0){
-    const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
-      exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
-    return {status:exact?'EXACT':errorCode===DEADLINE?'TIMEOUT':errorCode===CANCELLED?'INTERRUPTED':'FAILED',
-      rootWdl:exact?Atomics.load(resultWords,winner*STRIDE)-2:null,
-      move:exact?Atomics.load(resultWords,winner*STRIDE+2):-1,winner,winnerMetrics:null,
-      nodeCounts:null,workerTiming:null,frontierMetrics:null,
-      sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
+  function preparedConnect4ResourceMetadata32(){
+    let cacheBytes=0;
+    if(shared!==null){
+      if(layout===null)cacheBytes=sharedViewBytes32(shared);
+      else if(shared.payloadBytes!=null)cacheBytes=shared.payloadBytes;
+      else if(shared.banks)for(const bank of shared.banks)cacheBytes+=bank.entries.byteLength;
+      else cacheBytes=shared.entries.byteLength;
+      if(layout!==null)cacheBytes+=shared.stats.byteLength+(mixed?12:0);
+    }
+    return {
       sharedSampleMask,workerMode:'minimal',cacheIdentity:effectiveCacheIdentity,
       sharedCacheLayout,sharedTtEntryBytes:mixed?null:layout===null?(keyWords+2)*4:layout.entryBytes,
       sharedTtEntryWidths:mixed?[16,24]:null,sharedTtPayloadBytes:shared?.payloadBytes??shared?.entries?.byteLength??null,
@@ -117,6 +129,19 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       privateTtLogicalEntries:mixed?localCacheCapacity*1.5:localCacheCapacity,
       supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
       supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
+      sharedBytes:cacheBytes+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
+        control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
+        (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
+  }
+  function materializePreparedConnect4SearchResult32(reflected=0){
+    const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
+      exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
+    return {status:exact?'EXACT':errorCode===DEADLINE?'TIMEOUT':errorCode===CANCELLED?'INTERRUPTED':'FAILED',
+      rootWdl:exact?Atomics.load(resultWords,winner*STRIDE)-2:null,
+      move:exact?Atomics.load(resultWords,winner*STRIDE+2):-1,winner,winnerMetrics:null,
+      nodeCounts:null,workerTiming:null,frontierMetrics:null,
+      sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
+      ...(resourceMetadata??preparedConnect4ResourceMetadata32()),
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),
@@ -133,9 +158,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
         affinityTagStatus:workerTargets[i].platform==='darwin'?Atomics.load(affinityState,i*3+1):null,
         group:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+1),
         cpu:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+2)})),
-      sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):(shared.payloadBytes??(shared.banks?shared.banks.reduce((bytes,bank)=>bytes+bank.entries.byteLength,0):shared.entries.byteLength))+shared.stats.byteLength+(mixed?12:0))+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
-        control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
-        (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
+    };
   }
   async function solvePreparedConnect4Search32(moves){
     if(started)throw new Error('prepared search session is one-shot; already started');
@@ -159,6 +182,10 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   try{
     if(signal?.aborted){abortPreparedConnect4Search32();await closePreparedConnect4Search32();initializationFinished=performance.now();return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};}
     signal?.addEventListener('abort',abortPreparedConnect4Search32,{once:true});
+    if(!preparedInitializationAllowed32()){
+      session.fail(DEADLINE);await closePreparedConnect4Search32();initializationFinished=performance.now();
+      return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};
+    }
     root={words:new Uint32Array(new SharedArrayBuffer(geometry.keyWords*4)),
       basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
@@ -172,6 +199,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     else if(shared.banks)for(const bank of shared.banks)bank.entries.fill(0);
     else shared.entries.fill(0);
     for(let i=0;i<workers;i+=1){
+     if(!preparedInitializationAllowed32()){session.fail(signal?.aborted?CANCELLED:DEADLINE);break;}
      const file=new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(compiledTransitions?'-views-compiled':'-views'):'')+
       (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+(partial?'-'+cacheIdentity:'')+'.mjs',import.meta.url);
      session.spawn(workerTargets===null?file:new URL('./worker-startup-affinity.mjs',import.meta.url),{

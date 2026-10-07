@@ -6,9 +6,9 @@ Shared budgets1/2/4/8GiB are tested profiles;16/32/64/128GiB are experimental. T
 
 The records below are historical versions and explicit configurations, not current defaults. Main/registry promotion is separate from this prepared package.
 
-# Current IsoMax package and historical versions
+# Historical rc.2 package and configuration
 
-The promoted package is **0.2.0-rc.2**, available together under
+The earlier promoted package was **0.2.0-rc.2**, available together under
 [isomax/](../isomax/README.md). Runtime promotion commit:
 `8e176bc03bec4a0f8d7871d49595f7e0a4fd88be`, through
 [PR #125](https://github.com/iteathen/JSMinSys/pull/125). Later documentation commits
