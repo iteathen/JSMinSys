@@ -28,6 +28,12 @@ when needed to resolve noise; rejected experiments restored and tested too.
 
 ## Change sequence
 
+Owner clarification during execution: full solves follow substantial coherent
+changes, not individual lines/edits. The separate tooling repairs above are
+already recorded; combine the remaining related COLD admission, resource-release,
+deadline and documentation repairs into one prepared-application boundary change.
+No implementation change may bypass the matched memory preflight.
+
 1. L3: shared cold cycle-parameter validator + regression tests; repair eight
    undeclared selectors in shared-layout ledger. Full solve.
 2. L2: preserve callback-target expressions and admitted bindings in generators
@@ -87,3 +93,13 @@ when needed to resolve noise; rejected experiments restored and tested too.
   Full `nees-fix-07-signed-hash`:35.3293895s,210.890625s CPU,EXACT/WIN/c4,six
   pins/exits. No full-hash algorithm/public return contract change. Performance
   effect from one sample remains uncertain; final realization/repeats required.
+- Change8 `86e7823`: all32 workers normalize recursive windows and returned
+  scores without changing cancellation. Actual source-call regression and full
+ 482/482 suite pass; generator checks and564-unit graph pass. Full solve attempt
+ `nees-fix-08-integer-windows` is RESOURCE_CENSORED before startup: physical
+ free14.13GiB <preserved15.125GiB required. No performance conclusion or source
+ change after this attempt. Matched solve is pending recovered memory.
+- Grouped COLD regressions prepared while waiting, without modifying runtime:
+ ingress allocates before rejecting oversize/uses external iteration; expired
+ preparation launches4workers; pre-aborted partial throws; closed app retains a
+ real TT backing handle after8major-GC turns. Tests expose existing failures.
