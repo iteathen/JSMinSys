@@ -227,9 +227,9 @@ function negamax(depth,src,supportHandle,n,mover,orientation,liveOffset,orderRow
       const childHandle=coord.map[0];
       frontChild(childHandle,0,depth+1);
       advanceLive(liveProfile,liveState,liveOffset,mover,height*g.columns+physicalColumn,liveState,childLiveOffset);
-      value=negamax(depth+1,dst,childHandle,childN,mover^1,orientation^childReflected,childLiveOffset,childOrderRow,-beta,-alpha);
+      value=negamax(depth+1,dst,childHandle,childN,mover^1,orientation^childReflected,childLiveOffset,childOrderRow,(-beta)|0,(-alpha)|0);
       if(value===CANCELLED)return CANCELLED;
-      value=-value;
+      value=(-value)|0;
     }
 
     if(value>best){

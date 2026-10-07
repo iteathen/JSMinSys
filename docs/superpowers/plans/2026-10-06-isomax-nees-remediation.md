@@ -82,3 +82,8 @@ when needed to resolve noise; rejected experiments restored and tested too.
   states. Full `nees-fix-06-partial-abi`:34.9560658s,214.421875s CPU,EXACT/WIN/c4,
   six pins/exits. One sample is not a claimed11% speedup. Current per-isolate
   diagnostic still emits unsigned hash boxing, so M1 was not superseded.
+- Change7 `91677fd`: partial worker hash presentation signed32, all locator bits
+  unchanged; byte-identical private/banked rows,12 focused tests and catalog pass.
+  Full `nees-fix-07-signed-hash`:35.3293895s,210.890625s CPU,EXACT/WIN/c4,six
+  pins/exits. No full-hash algorithm/public return contract change. Performance
+  effect from one sample remains uncertain; final realization/repeats required.

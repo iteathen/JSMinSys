@@ -2,6 +2,7 @@
 import {readFileSync,writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {cycleExpressionForOperations} from './cycle-ledger-validation.mjs';
+import {refreshReviewedSourceGuards} from './cycle-source-guards.mjs';
 const path='catalog/addon-cycle-ledger-v0.json',ledger=JSON.parse(readFileSync(path,'utf8'));
 const action=process.argv[2];
 if(action==='symbols'){
@@ -66,5 +67,19 @@ if(action==='symbols'){
   u.cycleCount.parameters.TEST=u.cycleCount.parameters.TEST.replace('CANCELLED sentinel handling is removed.','CANCELLED sentinel guard remains; publication occurs only on completed paths.');
   u.cycleCount.expression=cycleExpressionForOperations(u.operations);
  }
+}else if(action==='windows'){
+ const sources=new Set(ledger.units.filter(u=>/^addons\/rba-connect4-lazy-smp-worker-minimal.*\.mjs$/.test(u.source)).map(u=>u.source));
+ assert.equal(sources.size,32);
+ for(const u of ledger.units.filter(u=>sources.has(u.source)&&u.name==='negamax')){
+  u.operations=u.operations.filter(o=>o.note!=='Integer window/score ABI normalization');
+  u.operations.push({op:'runtime.native.access.lowering',count:'2*RECURSE+RETURNED',note:'Integer window/score ABI normalization'});
+  Object.assign(u.cycleCount.parameters,{
+   RECURSE:'Actual nonterminal child negamax calls from this node, before exact cutoff/cancellation;0..legal child count.',
+   RETURNED:'Noncancelled recursive child returns whose score is negated; <=RECURSE. CANCELLED bypasses score normalization.',
+  });
+  u.cycleCount.expression=cycleExpressionForOperations(u.operations);
+  u.cycleCount.note=(u.cycleCount.note??'')+' Internal windows remain integer {-2..2}; scores {-1,0,1}, cancelled=-2 checked before negation. Three source int32 normalizations per completed recursion are realization-sensitive, not automatically three native OR instructions.';
+ }
+ refreshReviewedSourceGuards(ledger,sources);
 }else throw Error('Unknown scoped NEES ledger repair: '+action);
 writeFileSync(path,JSON.stringify(ledger,null,2)+'\n');
