@@ -133,3 +133,17 @@ No implementation change may bypass the matched memory preflight.
  candidate. First control34.1060957s primary/209.6875sCPU. Initial -01 launcher
  attempt failed before process due PSObject property creation; fixed and -02
  passed. No performance evidence from that non-started attempt.
+
+- Owner steering: Do not restore OneDrive. Earlier restoration requirement is
+ superseded; leave it stopped and preserve the environment-change record.
+
+- Matched alternating series A1/B1/A2/B2 finished: controls34.1060957,
+ 34.1992052s; candidates33.3282517,33.1626396s. Means34.15265045 ->
+ 33.24544565s; observed2.656% reduction. CPU209.7890625 ->205.75s.
+ All EXACT/WIN/c4,six verified pins/exits; no observed regression.
+ Composite retained; per-fix and portable performance gains unqualified.
+- Independent physical-minimax validation26positions per native32,
+ partial24banked andpartialMixed route: all78root/optimal-witness checks match,
+ all four-worker cleanup succeeds. Same26positions, not78independentfixtures.
+ No full10x10solve or sealed-holdout outcomes. Machine observation and limits
+ preserved in Connect4 nees-final-numeric-code and current REPORT.md.

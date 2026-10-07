@@ -9,7 +9,7 @@
         "kind": "symbolic",
         "name": "ATOMIC_LOAD_COST"
       },
-      "note": "Acquire/shared load; coherence/locality dependent."
+      "note": "Whole JavaScript Atomics.load realization, including builtin call/tag/type handling and shared acquire/coherence/locality costs. Not bare native load latency. Actual Intel i5/Node27 cycle cost remains unqualified."
     },
     "atomic.store.u32": {
       "cost": {
@@ -30,7 +30,7 @@
         "kind": "symbolic",
         "name": "CALL_LEDGER(target,scenario)"
       },
-      "note": "Composition edge; resolved by target function ledger."
+      "note": "Composition edge resolves target body plus caller/callee ABI and dispatch overhead; inlining is realization-dependent. CALL_LEDGER must not be interpreted as body-only native cost. Actual Intel i5/Node27 cycles unqualified."
     },
     "runtime.callback": {
       "cost": {
