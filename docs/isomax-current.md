@@ -1,4 +1,17 @@
-# Current memory-profile package — 2026-10-06
+# Current rc.5 distribution — 2026-10-06
+
+The owner-authorized Connect4 distribution is IsoMax0.2.0-rc.5 under `isomax/`,
+with runtime source8b81911bb19f58665f5a5bbb4811a05fc0fd9fba. Main promotion is
+tracked by [Connect4 PR181](https://github.com/iteathen/Connect4/pull/181).
+The package combines the tested NEES repairs, automatic core discovery/pinning
+and actual-width memory selection. Standard7x6 with admitted plans uses partial24;
+generic/incomplete/custom-incompatible settings retain native storage.
+The12GiB actual shared/192MiB private/six-worker public default confirmation
+took33.334s, EXACT/WIN/column4, clean exits. The matched prior candidate mean
+was33.245s. These are localhost results, not portable performance or a complete
+NEES certificate. Setup is [isomax/README.md](../isomax/README.md).
+
+## Historical rc.4 memory-profile package
 
 IsoMax0.2.0-rc.4 runtime freeze40b19431f00174c5d52c442677d67ec698e8c50a. See [package setup](../isomax/README.md). Cold startup discovers physical P-cores and available physical/process/Windows-commit memory, then selects the largest fitting profile, including experimental sizes as owner-authorized.
 

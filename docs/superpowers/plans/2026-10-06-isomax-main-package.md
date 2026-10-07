@@ -53,3 +53,22 @@ immutable source/ledger bindings and extraction closure; preserved main files.
 - Live producer456ef71 and consumer8b959e2 recovered; mainad0bfd0 protected,
   requires verify status, no mandatory external review. Existing tested source
   and OneDrive-off state remain authority. No solver redesign authorized.
+- Cold policy b7604c7 introduced partial24 admission/12GiB sizing. Fresh reviewer
+  found incompatible explicit layouts/tiny capacities and split40 metadata
+  width error. Both reproduced RED then GREEN in one fix pass; source freeze
+ 8b81911 preserves defaults and native fallback. Exact measured kernels unchanged.
+- Main-derived package has123locks/86runtime modules/all32workers. Final archive
+ SHA256be8335280f8dc1db881939c48fa65517f8b3c58c530efe57c5ee590d950d434b.
+ Independent extraction verifies and bounded4x1 smoke succeeds with6workers.
+- Final main/package suite121pass/0fail/1GCskip; producer493pass/0fail/1GCskip.
+ Separate GC3cases pass. Public default final solve33.3343664s, EXACT/WIN/c4,
+ automatic12GiB shared/192MiB private,6verified pins/exits, no remaining process.
+- Main-derived promotion branch work/isomax-nees-package-20261006, PR181.
+ Root npmstart and setup docs lead with packaged solver. Source implementation
+ trees under components/research/benchmarks/reference match mainad0bfd0.
+- Combined shell documentation writes were blocked by automatic approval review;
+ explicit scoped file patches succeeded. Agent/security governance stays unchanged.
+ Dated product documentation records the direct owner's promotion scope.
+- Ruling: the metadata discrepancy is Important for exact configuration/evidence
+ claims, so repaired with compatibility in the same cold pass. No hot cost added.
+ Reviewer declined exhaustive/portable/globalNEES/RSS claims; keep those limits.
