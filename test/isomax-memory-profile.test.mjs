@@ -47,7 +47,7 @@ test('profile sizing accounts for every worker and exact fit boundary',async()=>
  }
  for(const profile of m.ISOMAX_MEMORY_PROFILES){
   const selected=m.selectIsoMaxMemoryProfile32({geometry,workers:6,availableBytes:256*GiB,requested:profile.id});
-  assert.equal(selected.sharedBytes,profile.sharedBudgetBytes);assert.equal(selected.privateBytes,1.5*GiB);
+  assert.equal(selected.sharedBytes,profile.sharedGiB===12?8*GiB:profile.sharedBudgetBytes);assert.equal(selected.privateBytes,1.5*GiB);
  }
  assert.equal(m.selectIsoMaxMemoryProfile32({geometry,workers:6,availableBytes:256*GiB,allowExperimental:true}).profile.sharedGiB,128);
 });
@@ -82,8 +82,8 @@ test('generic board banks retain native field identity without compact assumptio
 test('memory profile catalog and selection include tested8 and experimental128',async()=>{
  const m=await import('../addons/isomax-memory-profile.mjs').catch(()=>({}));
  assert.equal(typeof m.selectIsoMaxMemoryProfile32,'function');
- assert.deepEqual(m.ISOMAX_MEMORY_PROFILES.map(p=>p.sharedGiB),[1,2,4,8,16,32,64,128]);
- assert.deepEqual(m.ISOMAX_MEMORY_PROFILES.map(p=>p.status),['tested','tested','tested','tested','experimental','experimental','experimental','experimental']);
+ assert.deepEqual(m.ISOMAX_MEMORY_PROFILES.map(p=>p.sharedGiB),[1,2,4,8,12,16,32,64,128]);
+ assert.deepEqual(m.ISOMAX_MEMORY_PROFILES.map(p=>p.status),['tested','tested','tested','tested','tested','experimental','experimental','experimental','experimental']);
  const geometry=prepareConnect4RbaGeometry({columns:7,rows:6});
  assert.equal(m.selectIsoMaxMemoryProfile32({geometry,workers:6,availableBytes:256*2**30}).profile.sharedGiB,128);
  const large=m.selectIsoMaxMemoryProfile32({geometry,workers:6,availableBytes:256*2**30,requested:'128'});

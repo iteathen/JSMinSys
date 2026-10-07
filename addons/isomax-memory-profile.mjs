@@ -3,10 +3,10 @@ import {freemem,totalmem} from 'node:os';
 import {prepareSharedCacheLayout,isCompactLayoutProfile8} from './rba-connect4-shared-exact-cache-layout.mjs';
 import {sharedNativeBankCapacity32,prepareBankedSharedCapacity32} from './rba-connect4-shared-banked-cache.mjs';
 const GiB=2**30,privateBudget=2**28;
-function createIsoMaxMemoryProfiles32(){return Object.freeze([1,2,4,8,16,32,64,128].map(sharedGiB=>Object.freeze({
+function createIsoMaxMemoryProfiles32(){return Object.freeze([1,2,4,8,12,16,32,64,128].map(sharedGiB=>Object.freeze({
  id:String(sharedGiB),sharedGiB,sharedBudgetBytes:sharedGiB*GiB,privateBudgetBytesPerWorker:privateBudget,
- status:sharedGiB<=8?'tested':'experimental',
- evidenceScope:sharedGiB<=4?'localhost i5-12600K Windows empty7x6,2..6 workers':sharedGiB===8?'localhost i5-12600K Windows empty7x6,six workers':'No full-capacity solve or performance qualification',
+ status:sharedGiB<=12?'tested':'experimental',
+ evidenceScope:sharedGiB===12?'localhost i5-12600K Windows empty7x6,six workers,partial24 actual12GiB':sharedGiB<=4?'localhost i5-12600K Windows empty7x6,2..6 workers,native32':sharedGiB===8?'localhost i5-12600K Windows empty7x6,six workers,native32':'No full-capacity solve or performance qualification',
  addressing:sharedGiB<=4?'native fields; banks selected from geometry':'native fields in independently addressed banks',
 })));}
 export const ISOMAX_MEMORY_PROFILES=createIsoMaxMemoryProfiles32();
@@ -29,11 +29,11 @@ export async function discoverAvailableSolverMemory32(){
   commitAvailableBytes,availableBytes,source});
 }
 
-export function estimateIsoMaxPreparationReserve32({geometry:g,workers,supportBasisPlanBudgetBytes=GiB,
+export function inspectIsoMaxPreparation32({geometry:g,workers,supportBasisPlanBudgetBytes=GiB,
  supportClosurePlan=true,supportReflectionPlan=true,supportBasisViews=true}={}){
  if(!g||!Number.isInteger(workers)||workers<2||workers>64||!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)
   throw RangeError('Invalid support/runtime memory reserve inputs');
- let profiles=1,planBytes=0,effectivePlan=supportBasisPlanBudgetBytes?null:g.supportBasisPlans;
+ let profiles=1,planBytes=0,compiledPlanEligible=false,effectivePlan=supportBasisPlanBudgetBytes?null:g.supportBasisPlans;
  for(let column=0;column<g.columns;column++){
   profiles*=g.rows+1;if(!Number.isSafeInteger(profiles)||profiles>0xffffffff){profiles=0;break;}
  }
@@ -58,8 +58,8 @@ export function estimateIsoMaxPreparationReserve32({geometry:g,workers,supportBa
    reusable=effectivePlan.transitionPlanBytes===compiledBytes&&effectivePlan.transitionDead===dead&&
     effectivePlan.transitionSlots instanceof Slot&&effectivePlan.transitionSlots.length===slots&&effectivePlan.transitionSlots.buffer instanceof SharedArrayBuffer&&
     effectivePlan.transitionStable instanceof Uint32Array&&effectivePlan.transitionStable.length===masks&&effectivePlan.transitionStable.buffer instanceof SharedArrayBuffer;
-  if(Number.isSafeInteger(compiledBytes)&&compiledBytes<=2**29&&slots<=0xffffffff&&masks<=0xffffffff&&!reusable)
-   planBytes+=compiledBytes+g.shapeCount*4;
+  compiledPlanEligible=reusable||(Number.isSafeInteger(compiledBytes)&&compiledBytes<=2**29&&slots<=0xffffffff&&masks<=0xffffffff);
+  if(compiledPlanEligible&&!reusable)planBytes+=compiledBytes+g.shapeCount*4;
  }
  // shareConnect4RbaGeometry32 allocates one shared copy per private view.
  let geometryCopyBytes=0;
@@ -71,31 +71,47 @@ export function estimateIsoMaxPreparationReserve32({geometry:g,workers,supportBa
   // Runtime allowances are estimates, not claims of measured per-isolate cost.
   bytes=planBytes+geometryCopyBytes+2**27+workers*(2**25+frameBytes+basisBytes);
  if(!Number.isSafeInteger(bytes)||bytes<0)throw RangeError('Geometry exceeds memory reserve range');
- return Math.max(2**28,2**Math.ceil(Math.log2(bytes)));
+ return {reserveBytes:Math.max(2**28,2**Math.ceil(Math.log2(bytes))),compiledPlanEligible};
 }
 
-export function selectIsoMaxMemoryProfile32({geometry,workers,availableBytes,requested='auto',allowExperimental=true,reserveBytes=2*GiB}={}){
+export function estimateIsoMaxPreparationReserve32(options){return inspectIsoMaxPreparation32(options).reserveBytes;}
+export function resolveIsoMaxCacheIdentity32(options){
+ const requested=options.cacheIdentity??'auto';
+ if(!['auto','native32','partial24'].includes(requested))throw RangeError('Invalid public cache identity');
+ const partial=isCompactLayoutProfile8(options.geometry,options.geometry.keyWords)&&inspectIsoMaxPreparation32(options).compiledPlanEligible;
+ if(requested==='partial24'&&!partial)throw RangeError('partial24 requires complete standard support plans');
+ return requested!=='native32'&&partial?'partial24':'native32';
+}
+
+export function selectIsoMaxMemoryProfile32({geometry,workers,availableBytes,requested='auto',allowExperimental=true,reserveBytes=2*GiB,cacheIdentity='native32'}={}){
  if(!geometry||!Number.isInteger(workers)||workers<2||workers>64||!Number.isSafeInteger(availableBytes)||availableBytes<0||
   !Number.isSafeInteger(reserveBytes)||reserveBytes<0||typeof allowExperimental!=='boolean')throw RangeError('Invalid memory profile inputs');
  requested=String(requested);
  if(requested!=='auto'&&!ISOMAX_MEMORY_PROFILES.some(p=>p.id===requested))throw RangeError('Unknown memory profile');
- const layout=prepareSharedCacheLayout(geometry,geometry.keyWords),compact=isCompactLayoutProfile8(geometry,geometry.keyWords),
-  privateEntryBytes=compact?32:geometry.keyWords*4+1,
+ if(!['native32','partial24'].includes(cacheIdentity))throw RangeError('Invalid memory cache identity');
+ const compact=isCompactLayoutProfile8(geometry,geometry.keyWords),partial=compact&&cacheIdentity==='partial24',
+  effectiveIdentity=partial?'partial24':'native32',layout=partial?{kind:'partial24',entryBytes:24,entryWords:6}:prepareSharedCacheLayout(geometry,geometry.keyWords),
+  privateEntryBytes=partial?24:compact?32:geometry.keyWords*4+1,
   localCacheCapacity=2**Math.floor(Math.log2(privateBudget/privateEntryBytes)),
   privateBytesPerWorker=localCacheCapacity*privateEntryBytes,
   candidates=requested==='auto'?ISOMAX_MEMORY_PROFILES.filter(p=>p.status==='tested'||allowExperimental).toReversed():ISOMAX_MEMORY_PROFILES.filter(p=>p.id===requested);
  if(!Number.isSafeInteger(localCacheCapacity)||localCacheCapacity<1)throw RangeError('Board key exceeds private memory profile budget');
- for(const profile of candidates){
+ for(let i=0;i<candidates.length;i++){
+  // Automatic duplicate row counts choose the smallest equivalent budget.
+  while(requested==='auto'&&i+1<candidates.length&&
+   Math.floor(Math.log2(candidates[i].sharedBudgetBytes/layout.entryBytes))===Math.floor(Math.log2(candidates[i+1].sharedBudgetBytes/layout.entryBytes)))i++;
+  const profile=candidates[i];
   const sharedCacheCapacity=2**Math.floor(Math.log2(profile.sharedBudgetBytes/layout.entryBytes)),sharedBytes=sharedCacheCapacity*layout.entryBytes,
    requiredBytes=sharedBytes+workers*privateBytesPerWorker+reserveBytes;
   if(requiredBytes>availableBytes)continue;
   const bankCapacity=Math.min(sharedCacheCapacity,sharedNativeBankCapacity32(layout)),plan=prepareBankedSharedCapacity32(sharedCacheCapacity,bankCapacity);
-  return Object.freeze({profile,selection:requested==='auto'?'automatic':'explicit',sharedCacheCapacity,localCacheCapacity,
+  const qualified=partial?sharedCacheCapacity===2**29&&workers===6:compact&&profile.status==='tested'&&workers<=6&&(profile.sharedGiB!==8||workers===6)&&profile.sharedGiB!==12;
+  return Object.freeze({profile,cacheIdentity:effectiveIdentity,selection:requested==='auto'?'automatic':'explicit',sharedCacheCapacity,localCacheCapacity,
    sharedCacheLayout:'native',localCacheLayout:compact?'native':'split',sharedBankCapacity:plan.bankCount>1?bankCapacity:null,
    sharedBytes,privateBytesPerWorker,privateBytes:workers*privateBytesPerWorker,reserveBytes,requiredBytes,availableBytes,
    bankCount:plan.bankCount,bankEntries:bankCapacity,entryBytes:layout.entryBytes,
    addressing:plan.bankCount>1?'banked native fields':'unbanked native fields',
-   localEvidenceMatchesGeometryAndWorkers:compact&&profile.status==='tested'&&workers<=6&&(profile.sharedGiB!==8||workers===6),performanceScope:profile.evidenceScope});
+   localEvidenceMatchesGeometryAndWorkers:qualified,performanceScope:qualified?profile.evidenceScope:'Exact geometry/cache layout has correctness coverage; performance unqualified for this allocation/worker combination'});
  }
  throw RangeError('Insufficient memory headroom for requested IsoMax memory profile');
 }
