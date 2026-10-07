@@ -31,11 +31,12 @@ export async function prepareLazySmpConnect4Rba32(options={}){
   const compact=isCompactLayoutProfile8(geometry,geometry.keyWords),layout=cacheIdentity==='partial24'?{entryBytes:24}:prepareSharedCacheLayout(geometry,geometry.keyWords);
   config={...profile.explicitCacheDefaults,...config};
   const native=config.sharedCacheLayout==='native'||(config.sharedCacheLayout==='auto'&&compact&&config.sharedCacheCapacity<=2**27),
-   sharedBytes=config.sharedCacheCapacity*(native?layout.entryBytes:((compact?8:geometry.keyWords)+2)*4),
+   entryBytes=native?layout.entryBytes:((compact?8:geometry.keyWords)+2)*4,
+   sharedBytes=config.sharedCacheCapacity*entryBytes,
    privateBytesPerWorker=config.localCacheCapacity*(cacheIdentity==='partial24'?24:config.localCacheLayout==='native'&&compact?32:(compact?8:geometry.keyWords)*4+1),
    requiredBytes=sharedBytes+workers*privateBytesPerWorker+reserveBytes;
   if(!Number.isSafeInteger(requiredBytes)||requiredBytes>snapshot.availableBytes)throw RangeError('Insufficient cache memory headroom');
-  memoryPlan=Object.freeze({profile:{id:'custom',status:'custom'},cacheIdentity,entryBytes:layout.entryBytes,selection:'explicit-capacities',sharedCacheCapacity:config.sharedCacheCapacity,
+  memoryPlan=Object.freeze({profile:{id:'custom',status:'custom'},cacheIdentity,entryBytes,selection:'explicit-capacities',sharedCacheCapacity:config.sharedCacheCapacity,
    localCacheCapacity:config.localCacheCapacity,sharedCacheLayout:config.sharedCacheLayout,localCacheLayout:config.localCacheLayout,
    sharedBytes,privateBytesPerWorker,privateBytes:workers*privateBytesPerWorker,reserveBytes,requiredBytes,availableBytes:snapshot.availableBytes,snapshot});
  }else{

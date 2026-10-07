@@ -78,7 +78,13 @@ export function estimateIsoMaxPreparationReserve32(options){return inspectIsoMax
 export function resolveIsoMaxCacheIdentity32(options){
  const requested=options.cacheIdentity??'auto';
  if(!['auto','native32','partial24'].includes(requested))throw RangeError('Invalid public cache identity');
- const partial=isCompactLayoutProfile8(options.geometry,options.geometry.keyWords)&&inspectIsoMaxPreparation32(options).compiledPlanEligible;
+ const sharedNative=options.sharedCacheLayout===undefined||options.sharedCacheLayout==='native'||
+  (options.sharedCacheLayout==='auto'&&(options.sharedCacheCapacity===undefined||options.sharedCacheCapacity<=2**27)),
+  localNative=options.localCacheLayout===undefined||options.localCacheLayout==='native',
+  capacities=(options.sharedCacheCapacity===undefined||options.sharedCacheCapacity>=8)&&
+   (options.localCacheCapacity===undefined||options.localCacheCapacity>=8)&&
+   (options.sharedBankCapacity==null||options.sharedBankCapacity>=8),
+  partial=sharedNative&&localNative&&capacities&&isCompactLayoutProfile8(options.geometry,options.geometry.keyWords)&&inspectIsoMaxPreparation32(options).compiledPlanEligible;
  if(requested==='partial24'&&!partial)throw RangeError('partial24 requires complete standard support plans');
  return requested!=='native32'&&partial?'partial24':'native32';
 }
