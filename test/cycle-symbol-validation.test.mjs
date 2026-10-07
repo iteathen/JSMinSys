@@ -16,3 +16,13 @@ test('callee and opcode names are excluded but every operation selector stays bo
   unit.operations[0].count='UNDECLARED';
   assert.throws(()=>validateCycleSymbols(unit),/unbound symbolic cycle term UNDECLARED/);
 });
+
+test('all authoritative expression fields reject undeclared multipliers',()=>{
+ for(const field of ['activeCycleExpression','unboundedTerms']){
+  const unit={unit:'fixture#f',operations:[{op:'memory.load.u32',count:1}],cycleCount:{expression:'C(memory.load.u32)',parameters:{}}};
+  unit.cycleCount[field]=field==='unboundedTerms'?['MISSING*C(memory.load.u32)']:'MISSING*C(memory.load.u32)';
+  assert.throws(()=>validateCycleSymbols(unit),/unbound symbolic cycle term MISSING/);
+  unit.cycleCount.parameters.MISSING='Explicit scenario count';
+  assert.doesNotThrow(()=>validateCycleSymbols(unit));
+ }
+});

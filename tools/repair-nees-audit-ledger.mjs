@@ -81,6 +81,47 @@ if(action==='symbols'){
   u.cycleCount.note=(u.cycleCount.note??'')+' Internal windows remain integer {-2..2}; scores {-1,0,1}, cancelled=-2 checked before negation. Three source int32 normalizations per completed recursion are realization-sensitive, not automatically three native OR instructions.';
  }
  refreshReviewedSourceGuards(ledger,sources);
+}else if(action==='review-affinity'){
+ const source='addons/rba-connect4-prepared-session-host.mjs',graph=ledger.isomaxSystemCycleGraph;
+ const op=(op,count,target)=>({op,count,...(target?{target}:{})});
+ const add=(name,operations,parameters)=>{
+  const id=source+'#'+name;assert.ok(!ledger.units.some(u=>u.unit===id));
+  ledger.units.push({unit:id,source,name,scope:'cold-prepared-report-callback',status:'decomposed',operations,
+   cycleCount:{kind:'symbolic',expression:cycleExpressionForOperations(operations),parameters,
+    note:'Actual inline reporting callback; parent owns Array.from/callback construction. No E0 reporting or measured native-latency assumption.'}});
+  graph.callbackTargets[id]=[id];return id;
+ };
+ const completed=add('<prepared-completion-callback>',[op('atomic.load.u32',1),op('alu.imul.u32',1),op('alu.add.u32',1)],{});
+ const affinity=add('<prepared-affinity-callback>',[
+  op('atomic.load.u32','5-DARWIN'),op('runtime.object.allocate',1),op('runtime.field.store',8),
+  op('runtime.array.reference.load',4),op('runtime.field.load',3),op('alu.imul.u32','5-DARWIN'),
+  op('alu.add.u32','2-DARWIN'),op('control.test.u32',6),op('control.branch',3)],
+  {DARWIN:'1 for macOS, otherwise0. Four atomic loads for macOS and five Windows/Linux; six-worker Windows reporting therefore owns30loads.'});
+ const parent=ledger.units.find(u=>u.source===source&&u.name==='materializePreparedConnect4SearchResult32');
+ for(const o of parent.operations){
+  if(o.op==='runtime.array.from'||o.op==='runtime.function.allocate')o.count='1+AFFINITY';
+  if(o.op==='runtime.object.allocate')o.count=2;
+  if(o.op==='atomic.load.u32')o.count='3+RESULT_DONE+2*EXACT';
+  if(o.op==='alu.imul.u32')o.count='2*EXACT';
+ }
+ parent.operations.push(op('runtime.callback','W',completed),op('runtime.callback','W*AFFINITY',affinity));
+ parent.cycleCount.parameters.AFFINITY='1 when affinityState supplied;0 otherwise.';
+ parent.cycleCount.expression=cycleExpressionForOperations(parent.operations);
+ parent.cycleCount.note='Dynamic result/timing fields plus explicit completion and affinity callback bodies. Six Windows workers add30atomic loads and6small objects, charged outside E0. Resource snapshot is a separate helper.';
+ // The state API also reports readiness/verification with two eager Array.from callbacks.
+ ledger.localOperationExtensions['runtime.array.every']={cost:{kind:'symbolic',name:'ARRAY_EVERY_COST(length,checked,V8)'},note:'Cold Array.every(Boolean) including reached built-in predicate calls. Early exit length remains variable, never zero by assumption.'};
+ const ready=add('<prepared-affinity-ready-callback>',[op('atomic.load.u32',1),op('alu.imul.u32',1),op('control.test.u32',1)],{}),
+  verified=add('<prepared-affinity-verified-callback>',[op('atomic.load.u32',1),op('alu.imul.u32',1),op('control.test.u32',1)],{}),
+  state=ledger.units.find(u=>u.source===source&&u.name==='preparedConnect4SearchState32');
+ state.operations.push(op('runtime.array.from','2*AFFINITY'),op('runtime.function.allocate','2*AFFINITY'),
+  op('runtime.array.every','2*AFFINITY'),op('runtime.callback','W*AFFINITY',ready),op('runtime.callback','W*AFFINITY',verified));
+ Object.assign(state.cycleCount.parameters,{AFFINITY:'1 if affinity state supplied, else0.',W:'Requested workers, both Array.from bodies execute for everyworker before native every short-circuits.'});
+ state.cycleCount.expression=cycleExpressionForOperations(state.operations);
+ graph.roots=[...new Set([...graph.roots,state.unit])];
+ for(const u of ledger.units)if((u.cycleCount.unboundedTerms??[]).includes('PARK_DURATION'))
+  u.cycleCount.parameters.PARK_DURATION='Explicit unbounded scheduler wait duration; not a constant, primitive multiplier, or zero-cost claim.';
+ ledger.summary.units=ledger.units.length;ledger.summary.decomposed=ledger.units.filter(u=>u.status==='decomposed').length;
+ ledger.summary.localExtensionOperations=Object.keys(ledger.localOperationExtensions).length;
 }else if(action==='cold-boundary'){
  const ingress='addons/rba-connect4-ingress.mjs',host='addons/rba-connect4-prepared-session-host.mjs';
  const get=(source,name)=>{const u=ledger.units.find(u=>u.source===source&&u.name===name);assert.ok(u);return u;};

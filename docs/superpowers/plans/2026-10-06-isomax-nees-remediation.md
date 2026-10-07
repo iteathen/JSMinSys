@@ -117,3 +117,19 @@ No implementation change may bypass the matched memory preflight.
   WeakRef/major-GC release and100 geometry shapes. Broad scan caught and corrected
   a new split-layout12byte double-count before timing. The proper top-level test
   set is being rerun; automatic discovery wrongly executes worker fixtures.
+
+- Grouped COLD fullsolve `nees-fix-09-cold-boundary`, source1c7b64f:
+ 33.8710484s primary,207.046875sCPU,15,665,020,928bytes peakRSS,
+ EXACT/WIN/c4,six pins/exits. Runtime hot bodies unchanged from change8.
+- Fresh whole-branch reviewer found two Important tooling gaps; both reproduced
+ RED then GREEN: active/unbounded expression symbols and affinity callback
+ accounting. One fix pass completed490pass/0fail/1GC-onlyskip and catalog
+ 651units/573reachable. No solver runtime edit. Reviewed source and limits in
+ evidence/isomax-nees-remediation-20261006/REVIEW.md. Final review: no minors.
+- Ruling: current work repairs producer candidate; historical frozenrc.4 remains
+ immutable, no main promotion. Cost if wrong: older distribution retains audit
+ issues; explicitly distinguish candidate fixes from a released package.
+- Matched controls: OneDrive remains stopped for both immutable6792395 and
+ candidate. First control34.1060957s primary/209.6875sCPU. Initial -01 launcher
+ attempt failed before process due PSObject property creation; fixed and -02
+ passed. No performance evidence from that non-started attempt.

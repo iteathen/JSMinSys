@@ -1,0 +1,29 @@
+// Frozen independent physical-minimax validation harness copied from exact-tt-identity evidence; outputs isolated here.
+import {writeFileSync} from 'node:fs';
+import {prepareConnect4RbaGeometry} from '../../addons/rba-connect4-geometry.mjs';
+import {connect4RbaFromMoves} from '../../addons/rba-connect4-ingress.mjs';
+import {prepareLazySmpConnect4Rba32} from '../../addons/rba-connect4-prepared-session-host.mjs';
+import {prepareSupportBasisPlans32} from '../../addons/rba-connect4-support-basis-plan.mjs';
+import {prepareSupportCompiledTransitions32} from '../../addons/rba-connect4-support-compiled-transition.mjs';
+const identity=process.argv[2]??'partial24';
+const banked=process.argv.includes('--banked');
+if(!['native32','partial24','partialMixed'].includes(identity))throw Error('Invalid identity case');
+const runLazySmpConnect4Rba32=async(moves,options)=>{
+ const g=options.geometry;
+ if(!g.supportBasisPlans){g.supportBasisPlans=prepareSupportBasisPlans32(g,2**30,true,true);g.supportBasisPlans=prepareSupportCompiledTransitions32(g,g.supportBasisPlans)??g.supportBasisPlans;}
+ const app=await prepareLazySmpConnect4Rba32({...options,cacheIdentity:identity,sharedProofBounds:true,sharedCacheLayout:'native',
+  localCacheLayout:'native',supportBasisPlanBudgetBytes:0,supportBasisViews:true,
+  sharedBankCapacity:banked&&g.columns===7&&g.rows===6?128:null});
+ try{return await app.solve(moves);}finally{await app.close();}
+};
+import {mixSpan32Locator32} from '../../src/widekey32.mjs';
+let seed=1729;
+const next=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return seed>>>0;};
+function win(board,C,R,c,r,p){for(const [dx,dy] of [[1,0],[0,1],[1,1],[1,-1]]){let n=1;for(const s of [-1,1])for(let k=1;k<4;k++){const x=c+dx*s*k,y=r+dy*s*k;if(x<0||x>=C||y<0||y>=R||board[y*C+x]!==p)break;n++;}if(n>=4)return true;}return false;}
+function makeMoves(C,R,length){const b=new Int8Array(C*R).fill(-1),h=new Uint32Array(C),moves=[];for(let i=0;i<length;i++){const legal=[];for(let c=0;c<C;c++){if(h[c]===R)continue;const r=h[c];b[r*C+c]=i&1;if(!win(b,C,R,c,r,i&1))legal.push(c);b[r*C+c]=-1;}if(!legal.length)return null;const c=legal[next()%legal.length];b[h[c]*C+c]=i&1;h[c]++;moves.push(c);}return moves;}
+function validate(moves,C,R,result){const b=new Int8Array(C*R).fill(-1),h=new Uint32Array(C);let terminal=-1;for(let i=0;i<moves.length;i++){const c=moves[i],r=h[c]++;b[r*C+c]=i&1;if(win(b,C,R,c,r,i&1))terminal=i&1;}const memo=new Map();function solve(p){if(terminal>=0)return terminal===0?1:-1;const k=Array.from(b).join(',')+p;if(memo.has(k))return memo.get(k);let best=p===0?-2:2,count=0;for(let c=0;c<C;c++){const r=h[c];if(r===R)continue;count++;h[c]++;b[r*C+c]=p;const v=win(b,C,R,c,r,p)?(p===0?1:-1):solve(p^1);h[c]--;b[r*C+c]=-1;if(p===0){if(v>best)best=v;if(best===1)break;}else{if(v<best)best=v;if(best===-1)break;}}if(!count)best=0;memo.set(k,best);return best;}const root=solve(moves.length&1),c=result.move,r=h[c];if(c<0||c>=C||r>=R)throw Error('illegal witness');const p=moves.length&1;h[c]++;b[r*C+c]=p;const child=win(b,C,R,c,r,p)?(p===0?1:-1):solve(p^1);if(result.status!=='EXACT'||root!==result.rootWdl||child!==root)throw Error(JSON.stringify({moves,result,root,child}));return {root,child,oracleNodes:memo.size};}
+const records=[];
+for(const [C,R,rank,repeats] of [[4,4,10,8],[7,6,34,8],[7,5,29,8],[3,3,0,1]]){const g=prepareConnect4RbaGeometry({columns:C,rows:R});for(let n=0;n<repeats;n++){let moves;while(!(moves=makeMoves(C,R,rank))){}const q=connect4RbaFromMoves(moves,{geometry:g,positionCode:false});const result=await runLazySmpConnect4Rba32(moves,{geometry:g,workers:4,workerMode:'minimal',localCacheCapacity:256,sharedCacheCapacity:256,sharedProofBounds:process.env.C4_IDEAS_PROOFS==="1",timeoutMs:5000});const checked=validate(moves,C,R,result);records.push({C,R,moves,words:Array.from(q.words),basisSize:q.basis.length,gray:Array.from(q.words.subarray(g.p0Offset)).every(v=>!v),hash:mixSpan32Locator32(q.words,0,g.keyWords),reflected:q.reflected,result,checked});}}
+let gray=null;const g=prepareConnect4RbaGeometry({columns:7,rows:6});for(let i=0;i<5000&&!gray;i++){const moves=makeMoves(7,6,40);if(!moves)continue;const q=connect4RbaFromMoves(moves,{geometry:g,positionCode:false});if(Array.from(q.words.subarray(g.p0Offset)).every(v=>!v))gray={moves,words:Array.from(q.words),basisSize:q.basis.length,hash:mixSpan32Locator32(q.words,0,g.keyWords),reflected:q.reflected};}
+if(gray){const result=await runLazySmpConnect4Rba32(gray.moves,{geometry:g,workers:4,workerMode:'minimal',localCacheCapacity:256,sharedCacheCapacity:256,sharedProofBounds:process.env.C4_IDEAS_PROOFS==="1",timeoutMs:5000});gray.result=result;gray.checked=validate(gray.moves,7,6,result);}
+const out={runtime:process.version,banked,records,gray};writeFileSync(new URL('./oracle-'+identity+(banked?'-banked':'')+'.json',import.meta.url),JSON.stringify(out,null,2));console.log(JSON.stringify({cases:records.length+(gray?1:0),oracleNodes:records.reduce((s,r)=>s+r.checked.oracleNodes,0)+(gray?.checked.oracleNodes??0),gray,results:records.map(r=>({C:r.C,R:r.R,gray:r.gray,wdl:r.result.rootWdl,move:r.result.move,cleanup:r.result.cleanup}))}));

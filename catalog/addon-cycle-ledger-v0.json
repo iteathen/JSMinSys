@@ -745,6 +745,13 @@
         "name": "ARRAY_IS_ARRAY_COST(type,map)"
       },
       "note": "Cold ingress Array.isArray predicate; V8 realization not assigned zero cost."
+    },
+    "runtime.array.every": {
+      "cost": {
+        "kind": "symbolic",
+        "name": "ARRAY_EVERY_COST(length,checked,V8)"
+      },
+      "note": "Cold Array.every(Boolean) including reached built-in predicate calls. Early exit length remains variable, never zero by assumption."
     }
   },
   "units": [
@@ -5356,7 +5363,7 @@
         {
           "op": "memory.allocate.shared.bytes",
           "count": "V",
-          "bytes": "Î£ view[i].byteLength"
+          "bytes": "\u00c3\u0192\u00c5\u00bd\u00c3\u201a\u00c2\u00a3 view[i].byteLength"
         },
         {
           "op": "runtime.typed_view.construct",
@@ -5365,7 +5372,7 @@
         {
           "op": "runtime.array.copy",
           "count": "V",
-          "bytes": "Î£ view[i].byteLength"
+          "bytes": "\u00c3\u0192\u00c5\u00bd\u00c3\u201a\u00c2\u00a3 view[i].byteLength"
         },
         {
           "op": "runtime.object.allocate",
@@ -9001,7 +9008,8 @@
           "P": "Retired waits until another result or host closes; unbounded duration",
           "T": "Executed cancellation, scan and park tests",
           "A": "Executed indexed addressing/increments",
-          "M": "Executed result-stride addressing"
+          "M": "Executed result-stride addressing",
+          "PARK_DURATION": "Explicit unbounded scheduler wait duration; not a constant, primitive multiplier, or zero-cost claim."
         }
       },
       "status": "decomposed"
@@ -10635,7 +10643,8 @@
           "P": "Retired waits until another result or host closes; unbounded duration",
           "T": "Executed cancellation, scan and park tests",
           "A": "Executed indexed addressing/increments",
-          "M": "Executed result-stride addressing"
+          "M": "Executed result-stride addressing",
+          "PARK_DURATION": "Explicit unbounded scheduler wait duration; not a constant, primitive multiplier, or zero-cost claim."
         }
       },
       "status": "decomposed"
@@ -13704,13 +13713,37 @@
         {
           "op": "control.branch",
           "count": 2
+        },
+        {
+          "op": "runtime.array.from",
+          "count": "2*AFFINITY"
+        },
+        {
+          "op": "runtime.function.allocate",
+          "count": "2*AFFINITY"
+        },
+        {
+          "op": "runtime.array.every",
+          "count": "2*AFFINITY"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "W*AFFINITY",
+          "target": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-ready-callback>"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "W*AFFINITY",
+          "target": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-verified-callback>"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(ManagedThreadSession.state)+(1)*C(atomic.load.u32)+(1)*C(runtime.object.allocate)+(STATE_FIELDS)*C(runtime.field.load)+(1)*C(runtime.field.store)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(4)*C(runtime.field.store)+(2)*C(control.test.u32)+(2)*C(control.branch)",
+        "expression": "(1)*CALL(ManagedThreadSession.state)+(1)*C(atomic.load.u32)+(1)*C(runtime.object.allocate)+(STATE_FIELDS)*C(runtime.field.load)+(1)*C(runtime.field.store)+(1)*C(runtime.field.load)+(3)*C(runtime.field.load)+(4)*C(runtime.field.store)+(2)*C(control.test.u32)+(2)*C(control.branch)+(2*AFFINITY)*C(runtime.array.from)+(2*AFFINITY)*C(runtime.function.allocate)+(2*AFFINITY)*C(runtime.array.every)+(W*AFFINITY)*CALLBACK(addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-ready-callback>)+(W*AFFINITY)*CALLBACK(addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-verified-callback>)",
         "parameters": {
-          "STATE_FIELDS": "properties copied from managed state snapshot plus readyWorkers/searchStarted/closed"
+          "STATE_FIELDS": "properties copied from managed state snapshot plus readyWorkers/searchStarted/closed",
+          "AFFINITY": "1 if affinity state supplied, else0.",
+          "W": "Requested workers, both Array.from bodies execute for everyworker before native every short-circuits."
         },
         "note": "Cold state snapshot copies managed status and reads readiness without starting search. Cold control-plane source-operation accounting only. Runtime costs remain symbolic and unmeasured on the actual Intel i5-12600K/Node 27 profile; the ledger AMD reference does not establish Intel cycle latency. C44coldbasisViewsselectedresult/statefield explicitlycharged; nothotstats. C66cold auxiliary512MiB compiled-plane allocation/worker selection/byte reporting; base/TT capacities unchanged, no hot setting or metric. Banked-TT experiment: source change is cold topology/dispatch/resource accounting only; current unbanked hot function bodies are unchanged. Banked hot access is charged to its new subledgers."
       },
@@ -13729,19 +13762,19 @@
         },
         {
           "op": "atomic.load.u32",
-          "count": "3+RESULT_DONE+2*EXACT+W"
+          "count": "3+RESULT_DONE+2*EXACT"
         },
         {
           "op": "runtime.object.allocate",
-          "count": 3
+          "count": 2
         },
         {
           "op": "runtime.array.from",
-          "count": 1
+          "count": "1+AFFINITY"
         },
         {
           "op": "runtime.function.allocate",
-          "count": 1
+          "count": "1+AFFINITY"
         },
         {
           "op": "runtime.timer.read",
@@ -13753,7 +13786,7 @@
         },
         {
           "op": "alu.imul.u32",
-          "count": "W+2*EXACT"
+          "count": "2*EXACT"
         },
         {
           "op": "runtime.call.subledger",
@@ -13783,11 +13816,21 @@
         {
           "op": "control.branch",
           "count": "TESTS"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "W",
+          "target": "addons/rba-connect4-prepared-session-host.mjs#<prepared-completion-callback>"
+        },
+        {
+          "op": "runtime.callback",
+          "count": "W*AFFINITY",
+          "target": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-callback>"
         }
       ],
       "cycleCount": {
         "kind": "symbolic",
-        "expression": "(1)*CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT+W)*C(atomic.load.u32)+(3)*C(runtime.object.allocate)+(1)*C(runtime.array.from)+(1)*C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(W+2*EXACT)*C(alu.imul.u32)+(RESOURCE)*CALL(preparedConnect4ResourceMetadata32)+(1)*C(runtime.object.spread)+(FIELDS)*C(runtime.field.load)+(STORES)*C(runtime.field.store)+(ADDS)*C(alu.add.u32)+(TESTS)*C(control.test.u32)+(TESTS)*C(control.branch)",
+        "expression": "(1)*CALL(ManagedThreadSession.state)+(3+RESULT_DONE+2*EXACT)*C(atomic.load.u32)+(2)*C(runtime.object.allocate)+(1+AFFINITY)*C(runtime.array.from)+(1+AFFINITY)*C(runtime.function.allocate)+(1+OPEN_INIT+OPEN_SOLVE+OPEN_CLOSE)*C(runtime.timer.read)+(1+EXACT+INIT_TIME+SOLVE_TIME+CLOSE_TIME)*C(runtime.number.subtract)+(2*EXACT)*C(alu.imul.u32)+(RESOURCE)*CALL(preparedConnect4ResourceMetadata32)+(1)*C(runtime.object.spread)+(FIELDS)*C(runtime.field.load)+(STORES)*C(runtime.field.store)+(ADDS)*C(alu.add.u32)+(TESTS)*C(control.test.u32)+(TESTS)*C(control.branch)+(W)*CALLBACK(addons/rba-connect4-prepared-session-host.mjs#<prepared-completion-callback>)+(W*AFFINITY)*CALLBACK(addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-callback>)",
         "parameters": {
           "W": "requested worker count; completedWorkers loads one result lane per worker",
           "EXACT": "1 when DONE,winner,error snapshot qualifies exact result",
@@ -13811,9 +13854,10 @@
           "FIELDS": "Executed managed-result/timing/affinity property reads outside metadata callee.",
           "STORES": "Executed result/timing/affinity object field writes.",
           "ADDS": "Executed result/affinity index additions.",
-          "TESTS": "Executed status/timing/nullish/affinity predicates outside metadata callee."
+          "TESTS": "Executed status/timing/nullish/affinity predicates outside metadata callee.",
+          "AFFINITY": "1 when affinityState supplied;0 otherwise."
         },
-        "note": "Result/state remains valid after large-owned-reference release; metadata is charged to its own helper. No hidden root/cache references. Array.from completion/affinity callbacks retain existing cold accounting; source model is not measured native latency."
+        "note": "Dynamic result/timing fields plus explicit completion and affinity callback bodies. Six Windows workers add30atomic loads and6small objects, charged outside E0. Resource snapshot is a separate helper."
       },
       "status": "decomposed"
     },
@@ -54620,15 +54664,149 @@
           "C(runtime.promise.await)"
         ]
       }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#<prepared-completion-callback>",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "<prepared-completion-callback>",
+      "scope": "cold-prepared-report-callback",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.add.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.imul.u32)+(1)*C(alu.add.u32)",
+        "parameters": {},
+        "note": "Actual inline reporting callback; parent owns Array.from/callback construction. No E0 reporting or measured native-latency assumption."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-callback>",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "<prepared-affinity-callback>",
+      "scope": "cold-prepared-report-callback",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": "5-DARWIN"
+        },
+        {
+          "op": "runtime.object.allocate",
+          "count": 1
+        },
+        {
+          "op": "runtime.field.store",
+          "count": 8
+        },
+        {
+          "op": "runtime.array.reference.load",
+          "count": 4
+        },
+        {
+          "op": "runtime.field.load",
+          "count": 3
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": "5-DARWIN"
+        },
+        {
+          "op": "alu.add.u32",
+          "count": "2-DARWIN"
+        },
+        {
+          "op": "control.test.u32",
+          "count": 6
+        },
+        {
+          "op": "control.branch",
+          "count": 3
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(5-DARWIN)*C(atomic.load.u32)+(1)*C(runtime.object.allocate)+(8)*C(runtime.field.store)+(4)*C(runtime.array.reference.load)+(3)*C(runtime.field.load)+(5-DARWIN)*C(alu.imul.u32)+(2-DARWIN)*C(alu.add.u32)+(6)*C(control.test.u32)+(3)*C(control.branch)",
+        "parameters": {
+          "DARWIN": "1 for macOS, otherwise0. Four atomic loads for macOS and five Windows/Linux; six-worker Windows reporting therefore owns30loads."
+        },
+        "note": "Actual inline reporting callback; parent owns Array.from/callback construction. No E0 reporting or measured native-latency assumption."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-ready-callback>",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "<prepared-affinity-ready-callback>",
+      "scope": "cold-prepared-report-callback",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.imul.u32)+(1)*C(control.test.u32)",
+        "parameters": {},
+        "note": "Actual inline reporting callback; parent owns Array.from/callback construction. No E0 reporting or measured native-latency assumption."
+      }
+    },
+    {
+      "unit": "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-verified-callback>",
+      "source": "addons/rba-connect4-prepared-session-host.mjs",
+      "name": "<prepared-affinity-verified-callback>",
+      "scope": "cold-prepared-report-callback",
+      "status": "decomposed",
+      "operations": [
+        {
+          "op": "atomic.load.u32",
+          "count": 1
+        },
+        {
+          "op": "alu.imul.u32",
+          "count": 1
+        },
+        {
+          "op": "control.test.u32",
+          "count": 1
+        }
+      ],
+      "cycleCount": {
+        "kind": "symbolic",
+        "expression": "(1)*C(atomic.load.u32)+(1)*C(alu.imul.u32)+(1)*C(control.test.u32)",
+        "parameters": {},
+        "note": "Actual inline reporting callback; parent owns Array.from/callback construction. No E0 reporting or measured native-latency assumption."
+      }
     }
   ],
   "summary": {
-    "units": 647,
-    "decomposed": 647,
+    "units": 651,
+    "decomposed": 651,
     "legacySymbolicVisible": 0,
     "missing": 0,
     "neesBoundOperations": 11,
-    "localExtensionOperations": 106
+    "localExtensionOperations": 107
   },
   "neesOperationBindings": {
     "alu.add.u32": {
@@ -54961,7 +55139,8 @@
       "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-local32-partialMixed.mjs#<module-main>",
       "addons/rba-connect4-lazy-smp-worker-minimal-views-compiled-center-proofs-local32-partialMixed.mjs#<module-main>",
       "addons/isomax-memory-profile.mjs#discoverAvailableSolverMemory32",
-      "addons/isomax-memory-profile.mjs#estimateIsoMaxPreparationReserve32"
+      "addons/isomax-memory-profile.mjs#estimateIsoMaxPreparationReserve32",
+      "addons/rba-connect4-prepared-session-host.mjs#preparedConnect4SearchState32"
     ],
     "callbackTargets": {
       "prepareRemove": [
@@ -55046,6 +55225,18 @@
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeCompactSharedCacheCounted32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeDirectSharedCacheCounted32",
         "addons/rba-connect4-shared-exact-cache-layout.mjs#storeFullSpanSharedCacheCounted32"
+      ],
+      "addons/rba-connect4-prepared-session-host.mjs#<prepared-completion-callback>": [
+        "addons/rba-connect4-prepared-session-host.mjs#<prepared-completion-callback>"
+      ],
+      "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-callback>": [
+        "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-callback>"
+      ],
+      "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-ready-callback>": [
+        "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-ready-callback>"
+      ],
+      "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-verified-callback>": [
+        "addons/rba-connect4-prepared-session-host.mjs#<prepared-affinity-verified-callback>"
       ]
     },
     "invariant": "Every add-on unit transitively reachable from the Lazy-SMP Connect4 roots through CALL/CALLBACK edges must be decomposed; no runtime.legacy.addon.body is allowed, and every callback must resolve to concrete units or an explicitly disabled callback.",
