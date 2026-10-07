@@ -27,3 +27,12 @@ test('12GiB profile reproduces measured rows, private size and bank boundary wit
  const large=memory.selectIsoMaxMemoryProfile32({geometry,workers:6,availableBytes:256*GiB,cacheIdentity:'partial24'});
  assert.equal(large.profile.id,'128');assert.equal(large.sharedCacheCapacity,2**32);
 });
+
+test('automatic identity preserves custom split layouts and tiny native caches',()=>{
+ for(const config of [{localCacheLayout:'split'},{sharedCacheLayout:'split40'},
+  {sharedCacheLayout:'auto',sharedCacheCapacity:2**29},{sharedCacheCapacity:4},
+  {localCacheCapacity:2},{sharedBankCapacity:4}]){
+  assert.equal(memory.resolveIsoMaxCacheIdentity32({geometry,workers:2,...config}),'native32');
+  assert.throws(()=>memory.resolveIsoMaxCacheIdentity32({geometry,workers:2,...config,cacheIdentity:'partial24'}),RangeError);
+ }
+});
