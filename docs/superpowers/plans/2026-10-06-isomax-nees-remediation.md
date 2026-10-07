@@ -147,3 +147,19 @@ No implementation change may bypass the matched memory preflight.
  all four-worker cleanup succeeds. Same26positions, not78independentfixtures.
  No full10x10solve or sealed-holdout outcomes. Machine observation and limits
  preserved in Connect4 nees-final-numeric-code and current REPORT.md.
+
+## Completion boundary
+
+Scoped implementation steps1..11 are complete, with9..11 grouped under the
+owner clarification. Final whole-branch review and its single fix pass are
+complete. Correctness, generated code, matched full solves, source identity,
+remote durability and no remaining benchmark process were verified.
+
+Ruling: retain the existing work branch; no automatic main or frozen-package
+promotion, as specified at plan start. An immutable6792395 control checkout is
+retained at C:/r/jsminsys-nees-control-20261006 for identical reruns. Production
+rc.4 remains its separate historical freeze and is not advertised as remediated.
+The original audit packet stays historical; current REPORT/correctness/timing/
+debt dispositions own these results. OneDrive stays stopped per latest owner
+instruction. No deferred review minors. Whole-runtime native cycle qualification
+and remaining optimization debt are not declared solved.
