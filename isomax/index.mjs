@@ -3,10 +3,10 @@ import {readFileSync} from 'node:fs';
 import {prepareConnect4RbaGeometry} from './runtime/addons/rba-connect4-geometry.mjs';
 import {prepareLazySmpConnect4Rba32 as prepareRaw} from './runtime/addons/rba-connect4-prepared-session-host.mjs';
 import {discoverWorkerPlan} from './runtime/addons/worker-topology.mjs';
-import {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32,estimateIsoMaxPreparationReserve32} from './runtime/addons/isomax-memory-profile.mjs';
+import {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32,estimateIsoMaxPreparationReserve32,resolveIsoMaxCacheIdentity32} from './runtime/addons/isomax-memory-profile.mjs';
 import {prepareSharedCacheLayout,isCompactLayoutProfile8} from './runtime/addons/rba-connect4-shared-exact-cache-layout.mjs';
 export {discoverWorkerPlan};
-export {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32};
+export {ISOMAX_MEMORY_PROFILES,discoverAvailableSolverMemory32,selectIsoMaxMemoryProfile32,resolveIsoMaxCacheIdentity32};
 export {prepareConnect4RbaGeometry};
 export {evaluateConnect4RankLocalLanding32} from './runtime/addons/connect4-rank-local-presearch.mjs';
 export const profile=JSON.parse(readFileSync(new URL('./profile.json',import.meta.url),'utf8'));
@@ -24,22 +24,23 @@ export async function prepareLazySmpConnect4Rba32(options={}){
   memoryRequested=options.memoryProfile??profile.options.memoryProfile,
   custom=Object.hasOwn(options,'sharedCacheCapacity')||Object.hasOwn(options,'localCacheCapacity'),
   reserveBytes=estimateIsoMaxPreparationReserve32({...profile.options,...options,geometry,workers});
- let memoryPlan,config={...profile.options,...options,geometry,workers:workerPlan.workers,workerTargets:workerPlan.targets};
+ const cacheIdentity=resolveIsoMaxCacheIdentity32({...profile.options,...options,geometry,workers});
+ let memoryPlan,config={...profile.options,...options,geometry,cacheIdentity,workers:workerPlan.workers,workerTargets:workerPlan.targets};
  if(custom){
   if(memoryRequested!=='auto')throw RangeError('Choose a memory profile or explicit cache capacities');
-  const compact=isCompactLayoutProfile8(geometry,geometry.keyWords),layout=prepareSharedCacheLayout(geometry,geometry.keyWords);
+  const compact=isCompactLayoutProfile8(geometry,geometry.keyWords),layout=cacheIdentity==='partial24'?{entryBytes:24}:prepareSharedCacheLayout(geometry,geometry.keyWords);
   config={...profile.explicitCacheDefaults,...config};
   const native=config.sharedCacheLayout==='native'||(config.sharedCacheLayout==='auto'&&compact&&config.sharedCacheCapacity<=2**27),
    sharedBytes=config.sharedCacheCapacity*(native?layout.entryBytes:((compact?8:geometry.keyWords)+2)*4),
-   privateBytesPerWorker=config.localCacheCapacity*(config.localCacheLayout==='native'&&compact?32:(compact?8:geometry.keyWords)*4+1),
+   privateBytesPerWorker=config.localCacheCapacity*(cacheIdentity==='partial24'?24:config.localCacheLayout==='native'&&compact?32:(compact?8:geometry.keyWords)*4+1),
    requiredBytes=sharedBytes+workers*privateBytesPerWorker+reserveBytes;
   if(!Number.isSafeInteger(requiredBytes)||requiredBytes>snapshot.availableBytes)throw RangeError('Insufficient cache memory headroom');
-  memoryPlan=Object.freeze({profile:{id:'custom',status:'custom'},selection:'explicit-capacities',sharedCacheCapacity:config.sharedCacheCapacity,
+  memoryPlan=Object.freeze({profile:{id:'custom',status:'custom'},cacheIdentity,entryBytes:layout.entryBytes,selection:'explicit-capacities',sharedCacheCapacity:config.sharedCacheCapacity,
    localCacheCapacity:config.localCacheCapacity,sharedCacheLayout:config.sharedCacheLayout,localCacheLayout:config.localCacheLayout,
    sharedBytes,privateBytesPerWorker,privateBytes:workers*privateBytesPerWorker,reserveBytes,requiredBytes,availableBytes:snapshot.availableBytes,snapshot});
  }else{
   const selected=selectIsoMaxMemoryProfile32({geometry,workers,availableBytes:snapshot.availableBytes,requested:memoryRequested,
-   allowExperimental:options.allowExperimentalMemoryProfiles??true,reserveBytes});
+   allowExperimental:options.allowExperimentalMemoryProfiles??true,reserveBytes,cacheIdentity});
   memoryPlan=Object.freeze({...selected,snapshot});
   config={...config,sharedCacheCapacity:selected.sharedCacheCapacity,localCacheCapacity:selected.localCacheCapacity,
    sharedCacheLayout:selected.sharedCacheLayout,localCacheLayout:selected.localCacheLayout,sharedBankCapacity:selected.sharedBankCapacity};

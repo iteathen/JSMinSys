@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0-rc.4",
-  "sourceCommit": "40b19431f00174c5d52c442677d67ec698e8c50a",
+  "version": "0.2.0-rc.5",
+  "sourceCommit": "b7604c7dcca54fca362d630ed96c96410469e3e2",
   "options": {
     "workers": "auto",
     "workerMode": "minimal",
@@ -15,36 +15,46 @@
     "supportBasisViews": true,
     "timeoutMs": 600000,
     "initializationTimeoutMs": 120000,
-    "memoryProfile": "auto"
+    "memoryProfile": "auto",
+    "cacheIdentity": "auto"
   },
   "launchFlags": [
     "--max-inlined-bytecode-size=2400",
     "--max-inlined-bytecode-size-cumulative=9600"
   ],
   "measured": {
-    "workers": 4,
+    "workers": 6,
     "node": "v27.0.0-nightly20260928b59840b593",
     "v8": "14.6.202.34-node.36",
     "cpu": "Intel Core i5-12600K",
     "platform": "Windows x64",
-    "processAffinityMask": 85,
     "searchCpus": [
       0,
       2,
       4,
-      6
+      6,
+      8,
+      10
     ],
-    "primaryMeanMs": 53828.45145,
-    "finalConfirmationMs": 54155.658,
-    "peakRssBytes": 6913200128,
-    "compiledTransitionAuxiliaryBudgetBytes": 536870912,
-    "compiledTransitionBytes": 466948881,
-    "retainedSupportPlanBytes": 1323433629,
-    "primaryBoundary": "all ready and empty TT initialized -> actual empty root -> exact; cleanup separate",
+    "primaryMeanMs": 33245.44565,
+    "bestMs": 33162.6396,
+    "controlMeanMs": 34152.65045,
+    "processCpuMeanMs": 205750,
+    "peakRssBytes": 15663845376,
+    "sharedBytes": 12884901888,
+    "privateBytesPerWorker": 201326592,
+    "sharedCacheCapacity": 536870912,
+    "localCacheCapacity": 8388608,
+    "sharedBankEntries": 268435456,
+    "cacheIdentity": "partial24",
+    "runtimeFreeze": "1c7b64f352c2e44b4853f9faaf916b48d7837bce",
+    "primaryBoundary": "READY/pages initialized -> actual empty root construction -> exact result; cleanup separate",
     "goalMs": 10000,
-    "goalMet": false
+    "goalMet": false,
+    "sampleCount": 2,
+    "oneDrive": "stopped by owner instruction"
   },
-  "notes": "Direct empty-board solve, no RLC. Discover all available physical performance cores and largest fitting memory profile, including clearly labeled experimental16/32/64/128GiB.1/2/4/8GiB are tested profiles, scoped to recorded localhost evidence. Shared/private layouts adapt to geometry at initialization. All pinning and hot search semantics retained.",
+  "notes": "Cold automatic identity selects partial24 for admitted complete standard7x6 plans, otherwise native32/generic fallback. Discover physical cores and select largest fitting memory allocation.12GiB partial24 is localhost-qualified with6workers; other allocations/hardware retain their stated evidence limits. Experimental16..128 profiles remain auto-selectable.",
   "explicitCacheDefaults": {
     "sharedCacheCapacity": 134217728,
     "localCacheCapacity": 8388608

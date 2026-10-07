@@ -4,8 +4,8 @@ import {readFileSync,existsSync} from 'node:fs';
 const root=new URL('../isomax/',import.meta.url);
 test('package auto worker and memory defaults preserve the historical measured configuration',()=>{
  const pkg=JSON.parse(readFileSync(new URL('package.json',root))),p=JSON.parse(readFileSync(new URL('profile.json',root)));
- assert.equal(pkg.version,'0.2.0-rc.4');
- assert.equal(p.options.workers,'auto');assert.equal(p.measured.workers,4);assert.equal(p.options.workerMode,'minimal');
+ assert.equal(pkg.version,'0.2.0-rc.5');
+ assert.equal(p.options.workers,'auto');assert.equal(p.measured.workers,6);assert.equal(p.options.workerMode,'minimal');
  assert.equal(p.options.memoryProfile,'auto');
  assert.equal(Object.hasOwn(p.options,'sharedCacheCapacity'),false);assert.equal(Object.hasOwn(p.options,'localCacheCapacity'),false);
  assert.equal(p.explicitCacheDefaults.sharedCacheCapacity,134217728);assert.equal(p.explicitCacheDefaults.localCacheCapacity,8388608);

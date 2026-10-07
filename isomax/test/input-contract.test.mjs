@@ -20,7 +20,7 @@ test('packaged capacity guards reject unsupported views before allocating',async
       assert.throws(()=>createConnect4RbaSharedExactCache32({capacity,geometry,keyWords:geometry.keyWords}),RangeError);
     }
     // The total8GiB profile is valid, but a single8GiB leaf view is not.
-    await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,sharedCacheLayout:'native',sharedCacheCapacity:268435456,sharedBankCapacity:268435456}),RangeError);
+    await assert.rejects(()=>prepareLazySmpConnect4Rba32({geometry,cacheIdentity:'native32',sharedCacheLayout:'native',sharedCacheCapacity:268435456,sharedBankCapacity:268435456}),RangeError);
     assert.throws(()=>createConnect4RbaSharedLayoutCache32({capacity:268435456,bankCapacity:268435456,geometry,keyWords:geometry.keyWords}),RangeError);
     assert.equal(allocations,0);
   }finally{globalThis.SharedArrayBuffer=Native;}

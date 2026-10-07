@@ -231,9 +231,9 @@ function negamax(depth,src,supportHandle,n,mover,alpha,beta){
       const childReflected=connect4RbaCanonicalize(g,profile,words,dst,basis,ci,childN,coord);
       const childHandle=coord.map[0];
       frontChild(childHandle,0,depth+1);
-      value=negamax(depth+1,dst,childHandle,childN,mover^1,-beta,-alpha);
+      value=negamax(depth+1,dst,childHandle,childN,mover^1,(-beta)|0,(-alpha)|0);
       if(value===CANCELLED)return CANCELLED;
-      value=-value;
+      value=(-value)|0;
     }
 
     if(value>best){

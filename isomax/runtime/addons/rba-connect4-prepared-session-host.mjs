@@ -9,6 +9,7 @@ import {prepareSharedCacheLayout,createConnect4RbaSharedLayoutCache32} from './r
 import {prepareSupportBasisPlans32} from './rba-connect4-support-basis-plan.mjs';
 import {prepareSupportCompiledTransitions32} from './rba-connect4-support-compiled-transition.mjs';
 import {prepareBankedSharedCapacity32,sharedNativeBankCapacity32} from './rba-connect4-shared-banked-cache.mjs';
+import {createIndexPartialCache32,createMixedIndexPartialCache32,createBankedIndexPartialCache32} from './rba-connect4-index-partial-cache.mjs';
 
 const STOP=0,DONE=1,ERROR=2,WAKE=3,WINNER=4,STRIDE=4,
   WORKER_DIED=101,DEADLINE=102,CANCELLED=103;
@@ -17,7 +18,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   sharedCacheCapacity=65536,localCacheCapacity=65536,sharedSampleMask=0,
   timeoutMs=120000,signal,workerMode='minimal',rootFrontier=false,
   behaviorMemory=null,cpcFrontierResponse=false,cpcProjectedAdvisory=false,
-  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false,workerTargets=null,sharedBankCapacity=null}={}){
+  initializationTimeoutMs=30000,sharedCacheLayout='auto',sharedProofBounds=false,supportBasisPlanBudgetBytes=0,supportClosurePlan=false,supportReflectionPlan=false,localCacheLayout='split',supportBasisViews=false,workerTargets=null,sharedBankCapacity=null,cacheIdentity='native32'}={}){
   const initializationStarted=performance.now();
   if(!geometry)throw new TypeError('prepared Connect4 RBA geometry required');
   if(!Number.isSafeInteger(supportBasisPlanBudgetBytes)||supportBasisPlanBudgetBytes<0)throw new RangeError('invalid support-plan budget');
@@ -30,6 +31,8 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(!Number.isInteger(workers)||workers<2||workers>64)throw new RangeError('Lazy SMP requires at least two search workers');
   if(workerTargets!==null&&(!Array.isArray(workerTargets)||workerTargets.length!==workers))throw new RangeError('Invalid worker affinity target count');
   const compact=isCompactProfile8(geometry,geometry.keyWords),keyWords=compact?8:geometry.keyWords;
+  if(!['native32','partial24','partialMixed'].includes(cacheIdentity))throw RangeError('invalid TT identity experiment');
+  const partial=compact&&cacheIdentity!=='native32',mixed=partial&&cacheIdentity==='partialMixed',effectiveCacheIdentity=partial?cacheIdentity:'native32',partialEntryWords=6;
   if(localCacheLayout!=='split'&&localCacheLayout!=='native')throw new RangeError('invalid private TT layout');
   const localNative=localCacheLayout==='native'&&compact;
   if(localNative)validateConnect4CacheCapacity32(localCacheCapacity,16);
@@ -37,7 +40,10 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   // storage and valid larger capacities outside the native halfword-view bound.
   if(sharedCacheLayout==='auto')sharedCacheLayout=compact&&sharedCacheCapacity<=0x08000000?'native':'split40';
   if(sharedCacheLayout!=='split40'&&sharedCacheLayout!=='native')throw new RangeError('invalid shared TT layout');
-  const layout=sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
+  if(partial&&(!localNative||sharedCacheLayout!=='native'||sharedCacheCapacity<(mixed?16:8)||localCacheCapacity<(mixed?16:8)||
+    sharedCacheCapacity>(mixed?2**28:2**32)||(mixed&&sharedBankCapacity!==null)))
+    throw RangeError('partial TT requires native caches within admitted banks');
+  const layout=partial?{kind:cacheIdentity,entryBytes:partialEntryWords*4,entryWords:partialEntryWords}:sharedCacheLayout==='native'?prepareSharedCacheLayout(geometry,geometry.keyWords):null,
     sharedStride=layout===null?keyWords:layout.kind==='compact32'?16:
       layout.kind==='direct'?layout.heightStride:layout.entryWords;
   const banked=layout!==null&&(sharedBankCapacity!==null||sharedCacheCapacity>sharedNativeBankCapacity32(layout));
@@ -45,6 +51,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   if(banked){
     const limit=sharedNativeBankCapacity32(layout),capacity=sharedBankCapacity??limit;
     if(capacity>limit)throw RangeError('native TT bank index exceeds optimized range');
+    if(partial&&(mixed||capacity<8))throw RangeError('invalid partial TT bank range');
     prepareBankedSharedCapacity32(sharedCacheCapacity,capacity);
   }
   else validateConnect4CacheCapacity32(sharedCacheCapacity,sharedStride);
@@ -53,12 +60,17 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
      (sharedSampleMask&(sharedSampleMask+1)))throw new RangeError('invalid Lazy SMP shared sample mask');
   if(!Number.isFinite(timeoutMs)||timeoutMs<=0||!Number.isFinite(initializationTimeoutMs)||initializationTimeoutMs<=0)
     throw new RangeError('invalid Lazy SMP timeout');
-  if(supportBasisPlanBudgetBytes&&!signal?.aborted)geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
+  // Cooperative COLD deadline checks cannot preempt a synchronous initializer.
+  function preparedInitializationAllowed32(){
+    return !signal?.aborted&&performance.now()-initializationStarted<=initializationTimeoutMs;
+  }
+  if(supportBasisPlanBudgetBytes&&preparedInitializationAllowed32())geometry={...geometry,supportBasisPlans:prepareSupportBasisPlans32(geometry,supportBasisPlanBudgetBytes,supportClosurePlan,supportReflectionPlan)};
 
   const basisViews=supportBasisViews&&Boolean(geometry.supportBasisPlans?.closures&&geometry.supportBasisPlans?.mirrorMap);
   const transitionBudget=536870912,
-    transitionPlan=basisViews&&!signal?.aborted?prepareSupportCompiledTransitions32(geometry,geometry.supportBasisPlans,transitionBudget):null,
+    transitionPlan=basisViews&&preparedInitializationAllowed32()?prepareSupportCompiledTransitions32(geometry,geometry.supportBasisPlans,transitionBudget):null,
     compiledTransitions=transitionPlan!==null;
+  if(partial&&!compiledTransitions&&preparedInitializationAllowed32())throw RangeError('partial TT candidate requires admitted compiled support plans');
   if(compiledTransitions)geometry={...geometry,supportBasisPlans:transitionPlan};
   const control=new Int32Array(new SharedArrayBuffer(20)),
     resultWords=new Int32Array(new SharedArrayBuffer(workers*STRIDE*4)),
@@ -67,7 +79,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session=createManagedThreadSession32({control,stopIndex:STOP,doneIndex:DONE,errorIndex:ERROR,
       wakeIndex:WAKE,workerDiedCode:WORKER_DIED,deadlineCode:DEADLINE,cancelledCode:CANCELLED});
   control[WINNER]=-1;
-  let root=null,shared=null,workerGeometry=null,started=false,closed=false,closePromise=null,
+  let root=null,shared=null,workerGeometry=null,resourceMetadata=null,started=false,closed=false,closePromise=null,
     initializationFinished=null,solveStarted=null,solveFinished=null,cleanupStarted=null,cleanupFinished=null;
 
   async function closePreparedConnect4Search32(){
@@ -76,8 +88,14 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     if(started&&!Atomics.load(control,DONE)&&!Atomics.load(control,ERROR))session.fail(CANCELLED);
     closed=true;cleanupStarted=performance.now();
     Atomics.store(readyGate,1,-1);Atomics.notify(readyGate,1);
-    closePromise=session.close();
-    await closePromise;cleanupFinished=performance.now();
+    closePromise=releasePreparedConnect4Resources32();
+    await closePromise;
+  }
+  async function releasePreparedConnect4Resources32(){
+    await session.close();
+    resourceMetadata=preparedConnect4ResourceMetadata32();
+    root=null;shared=null;workerGeometry=null;geometry=null;
+    cleanupFinished=performance.now();
     signal?.removeEventListener('abort',abortPreparedConnect4Search32);
   }
   function abortPreparedConnect4Search32(){
@@ -85,9 +103,36 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
     session.fail(CANCELLED);void closePreparedConnect4Search32();
   }
   function preparedConnect4SearchState32(){return {...session.state(),readyWorkers:Atomics.load(readyGate,0),
-    searchStarted:started,closed,basisViews,compiledTransitions,
+    searchStarted:started,closed,basisViews,compiledTransitions,cacheIdentity:effectiveCacheIdentity,
     affinityReady:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)>0).every(Boolean),
     affinityVerified:affinityState!==null&&Array.from({length:workers},(_,i)=>Atomics.load(affinityState,i*3)===1).every(Boolean)};}
+  function preparedConnect4ResourceMetadata32(){
+    let cacheBytes=0;
+    if(shared!==null){
+      if(layout===null)cacheBytes=sharedViewBytes32(shared);
+      else if(shared.payloadBytes!=null)cacheBytes=shared.payloadBytes;
+      else if(shared.banks)for(const bank of shared.banks)cacheBytes+=bank.entries.byteLength;
+      else cacheBytes=shared.entries.byteLength;
+      if(layout!==null)cacheBytes+=shared.stats.byteLength+(mixed?12:0);
+    }
+    return {
+      sharedSampleMask,workerMode:'minimal',cacheIdentity:effectiveCacheIdentity,
+      sharedCacheLayout,sharedTtEntryBytes:mixed?null:layout===null?(keyWords+2)*4:layout.entryBytes,
+      sharedTtEntryWidths:mixed?[16,24]:null,sharedTtPayloadBytes:shared?.payloadBytes??shared?.entries?.byteLength??null,
+      sharedTtLogicalEntries:mixed?shared?.logicalEntries:sharedCacheCapacity,sharedTtPools:mixed?2:1,
+      sharedTtBanks:shared?.banks?.length??1,sharedTtBankEntries:shared?.banks?.[0]?.mask===undefined?null:shared.banks[0].mask+1,
+      sharedProofBounds,basisViews,compiledTransitions,supportTransitionPlanBudgetBytes:transitionBudget,
+      supportTransitionPlanBytes:geometry.supportBasisPlans?.transitionPlanBytes??0,
+      supportTransitionWorkingBytes:geometry.supportBasisPlans?.transitionWorkingBytes??0,
+      localCacheLayout:localNative?'native':'split',privateTtEntryBytes:mixed?null:partial?partialEntryWords*4:localNative?32:keyWords*4+1,
+      privateTtEntryWidths:mixed?[16,24]:null,privateTtPayloadBytes:mixed?localCacheCapacity*28:null,
+      privateTtLogicalEntries:mixed?localCacheCapacity*1.5:localCacheCapacity,
+      supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
+      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
+      sharedBytes:cacheBytes+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
+        control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
+        (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
+  }
   function materializePreparedConnect4SearchResult32(reflected=0){
     const host=session.state(),winner=Atomics.load(control,WINNER),errorCode=host.errorCode,
       exact=!errorCode&&Atomics.load(control,DONE)===1&&winner>=0;
@@ -96,15 +141,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
       move:exact?Atomics.load(resultWords,winner*STRIDE+2):-1,winner,winnerMetrics:null,
       nodeCounts:null,workerTiming:null,frontierMetrics:null,
       sharedCacheHits:null,sharedCacheStores:null,sharedCacheStoreContention:null,
-      sharedSampleMask,workerMode:'minimal',
-      sharedCacheLayout,sharedTtEntryBytes:layout===null?(keyWords+2)*4:layout.entryBytes,
-      sharedTtBanks:shared?.banks?.length??1,sharedTtBankEntries:shared?.banks?.[0]?.mask===undefined?null:shared.banks[0].mask+1,
-      sharedProofBounds,basisViews,compiledTransitions,supportTransitionPlanBudgetBytes:transitionBudget,
-      supportTransitionPlanBytes:geometry.supportBasisPlans?.transitionPlanBytes??0,
-      supportTransitionWorkingBytes:geometry.supportBasisPlans?.transitionWorkingBytes??0,
-      localCacheLayout:localNative?'native':'split',privateTtEntryBytes:localNative?32:keyWords*4+1,
-      supportBasisPlanBytes:geometry.supportBasisPlans?.bytes??0,supportBasisPlanProfiles:geometry.supportBasisPlans?.profiles??0,
-      supportClosurePlan:Boolean(geometry.supportBasisPlans?.closures),supportReflectionPlan:Boolean(geometry.supportBasisPlans?.mirrorMap),supportPlanWorkingBytes:geometry.supportBasisPlans?.workingBytes??0,
+      ...(resourceMetadata??preparedConnect4ResourceMetadata32()),
       completedWorkers:Array.from({length:workers},(_,i)=>Atomics.load(resultWords,i*STRIDE+3)),
       reflected,elapsedMs:performance.now()-initializationStarted,
       readyWorkers:Atomics.load(readyGate,0),
@@ -121,9 +158,7 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
         affinityTagStatus:workerTargets[i].platform==='darwin'?Atomics.load(affinityState,i*3+1):null,
         group:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+1),
         cpu:workerTargets[i].platform==='darwin'?null:Atomics.load(affinityState,i*3+2)})),
-      sharedBytes:(shared===null?0:layout===null?sharedViewBytes32(shared):(shared.banks?shared.banks.reduce((bytes,bank)=>bytes+bank.entries.byteLength,0):shared.entries.byteLength)+shared.stats.byteLength)+(workerGeometry===null?0:sharedViewBytes32(workerGeometry))+(geometry.supportBasisPlans?.bytes??0)+
-        control.byteLength+resultWords.byteLength+readyGate.byteLength+(affinityState?.byteLength??0)+
-        (root===null?0:root.words.byteLength+root.basis.byteLength+root.moveHistory.byteLength)};
+    };
   }
   async function solvePreparedConnect4Search32(moves){
     if(started)throw new Error('prepared search session is one-shot; already started');
@@ -147,18 +182,26 @@ export async function prepareLazySmpConnect4Rba32({geometry,workers=2,
   try{
     if(signal?.aborted){abortPreparedConnect4Search32();await closePreparedConnect4Search32();initializationFinished=performance.now();return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};}
     signal?.addEventListener('abort',abortPreparedConnect4Search32,{once:true});
+    if(!preparedInitializationAllowed32()){
+      session.fail(DEADLINE);await closePreparedConnect4Search32();initializationFinished=performance.now();
+      return {solve:solvePreparedConnect4Search32,close:closePreparedConnect4Search32,state:preparedConnect4SearchState32};
+    }
     root={words:new Uint32Array(new SharedArrayBuffer(geometry.keyWords*4)),
       basis:new Uint32Array(new SharedArrayBuffer(geometry.maxBasis*4)),
       moveHistory:new Uint32Array(new SharedArrayBuffer(geometry.cellCount*4)),reflected:0};
     workerGeometry=shareConnect4RbaGeometry32(geometry);
-    shared=(layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry,bankCapacity:sharedBankCapacity});
+    shared=mixed?createMixedIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true}):partial?
+      (banked?createBankedIndexPartialCache32({geometry,capacity:sharedCacheCapacity,bankCapacity:sharedBankCapacity??2**28}):
+       createIndexPartialCache32({geometry,capacity:sharedCacheCapacity,shared:true,kind:cacheIdentity})):
+      (layout===null?createConnect4RbaSharedExactCache32:createConnect4RbaSharedLayoutCache32)({capacity:sharedCacheCapacity,keyWords:geometry.keyWords,geometry,bankCapacity:sharedBankCapacity});
     if(sharedProofBounds)shared.proofDomain='absolute-wdl-zero-v1';
     if(layout===null){shared.sequence.fill(0);shared.value.fill(0);shared.keys.fill(0);}
     else if(shared.banks)for(const bank of shared.banks)bank.entries.fill(0);
     else shared.entries.fill(0);
     for(let i=0;i<workers;i+=1){
+     if(!preparedInitializationAllowed32()){session.fail(signal?.aborted?CANCELLED:DEADLINE);break;}
      const file=new URL('./rba-connect4-lazy-smp-worker-minimal'+(basisViews?(compiledTransitions?'-views-compiled':'-views'):'')+
-      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+'.mjs',import.meta.url);
+      (i&1?'':'-center')+(sharedProofBounds?'-proofs':'')+(localNative?'-local32':'')+(partial?'-'+cacheIdentity:'')+'.mjs',import.meta.url);
      session.spawn(workerTargets===null?file:new URL('./worker-startup-affinity.mjs',import.meta.url),{
       control,resultWords,workerIndex:i,workerCount:workers,geometry:workerGeometry,
       root,rootReflected:0,sharedExactCache:shared,localCacheCapacity,sharedSampleMask,readyGate,

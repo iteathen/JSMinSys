@@ -1,0 +1,45 @@
+{
+  "testedProducer": "d12d6d798b18c66c7ca2d1ee913cb2166089cc0f",
+  "runtimeIdenticalTo": "1c7b64f352c2e44b4853f9faaf916b48d7837bce",
+  "fullTestSuite": {
+    "passed": 490,
+    "failed": 0,
+    "skipped": 1,
+    "skipReason": "GC exposure required; targeted GC test separately passes"
+  },
+  "targetedGcAndLayoutTests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "geometryBoundaryShapes": 100,
+  "ledgerUnits": 651,
+  "costGraphEnforcedUnits": 573,
+  "oracle": [
+    {
+      "file": "oracle-native32.json",
+      "sha256": "f4c4d645744f285dc70ae73b2405024650238179b651f108a80678552795a7e8",
+      "cases": 26,
+      "oracleMemoNodes": 1340,
+      "exactAndWitnessMatch": true,
+      "allWorkersExited": true
+    },
+    {
+      "file": "oracle-partial24-banked.json",
+      "sha256": "ee3a6a0ee32ded2c0370f30d41ce15050e27c6b2fc7d2c3806c7033674159ba2",
+      "cases": 26,
+      "oracleMemoNodes": 1340,
+      "exactAndWitnessMatch": true,
+      "allWorkersExited": true
+    },
+    {
+      "file": "oracle-partialMixed.json",
+      "sha256": "ec9d52df62b36126558d208c801c9e663375bb0f6918ce50a8e9683e6cedc0f9",
+      "cases": 26,
+      "oracleMemoNodes": 1340,
+      "exactAndWitnessMatch": true,
+      "allWorkersExited": true
+    }
+  ],
+  "holdoutOutcomesAccessed": false,
+  "full10x10Solve": false
+}
